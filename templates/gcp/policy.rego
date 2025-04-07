@@ -1,6 +1,6 @@
 package terraform.gcp.security.<service>.<resource_type>.<policy_name> # Edit here 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.storage.bucket.vars
+import data.terraform.gcp.security.<service>.<resource_type>.vars
 
 attribute_path := "" # Edit here (eg., "storage_class")
 compliant_values := [
