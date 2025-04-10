@@ -44,6 +44,7 @@ array_contains(arr, elem) if {
 # Format violation messages
 get_violations(resource_type, attribute_path, compliant_values, friendly_resource_name) = violations if { 
     is_array(compliant_values)
+    is_string(attribute_path)
     violations := 
     [msg |
     nc_resources := get_nc_resources(resource_type, attribute_path, compliant_values)
@@ -56,6 +57,7 @@ get_violations(resource_type, attribute_path, compliant_values, friendly_resourc
 
 get_violations(resource_type, attribute_path, compliant_values, friendly_resource_name) = violations if { 
     is_boolean(compliant_values)
+    is_string(attribute_path)
     violations := 
     [msg |
     nc_resources := get_nc_resources(resource_type, attribute_path, compliant_values)
@@ -65,6 +67,33 @@ get_violations(resource_type, attribute_path, compliant_values, friendly_resourc
         ) 
     ]
 }
+# Overloaded this method to accept an array as 
+get_violations(resource_type, attribute_path, compliant_values, friendly_resource_name) = violations if { 
+    is_array(compliant_values)
+    is_array(attribute_path)
+    violations := 
+    [msg |
+    nc_resources := get_nc_resources(resource_type, attribute_path, compliant_values)
+    msg := sprintf(
+    "%s '%s' uses unapproved %s: '%s'",
+    [friendly_resource_name, nc_resources[_].values.name, array.reverse(attribute_path)[0], object.get(nc_resources[_].values, attribute_path, null)]
+    )
+    ]
+}
+
+get_violations(resource_type, attribute_path, compliant_values, friendly_resource_name) = violations if { 
+    is_boolean(compliant_values)
+    is_array(attribute_path)
+    violations := 
+    [msg |
+    nc_resources := get_nc_resources(resource_type, attribute_path, compliant_values)
+        msg := sprintf(
+        "%s '%s' has '%s' set to '%s'. It should be set to '%s'",
+        [friendly_resource_name, nc_resources[_].values.name, array.reverse(attribute_path)[0], object.get(nc_resources[_].values, attribute_path, null), compliant_values]
+        ) 
+    ]
+}
+
 
 # Summary output
 get_summary(resource_type, attribute_path, compliant_values, friendly_resource_name) = summary if {
