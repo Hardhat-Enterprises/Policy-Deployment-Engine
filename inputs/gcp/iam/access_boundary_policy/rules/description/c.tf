@@ -5,10 +5,10 @@ resource "google_iam_access_boundary_policy" "c" {
     name = "abp-c"
     parent = ""
     rules {
-      description = ""
+      description = "change me"
       access_boundary_rule {
         available_resource = "*"
-        available_permissions = []
+        available_permissions = [""]
         availability_condition {
           expression = ""
           title = ""
