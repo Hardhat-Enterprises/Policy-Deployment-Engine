@@ -3,6 +3,7 @@
 
 resource "google_privateca_certificate_authority" "c" {
     pool = "ca-pool"
+    project = "PDE-project"
     location = "us-central1"
     certificate_authority_id = "test_ca"
     deletion_protection = true
