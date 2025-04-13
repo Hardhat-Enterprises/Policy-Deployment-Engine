@@ -41,7 +41,6 @@ This branch of the project provides automated compliance enforcement for Terrafo
 - Python 3.8+
 - Terraform installed and accessible via CLI
 - OPA installed (`opa eval` must be available)
-- `gcloud` CLI installed and authenticated (`gcloud auth application-default login`)
 
 ## ⚙️ Setup Instructions
 
