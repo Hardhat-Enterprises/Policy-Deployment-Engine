@@ -1,50 +1,73 @@
-🕒 retention Policy – GCP Backup Vault Compliance
-This policy ensures that all GCP Backup Vaults (google_backup_dr_backup_vault) enforce a minimum retention duration of exactly 86400s (24 hours). This prevents backups from being deleted too soon and supports data retention policies required for compliance and disaster recovery.
+# 🕒 Retention Policy – GCP Backup Vault Compliance
 
-📂 Location
-Policy File: policies/gcp/backupdr/vault/retention/policy.rego
+This policy ensures that all Google Cloud Platform (GCP) Backup Vaults (`google_backup_dr_backup_vault`) are configured with a minimum retention duration of exactly 86400 seconds (24 hours). This helps prevent accidental or premature deletion of backups, supporting essential data retention requirements for compliance and effective disaster recovery strategies.
 
-Vars File: policies/gcp/backupdr/vault/retention/vars.rego
+## 📂 Policy Structure
 
-Terraform Plan Input: inputs/gcp/backupdr/vault/retention/plan.json
+This policy is organized within the following directory structure:
 
-✅ Compliance Rule
-Each GCP Backup Vault must have:
+```
+policies/gcp/backupdr/vault/retention/
+├── policy.rego  # The main Rego policy file
+└── vars.rego    # Variable definitions for the policy
+inputs/gcp/backupdr/vault/retention/
+└── plan.json    # Example Terraform plan input file
+```
 
-hcl
-Copy
-Edit
-backup_minimum_enforced_retention_duration = "86400s"
-📜 What the Policy Checks
-All resources of type google_backup_dr_backup_vault.
+## ✅ Compliance Requirement
 
-For each resource, whether the backup_minimum_enforced_retention_duration attribute is exactly "86400s".
+A GCP Backup Vault is considered compliant if its `backup_minimum_enforced_retention_duration` attribute is set to `"86400s"`.
 
-Flags any backup vaults with an incorrect retention value.
+```hcl
+# Example of a compliant configuration
+resource "google_backup_dr_backup_vault" "compliant_vault" {
+  # ... other configurations ...
+  backup_minimum_enforced_retention_duration = "86400s"
+}
+```
 
-🛠️ How to Run the Policy
-Use the following command to evaluate compliance:
+## 📜 What This Policy Checks
 
-bash
-Copy
-Edit
-opa eval \
-  --data ./policies/gcp \
-  --input ./inputs/gcp/backupdr/vault/retention/plan.json \
-  --format pretty \
-  "data.terraform.gcp.security.backupdr.vault.retention.summary.message"
-🧾 Example Output
-arduino
-Copy
-Edit
+This policy examines all resources of type `google_backup_dr_backup_vault` within your Terraform plan. For each Backup Vault, it verifies that the value of the `backup_minimum_enforced_retention_duration` attribute is exactly `"86400s"`. Any Backup Vault found with a different retention duration will be flagged as non-compliant.
+
+## 🛠️ How to Evaluate Compliance
+
+To check your Terraform plan against this policy, use the Open Policy Agent (OPA) command-line tool. Ensure you have OPA installed.
+
+1.  Navigate to the root directory of your policy repository.
+2.  Execute the following command:
+
+    ```bash
+    opa eval \
+      --data ./policies/gcp \
+      --input ./inputs/gcp/backupdr/vault/retention/plan.json \
+      --format pretty \
+      "data.terraform.gcp.security.backupdr.vault.retention.summary.message"
+    ```
+
+    * `--data ./policies/gcp`: Specifies the directory containing your policy files.
+    * `--input ./inputs/gcp/backupdr/vault/retention/plan.json`: Points to your Terraform plan file in JSON format.
+    * `--format pretty`: Formats the output for better readability.
+    * `"data.terraform.gcp.security.backupdr.vault.retention.summary.message"`: Specifies the Rego path to evaluate, which will output the summary message.
+
+## 🧾 Example Output
+
+Here's an example of the output you might see when running the policy against a Terraform plan:
+
+```
 [
   "Total GCP Backup Vaults found: 2",
   "Non-compliant GCP Backup Vaults: 1/2",
   "GCP Backup Vault 'backup-vault-nc' uses unapproved backup minimum enforced retention duration: '3600s'"
 ]
-🔍 Why This Policy Matters
-Data Protection: Ensures backups are retained for a safe minimum period.
+```
 
-Disaster Recovery: Protects against accidental early deletion of data.
+In this example, the policy found two GCP Backup Vaults. One vault (`backup-vault-nc`) was found to be non-compliant because its `backup_minimum_enforced_retention_duration` was set to `3600s` instead of the required `86400s`.
 
-Compliance: Aligns with organizational policies for data retention and security.
+## 🔍 Why This Policy is Important
+
+* **Ensures Data Protection:** By enforcing a minimum retention period, this policy helps safeguard your valuable backup data from accidental or premature deletion.
+* **Supports Disaster Recovery:** Maintaining backups for a sufficient duration is crucial for effective disaster recovery planning and execution.
+* **Aids Compliance Efforts:** Many regulatory frameworks and organizational policies mandate specific data retention periods. This policy helps ensure your GCP Backup Vault configurations align with these requirements.
+
+By implementing and regularly running this policy, you can maintain a secure and compliant backup infrastructure on GCP.
