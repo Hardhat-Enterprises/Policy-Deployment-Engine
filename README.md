@@ -36,6 +36,30 @@ This branch of the project provides automated compliance enforcement for Terrafo
 │   └── policy_document.md                 # Human-readable policy summary
 ```
 
+## ⚙️ Setup Instructions
+
+1. Clone the repository:
+   ```bash
+   git clone <your-repo-url>
+   cd <repo-name>
+   ```
+
+2. Add your GCP service account key to:
+   ```bash
+   secrets/credentials.json
+   ```
+
+3. Edit infrastructure configuration:
+   ```bash
+   inputs/gcp/terraform.tfvars
+   ```
+
+4. Run the automation script:
+   ```bash
+   cd scripts/
+   python3 Automation_terraform_with_OPA.py
+   ```
+
 ---
 
 ## 🔐 Enforced Policies
@@ -72,6 +96,21 @@ Example:
 ❌ VM series must be e2-*
 ❌ Region must be australia-southeast1 or southeast2
 ```
+```bash
+📄 Terraform Plan Summary:
+
+No changes. Your infrastructure matches the configuration.
+
+Terraform has compared your real infrastructure against your configuration and found no differences.
+
+⚠️ Are you sure you want to apply this infrastructure? (yes/no): no
+
+```
+
+
+## 📜 Policy Enforcement
+
+All policies are written in [Rego](https://www.openpolicyagent.org/docs/latest/policy-language/) and stored under `policies/gcp/compute/*`. These are automatically evaluated using OPA.
 
 ---
 
@@ -97,3 +136,7 @@ To add a new policy:
 ## 👤 Author
 
 Chathura Dandeniya
+
+## 📄 License
+
+This project is for academic and learning purposes.
