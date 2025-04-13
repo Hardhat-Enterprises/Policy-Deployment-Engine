@@ -36,6 +36,13 @@ This branch of the project provides automated compliance enforcement for Terrafo
 │   └── policy_document.md                 # Human-readable policy summary
 ```
 
+## 🛠 Prerequisites
+
+- Python 3.8+
+- Terraform installed and accessible via CLI
+- OPA installed (`opa eval` must be available)
+- `gcloud` CLI installed and authenticated (`gcloud auth application-default login`)
+
 ## ⚙️ Setup Instructions
 
 1. Clone the repository:
@@ -126,10 +133,10 @@ To add a new policy:
 
 ## 🧠 Smart Features
 
-- 🧠 Dynamic `project_id` injection from credentials
-- 🔄 Modular Rego policy structure
-- 💥 Apply blocked on policy violation
-- 📦 Self-organizing folder structure
+- 🧠 Automatically injects `project_id` from `credentials.json`
+- 📦 Modular and scalable Rego policy structure
+- ❌ Prevents apply if policy violations are detected
+- 🗂️ Organized directory structure with environment separation
 
 ---
 
