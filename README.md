@@ -1,1 +1,148 @@
-# Policy-Deployment-Engine
+
+# 🚀 Terraform + OPA Policy Enforcement with Dynamic GCP Context
+
+This branch of the project provides automated compliance enforcement for Terraform plans using Open Policy Agent (OPA). Policies are modular, cloud-aware, and dynamically injected with GCP context (like `project_id`) extracted from a service account JSON file.
+
+---
+
+## 🔍 What This Project Does
+
+- Parses Terraform plans (`terraform plan`)
+- Dynamically injects `project_id` from `credentials.json`
+- Validates against custom OPA policies written in Rego
+- Blocks infrastructure changes if any policy violations occur
+- Generates a human-readable compliance report
+
+---
+
+## 📁 Project Structure
+
+```bash
+.
+├── scripts/
+│   └── Automation_terraform_with_OPA.py   # Main Python automation script
+├── inputs/
+│   └── gcp/
+│       ├── main.tf                        # Terraform config
+│       ├── terraform.tfvars               # Variable values (updated automatically)
+│       └── plans/                         # tfplan binary & json outputs
+├── policies/
+│   └── gcp/
+│       └── compute/                       # All Rego policy modules
+├── secrets/
+│   └── credentials.json                   # GCP service account credentials
+├── docs/
+│   └── compliance_report.txt              # Output compliance report
+│   └── policy_document.md                 # Human-readable policy summary
+```
+
+## 🛠 Prerequisites
+
+- Python 3.8+
+- Terraform installed and accessible via CLI
+- OPA installed (`opa eval` must be available)
+
+## ⚙️ Setup Instructions
+
+1. Clone the repository:
+   ```bash
+   git clone <your-repo-url>
+   cd <repo-name>
+   ```
+
+2. Add your GCP service account key to:
+   ```bash
+   secrets/credentials.json
+   ```
+
+3. Edit infrastructure configuration:
+   ```bash
+   inputs/gcp/terraform.tfvars
+   ```
+
+4. Run the automation script:
+   ```bash
+   cd scripts/
+   python3 Automation_terraform_with_OPA.py
+   ```
+
+---
+
+## 🔐 Enforced Policies
+
+| Policy             | Description                                                 |
+|--------------------|-------------------------------------------------------------|
+| Disk Size          | Boot disk must not exceed 20 GB                             |
+| Zone Restriction   | Only zones in southeast Australia are allowed               |
+| Machine Type       | Only shared-core and standard machines are permitted        |
+| OS Type            | Only CentOS and Debian OS images are allowed                |
+| VM Series          | Only `e2-` series VMs are accepted                          |
+| Region Restriction | Only southeast Australian regions (`australia-southeast1/2`) |
+
+---
+
+## ⚙️ How It Works
+
+1. Reads `project_id` from `secrets/credentials.json`
+2. Injects/updates it into `inputs/gcp/terraform.tfvars`
+3. Runs `terraform plan` and exports a JSON plan
+4. Validates the plan using OPA against Rego policies
+5. Applies infrastructure **only if all policies pass**
+
+---
+
+## 📄 Compliance Report
+
+Each run generates:
+- `docs/compliance_report.txt`: Shows policy pass/fail breakdown
+
+Example:
+```
+✅ Disk size compliant
+❌ VM series must be e2-*
+❌ Region must be australia-southeast1 or southeast2
+```
+```bash
+📄 Terraform Plan Summary:
+
+No changes. Your infrastructure matches the configuration.
+
+Terraform has compared your real infrastructure against your configuration and found no differences.
+
+⚠️ Are you sure you want to apply this infrastructure? (yes/no): no
+
+```
+
+
+## 📜 Policy Enforcement
+
+All policies are written in [Rego](https://www.openpolicyagent.org/docs/latest/policy-language/) and stored under `policies/gcp/compute/*`. These are automatically evaluated using OPA.
+
+---
+
+## 🧩 Extending the Policy Engine
+
+To add a new policy:
+1. Add a `.rego` file inside the appropriate folder under `policies/gcp/compute/`
+2. Ensure it has a `deny[msg]` rule
+3. Import it in `main.rego` and update the `import data...` path
+4. Add an entry to the `policies = {}` dictionary in the Python script
+
+---
+
+## 🧠 Smart Features
+
+- 🧠 Automatically injects `project_id` from `credentials.json`
+- 📦 Modular and scalable Rego policy structure
+- ❌ Prevents apply if policy violations are detected
+- 🗂️ Organized directory structure with environment separation
+
+---
+
+## 👤 Author
+
+Chathura Dandeniya
+
+## 📄 License
+
+This project is for academic and learning purposes.
