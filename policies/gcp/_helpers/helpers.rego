@@ -44,27 +44,60 @@ array_contains(arr, elem) if {
 # Format violation messages
 get_violations(resource_type, attribute_path, compliant_values, friendly_resource_name) = violations if { 
     is_array(compliant_values)
+    is_string(attribute_path)
     violations := 
     [msg |
     nc_resources := get_nc_resources(resource_type, attribute_path, compliant_values)
+    this_nc_resource = nc_resources[_] # for some nc resource
     msg := sprintf(
     "%s '%s' uses unapproved %s: '%s'",
-    [friendly_resource_name, nc_resources[_].values.name, replace(attribute_path, "_", " "), object.get(nc_resources[_].values, attribute_path, null)]
+    [friendly_resource_name, this_nc_resource.values.name, replace(attribute_path, "_", " "), object.get(this_nc_resource.values, attribute_path, null)]
     )
     ]
 }
 
 get_violations(resource_type, attribute_path, compliant_values, friendly_resource_name) = violations if { 
     is_boolean(compliant_values)
+    is_string(attribute_path)
     violations := 
     [msg |
     nc_resources := get_nc_resources(resource_type, attribute_path, compliant_values)
+    this_nc_resource = nc_resources[_] # for some nc resource
         msg := sprintf(
         "%s '%s' has '%s' set to '%s'. It should be set to '%s'",
-        [friendly_resource_name, nc_resources[_].values.name, replace(attribute_path, "_", " "), object.get(nc_resources[_].values, attribute_path, null), compliant_values]
+        [friendly_resource_name, this_nc_resource.values.name, replace(attribute_path, "_", " "), object.get(this_nc_resource.values, attribute_path, null), compliant_values]
         ) 
     ]
 }
+# Overloaded this method to accept an array as 
+get_violations(resource_type, attribute_path, compliant_values, friendly_resource_name) = violations if { 
+    is_array(compliant_values)
+    is_array(attribute_path)
+    violations := 
+    [msg |
+    nc_resources := get_nc_resources(resource_type, attribute_path, compliant_values)
+    this_nc_resource = nc_resources[_] # for some nc resource
+    msg := sprintf(
+    "%s '%s' uses unapproved %s: '%s'",
+    [friendly_resource_name, this_nc_resource.values.name, array.reverse(attribute_path)[0], object.get(this_nc_resource.values, attribute_path, null)]
+    )
+    ]
+}
+
+get_violations(resource_type, attribute_path, compliant_values, friendly_resource_name) = violations if { 
+    is_boolean(compliant_values)
+    is_array(attribute_path)
+    violations := 
+    [msg |
+    nc_resources := get_nc_resources(resource_type, attribute_path, compliant_values)
+    this_nc_resource = nc_resources[_] # for some nc resource
+        msg := sprintf(
+        "%s '%s' has '%s' set to '%s'. It should be set to '%s'",
+        [friendly_resource_name, this_nc_resource.values.name, array.reverse(attribute_path)[0], object.get(this_nc_resource.values, attribute_path, null), compliant_values]
+        ) 
+    ]
+}
+
 
 # Summary output
 get_summary(resource_type, attribute_path, compliant_values, friendly_resource_name) = summary if {
@@ -80,4 +113,24 @@ get_summary(resource_type, attribute_path, compliant_values, friendly_resource_n
         violations 
     ) 
 }
+}
+get_multi_summary(resource_type, compliance_conditions, friendly_resource_name) = summary if {
+    all_resources := get_all_resources(resource_type)
+    violations := [
+        msg |
+        condition := compliance_conditions[_]
+        attr := condition.attribute_path
+        val := condition.compliant_values
+        vs := get_violations(resource_type, attr, val, friendly_resource_name)
+        msg := vs[_]
+    ]
+    summary := {
+        "message": array.concat(
+            [
+                sprintf("Total %s detected: %d", [friendly_resource_name, count(all_resources)]),
+                sprintf("Non-compliant %s: %d/%d", [friendly_resource_name, count(violations), count(all_resources)])
+            ],
+            violations
+        )
+    }
 }
