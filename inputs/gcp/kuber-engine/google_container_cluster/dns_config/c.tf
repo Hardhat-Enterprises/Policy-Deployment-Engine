@@ -1,6 +1,25 @@
 # Describe your resource type here
 # Keep "c" as the name to indicate that this resource and its attributes are compliant
 
-resource "RESOURCE TYPE" "c" {
+resource "dns_config" "c" {
+
+    name     = "gke-policy-cluster"
+  location = "AU"
+
+resource "dns_config" "c" {
+  name     = "gke-policy-cluster"
+  location = "AU"
+
+  dns_config {
+    additive_vpc_scope_dns_domain = "gke.internal.com"
+    cluster_dns                   = "CLOUD_DNS"
+    cluster_dns_scope             = "VPC_SCOPE"
+    cluster_dns_domain            = "cluster.local"
+  }
+
+  gateway_api_config {
+    channel = "CHANNEL_STANDARD"
+  }
+}
 
 }
