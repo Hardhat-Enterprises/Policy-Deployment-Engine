@@ -1,6 +1,6 @@
-package terraform.gcp.security.compute.google_container_cluster.Private_cluster_config # Edit here 
+package terraform.gcp.security.kuber_engin.google_container_cluster.Private_cluster_config # Edit here 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.compute.google_container_cluster.vars
+import data.terraform.gcp.security.kuber_engin.google_container_cluster.vars
 
 
 compliance_conditions := [
