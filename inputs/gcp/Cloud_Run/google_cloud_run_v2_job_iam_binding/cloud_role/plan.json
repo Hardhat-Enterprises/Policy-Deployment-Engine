@@ -1,0 +1,146 @@
+{
+    "format_version": "1.2",
+    "terraform_version": "1.11.4",
+    "planned_values": {
+        "root_module": {}
+    },
+    "configuration": {
+        "provider_config": {
+            "google": {
+                "name": "google",
+                "full_name": "registry.terraform.io/hashicorp/google",
+                "version_constraint": "6.8.0"
+            }
+        },
+        "root_module": {
+            "resources": [
+                {
+                    "address": "google_cloud_run_v2_job.c",
+                    "mode": "managed",
+                    "type": "google_cloud_run_v2_job",
+                    "name": "c",
+                    "provider_config_key": "google",
+                    "expressions": {
+                        "location": {
+                            "constant_value": "AU"
+                        },
+                        "name": {
+                            "constant_value": "cloud_run_iam_job-c"
+                        },
+                        "template": [
+                            {
+                                "template": [
+                                    {
+                                        "containers": [
+                                            {
+                                                "image": {
+                                                    "constant_value": "gcr.io/example/image"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "schema_version": 0
+                },
+                {
+                    "address": "google_cloud_run_v2_job.nc",
+                    "mode": "managed",
+                    "type": "google_cloud_run_v2_job",
+                    "name": "nc",
+                    "provider_config_key": "google",
+                    "expressions": {
+                        "location": {
+                            "constant_value": "AU"
+                        },
+                        "name": {
+                            "constant_value": "cloud_run_iam_job-nc"
+                        },
+                        "template": [
+                            {
+                                "template": [
+                                    {
+                                        "containers": [
+                                            {
+                                                "image": {
+                                                    "constant_value": "gcr.io/example/image"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "schema_version": 0
+                },
+                {
+                    "address": "google_cloud_run_v2_job_iam_binding.c",
+                    "mode": "managed",
+                    "type": "google_cloud_run_v2_job_iam_binding",
+                    "name": "c",
+                    "provider_config_key": "google",
+                    "expressions": {
+                        "location": {
+                            "references": [
+                                "google_cloud_run_v2_job.c.location",
+                                "google_cloud_run_v2_job.c"
+                            ]
+                        },
+                        "members": {
+                            "constant_value": [
+                                "serviceAccount:secure-user@your-project-id.iam.gserviceaccount.com"
+                            ]
+                        },
+                        "name": {
+                            "references": [
+                                "google_cloud_run_v2_job.c.name",
+                                "google_cloud_run_v2_job.c"
+                            ]
+                        },
+                        "role": {
+                            "constant_value": "roles/run.invoker"
+                        }
+                    },
+                    "schema_version": 0
+                },
+                {
+                    "address": "google_cloud_run_v2_job_iam_binding.nc",
+                    "mode": "managed",
+                    "type": "google_cloud_run_v2_job_iam_binding",
+                    "name": "nc",
+                    "provider_config_key": "google",
+                    "expressions": {
+                        "location": {
+                            "references": [
+                                "google_cloud_run_v2_job.nc.location",
+                                "google_cloud_run_v2_job.nc"
+                            ]
+                        },
+                        "members": {
+                            "constant_value": [
+                                "allUsers"
+                            ]
+                        },
+                        "name": {
+                            "references": [
+                                "google_cloud_run_v2_job.nc.name",
+                                "google_cloud_run_v2_job.nc"
+                            ]
+                        },
+                        "role": {
+                            "constant_value": "roles/owner"
+                        }
+                    },
+                    "schema_version": 0
+                }
+            ]
+        }
+    },
+    "timestamp": "2025-04-21T05:48:10Z",
+    "applyable": false,
+    "complete": false,
+    "errored": true
+}
