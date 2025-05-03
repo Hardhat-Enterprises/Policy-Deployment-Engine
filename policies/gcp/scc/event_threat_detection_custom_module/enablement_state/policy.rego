@@ -1,7 +1,6 @@
-package terraform.gcp.security.security_command_center.event_threat_detection_custom_module.enablement_state
+package terraform.gcp.security.scc.event_threat_detection_custom_module.enablement_state
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.scc.event_threat_detection.vars
-
+import data.terraform.gcp.security.scc.event_threat_detection_custom_module.vars
 
 
 # STEP 1: STUDY YOUR RESOURCE AND ITS ATTRIBUTES, THEN FILL IN THE VARS FILE
@@ -9,13 +8,13 @@ import data.terraform.gcp.security.scc.event_threat_detection.vars
 # STEP 2: CREATE SCENARIOS (can be simple (one condition) or complex (multiple linked conditions) )
 conditions := [
     [
-    {"situation_description" : "A self documenting message about the conditions within",
+    {"situation_description" : "enablement_state must be ENABLE",
     "remedies":[ "Something that fixes the issues in this situation","You can have multiple items in the array"]},
     {
         "condition": "Check if the resource is in a specific state",
         "attribute_path" : ["enablement_state"], # An array of strings and indicies eg. ["rsa",0,"key"]
-        "values" : "ENABLE", # Values to compare against
-        "policy_type" : "blacklist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
+        "values" : "ENABLED", # Values to compare against
+        "policy_type" : "whitelist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
     }
     ]
 ]
