@@ -44,6 +44,7 @@ array_contains(arr, elem) if {
 # Format violation messages
 get_violations(resource_type, attribute_path, compliant_values, friendly_resource_name) = violations if { 
     is_array(compliant_values)
+    is_string(attribute_path)
     violations := 
     [msg |
     nc_resources := get_nc_resources(resource_type, attribute_path, compliant_values)
@@ -56,6 +57,7 @@ get_violations(resource_type, attribute_path, compliant_values, friendly_resourc
 
 get_violations(resource_type, attribute_path, compliant_values, friendly_resource_name) = violations if { 
     is_boolean(compliant_values)
+    is_string(attribute_path)
     violations := 
     [msg |
     nc_resources := get_nc_resources(resource_type, attribute_path, compliant_values)
@@ -65,6 +67,33 @@ get_violations(resource_type, attribute_path, compliant_values, friendly_resourc
         ) 
     ]
 }
+
+get_violations(resource_type, attribute_path, compliant_values, friendly_resource_name) = violations if { 
+    is_array(compliant_values)
+    is_array(attribute_path)
+    violations := 
+    [msg |
+    nc_resources := get_nc_resources(resource_type, attribute_path, compliant_values)
+    msg := sprintf(
+    "%s '%s' uses unapproved %s: '%s'",
+    [friendly_resource_name, nc_resources[_].values.name, concat(".", get_attribute_path(attribute_path)), object.get(nc_resources[_].values, attribute_path, null)]
+    )
+    ]
+}
+
+get_violations(resource_type, attribute_path, compliant_values, friendly_resource_name) = violations if { 
+    is_boolean(compliant_values)
+    is_array(attribute_path)
+    violations := 
+    [msg |
+    nc_resources := get_nc_resources(resource_type, attribute_path, compliant_values)
+        msg := sprintf(
+        "%s '%s' has '%s' set to '%s'. It should be set to '%s'",
+        [friendly_resource_name, nc_resources[_].values.name, concat(".", get_attribute_path(attribute_path)), object.get(nc_resources[_].values, attribute_path, null), compliant_values]
+        ) 
+    ]
+}
+
 
 # Summary output
 get_summary(resource_type, attribute_path, compliant_values, friendly_resource_name) = summary if {
@@ -80,4 +109,22 @@ get_summary(resource_type, attribute_path, compliant_values, friendly_resource_n
         violations 
     ) 
 }
+}
+
+# Converts each entry in attribute path into a string
+get_attribute_path(attribute_path) = result if {
+    is_array(attribute_path)
+    result := [ val |
+        x := attribute_path[_]
+        val := convert_value(x)
+  ]
+}
+
+convert_value(x) = string if {
+  type_name(x) == "number"
+  string := sprintf("[%v]", [x])
+}
+
+convert_value(x) = x if {
+  type_name(x) == "string"
 }
