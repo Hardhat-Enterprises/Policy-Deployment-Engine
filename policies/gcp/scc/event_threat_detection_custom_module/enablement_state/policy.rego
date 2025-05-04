@@ -9,11 +9,11 @@ import data.terraform.gcp.security.scc.event_threat_detection_custom_module.vars
 conditions := [
     [
     {"situation_description" : "enablement_state must be ENABLE",
-    "remedies":[ "Something that fixes the issues in this situation","You can have multiple items in the array"]},
+    "remedies":[ "enablement_state in event threat detection custom module should be ENABLED"]},
     {
         "condition": "Check if the resource is in a specific state",
         "attribute_path" : ["enablement_state"], # An array of strings and indicies eg. ["rsa",0,"key"]
-        "values" : "ENABLED", # Values to compare against
+        "values" : ["ENABLED"], # Values to compare against
         "policy_type" : "whitelist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
     }
     ]
