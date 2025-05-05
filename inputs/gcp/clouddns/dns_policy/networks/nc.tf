@@ -3,8 +3,8 @@
 
 resource "google_dns_policy" "nc" {
     name = "networks"
-    project = "network_policy"
-    networks{
-        network_url = ""
+    project = "dns_polices"
+    networks {
+      network_url = ""
     }
 }
