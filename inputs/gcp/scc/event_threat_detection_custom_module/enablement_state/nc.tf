@@ -18,5 +18,4 @@ resource "google_scc_event_threat_detection_custom_module" "nc" {
     })
     enablement_state = "DISABLED"
 
-
 }
