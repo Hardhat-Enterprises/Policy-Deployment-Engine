@@ -10,7 +10,7 @@ resource "google_cloudbuildv2_connection" "nc" {
   github_config {
     app_installation_id = "12345678"
     authorizer_credential {
-      oauth_token_secret_version = "hardcoded-token-value"  # ❌ Not from Secret Manager
+      oauth_token_secret_version = "hardcoded-token-value"  #  Not from Secret Manager
     }
   }
 }

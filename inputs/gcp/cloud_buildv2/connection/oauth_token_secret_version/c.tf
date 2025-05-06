@@ -10,7 +10,7 @@ resource "google_cloudbuildv2_connection" "c" {
   github_config {
     app_installation_id = "12345678"
     authorizer_credential {
-      oauth_token_secret_version = "projects/demo/secrets/github-token/versions/1"  # ✅ Uses Secret Manager
+      oauth_token_secret_version = "projects/demo/secrets/github-token/versions/1"  #  Uses Secret Manager
     }
   }
 }
