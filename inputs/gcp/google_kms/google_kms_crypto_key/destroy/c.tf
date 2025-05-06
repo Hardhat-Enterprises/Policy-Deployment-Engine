@@ -1,0 +1,11 @@
+# Describe your resource type here
+# Keep "c" as the name to indicate that this resource and its attributes are compliant
+
+resource "google_kms_crypto_key" "c" {
+    name            = "compliant-key"
+    key_ring        = "example-key-ring"
+    purpose         = "ENCRYPT_DECRYPT"  # Compliant: purpose is set as approved
+    destroy_scheduled_duration = "2592000s"   # Compliant: set to the default 30 days
+
+
+}
