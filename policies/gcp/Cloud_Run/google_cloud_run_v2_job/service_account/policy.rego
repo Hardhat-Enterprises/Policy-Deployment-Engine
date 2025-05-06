@@ -1,10 +1,22 @@
-package terraform.gcp.security.Cloud_Run.google_cloud_run_v2_job.service_account # Edit here 
+package terraform.gcp.security.Cloud_Run.google_cloud_run_v2_job.service_account
+
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.Cloud_Run.google_cloud_run_v2_job.vars
 
-attribute_path := "template.template.service_account" # Edit here (eg., "storage_class")
-compliant_values := [
-    "cloud-run-sa@your-project-id.iam.gserviceaccount.com"
+conditions := [
+  [
+    {
+      "situation_description": "Job is missing a service account",
+      "remedies": ["Specify a secure, least-privilege service account using the 'service_account' attribute"]
+    },
+    {
+      "condition": "Ensure 'service_account' is not missing or empty",
+      "attribute_path": ["template", "template", "service_account"],
+      "values": ["", null],
+      "policy_type": "blacklist"
+    }
+  ]
 ]
 
-summary := helpers.get_summary(vars.resource_type, attribute_path, compliant_values, vars.friendly_resource_name)
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

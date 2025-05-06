@@ -1,6 +1,3 @@
-# Describe your resource type here
-# Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
-
 resource "google_cloud_run_v2_job" "nc" {
   name     = "cloud_run_secret-nc"
   location = "AU"
@@ -12,7 +9,7 @@ resource "google_cloud_run_v2_job" "nc" {
 
         env {
           name  = "DB_PASSWORD"
-          value = "hardcoded-password"  
+          value = "hardcoded-password"
         }
       }
     }

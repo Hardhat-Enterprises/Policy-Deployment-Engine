@@ -1,10 +1,22 @@
-package terraform.gcp.security.Cloud_Run.google_cloud_run_v2_service.deletion_protection # Edit here 
+package terraform.gcp.security.Cloud_Run.google_cloud_run_v2_service.deletion_protection
+
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.Cloud_Run.google_cloud_run_v2_service.vars
 
-attribute_path := ["expressions","name"]
-compliant_values := [
-    "cloud_run_service-c"
+conditions := [
+  [
+    {
+      "situation_description": "Cloud Run service does not have deletion protection enabled",
+      "remedies": ["Add 'lifecycle.prevent_destroy = true' to prevent accidental deletion"]
+    },
+    {
+      "condition": "Ensure 'prevent_destroy' is true",
+      "attribute_path": ["lifecycle", "prevent_destroy"],
+      "values": [true],
+      "policy_type": "whitelist"
+    }
+  ]
 ]
 
-summary := helpers.get_summary(vars.resource_type, attribute_path, compliant_values, vars.friendly_resource_name)
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details
