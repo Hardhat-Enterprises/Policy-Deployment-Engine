@@ -4,6 +4,14 @@
 resource "google_kms_crypto_key" "nc" {
     name            = "non-compliant-key"
     key_ring        = "example-key-ring"
-    purpose         = "ENCRYPT_DECRYPT"  # Non-compliant: purpose must be "ENCRYPT_DECRYPT"
+    purpose         = "ASYMMETRIC_DECRYPT"  # Non-compliant: purpose must be "ENCRYPT_DECRYPT"
     rotation_period = "100000s"
+}
+
+# NC #2: signing key missing the required label
+resource "google_kms_crypto_key" "nc2" {
+  name     = "nc-missing-label"
+  key_ring = "example-key-ring"
+  purpose  = "ASYMMETRIC_SIGN"      
+  # no `signing = "true"` label → violation
 }

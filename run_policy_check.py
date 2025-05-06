@@ -62,7 +62,7 @@ def main():
       #  sys.exit(1)
 
     # Construct OPA query and command for later use
-    opa_query = f"data.terraform.gcp.security.{service_name}.{resource}.{attribute}.summary.message"
+    opa_query = f"data.terraform.gcp.security.{service_name}.{resource}.{attribute}.message"
     opa_cmd = f'opa eval --data "{policies_dir}" --input "{plan_path}" --format pretty "{opa_query}"'
 
     # Prepare the commands dictionary (these commands can be re-run if desired)

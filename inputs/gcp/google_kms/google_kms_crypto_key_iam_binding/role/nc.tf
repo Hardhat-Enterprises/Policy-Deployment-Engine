@@ -1,9 +1,19 @@
-# nc.tf - Non-compliant configuration sample for google_kms_crypto_key_iam
+# nc.tf - Non-compliant configurations for google_kms_crypto_key_iam_binding
 
-resource "google_kms_crypto_key_iam_binding" "nc" {
+# Violation 1: Role is NOT whitelisted
+resource "google_kms_crypto_key_iam_binding" "nc_1" {
   crypto_key_id = "projects/my-project/locations/global/keyRings/my-keyring/cryptoKeys/my-key"
-  role          = "roles/owner"  # Unapproved role, this should trigger the policy
+  role          = "roles/owner"  #  Not in whitelist
   members       = [
     "user:unauthorized@example.com"
+  ]
+}
+
+# Violation 2: Admin role used with a user (not service account)
+resource "google_kms_crypto_key_iam_binding" "nc_2" {
+  crypto_key_id = "projects/my-project/locations/global/keyRings/my-keyring/cryptoKeys/my-key"
+  role          = "roles/cloudkms.admin"  # Admin role
+  members       = [
+    "user:admin-user@example.com"  #  Should be a serviceAccount
   ]
 }
