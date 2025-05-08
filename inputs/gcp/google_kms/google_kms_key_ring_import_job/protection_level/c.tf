@@ -1,0 +1,9 @@
+# Describe your resource type here
+# Keep "c" as the name to indicate that this resource and its attributes are compliant
+
+resource "google_kms_key_ring_import_job" "c" {
+  import_job_id    = "valid-job-01"                             # matches regex
+  key_ring         = "projects/my-project/locations/global/keyRings/my-ring"
+  import_method    = "RSA_OAEP_4096_SHA256_AES_256"
+  protection_level = "HSM"                                       # whitelisted
+}
