@@ -17,8 +17,5 @@ resource "google_vmwareengine_network_peering" "nc" {
     vmware_engine_network = google_vmwareengine_network.network-peering-nw_nc.id
     peer_network = google_vmwareengine_network.network-peering-peer-nw_nc.id
     peer_network_type = "THIRD_PARTY_SERVICE"
-    export_custom_routes = false
-    import_custom_routes = false
-    export_custom_routes_with_public_ip = false
-    import_custom_routes_with_public_ip = false
+    import_custom_routes_with_public_ip = true
 }

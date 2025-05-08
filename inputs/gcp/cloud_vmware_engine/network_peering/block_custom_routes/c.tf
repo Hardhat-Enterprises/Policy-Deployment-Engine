@@ -13,12 +13,9 @@ resource "google_vmwareengine_network" "network-peering-peer-nw" {
 }
 resource "google_vmwareengine_network_peering" "c" {
     name = "sample-network-peering-c"
-    description = "Sample description"
+
     vmware_engine_network = google_vmwareengine_network.network-peering-nw.id
     peer_network = google_vmwareengine_network.network-peering-peer-nw.id
     peer_network_type = "VMWARE_ENGINE_NETWORK"
-    export_custom_routes = false
-    import_custom_routes = false
-    export_custom_routes_with_public_ip = false
     import_custom_routes_with_public_ip = false
 }

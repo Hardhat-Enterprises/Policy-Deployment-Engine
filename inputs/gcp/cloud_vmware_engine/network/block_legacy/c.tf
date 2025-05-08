@@ -3,7 +3,7 @@
 
 resource "google_vmwareengine_network" "c" {
   project     = google_project_service.acceptance.project
-  name        = "us-west1-default" #Legacy network IDs are in the format: {region-id}-default
+  name        = "australia-southeast2-c-default" #Legacy network IDs are in the format: {region-id}-default
   location    = "australia-southeast2"
   type        = "STANDARD"
   description = "VMwareEngine legacy network sample"
