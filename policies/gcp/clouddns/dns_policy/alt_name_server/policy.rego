@@ -9,7 +9,7 @@ conditions := [
     [
         {
             "situation_description" : "Alternative server",
-            "remedies": ["Allows use of an alternative server if needed"]
+            "remedies": ["Allows use of a single alternative server if needed"]
         },
         {
             "condition": "Use alt server if main is unavailable",

@@ -11,8 +11,8 @@ conditions := [
     "remedies":[ "Something that fixes the issues in this situation","You can have multiple items in the array"]},
     {
         "condition": "A message about what the condition does",
-        "attribute_path" : [], # An array of strings and indicies eg. ["rsa",0,"key"]
-        "values" : [], # Values to compare against
+        "attribute_path" : [""], # An array of strings and indicies eg. ["rsa",0,"key"]
+        "values" : [""], # Values to compare against
         "policy_type" : "" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
     }
     ]

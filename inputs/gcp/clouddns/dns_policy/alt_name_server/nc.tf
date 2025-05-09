@@ -7,7 +7,7 @@ resource "google_dns_policy" "nc" {
 
     alternative_name_server_config {
         target_name_servers {
-        ipv4_address = "139.0.0.1"
+        ipv4_address = ""
         }
     }
 }
