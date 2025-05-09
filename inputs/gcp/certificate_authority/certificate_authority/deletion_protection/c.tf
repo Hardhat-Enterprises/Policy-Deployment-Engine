@@ -5,7 +5,7 @@ resource "google_privateca_certificate_authority" "c" {
     pool = "ca-pool"
     project = "PDE-project"
     location = "us-central1"
-    certificate_authority_id = "test_ca"
+    certificate_authority_id = "c"
     deletion_protection = true
     config {
         subject_config {
@@ -33,6 +33,6 @@ resource "google_privateca_certificate_authority" "c" {
     lifetime = "${10 * 365 * 24 * 3600}s"
     key_spec {
             algorithm = ""
-        }    
+        }
     
 }
