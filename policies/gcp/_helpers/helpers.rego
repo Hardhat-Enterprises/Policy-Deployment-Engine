@@ -2,6 +2,7 @@ package terraform.gcp.helpers
 # Defines the types of policies capable of being processed
 policy_types := ["blacklist", "whitelist", "range", "pattern blacklist", "pattern whitelist"]
 
+####################################################
 
 # Generic helper functions:
 
