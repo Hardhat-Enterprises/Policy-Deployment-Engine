@@ -1,17 +1,21 @@
+# 🚀 Policy Deployment Engine
 
-# 🚀 Terraform + OPA Policy Enforcement with Dynamic GCP Context
+## 📘 Project Overview
 
-This branch of the project provides automated compliance enforcement for Terraform plans using Open Policy Agent (OPA). Policies are modular, cloud-aware, and dynamically injected with GCP context (like `project_id`) extracted from a service account JSON file.
+**Policy Deployment Engine** is an automated framework for validating Google Cloud Platform (GCP) infrastructure-as-code (IaC) configurations. It combines **Terraform**, **Open Policy Agent (OPA)**, and **Rego** to enforce compliance, security policies, and naming conventions across cloud deployments.
+
+By converting Terraform plans to JSON and evaluating them against custom-defined Rego policies, this engine standardizes cloud infrastructure and integrates seamlessly into CI/CD pipelines.
 
 ---
 
-## 🔍 What This Project Does
+## ⚙️ Technologies Used
 
-- Parses Terraform plans (`terraform plan`)
-- Dynamically injects `project_id` from `credentials.json`
-- Validates against custom OPA policies written in Rego
-- Blocks infrastructure changes if any policy violations occur
-- Generates a human-readable compliance report
+- **Terraform** – Define and provision infrastructure using declarative configuration.
+- **Open Policy Agent (OPA)** – General-purpose policy engine for compliance enforcement.
+- **Rego** – Policy definition language used with OPA.
+- **GCP (Google Cloud Platform)** – Target environment for infrastructure validation.
+- **JSON** – Terraform plans are rendered as JSON for policy evaluation.
+- **Shell / CLI** – Used to execute Terraform and OPA workflows.
 
 ---
 
@@ -19,130 +23,82 @@ This branch of the project provides automated compliance enforcement for Terrafo
 
 ```bash
 .
-├── scripts/
-│   └── Automation_terraform_with_OPA.py   # Main Python automation script
 ├── inputs/
+│   ├── aws/
+│   ├── azure/
 │   └── gcp/
-│       ├── main.tf                        # Terraform config
-│       ├── terraform.tfvars               # Variable values (updated automatically)
-│       └── plans/                         # tfplan binary & json outputs
+│       └── compute/instance/
+│           ├── boot_disk/
+│           ├── deletion_protection/
+│           ├── desired_status/
+│           ├── interface/
+│           ├── machine_type/
+│           └── zone/
+│       └── endpoints/service/
+│           └── service_name/
+
 ├── policies/
+│   ├── aws/
+│   ├── azure/
 │   └── gcp/
-│       └── compute/                       # All Rego policy modules
-├── secrets/
-│   └── credentials.json                   # GCP service account credentials
-├── docs/
-│   └── compliance_report.txt              # Output compliance report
-│   └── policy_document.md                 # Human-readable policy summary
+│       ├── _helpers/
+│       ├── compute/instance/
+│       │   ├── boot_disk/
+│       │   ├── deletion_protection/
+│       │   ├── desired_status/
+│       │   ├── interface/
+│       │   ├── machine_type/
+│       │   └── zone/
+│       └── endpoints/service/
+│           └── service_name/
+
+├── templates/
+├── .gitignore
+└── README.md
 ```
 
-## 🛠 Prerequisites
-
-- Python 3.8+
-- Terraform installed and accessible via CLI
-- OPA installed (`opa eval` must be available)
-
-## ⚙️ Setup Instructions
-
-1. Clone the repository:
-   ```bash
-   git clone <your-repo-url>
-   cd <repo-name>
-   ```
-
-2. Add your GCP service account key to:
-   ```bash
-   secrets/credentials.json
-   ```
-
-3. Edit infrastructure configuration:
-   ```bash
-   inputs/gcp/terraform.tfvars
-   ```
-
-4. Run the automation script:
-   ```bash
-   cd scripts/
-   python3 Automation_terraform_with_OPA.py
-   ```
+Each subdirectory under `inputs/gcp/compute/instance/` contains:
+- `c.tf` – Compliant Terraform configuration
+- `nc.tf` – Non-compliant Terraform configuration
+- `plan.json` – Terraform plan output in JSON format
 
 ---
 
-## 🔐 Enforced Policies
+## 🚀 How to Run
 
-| Policy             | Description                                                 |
-|--------------------|-------------------------------------------------------------|
-| Disk Size          | Boot disk must not exceed 20 GB                             |
-| Zone Restriction   | Only zones in southeast Australia are allowed               |
-| Machine Type       | Only shared-core and standard machines are permitted        |
-| OS Type            | Only CentOS and Debian OS images are allowed                |
-| VM Series          | Only `e2-` series VMs are accepted                          |
-| Region Restriction | Only southeast Australian regions (`australia-southeast1/2`) |
+### 1. Generate a Terraform Plan
 
----
-
-## ⚙️ How It Works
-
-1. Reads `project_id` from `secrets/credentials.json`
-2. Injects/updates it into `inputs/gcp/terraform.tfvars`
-3. Runs `terraform plan` and exports a JSON plan
-4. Validates the plan using OPA against Rego policies
-5. Applies infrastructure **only if all policies pass**
-
----
-
-## 📄 Compliance Report
-
-Each run generates:
-- `docs/compliance_report.txt`: Shows policy pass/fail breakdown
-
-Example:
-```
-✅ Disk size compliant
-❌ VM series must be e2-*
-❌ Region must be australia-southeast1 or southeast2
-```
 ```bash
-📄 Terraform Plan Summary:
-
-No changes. Your infrastructure matches the configuration.
-
-Terraform has compared your real infrastructure against your configuration and found no differences.
-
-⚠️ Are you sure you want to apply this infrastructure? (yes/no): no
-
+terraform init
+terraform plan -out=plan
+terraform show -json plan > plan.json
 ```
 
+### 2. Evaluate Using OPA
 
-## 📜 Policy Enforcement
+```bash
+opa eval \
+  --data policies/gcp \
+  --input inputs/gcp/compute/instance/<policy_name>/plan.json \
+  --format pretty \
+  "data.terraform.gcp.compute.instance.<policy_name>.message"
+```
 
-All policies are written in [Rego](https://www.openpolicyagent.org/docs/latest/policy-language/) and stored under `policies/gcp/compute/*`. These are automatically evaluated using OPA.
-
----
-
-## 🧩 Extending the Policy Engine
-
-To add a new policy:
-1. Add a `.rego` file inside the appropriate folder under `policies/gcp/compute/`
-2. Ensure it has a `deny[msg]` rule
-3. Import it in `main.rego` and update the `import data...` path
-4. Add an entry to the `policies = {}` dictionary in the Python script
+💡 Replace `<policy_name>` with one of:
+boot_disk, deletion_protection, desired_status, interface, machine_type, zone, etc.
 
 ---
 
-## 🧠 Smart Features
+## 📋 Example Policy Use Cases
 
-- 🧠 Automatically injects `project_id` from `credentials.json`
-- 📦 Modular and scalable Rego policy structure
-- ❌ Prevents apply if policy violations are detected
-- 🗂️ Organized directory structure with environment separation
+- ✅ Ensure `boot_disk.auto_delete` is set correctly
+- ✅ Validate `deletion_protection` is enabled for production VMs
+- ✅ Enforce `desired_status` is not TERMINATED
+- ✅ Check that the `zone` aligns with organizational policy
+- ✅ Verify `interface.network` and other interface settings
+- ✅ Confirm naming patterns for `service_name` in Cloud Endpoints
 
 ---
 
 ## 👤 Author
-
 Chathura Dandeniya
-
-## 📄 License
-
-This project is for academic and learning purposes.
