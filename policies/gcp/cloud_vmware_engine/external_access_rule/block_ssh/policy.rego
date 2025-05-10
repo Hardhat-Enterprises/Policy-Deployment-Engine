@@ -1,19 +1,34 @@
-package terraform.gcp.security.cloud_vmware_engine.network_peering.block_custom_routes # Edit here 
+package terraform.gcp.security.cloud_vmware_engine.external_access_rule.block_ssh # Edit here 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.cloud_vmware_engine.network_peering.vars
+import data.terraform.gcp.security.cloud_vmware_engine.external_access_rule.vars
 
 
 
 conditions := [
     [
-    {"situation_description" : "Custom routes with public ip should be blocked",
-    "remedies":[ "Set public ip to false for custom routes"]},
+    {"situation_description" : "ip range is too broad",
+    "remedies":[ "Set  ip range for required ips and make sure that all ports are not opened"]},
     {
-        "condition": "c1 Custom routes with public ip is blocked",
-        "attribute_path" : ["import_custom_routes_with_public_ip"], # An array of strings and indicies eg. ["rsa",0,"key"]
-        "values" : [false], # Values to compare against
-        "policy_type" : "whitelist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
+        "condition": "c1 0.0.0.0/0 not allowed",
+        "attribute_path" : ["source_ip_ranges",0,"ip_address_range"], # An array of strings and indicies eg. ["rsa",0,"key"]
+        "values" : ["0.0.0.0/0"], # Values to compare against
+        "policy_type" : "blacklist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
+    },
+
+        {
+        "condition": "c2 valid for tcp or udp",
+        "attribute_path" : ["ip_protocol"], # An array of strings and indicies eg. ["rsa",0,"key"]
+        "values" : ["TCP","UDP"], # Values to compare against
+        "policy_type" : "blacklist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
+    },
+
+    {
+        "condition": "c3 check if all ports are open",
+        "attribute_path" : ["source_ports",0], # An array of strings and indicies eg. ["rsa",0,"key"]
+        "values" : ["*"], # Values to compare against
+        "policy_type" : "blacklist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
     }
+
     ]
 ]
 
