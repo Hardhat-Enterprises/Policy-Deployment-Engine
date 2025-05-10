@@ -8,6 +8,6 @@ resource "google_healthcare_dataset" "nc" {
     project = "project" 
     
     encryption_spec {
-    kms_key_name = ""
+    kms_key_name = "wrong_key"
   }
 }
