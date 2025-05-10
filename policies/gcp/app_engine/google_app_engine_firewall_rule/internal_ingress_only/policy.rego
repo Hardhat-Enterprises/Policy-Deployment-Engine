@@ -1,7 +1,7 @@
-package terraform.gcp.security.app_engine.internal_ingress_only
+package terraform.gcp.security.app_engine.google_app_engine_firewall_rule.internal_ingress_only
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.app_engine.internal_ingress_only.vars
+import data.terraform.gcp.security.app_engine.google_app_engine_firewall_rule.internal_ingress_only.vars
 
 # Only allow internal IP ranges (e.g. 10.0.0.0/8, 192.168.0.0/16) and deny everything else.
 

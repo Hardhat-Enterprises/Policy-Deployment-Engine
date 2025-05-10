@@ -1,7 +1,7 @@
-package terraform.gcp.security.app_engine.region_restriction
+package terraform.gcp.security.app_engine.google_app_engine_application.region_restriction
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.app_engine.region_restriction.vars
+import data.terraform.gcp.security.app_engine.google_app_engine_application.region_restriction.vars
 
 # Enforce use of only approved regions (e.g., us-central, europe-west, etc.)
 # Disallow deployment to unapproved or global/multi-region locations

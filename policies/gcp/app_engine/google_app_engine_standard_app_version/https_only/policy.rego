@@ -1,7 +1,7 @@
-package terraform.gcp.security.app_engine.https_only
+package terraform.gcp.security.app_engine.google_app_engine_standard_app_version.https_only
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.app_engine.https_only.vars
+import data.terraform.gcp.security.app_engine.google_app_engine_standard_app_version.https_only.vars
 
 conditions := [
   [

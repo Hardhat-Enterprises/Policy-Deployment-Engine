@@ -1,7 +1,7 @@
-package terraform.gcp.security.app_engine.no_default_service_account
+package terraform.gcp.security.app_engine.google_app_engine_standard_app_version.no_default_service_account
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.app_engine.no_default_service_account.vars
+import data.terraform.gcp.security.app_engine.google_app_engine_standard_app_version.no_default_service_account.vars
 
 # Enforce use of custom service accounts, not the default App Engine SA
 # The default App Engine SA usually follows the format: PROJECT_ID@appspot.gserviceaccount.com

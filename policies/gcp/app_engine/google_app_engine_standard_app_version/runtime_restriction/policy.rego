@@ -1,7 +1,7 @@
-package terraform.gcp.security.app_engine.runtime_restriction
+package terraform.gcp.security.app_engine.google_app_engine_standard_app_version.runtime_restriction
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.app_engine.runtime_restriction.vars
+import data.terraform.gcp.security.app_engine.google_app_engine_standard_app_version.runtime_restriction.vars
 
 # Allow only a defined set of secure/approved runtimes
 # For example: python39, nodejs18, go119, etc.

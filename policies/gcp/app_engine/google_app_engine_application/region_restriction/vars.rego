@@ -1,4 +1,4 @@
-package terraform.gcp.security.app_engine.region_restriction.vars
+package terraform.gcp.security.app_engine.google_app_engine_application.region_restriction.vars
 
 variables := {
   "friendly_resource_name": "App Engine Application",

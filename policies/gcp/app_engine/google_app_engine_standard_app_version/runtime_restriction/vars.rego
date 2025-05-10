@@ -1,4 +1,4 @@
-package terraform.gcp.security.app_engine.runtime_restriction.vars
+package terraform.gcp.security.app_engine.google_app_engine_standard_app_version.runtime_restriction.vars
 
 variables := {
   "friendly_resource_name": "App Engine Standard App Version",

@@ -1,7 +1,7 @@
-package terraform.gcp.security.app_engine.env_vars_encrypted
+package terraform.gcp.security.app_engine.google_app_engine_standard_app_version.env_vars_encrypted
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.app_engine.env_vars_encrypted.vars
+import data.terraform.gcp.security.app_engine.google_app_engine_standard_app_version.env_vars_encrypted.vars
 
 conditions := [
   [

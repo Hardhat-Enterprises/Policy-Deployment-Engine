@@ -1,4 +1,4 @@
-package terraform.gcp.security.app_engine.https_only.vars
+package terraform.gcp.security.app_engine.google_app_engine_standard_app_version.https_only.vars
 
 variables := {
     "friendly_resource_name": "App Engine Inbound Services",
