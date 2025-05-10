@@ -3,9 +3,6 @@ package terraform.gcp.helpers
 policy_types := ["blacklist", "whitelist", "range", "pattern blacklist", "pattern whitelist"]
 
 
-
-####################################################
-
 # Generic helper functions:
 
 # Helper: Check if value exists in array
