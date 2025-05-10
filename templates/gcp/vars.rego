@@ -1,4 +1,4 @@
-package terraform.gcp.security.<service>.<resource_type>.vars
+package terraform.gcp.security.kuber_engine.google_container_cluster.private_cluster_config.vars
 
 
 variables := {
