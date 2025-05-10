@@ -1,3 +1,4 @@
+
 package terraform.gcp.helpers
 # Defines the types of policies capable of being processed
 policy_types := ["blacklist", "whitelist", "range", "pattern blacklist", "pattern whitelist"]
@@ -501,6 +502,7 @@ get_nc_pattern_whitelist_resources(resource_type, attribute_path, values) = reso
         count(get_nc_pattern_whitelist(resource, attribute_path, target, patterns)) > 0 # ok, there is a resource with at least one non-compliant
     ]
 }
+
 
 get_pattern_whitelist_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name) = results if {
     string_path := format_attribute_path(attribute_path)
