@@ -1,4 +1,7 @@
 package terraform.gcp.security.datastream.stream.vars
 
-friendly_resource_name := "Data Freshness" 
-resource_type := "google_datastream_stream" 
+variables := {
+    "friendly_resource_name": "Google Cloud Datastream Stream",
+    "resource_type": "google_datastream_stream",
+    "resource_value_name": "name"
+}
