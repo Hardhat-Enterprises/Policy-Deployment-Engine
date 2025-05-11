@@ -7,8 +7,8 @@ import data.terraform.gcp.security.clouddns.dns_policy.vars
 # STEP 2: CREATE SCENARIOS (can be simple (one condition) or complex (multiple linked conditions) )
 conditions := [
     [
-    {"situation_description" : "Allows a user to log in",
-    "remedies":[ "user login rules"]},
+    {"situation_description" : "Logs DNS queries",
+    "remedies":[ "Allows capture of DNS queries"]},
     {
         "condition": "login = true",
         "attribute_path" : ["enable_logging"], # An array of strings and indicies eg. ["rsa",0,"key"]
