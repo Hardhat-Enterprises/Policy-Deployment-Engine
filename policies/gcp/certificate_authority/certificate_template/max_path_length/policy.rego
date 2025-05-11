@@ -12,12 +12,6 @@ conditions := [
         "attribute_path" : ["predefined_values",0,"ca_options",0,"max_issuer_path_length"], 
         "values" : [null,4],
         "policy_type" : "range" 
-    },
-    {
-        "condition": "Zero issuer path length is set to true",
-        "attribute_path" : ["predefined_values",0,"ca_options",0,"zero_max_issuer_path_length"], 
-        "values" : [true], 
-        "policy_type" : "whitelist" 
     }
     ]
 ]
