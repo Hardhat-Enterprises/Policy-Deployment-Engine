@@ -2,7 +2,7 @@
 # Keep "c" as the name to indicate that this resource and its attributes are compliant
 
 resource "google_datastream_stream" "c" {
-    project               = "your-gcp-project-id"
+    project               = "your-gcp-project-id.c"
   display_name = "Salesforce to BigQuery"
   location     = "AU"
   stream_id    = ""

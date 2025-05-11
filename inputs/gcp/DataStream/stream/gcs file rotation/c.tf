@@ -1,10 +1,10 @@
 # Describe your resource type here
 # Keep "c" as the name to indicate that this resource and its attributes are compliant
 
-resource "google_datastream_stream" "nc" {
-project  = "your-gcp-project-id.nc"
+resource "google_datastream_stream" "c" {
+project  = "your-gcp-project-id.c"
   display_name = "Salesforce to BigQuery"
-  location     = "AU"
+  location     = "australia-southeast1"
   stream_id    = ""
 
   source_config {
@@ -17,18 +17,18 @@ project  = "your-gcp-project-id.nc"
 
   destination_config {
     destination_connection_profile = "destination-profile"
-    bigquery_destination_config {
-      data_freshness = "300s"
-        source_hierarchy_datasets {
-                dataset_template {
-                   location = "us-central1"
-    }
-                }
-                }
-
-    }
-      backfill_none {}
+    gcs_destination_config {
+            path = "mydata"
+            file_rotation_mb = 200
+            file_rotation_interval = "60s"
+            json_file_format {
+                schema_file_format = "NO_SCHEMA_FILE"
+                compression = "GZIP"
+            }
+        }
   }
+        backfill_all {}
+}
   
   
 

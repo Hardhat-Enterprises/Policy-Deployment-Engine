@@ -22,6 +22,7 @@ project  = "your-gcp-project-id.nc"
         source_hierarchy_datasets {
                 dataset_template {
                    location = "us-central1"
+                   kms_key_name = "projects/my-secure-project/global/keyRings/my-keyring/cryptoKeys/my-key"
     }
                 }
                 }

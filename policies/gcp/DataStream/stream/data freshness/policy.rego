@@ -11,9 +11,9 @@ conditions := [
         },
         {
             "condition": "Checks that the BigQuery destination 'data_freshness' setting is one of the allowed values.",
-            "attribute_path": ["destination_config", 0, "bigquery_destination_config", 0, "data_freshness"],
-            "values": ["300s", "600s", "900s"],
-            "policy_type": "enum"
+            "attribute_path": ["destination_config", 0, "bigquery_destination_config", 0 , "data_freshness"],
+            "values": ["300s", "900s", "600s"],
+            "policy_type": "whitelist"
         }
     ]
 ]

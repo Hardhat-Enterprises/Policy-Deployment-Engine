@@ -1,10 +1,10 @@
 # Describe your resource type here
 # Keep "c" as the name to indicate that this resource and its attributes are compliant
 
-resource "google_datastream_stream" "nc" {
-project  = "your-gcp-project-id.nc"
+resource "google_datastream_stream" "c" {
+project  = "your-gcp-project-id.c"
   display_name = "Salesforce to BigQuery"
-  location     = "AU"
+  location     = "australia-southeast1"
   stream_id    = ""
 
   source_config {
@@ -22,7 +22,8 @@ project  = "your-gcp-project-id.nc"
         source_hierarchy_datasets {
                 dataset_template {
                    location = "us-central1"
-    }
+                   kms_key_name = "projects/my-secure-project/locations/global/keyRings/my-keyring/cryptoKeys/my-key"
+                  }
                 }
                 }
 

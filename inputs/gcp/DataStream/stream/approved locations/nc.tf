@@ -4,7 +4,7 @@
 resource "google_datastream_stream" "nc" {
 project  = "your-gcp-project-id.nc"
   display_name = "Salesforce to BigQuery"
-  location     = "AU"
+  location     = "asia-northeast1"
   stream_id    = ""
 
   source_config {
@@ -22,7 +22,8 @@ project  = "your-gcp-project-id.nc"
         source_hierarchy_datasets {
                 dataset_template {
                    location = "us-central1"
-    }
+                   kms_key_name = "projects/my-secure-project/locations/global/keyRings/my-keyring/cryptoKeys/my-key"
+                  }
                 }
                 }
 
