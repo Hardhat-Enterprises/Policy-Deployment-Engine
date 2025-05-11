@@ -10,12 +10,8 @@ conditions := [
         "condition": "Is a subordinate Certifcate Authority",
         "attribute_path" : ["type"], 
         "values" : ["SUBORDINATE"],
-        "policy_type" : "whitelist" 
-    }
-    ],
-    [
-    {"situation_description" : "Certificate Authority with a path length less than 2",
-    "remedies":["Reduce the path length to 2", "Set zero issuer path length to true"]},
+        "policy_type" : "blacklist" 
+    },
     {
         "condition": "Path length is less than 2",
         "attribute_path" : ["config",0,"x509_config",0,"ca_options",0,"max_issuer_path_length"], 

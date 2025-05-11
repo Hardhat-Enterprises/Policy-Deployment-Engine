@@ -11,6 +11,10 @@ resource "google_privateca_ca_pool" "nc" {
         publish_crl = true
     }
     issuance_policy {
+      identity_constraints {
+        allow_subject_alt_names_passthrough = true
+        allow_subject_passthrough = true
+      }
       allowed_key_types {
         rsa {
           min_modulus_size = 1024
