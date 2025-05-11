@@ -16,6 +16,6 @@ resource "google_datastream_connection_profile" "c" {
     hostname = "google.com"
     username = "my-user"
     port     = 8022
-    password = file("ssh_password.rsa")
+    password = "file()"
   }
 }

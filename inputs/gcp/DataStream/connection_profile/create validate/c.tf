@@ -6,6 +6,7 @@ resource "google_datastream_connection_profile" "c" {
   display_name          = "Connection profile-c"
   location              = "australia-southeast1"
   connection_profile_id = "my-profile"
+  create_without_validation = false
 
   gcs_profile {
     bucket    = "fake-bucket"
@@ -16,6 +17,6 @@ resource "google_datastream_connection_profile" "c" {
     hostname = "google.com"
     username = "my-user"
     port     = 8022
-    password = file("ssh_password.rsa")
+    password = "file()"
   }
 }

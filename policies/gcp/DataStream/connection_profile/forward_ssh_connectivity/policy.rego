@@ -14,9 +14,9 @@ conditions := [
     },
     {
       "condition": "Checks if the password is hardcoded as 'swordfish' under forward_ssh_connectivity",
-      "attribute_path": ["forward_ssh_connectivity", "password"],
+      "attribute_path": ["forward_ssh_connectivity", 0, "password"],
       "values": ["swordfish"],
-      "policy_type": "equality"
+      "policy_type": "blacklist"
     }
   ]
 ]

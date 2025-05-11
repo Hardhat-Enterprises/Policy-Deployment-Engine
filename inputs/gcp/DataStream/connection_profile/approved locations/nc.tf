@@ -1,10 +1,10 @@
 # Describe your resource type here
 # Keep "c" as the name to indicate that this resource and its attributes are compliant
 
-resource "google_datastream_connection_profile" "c" {
-  project               = "your-gcp-project-id.c"
+resource "google_datastream_connection_profile" "nc" {
+  project               = "your-gcp-project-id.nc"
   display_name          = "Connection profile-c"
-  location              = "australia-southeast1"
+  location              = "europe-west4"
   connection_profile_id = "my-profile"
 
   gcs_profile {
@@ -16,6 +16,6 @@ resource "google_datastream_connection_profile" "c" {
     hostname = "google.com"
     username = "my-user"
     port     = 8022
-    password = file("ssh_password.rsa")
+    password = "file()"
   }
 }

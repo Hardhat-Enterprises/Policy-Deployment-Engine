@@ -3,7 +3,7 @@
 
 
 resource "google_datastream_connection_profile" "nc" {
-    project               = "your-gcp-project-id"
+    project               = "your-gcp-project-id.nc"
     display_name          = "Connection profile-nc"
     location              = "AU"
     connection_profile_id = "my-profile"
