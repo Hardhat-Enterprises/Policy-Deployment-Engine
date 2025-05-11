@@ -516,17 +516,9 @@ get_pattern_whitelist_violations(resource_type, attribute_path, values_formatted
     ]
 }
 
-# Summary output
-get_summary(resource_type, attribute_path, compliant_values, friendly_resource_name) = summary if {
-    all_resources_count := count(get_all_resources(resource_type))
-    violations := get_violations(resource_type, attribute_path, compliant_values, friendly_resource_name)
-    violations_count := count(violations)
-    summary := {      
-    "message": array.concat(
-        [            
-            sprintf("Total %s detected: %d", [friendly_resource_name, all_resources_count]),            
-            sprintf("Non-compliant %s: %d/%d", [friendly_resource_name, violations_count, all_resources_count]) 
-        ], 
-        violations 
+format_pattern_whitelist_message(friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, allowed_values) = msg if {
+    msg := sprintf(
+        "%s '%s' has '%s' set to '%s'%s. It should be set to one of: %s",
+        [friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, allowed_values]
     ) 
 }
