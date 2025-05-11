@@ -59,6 +59,19 @@ else:
 
 type_out("🚀 Starting OPA Policy Evaluation...\n")
 
+try:
+    subprocess.run(["terraform", "init", "-input=false"], cwd=zone_dir, check=True)
+    subprocess.run(["terraform", "plan", "-out=plan"], cwd=zone_dir, check=True)
+    subprocess.run(
+        ["terraform", "show", "-json", "plan"],
+        cwd=zone_dir,
+        stdout=open(os.path.join(zone_dir, "plan.json"), "w"),
+        check=True
+    )
+except subprocess.CalledProcessError as e:
+        print(f"❌ Terraform failed:\n{e}")
+
+
 for policy in policy_dirs:
     plan_path = os.path.join(input_base, policy, "plan.json")
 
@@ -139,16 +152,12 @@ time.sleep(1)
 if os.path.isdir(zone_dir):
     print("🚀 Running Terraform plan...")
     try:
-        subprocess.run(["terraform", "init", "-input=false"], cwd=zone_dir, check=True)
-        subprocess.run(["terraform", "plan", "-out=plan"], cwd=zone_dir, check=True)
-        subprocess.run(
-            ["terraform", "show", "-json", "plan"],
-            cwd=zone_dir,
-            stdout=open(os.path.join(zone_dir, "plan.json"), "w"),
-            check=True
-        )
-        print("✅ Terraform plan.json generated.")
-        subprocess.run(["terraform", "apply", "-auto-approve", "-target=google_compute_instance.c"], cwd=zone_dir, check=True)
-        print("✅ GCP instance successfully deployed.")
+        confirm = input("\n❓ Are you sure you want to apply the Terraform plan? (yes/no): ").strip().lower()
+        if (confirm == "yes"):
+            subprocess.run(["terraform", "apply", "-auto-approve", "-target=google_compute_instance.c"], cwd=zone_dir, check=True)
+            print("✅ GCP instance successfully deployed.")
+        else:
+            print("⚠️ Terraform apply skipped by user.")
+            sys.exit()
     except subprocess.CalledProcessError as e:
-        print(f"❌ Terraform failed:\n{e}")
+        print(f"❌ Terraform apply failed:\n{e}")
