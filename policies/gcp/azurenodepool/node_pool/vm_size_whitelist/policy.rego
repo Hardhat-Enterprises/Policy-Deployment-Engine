@@ -1,5 +1,40 @@
 package terraform.gcp.security.azurenodepool.node_pool.vm_size_whitelist
 
+import data.terraform.gcp.helpers.resource
+import data.terraform.gcp.helpers.message
+import data.terraform.gcp.security.azurenodepool.node_pool.vars
+
+default allow = true
+
+_vm_size_whitelist_ := {
+  "metadata": {
+    "id": "VM_SIZE_WHITELIST",
+    "version": "v1.0.0",
+    "description": "Ensures that the VM size in Azure Node Pool config is from an approved list.",
+    "custom": true
+  },
+  "policy": {
+    "resource": "google_container_azure_node_pool",
+    "select": {
+      "field": "values.config.vm_size"
+    },
+    "condition": {
+      "type": "in",
+      "approved_list": vars.vm_size_whitelist
+    },
+    "message": {
+      "type": "summary",
+      "prefix": "GCP Azure Node Pool",
+      "fields": ["values.name", "values.config.vm_size"],
+      "suffix": "uses unapproved VM size"
+    }
+  }
+}
+
+
+
+/* package terraform.gcp.security.azurenodepool.node_pool.vm_size_whitelist
+
 resource_type := "google_container_azure_node_pool"
 friendly_resource_name := "GCP Azure Node Pool"
 
@@ -30,3 +65,4 @@ summary.message := array.concat(
     r := violations[_]
   ]
 )
+*/

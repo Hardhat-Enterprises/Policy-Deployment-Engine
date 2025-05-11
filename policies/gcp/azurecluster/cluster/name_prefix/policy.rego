@@ -1,4 +1,24 @@
-package terraform.gcp.security.azurecluster.cluster.name_prefix
+package terraform.gcp.security.container_azure_cluster.name_prefix
+
+import data.terraform.gcp.helpers
+import data.terraform.gcp.security.container_azure_cluster.name_prefix.vars
+
+scenarios_list := [
+  {
+    "situation_description": "Name does not start with required prefix",
+    "remedies": ["Use a name starting with 'cluster-'"],
+    "condition": "name must start with 'cluster-'",
+    "attribute_path": ["name"],
+    "values": ["cluster-"],
+    "policy_type": "prefix"
+  }
+]
+
+summary := helpers.get_multi_summary(scenarios_list, vars.variables)
+
+
+
+/* package terraform.gcp.security.azurecluster.cluster.name_prefix
 
 default deny = []
 
@@ -24,3 +44,4 @@ summary := {
     sprintf("Non-compliant %s: %d/%d", [friendly_resource_name, count(deny), count(resources)])
   ]
 }
+*/
