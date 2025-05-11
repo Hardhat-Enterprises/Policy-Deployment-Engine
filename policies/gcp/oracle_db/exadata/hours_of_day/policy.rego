@@ -1,4 +1,4 @@
-package terraform.gcp.security.oracle_db.exadata.deletion_protection # Edit here 
+package terraform.gcp.security.oracle_db.exadata.hours_of_day # Edit here 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.oracle_db.exadata.vars
 
@@ -7,12 +7,12 @@ import data.terraform.gcp.security.oracle_db.exadata.vars
 # STEP 2: CREATE SCENARIOS (can be simple (one condition) or complex (multiple linked conditions) )
 conditions := [
     [
-    {"situation_description" : "Prevent terraform from deleting the cluster",
-    "remedies":[ "Enable deletion_protection"]},
+    {"situation_description" : "Restrict maintenance to overnight hours",
+    "remedies":["Set hours_of_day to time slots like 0 or 4"]},
     {
-        "condition": "enable deletion_protection",
-        "attribute_path" : ["deletion_protection"], # An array of strings and indicies eg. ["rsa",0,"key"]
-        "values" : [true], # Values to compare against
+        "condition": "maintenance only allowed during safe hours",
+        "attribute_path" : ["properties",0,"maintenance_window",0,"hours_of_day",0], # An array of strings and indicies eg. ["rsa",0,"key"]
+        "values" : [0, 4], # Values to compare against
         "policy_type" : "whitelist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
     }
     ]

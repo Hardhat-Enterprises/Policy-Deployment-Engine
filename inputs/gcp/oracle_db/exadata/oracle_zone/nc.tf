@@ -2,9 +2,9 @@
 # Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
 
 resource "google_oracle_database_cloud_exadata_infrastructure" "nc" {
-    location = "AU"
+    location = "asia-northeast2"
     cloud_exadata_infrastructure_id = "my-instance"
     project = "my-project-nc"
 
-    deletion_protection = false
+    gcp_oracle_zone = "asia-northeast2-a"
 }

@@ -1,4 +1,4 @@
-package terraform.gcp.security.oracle_db.exadata.deletion_protection # Edit here 
+package terraform.gcp.security.oracle_db.exadata.days_of_week # Edit here 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.oracle_db.exadata.vars
 
@@ -7,12 +7,12 @@ import data.terraform.gcp.security.oracle_db.exadata.vars
 # STEP 2: CREATE SCENARIOS (can be simple (one condition) or complex (multiple linked conditions) )
 conditions := [
     [
-    {"situation_description" : "Prevent terraform from deleting the cluster",
-    "remedies":[ "Enable deletion_protection"]},
+    {"situation_description" : "Restrict maintenance to weekdays only",
+    "remedies":[ "Set days_of_week to MONDAY through FRIDAY"]},
     {
-        "condition": "enable deletion_protection",
-        "attribute_path" : ["deletion_protection"], # An array of strings and indicies eg. ["rsa",0,"key"]
-        "values" : [true], # Values to compare against
+        "condition": "maintenance allowed only on weekdays",
+        "attribute_path" : ["properties",0,"maintenance_window",0,"days_of_week",0], # An array of strings and indicies eg. ["rsa",0,"key"]
+        "values" : ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"], # Values to compare against
         "policy_type" : "whitelist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
     }
     ]

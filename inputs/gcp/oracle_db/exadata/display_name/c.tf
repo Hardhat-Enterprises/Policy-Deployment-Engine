@@ -6,5 +6,5 @@ resource "google_oracle_database_cloud_exadata_infrastructure" "c" {
     cloud_exadata_infrastructure_id = "my-instance"
     project = "my-project-c"
 
-    deletion_protection = true
+    display_name = "prod-exadata-1"
 }

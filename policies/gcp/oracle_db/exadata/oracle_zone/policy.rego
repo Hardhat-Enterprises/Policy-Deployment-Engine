@@ -1,4 +1,4 @@
-package terraform.gcp.security.oracle_db.exadata.deletion_protection # Edit here 
+package terraform.gcp.security.oracle_db.exadata.oracle_zone # Edit here 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.oracle_db.exadata.vars
 
@@ -7,12 +7,12 @@ import data.terraform.gcp.security.oracle_db.exadata.vars
 # STEP 2: CREATE SCENARIOS (can be simple (one condition) or complex (multiple linked conditions) )
 conditions := [
     [
-    {"situation_description" : "Prevent terraform from deleting the cluster",
-    "remedies":[ "Enable deletion_protection"]},
+    {"situation_description" : "Restrict Oracle Exadata deployments to approved GCP zones only",
+    "remedies":[ "Use gcp_oracle_zone values like australia-southeast1-a"]},
     {
-        "condition": "enable deletion_protection",
-        "attribute_path" : ["deletion_protection"], # An array of strings and indicies eg. ["rsa",0,"key"]
-        "values" : [true], # Values to compare against
+        "condition": "gcp_oracle_zone must be in approved list",
+        "attribute_path" : ["gcp_oracle_zone"], # An array of strings and indicies eg. ["rsa",0,"key"]
+        "values" : ["australia-southeast1-a"], # Values to compare against
         "policy_type" : "whitelist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
     }
     ]

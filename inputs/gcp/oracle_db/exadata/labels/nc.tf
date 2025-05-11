@@ -6,5 +6,8 @@ resource "google_oracle_database_cloud_exadata_infrastructure" "nc" {
     cloud_exadata_infrastructure_id = "my-instance"
     project = "my-project-nc"
 
-    deletion_protection = false
+    labels = {
+      "env" = ""
+      "owner" = ""
+    }
 }
