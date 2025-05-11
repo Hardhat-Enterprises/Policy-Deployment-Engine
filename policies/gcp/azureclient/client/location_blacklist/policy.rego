@@ -1,5 +1,31 @@
 package terraform.gcp.security.azureclient.client.location_blacklist
 
+import data.terraform.lib.blacklist
+import data.terraform.gcp.security.azureclient.client.location_blacklist
+
+default summary = {
+  "message": [],
+}
+
+summary[msg] {
+  violations := blacklist.run_blacklist_check(
+    _input_path_,
+    _resource_type_,
+    _blacklist_,
+  )
+  msg := blacklist.build_blacklist_message(
+    violations,
+    _blacklist_.field,
+    _resource_type_,
+    "blacklist"
+  )
+
+
+
+
+
+/* package terraform.gcp.security.azureclient.client.location_blacklist
+
 import input as tfplan
 
 attribute_path := "location"
@@ -22,3 +48,4 @@ summary := {
   "non_compliant": sprintf("Non-compliant GCS azure container: %d", [count(deny)]),
   "details": deny
 }
+*/

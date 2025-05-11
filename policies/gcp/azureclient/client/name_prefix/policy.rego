@@ -1,4 +1,27 @@
-package terraform.gcp.security.azureclient.client.name_prefix
+package terraform.gcp.security.container_azure_client.rules.name
+
+import data.terraform.gcp.helpers
+import data.terraform.gcp.security.container_azure_client.vars
+
+scenarios_list := [
+  {
+    "situation_description": "Name must start with org-",
+    "remedies": ["Use prefix org-"],
+    "condition": "C1: Name must start with org-",
+    "attribute_path": ["name"],
+    "values": ["org-"],
+    "policy_type": "pattern whitelist"
+  }
+]
+
+summary := helpers.get_multi_summary(scenarios_list, vars.variables)
+
+message := summary.message
+detail := summary.details
+
+
+
+/* package terraform.gcp.security.azureclient.client.name_prefix
 
 import input as tfplan
 
@@ -20,3 +43,4 @@ summary := {
   "non_compliant": sprintf("Non-compliant GCS azure container: %d", [count(deny)]),
   "details": deny
 }
+*/
