@@ -8,4 +8,7 @@ terraform {
   }
 }
 
-provider "google" {}
+provider "google" {
+  # Newly added line
+  credentials = file("${path.module}/../../../../../secrets/credentials.json")
+}
