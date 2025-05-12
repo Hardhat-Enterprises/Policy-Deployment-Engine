@@ -37,5 +37,4 @@ violation_msgs := [
 
 message := array.concat(base_msgs, violation_msgs)
 
-
 detail := summary.details
