@@ -3,7 +3,7 @@ package terraform.gcp.security.kuber_engine.google_container_cluster.addons_conf
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.kuber_engine.google_container_cluster.addons_config.vars
 
-# شرایط مجاز (whitelist) برای addonهای زیر
+
 conditions := [
 
   # horizontal_pod_autoscaling
@@ -48,8 +48,7 @@ conditions := [
     }
   ],
 
-  # dns_cache_config (بدون بررسی نسخه)
-  [
+  # dns_cache_config 
     {
       "situation_description": "DNS Cache Addon is disabled",
       "remedies": ["Set dns_cache_config.enabled = true"]
@@ -61,10 +60,10 @@ conditions := [
       "policy_type": "whitelist"
     }
   ]
-]
 
-# پیام کلی
+
+
 message := helpers.get_multi_summary(conditions, vars.variables).message
 
-# گزارش دقیق برای هر resource و هر addon
+
 details := helpers.get_multi_summary(conditions, vars.variables).details
