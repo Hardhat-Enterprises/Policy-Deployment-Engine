@@ -1,30 +1,41 @@
-package terraform.gcp.security.azureclient.tenant_id_whitelist
-
-import data.terraform.helpers.general
-
-deny[res] {
-  general.whitelist_violation({
-    "input": input,
-    "resource_type": "google_container_azure_client",
-    "attribute": "tenant_id",
-    "allowed": data.terraform.gcp.security.azureclient.tenant_id_whitelist.allowed_tenants,
-    "resource_path": ["planned_values", "root_module", "resources"]
-  }, res)
-}
-
-
-
-
-/* package terraform.gcp.security.azureclient.client.tenant_id_whitelist
+package terraform.gcp.security.azureclient.client.tenant_id_whitelist
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.azureclient.client.vars
+import data.terraform.gcp.security.azureclient.client.tenant_id_whitelist.vars
 
-
-attribute_path := "tenant id"
-compliant_values := [
-    "12345678-aaaa-bbbb-cccc-1234567890ab"
+approved_tenants := [
+  "12345678-aaaa-bbbb-cccc-1234567890ab",
+  "87654321-bbbb-aaaa-dddd-0987654321cd"
 ]
 
-summary := helpers.get_summary(vars.resource_type, attribute_path, compliant_values, vars.friendly_resource_name)
-*/
+scenarios_list := [
+  {
+    "situation_description": "🚨 Tenant ID must be from the approved list",
+    "remedies": ["✅ Use a tenant_id from the whitelist"],
+    "condition": "C1: Invalid tenant_id detected",
+    "attribute_path": ["tenant_id"],
+    "values": approved_tenants,
+    "policy_type": "whitelist"
+  }
+]
+
+summary := helpers.get_multi_summary(scenarios_list, vars.variables)
+
+total := count(vars.variables)
+violating := count([res | s := summary.details[_]; res := s.non_compliant_resources[_]])
+
+base_msgs := [
+  sprintf("📦 Total GCP Azure Clients detected: %v", [total]),
+  sprintf("🚫 Non-compliant clients: %v/%v", [violating, total])
+]
+
+violation_msgs := [
+  sprintf("❌ Client '%s' uses unapproved tenant_id: '%s'", [res.name, res.tenant_id])
+  | s := summary.details[_]
+  res := s.non_compliant_resources[_]
+]
+
+message := array.concat(base_msgs, violation_msgs)
+
+
+detail := summary.details

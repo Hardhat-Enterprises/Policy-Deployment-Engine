@@ -1,6 +1,7 @@
-package terraform.gcp.security.azurecluster.cluster.vars
+package terraform.gcp.security.azurecluster.cluster.fleet_project_whitelist.vars
 
-allowed_fleet_projects = [
-  "approved-project-1",
-  "approved-project-2"
-]
+variables := {
+  "friendly_resource_name": "GCP Azure Cluster",
+  "resource_type": "google_container_azure_cluster",
+  "resource_value_name": "name"
+}

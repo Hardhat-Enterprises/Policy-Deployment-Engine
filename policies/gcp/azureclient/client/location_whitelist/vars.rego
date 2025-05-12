@@ -1,4 +1,4 @@
-package terraform.gcp.containerazure.client.vars
+package terraform.gcp.security.azureclient.client.location_whitelist.vars
 
 variables := {
   "friendly_resource_name": "GCP Azure Client",

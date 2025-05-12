@@ -1,51 +1,37 @@
 package terraform.gcp.security.azureclient.client.location_blacklist
 
-import data.terraform.lib.blacklist
-import data.terraform.gcp.security.azureclient.client.location_blacklist
+import data.terraform.gcp.helpers
+import data.terraform.gcp.security.azureclient.client.location_blacklist.vars
 
-default summary = {
-  "message": [],
-}
+blacklisted_locations := ["global", "unapproved-region"]
 
-summary[msg] {
-  violations := blacklist.run_blacklist_check(
-    _input_path_,
-    _resource_type_,
-    _blacklist_,
-  )
-  msg := blacklist.build_blacklist_message(
-    violations,
-    _blacklist_.field,
-    _resource_type_,
-    "blacklist"
-  )
+scenarios_list := [
+  {
+    "situation_description": "🚫 Azure client must not use blacklisted locations",
+    "remedies": ["✅ Use a region outside the blacklisted list"],
+    "condition": "C1: Location is blacklisted",
+    "attribute_path": ["location"],
+    "values": blacklisted_locations,
+    "policy_type": "blacklist"
+  }
+]
 
+summary := helpers.get_multi_summary(scenarios_list, vars.variables)
 
+total := count(vars.variables)
+violating := count([res | s := summary.details[_]; res := s.non_compliant_resources[_]])
 
+base_msgs := [
+  sprintf("📦 Total Azure Clients detected: %v", [total]),
+  sprintf("🚫 Non-compliant clients: %v/%v", [violating, total])
+]
 
+violation_msgs := [
+  sprintf("❌ Client '%s' is using blacklisted location: '%s'", [res.name, res.location])
+  | s := summary.details[_]
+  res := s.non_compliant_resources[_]
+  res.location != null
+]
 
-/* package terraform.gcp.security.azureclient.client.location_blacklist
-
-import input as tfplan
-
-attribute_path := "location"
-blacklisted_locations := {"global", "us-central1"}
-
-deny[msg] if {
-  some i
-  tfplan.resource_changes[i].type == "google_container_azure_client"
-  resource := tfplan.resource_changes[i]
-  location := resource.change.after.location
-  location != null
-  location != ""
-  location in blacklisted_locations
-
-  msg := sprintf("GCS azure container '%s' is deployed in a blacklisted region: '%s'", [resource.change.after.name, location])
-}
-
-summary := {
-  "message": sprintf("Total GCS azure container detected: %d", [count({r | r := tfplan.resource_changes[_]; r.type == "google_container_azure_client"})]),
-  "non_compliant": sprintf("Non-compliant GCS azure container: %d", [count(deny)]),
-  "details": deny
-}
-*/
+message := array.concat(base_msgs, violation_msgs)
+detail := summary.details

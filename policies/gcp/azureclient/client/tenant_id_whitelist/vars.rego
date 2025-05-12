@@ -1,6 +1,7 @@
-package terraform.gcp.security.azureclient.tenant_id_whitelist
+package terraform.gcp.security.azureclient.client.tenant_id_whitelist.vars
 
-allowed_tenants := {
-  "11111111-2222-3333-4444-555555555555",
-  "66666666-7777-8888-9999-000000000000"
+variables := {
+  "friendly_resource_name": "GCP Azure Client",
+  "resource_type": "google_container_azure_client",
+  "resource_value_name": "name"
 }

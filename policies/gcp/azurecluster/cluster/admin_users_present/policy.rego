@@ -1,51 +1,38 @@
 package terraform.gcp.security.azurecluster.cluster.admin_users_present
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.azurecluster.cluster.vars
+import data.terraform.gcp.security.azurecluster.cluster.admin_users_present.vars
 
-deny = helpers.deny_with_messages[violation] {
-  resource := input.planned_values.root_module.resources[_]
-  resource.type == "google_container_azure_cluster"
+approved_admins := ["admin@example.com", "supervisor@company.com"]
 
-  not resource.values.authorization.admin_users
-
-  violation := {
-    "msg": sprintf("%s '%s' does not have any admin users.", [vars.friendly_resource_name, resource.values.name]),
-    "resource": resource.address
+scenarios_list := [
+  {
+    "situation_description": "🚨 [Cluster Admin Policy] Unauthorized admin users present",
+    "remedies": ["✅ Only allow admin users from the approved list"],
+    "condition": "C1: admin_users includes unauthorized usernames",
+    "attribute_path": ["authorization", 0, "admin_users", 0, "username"],
+    "values": approved_admins,
+    "policy_type": "whitelist"
   }
-}
-
-summary.message = helpers.summary_from_violations(deny, vars.friendly_resource_name)
-
-
-
-
-
-/* package terraform.gcp.security.azurecluster.cluster.admin_users_present
-
-import data.terraform.gcp.helpers
-import data.terraform.gcp.security.azurecluster.cluster.vars
-
-resource_type = "google_container_azure_cluster"
-friendly_resource_name = "GCP Azure Cluster"
-
-default allow = false
-
-deny = [res |
-  res := input.planned_values.root_module.resources[_]
-  res.type == resource_type
-  not res.values.authorization.admin_users
 ]
 
-resources := [res |
-  res := input.planned_values.root_module.resources[_]
-  res.type == resource_type
+summary := helpers.get_multi_summary(scenarios_list, vars.variables)
+
+# ✅ Create summary header separately
+header := [
+  "🔒 Admin Audit Report for Azure Clusters",
+  sprintf("🧪 Total clusters reviewed: %v", [count(vars.variables)]),
+  sprintf("🚫 Violations found: %v", [count([res | s := summary.details[_]; res := s.non_compliant_resources[_]])])
 ]
 
-summary := {
-  "message": [
-    sprintf("Total %s detected: %d", [friendly_resource_name, count(resources)]),
-    sprintf("Non-compliant %s: %d/%d", [friendly_resource_name, count(deny), count(resources)])
-  ]
-}
-*/
+# ✅ Build violation message list separately
+violations := [
+  sprintf("❌ Cluster '%s' has an unauthorized admin user: '%s'", [res.name, res.authorization[0].admin_users[0].username])
+  | s := summary.details[_]
+  res := s.non_compliant_resources[_]
+  res.authorization[0].admin_users[0].username != null
+]
+
+# ✅ Final output message with no self-reference
+message := array.concat(header, violations)
+detail := summary.details

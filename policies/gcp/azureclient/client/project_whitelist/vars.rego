@@ -1,4 +1,4 @@
-package terraform.gcp.security.azureclient.client.name_prefix.vars
+package terraform.gcp.security.azureclient.client.project_whitelist.vars
 
 variables := {
   "friendly_resource_name": "GCP Azure Client",

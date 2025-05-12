@@ -1,47 +1,37 @@
-package terraform.gcp.security.container_azure_cluster.name_prefix
+package terraform.gcp.security.azurecluster.cluster.name_prefix
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.container_azure_cluster.name_prefix.vars
+import data.terraform.gcp.security.azurecluster.cluster.name_prefix.vars
+
+required_prefix := "prod-"
 
 scenarios_list := [
   {
-    "situation_description": "Name does not start with required prefix",
-    "remedies": ["Use a name starting with 'cluster-'"],
-    "condition": "name must start with 'cluster-'",
+    "situation_description": "🔤 Cluster name must start with the prefix 'prod-'",
+    "remedies": ["✅ Rename the cluster to start with 'prod-'"],
+    "condition": "C1: Cluster name does not follow naming convention",
     "attribute_path": ["name"],
-    "values": ["cluster-"],
-    "policy_type": "prefix"
+    "values": [required_prefix],
+    "policy_type": "pattern whitelist"
   }
 ]
 
 summary := helpers.get_multi_summary(scenarios_list, vars.variables)
 
-
-
-/* package terraform.gcp.security.azurecluster.cluster.name_prefix
-
-default deny = []
-
-resource_type := "google_container_azure_cluster"
-friendly_resource_name := "GCP Azure Cluster"
-required_prefix := "cluster-"
-
-resources := [res |
-  res := input.planned_values.root_module.resources[_]
-  res.type == resource_type
+# 🎯 Create badge-style summary
+badge := [
+  "🏷️ Cluster Naming Convention Report",
+  "──────────────────────────────────────",
+  sprintf("🔎 Clusters checked: %v", [count(vars.variables)]),
+  sprintf("🟥 Clusters with naming issues: %v", [count([res | s := summary.details[_]; res := s.non_compliant_resources[_]])])
 ]
 
-deny := [msg |
-  res := input.planned_values.root_module.resources[_]
-  res.type == resource_type
-  not startswith(res.values.name, required_prefix)
-  msg := sprintf("%s '%s' does not start with required prefix '%s'", [friendly_resource_name, res.values.name, required_prefix])
+violations := [
+  sprintf("❌ '%s' is not using the required prefix '%s'", [res.name, required_prefix])
+  | s := summary.details[_]
+  res := s.non_compliant_resources[_]
+  res.name != null
 ]
 
-summary := {
-  "message": [
-    sprintf("Total %s detected: %d", [friendly_resource_name, count(resources)]),
-    sprintf("Non-compliant %s: %d/%d", [friendly_resource_name, count(deny), count(resources)])
-  ]
-}
-*/
+message := array.concat(badge, violations)
+detail := summary.details

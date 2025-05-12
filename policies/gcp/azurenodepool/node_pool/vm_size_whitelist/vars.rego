@@ -1,7 +1,7 @@
-package terraform.gcp.security.azurenodepool.node_pool.vars
+package terraform.gcp.security.azurenodepool.node_pool.vm_size_whitelist.vars
 
-vm_size_whitelist := [
-  "Standard_D2s_v3",
-  "Standard_D4s_v3",
-  "Standard_E4s_v3"
-]
+variables := {
+  "friendly_resource_name": "GCP Azure Node Pool",
+  "resource_type": "google_container_azure_node_pool",
+  "resource_value_name": "name"
+}

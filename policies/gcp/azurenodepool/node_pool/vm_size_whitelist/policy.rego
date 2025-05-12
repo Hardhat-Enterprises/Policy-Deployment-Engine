@@ -1,68 +1,37 @@
 package terraform.gcp.security.azurenodepool.node_pool.vm_size_whitelist
 
-import data.terraform.gcp.helpers.resource
-import data.terraform.gcp.helpers.message
-import data.terraform.gcp.security.azurenodepool.node_pool.vars
+import data.terraform.gcp.helpers
+import data.terraform.gcp.security.azurenodepool.node_pool.vm_size_whitelist.vars
 
-default allow = true
+approved_vm_sizes := ["Standard_D2s_v3", "Standard_E2s_v3", "Standard_DS3_v2"]
 
-_vm_size_whitelist_ := {
-  "metadata": {
-    "id": "VM_SIZE_WHITELIST",
-    "version": "v1.0.0",
-    "description": "Ensures that the VM size in Azure Node Pool config is from an approved list.",
-    "custom": true
-  },
-  "policy": {
-    "resource": "google_container_azure_node_pool",
-    "select": {
-      "field": "values.config.vm_size"
-    },
-    "condition": {
-      "type": "in",
-      "approved_list": vars.vm_size_whitelist
-    },
-    "message": {
-      "type": "summary",
-      "prefix": "GCP Azure Node Pool",
-      "fields": ["values.name", "values.config.vm_size"],
-      "suffix": "uses unapproved VM size"
-    }
+scenarios_list := [
+  {
+    "situation_description": "⚙️ VM size must be one of the approved configurations for production workloads",
+    "remedies": ["✅ Use a vm_size like Standard_D2s_v3 or Standard_E2s_v3"],
+    "condition": "C1: Unapproved VM size selected",
+    "attribute_path": ["config", 0, "vm_size"],
+    "values": approved_vm_sizes,
+    "policy_type": "whitelist"
   }
-}
-
-
-
-/* package terraform.gcp.security.azurenodepool.node_pool.vm_size_whitelist
-
-resource_type := "google_container_azure_node_pool"
-friendly_resource_name := "GCP Azure Node Pool"
-
-compliant_vm_sizes := [
-  "Standard_D2s_v3",
-  "Standard_D4s_v3",
-  "Standard_E4s_v3"
 ]
 
-resources := [res |
-  res := input.planned_values.root_module.resources[_]
-  res.type == resource_type
+summary := helpers.get_multi_summary(scenarios_list, vars.variables)
+
+# 🖥️ Compatibility check format
+header := [
+  "🖥️ Node Pool VM Size Compatibility Report",
+  "───────────────────────────────────────────────",
+  sprintf("🔍 Node pools reviewed: %v", [count(vars.variables)]),
+  sprintf("🚨 Incompatible VM sizes found: %v", [count([res | s := summary.details[_]; res := s.non_compliant_resources[_]])])
 ]
 
-violations := [res |
-  res := input.planned_values.root_module.resources[_]
-  res.type == resource_type
-  res.values.config.vm_size != ""  # Ensure the field exists
-  not res.values.config.vm_size in compliant_vm_sizes
+violations := [
+  sprintf("❌ Node pool '%s' uses disallowed vm_size: '%s'", [res.name, res.config[0].vm_size])
+  | s := summary.details[_]
+  res := s.non_compliant_resources[_]
+  res.config[0].vm_size != null
 ]
 
-summary.message := array.concat(
-  [
-    sprintf("Total %s detected: %d", [friendly_resource_name, count(resources)]),
-    sprintf("Non-compliant %s: %d/%d", [friendly_resource_name, count(violations), count(resources)])
-  ],
-  [sprintf("%s '%s' uses unapproved VM size: '%s'", [friendly_resource_name, r.values.name, r.values.config.vm_size]) |
-    r := violations[_]
-  ]
-)
-*/
+message := array.concat(header, violations)
+detail := summary.details

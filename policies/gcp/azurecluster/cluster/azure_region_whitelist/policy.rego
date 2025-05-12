@@ -1,40 +1,37 @@
 package terraform.gcp.security.azurecluster.cluster.azure_region_whitelist
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.azurecluster.cluster.azure_region_whitelist.vars as policy_vars
+import data.terraform.gcp.security.azurecluster.cluster.azure_region_whitelist.vars
 
-default summary = {
-  "message": []
-}
+approved_regions := ["australiaeast", "australiasoutheast", "uswest1"]
 
-summary["message"] = helpers.standard_violation_summary({
-  "resource_type": "GCP Azure Cluster",
-  "violation_key": "azure_region",
-  "violation_message": "uses unapproved Azure region",
-  "violations": [r for r in policy_vars.violation]
-})
-
-
-
-/* package terraform.gcp.security.azurecluster.cluster.azure_region_whitelist
-
-import data.terraform.gcp.helpers
-import data.terraform.gcp.security.azurecluster.cluster.vars
-
-resource_type := "google_container_azure_cluster"
-friendly_resource_name := "GCP Azure Cluster"
-
-attribute_path := "azure_region"
-compliant_values := [
-    "australia-southeast1",
-    "us-central1",
-    "europe-west1"
+scenarios_list := [
+  {
+    "situation_description": "🗺️ Azure Region must be from the approved list",
+    "remedies": ["✅ Use a region such as australiaeast, australiasoutheast, or uswest1"],
+    "condition": "C1: Region not whitelisted",
+    "attribute_path": ["azure_region"],
+    "values": approved_regions,
+    "policy_type": "whitelist"
+  }
 ]
 
-summary := helpers.get_summary(
-    resource_type,
-    attribute_path,
-    compliant_values,
-    friendly_resource_name
-)
-*/
+summary := helpers.get_multi_summary(scenarios_list, vars.variables)
+
+# Create scorecard output
+scorecard := [
+  "📍 Azure Region Compliance Check",
+  "────────────────────────────────────",
+  sprintf("🔎 Clusters reviewed: %v", [count(vars.variables)]),
+  sprintf("❌ Non-compliant clusters: %v", [count([res | s := summary.details[_]; res := s.non_compliant_resources[_]])])
+]
+
+violations := [
+  sprintf("🚫 Cluster '%s' uses disallowed Azure region: '%s'", [res.name, res.azure_region])
+  | s := summary.details[_]
+  res := s.non_compliant_resources[_]
+  res.azure_region != null
+]
+
+message := array.concat(scorecard, violations)
+detail := summary.details

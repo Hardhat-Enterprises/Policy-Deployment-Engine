@@ -1,53 +1,37 @@
 package terraform.gcp.security.azurecluster.cluster.fleet_project_whitelist
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.azurecluster.cluster.vars
+import data.terraform.gcp.security.azurecluster.cluster.fleet_project_whitelist.vars
 
-default summary = {
-  "message": []
-}
+approved_fleet_projects := ["chrome-ability-456100-t1", "prod-fleet-789", "secure-fleet"]
 
-deny[r] {
-  helpers.resource_type_match(r, "google_container_azure_cluster")
-  not helpers.has_key(r.values, "fleet")
-}
-
-deny[r] {
-  helpers.resource_type_match(r, "google_container_azure_cluster")
-  r.values.fleet.project != vars.allowed_fleet_projects[_]
-}
-
-summary["message"] = helpers.summary_with_violations(
-  "GCP Azure Cluster",
-  "Fleet project must be in allowed list",
-  deny,
-  [r.values.name | r := deny]
-)
-
-
-
-/* package terraform.gcp.security.azurecluster.cluster.fleet_project_whitelist
-
-resource_type := "google_container_azure_cluster"
-friendly_resource_name := "GCP Azure Cluster"
-approved_fleet_projects := ["secure-project-1", "prod-fleet-project", "approved-fleet"]
-
-resources := [r |
-  r := input.planned_values.root_module.resources[_]
-  r.type == resource_type
+scenarios_list := [
+  {
+    "situation_description": "🔗 Fleet project must be in the approved project list",
+    "remedies": ["✅ Use a fleet.project from the approved list"],
+    "condition": "C1: Unauthorized fleet project",
+    "attribute_path": ["fleet", 0, "project"],
+    "values": approved_fleet_projects,
+    "policy_type": "whitelist"
+  }
 ]
 
-violations := [v |
-  r := resources[_]
-  not r.values.fleet.project in approved_fleet_projects
-  v := sprintf("%s '%s' uses unapproved fleet project: '%s'", [friendly_resource_name, r.values.name, r.values.fleet.project])
+summary := helpers.get_multi_summary(scenarios_list, vars.variables)
+
+# 🧾 Fleet Project Validation Report
+header := [
+  "🛰️ Fleet Project Assignment Audit",
+  "────────────────────────────────────────────",
+  sprintf("🧩 Clusters scanned: %v", [count(vars.variables)]),
+  sprintf("🚫 Unauthorized fleet assignments: %v", [count([res | s := summary.details[_]; res := s.non_compliant_resources[_]])])
 ]
 
-summary.message := concat(", ", array.concat(
-  [
-    sprintf("Total %s detected: %d", [friendly_resource_name, count(resources)]),
-    sprintf("Non-compliant %s: %d/%d", [friendly_resource_name, count(violations), count(resources)])
-  ],
-  violations
-))
-*/
+violations := [
+  sprintf("❌ Cluster '%s' assigned to unauthorized fleet project: '%s'", [res.name, res.fleet[0].project])
+  | s := summary.details[_]
+  res := s.non_compliant_resources[_]
+  res.fleet[0].project != null
+]
+
+message := array.concat(header, violations)
+detail := summary.details

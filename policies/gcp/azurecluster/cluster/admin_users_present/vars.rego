@@ -1,4 +1,4 @@
-package terraform.gcp.security.azurecluster.cluster.name_prefix.vars
+package terraform.gcp.security.azurecluster.cluster.azure_region_whitelist.vars
 
 variables := {
   "friendly_resource_name": "GCP Azure Cluster",
