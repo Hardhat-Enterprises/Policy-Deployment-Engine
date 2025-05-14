@@ -1,4 +1,7 @@
-package terraform.gcp.security.azureclient.client.vars
+package terraform.gcp.security.container.azure_client.vars
 
-friendly_resource_name := "GCS azure container"
-resource_type := "google_container_azure_client"
+variables := {
+  "friendly_resource_name": "GCP Azure Client",
+  "resource_type": "google_container_azure_client",
+  "resource_value_name": "name"
+}

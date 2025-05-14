@@ -1,40 +1,20 @@
 package terraform.gcp.security.azureclient.client.tenant_id_whitelist
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.azureclient.client.tenant_id_whitelist.vars
+import data.terraform.gcp.security.azureclient.vars
 
-approved_tenants := [
-  "12345678-aaaa-bbbb-cccc-1234567890ab",
-  "87654321-bbbb-aaaa-dddd-0987654321cd"
-]
-
-scenarios_list := [
+conditions := [
   {
-    "situation_description": "🚨 Tenant ID must be from the approved list",
-    "remedies": ["✅ Use a tenant_id from the whitelist"],
-    "condition": "C1: Invalid tenant_id detected",
+    "situation_description": "Only approved tenant_id values are allowed for GCP Azure Clients",
+    "remedies": ["Use a tenant_id that is part of the organization's approved list"],
+    "condition": "C1: Unauthorized tenant_id",
     "attribute_path": ["tenant_id"],
-    "values": approved_tenants,
+    "values": ["12345678-aaaa-bbbb-cccc-1234567890ab", "87654321-bbbb-aaaa-dddd-0987654321cd"],
     "policy_type": "whitelist"
   }
 ]
 
-summary := helpers.get_multi_summary(scenarios_list, vars.variables)
+summary := helpers.get_multi_summary(conditions, vars.variables)
 
-total := count(vars.variables)
-violating := count([res | s := summary.details[_]; res := s.non_compliant_resources[_]])
-
-base_msgs := [
-  sprintf("📦 Total GCP Azure Clients detected: %v", [total]),
-  sprintf("🚫 Non-compliant clients: %v/%v", [violating, total])
-]
-
-violation_msgs := [
-  sprintf("❌ Client '%s' uses unapproved tenant_id: '%s'", [res.name, res.tenant_id])
-  | s := summary.details[_]
-  res := s.non_compliant_resources[_]
-]
-
-message := array.concat(base_msgs, violation_msgs)
-
+message := summary.message
 detail := summary.details

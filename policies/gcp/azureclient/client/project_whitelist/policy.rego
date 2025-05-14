@@ -1,37 +1,20 @@
 package terraform.gcp.security.azureclient.client.project_whitelist
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.azureclient.client.project_whitelist.vars
+import data.terraform.gcp.security.azureclient.vars as vars
 
-approved_projects := ["approved-project", "secure-project-1", "prod-project-xyz"]
-
-scenarios_list := [
+conditions := [
   {
-    "situation_description": "🚫 Azure client project must be from the approved list",
-    "remedies": ["✅ Use one of the approved project names"],
-    "condition": "C1: Project name is not approved",
+    "situation_description": "Azure Clients must belong to an approved GCP project",
+    "remedies": ["Use only approved project names like chrome-ability-456100-t1"],
+    "condition": "C1",
     "attribute_path": ["project"],
-    "values": approved_projects,
+    "values": ["chrome-ability-456100-t1", "secure-infra-001", "prod-core-999"],
     "policy_type": "whitelist"
   }
 ]
 
-summary := helpers.get_multi_summary(scenarios_list, vars.variables)
+summary := helpers.get_multi_summary(conditions, vars.variables)
 
-total := count(vars.variables)
-violating := count([res | s := summary.details[_]; res := s.non_compliant_resources[_]])
-
-base_msgs := [
-  sprintf("📦 Total Azure Clients detected: %v", [total]),
-  sprintf("🚫 Non-compliant clients: %v/%v", [violating, total])
-]
-
-violation_msgs := [
-  sprintf("❌ Client '%s' uses unapproved project: '%s'", [res.name, res.project])
-  | s := summary.details[_]
-  res := s.non_compliant_resources[_]
-  res.project != null
-]
-
-message := array.concat(base_msgs, violation_msgs)
+message := summary.message
 detail := summary.details

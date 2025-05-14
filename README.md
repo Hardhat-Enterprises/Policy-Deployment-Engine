@@ -1,37 +1,55 @@
-# 🛡️ GCP Azure Terraform Policies – Helper-Based Upgrade
+# 🛡️ GCP Policy Deployment - Rego Rules
 
-This folder contains a set of upgraded Rego policies for Google Cloud Platform (GCP) Azure-based Terraform resources, aligned with the Policy Deployment Engine (PDE) framework. All policies are written using `get_multi_summary()` and structured helper functions, offering reusable logic, consistent formatting, and user-friendly outputs.
-
----
-
-## ✅ Resources Covered
+This folder contains **Rego-based security and compliance policies** for GCP Terraform resources, specifically focused on:
 
 - `google_container_azure_client`
 - `google_container_azure_cluster`
 - `google_container_azure_node_pool`
 
----
-
-## 📜 Upgraded Policies
-
-| Resource                        | Policy Name               | Description                                              |
-|--------------------------------|---------------------------|----------------------------------------------------------|
-| `google_container_azure_client`| `tenant_id_whitelist`     | Only allows approved tenant IDs                          |
-| `google_container_azure_client`| `location_blacklist`      | Prevents use of blocked Azure locations                  |
-| `google_container_azure_client`| `location_whitelist`      | Enforces usage of whitelisted Azure locations            |
-| `google_container_azure_client`| `project_whitelist`       | Validates project names against a whitelist              |
-| `google_container_azure_client`| `name_prefix`             | Requires client name to start with a defined prefix      |
-| `google_container_azure_cluster`| `admin_users_present`    | Ensures only approved admin usernames are used           |
-| `google_container_azure_cluster`| `azure_region_whitelist` | Validates Azure region usage against allowed regions     |
-| `google_container_azure_cluster`| `name_prefix`            | Enforces naming convention for cluster names             |
-| `google_container_azure_cluster`| `fleet_project_whitelist`| Validates fleet.project field against approved values    |
-| `google_container_azure_node_pool`| `vm_size_whitelist`    | Requires use of specific, approved VM sizes              |
+Each policy inspects the Terraform plan file (`plan.json`) and validates attributes against defined standards. Policies are grouped by resource.
 
 ---
 
-## 🧪 How to Test
+## ✅ Resources & Policies
 
-Each policy can be tested using the OPA CLI:
+### 1. `google_container_azure_client`
+
+| Policy Name                | Description                                           |
+|---------------------------|-------------------------------------------------------|
+| `application_id_pattern`  | Ensures Application ID matches secure naming pattern |
+| `location`                | Enforces allowed/disallowed Azure client locations   |
+| `project_whitelist`       | Ensures projects belong to an approved list          |
+| `tenant_id_whitelist`     | Only whitelisted tenant IDs are allowed              |
+
+
+---
+
+### 2. `google_container_azure_cluster`
+
+| Policy Name                    | Description                                               |
+|--------------------------------|-----------------------------------------------------------|
+| `admin_groups`                 | Requires non-empty admin_groups for authorization         |
+| `admin_users_present`          | Validates presence of admin users                         |
+| `azure_region_whitelist`       | Checks cluster region against an allowed list             |
+| `fleet_project_whitelist`      | Ensures clusters are part of approved fleet projects      |
+| `kubernetes_version_whitelist` | Enforces specific Kubernetes versions                     |
+| `azure_services_authentication`| Authentication must not be disabled                       |
+
+---
+
+### 3. `google_container_azure_node_pool`
+
+| Policy Name           | Description                                     |
+|-----------------------|-------------------------------------------------|
+| `disk_size_minimum`   | VM disk size must meet minimum threshold        |
+| `node_count_range`    | Node count must fall within allowed range       |
+| `vm_size_whitelist`   | Validates VM size against approved types        |
+
+---
+
+## 🧪 How to Run
 
 ```bash
-opa eval --data ./policies/gcp --data ./helpers --input ./inputs/<resource>/<policy>/plan.json --format pretty "data.terraform.gcp.<resource_path>.<policy>.message"
+opa eval --data ./policies/gcp --data ./helpers \
+  --input ./inputs/gcp/[resource]/[policy]/plan.json \
+  --format pretty "data.terraform.gcp.security.[resource_type].[resource_name].[policy_name].message"
