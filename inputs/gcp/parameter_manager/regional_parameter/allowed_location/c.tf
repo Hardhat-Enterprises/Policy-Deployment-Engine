@@ -1,7 +1,3 @@
-# Describe your resource type here
-# Keep "c" as the name to indicate that this resource and its attributes are compliant
-
-
 resource "google_parameter_manager_regional_parameter" "c" {
   parameter_id = "regional_parameter_c"
   location = "australia-southeast1"
