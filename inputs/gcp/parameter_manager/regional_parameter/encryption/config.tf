@@ -6,6 +6,4 @@ terraform {
   }
 }
 
-provider "google" {
-  project = "abc"
-}
+provider "google" {}
