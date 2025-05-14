@@ -6,16 +6,16 @@ import data.terraform.gcp.security.app_engine.google_app_engine_standard_app_ver
 conditions := [
   [
     {
-      "situation_description": "App Engine service does not define a VPC Access Connector",
+      "situation_description": "App Engine service is not connected to a VPC via vpc_access_connector.",
       "remedies": [
-        "Add a `vpc_access_connector` block to ensure traffic is routed securely"
+        "Define a valid VPC connector using the 'vpc_access_connector.name' attribute"
       ]
     },
     {
-      "condition": "The `vpc_access_connector` block must be defined",
+      "condition": "The `vpc_access_connector.name` must not be null or empty",
       "attribute_path": ["vpc_access_connector", "name"],
       "values": [""],
-      "policy_type": "not null"
+      "policy_type": "blacklist"
     }
   ]
 ]

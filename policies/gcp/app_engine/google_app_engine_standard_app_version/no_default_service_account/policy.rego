@@ -16,7 +16,7 @@ conditions := [
     {
       "condition": "Disallow use of default App Engine service account",
       "attribute_path": ["service_account"],
-      "values": ["@appspot.gserviceaccount.com"],
+      "values": ["*@appspot.gserviceaccount.com"],
       "policy_type": "pattern blacklist"
     }
   ]
