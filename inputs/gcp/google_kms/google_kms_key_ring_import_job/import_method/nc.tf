@@ -1,6 +1,3 @@
-# Describe your resource type here
-# Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
-
 # Unsupported import_method
 resource "google_kms_key_ring_import_job" "nc_method" {
   import_job_id    = "bad-import-job"

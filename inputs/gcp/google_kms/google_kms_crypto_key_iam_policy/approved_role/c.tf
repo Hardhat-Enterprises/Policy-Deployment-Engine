@@ -1,6 +1,3 @@
-# Describe your resource type here
-# Keep "c" as the name to indicate that this resource and its attributes are compliant
-
 data "google_iam_policy" "compliant"{
     binding {
     role = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
