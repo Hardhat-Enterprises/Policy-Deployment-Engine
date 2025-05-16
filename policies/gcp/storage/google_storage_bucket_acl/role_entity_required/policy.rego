@@ -6,16 +6,20 @@ import data.terraform.gcp.security.storage.google_storage_bucket_acl.vars
 conditions := [
   [
     {
-      "situation_description": "'role_entity' is required to define access roles explicitly.",
+      "situation_description": "'role_entity' contains unapproved values.",
       "remedies": [
-        "Include the 'role_entity' field to define user or group roles for the bucket."
+        "Ensure 'role_entity' only includes approved entities: user:user@example.com, group:admin@example.com, or domain:example.com"
       ]
     },
     {
-      "condition": "This resource is missing or has empty 'role_entity'.",
+      "condition": "Only exact whitelisted role_entity sets allowed.",
       "attribute_path": ["role_entity"],
-      "values": [null, []],  # ✅ Catch both missing and empty lists
-      "policy_type": "blacklist"
+      "values": [
+        ["user:user@example.com", "group:admin@example.com", "domain:example.com"],
+        ["group:admin@example.com", "user:user@example.com", "domain:example.com"]
+        # Add permutations if needed
+      ],
+      "policy_type": "whitelist"
     }
   ]
 ]

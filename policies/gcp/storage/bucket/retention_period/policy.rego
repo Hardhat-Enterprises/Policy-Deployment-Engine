@@ -11,7 +11,7 @@ conditions := [
         },
         {
             "condition": "Retention must be within 7 to 30 days.",
-            "attribute_path": ["retention_policy", "retention_period"],
+            "attribute_path": ["retention_policy", 0, "retention_period"],
             "values": [604800, 2592000],
             "policy_type": "range"
         }

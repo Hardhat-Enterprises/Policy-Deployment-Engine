@@ -1,4 +1,4 @@
-package terraform.gcp.security.storage.bucket.storage_class_blacklist
+package terraform.gcp.security.storage.bucket.storage_class_whitelist
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.storage.bucket.vars
@@ -6,14 +6,14 @@ import data.terraform.gcp.security.storage.bucket.vars
 conditions := [
     [
         {
-            "situation_description": "Bucket uses cold storage class which is blacklisted for critical workloads.",
+            "situation_description": "Bucket uses a storage class that is not approved for critical workloads.",
             "remedies": ["Set storage_class to STANDARD or MULTI_REGIONAL"]
         },
         {
-            "condition": "Disallow cold storage classes",
+            "condition": "Only allow STANDARD or MULTI_REGIONAL storage classes",
             "attribute_path": ["storage_class"],
-            "values": ["NEARLINE", "COLDLINE", "ARCHIVE"],
-            "policy_type": "blacklist"
+            "values": ["STANDARD", "MULTI_REGIONAL"],
+            "policy_type": "whitelist"
         }
     ]
 ]

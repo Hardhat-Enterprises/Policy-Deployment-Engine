@@ -6,16 +6,16 @@ import data.terraform.gcp.security.storage.google_storage_bucket_acl.vars
 conditions := [
   [
     {
-      "situation_description": "The bucket ACL uses the 'default_acl' field, which is discouraged for security and consistency reasons.",
+      "situation_description": "'default_acl' is set, but only null is allowed to prevent misconfigured access.",
       "remedies": [
-        "Remove the use of 'default_acl' and manage access using 'predefined_acl' or 'role_entity' explicitly."
+        "Remove the 'default_acl' field or set it to null. Use 'predefined_acl' or 'role_entity' to manage access instead."
       ]
     },
     {
-      "condition": "This resource sets 'default_acl' to a non-null value.",
-      "attribute_path": ["default_acl"],  
-      "values": ["projectPrivate"],       
-      "policy_type": "blacklist"
+      "condition": "'default_acl' must be null.",
+      "attribute_path": ["default_acl"],
+      "values": [null],
+      "policy_type": "whitelist"
     }
   ]
 ]

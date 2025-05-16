@@ -6,16 +6,16 @@ import data.terraform.gcp.security.storage.google_storage_bucket_acl.vars
 conditions := [
   [
     {
-      "situation_description": "The bucket ACL uses 'predefined_acl', which is discouraged to ensure fine-grained access control.",
+      "situation_description": "'predefined_acl' is set, but only a null value is allowed to enforce fine-grained control via 'role_entity'.",
       "remedies": [
-        "Use 'role_entity' instead of 'predefined_acl' for clearer ACL definitions."
+        "Remove 'predefined_acl' or set it to null, and define access using 'role_entity' instead."
       ]
     },
     {
-      "condition": "This resource sets 'predefined_acl' to a non-null value.",
+      "condition": "'predefined_acl' must be null.",
       "attribute_path": ["predefined_acl"],
-      "values": ["private", "projectPrivate", "publicRead", "publicReadWrite", "authenticatedRead", "bucketOwnerRead", "bucketOwnerFullControl", "logDeliveryWrite"],
-      "policy_type": "blacklist"
+      "values": [null],
+      "policy_type": "whitelist"
     }
   ]
 ]
