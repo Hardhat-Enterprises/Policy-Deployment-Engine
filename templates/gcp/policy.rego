@@ -93,7 +93,7 @@ conditions := [
     {
         "condition": "Wrong description pattern",
         "attribute_path" : ["description"],
-        "values" : ["project//gcp/", [["a","c","d"],["b","d"]]], # Value to be compared
+        "values" : ["project/*/gcp/*", [["a","c","d"],["b","d"]]], # Value to be compared
         "policy_type" : "pattern whitelist" # First value must be one of a,c,d. Second value must be one of b,d.
     }
     ]
@@ -105,7 +105,7 @@ conditions := [
     {
         "condition": "Wrong description pattern",
         "attribute_path" : ["description"],
-        "values" : ["project/*", [["root"]]], # Value to be compared
+        "values" : ["project/*", [["root"]], # Value to be compared
         "policy_type" : "pattern blacklist" # Can be any value but root
     }
     ]
