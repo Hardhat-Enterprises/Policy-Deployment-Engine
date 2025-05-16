@@ -1,16 +1,16 @@
-package terraform.gcp.security.cloud_vmware_engine.network.block_legacy # Edit here 
+package terraform.gcp.security.cloud_vmware_engine.network.block_legacy  
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.cloud_vmware_engine.network.vars
 
 conditions := [
     [
-    {"situation_description" : "Legacy network should be blocked",
-    "remedies":[ "Legacy network should be blocked"]},
+    {"situation_description" : "Check if legacy network type is used",
+    "remedies":[ "Do not use legacy network as it is being phased out now, use standard instead"]},
     {
         "condition": "c1 Legacy network is not allowed",
-        "attribute_path" : ["type"], # An array of strings and indicies eg. ["rsa",0,"key"]
-        "values" : ["LEGACY"], # Values to compare against
-        "policy_type" : "blacklist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
+        "attribute_path" : ["type"], 
+        "values" : ["LEGACY"], 
+        "policy_type" : "blacklist" 
     }
     ]
 ]
@@ -18,7 +18,4 @@ conditions := [
 summary := helpers.get_multi_summary(conditions, vars.variables)
 message := summary.message
 
-# Displays a detailed summary of each resources compliance to every condition and situation
-# Useful for debugging
-# Use 'opa eval ... "data.terraform.gcp.security.<service>.<resource_type>.<policy_name>.details"
 details := helpers.get_multi_summary(conditions, vars.variables).details

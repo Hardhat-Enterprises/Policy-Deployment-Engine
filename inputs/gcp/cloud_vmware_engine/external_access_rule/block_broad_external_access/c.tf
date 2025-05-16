@@ -1,6 +1,3 @@
-# Describe your resource type here
-# Keep "c" as the name to indicate that this resource and its attributes are compliant
-
 resource "google_vmwareengine_network" "external-access-rule-nw" {
   name        = "sample-nw"
   location    = "global"

@@ -1,9 +1,6 @@
-# Describe your resource type here
-# Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
-
 resource "google_vmwareengine_network" "nc" {
   project     = google_project_service.acceptance_nc.project
-  name        = "us-west1-nc-default" #Legacy network IDs are in the format: {region-id}-default
+  name        = "us-west1-nc-default" 
   location    = "us-west1"
   type        = "LEGACY"
   description = "VMwareEngine legacy network sample"

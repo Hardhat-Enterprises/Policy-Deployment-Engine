@@ -1,6 +1,3 @@
-# Describe your resource type here
-# Keep "c" as the name to indicate that this resource and its attributes are compliant
-
 resource "google_vmwareengine_private_cloud" "c" {
   location    = "australia-southeast-1"
   name        = "sample-private-cloud-c"

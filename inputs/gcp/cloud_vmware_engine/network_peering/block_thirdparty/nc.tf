@@ -1,6 +1,3 @@
-# Describe your resource type here
-# Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
-
 resource "google_vmwareengine_network" "network-peering-nw_nc" {
    name              = "default-np-nw"
    location          = "global"

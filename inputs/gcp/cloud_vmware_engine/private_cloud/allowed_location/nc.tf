@@ -1,6 +1,3 @@
-# Describe your resource type here
-# Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
-
 resource "google_vmwareengine_private_cloud" "nc" {
   location    = "us-west1-a"
   name        = "sample-private-cloud-nc"
