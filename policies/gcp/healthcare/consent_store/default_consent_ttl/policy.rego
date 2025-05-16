@@ -1,6 +1,6 @@
 package terraform.gcp.security.healthcare.consent_store.default_consent_ttl
-
 import data.terraform.gcp.helpers
+import data.terraform.gcp.security.healthcare.consent_store.vars
 
 scenarios_list := [
     # SCENARIO 1
@@ -12,19 +12,12 @@ scenarios_list := [
         {
             "condition": "non-compliant default_consent_ttl",
             "attribute_path": ["default_consent_ttl"],
-            "values": ["3600s"],  # explicitly blacklist this value
-            "policy_type": "blacklist"
+            "values": ["3600s"],
+            "policy_type": "whitelist"
         }
     ]
 ]
 
-variables := {
-    "resource_type": "google_healthcare_consent_store",
-    "friendly_resource_name": "Google Cloud Healthcare Consent Store",
-    "resource_value_name": "default_consent_ttl"
-}
+message := helpers.get_multi_summary(scenarios_list, vars.variables).message
 
-summary := helpers.get_multi_summary(scenarios_list, variables)
-
-message := summary.message
-detail := summary.details
+details := helpers.get_multi_summary(scenarios_list, vars.variables).details

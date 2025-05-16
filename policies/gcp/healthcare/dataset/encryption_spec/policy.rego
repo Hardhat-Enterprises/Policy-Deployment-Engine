@@ -1,5 +1,4 @@
 package terraform.gcp.security.healthcare.dataset.encryption_spec
-
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.healthcare.dataset.vars
 
@@ -18,13 +17,6 @@ scenarios_list := [
     ]
 ]
 
-variables := {
-    "resource_type": "google_healthcare_dataset",
-    "friendly_resource_name": "Google Cloud Healthcare Dataset",
-    "resource_value_name": "name"
-}
+message := helpers.get_multi_summary(scenarios_list, vars.variables).message
 
-summary := helpers.get_multi_summary(scenarios_list, variables)
-
-message := summary.message
-detail := summary.details
+details := helpers.get_multi_summary(scenarios_list, vars.variables).details
