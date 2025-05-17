@@ -9,19 +9,16 @@ conditions := [
     "remedies":[ "for private dns zones"]},
     {
         "condition": "for privately visible zones",
-        "attribute_path" : ["managed_zone_private"], # An array of strings and indicies eg. ["rsa",0,"key"]
-        "values" : [], # Values to compare against
-        "policy_type" : "whitelist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
+        "attribute_path" : ["private_visibility_config", 1, "network_url", 0], 
+        "values" : [false], 
+        "policy_type" : "whitelist" 
     }
     ]
 ]
    
 
-# Displays a general message about policy compliance
-# Use 'opa eval ... "data.terraform.gcp.security.<service>.<resource_type>.<policy_name>.message"
+
 message := helpers.get_multi_summary(conditions, vars.variables).message
 
-# Displays a detailed summary of each resources compliance to every condition and situation
-# Useful for debugging
-# Use 'opa eval ... "data.terraform.gcp.security.<service>.<resource_type>.<policy_name>.details"
+
 details := helpers.get_multi_summary(conditions, vars.variables).details

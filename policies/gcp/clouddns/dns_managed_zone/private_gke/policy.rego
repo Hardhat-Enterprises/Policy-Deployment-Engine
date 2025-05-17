@@ -1,4 +1,4 @@
-package terraform.gcp.security.clouddns.dns_managed_zone.private_gke # Edit here 
+package terraform.gcp.security.clouddns.dns_managed_zone.private_gke 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.clouddns.dns_managed_zone.vars
 
@@ -9,9 +9,9 @@ conditions := [
     "remedies":[ "describes gke cluster name"]},
     {
         "condition": "whitelist for private gke cluster name",
-        "attribute_path" : ["private_gke"], # An array of strings and indicies eg. ["rsa",0,"key"]
-        "values" : [], # Values to compare against
-        "policy_type" : "whitelist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
+        "attribute_path" : ["private_visibility_config", 0, "gke_cluster_name", 0], 
+        "values" : [], 
+        "policy_type" : "whitelist" 
     }
     ]
 ]

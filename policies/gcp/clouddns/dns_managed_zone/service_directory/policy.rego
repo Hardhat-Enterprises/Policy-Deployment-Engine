@@ -1,4 +1,4 @@
-package terraform.gcp.security.clouddns.dns_managed_zone.service_directory # Edit here 
+package terraform.gcp.security.clouddns.dns_managed_zone.service_directory  
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.clouddns.dns_managed_zone.vars
 
@@ -9,9 +9,9 @@ conditions := [
     "remedies":[ "service directory for organisation"]},
     {
         "condition": "creates a service directory for private dns",
-        "attribute_path" : ["service_directory"], # An array of strings and indicies eg. ["rsa",0,"key"]
-        "values" : [""], # Values to compare against
-        "policy_type" : "whitelist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
+        "attribute_path" : ["service_directory_config", 0, "namespace_url", 0],
+        "values" : [""], 
+        "policy_type" : "whitelist" 
     }
     ]
 ]

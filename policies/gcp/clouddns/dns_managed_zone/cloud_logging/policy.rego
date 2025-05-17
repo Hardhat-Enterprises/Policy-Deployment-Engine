@@ -9,9 +9,9 @@ conditions := [
     "remedies":[ "enables cloud logging"]},
     {
         "condition": "cloud logging in enable dns zone",
-        "attribute_path" : ["cloud_logging"], # An array of strings and indicies eg. ["rsa",0,"key"]
-        "values" : [""], # Values to compare against
-        "policy_type" : "whitelist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
+        "attribute_path" : ["cloud_logging"], 
+        "values" : [true], 
+        "policy_type" : "whitelist" 
     }
     ]
 ]

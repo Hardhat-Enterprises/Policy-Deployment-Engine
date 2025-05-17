@@ -9,9 +9,9 @@ conditions := [
     "remedies":[ "Blocks unauthorised networks"]},
     {
         "condition": "Whitelists allowed networks",
-        "attribute_path" : ["networks"], # An array of strings and indicies eg. ["rsa",0,"key"]
-        "values" : [], # Values to compare against
-        "policy_type" : "whitelist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
+        "attribute_path" : ["networks", 0, "network_url", 0], 
+        "values" : [true], 
+        "policy_type" : "whitelist" 
     }
     ]
 ]

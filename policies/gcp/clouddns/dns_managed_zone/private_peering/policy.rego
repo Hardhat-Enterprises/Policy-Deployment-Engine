@@ -9,9 +9,9 @@ conditions := [
     "remedies":[ "allows creation of a private peer network"]},
     {
         "condition": "sets private peering and disallows public",
-        "attribute_path" : ["private_peering"], # An array of strings and indicies eg. ["rsa",0,"key"]
-        "values" : [""], # Values to compare against
-        "policy_type" : "whitelist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
+        "attribute_path" : ["peering_config", 0, "network_url", 0], 
+        "values" : ["private"], 
+        "policy_type" : "whitelist" 
     }
     ]
 ]

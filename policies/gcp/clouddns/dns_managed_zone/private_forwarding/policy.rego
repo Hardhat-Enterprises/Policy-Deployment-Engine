@@ -9,18 +9,15 @@ conditions := [
     "remedies":[ "random ipv4 address allocation"]},
     {
         "condition": "specifies whitelisted ip4 addresses for forwarding",
-        "attribute_path" : ["private_forwarding"], 
+        "attribute_path" : ["forwarding_config", 0, "target_name_servers", 0, "139.0.0.1"], 
         "values" : [], 
         "policy_type" : "whitelist" 
     }
     ]
 ]
     
-# Displays a general message about policy compliance
-# Use 'opa eval ... "data.terraform.gcp.security.<service>.<resource_type>.<policy_name>.message"
+
 message := helpers.get_multi_summary(conditions, vars.variables).message
 
-# Displays a detailed summary of each resources compliance to every condition and situation
-# Useful for debugging
-# Use 'opa eval ... "data.terraform.gcp.security.<service>.<resource_type>.<policy_name>.details"
+
 details := helpers.get_multi_summary(conditions, vars.variables).details
