@@ -2,7 +2,7 @@ package terraform.gcp.security.healthcare.hl7_v2_store.labels
 import data.terraform.gcp.security.healthcare.hl7_v2_store.vars
 import data.terraform.gcp.helpers
 
-scenarios_list := [
+conditions := [
     [
         {
             "situation_description": "Sensitive or non-approved label keys found in HL7v2 store.",
@@ -20,6 +20,6 @@ scenarios_list := [
     ]
 ]
 
-message := helpers.get_multi_summary(scenarios_list, vars.variables).message
+message := helpers.get_multi_summary(conditions, vars.variables).message
 
-details := helpers.get_multi_summary(scenarios_list, vars.variables).details
+details := helpers.get_multi_summary(conditions, vars.variables).details

@@ -2,7 +2,7 @@ package terraform.gcp.security.healthcare.fhir_store.disable_referential_integri
 import data.terraform.gcp.security.healthcare.fhir_store.vars
 import data.terraform.gcp.helpers
 
-scenarios_list := [
+conditions := [
     [
         {
             "situation_description": "Non-compliant 'disable_referential_integrity' setting.",
@@ -17,6 +17,6 @@ scenarios_list := [
     ]
 ]
 
-message := helpers.get_multi_summary(scenarios_list, vars.variables).message
+message := helpers.get_multi_summary(conditions, vars.variables).message
 
-details := helpers.get_multi_summary(scenarios_list, vars.variables).details
+details := helpers.get_multi_summary(conditions, vars.variables).details

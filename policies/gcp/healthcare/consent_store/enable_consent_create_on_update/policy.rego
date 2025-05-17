@@ -2,7 +2,7 @@ package terraform.gcp.security.healthcare.consent_store.enable_consent_create_on
 import data.terraform.gcp.security.healthcare.consent_store.vars
 import data.terraform.gcp.helpers
 
-scenarios_list := [
+conditions := [
     [
         {
             "situation_description": "Non-compliant enable_consent_create_on_update setting.",
@@ -17,6 +17,6 @@ scenarios_list := [
     ]
 ]
 
-message := helpers.get_multi_summary(scenarios_list, vars.variables).message
+message := helpers.get_multi_summary(conditions, vars.variables).message
 
-details := helpers.get_multi_summary(scenarios_list, vars.variables).details
+details := helpers.get_multi_summary(conditions, vars.variables).details

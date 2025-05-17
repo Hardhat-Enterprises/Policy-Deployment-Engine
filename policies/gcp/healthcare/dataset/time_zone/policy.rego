@@ -2,22 +2,23 @@ package terraform.gcp.security.healthcare.dataset.time_zone
 import data.terraform.gcp.security.healthcare.dataset.vars
 import data.terraform.gcp.helpers
 
-scenarios_list := [
-    # SCENARIO 1
+conditions := [
     [
         {
-            "situation_description": "Non-compliant time_zone setting.",
-            "remedies": ["Use UTC+10:00 as time_zone."]
+            "situation_description": "Non-compliant 'time_zone' setting.",
+            "remedies": [
+                "Set 'time_zone' to the approved value: 'UTC+10:00' to ensure consistency across systems and avoid scheduling or rotation issues."
+            ]
         },
         {
-            "condition": "non-compliant time_zone",
+            "condition": "non-approved time_zone value",
             "attribute_path": ["time_zone"],
-            "values": ["UTC+5:00"],  # explicitly blacklist this
-            "policy_type": "blacklist"
+            "values": ["UTC+10:00"],
+            "policy_type": "whitelist"
         }
     ]
 ]
 
-message := helpers.get_multi_summary(scenarios_list, vars.variables).message
+message := helpers.get_multi_summary(conditions, vars.variables).message
 
-details := helpers.get_multi_summary(scenarios_list, vars.variables).details
+details := helpers.get_multi_summary(conditions, vars.variables).details
