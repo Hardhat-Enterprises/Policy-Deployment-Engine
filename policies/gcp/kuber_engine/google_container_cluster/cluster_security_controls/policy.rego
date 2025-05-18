@@ -1,7 +1,7 @@
 package terraform.gcp.security.kuber_engine.google_container_cluster.cluster_security_controls
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.kuber_engine.google_container_cluster.cluster_security_controls.vars
+import data.terraform.gcp.security.kuber_engine.google_container_cluster.vars
 
 conditions := [
 

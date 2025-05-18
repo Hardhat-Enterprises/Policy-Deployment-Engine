@@ -1,4 +1,4 @@
-package terraform.gcp.security.kuber_engine.google_container_node_pool.network_config.vars
+package terraform.gcp.security.kuber_engine.google_container_node_pool.vars
 
 
 variables := {

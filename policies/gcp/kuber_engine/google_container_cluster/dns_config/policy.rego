@@ -1,7 +1,7 @@
 package terraform.gcp.security.kuber_engine.google_container_cluster.dns_config
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.kuber_engine.google_container_cluster.dns_config.vars
+import data.terraform.gcp.security.kuber_engine.google_container_cluster.vars
 
 conditions := [
 

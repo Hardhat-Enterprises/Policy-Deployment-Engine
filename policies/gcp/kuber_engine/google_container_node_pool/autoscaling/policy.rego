@@ -1,7 +1,7 @@
 package terraform.gcp.security.kuber_engine.google_container_node_pool.autoscaling
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.kuber_engine.google_container_node_pool.autoscaling.vars
+import data.terraform.gcp.security.kuber_engine.google_container_node_pool.vars
 
 conditions := [
   [

@@ -1,7 +1,7 @@
 package terraform.gcp.security.kuber_engine.google_container_node_pool.network_config
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.kuber_engine.google_container_node_pool.network_config.vars
+import data.terraform.gcp.security.kuber_engine.google_container_node_pool.vars
 
 # STEP 1: STUDY YOUR RESOURCE AND ITS ATTRIBUTES, THEN FILL IN THE VARS FILE
 

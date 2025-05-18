@@ -1,4 +1,4 @@
-package terraform.gcp.security.kuber_engine.google_container_cluster.dns_config.vars
+package terraform.gcp.security.kuber_engine.google_container_cluster.vars
 
 variables := {
   "friendly_resource_name": "GKE Cluster",

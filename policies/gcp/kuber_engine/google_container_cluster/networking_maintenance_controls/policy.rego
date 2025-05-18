@@ -1,7 +1,7 @@
 package terraform.gcp.security.kuber_engine.google_container_cluster.networking_maintenance_controls
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.kuber_engine.google_container_cluster.networking_maintenance_controls.vars
+import data.terraform.gcp.security.kuber_engine.google_container_cluster.vars
 
 conditions := [
 
