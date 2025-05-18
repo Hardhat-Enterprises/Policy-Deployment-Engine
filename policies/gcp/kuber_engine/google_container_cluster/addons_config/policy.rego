@@ -9,7 +9,7 @@ conditions := [
   # horizontal_pod_autoscaling
   [
     {
-      "situation_description": "Horizontal Pod Autoscaling is disabled",
+      "situation_description": "HPA is disabled, increasing risk of resource exhaustion or DoS attacks under high load.",
       "remedies": ["Set horizontal_pod_autoscaling.disabled = false"]
     },
     {
