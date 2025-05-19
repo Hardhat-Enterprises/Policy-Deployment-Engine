@@ -3,7 +3,7 @@ package terraform.gcp.security.Cloud_Run.google_cloud_run_v2_service.vpc_access
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.Cloud_Run.google_cloud_run_v2_service.vars
 
-# STEP 1: Define compliance conditions
+
 conditions := [
   [
     {
@@ -22,8 +22,6 @@ conditions := [
   ]
 ]
 
-# Displays a general message about policy compliance
-message := helpers.get_multi_summary(conditions, vars.variables).message
 
-# Displays a detailed summary of each resources compliance to every condition and situation
+message := helpers.get_multi_summary(conditions, vars.variables).message
 details := helpers.get_multi_summary(conditions, vars.variables).details
