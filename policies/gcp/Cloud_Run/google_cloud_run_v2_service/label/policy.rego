@@ -7,10 +7,8 @@ required_labels := ["env", "owner", "cost-center"]
 
 resources := helpers.get_all_resources(vars.variables.resource_type)
 
-# List of non-compliant resource names
 non_compliant := [r.values.name | r := resources[_]; not is_compliant(r)]
 
-# Function: returns true if all required labels are present in the resource
 is_compliant(r) if {
     all_required_present := [label | label := required_labels[_]; r.values.labels[label]]
     count(all_required_present) == count(required_labels)
