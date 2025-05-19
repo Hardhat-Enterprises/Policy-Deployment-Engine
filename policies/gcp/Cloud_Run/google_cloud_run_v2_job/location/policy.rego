@@ -13,7 +13,7 @@ conditions := [
     },
     {
       "condition": "Ensure location is in the approved list",
-      "attribute_path": ["location"],  # ✅ fixed path (no "values")
+      "attribute_path": ["location"],  
       "values": ["AU"],
       "policy_type": "whitelist"
     }
