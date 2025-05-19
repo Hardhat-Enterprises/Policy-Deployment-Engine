@@ -20,8 +20,8 @@ conditions := [
   ]
 ]
 
-# Summary message for OPA evaluation
+
 message := helpers.get_multi_summary(conditions, vars.variables).message
 
-# Detailed compliance evaluation for each resource
+
 details := helpers.get_multi_summary(conditions, vars.variables).details
