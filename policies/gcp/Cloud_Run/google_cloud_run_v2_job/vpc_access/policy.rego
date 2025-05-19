@@ -3,7 +3,7 @@ package terraform.gcp.security.Cloud_Run.google_cloud_run_v2_job.vpc_access
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.Cloud_Run.google_cloud_run_v2_job.vars
 
-# Policy conditions
+
 conditions := [
   [
     {
@@ -22,6 +22,5 @@ conditions := [
   ]
 ]
 
-# Must use vars.variables, not vars.vpc_access
 message := helpers.get_multi_summary(conditions, vars.variables).message
 details := helpers.get_multi_summary(conditions, vars.variables).details
