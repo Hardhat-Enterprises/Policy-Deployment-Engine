@@ -15,7 +15,10 @@ conditions := [
     {
       "condition": "Reject images that exactly match ':latest' tag",
       "attribute_path": ["template", "containers", 0, "image"],
-      "values": ["gcr.io/my-project/my-image:latest"],
+      "values": [
+      "gcr.io/my-project/my-image:latest",
+      "docker.io/library/nginx:latest"
+        ],
       "policy_type": "blacklist"
     }
   ]
