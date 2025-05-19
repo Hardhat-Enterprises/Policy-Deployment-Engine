@@ -3,17 +3,18 @@ import data.terraform.gcp.helpers as helpers
 import data.terraform.gcp.security.google_kms.google_kms_crypto_key.vars as vars
 
 conditions := [
-[   #Situation 1: Purpose must be ENCRYPT_DECRYPT 
+    [   
     {"situation_description" : "Purpose is not correct",
     "remedies":[ "Purpose must be ENCRYPT_DECRYPT or ASYMMETRIC_SIGN"]},
     {
         "condition": "Check purpose",
         "attribute_path" : ["purpose"],
-        "values" : ["ENCRYPT_DECRYPT"],
+        "values" : ["ENCRYPT_DECRYPT"," ASYMMETRIC_DECRYPT"],
         "policy_type" : "whitelist" 
     }
-    ], 
-    [#Situation 2 If purpose is asymmetric sign then the signing label must be true
+    ],
+
+    [
     {"situation_description" : "ASYMMETRIC SIGN but missing label true",
     "remedies":[ "ASYMMETRIC_SIGN purpose must have label set to true"]},
     {
@@ -32,4 +33,5 @@ conditions := [
     ]
 ]
 
-message = helpers.get_multi_summary(conditions, vars.variables)
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

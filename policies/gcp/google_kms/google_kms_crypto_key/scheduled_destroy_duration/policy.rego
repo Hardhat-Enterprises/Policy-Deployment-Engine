@@ -2,9 +2,9 @@ package terraform.gcp.security.google_kms.google_kms_crypto_key.destroy
 import data.terraform.gcp.helpers as helpers
 import data.terraform.gcp.security.google_kms.google_kms_crypto_key.vars as vars
 
-#Situation: 1
-situation :=[
-[
+
+conditions :=[
+    [
     {"situation_description" : "Crypto key destroy duration",
     "remedies":[ "Duration can only be one month"]},
 
@@ -16,5 +16,6 @@ situation :=[
     }
     ]
 ]
-summary = helpers.get_multi_summary(situation,vars.variables)
-message = summary.message
+
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

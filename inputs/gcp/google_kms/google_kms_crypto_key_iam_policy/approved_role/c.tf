@@ -3,8 +3,7 @@ data "google_iam_policy" "compliant"{
     role = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
 
     members = [
-      "user:compliant-user@example.com",
-      "serviceAccount:encrypt-sa@my-project.iam.gserviceaccount.com",
+      "serviceAccount:admin-user@example.com",
     ]
   }
 }

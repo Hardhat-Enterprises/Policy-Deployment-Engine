@@ -5,13 +5,13 @@ resource "google_kms_crypto_key_iam_binding" "nc_1" {
   crypto_key_id = "projects/my-project/locations/global/keyRings/my-keyring/cryptoKeys/my-key"
   role          = "roles/owner"  #  Not in whitelist
   members       = [
-    "user:unauthorized@example.com"
+    "user:admin-user@example.com"
   ]
 }
 
 # Violation 2: Admin role used with a user (not service account)
 resource "google_kms_crypto_key_iam_binding" "nc_2" {
-  crypto_key_id = "projects/my-project/locations/global/keyRings/my-keyring/cryptoKeys/my-key"
+  crypto_key_id = "projects/my-project/locations/global/keyRings/my-keyring/cryptoKeys/non-admin"
   role          = "roles/cloudkms.admin"  # Admin role
   members       = [
     "user:admin-user@example.com"  #  Should be a serviceAccount
