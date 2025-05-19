@@ -14,7 +14,6 @@ is_compliant(r) if {
     count(all_required_present) == count(required_labels)
 }
 
-# Message summary
 message := [
     sprintf("Total Cloud Run v2 Job detected: %v", [count(resources)]),
     [
