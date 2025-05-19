@@ -212,7 +212,7 @@ check_conditions(resource_type, situation, friendly_resource_name, value_name) =
     violations := {
         "situation_description": sd,
         "remedies": remedies,
-        "all_conditions": messages #[{c1 : [{msg, nc}, {msg, nc}, ...]}, {c2 :[{msg, nc}, ...]}, ... : [...], ...}]
+        "all_conditions": messages #[{c1 : [{msg, nc}, {msg, nc}, ...]}, {c2 :[{msg, nc}, ...]}, ... : {[...], ...}]
     }
 }
 
@@ -481,7 +481,7 @@ format_pattern_blacklist_message(friendly_resource_name, resource_value_name, at
     ) 
 }
 
-# PATTERN WHITELIST (clone of blacklist, but not array_contains()
+# PATTERN WHITELIST (clone of blacklist, but not array_contains())
 get_nc_pattern_whitelist(resource, attribute_path, target, patterns) = ncc if {
     target_list = get_target_list(resource, attribute_path, target) # list of targetted substrings
     ncc := [

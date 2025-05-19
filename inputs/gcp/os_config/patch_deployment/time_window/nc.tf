@@ -36,7 +36,7 @@ resource "google_os_config_patch_deployment" "nc" {
   recurring_schedule {
     # Proper time zone specification
     time_zone {
-      id = "Australia/Melbourne"
+      id = "USA/New York"
     }
     
     # Non-compliant: Scheduled at 10:00 AM (during business hours 8AM-5PM)
