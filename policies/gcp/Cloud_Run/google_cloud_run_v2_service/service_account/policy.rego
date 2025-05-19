@@ -3,7 +3,6 @@ package terraform.gcp.security.Cloud_Run.google_cloud_run_v2_service.service_acc
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.Cloud_Run.google_cloud_run_v2_service.vars
 
-# Define the policy conditions
 conditions := [
   [
     {
