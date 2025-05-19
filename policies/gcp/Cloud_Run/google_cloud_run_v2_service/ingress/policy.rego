@@ -1,4 +1,4 @@
-package terraform.gcp.security.Cloud_Run.google_cloud_run_v2_service.label
+package terraform.gcp.security.Cloud_Run.google_cloud_run_v2_service.ingress
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.Cloud_Run.google_cloud_run_v2_service.vars
@@ -6,17 +6,17 @@ import data.terraform.gcp.security.Cloud_Run.google_cloud_run_v2_service.vars
 conditions := [
   [
     {
-      "situation_description": "Cloud Run service is missing required labels: env, owner, cost-center.",
+      "situation_description": "Cloud Run service allows unrestricted ingress traffic.",
       "remedies": [
-        "Add the required labels under the 'labels' block.",
-        "Example: labels = { env = \"prod\", owner = \"security-team\", cost-center = \"cc-12345\" }"
+        "Set ingress to 'INGRESS_TRAFFIC_INTERNAL_ONLY' or 'INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER'.",
+        "This limits external exposure and reduces risk."
       ]
     },
     {
-      "condition": "Ensure required labels exist",
-      "attribute_path": ["labels"],
-      "values": [["env", "owner", "cost-center"]],
-      "policy_type": "pattern whitelist"
+      "condition": "Restrict ingress setting",
+      "attribute_path": ["ingress"],
+      "values": ["INGRESS_TRAFFIC_ALL"],
+      "policy_type": "blacklist"
     }
   ]
 ]
