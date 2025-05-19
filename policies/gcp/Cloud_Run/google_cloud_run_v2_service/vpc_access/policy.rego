@@ -3,7 +3,6 @@ package terraform.gcp.security.Cloud_Run.google_cloud_run_v2_service.vpc_access
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.Cloud_Run.google_cloud_run_v2_service.vars
 
-# List of approved VPC connectors
 approved_connectors := [
   "projects/my-project/locations/AU/connectors/my-vpc-connector"
 ]
