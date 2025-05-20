@@ -5,20 +5,6 @@ import data.terraform.gcp.security.kuber_engine.google_container_cluster.vars
 
 conditions := [
 
- 
-  [
-    {
-      "situation_description": "Default SNAT is not disabled (in-node masquerading still active)",
-      "remedies": ["Set default_snat_status.disabled = true"]
-    },
-    {
-      "condition": "Ensure SNAT is disabled for better network control",
-      "attribute_path": ["default_snat_status", 0, "disabled"],
-      "values": [true],
-      "policy_type": "whitelist"
-    }
-  ],
-
   [
     {
       "situation_description": "Pod IP CIDR block is not configured",
