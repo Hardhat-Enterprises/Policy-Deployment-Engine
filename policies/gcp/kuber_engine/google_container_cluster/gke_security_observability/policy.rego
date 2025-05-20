@@ -45,8 +45,8 @@ conditions := [
         {
             "condition": "Ensure workload_identity_config uses valid workload pool",
             "attribute_path": ["workload_identity_config", 0, "workload_pool"],
-            "values": ["my-project.svc.id.goog"],
-            "policy_type": "whitelist"
+            "values": [["endsWith", ".svc.id.goog"]],
+            "policy_type": "pattern whitelist"
         }
     ]
 ]
