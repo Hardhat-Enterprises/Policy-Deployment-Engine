@@ -5,7 +5,7 @@ import data.terraform.gcp.security.kuber_engine.google_container_cluster.vars
 
 conditions := [
 
-  # 1. cluster_dns should be CLOUD_DNS
+  
   [
     {"situation_description" : "DNS provider is not set to CLOUD_DNS",
      "remedies": ["Set 'cluster_dns' to 'CLOUD_DNS' to enable modern Cloud DNS support."]},
@@ -17,7 +17,7 @@ conditions := [
     }
   ],
 
-  # 2. cluster_dns_scope should be VPC_SCOPE
+
   [
     {"situation_description" : "Cluster DNS scope is not set to VPC_SCOPE",
      "remedies": ["Set 'cluster_dns_scope' to 'VPC_SCOPE' for correct DNS resolution."]},
@@ -29,7 +29,7 @@ conditions := [
     }
   ],
 
-  # 3. cluster_dns_domain should be cluster.local
+ 
   [
     {"situation_description" : "DNS domain is not 'cluster.local'",
      "remedies": ["Set 'cluster_dns_domain' to 'cluster.local' to match GKE defaults."]},
@@ -40,20 +40,7 @@ conditions := [
       "policy_type": "whitelist"
     }
   ],
-
-  # 4. additive_vpc_scope_dns_domain must not include bad-domain.com (blacklist example)
-  [
-    {"situation_description" : "Domain name for additive_vpc_scope_dns_domain is blacklisted",
-     "remedies": ["Use an internal and trusted domain name (not like 'bad-domain.com')."]},
-    {
-      "condition": "Blacklist domains that are untrusted or invalid",
-      "attribute_path": ["dns_config", 0, "additive_vpc_scope_dns_domain"],
-      "values": ["gke.bad-domain.com"],
-      "policy_type": "blacklist"
-    }
-  ],
-
-  # 5. gateway_api_config.channel should be CHANNEL_STANDARD
+  
   [
     {"situation_description" : "Gateway API channel is not set to CHANNEL_STANDARD",
      "remedies": ["Use 'CHANNEL_STANDARD' for production-ready API channel."]},

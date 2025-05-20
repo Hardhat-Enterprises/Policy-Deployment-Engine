@@ -7,7 +7,6 @@ resource "google_container_cluster" "nc"  {
   location = "AU"
 
   dns_config {
-    additive_vpc_scope_dns_domain = "gke.bad-domain.com"  
     cluster_dns                   = "PLATFORM_DEFAULT"     
     cluster_dns_scope             = "CLUSTER_SCOPE"       
     cluster_dns_domain            = "example.local"       

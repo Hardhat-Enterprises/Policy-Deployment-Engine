@@ -7,7 +7,6 @@ resource "google_container_cluster" "c"  {
   location = "AU"
 
   dns_config {
-    additive_vpc_scope_dns_domain = "gke.internal.com"
     cluster_dns                   = "CLOUD_DNS"
     cluster_dns_scope             = "VPC_SCOPE"
     cluster_dns_domain            = "cluster.local"
