@@ -9,8 +9,8 @@ conditions := [
     "remedies":[ "describes gke cluster name"]},
     {
         "condition": "whitelist for private gke cluster name",
-        "attribute_path" : ["private_visibility_config", 0, "gke_cluster_name", 0], 
-        "values" : [], 
+        "attribute_path" : ["private_visibility_config", 0, "gke_cluster_name"], 
+        "values" : ["google_container_cluster.pde.id"], 
         "policy_type" : "whitelist" 
     }
     ]

@@ -9,7 +9,7 @@ conditions := [
     "remedies":[ "enables cloud logging"]},
     {
         "condition": "cloud logging in enable dns zone",
-        "attribute_path" : ["cloud_logging"], 
+        "attribute_path" : ["cloud_logging_config", 0, "enable_logging"], 
         "values" : [true], 
         "policy_type" : "whitelist" 
     }

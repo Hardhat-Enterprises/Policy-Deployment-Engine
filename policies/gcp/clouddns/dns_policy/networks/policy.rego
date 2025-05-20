@@ -9,8 +9,8 @@ conditions := [
     "remedies":[ "Blocks unauthorised networks"]},
     {
         "condition": "Whitelists allowed networks",
-        "attribute_path" : ["networks", 0, "network_url", 0], 
-        "values" : [true], 
+        "attribute_path" : ["networks", 0, "network_url"], 
+        "values" : ["http://love_writing_polices_for_yotham.net.id"], 
         "policy_type" : "whitelist" 
     }
     ]

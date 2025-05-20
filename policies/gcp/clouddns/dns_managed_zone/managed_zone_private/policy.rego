@@ -9,8 +9,8 @@ conditions := [
     "remedies":[ "for private dns zones"]},
     {
         "condition": "for privately visible zones",
-        "attribute_path" : ["private_visibility_config", 1, "network_url", 0], 
-        "values" : [false], 
+        "attribute_path" : ["private_visibility_config", 1, "network_url"], 
+        "values" : ["pde.coding_for_yotham.net"], 
         "policy_type" : "whitelist" 
     }
     ]

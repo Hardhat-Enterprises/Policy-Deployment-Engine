@@ -9,8 +9,8 @@ conditions := [
     "remedies":[ "random ipv4 address allocation"]},
     {
         "condition": "specifies whitelisted ip4 addresses for forwarding",
-        "attribute_path" : ["forwarding_config", 0, "target_name_servers", 0, "139.0.0.1"], 
-        "values" : [], 
+        "attribute_path" : ["forwarding_config", 0, "target_name_servers", 1, "ipv4_address"], 
+        "values" : ["139.0.0.1"], 
         "policy_type" : "whitelist" 
     }
     ]

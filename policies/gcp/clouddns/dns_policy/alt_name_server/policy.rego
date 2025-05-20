@@ -11,8 +11,8 @@ conditions := [
         },
         {
             "condition": "Use alt server if main is unavailable",
-            "attribute_path" : ["alternative_name_server_config", 1, "ipv4_address", 0], 
-            "values" : [], 
+            "attribute_path" : ["alternative_name_server_config", 0, "target_name_servers", 1,"ipv4_address"], 
+            "values" : ["139.0.0.1"], 
             "policy_type" : "whitelist" 
         }
     ]
