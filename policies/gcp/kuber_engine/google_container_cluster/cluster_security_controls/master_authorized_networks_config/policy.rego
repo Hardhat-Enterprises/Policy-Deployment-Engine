@@ -19,34 +19,6 @@ conditions := [
     }
   ],
 
-  # Condition 2: enable_legacy_abac must be false
-  [
-    {
-      "situation_description": "Legacy ABAC is enabled, which grants overly permissive static access.",
-      "remedies": ["Disable enable_legacy_abac (set to false or remove it)"]
-    },
-    {
-      "condition": "Legacy ABAC must be disabled",
-      "attribute_path": ["enable_legacy_abac"],
-      "values": [false],
-      "policy_type": "whitelist"
-
-    }
-  ],
-
-  # Condition 3: enable_secure_boot must be true
-  [
-    {
-      "situation_description": "Secure Boot is disabled in node_config.shielded_instance_config.",
-      "remedies": ["Set node_config.shielded_instance_config.enable_secure_boot = true"]
-    },
-    {
-      "condition": "Secure Boot must be enabled",
-      "attribute_path": ["node_config", 0, "shielded_instance_config", 0, "enable_secure_boot"],
-      "values": [true],
-      "policy_type": "whitelist"
-    }
-  ]
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
