@@ -28,8 +28,9 @@ conditions := [
     {
       "condition": "Legacy ABAC must be disabled",
       "attribute_path": ["enable_legacy_abac"],
-      "values": [true],
-      "policy_type": "blacklist"
+      "values": [false],
+      "policy_type": "whitelist"
+
     }
   ],
 
