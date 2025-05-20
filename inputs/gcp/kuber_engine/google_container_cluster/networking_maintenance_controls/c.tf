@@ -20,8 +20,5 @@ resource "google_container_cluster" "c" {
       services_ipv4_cidr_block = "10.96.0.0/20"
     }
   
-    vertical_pod_autoscaling {
-      enabled = true
-    }
   }
   

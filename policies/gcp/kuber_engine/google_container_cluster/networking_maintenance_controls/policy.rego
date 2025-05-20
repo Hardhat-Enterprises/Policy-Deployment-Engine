@@ -5,7 +5,7 @@ import data.terraform.gcp.security.kuber_engine.google_container_cluster.vars
 
 conditions := [
 
-  # 1. default_snat_status must have disabled = true
+ 
   [
     {
       "situation_description": "Default SNAT is not disabled (in-node masquerading still active)",
@@ -19,21 +19,6 @@ conditions := [
     }
   ],
 
-  # 2. vertical_pod_autoscaling must be enabled
-  [
-    {
-      "situation_description": "Vertical Pod Autoscaling is disabled",
-      "remedies": ["Set vertical_pod_autoscaling.enabled = true"]
-    },
-    {
-      "condition": "Ensure vertical pod autoscaling is enabled",
-      "attribute_path": ["vertical_pod_autoscaling", 0, "enabled"],
-      "values": [true],
-      "policy_type": "whitelist"
-    }
-  ],
-
-  # 3. ip_allocation_policy.cluster_ipv4_cidr_block must not be empty
   [
     {
       "situation_description": "Pod IP CIDR block is not configured",
@@ -47,7 +32,6 @@ conditions := [
     }
   ],
 
-  # 4. ip_allocation_policy.services_ipv4_cidr_block must not be empty
   [
     {
       "situation_description": "Service IP CIDR block is not configured",

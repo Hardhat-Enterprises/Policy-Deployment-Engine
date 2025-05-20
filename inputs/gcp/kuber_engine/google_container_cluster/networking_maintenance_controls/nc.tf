@@ -20,8 +20,4 @@ resource "google_container_cluster" "nc" {
     services_ipv4_cidr_block = ""
   }
 
-
-  vertical_pod_autoscaling {
-    enabled = false
-  }
 }
