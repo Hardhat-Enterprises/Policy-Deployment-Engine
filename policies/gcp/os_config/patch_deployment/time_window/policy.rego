@@ -14,26 +14,14 @@ conditions := [
         {
             "condition": "Check if time_of_day is scheduled during business hours",
             "attribute_path" : ["recurring_schedule", 0, "time_of_day", 0, "hours"],
-            "values" : [10],
-            "policy_type" : "blacklist" 
+            "values" : [0, 8],
+            "policy_type" : "range"
         },
         {
             "condition": "Check if time_of_day is scheduled during business hours",
-            "attribute_path" : ["recurring_schedule", 0, "time_of_day", 0, "minutes"],
-            "values" : [0],
-            "policy_type" : "blacklist" 
-        },
-        {
-            "condition": "Check if time_of_day is scheduled during business hours",
-            "attribute_path" : ["recurring_schedule", 0, "time_of_day", 0, "seconds"],
-            "values" : [0],
-            "policy_type" : "blacklist" 
-        },
-        {
-            "condition": "Check if time_of_day is scheduled during business hours",
-            "attribute_path" : ["recurring_schedule", 0, "time_of_day", 0, "nanos"],
-            "values" : [0],
-            "policy_type" : "blacklist" 
+            "attribute_path" : ["recurring_schedule", 0, "time_of_day", 0, "hours"],
+            "values" : [18, 24],
+            "policy_type" : "range"
         }
     ],
     [

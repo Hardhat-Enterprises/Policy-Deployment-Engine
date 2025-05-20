@@ -14,8 +14,8 @@ conditions := [
         {
             "condition": "Check if min_wait_duration is defined",
             "attribute_path" : ["rollout", 0, "min_wait_duration"],
-            "values" : ["60s", "120s", "180s", "240s"],
-            "policy_type" : "blacklist"
+            "values" : ["300s", "600s"],
+            "policy_type" : "whitelist"
         }
     ]
 ]

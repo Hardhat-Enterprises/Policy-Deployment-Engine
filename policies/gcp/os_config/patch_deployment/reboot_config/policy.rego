@@ -14,8 +14,8 @@ conditions := [
         {
             "condition": "Check if production environments avoid ALWAYS reboot",
             "attribute_path" : ["patch_config", 0, "reboot_config"],
-            "values" : ["ALWAYS"],
-            "policy_type" : "blacklist"
+            "values" : ["NEVER", "DEFAULT"],
+            "policy_type" : "whitelist"
         }
     ]
 ]
