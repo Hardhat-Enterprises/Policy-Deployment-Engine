@@ -1,6 +1,3 @@
-# Describe your resource type here
-# Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
-
 
 resource "google_datastream_connection_profile" "nc" {
     project               = "your-gcp-project-id.nc"

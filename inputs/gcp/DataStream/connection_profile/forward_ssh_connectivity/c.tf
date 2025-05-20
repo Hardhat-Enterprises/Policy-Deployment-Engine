@@ -1,5 +1,3 @@
-# Describe your resource type here
-# Keep "c" as the name to indicate that this resource and its attributes are compliant
 
 resource "google_datastream_connection_profile" "c" {
   project               = "your-gcp-project-id.c"
@@ -16,6 +14,6 @@ resource "google_datastream_connection_profile" "c" {
     hostname = "google.com"
     username = "my-user"
     port     = 8022
-    password = file("ssh_password.rsa")
+    password = "/secrets/ssh/ssh_password.rsa"
   }
 }
