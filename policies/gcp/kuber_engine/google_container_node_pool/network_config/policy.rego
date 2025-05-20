@@ -3,10 +3,6 @@ package terraform.gcp.security.kuber_engine.google_container_node_pool.network_c
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.kuber_engine.google_container_node_pool.vars
 
-# STEP 1: STUDY YOUR RESOURCE AND ITS ATTRIBUTES, THEN FILL IN THE VARS FILE
-
-# STEP 2: CREATE SCENARIOS (can be simple (one condition) or complex (multiple linked conditions) )
-
 conditions := [
   [
     {
@@ -46,8 +42,6 @@ conditions := [
   ]
 ]
 
-# Displays a general message about policy compliance
-message := helpers.get_multi_summary(conditions, vars.variables).message
 
-# Displays a detailed summary of each resources compliance to every condition and situation
+message := helpers.get_multi_summary(conditions, vars.variables).message
 details := helpers.get_multi_summary(conditions, vars.variables).details
