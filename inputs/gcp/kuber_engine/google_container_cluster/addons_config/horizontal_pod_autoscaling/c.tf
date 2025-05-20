@@ -9,22 +9,6 @@ resource "google_container_cluster" "c" {
     horizontal_pod_autoscaling {
       disabled = false
     }
-
-    http_load_balancing {
-      disabled = false
-    }
-
-    network_policy_config {
-      disabled = false
-    }
-
-    dns_cache_config {
-      enabled = true
-    }
   }
-
-  network_policy {
-    enabled  = true
-    provider = "CALICO"
-  }
+ 
 }
