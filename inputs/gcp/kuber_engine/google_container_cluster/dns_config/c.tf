@@ -12,8 +12,5 @@ resource "google_container_cluster" "c"  {
     cluster_dns_domain            = "cluster.local"
   }
 
-  gateway_api_config {
-    channel = "CHANNEL_STANDARD"
-  }
 }
 

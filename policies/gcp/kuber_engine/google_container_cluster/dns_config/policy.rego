@@ -41,16 +41,6 @@ conditions := [
     }
   ],
   
-  [
-    {"situation_description" : "Gateway API channel is not set to CHANNEL_STANDARD",
-     "remedies": ["Use 'CHANNEL_STANDARD' for production-ready API channel."]},
-    {
-      "condition": "Check if channel is CHANNEL_STANDARD",
-      "attribute_path": ["gateway_api_config", 0, "channel"],
-      "values": ["CHANNEL_STANDARD"],
-      "policy_type": "whitelist"
-    }
-  ]
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message

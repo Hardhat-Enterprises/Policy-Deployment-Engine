@@ -12,8 +12,5 @@ resource "google_container_cluster" "nc"  {
     cluster_dns_domain            = "example.local"       
   }
 
-  gateway_api_config {
-    channel = "CHANNEL_DISABLED"  
-  }
 }
   
