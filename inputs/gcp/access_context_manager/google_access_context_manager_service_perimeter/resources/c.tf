@@ -1,0 +1,13 @@
+resource "google_access_context_manager_service_perimeter" "c" {
+  parent         = "accessPolicies/1234567890"
+  title          = "Perimeter Secure"
+  perimeter_type = "PERIMETER_TYPE_REGULAR"
+  name           = "accessPolicies/1234567890/servicePerimeters/perimeter-secure"
+
+  status {
+    resources = [
+      "projects/secure-project-1",
+      "projects/secure-project-2"
+    ]
+  }
+}
