@@ -1,4 +1,4 @@
-package terraform.gcp.security.analysis_note.attestation_authority.hint.vars
+package terraform.gcp.security.analysis_note.attestation_authority.vars
 
 variables := {
     "friendly_resource_name": "Container Analysis Note",  # Human-readable name of the resource
