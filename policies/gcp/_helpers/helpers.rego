@@ -8,16 +8,7 @@ policy_types := ["blacklist", "whitelist", "range", "pattern blacklist", "patter
 
 # Helper: Check if value exists in array
 array_contains(arr, elem) if {
-    not is_array(elem)
     arr[_] == elem
-}
-
-# if elem is an array!
-array_contains(arr, elem) if {
-    is_array(elem)
-    arr_to_set = {x | x := arr[_]}
-    elem_to_set = {x | x := elem[_]}
-    object.subset(arr_to_set, elem_to_set)
 }
 
 # For resource filtering

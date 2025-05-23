@@ -1,0 +1,55 @@
+# Describe your resource type here
+# Keep "c" as the name to indicate that this resource and its attributes are compliant
+
+resource "google_project" "project-c" {
+  project_id      = "my-project"
+  name            = "my-project"
+  org_id          = "123456789"
+  billing_account = "000000-0000000-0000000-000000"
+  deletion_policy = "DELETE"
+}
+
+resource "google_access_context_manager_access_policy" "access-policy-c" {
+  parent = "organizations/${google_project.project-c.org_id}"
+  title  = "my policy"
+}
+
+resource "google_access_context_manager_access_level" "test-access-c" {
+  parent = "accessPolicies/${google_access_context_manager_access_policy.access-policy-c.name}"
+  name   = "accessPolicies/${google_access_context_manager_access_policy.access-policy-c.name}/accessLevels/chromeos_no_lock"
+  title  = "chromeos_no_lock"
+  basic {
+    conditions {
+      device_policy {
+        require_screen_lock = true
+        os_constraints {
+          os_type = "DESKTOP_CHROME_OS"
+        }
+      }
+      regions = [
+        "CH",
+        "IT",
+        "US",
+      ]
+    }
+  }
+}
+
+resource "google_iam_access_boundary_policy" "c" {
+    name = "abp-c"
+    parent = ""
+    rules {
+      description = ""
+      access_boundary_rule {
+        available_resource = ""
+        available_permissions = [""]
+        availability_condition {
+          expression = "request.matchAccessLevels(google_project.project-c.org_id, [google_access_context_manager_access_level.test-access-c.name])"
+          title = ""
+          description = "" 
+          location = ""
+        }
+      }
+    }
+    display_name = ""
+}
