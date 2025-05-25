@@ -4,14 +4,16 @@ import data.terraform.gcp.security.certificate_authority.ca.vars
 
 conditions := [
     [
-    {"situation_description" : "Deletion protection is turned on",
-    "remedies":["Turn deletion protection on"]},
-    {
-        "condition": "Deletion protection is turned on",
-        "attribute_path" : ["deletion_protection"], 
-        "values" : [true],
-        "policy_type" : "whitelist" 
-    }
+        {
+            "situation_description" : "Deletion protection is turned on",
+            "remedies":["Turn deletion protection on"]
+        },
+        {
+            "condition": "Deletion protection is turned on",
+            "attribute_path" : ["deletion_protection"], 
+            "values" : [true],
+            "policy_type" : "whitelist" 
+        }
     ]
 ]
 

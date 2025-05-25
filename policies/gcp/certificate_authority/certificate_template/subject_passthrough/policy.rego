@@ -4,14 +4,16 @@ import data.terraform.gcp.security.certificate_authority.certificate_template.va
 
 conditions := [
     [
-    {"situation_description" : "Subject passthrough is diasabled",
-    "remedies":["Disable subject passthrough"]},
-    {
-        "condition": "Subject passthrough is diasabled",
-        "attribute_path" : ["identity_constraints",0,"allow_subject_passthrough"],
-        "values" : [false],
-        "policy_type" : "whitelist" 
-    }
+        {
+            "situation_description" : "Subject passthrough is diasabled",
+            "remedies":["Disable subject passthrough"]
+        },
+        {
+            "condition": "Subject passthrough is diasabled",
+            "attribute_path" : ["identity_constraints",0,"allow_subject_passthrough"],
+            "values" : [false],
+            "policy_type" : "whitelist" 
+        }
     ]
 ]
 

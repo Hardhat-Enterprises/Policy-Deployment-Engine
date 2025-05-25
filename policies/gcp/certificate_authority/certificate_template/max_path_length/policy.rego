@@ -5,14 +5,16 @@ import data.terraform.gcp.security.certificate_authority.certificate_template.va
 
 conditions := [
     [
-    {"situation_description" : "Path length less than 4",
-    "remedies":["Reduce the path length to 4 or less than"]},
-    {
-        "condition": "Path length is less than 4",
-        "attribute_path" : ["predefined_values",0,"ca_options",0,"max_issuer_path_length"], 
-        "values" : [null,4],
-        "policy_type" : "range" 
-    }
+        {
+            "situation_description" : "Path length less than 4",
+            "remedies":["Reduce the path length to 4 or less than"]
+        },
+        {
+            "condition": "Path length is less than 4",
+            "attribute_path" : ["predefined_values",0,"ca_options",0,"max_issuer_path_length"], 
+            "values" : [null,4],
+            "policy_type" : "range" 
+        }
     ]
 ]
 
