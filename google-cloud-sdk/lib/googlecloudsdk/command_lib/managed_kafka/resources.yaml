@@ -1,0 +1,108 @@
+project:
+  name: project
+  collection: managedkafka.projects
+  attributes:
+  - parameter_name: projectsId
+    attribute_name: project
+    help: |
+      The project name.
+    property: core/project
+
+location:
+  name: location
+  collection: managedkafka.projects.locations
+  attributes:
+  - &location
+    parameter_name: locationsId
+    attribute_name: location
+    help: |
+      ID of the location of the Managed Service for Apache Kafka resource. See
+      https://cloud.google.com/managed-service-for-apache-kafka/docs/locations for a list of supported
+      locations.
+
+cluster:
+  name: cluster
+  collection: managedkafka.projects.locations.clusters
+  request_id_field: clusterId
+  attributes:
+  - *location
+  - &cluster
+    parameter_name: clustersId
+    attribute_name: cluster
+    help: |
+      The cluster name.
+
+connect_cluster:
+  name: connect_cluster
+  collection: managedkafka.projects.locations.connectClusters
+  request_id_field: connectClusterId
+  attributes:
+  - *location
+  - &connect_cluster
+    parameter_name: connectClustersId
+    attribute_name: connect_cluster
+    help: |
+      The connect cluster name.
+
+connector:
+  name: connector
+  collection: managedkafka.projects.locations.connectClusters.connectors
+  request_id_field: connectorId
+  attributes:
+  - *location
+  - *connect_cluster
+  - &connector
+    parameter_name: connectorsId
+    attribute_name: connector
+    help: |
+      The connector name.
+
+topic:
+  name: topic
+  collection: managedkafka.projects.locations.clusters.topics
+  request_id_field: topicId
+  attributes:
+  - *location
+  - *cluster
+  - &topic
+    parameter_name: topicsId
+    attribute_name: topic
+    help: |
+      The topic name.
+
+consumer_group:
+  name: consumer_group
+  collection: managedkafka.projects.locations.clusters.consumerGroups
+  request_id_field: consumerGroupId
+  attributes:
+  - *location
+  - *cluster
+  - &consumer_group
+    parameter_name: consumerGroupsId
+    attribute_name: consumer_group
+    help: |
+      The consumer group name.
+
+acl:
+  name: acl
+  collection: managedkafka.projects.locations.clusters.acls
+  request_id_field: aclId
+  attributes:
+  - *location
+  - *cluster
+  - &acl
+    parameter_name: aclsId
+    attribute_name: acl
+    help: |
+      The acl name.
+
+operation:
+  name: operation
+  collection: managedkafka.projects.locations.operations
+  attributes:
+  - *location
+  - &operation
+    parameter_name: operationsId
+    attribute_name: operation
+    help: |
+      The operation name.

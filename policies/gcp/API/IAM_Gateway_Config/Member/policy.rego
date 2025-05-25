@@ -1,29 +1,22 @@
 package terraform.gcp.security.API.IAM_Gateway_Config.Member
 
-import data.terraform.gcp.security.API.IAM.vars
+import data.terraform.gcp.helpers
+import data.terraform.gcp.security.API.IAM.Member.vars
 
-compliant_members := {
-  "user:user@gmail.com"
-}
-
-non_compliant[res.name] if {
-  res := input.planned_values.root_module.resources[_]
-  res.type == vars.resource_type
-  not res.values.member in compliant_members
-}
-
-summary := {
-  "message": [
-    sprintf("Total IAM Member resources detected: %v", [count({r | r := input.planned_values.root_module.resources[_]; r.type == vars.resource_type})]),
-    sprintf("Non-compliant IAM Member resources: %v", [count(non_compliant)])
-  ],
-  "details": [
+conditions := [
+  [  # wrap this in a nested array
     {
-      "resource": res.name,
-      "reason": sprintf("IAM member '%v' is not allowed", [res.values.member])
-    } |
-    res := input.planned_values.root_module.resources[_]
-    res.type == vars.resource_type
-    not res.values.member in compliant_members
+      "situation_description": "Ensure only approved IAM members are added.",
+      "remedies": ["Restrict IAM access to allowed users only."]
+    },
+    {
+      "condition": "Disallow any non-approved IAM members",
+      "attribute_path": ["member"],
+      "values": ["user:user@gmail.com"],
+      "policy_type": "whitelist"
+    }
   ]
-}
+]
+
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

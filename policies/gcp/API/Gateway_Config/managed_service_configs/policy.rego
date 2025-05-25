@@ -1,25 +1,25 @@
 package terraform.gcp.security.API.Gateway_Config.managed_service_configs
 
+import data.terraform.gcp.helpers
 import data.terraform.gcp.security.API.Gateway_Config.managed_service_configs.vars
 
-compliant_path := "service-config.json"
-resource_type := vars.resource_type
+conditions := [
+  [
+    {
+      "situation_description": "Ensure the API Gateway config uses only approved backend service config files.",
+      "remedies": [
+        "Use only approved 'service-config.json' as managed_service_config path."
+      ]
+    },
+    {
+      "condition": "Disallow any non-whitelisted managed_service_configs path",
+      "attribute_path": ["managed_service_configs", 0, "path"],
+      "values": ["service-config.json"],
+      "policy_type": "whitelist"
+    }
+  ]
+]
 
-# Collect non-compliant resource names and reasons
-violations[{
-  "resource": res.name,
-  "reason": sprintf("Path in managed_service_configs is '%v'. It should be '%v'", [res.values.managed_service_configs[i].path, compliant_path])
-}] if {
-  res := input.planned_values.root_module.resources[_]
-  res.type == resource_type
-  some i
-  res.values.managed_service_configs[i].path != compliant_path
-}
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details
 
-summary := {
-  "message": [
-    sprintf("Total API Gateway Managed Service Config detected: %v", [count({r | r := input.planned_values.root_module.resources[_]; r.type == resource_type})]),
-    sprintf("Non-compliant API Gateway Managed Service Config: %v/%v", [count(violations), count({r | r := input.planned_values.root_module.resources[_]; r.type == resource_type})])
-  ],
-  "details": violations
-}

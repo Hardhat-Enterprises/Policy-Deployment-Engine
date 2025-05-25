@@ -1,0 +1,52 @@
+- release_tracks: [ALPHA, BETA, GA]
+
+  help_text:
+    brief: Create a new Privileged Access Manager (PAM) grant.
+    description: Create a new Privileged Access Manager (PAM) grant under an entitlement.
+    examples: |
+      The following command creates a new grant against the entitlement with the full name
+      ``ENTITLEMENT_NAME'', a requested duration of 1 hour 30 minutes, a justification of
+      `some justification` and two additional email recipients `abc@example.com` and
+      `xyz@example.com`:
+
+      $ {command} --entitlement=ENTITLEMENT_NAME --requested-duration=5400s --justification="some justification" --additional-email-recipients=abc@example.com,xyz@example.com
+
+  request:
+    ALPHA:
+      api_version: v1alpha
+    BETA:
+      api_version: v1beta
+    GA:
+      api_version: v1
+    collection:
+    - privilegedaccessmanager.projects.locations.entitlements.grants
+    - privilegedaccessmanager.folders.locations.entitlements.grants
+    - privilegedaccessmanager.organizations.locations.entitlements.grants
+
+  arguments:
+    params:
+    - arg_name: entitlement
+      resource_spec: !REF googlecloudsdk.command_lib.pam.resources:entitlement
+      is_parent_resource: true
+      is_primary_resource: true
+      is_positional: false
+      required: true
+      help_text: |
+        Entitlement the grant is to be created against.
+    - arg_name: requested-duration
+      api_field: grant.requestedDuration
+      required: true
+      help_text: |
+        Duration of the grant being created.
+    - arg_name: justification
+      api_field: grant.justification.unstructuredJustification
+      help_text: |
+        Justification for the grant.
+    - arg_name: additional-email-recipients
+      api_field: grant.additionalEmailRecipients
+      repeated: true
+      help_text: |
+        Additional email addresses that are notified for all actions performed on the grant.
+
+  output:
+    format: yaml
