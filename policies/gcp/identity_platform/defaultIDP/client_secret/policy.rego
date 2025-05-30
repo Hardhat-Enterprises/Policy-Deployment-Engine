@@ -4,20 +4,23 @@ import data.terraform.gcp.helpers
 import data.terraform.gcp.security.identity_platform.default_supported_idp_config.vars
 
 conditions := [
+
+  # Blacklist: Disallow blank or missing client_secret
   [
     {
-      "situation_description": "The OAuth client_secret is blank or missing, which is not allowed.",
+      "situation_description": "The OAuth client_secret is blank or missing, which is not allowed and may break authentication flows.",
       "remedies": [
-        "Provide a valid OAuth client secret string."
+        "Provide a valid, non-empty OAuth client secret string."
       ]
     },
     {
-      "condition": "Ensure client_secret is not blank",
+      "condition": "client_secret must not be blank",
       "attribute_path": ["client_secret"],
-      "values": [".+"],
-      "policy_type": "pattern whitelist"
+      "values": [""],  # This is the blacklisted value
+      "policy_type": "blacklist"
     }
   ]
+
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message

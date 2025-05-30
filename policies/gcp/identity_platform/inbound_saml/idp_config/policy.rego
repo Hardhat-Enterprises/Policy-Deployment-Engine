@@ -1,55 +1,54 @@
 package terraform.gcp.security.identity_platform.inbound_saml_config.idp_config_check
-
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.identity_platform.inbound_saml_config.vars
 
 conditions := [
 
-  # idp_entity_id non-empty
+  # Blacklist: idp_entity_id should not be empty or placeholder
   [
     {
-      "situation_description": "idp_entity_id in idp_config is blank.",
+      "situation_description": "idp_entity_id in idp_config is blank or a placeholder.",
       "remedies": [
-        "Provide a valid IdP entity ID."
+        "Provide a valid IdP entity ID that uniquely identifies the SAML provider."
       ]
     },
     {
-      "condition": "Check that idp_config.idp_entity_id is non-empty",
+      "condition": "Ensure idp_config.idp_entity_id is not empty or placeholder",
       "attribute_path": ["idp_config", "idp_entity_id"],
-      "values": [".+"],
-      "policy_type": "pattern whitelist"
+      "values": ["", " ", "-", "n/a", "N/A", "none", "None"],
+      "policy_type": "blacklist"
     }
   ],
 
-  #sso_url non-empty
+  # Blacklist: sso_url should not be empty or placeholder
   [
     {
-      "situation_description": "sso_url in idp_config is blank.",
+      "situation_description": "sso_url in idp_config is blank or a placeholder.",
       "remedies": [
-        "Provide a valid SSO URL for the SAML provider."
+        "Provide a valid SSO URL to allow SAML redirection for authentication."
       ]
     },
     {
-      "condition": "Check that idp_config.sso_url is non-empty",
+      "condition": "Ensure idp_config.sso_url is not empty or placeholder",
       "attribute_path": ["idp_config", "sso_url"],
-      "values": [".+"],
-      "policy_type": "pattern whitelist"
+      "values": ["", " ", "-", "n/a", "N/A", "none", "None"],
+      "policy_type": "blacklist"
     }
   ],
 
-  # idp_certificates.x509_certificate non-empty
+  # Blacklist: x509_certificate should not be empty or placeholder
   [
     {
-      "situation_description": "x509_certificate in idp_certificates is missing or blank.",
+      "situation_description": "x509_certificate in idp_certificates[0] is blank or missing.",
       "remedies": [
-        "Provide a valid x509 certificate for the IdP."
+        "Provide a valid x509 certificate for the IdP to validate SAML assertions."
       ]
     },
     {
-      "condition": "Check that idp_certificates[0].x509_certificate is non-empty",
+      "condition": "Ensure x509_certificate is not blank",
       "attribute_path": ["idp_config", "idp_certificates", 0, "x509_certificate"],
-      "values": [".+"],
-      "policy_type": "pattern whitelist"
+      "values": ["", " ", "-", "n/a", "N/A", "none", "None"],
+      "policy_type": "blacklist"
     }
   ]
 

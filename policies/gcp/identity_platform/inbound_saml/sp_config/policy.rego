@@ -5,7 +5,7 @@ import data.terraform.gcp.security.identity_platform.inbound_saml.vars
 
 conditions := [
 
-  # callback_uri must start with https:// if provided
+  # Whitelist: callback_uri must start with https://
   [
     {
       "situation_description": "callback_uri does not start with 'https://', which is required for security.",
@@ -14,14 +14,13 @@ conditions := [
       ]
     },
     {
-      "condition": "Check that callback_uri starts with 'https://'",
+      "condition": "Ensure callback_uri begins with 'https://'",
       "attribute_path": ["sp_config", "callback_uri"],
-      "values": ["^https://.*"],
-      "policy_type": "pattern whitelist"
+      "values": ["^https://.*"],  # Regex to validate secure scheme
+      "policy_type": "whitelist"  # Correct usage in your framework
     }
   ]
 
-  # Note: sp_entity_id and sp_certificates are optional and not enforced here.
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
