@@ -4,18 +4,25 @@ import data.terraform.gcp.helpers
 import data.terraform.gcp.security.artifact_registry.repository_iam.vars
 
 conditions := [
-  {
-    "situation_description": "Repository IAM binding includes an overly permissive role (roles/owner or roles/editor).",
-    "remedies": [
-      "Replace with a least privilege role such as roles/artifactregistry.reader or roles/artifactregistry.writer."
-    ]
-  },
-  {
-    "condition": "Disallow overly broad IAM roles.",
-    "attribute_path": ["role"],
-    "values": ["roles/owner", "roles/editor"],
-    "policy_type": "blacklist"
-  }
+  [
+    {
+      "situation_description": "Repository IAM binding includes a role that is not explicitly allowed (e.g., overly permissive roles like roles/owner or roles/editor).",
+      "remedies": [
+        "Use only least privilege roles such as roles/artifactregistry.reader or roles/artifactregistry.writer.",
+        "Remove roles like roles/owner or roles/editor from Artifact Registry IAM bindings."
+      ]
+    },
+    {
+      "condition": "Allow only specific least-privileged roles for Artifact Registry.",
+      "attribute_path": ["role"],
+      "values": [
+        "roles/artifactregistry.reader",
+        "roles/artifactregistry.writer",
+        "roles/artifactregistry.admin"
+      ],
+      "policy_type": "whitelist"
+    }
+  ]
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
