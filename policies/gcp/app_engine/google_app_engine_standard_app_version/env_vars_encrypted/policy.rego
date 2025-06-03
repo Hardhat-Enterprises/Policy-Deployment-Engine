@@ -10,7 +10,7 @@ conditions := [
     {
       "condition": "Ensure sensitive environment variables are encrypted via Secret Manager",
       "attribute_path": ["env_variables", "SECRET_SOURCE"],
-      "values": ["projects/[]/secrets/[]"],
+      "values": [["projects/*/secrets/"[Access_key], [secret_access_key]]],
       "policy_type": "pattern whitelist"
     }
   ]
