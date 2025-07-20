@@ -1,0 +1,82 @@
+name: Terraform OPA Policy Check
+
+on:
+  pull_request:
+    paths:
+      - 'inputs/**'
+      - 'policies/**'
+      - 'find_pairs.py'
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+
+      
+      - name: Find input-policy pairs
+        id: set-matrix
+        run: |
+          python3 find_pairs.py \
+            --inputs infra/terraform/inputs/gcp \
+            --policies infra/policies/gcp > pairs.json
+
+          INPUT_DIRS=$(jq -c '[.[] | .input]' pairs.json)
+          echo "matrix={\"input_dirs\":$INPUT_DIRS}" >> $GITHUB_OUTPUT
+
+  policy_check:
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.discover.outputs.matrix).input_dirs }}
+    name: Check ${{ matrix }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Install OPA
+        run: |
+          curl -L -o opa https://openpolicyagent.org/downloads/latest/opa_linux_amd64_static
+          chmod +x opa
+          sudo mv opa /usr/local/bin/
+
+      - name: Terraform Init
+        working-directory: ${{ matrix }}
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: ${{ matrix }}
+        run: terraform plan -out=plan
+
+      - name: Terraform Show
+        working-directory: ${{ matrix }}
+        run: terraform show -json plan > plan.json
+
+      - name: Run OPA Check
+        working-directory: ${{ matrix }}
+        run: |
+          SERVICE=$(basename $(dirname $(dirname ${{ matrix }})))
+          RESOURCE=$(basename $(dirname ${{ matrix }}))
+          ATTRIBUTE=$(basename ${{ matrix }})
+          QUERY="data.terraform.gcp.security.${SERVICE}.${RESOURCE}.${ATTRIBUTE}.summary.details"
+          RESULT=$(opa eval --data policies/gcp --input plan.json --format pretty "$QUERY")
+          MESSAGES=$(echo "$RESULT" | jq -r '.result[0].expressions[0].value[]?')
+
+          if [ -z "$MESSAGES" ]; then
+            echo "✅ No policy violations."
+          else
+            echo "❌ Policy violations found:"
+            echo "$MESSAGES"
+            echo "$MESSAGES" | while read -r msg; do
+              echo "::error title=OPA Policy Violation::$msg"
+            done
+            exit 1
+          fi
