@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_storage.bucket_acl.default_acl_nc
+package terraform.gcp.security.cloud_storage.bucket_acl.default_acl
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.cloud_storage.bucket_acl.vars
