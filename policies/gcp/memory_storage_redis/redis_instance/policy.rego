@@ -13,10 +13,13 @@ conditions :=[
         },
         {
             "condition": "Checks if auth_enable is set to TRUE",
-            "attribute_path": ["auth_enable"],
+            "attribute_path": ["auth_enabled"],
             "values": [true],
             "policy_type": "whitelist"
         }
     ]
 
 ]
+
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details
