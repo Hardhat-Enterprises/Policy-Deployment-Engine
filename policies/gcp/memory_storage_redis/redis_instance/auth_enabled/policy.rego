@@ -1,8 +1,9 @@
-package terraform.gcp.security.memorystorage.redis.auth_policy
+package terraform.gcp.security.memorystorage_redis.redis_instance.auth_enabled_policy
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.memorystorage.redis.vars
 
+# opa eval --input inputs/gcp/memory_storage_redis/redis_instance/auth_enabled/plan.json --data policies "data.terraform.gcp.security.memorystorage_redis.redis_instance.auth_enabled_policy.message"
 conditions :=[
     [
         {
