@@ -11,6 +11,5 @@ resource "google_redis_instance" "c" {
     persistence_config {
         persistence_mode = "RDB"
         rdb_snapshot_period = "TWELVE_HOURS"
-        rdb_snapshot_start_time = "2025-08-03T15:01:23.045123456Z"
     }
 }

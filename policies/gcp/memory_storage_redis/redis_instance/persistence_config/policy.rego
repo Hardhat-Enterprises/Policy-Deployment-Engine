@@ -12,7 +12,7 @@ conditions := [
         {
             "condition": "Persistence config must be present",
             "attribute_path": ["persistence_config"],
-            "values": [[]],
+            "values": [null],
             "policy_type": "blacklist"
         }
     ],
@@ -31,7 +31,7 @@ conditions := [
     [
         {
             "situation_description": "Checks if persistence_config.rdb_snapshot_period is set to a valid option",
-            "remedies": ["Set `persistence_config.rdb_snapshot_period` to valid option"]
+            "remedies": ["Set `persistence_config.rdb_snapshot_period` to valid option (ONE_HOUR, SIX_HOURS, TWELVE_HOURS, TWENTY_FOUR_HOURS)"]
         },
         {
             "condition": "Snapshot period must be valid",
