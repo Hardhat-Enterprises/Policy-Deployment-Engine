@@ -6,7 +6,7 @@ resource "google_storage_bucket" "image-store_nc" {
 resource "google_storage_default_object_acl" "nc" {
   bucket = google_storage_bucket.image-store_nc.name
   role_entity = [
-    "OWNER:user-my.email@gmail.com",
+    "OWNER:allAuthenticatedUsers",
     "READER:allUsers",
   ]
 }

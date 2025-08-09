@@ -3,7 +3,6 @@ package terraform.gcp.security.cloud_storage.bucket.force_destroy
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.cloud_storage.bucket.vars
 
-# This policy checks that `force_destroy` is NOT enabled (i.e., should be false)
 
 conditions := [
     [

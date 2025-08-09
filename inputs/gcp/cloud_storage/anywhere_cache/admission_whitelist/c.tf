@@ -1,5 +1,5 @@
 resource "google_storage_bucket" "compliant_bucket" {
-  name     = "au-admission-policy"
+  name     = "au-admission-policy-c"
   location = "australia-southeast1"
 }
 

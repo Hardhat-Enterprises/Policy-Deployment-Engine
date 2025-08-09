@@ -3,8 +3,6 @@ package terraform.gcp.security.cloud_storage.bucket_acl.role_entity_protection
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.cloud_storage.bucket_acl.vars
 
-
-
 conditions := [
   [
     {

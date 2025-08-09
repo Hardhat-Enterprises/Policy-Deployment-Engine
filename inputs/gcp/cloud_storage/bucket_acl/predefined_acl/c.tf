@@ -8,5 +8,5 @@ resource "google_storage_bucket_acl" "c" {
   role_entity = [
     "OWNER:user@example.com",
     "READER:group@example.com"
-  ]  # ✅
+  ]  
 }

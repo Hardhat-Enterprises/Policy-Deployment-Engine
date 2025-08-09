@@ -1,5 +1,5 @@
 resource "google_storage_bucket" "noncompliant_bucket" {
-  name     = "au-admission-policy"
+  name     = "au-admission-policy-nc"
   location = "australia-southeast1"
 }
 

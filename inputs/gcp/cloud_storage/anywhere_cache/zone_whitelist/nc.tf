@@ -5,6 +5,6 @@ resource "google_storage_bucket" "noncompliant_bucket" {
 
 resource "google_storage_anywhere_cache" "nc" {
   bucket = google_storage_bucket.noncompliant_bucket.name
-  zone   = "us-east1-b"  # Or bad TTL / admission policy, depending on test
+  zone   = "us-east1-b"  
   ttl    = "1800s"
 }
