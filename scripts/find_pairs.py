@@ -177,14 +177,17 @@ def run_policy_check_pair(input_dir: Path, policy_dir: Path):
     # Use the root policies directory for OPA --data
     policies_root = Path(sys.argv[sys.argv.index('--policies') + 1]) if '--policies' in sys.argv else Path('policies/gcp')
 
-    # 1) Terraform steps
-    tf_commands = [
-        ("terraform init", "▶ terraform init"),
-        ("terraform plan -out=plan", "▶ terraform plan"),
-        ("terraform show -json plan > plan.json", "▶ terraform show"),
-    ]
-    for cmd, desc in tf_commands:
-        run_command(cmd, desc, cwd=str(abs_input_dir))
+    # 1) Terraform steps (skip if an existing plan.json is present)
+    if plan_path.exists():
+        print("ℹ️ Found existing plan.json; skipping Terraform init/plan/show")
+    else:
+        tf_commands = [
+            ("terraform init -backend=false", "▶ terraform init (no backend)"),
+            ("terraform plan -refresh=false -input=false -out=plan", "▶ terraform plan (no refresh)"),
+            ("terraform show -json plan > plan.json", "▶ terraform show"),
+        ]
+        for cmd, desc in tf_commands:
+            run_command(cmd, desc, cwd=str(abs_input_dir))
 
     # 2) Build OPA queries from policy.rego metadata to avoid directory/package mismatches
     pkg_path, vars_import = parse_rego_metadata(policy_dir)
