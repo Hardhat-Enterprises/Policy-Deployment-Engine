@@ -11,7 +11,7 @@ conditions := [
         {
             "condition": "Deletion protection is turned on",
             "attribute_path" : ["deletion_protection"], 
-            "values" : [true],
+            "values" : [false],
             "policy_type" : "whitelist" 
         }
     ]
