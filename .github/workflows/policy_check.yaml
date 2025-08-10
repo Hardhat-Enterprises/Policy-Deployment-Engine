@@ -2,14 +2,11 @@ name: Terraform OPA Policy Check
 
 on:
   pull_request:
-    actions:
-      - opened
-      - synchronize
-      - reopened
+    types: [opened, synchronize, reopened]
     paths:
-      - '/inputs/**'
-      - '/policies/**'
-      - '/scripts/find_pairs.py'
+      - 'Policy-Deployment-Engine/inputs/**'
+      - 'Policy-Deployment-Engine/policies/**'
+      - 'Policy-Deployment-Engine/find_pairs.py'
 
 jobs:
   policy_check:
@@ -32,5 +29,5 @@ jobs:
       - name: Run policy checks (Terraform + OPA)
         run: |
           python3 Policy-Deployment-Engine/find_pairs.py \
-            --inputs /inputs/gcp \
-            --policies /policies/gcp
+            --inputs Policy-Deployment-Engine/inputs/gcp \
+            --policies Policy-Deployment-Engine/policies/gcp
