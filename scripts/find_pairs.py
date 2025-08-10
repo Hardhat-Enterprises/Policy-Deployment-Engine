@@ -166,7 +166,7 @@ def match_names_in_messages(messages: list[str], candidate_names: set[str]) -> s
     return matched
 
 
-def run_policy_check_pair(input_dir: Path, policy_dir: Path, allow_plan: bool = False):
+def run_policy_check_pair(input_dir: Path, policy_dir: Path):
     print(f"\n Running policy check for: {input_dir}")
     root_dir = Path.cwd()
     abs_input_dir = input_dir.resolve()
@@ -177,21 +177,14 @@ def run_policy_check_pair(input_dir: Path, policy_dir: Path, allow_plan: bool = 
     # Use the root policies directory for OPA --data
     policies_root = Path(sys.argv[sys.argv.index('--policies') + 1]) if '--policies' in sys.argv else Path('policies/gcp')
 
-    # 1) Terraform steps (only if explicitly allowed and plan.json is missing)
-    if plan_path.exists():
-        print("ℹ️ Found existing plan.json; skipping Terraform init/plan/show")
-    else:
-        if not allow_plan:
-            print(f"❌ plan.json not found in {abs_input_dir}. Refusing to run Terraform without --allow-plan.")
-            print("   Add a pre-generated plan.json to the test directory or run with --allow-plan if you accept provider init.")
-            sys.exit(1)
-        tf_commands = [
+    # 1) Terraform steps 
+    tf_commands = [
             ("terraform init -backend=false -reconfigure", "▶ terraform init (no backend)"),
             ("terraform plan -refresh=false -input=false -out=plan", "▶ terraform plan (no refresh)"),
             ("terraform show -json plan > plan.json", "▶ terraform show"),
         ]
-        for cmd, desc in tf_commands:
-            run_command(cmd, desc, cwd=str(abs_input_dir))
+    for cmd, desc in tf_commands:
+        run_command(cmd, desc, cwd=str(abs_input_dir))
 
     # 2) Build OPA queries from policy.rego metadata to avoid directory/package mismatches
     pkg_path, vars_import = parse_rego_metadata(policy_dir)
@@ -285,7 +278,6 @@ def main():
     parser = argparse.ArgumentParser(description="Run Terraform + OPA policy checks for all matched input/policy pairs.")
     parser.add_argument("--inputs", default="inputs/gcp", help="Root directory for Terraform inputs")
     parser.add_argument("--policies", default="policies/gcp", help="Root directory for policy files")
-    parser.add_argument("--allow-plan", action="store_true", help="Generate plan.json by running Terraform if missing")
     args = parser.parse_args()
 
     inputs_root = Path(args.inputs)
@@ -297,7 +289,7 @@ def main():
         sys.exit(1)
 
     for input_dir, policy_dir in pairs:
-        run_policy_check_pair(input_dir, policy_dir, allow_plan=args.allow_plan)
+        run_policy_check_pair(input_dir, policy_dir)
 
 
 if __name__ == "__main__":
