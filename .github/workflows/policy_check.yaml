@@ -4,9 +4,10 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
-      - 'Policy-Deployment-Engine/inputs/**'
-      - 'Policy-Deployment-Engine/policies/**'
-      - 'Policy-Deployment-Engine/find_pairs.py'
+      - 'inputs/**'
+      - 'policies/**'
+      - 'scripts/**'
+      - '.github/workflows/**'
 
 jobs:
   policy_check:
@@ -16,6 +17,8 @@ jobs:
 
       - name: Setup Python
         uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -28,6 +31,6 @@ jobs:
 
       - name: Run policy checks (Terraform + OPA)
         run: |
-          python3 Policy-Deployment-Engine/find_pairs.py \
-            --inputs Policy-Deployment-Engine/inputs/gcp \
-            --policies Policy-Deployment-Engine/policies/gcp
+          python3 scripts/find_pairs.py \
+            --inputs inputs/gcp \
+            --policies policies/gcp
