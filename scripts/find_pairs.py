@@ -36,7 +36,7 @@ def opa_eval_value(policies_root: Path, plan_json_path: Path, query: str):
     cmd = f'opa eval --data "{policies_root}" --input "{plan_json_path}" --format json "{query}"'
     result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
     if result.returncode != 0:
-        print(f"❌ OPA eval failed: {query}")
+        print(f"OPA eval failed: {query}")
         print(result.stdout)
         print(result.stderr)
         return None
@@ -51,7 +51,7 @@ def opa_eval_value(policies_root: Path, plan_json_path: Path, query: str):
             return None
         return exprs[0].get("value")
     except Exception as e:
-        print(f"⚠️ Failed to parse OPA JSON output: {e}")
+        print(f"Failed to parse OPA JSON output: {e}")
         return None
 
 
@@ -187,9 +187,9 @@ def run_policy_check_pair(input_dir: Path, policy_dir: Path):
     })
     
     tf_commands = [
-        ("terraform init -backend=false -reconfigure", "▶ terraform init (no backend)"),
-        ("terraform plan -refresh=false -input=false -out=plan", "▶ terraform plan (no refresh)"),
-        ("terraform show -json plan > plan.json", "▶ terraform show"),
+        ("terraform init -backend=false -reconfigure", "terraform init"),
+        ("terraform plan -refresh=false -input=false -out=plan", "terraform plan"),
+        ("terraform show -json plan > plan.json", "terraform show"),
     ]
     for cmd, desc in tf_commands:
         print(desc)
@@ -228,7 +228,7 @@ def run_policy_check_pair(input_dir: Path, policy_dir: Path):
     elif messages_value is not None:
         messages = [str(messages_value)]
 
-    print(f"▶ OPA check: {message_query}")
+    print(f"OPA check: {message_query}")
     for m in messages:
         print(m)
 
@@ -245,18 +245,18 @@ def run_policy_check_pair(input_dir: Path, policy_dir: Path):
     missing = unique_names - matched
     missing_non_c = {n for n in missing if n != "c"}
 
-    print(f"🔢 Unique resource names in plan ({resource_type if resource_type else 'any'}): {len(unique_names)}")
-    print(f"✅ Names mentioned in output: {len(matched)}")
+    print(f"Unique resource names in plan ({resource_type if resource_type else 'any'}): {len(unique_names)}")
+    print(f"Names mentioned in output: {len(matched)}")
     if missing:
-        print(f"ℹ️ Missing mentions: {', '.join(sorted(missing))}")
+        print(f" Missing mentions: {', '.join(sorted(missing))}")
 
     if missing_non_c:
-        print(f"❌ Check failed: Unmentioned resources other than 'c' found: {', '.join(sorted(missing_non_c))}")
+        print(f"Check failed: Unmentioned resources other than 'c' found: {', '.join(sorted(missing_non_c))}")
         sys.exit(1)
     else:
         if missing and missing == {"c"}:
-            print("ℹ️ Only 'c' is unmentioned; ignoring as per rule")
-        print("✅ Check passed\n")
+            print("Only 'c' is unmentioned; ignoring as per rule")
+        print("Check passed\n")
 
 
 def is_terraform_directory(directory: Path) -> bool:
