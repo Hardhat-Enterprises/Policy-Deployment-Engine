@@ -12,7 +12,7 @@ conditions := [
         {
             "condition": "Path length is less than 4",
             "attribute_path" : ["config",0,"x509_config",0,"ca_options",0,"max_issuer_path_length"], 
-            "values" : [null,10],
+            "values" : [null,4],
             "policy_type" : "range" 
         },
         {
@@ -36,7 +36,7 @@ conditions := [
         {
             "condition": "Path length is less than 2",
             "attribute_path" : ["config",0,"x509_config",0,"ca_options",0,"max_issuer_path_length"], 
-            "values" : [null,7],
+            "values" : [null,2],
             "policy_type" : "range" 
         },
         {
