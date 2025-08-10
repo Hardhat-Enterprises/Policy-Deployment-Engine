@@ -22,7 +22,7 @@ conditions := [
                 "EC_P256_SHA256",
                 "EC_P384_SHA384"
                 ],
-            "policy_type" : "blacklist" 
+            "policy_type" : "whitelist" 
         }
     ]
 ]

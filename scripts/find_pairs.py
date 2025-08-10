@@ -177,14 +177,28 @@ def run_policy_check_pair(input_dir: Path, policy_dir: Path):
     # Use the root policies directory for OPA --data
     policies_root = Path(sys.argv[sys.argv.index('--policies') + 1]) if '--policies' in sys.argv else Path('policies/gcp')
 
-    # 1) Terraform steps 
+    # 1) Terraform steps - skip provider validation to avoid credentials
+    # Set fake GCP credentials to avoid authentication errors
+    env = os.environ.copy()
+    env.update({
+        'GOOGLE_CREDENTIALS': '{"type": "service_account", "project_id": "fake-project"}',
+        'GOOGLE_PROJECT': 'fake-project',
+        'GOOGLE_REGION': 'us-central1'
+    })
+    
     tf_commands = [
-            ("terraform init -backend=false -reconfigure", "▶ terraform init (no backend)"),
-            ("terraform plan -refresh=false -input=false -out=plan", "▶ terraform plan (no refresh)"),
-            ("terraform show -json plan > plan.json", "▶ terraform show"),
-        ]
+        ("terraform init -backend=false -reconfigure", "▶ terraform init (no backend)"),
+        ("terraform plan -refresh=false -input=false -out=plan", "▶ terraform plan (no refresh)"),
+        ("terraform show -json plan > plan.json", "▶ terraform show"),
+    ]
     for cmd, desc in tf_commands:
-        run_command(cmd, desc, cwd=str(abs_input_dir))
+        print(desc)
+        result = subprocess.run(cmd, shell=True, cwd=str(abs_input_dir), capture_output=True, text=True, env=env)
+        if result.returncode != 0:
+            print(f" Command failed: {cmd}")
+            print(result.stdout)
+            print(result.stderr)
+            sys.exit(result.returncode)
 
     # 2) Build OPA queries from policy.rego metadata to avoid directory/package mismatches
     pkg_path, vars_import = parse_rego_metadata(policy_dir)
