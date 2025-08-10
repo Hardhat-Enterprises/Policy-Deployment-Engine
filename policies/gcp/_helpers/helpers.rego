@@ -151,7 +151,7 @@ get_multi_summary(situations, variables) = summary if { # Samira , Patrick
     all_resources := get_all_resources(resource_type)
     violations := check_violations(resource_type, situations, friendly_resource_name, value_name)
     violations_object := process_violations(violations)
-    formatted_message := format_violations(violations_object)
+    formatted_message := format_violations(violations_object) 
     summary := {
         "message": array.concat(
             [sprintf("Total %s detected: %d ", [friendly_resource_name, count(all_resources)])],

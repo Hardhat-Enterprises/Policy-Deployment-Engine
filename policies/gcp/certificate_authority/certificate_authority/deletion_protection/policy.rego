@@ -1,4 +1,4 @@
-package terraform.gcp.security.certificate_authority.ca.deletion_protection 
+package terraform.gcp.security.certificate_authority.certificate_authority.deletion_protection 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.certificate_authority.ca.vars
 

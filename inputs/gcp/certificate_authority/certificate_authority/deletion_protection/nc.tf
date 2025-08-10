@@ -35,3 +35,37 @@ resource "google_privateca_certificate_authority" "nc" {
             algorithm = ""
         }    
 }
+resource "google_privateca_certificate_authority" "nca" {
+    pool = "ca-pool"
+    project = "PDE-project"
+    location = "us-central1"
+    certificate_authority_id = "nca"
+    deletion_protection = false
+    config {
+        subject_config {
+            subject {
+                organization = ""
+                common_name = ""
+            }
+        }
+        x509_config {
+                ca_options {
+                    is_ca = true
+                }
+            key_usage {
+                    base_key_usage {
+                        cert_sign = true
+                        crl_sign = true
+                    }
+                    extended_key_usage {
+
+                    }
+                }
+            }
+        }
+    # 10 years
+    lifetime = "${10 * 365 * 24 * 3600}s"
+    key_spec {
+            algorithm = ""
+        }    
+}
