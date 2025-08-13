@@ -1,5 +1,5 @@
 # 1 
-resource "google_kms_ekm_connection" "bad_location" {
+resource "google_kms_ekm_connection" "nc1" {
   name                = "ekm_bad_hostname"
   location            = "us-central1"
   key_management_mode = "MANUAL"
@@ -14,7 +14,7 @@ resource "google_kms_ekm_connection" "bad_location" {
 }
 
 # 2 
-resource "google_kms_ekm_connection" "bad_directory" {
+resource "google_kms_ekm_connection" "nc2" {
   name                = "ekm_bad_directory"
   location            = "australia-southeast1"
   key_management_mode = "MANUAL"

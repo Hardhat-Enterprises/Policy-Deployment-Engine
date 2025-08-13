@@ -1,7 +1,6 @@
 
-
 # 1 Bad region
-resource "google_kms_ekm_connection" "bad_location" {
+resource "google_kms_ekm_connection" "nc1" {
   name                 = "ekm_bad_loc"
   location             = "asia-east1"   # ← not whitelisted
   key_management_mode  = "MANUAL"
@@ -16,7 +15,7 @@ resource "google_kms_ekm_connection" "bad_location" {
 }
 
 # 2 Bad hostname
-resource "google_kms_ekm_connection" "bad_hostname" {
+resource "google_kms_ekm_connection" "nc2" {
   name                 = "ekm_bad_host"
   location             = "us-central1"
   key_management_mode  = "MANUAL"

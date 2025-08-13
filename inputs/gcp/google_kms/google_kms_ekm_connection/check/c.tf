@@ -1,4 +1,4 @@
-resource "google_kms_ekm_connection" "good" {
+resource "google_kms_ekm_connection" "c1" {
   name                 = "ekmconnection_example"
   location             = "us-central1"
   key_management_mode  = "MANUAL"

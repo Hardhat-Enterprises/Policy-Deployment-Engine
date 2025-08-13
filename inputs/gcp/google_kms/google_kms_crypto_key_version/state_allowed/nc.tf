@@ -1,4 +1,4 @@
-resource "google_kms_crypto_key_version" "nc" {
+resource "google_kms_crypto_key_version" "nc1" {
   
   crypto_key = "projects/my-project/locations/global/keyRings/my-keyring/cryptoKeys/my-key"
   

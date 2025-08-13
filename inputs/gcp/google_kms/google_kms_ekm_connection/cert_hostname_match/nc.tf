@@ -1,6 +1,6 @@
 # 1 Bad hostname
-resource "google_kms_ekm_connection" "bad_hostname" {
-  name                = "bad-host"
+resource "google_kms_ekm_connection" "nc1" {
+  name                = "nc1"
   location            = "australia-southeast1"
   key_management_mode = "MANUAL"
 
@@ -14,8 +14,8 @@ resource "google_kms_ekm_connection" "bad_hostname" {
 }
 
 # 2 Bad cert
-resource "google_kms_ekm_connection" "bad_cert" {
-  name                = "bad-cert"
+resource "google_kms_ekm_connection" "nc2" {
+  name                = "nc2"
   location            = "australia-southeast1"
   key_management_mode = "MANUAL"
 

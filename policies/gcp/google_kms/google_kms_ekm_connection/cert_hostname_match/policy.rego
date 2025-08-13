@@ -14,10 +14,7 @@ conditions := [
     {
       "condition": "Allowed hostnames",
       "attribute_path": ["service_resolvers", 0, "hostname"],
-      "values": [
-        "ekm-au.trusted.example.com",
-        "ekm-eu.trusted.example.com"
-      ],
+      "values": ["ekm-au.trusted.example.com","ekm-eu.trusted.example.com"],
       "policy_type": "whitelist"
     }
     ],
@@ -32,10 +29,7 @@ conditions := [
     {
       "condition": "Approved raw_der certs",
       "attribute_path": ["service_resolvers", 0, "server_certificates", 0, "raw_der"],
-      "values": [
-        "AU_CERT_ABC",
-        "EU_CERT_DEF"
-      ],
+      "values": ["AU_CERT_ABC","EU_CERT_DEF"],
       "policy_type": "whitelist"
     }
     ]

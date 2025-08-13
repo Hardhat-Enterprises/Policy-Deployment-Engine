@@ -1,5 +1,5 @@
 
-resource "google_kms_ekm_connection" "au_good" {
+resource "google_kms_ekm_connection" "c1" {
   name                = "ekm-au"
   location            = "australia-southeast1"
   key_management_mode = "MANUAL"
@@ -13,7 +13,7 @@ resource "google_kms_ekm_connection" "au_good" {
   }
 }
 
-resource "google_kms_ekm_connection" "eu_good" {
+resource "google_kms_ekm_connection" "c2" {
   name                = "ekm-eu"
   location            = "europe-west1"
   key_management_mode = "MANUAL"
