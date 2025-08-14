@@ -1,4 +1,4 @@
-package terraform.gcp.security.google_kms.google_kms_crypto_key.rotation 
+package terraform.gcp.security.google_kms.google_kms_crypto_key.scheduled_rotation_period
 import data.terraform.gcp.helpers as helpers
 import data.terraform.gcp.security.google_kms.google_kms_crypto_key.vars as vars
 

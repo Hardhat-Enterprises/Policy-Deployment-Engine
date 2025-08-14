@@ -1,4 +1,4 @@
-package terraform.gcp.security.google_kms.google_kms_crypto_key_version.state
+package terraform.gcp.security.google_kms.google_kms_crypto_key_version.state_allowed
 import data.terraform.gcp.helpers as helpers
 import data.terraform.gcp.security.google_kms.google_kms_crypto_key_version.vars
 

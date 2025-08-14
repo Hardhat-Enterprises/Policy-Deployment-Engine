@@ -1,4 +1,4 @@
-package terraform.gcp.security.google_kms.google_kms_crypto_key.destroy
+package terraform.gcp.security.google_kms.google_kms_crypto_key.scheduled_destroy_duration
 import data.terraform.gcp.helpers as helpers
 import data.terraform.gcp.security.google_kms.google_kms_crypto_key.vars as vars
 
