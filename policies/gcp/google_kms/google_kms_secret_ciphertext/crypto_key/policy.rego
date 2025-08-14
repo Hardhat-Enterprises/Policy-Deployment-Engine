@@ -1,6 +1,6 @@
 package terraform.gcp.security.google_kms.google_kms_secret_ciphertext.crypto_key
-import data.terraform.gcp.helpers as helpers
-import data.terraform.gcp.security.google_kms.google_kms_secret_ciphertext.crypto_key.vars as vars
+import data.terraform.gcp.helpers
+import data.terraform.gcp.security.google_kms.google_kms_secret_ciphertext.vars
 
 situations := [
 
