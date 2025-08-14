@@ -2,7 +2,7 @@ package terraform.gcp.security.access_approval.google_folder_access_approval_set
 
 
 variables := {
-    "friendly_resource_name": "Access Approval", # eg., "GCS Bucket",
-    "resource_type":  "google_folder_access_approval_settings", # eg., "google_storage_bucket"
-    "resource_value_name" : "folder_id" # eg., "name"
+    "friendly_resource_name": "Access Approval", 
+    "resource_type":  "google_folder_access_approval_settings", 
+    "resource_value_name" : "folder_id" 
 }
