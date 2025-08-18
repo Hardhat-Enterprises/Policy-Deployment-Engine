@@ -10,6 +10,6 @@ data "google_iam_policy" "admin-nc" {
 resource "google_cloudfunctions2_function_iam_policy" "nc" {
   project = "google_cloudfunctions2_function"
   location = "us-central1"
-  cloud_function = ""
+  cloud_function = " " #empty cloud function
   policy_data = data.google_iam_policy.admin.policy_data
 }

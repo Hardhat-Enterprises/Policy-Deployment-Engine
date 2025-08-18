@@ -1,5 +1,5 @@
 resource "google_cloudfunctions2_function" "nc" {
-  name     = ""
+  name     = " " # empty name
   location = "us-central1"
 
   build_config {
