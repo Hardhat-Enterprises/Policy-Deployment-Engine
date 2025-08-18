@@ -143,9 +143,7 @@ check_empty_set(set,msg) = return if {
 ####################################################
 
 # Entry point for all policies 
-get_multi_summary(situations, variables) = summary if {
-    
-     # Samira , Patrick
+get_multi_summary(situations, variables) = summary if {# Samira , Patrick
     # Unpack values from vars
     resource_type := variables.resource_type
     friendly_resource_name := variables.friendly_resource_name
