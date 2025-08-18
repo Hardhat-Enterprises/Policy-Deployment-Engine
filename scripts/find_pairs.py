@@ -6,33 +6,14 @@ import json
 import re
 from pathlib import Path
 
-def run_command(cmd, desc=None, cwd=None, print_output=False):
-    if desc:
-        print(desc)
-    result = subprocess.run(cmd, shell=True, cwd=cwd, capture_output=True, text=True)
-    if result.returncode != 0:
-        print(f" Command failed: {cmd}")
-        print(result.stdout)
-        print(result.stderr)
-        sys.exit(result.returncode)
-    if print_output:
-        print(result.stdout)
-
-
 def extract_path_parts(path: Path):
     if len(path.parts) < 3:
         sys.exit(f"Invalid path: {path}")
     return path.parts[-3], path.parts[-2], path.parts[-1]  # service, resource, attribute
 
 
-def build_opa_command(service, resource, attribute, policies_dir, plan_path):
-    query = f"data.terraform.gcp.security.{service}.{resource}.{attribute}.message"
-    data_path = str(Path(policies_dir).resolve())
-    return f'opa eval --data "{data_path}" --input "{plan_path}" --format pretty "{query}"', query
-
-
 def opa_eval_value(policies_root: Path, plan_json_path: Path, query: str):
-    """Evaluate an OPA query and return the expression value from JSON output, or None."""
+    """Evaluate an OPA query and return the expression value from JSON output or None."""
     cmd = f'opa eval --data "{policies_root}" --input "{plan_json_path}" --format json "{query}"'
     result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
     if result.returncode != 0:
@@ -166,7 +147,7 @@ def match_names_in_messages(messages: list[str], candidate_names: set[str]) -> s
     return matched
 
 
-def run_policy_check_pair(input_dir: Path, policy_dir: Path):
+def run_policy_check_pair(input_dir: Path, policy_dir: Path, policies_root: Path):
     print(f"\n Running policy check for: {input_dir}")
     root_dir = Path.cwd()
     abs_input_dir = input_dir.resolve()
@@ -174,8 +155,6 @@ def run_policy_check_pair(input_dir: Path, policy_dir: Path):
     service, resource, attribute = extract_path_parts(input_dir)
 
     plan_path = abs_input_dir / "plan.json"
-    # Use the root policies directory for OPA --data
-    policies_root = Path(sys.argv[sys.argv.index('--policies') + 1]) if '--policies' in sys.argv else Path('policies/gcp')
 
     # 1) Terraform steps - skip provider validation to avoid credentials
     # Set fake GCP credentials to avoid authentication errors
@@ -243,7 +222,9 @@ def run_policy_check_pair(input_dir: Path, policy_dir: Path):
         matched = match_names_in_messages(messages, unique_names)
 
     missing = unique_names - matched
-    missing_non_c = {n for n in missing if n != "c"}
+    # Ignore "c" followed by optional digits
+    ignore_pattern = re.compile(r"^c\d*$")
+    missing_non_c = {n for n in missing if not ignore_pattern.fullmatch(n)}
 
     print(f"Unique resource names in plan ({resource_type if resource_type else 'any'}): {len(unique_names)}")
     print(f"Names mentioned in output: {len(matched)}")
@@ -255,13 +236,8 @@ def run_policy_check_pair(input_dir: Path, policy_dir: Path):
         sys.exit(1)
     else:
         if missing and missing == {"c"}:
-            print("Only 'c' is unmentioned; ignoring as per rule")
+            print("Only compliant resources are unmentioned; ignoring")
         print("Check passed\n")
-
-
-def is_terraform_directory(directory: Path) -> bool:
-    """Returns True if the directory contains at least one .tf file."""
-    return any(f.suffix == ".tf" for f in directory.glob("*.tf"))
 
 def find_matching_pairs(inputs_root: Path, policies_root: Path):
     def is_leaf_terraform_dir(directory: Path) -> bool:
@@ -303,7 +279,7 @@ def main():
         sys.exit(1)
 
     for input_dir, policy_dir in pairs:
-        run_policy_check_pair(input_dir, policy_dir)
+        run_policy_check_pair(input_dir, policy_dir, policies_root)
 
 
 if __name__ == "__main__":
