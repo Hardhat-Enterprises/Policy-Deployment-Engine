@@ -1,0 +1,18 @@
+# Describe your resource type here
+# Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
+
+#data_store_kms_key_name
+
+resource "google_discovery_engine_data_store" "nc" {
+  location                    = "us"
+  data_store_id               = "nc-data-store-keyname"
+  display_name                = "tf-test-risky-datastore"
+  industry_vertical           = "GENERIC"
+  content_config              = "NO_CONTENT"
+  solution_types              = ["SOLUTION_TYPE_SEARCH"]
+  create_advanced_site_search = false
+}
+
+#Key is ommited, so default is used.
+#Use Blacklist "" to ensure that a null answer is not premitted, or whitelist the proper key.
+
