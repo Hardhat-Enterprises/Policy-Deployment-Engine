@@ -1,0 +1,14 @@
+resource "google_netapp_volume" "nc_test_volume" {
+  location = ""
+  name = "test-volume"
+  capacity_gib = ""
+  share_name = "test-volume"
+  storage_pool = "test-pool"
+  protocols = ["NFSV3"]
+  project = "test1"
+}
+
+
+
+
+
