@@ -3,5 +3,5 @@ resource "google_bigquery_datapolicy_data_policy" "nc" {
   data_policy_id   = ""
   policy_tag       = "Big Query"
   data_policy_type = "COLUMN_LEVEL_SECURITY_POLICY"
-  project = "PDE"
+  project          = "PDE"
 }
