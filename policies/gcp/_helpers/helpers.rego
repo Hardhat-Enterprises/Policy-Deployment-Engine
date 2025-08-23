@@ -43,7 +43,7 @@ array_contains(arr, elem, pol) if {
 # Helper: Check if value exists in array
 array_contains(arr, elem, pol) if {
     not is_array(elem)
-    print(sprintf("%s", ["a2"]))
+    #print(sprintf("%s", ["a2"]))
     arr[_] == elem
 }
 
