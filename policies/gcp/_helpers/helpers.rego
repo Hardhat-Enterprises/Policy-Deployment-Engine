@@ -4,6 +4,27 @@ policy_types := ["blacklist", "whitelist", "range", "pattern blacklist", "patter
 
 ####################################################
 
+# NEW FUNCTIONS (backwards compatible) 
+
+# Get resource's name; if not in values, take default "name".
+get_resource_name(this_nc_resource, value_name) = resource_name if
+{
+    resource_name := this_nc_resource.values[value_name]
+}
+
+get_resource_name(this_nc_resource, value_name) = resource_name if
+{
+    resource_name := this_nc_resource[value_name] # i.e., vars.rego: "resource_value_name": "name"
+}
+
+# if elem is an array; checks if elem is at least a subset of arr. e.g., elem=[write, read], arr=[read, write, eat] -> OK
+array_contains(arr, elem) if {
+    is_array(elem)
+    arr_to_set = {x | x := arr[_]}
+    elem_to_set = {x | x := elem[_]}
+    object.subset(arr_to_set, elem_to_set)
+}
+
 # Generic helper functions:
 
 # Helper: Check if value exists in array
@@ -317,13 +338,13 @@ get_blacklisted_resources(resource_type, attribute_path, blacklisted_values) = r
 get_blacklist_violations(resource_type, attribute_path, blacklisted_values, friendly_resource_name, value_name) = results if {
     string_path := format_attribute_path(attribute_path)
     results := 
-    [ { "name": this_nc_resource.values[value_name],
+    [ { "name": get_resource_name(this_nc_resource, value_name),
         "message": msg
     } |
     nc_resources := get_blacklisted_resources(resource_type, attribute_path, blacklisted_values)
     this_nc_resource = nc_resources[_]
     this_nc_attribute = object.get(this_nc_resource.values, attribute_path, null)
-    msg := format_blacklist_message(friendly_resource_name, this_nc_resource.values[value_name], string_path, this_nc_attribute, empty_message(this_nc_attribute))
+    msg := format_blacklist_message(friendly_resource_name, get_resource_name(this_nc_resource, value_name), string_path, this_nc_attribute, empty_message(this_nc_attribute))
     ]
 }
 
@@ -357,13 +378,13 @@ get_nc_whitelisted_resources(resource_type, attribute_path, compliant_values) = 
 get_whitelist_violations(resource_type, attribute_path, compliant_values, friendly_resource_name, value_name) = results if {
     string_path := format_attribute_path(attribute_path)
     results := 
-    [ { "name": this_nc_resource.values[value_name],
+    [ { "name": get_resource_name(this_nc_resource, value_name),
         "message": msg
     } |
     nc_resources := get_nc_whitelisted_resources(resource_type, attribute_path, compliant_values)
     this_nc_resource = nc_resources[_]
     this_nc_attribute = object.get(this_nc_resource.values, attribute_path, null)
-    msg := format_whitelist_message(friendly_resource_name, this_nc_resource.values[value_name], string_path, this_nc_attribute, empty_message(this_nc_attribute), compliant_values)
+    msg := format_whitelist_message(friendly_resource_name, get_resource_name(this_nc_resource, value_name), string_path, this_nc_attribute, empty_message(this_nc_attribute), compliant_values)
     ]
 }
 
@@ -409,13 +430,13 @@ get_range_violations(resource_type, attribute_path, range_values, friendly_resou
     unpacked_range_values = range_values #[0] <===================================================================== removed [0] - Visal
     string_path := format_attribute_path(attribute_path)
     results := 
-    [ { "name": this_nc_resource.values[value_name],
+    [ { "name": get_resource_name(this_nc_resource, value_name),
         "message": msg
     } |
     nc_resources := get_nc_range_resources(resource_type, attribute_path, unpacked_range_values)
     this_nc_resource = nc_resources[_]
     this_nc_attribute = object.get(this_nc_resource.values, attribute_path, null) 
-    msg := format_range_validation_message(friendly_resource_name, this_nc_resource.values[value_name], string_path, this_nc_attribute, empty_message(this_nc_attribute), unpacked_range_values)
+    msg := format_range_validation_message(friendly_resource_name, get_resource_name(this_nc_resource, value_name), string_path, this_nc_attribute, empty_message(this_nc_attribute), unpacked_range_values)
     ]
 }
 
@@ -463,14 +484,14 @@ get_nc_pattern_blacklist_resources(resource_type, attribute_path, values) = reso
 get_pattern_blacklist_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name) = results if {
     string_path := format_attribute_path(attribute_path)
     results := # and their patterns 
-    [ { "name": this_nc_resource.values[value_name],
+    [ { "name": get_resource_name(this_nc_resource, value_name),
         "message": msg
     } |
     nc_resources := get_nc_pattern_blacklist_resources(resource_type, attribute_path, values_formatted)
     this_nc_resource = nc_resources[_]
     nc := get_nc_pattern_blacklist(this_nc_resource, attribute_path, values_formatted[0], values_formatted[1])
     this_nc := nc[_]
-    msg := format_pattern_blacklist_message(friendly_resource_name, this_nc_resource.values[value_name], string_path, final_formatter(object.get(this_nc_resource.values, attribute_path, null), this_nc.value), empty_message(this_nc.value), this_nc.allowed)
+    msg := format_pattern_blacklist_message(friendly_resource_name, get_resource_name(this_nc_resource, value_name), string_path, final_formatter(object.get(this_nc_resource.values, attribute_path, null), this_nc.value), empty_message(this_nc.value), this_nc.allowed)
     ]
 }
 
@@ -505,14 +526,14 @@ get_nc_pattern_whitelist_resources(resource_type, attribute_path, values) = reso
 get_pattern_whitelist_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name) = results if {
     string_path := format_attribute_path(attribute_path)
     results := # and their patterns 
-    [ { "name": this_nc_resource.values[value_name],
+    [ { "name": get_resource_name(this_nc_resource, value_name),
         "message": msg
     } |
     nc_resources := get_nc_pattern_whitelist_resources(resource_type, attribute_path, values_formatted)
     this_nc_resource = nc_resources[_]
     nc := get_nc_pattern_whitelist(this_nc_resource, attribute_path, values_formatted[0], values_formatted[1])
     this_nc := nc[_]
-    msg := format_pattern_whitelist_message(friendly_resource_name, this_nc_resource.values[value_name], string_path, final_formatter(object.get(this_nc_resource.values, attribute_path, null), this_nc.value), empty_message(this_nc.value), this_nc.allowed)
+    msg := format_pattern_whitelist_message(friendly_resource_name, get_resource_name(this_nc_resource, value_name), string_path, final_formatter(object.get(this_nc_resource.values, attribute_path, null), this_nc.value), empty_message(this_nc.value), this_nc.allowed)
     ]
 }
 
