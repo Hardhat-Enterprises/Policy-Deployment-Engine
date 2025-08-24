@@ -106,7 +106,6 @@ conditions_2 := [
 ]
 
 
-# 获取资源并检测模式
 all_resources := helpers.get_all_resources(vars.variables.resource_type)
 
 has_aof := count([resource |
@@ -121,7 +120,6 @@ has_rdb := count([resource |
     resource.values.persistence_config[0].mode == "RDB"
 ]) > 0
 
-# 根据检测到的模式选择条件
 final_conditions := conditions_1 if {
     has_aof
 } else := conditions_2 if {
@@ -141,6 +139,5 @@ final_conditions := conditions_1 if {
     ]
 ]
 
-# 使用选择的条件
 message := helpers.get_multi_summary(final_conditions, vars.variables).message
 details := helpers.get_multi_summary(final_conditions, vars.variables).details
