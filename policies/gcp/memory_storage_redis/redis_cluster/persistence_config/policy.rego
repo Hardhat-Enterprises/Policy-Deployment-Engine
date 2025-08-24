@@ -120,6 +120,7 @@ has_rdb := count([resource |
     resource.values.persistence_config[0].mode == "RDB"
 ]) > 0
 
+
 final_conditions := conditions_1 if {
     has_aof
 } else := conditions_2 if {
@@ -138,6 +139,7 @@ final_conditions := conditions_1 if {
         }
     ]
 ]
+
 
 message := helpers.get_multi_summary(final_conditions, vars.variables).message
 details := helpers.get_multi_summary(final_conditions, vars.variables).details
