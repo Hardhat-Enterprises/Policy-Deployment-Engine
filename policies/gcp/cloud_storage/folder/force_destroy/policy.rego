@@ -5,16 +5,20 @@ import data.terraform.gcp.security.cloud_storage.folder.vars
 
 
 conditions := [
-    [
-        {"situation_description": "Folder has force_destroy enabled, which can lead to unintended data deletion.",
-         "remedies": ["Set force_destroy to false to prevent accidental folder deletion."]},
-        {
-            "condition": "force_destroy should be false for safe deletion practices.",
-            "attribute_path": ["force_destroy"],
-            "values": [true],  
-            "policy_type": "blacklist"
-        }
-    ]
+  [
+    {
+      "situation_description": "Folder has force_destroy enabled, which can lead to unintended data deletion.",
+      "remedies": ["Set force_destroy to false to prevent accidental folder deletion."]
+      
+    },
+        
+    {
+      "condition": "force_destroy should be false for safe deletion practices.",
+      "attribute_path": ["force_destroy"],
+      "values": [true],  
+      "policy_type": "blacklist"
+    }
+  ]
 ]
 
 summary := helpers.get_multi_summary(conditions, vars.variables)

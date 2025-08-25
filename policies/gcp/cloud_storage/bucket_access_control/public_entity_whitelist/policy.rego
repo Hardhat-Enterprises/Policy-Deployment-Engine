@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_storage.bucket_access_control.public_entity_whitelist
+package terraform.gcp.security.cloud_storage.bucket_access_control.public_entity_blacklist
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.cloud_storage.bucket_access_control.vars
@@ -13,11 +13,10 @@ conditions := [
             "condition": "Only approved ACL entities are allowed.",
             "attribute_path": ["entity"],
             "values": [
-                "user:user@example.com",
-                "group:admins@example.com",
-                "domain:example.com"
+                "allAuthenticatedUsers ",
+                "allUsers"
             ],
-            "policy_type": "whitelist"
+            "policy_type": "blacklist"
         }
     ]
 ]
