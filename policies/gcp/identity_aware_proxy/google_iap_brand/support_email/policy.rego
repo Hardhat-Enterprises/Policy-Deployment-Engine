@@ -1,28 +1,42 @@
-package terraform.gcp.security.identity_aware_proxy.google_iap_brand.support_email 
+package terraform.gcp.security.identity_aware_proxy.google_iap_brand.support_email
+
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.identity_aware_proxy.google_iap_brand.vars
 
-# STEP 1: STUDY YOUR RESOURCE AND ITS ATTRIBUTES, THEN FILL IN THE VARS FILE
+# SECURITY POLICY (exact-match; helper-friendly)
+# c.tf has: support_email = "support@example.com"
+# nc.tf has: "support@gmail.com", "help@vendor.io", "support@example.com "
 
-# STEP 2: CREATE SCENARIOS (can be simple (one condition) or complex (multiple linked conditions) )
 conditions := [
-    [
-    {"situation_description" : "A self documenting message about the conditions within",
-    "remedies":[ "Something that fixes the issues in this situation","You can have multiple items in the array"]},
+  [
     {
-        "condition": "A message about what the condition does",
-        "attribute_path" : ["support_email"], # An array of strings and indicies eg. ["rsa",0,"key"]
-        "values" : ["support@example.com"], # Values to compare against
-        "policy_type" : "whitelist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
+      "situation_description": "Support email must use corporate domain",
+      "remedies": [
+        "Set support_email = \"support@example.com\""
+      ]
+    },
+    {
+      "condition": "support_email must be corporate",
+      "attribute_path": ["support_email"],
+      "values": ["support@example.com"],
+      "policy_type": "whitelist"
     }
-    ]
+  ],
+  [
+    {
+      "situation_description": "Public/external/malformed support emails are not allowed",
+      "remedies": [
+        "Use a corporate mailbox (example.com)"
+      ]
+    },
+    {
+      "condition": "support_email must not be public/external/malformed",
+      "attribute_path": ["support_email"],
+      "values": ["support@gmail.com", "help@vendor.io", "support@example.com "],
+      "policy_type": "blacklist"
+    }
+  ]
 ]
 
-# Displays a general message about policy compliance
-# Use 'opa eval ... "data.terraform.gcp.security.<service>.<resource_type>.<policy_name>.message"
 message := helpers.get_multi_summary(conditions, vars.variables).message
-
-# Displays a detailed summary of each resources compliance to every condition and situation
-# Useful for debugging
-# Use 'opa eval ... "data.terraform.gcp.security.<service>.<resource_type>.<policy_name>.details"
 details := helpers.get_multi_summary(conditions, vars.variables).details

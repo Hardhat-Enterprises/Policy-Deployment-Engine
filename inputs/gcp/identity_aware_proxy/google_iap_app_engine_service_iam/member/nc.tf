@@ -52,3 +52,10 @@ resource "google_iap_app_engine_service_iam_member" "nc_member_whitespace" {
   role    = "roles/iap.httpsResourceAccessor"
   member  = " user:jane@example.com "             #contains spaces
 }
+
+resource "google_iap_app_engine_service_iam_member" "nc_member_external_user" {
+  app_id  = "my-gcp-project"
+  service = "default"
+  role    = "roles/iap.httpsResourceAccessor"
+  member  = "user:jane@gmail.com"  # external domain; fails corp-domain rule
+}

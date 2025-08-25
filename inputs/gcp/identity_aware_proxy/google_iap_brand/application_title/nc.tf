@@ -1,20 +1,23 @@
-# Test-y title
-resource "google_iap_brand" "brand_test_title" {
+resource "google_iap_brand" "nc_title_test" {
   project           = "my-project"
   support_email     = "support@example.com"
-  application_title = "Test Application"               
+  application_title = "Test"                           #  too generic
 }
 
-# Demo keyword
-resource "google_iap_brand" "brand_demo_title" {
+resource "google_iap_brand" "nc_title_demo" {
   project           = "my-project"
   support_email     = "support@example.com"
-  application_title = "Demo App"                       
+  application_title = "Demo"                           #  testy
 }
 
-# Trailing whitespace
-resource "google_iap_brand" "brand_trailing_space" {
+resource "google_iap_brand" "nc_title_generic" {
   project           = "my-project"
   support_email     = "support@example.com"
-  application_title = " "             
+  application_title = "My Application"                 #  generic
+}
+
+resource "google_iap_brand" "nc_title_trailing_space" {
+  project           = "my-project"
+  support_email     = "support@example.com"
+  application_title = "Cloud IAP – Customer Portal "   #  trailing space
 }

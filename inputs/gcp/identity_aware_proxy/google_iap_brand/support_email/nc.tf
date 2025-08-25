@@ -1,13 +1,20 @@
 # Public mailbox
-resource "google_iap_brand" "brand_public_email" {
+resource "google_iap_brand" "nc_public_email" {
   project           = "my-project"
-  support_email     = "support@gmail.com"       #public domain
+  support_email     = "support@gmail.com"             #  public
   application_title = "Cloud IAP – Customer Portal"
 }
 
-# Non-corporate external domain
-resource "google_iap_brand" "brand_external_domain" {
+# External vendor domain
+resource "google_iap_brand" "nc_vendor_email" {
   project           = "my-project"
-  support_email     = "help@vendor.io"          #not in allowed corp domain
+  support_email     = "help@vendor.io"                #  external
+  application_title = "Cloud IAP – Customer Portal"
+}
+
+# Trailing space
+resource "google_iap_brand" "nc_trailing_space_email" {
+  project           = "my-project"
+  support_email     = "support@example.com "          #  space
   application_title = "Cloud IAP – Customer Portal"
 }
