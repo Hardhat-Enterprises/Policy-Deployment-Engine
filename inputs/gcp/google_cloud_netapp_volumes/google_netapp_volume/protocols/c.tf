@@ -4,7 +4,7 @@ resource "google_netapp_volume" "c_test_volume" {
   capacity_gib = "100"
   share_name = "test-volume"
   storage_pool = "test-pool"
-  protocols = ["NFSV3"]
+  protocols = ["NFSV4"]
   project = "test1"
 }
 
