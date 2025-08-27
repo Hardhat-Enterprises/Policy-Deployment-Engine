@@ -1,5 +1,6 @@
 package terraform.gcp.security.analysis_occurence.remediation.vars
 
+inherited/gcp/service/container_registeries
 variables := {
   "friendly_resource_name": "Container Analysis Occurrence (remediation)",
   "resource_type": "google_container_analysis_occurrence",
@@ -20,4 +21,11 @@ variables := {
     "@",          # email-like id
     "^.{0,7}$"    # too short to be useful
   ],
+
+
+variables := {
+    "friendly_resource_name": "Container Analysis Occurence", # eg., "GCS Bucket",
+    "resource_type":  "google_container_analysis_occurence", # eg., "google_storage_bucket"
+    "resource_value_name" : "name" # eg., "name"
+gcp/service/container_registries
 }

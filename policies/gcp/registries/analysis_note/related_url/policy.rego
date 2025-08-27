@@ -1,8 +1,13 @@
+inherited/gcp/service/container_registeries
 package terraform.gcp.security.analysis_note.related_url
+
+package terraform.gcp.security.registries.google_container_analysis_note.related_url
+gcp/service/container_registries
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.analysis_note.related_url.vars
 
+inherited/gcp/service/container_registeries
 banned_exact  := vars.variables["banned_related_url_exact"]
 banned_scheme := vars.variables["banned_related_url_scheme_regex"]
 banned_host   := vars.variables["banned_related_url_host_regex"]
@@ -78,4 +83,25 @@ conditions := [
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
+
+allowed_urls := [
+    "https://github.com/Hardhat-Enterprises/Policy-Deployment-Engine/tree/gcp/service/cloud_vmware_engine/policies/gcp"  
+]
+
+conditions := [
+    [
+        {"situation_description": "Related URL does not match the allowed URL(s).",
+        "remedies": ["Ensure related URL matches the allowed URL(s)."]},
+        {
+            "condition": "Check if related URL matches the allowed URLs",
+            "attribute_path": ["related_url", 0, "url"],  
+            "values": allowed_urls, 
+            "policy_type": "whitelist" 
+        }
+    ]
+]
+
+message := helpers.get_multi_summary(conditions, vars.variables).message
+
+gcp/service/container_registries
 details := helpers.get_multi_summary(conditions, vars.variables).details

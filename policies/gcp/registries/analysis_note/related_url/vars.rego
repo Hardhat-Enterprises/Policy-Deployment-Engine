@@ -1,5 +1,6 @@
 package terraform.gcp.security.analysis_note.related_url.vars
 
+inherited/gcp/service/container_registeries
 variables := {
   "friendly_resource_name": "Container Analysis Note related_url",
   "resource_type": "google_container_analysis_note",
@@ -32,4 +33,11 @@ variables := {
   "banned_related_url_userinfo_regex": [
     "://[^/]*@"
   ],
+
+
+variables := {
+    "friendly_resource_name": "", # eg., "GCS Bucket",
+    "resource_type":  "", # eg., "google_storage_bucket"
+    "resource_value_name" : "" # eg., "name"
+gcp/service/container_registries
 }
