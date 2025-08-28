@@ -3,6 +3,6 @@
 
 resource "google_clouddeploy_custom_target_type" "nc" {
   location = "us-central1"
-  name     = "test-custom-target-c"
+  name     = "test-custom-target-nc"
   project  = "my-project-name"
 }
