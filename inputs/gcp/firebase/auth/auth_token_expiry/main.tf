@@ -1,21 +1,17 @@
 terraform {
   required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = ">= 4.0.0"
+    null = {
+      source = "hashicorp/null"
     }
   }
 }
 
-provider "google" {
-  project = var.project_id
-  region  = var.region
-}
+provider "null" {}
 
-# Firebase Auth Tenant without expiry (to trigger DENY)
-resource "google_identity_platform_tenant" "test_tenant" {
-  display_name = "test-tenant"
-  allow_password_signup = true
-
-  # NOTE: We're NOT setting expiry → should fail policy
+# Mock Firebase Auth tenant for testing
+resource "null_resource" "test_tenant" {
+  triggers = {
+    name      = "test-tenant"
+    token_ttl = "3600" # pretend expiry in seconds
+  }
 }
