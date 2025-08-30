@@ -1,4 +1,4 @@
-package terraform.gcp.security.api_hub.google_apihub_curation.endpoint_application_integration_endpoint_details
+package terraform.gcp.security.api_hub.google_apihub_curation.location
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.api_hub.google_apihub_curation.vars
@@ -9,14 +9,8 @@ conditions := [
     "remedies":[ "Use valid settings to fit patterns"]},
     {
         "condition": "Trigger ID not approved",
-        "attribute_path" : ["endpoint", "application_integration_endpoint_details", "trigger_id"],
+        "attribute_path" : ["location",],
         "values" : ["api_trigger/curation_API_PDE_", ["1","2","3"]],
-        "policy_type" : "pattern whitelist" 
-    },
-    {
-        "condition": "Wrong URI pattern",
-        "attribute_path" : ["endpoint", "application_integration_endpoint_details", "uri"],
-        "values" : ["https://integrations.googleapis.com/v1/{name=projects/*/locations/*/integrations/*}:execute", "https://{location}-integrations.googleapis.com/v1/{name=projects/*/locations/*/integrations/*}:execute" ],
         "policy_type" : "pattern whitelist" 
     }
     ]
