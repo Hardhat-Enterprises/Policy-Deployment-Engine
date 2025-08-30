@@ -1,6 +1,6 @@
 resource "google_vmwareengine_private_cloud" "c" {
   location    = "australia-southeast1"
-  name        = "c"
+  name        = "sample-private-cloud-c"
   description = "Sample test PC."
   network_config {
     management_cidr       = "192.168.30.0/24"

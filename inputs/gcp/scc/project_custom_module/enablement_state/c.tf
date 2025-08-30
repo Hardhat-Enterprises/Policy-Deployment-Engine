@@ -1,6 +1,9 @@
+# Describe your resource type here
+# Keep "c" as the name to indicate that this resource and its attributes are compliant
+
 resource "google_scc_project_custom_module" "c" {
   project = "cefwed"
-  display_name = "c"
+  display_name = "enablement_state"
   enablement_state = "ENABLED"
   custom_config {
     predicate {

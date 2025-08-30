@@ -1,29 +1,31 @@
+# Describe your resource type here
+# Keep "c" as the name to indicate that this resource and its attributes are compliant
+
 resource "google_folder" "folder_c" {
-  parent              = "organizations/123456789"
-  display_name        = "c"
+  parent       = "organizations/123456789"
+  display_name = "folder-name"
   deletion_protection = false
 }
 
 resource "google_scc_folder_custom_module" "c" {
-  folder          = google_folder.folder_c.folder_id
-  display_name    = "c"
+  folder = google_folder.folder_c.folder_id
+  display_name = "enablement_state"
   enablement_state = "ENABLED"
-
   custom_config {
     predicate {
-      expression   = "resource.rotationPeriod > duration(\"2592000s\")"
-      title        = "Purpose of the expression"
-      description  = "description of the expression"
-      location     = "location of the expression"
+      expression = "resource.rotationPeriod > duration(\"2592000s\")"
+      title = "Purpose of the expression"
+      description = "description of the expression"
+      location = "location of the expression"
     }
     custom_output {
       properties {
         name = "duration"
         value_expression {
-          expression   = "resource.rotationPeriod"
-          title        = "Purpose of the expression"
-          description  = "description of the expression"
-          location     = "location of the expression"
+          expression = "resource.rotationPeriod"
+          title = "Purpose of the expression"
+          description = "description of the expression"
+          location = "location of the expression"
         }
       }
     }
@@ -32,8 +34,8 @@ resource "google_scc_folder_custom_module" "c" {
         "cloudkms.googleapis.com/CryptoKey",
       ]
     }
-    severity       = "LOW"
-    description    = "Description of the custom module"
+    severity = "LOW"
+    description = "Description of the custom module"
     recommendation = "Steps to resolve violation"
   }
 }

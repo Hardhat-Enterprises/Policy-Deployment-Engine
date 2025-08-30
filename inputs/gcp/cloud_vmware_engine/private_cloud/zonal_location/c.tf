@@ -1,6 +1,6 @@
 resource "google_vmwareengine_private_cloud" "c" {
   location    = "australia-southeast-1"
-  name        = "c"
+  name        = "sample-private-cloud-c"
   description = "Sample test PC."
   type        = "STRETCHED"
   network_config {

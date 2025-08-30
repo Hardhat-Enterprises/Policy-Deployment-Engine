@@ -1,5 +1,5 @@
 package terraform.gcp.security.<service>.<resource_type>.<policy_name> # Edit here 
-import data.terraform.helpers
+import data.terraform.gcp.helpers
 import data.terraform.gcp.security.<service>.<resource_type>.vars
 
 # STEP 1: STUDY YOUR RESOURCE AND ITS ATTRIBUTES, THEN FILL IN THE VARS FILE
