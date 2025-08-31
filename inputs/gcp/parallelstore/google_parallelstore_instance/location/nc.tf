@@ -1,6 +1,7 @@
-resource "google_parallelstore_instance" "bad" {
+@"
+resource "google_parallelstore_instance" "nc" {
   name         = "bad-instance"
-  location     = "us-central1"   # not allowed
+  location     = "us-central1"
   capacity_gib = 1200
 
   labels = {
@@ -8,3 +9,4 @@ resource "google_parallelstore_instance" "bad" {
     env   = "dev"
   }
 }
+"@ | Out-File -Encoding utf8 "inputs\gcp\parallelstore\google_parallelstore_instance\location\nc.tf"
