@@ -1,4 +1,3 @@
-@"
 package terraform.gcp.security.parallelstore.google_parallelstore_instance.location
 
 import data.terraform.gcp.helpers
@@ -19,4 +18,4 @@ conditions := [
 
 message := helpers.get_multi_summary(conditions, variables).message
 details := helpers.get_multi_summary(conditions, variables).details
-"@ | Out-File -Encoding utf8 "policies\gcp\parallelstore\google_parallelstore_instance\location\policy.rego"
+

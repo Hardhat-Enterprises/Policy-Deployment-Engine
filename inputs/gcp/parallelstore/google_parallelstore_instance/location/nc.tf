@@ -1,4 +1,3 @@
-@"
 resource "google_parallelstore_instance" "nc" {
   name         = "bad-instance"
   location     = "us-central1"
@@ -9,4 +8,3 @@ resource "google_parallelstore_instance" "nc" {
     env   = "dev"
   }
 }
-"@ | Out-File -Encoding utf8 "inputs\gcp\parallelstore\google_parallelstore_instance\location\nc.tf"
