@@ -1,10 +1,7 @@
-package terraform.gcp.security.deploy.delivery_pipeline.suspended # Edit here 
+package terraform.gcp.security.deploy.delivery_pipeline.suspended
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.deploy.delivery_pipeline.vars
 
-# STEP 1: STUDY YOUR RESOURCE AND ITS ATTRIBUTES, THEN FILL IN THE VARS FILE
-
-# STEP 2: CREATE SCENARIOS (can be simple (one condition) or complex (multiple linked conditions) )
 conditions := [
     [
     {"situation_description" : "Policy is suspended",
