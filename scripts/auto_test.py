@@ -164,15 +164,15 @@ def validate_policy_output(attribute: str, resource_type: str | None, plan_path:
     matched = match_names_in_messages(messages, unique_names)
 
     # Fail if any name other than 'nc*' appears
-    nc_pattern = re.compile(r"^nc\d*$")
-    non_nc_in_output = {n for n in matched if not nc_pattern.fullmatch(n)}
+    nc_pattern = re.compile(r"^nc\d*$", re.IGNORECASE)
+    non_nc_in_output = {n.strip() for n in matched if not nc_pattern.fullmatch(n)}
     if non_nc_in_output:
         return make_failure(attribute, f"Resources in output other than 'nc' found: {', '.join(sorted(non_nc_in_output))}")
 
     # Ensure all resources are mentioned, except 'c*' which can be omitted
     missing = unique_names - matched
-    ignore_pattern = re.compile(r"^c\d*$")
-    missing_non_c = {n for n in missing if not ignore_pattern.fullmatch(n)}
+    ignore_pattern = re.compile(r"^c\d*$", re.IGNORECASE)
+    missing_non_c = {n.strip() for n in missing if not ignore_pattern.fullmatch(n)}
 
     if verbose:
         rt = resource_type if resource_type else "any"

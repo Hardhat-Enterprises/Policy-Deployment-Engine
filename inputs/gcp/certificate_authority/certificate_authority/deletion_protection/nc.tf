@@ -39,7 +39,7 @@ resource "google_privateca_certificate_authority" "nc1" {
     pool = "ca-pool"
     project = "PDE-project"
     location = "us-central1"
-    certificate_authority_id = "nca"
+    certificate_authority_id = "nc1"
     deletion_protection = false
     config {
         subject_config {
