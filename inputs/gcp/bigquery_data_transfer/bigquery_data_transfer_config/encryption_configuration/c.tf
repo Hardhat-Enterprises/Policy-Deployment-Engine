@@ -1,0 +1,29 @@
+variable "project_id" {
+  description = "GCP Project ID"
+  type        = string
+  default     = "civil-lightning-468910-m1"
+}
+
+data "google_project" "project" {
+  project_id = var.project_id
+}
+
+resource "google_bigquery_data_transfer_config" "encryption_C" {
+  project                = "my_project_id"
+  display_name           = "Encrypted BQ Transfer"
+  data_source_id         = "scheduled_query"
+  destination_dataset_id = "my_dataset"
+  schedule               = "every 24 hours"
+
+  service_account_name = "service-${data.google_project.project.number}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com"
+
+  encryption_configuration {
+    kms_key_name = "projects/your-project-id/locations/global/keyRings/your-keyring/cryptoKeys/your-key"
+  }
+
+  params = {
+    query                           = "SELECT CURRENT_DATE()"
+    destination_table_name_template = "my_table_$${run_time}"
+    write_disposition               = "WRITE_TRUNCATE"
+  }
+}
