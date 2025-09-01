@@ -35,7 +35,7 @@ resource "google_privateca_certificate_authority" "nc" {
             algorithm = ""
         }    
 }
-resource "google_privateca_certificate_authority" "nca" {
+resource "google_privateca_certificate_authority" "nc1" {
     pool = "ca-pool"
     project = "PDE-project"
     location = "us-central1"
