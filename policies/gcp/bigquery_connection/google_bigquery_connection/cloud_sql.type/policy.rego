@@ -2,9 +2,7 @@ package terraform.gcp.security.bigquery_connection.google_bigquery_connection.cl
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.bigquery_connection.google_bigquery_connection.vars
 
-# STEP 1: STUDY YOUR RESOURCE AND ITS ATTRIBUTES, THEN FILL IN THE VARS FILE
 
-# STEP 2: CREATE SCENARIOS (can be simple (one condition) or complex (multiple linked conditions) )
 conditions := [
     [
     {"situation_description" : "Require explicit supported Cloud SQL type",

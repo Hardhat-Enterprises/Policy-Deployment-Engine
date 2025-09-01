@@ -3,8 +3,6 @@ package terraform.gcp.security.bigquery_connection.google_bigquery_connection.aw
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.bigquery_connection.google_bigquery_connection.vars
 
-# Whitelist the ONLY IAM roles allowed for this connection.
-# (Replace with your approved ARNs.)
 conditions := [[
   {
     "situation_description": "AWS access role for the BigQuery connection must be an approved IAM role",
@@ -25,4 +23,4 @@ conditions := [[
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
 details := helpers.get_multi_summary(conditions, vars.variables).details
-policy := {"message": message, "details": details}
+

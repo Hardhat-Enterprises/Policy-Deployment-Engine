@@ -7,7 +7,7 @@ resource "google_bigquery_connection" "c" {
 
   cloud_sql {
     instance_id = "my-project:australia-southeast1:pg-app"
-    database    = "appdb_prod"   # compliant
+    database    = "appdb_prod"   
     type        = "POSTGRES"
 
     credential {

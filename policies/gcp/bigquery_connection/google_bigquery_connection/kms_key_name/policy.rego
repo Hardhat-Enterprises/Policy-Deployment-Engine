@@ -14,7 +14,7 @@ conditions := [[
     "condition": "kms_key_name must match AU KMS key resource pattern",
     "attribute_path": ["kms_key_name"],
     "values": [
-       "^projects/my-project-c/locations/australia-southeast2/keyRings/australia-southeast2/cryptoKeys/bq-key(?:/cryptoKeyVersions/[0-9]+)?$"
+       "^projects/my-project-c/locations/australia-southeast2/keyRings/australia-southeast2/cryptoKeys/bq-key(?:/cryptoKeyVersions/[0-9]+)?$", 
        "projects/my-project-nc/locations/US/keyRings/us/cryptoKeys/bq-key(?:/cryptoKeyVersions/[0-9]+)?$"
 
     ],

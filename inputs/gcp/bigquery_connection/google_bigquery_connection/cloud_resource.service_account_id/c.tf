@@ -3,5 +3,5 @@ resource "google_bigquery_connection" "c" {
   location      = "australia-southeast1"
   connection_id = "cloud-resource-conn-c"
 
-  cloud_resource {}  # leave empty; service_account_id is computed
+  cloud_resource {}  
 }

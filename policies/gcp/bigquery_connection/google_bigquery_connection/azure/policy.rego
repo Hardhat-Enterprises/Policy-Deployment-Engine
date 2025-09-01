@@ -3,10 +3,7 @@ package terraform.gcp.security.bigquery_connection.google_bigquery_connection.az
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.bigquery_connection.google_bigquery_connection.vars
 
-# STEP 1: STUDY YOUR RESOURCE AND ITS ATTRIBUTES, THEN FILL IN THE VARS FILE
-# We validate azure.customer_tenant_id and azure.federated_application_client_id.
 
-# STEP 2: CREATE SCENARIOS
 conditions := [[
   {
     "situation_description": "Azure BigQuery connection must use approved tenant and federated application client IDs",
@@ -27,7 +24,7 @@ conditions := [[
     "condition": "azure.federated_application_client_id must be approved",
     "attribute_path": ["azure", 0, "federated_application_client_id"],
     "values": [
-      "22222222-2222-2222-2222-222222222222"  # <- keep in sync with c.tf
+      "22222222-2222-2222-2222-222222222222"  
     ],
     "policy_type": "whitelist"
   }

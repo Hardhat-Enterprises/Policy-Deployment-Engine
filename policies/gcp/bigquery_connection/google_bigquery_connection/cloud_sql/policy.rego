@@ -4,8 +4,6 @@ package terraform.gcp.security.bigquery_connection.google_bigquery_connection.cl
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.bigquery_connection.google_bigquery_connection.vars
 
-# One situation, same 2-object inner array shape:
-# [ {situation_description, remedies}, {condition, attribute_path, policy_type, values} ]
 conditions := [[
   {
     "situation_description": "Require BigQuery Cloud SQL connections to be in approved AU regions",
@@ -25,6 +23,6 @@ conditions := [[
   }
 ]]
 
-# Keep the same summary helpers/shape
+
 message := helpers.get_multi_summary(conditions, vars.variables).message
 details := helpers.get_multi_summary(conditions, vars.variables).details
