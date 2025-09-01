@@ -15,8 +15,8 @@ conditions := [
     {
       "condition": "force_destroy should be false for safe deletion practices.",
       "attribute_path": ["force_destroy"],
-      "values": [true],  
-      "policy_type": "blacklist"
+      "values": [false],  
+      "policy_type": "whitelist"
     }
   ]
 ]
