@@ -111,29 +111,8 @@ def parse_rego_metadata(policy_dir: Path):
     return pkg, vars_import
 
 
-def extract_names_from_opa_output(messages: list[str] | None, details: object | None) -> set[str]:
-    """Extract resource names from structured OPA details if available.
-    Looks for common keys like name/resource_name/resource/address.
-    """
-    names: set[str] = set()
-    if isinstance(details, list):
-        for item in details:
-            if isinstance(item, dict):
-                for key in ("name", "resource_name", "resource", "address"):
-                    v = item.get(key)
-                    if isinstance(v, str):
-                        names.add(v)
-    elif isinstance(details, dict):
-        # Sometimes details can be a dict with nested arrays
-        for key in ("name", "resource_name", "resource", "address"):
-            v = details.get(key)
-            if isinstance(v, str):
-                names.add(v)
-    return names
-
-
 def match_names_in_messages(messages: list[str], candidate_names: set[str]) -> set[str]:
-    """Match candidate names within messages using safe token boundaries to avoid short-name false positives."""
+    """Match candidate names within messages using safe boundaries to avoid short-name false positives."""
     matched: set[str] = set()
     if not messages or not candidate_names:
         return matched
@@ -147,58 +126,40 @@ def match_names_in_messages(messages: list[str], candidate_names: set[str]) -> s
     return matched
 
 
-def run_policy_check_pair(input_dir: Path, policy_dir: Path, policies_root: Path):
-    print(f"\n Running policy check for: {input_dir}")
-    root_dir = Path.cwd()
+def run_policy_check_pair(input_dir: Path, policy_dir: Path, policies_root: Path, verbose: bool = False):
     abs_input_dir = input_dir.resolve()
-
     service, resource, attribute = extract_path_parts(input_dir)
-
     plan_path = abs_input_dir / "plan.json"
-
-    # 1) Terraform steps - skip provider validation to avoid credentials
-    # Set fake GCP credentials to avoid authentication errors
     env = os.environ.copy()
     env.update({
         'GOOGLE_CREDENTIALS': '{"type": "service_account", "project_id": "fake-project"}',
         'GOOGLE_PROJECT': 'fake-project',
         'GOOGLE_REGION': 'us-central1'
     })
-    
     tf_commands = [
-        ("terraform init -backend=false -reconfigure", "terraform init"),
-        ("terraform plan -refresh=false -input=false -out=plan", "terraform plan"),
-        ("terraform show -json plan > plan.json", "terraform show"),
+        ("terraform init -backend=false -reconfigure"),
+        ("terraform plan -refresh=false -input=false -out=plan"),
+        ("terraform show -json plan > plan.json"),
     ]
-    for cmd, desc in tf_commands:
-        print(desc)
+    for cmd in tf_commands:
         result = subprocess.run(cmd, shell=True, cwd=str(abs_input_dir), capture_output=True, text=True, env=env)
         if result.returncode != 0:
-            print(f" Command failed: {cmd}")
-            print(result.stdout)
-            print(result.stderr)
-            sys.exit(result.returncode)
-
-    # 2) Build OPA queries from policy.rego metadata to avoid directory/package mismatches
+            if verbose:
+                print(f" Command failed: {cmd}")
+                print(result.stdout)
+                print(result.stderr)
+            return {"policy": str(attribute), "passed": False}
     pkg_path, vars_import = parse_rego_metadata(policy_dir)
     if not pkg_path:
-        # Fallback to directory-derived package path
         pkg_path = f"terraform.gcp.security.{service}.{resource}.{attribute}"
     message_query = f"data.{pkg_path}.message"
-    details_query = f"data.{pkg_path}.details"
-
     if vars_import:
         vars_resource_type_query = f"{vars_import}.variables.resource_type"
     else:
         vars_resource_type_query = f"data.terraform.gcp.security.{service}.{resource}.vars.variables.resource_type"
-
-    # 2a) OPA queries (JSON output for parsing)
     policies_data_path = str(policies_root.resolve())
     resource_type = opa_eval_value(Path(policies_data_path), plan_path, vars_resource_type_query)
     messages_value = opa_eval_value(Path(policies_data_path), plan_path, message_query)
-    details_value = opa_eval_value(Path(policies_data_path), plan_path, details_query)
-
-    # Normalize messages to a list of strings
     messages: list[str] = []
     if isinstance(messages_value, list):
         messages = [str(m) for m in messages_value]
@@ -206,38 +167,30 @@ def run_policy_check_pair(input_dir: Path, policy_dir: Path, policies_root: Path
         messages = [messages_value]
     elif messages_value is not None:
         messages = [str(messages_value)]
-
-    print(f"OPA check: {message_query}")
-    for m in messages:
-        print(m)
-
-    # 3) Count unique resource names from plan.json limited to this policy's TF (root module only)
+    if verbose:
+        print(f"OPA check: {message_query}")
+        for m in messages:
+            print(m)
     unique_names = get_unique_resource_names(plan_path, str(resource_type) if resource_type else None, include_children=False)
-
-    # Prefer names referenced in structured details; fallback to regex on messages
-    names_in_output = extract_names_from_opa_output(messages, details_value)
-    if names_in_output:
-        matched = unique_names & names_in_output
-    else:
-        matched = match_names_in_messages(messages, unique_names)
-
+    matched = match_names_in_messages(messages, unique_names)
     missing = unique_names - matched
-    # Ignore "c" followed by optional digits
     ignore_pattern = re.compile(r"^c\d*$")
     missing_non_c = {n for n in missing if not ignore_pattern.fullmatch(n)}
-
-    print(f"Unique resource names in plan ({resource_type if resource_type else 'any'}): {len(unique_names)}")
-    print(f"Names mentioned in output: {len(matched)}")
-    if missing:
-        print(f" Missing mentions: {', '.join(sorted(missing))}")
-
+    if verbose:
+        print(f"Unique resource names in plan ({resource_type if resource_type else 'any'}): {len(unique_names)}")
+        print(f"Names mentioned in output: {len(matched)}")
+        if missing:
+            print(f" Missing mentions: {', '.join(sorted(missing))}")
     if missing_non_c:
-        print(f"Check failed: Unmentioned resources other than 'c' found: {', '.join(sorted(missing_non_c))}")
-        sys.exit(1)
+        if verbose:
+            print(f"Check failed: Unmentioned resources other than 'c' found: {', '.join(sorted(missing_non_c))}")
+        return {"policy": str(attribute), "passed": False}
     else:
-        if missing and missing == {"c"}:
+        if missing and missing == {"c"} and verbose:
             print("Only compliant resources are unmentioned; ignoring")
-        print("Check passed\n")
+        if verbose:
+            print("Check passed\n")
+        return {"policy": str(attribute), "passed": True}
 
 def find_matching_pairs(inputs_root: Path, policies_root: Path):
     def is_leaf_terraform_dir(directory: Path) -> bool:
@@ -256,7 +209,6 @@ def find_matching_pairs(inputs_root: Path, policies_root: Path):
     for input_dir in input_dirs:
         relative = input_dir.relative_to(inputs_root)
         policy_dir = policies_root / relative
-        print(f" Checking input dir: {input_dir} against policy dir: {policy_dir}")
         if policy_dir.is_dir():
             pairs.append((input_dir, policy_dir))
         else:
@@ -268,6 +220,7 @@ def main():
     parser = argparse.ArgumentParser(description="Run Terraform + OPA policy checks for all matched input/policy pairs.")
     parser.add_argument("--inputs", default="inputs/gcp", help="Root directory for Terraform inputs")
     parser.add_argument("--policies", default="policies/gcp", help="Root directory for policy files")
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
     args = parser.parse_args()
 
     inputs_root = Path(args.inputs)
@@ -278,9 +231,22 @@ def main():
         print(" No matching input/policy pairs found.")
         sys.exit(1)
 
+    results = []
+    failure_flag = False
     for input_dir, policy_dir in pairs:
-        run_policy_check_pair(input_dir, policy_dir, policies_root)
+        result = run_policy_check_pair(input_dir, policy_dir, policies_root, verbose=args.verbose)
+        results.append(result)
+    print("\nSummary of policy checks:")
+    for res in results:
+        if res["passed"]:
+            status = "✅"
+        else:
+            status = "❌"
+            failure_flag = True
+        print(f"Policy: {res['policy']} - {status}")
 
+    if failure_flag:
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
