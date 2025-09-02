@@ -10,12 +10,13 @@ conditions := [
         "condition": "Cloud Run service must be deployed in approved secure locations",
             "attribute_path": ["run", 0, "location"],
             "values": [
-                "projects/my-project-name/locations/us-central1",
-                "projects/my-project-name/locations/us-east1",
-                "projects/my-project-name/locations/europe-west1",
-                "projects/my-project-name/locations/asia-southeast1"
+                "projects/*/locations/*",
+                [
+                    ["my-project-name"],
+                    ["us-central1", "us-east1", "europe-west1", "asia-southeast1"]
+                ]
             ],
-            "policy_type": "whitelist"
+            "policy_type": "pattern whitelist"
     }
     ]
 ]
