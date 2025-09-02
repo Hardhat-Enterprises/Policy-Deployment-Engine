@@ -1,5 +1,5 @@
 resource "google_os_config_v2_policy_orchestrator" "nc" {
-    policy_orchestrator_id = "po"
+    policy_orchestrator_id = "p1"
     project = "121623553414"
     state = "ACTIVE"
     action = "DELETE"

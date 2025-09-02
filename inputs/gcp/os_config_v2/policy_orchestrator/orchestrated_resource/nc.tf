@@ -9,7 +9,7 @@ resource "google_os_config_v2_policy_orchestrator" "nc" {
         os_policy_assignment_v1_payload {
             os_policies {
                 id = "test-os-policy"
-                mode = "VALIDATION"
+                mode = "MODE_UNSPECIFIED"
                 resource_groups {
                     resources {
                         id = "resource-tf"
