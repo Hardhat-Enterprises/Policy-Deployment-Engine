@@ -12,7 +12,15 @@ resource "google_os_config_v2_policy_orchestrator" "nc" {
                 mode = "MODE_UNSPECIFIED"
                 resource_groups {
                     resources {
-                        id = "resource-tf"
+                        id = "Nmap"
+                        repository {
+                            apt {
+                                uri = "ppa:nmap/nmap"
+                                distribution = "focal"
+                                components = ["main"]
+                                archive_type = "UNSPECIFIED_ARCHIVE_TYPE"
+                            }
+                        }
                     }
                 }
             }
