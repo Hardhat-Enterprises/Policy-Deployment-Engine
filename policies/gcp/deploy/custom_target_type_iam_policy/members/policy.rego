@@ -9,7 +9,7 @@ conditions := [
     {
         "condition": "Check if policy_data contains overly permissive identities in bindings",
         "attribute_path" : ["policy_data"],
-        "values" : ["\"allUsers\"", "\"allAuthenticatedUsers\""],
+        "values" : ["allUsers", "allAuthenticatedUsers"],
         "policy_type" : "blacklist"
     }
     ]
