@@ -32,7 +32,7 @@ array_contains(arr, elem, pol) if {
     #print(sprintf("%s", ["ww"]))
     arr_to_set = {x | x := arr[_]}
     elem_to_set = {x | x := elem[_]}
-    object.subset(arr_to_set, elem_to_set)
+    object.subset(elem_to_set, arr_to_set)
 }
 
 # Generic helper functions:
@@ -43,6 +43,16 @@ array_contains(arr, elem, pol) if {
     not is_array(elem)
     pol == "blacklist"
     some i
+    # Fixed: Check if any array element contains the elem (substring match)
+    # or if elem exactly matches any array element
+    arr[i] == elem
+}
+
+array_contains(arr, elem, pol) if {
+    not is_array(elem)
+    pol == "blacklist"
+    some i
+    # Also support substring matching - check if elem contains any blacklisted substring
     contains(elem, arr[i])
 }
 
@@ -51,6 +61,15 @@ array_contains(arr, elem, pol) if {
     not is_array(elem)
     pol == "whitelist"
     some i
+    # Fixed: Check exact match first
+    arr[i] == elem
+}
+
+array_contains(arr, elem, pol) if {
+    not is_array(elem)
+    pol == "whitelist"
+    some i
+    # Also support substring matching - check if elem contains any whitelisted substring
     contains(elem, arr[i])
 }
 
