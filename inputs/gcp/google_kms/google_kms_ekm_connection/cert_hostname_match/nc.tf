@@ -6,7 +6,7 @@ resource "google_kms_ekm_connection" "nc1" {
 
   service_resolvers {
     service_directory_service = "projects/my-project/locations/australia-southeast1/namespaces/ns/services/svc"
-    hostname                  = "malicious.example.com"  # Not whitelisted
+    hostname                  = "malicious.example.com" # Not whitelisted
     server_certificates {
       raw_der = "AU_CERT_ABC"
     }
@@ -23,7 +23,7 @@ resource "google_kms_ekm_connection" "nc2" {
     service_directory_service = "projects/my-project/locations/australia-southeast1/namespaces/ns/services/svc"
     hostname                  = "ekm-au.trusted.example.com"
     server_certificates {
-      raw_der = "BAD_CERT_999"  # Not whitelisted
+      raw_der = "BAD_CERT_999" # Not whitelisted
     }
   }
 }

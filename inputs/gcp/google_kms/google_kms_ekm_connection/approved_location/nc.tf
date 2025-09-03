@@ -1,12 +1,12 @@
 # 1 
 resource "google_kms_ekm_connection" "nc1" {
-  name                = "ekm_bad_hostname"
+  name                = "nc1"
   location            = "us-central1"
   key_management_mode = "MANUAL"
 
   service_resolvers {
     service_directory_service = "projects/my-project/locations/us-central1/namespaces/ns/services/svc"
-    hostname                  = "malicious.example.com"  
+    hostname                  = "malicious.example.com"
     server_certificates {
       raw_der = "dummy"
     }
@@ -15,13 +15,13 @@ resource "google_kms_ekm_connection" "nc1" {
 
 # 2 
 resource "google_kms_ekm_connection" "nc2" {
-  name                = "ekm_bad_directory"
+  name                = "nc2"
   location            = "australia-southeast1"
   key_management_mode = "MANUAL"
 
   service_resolvers {
     service_directory_service = "projects/my-project/locations/us-central1/namespaces/ns/services/svc"
-    hostname                  = "malicious.example.com"  
+    hostname                  = "malicious.example.com"
     server_certificates {
       raw_der = "dummy"
     }

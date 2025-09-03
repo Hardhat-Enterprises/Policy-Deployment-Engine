@@ -1,7 +1,7 @@
 resource "google_kms_ekm_connection" "c1" {
-  name                 = "ekmconnection_example"
-  location             = "us-central1"
-  key_management_mode  = "MANUAL"
+  name                = "c1"
+  location            = "us-central1"
+  key_management_mode = "MANUAL"
 
   service_resolvers {
     service_directory_service = "projects/my-project/locations/us-central1/namespaces/namespace_name/services/service_name"

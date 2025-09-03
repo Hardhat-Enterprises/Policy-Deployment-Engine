@@ -1,5 +1,5 @@
 resource "google_kms_ekm_connection" "c1" {
-  name                = "ekmconnection_australia"
+  name                = "c1"
   location            = "australia-southeast1"
   key_management_mode = "MANUAL"
 
