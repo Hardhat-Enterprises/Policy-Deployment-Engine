@@ -1,6 +1,6 @@
-package terraform.gcp.security.<service>.<resource_type>.<policy_name> # Edit here 
+package terraform.gcp.security.firebase.google_firebase_web_app_config.auth_domain
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.<service>.<resource_type>.vars
+import data.terraform.gcp.security.firebase.google_firebase_web_app_config.vars
 
 
 conditions := [
@@ -20,9 +20,6 @@ conditions := [
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
 
-# Displays a detailed summary of each resources compliance to every condition and situation
-# Useful for debugging
-# Use 'opa eval ... "data.terraform.gcp.security.<service>.<resource_type>.<policy_name>.details"
 
 
 details := helpers.get_multi_summary(conditions, vars.variables).details
