@@ -1,4 +1,4 @@
-package terraform.gcp.security.firebase.auth-settings.vars
+package terraform.gcp.security.firebase.google_firebase_web_app_config.auth_domain.vars
 
 
 variables := {
