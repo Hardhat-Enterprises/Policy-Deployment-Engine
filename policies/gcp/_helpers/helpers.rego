@@ -38,39 +38,10 @@ array_contains(arr, elem, pol) if {
 # Generic helper functions:
 
 # Helper: Check if value exists in array
-# For blacklist: if elem is found in arr, it's a violation
 array_contains(arr, elem, pol) if {
     not is_array(elem)
-    pol == "blacklist"
-    some i
-    # Fixed: Check if any array element contains the elem (substring match)
-    # or if elem exactly matches any array element
-    arr[i] == elem
-}
-
-array_contains(arr, elem, pol) if {
-    not is_array(elem)
-    pol == "blacklist"
-    some i
-    # Also support substring matching - check if elem contains any blacklisted substring
-    contains(elem, arr[i])
-}
-
-# For whitelist: if elem is found in arr, it's compliant (NOT a violation)
-array_contains(arr, elem, pol) if {
-    not is_array(elem)
-    pol == "whitelist"
-    some i
-    # Fixed: Check exact match first
-    arr[i] == elem
-}
-
-array_contains(arr, elem, pol) if {
-    not is_array(elem)
-    pol == "whitelist"
-    some i
-    # Also support substring matching - check if elem contains any whitelisted substring
-    contains(elem, arr[i])
+    #print(sprintf("%s", ["a2"]))
+    arr[_] == elem
 }
 
 # For resource filtering
