@@ -9,7 +9,7 @@ conditions := [
     "remedies":[ "Set encryption_type to CMEK only"]},
     {
         "condition": "Check if encryption_type is allowed",
-        "attribute_path" : ["config", "encryption_type"], 
+        "attribute_path" : ["config",0,"encryption_type"], 
         "values" : ["CMEK"], 
         "policy_type" : "whitelist" 
     }
@@ -18,6 +18,4 @@ conditions := [
 
 summary := helpers.get_multi_summary(conditions, vars.variables)
 message := summary.message
-
-
 details := helpers.get_multi_summary(conditions, vars.variables).details

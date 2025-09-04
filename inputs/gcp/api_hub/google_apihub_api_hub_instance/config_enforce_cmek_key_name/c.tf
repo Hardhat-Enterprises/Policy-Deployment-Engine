@@ -3,7 +3,7 @@ resource "google_apihub_api_hub_instance" "c"{
     location = "us-central1"
     api_hub_instance_id = "c"
     config {
-        encryption_type = "CMEK"
+        cmek_key_name = "projects/PDE/locations/us-central1/keyRings/apihub/cryptoKeys/apihub-key"
     }
 }
 
