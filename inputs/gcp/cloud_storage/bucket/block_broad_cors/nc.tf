@@ -1,5 +1,5 @@
 resource "google_storage_bucket" "nc" {
-name = "gcp-test-bucket-nc1"
+name = "nc"
 location ="EUROPE-WEST8"
 
 cors {
@@ -8,8 +8,8 @@ cors {
 }
 }
 
-resource "google_storage_bucket" "nc2" {
-name = "gcp-test-bucket-nc2"
+resource "google_storage_bucket" "nc1" {
+name = "nc1"
 location ="EUROPE-WEST8"
 
 cors {

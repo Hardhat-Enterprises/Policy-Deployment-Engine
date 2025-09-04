@@ -5,6 +5,6 @@ resource "google_storage_default_object_access_control" "c" {
 }
 
 resource "google_storage_bucket" "bucket" {
-  name     = "static-content-bucket-c"
+  name     = "c"
   location = "US"
 }

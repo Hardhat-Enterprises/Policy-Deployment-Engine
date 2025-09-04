@@ -1,5 +1,5 @@
 resource "google_storage_bucket" "image-store_nc" {
-  name     = "image-store-bucket-nc"
+  name     = "nc"
   location = "EU"
 }
 resource "google_storage_bucket_iam_binding" "nc" {

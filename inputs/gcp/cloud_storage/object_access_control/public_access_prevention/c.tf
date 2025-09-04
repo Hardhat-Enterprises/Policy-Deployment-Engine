@@ -6,12 +6,12 @@ resource "google_storage_object_access_control" "c" {
 }
 
 resource "google_storage_bucket" "bucket" {
-  name     = "static-content-bucket-c"
+  name     = "c"
   location = "US"
 }
 
 resource "google_storage_bucket_object" "object" {
-  name   = "public-object"
+  name   = "c"
   bucket = google_storage_bucket.bucket.name
   source = "../static/img/header-logo.png"
 }

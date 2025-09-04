@@ -1,10 +1,10 @@
 resource "google_storage_bucket" "image-store" {
-  name     = "image-store-bucket-c"
+  name     = "c"
   location = "EU"
 }
 
 resource "google_storage_bucket_object" "image" {
-  name   = "image1"
+  name   = "c"
   bucket = google_storage_bucket.image-store.name
   source = "image1.jpg"
 }

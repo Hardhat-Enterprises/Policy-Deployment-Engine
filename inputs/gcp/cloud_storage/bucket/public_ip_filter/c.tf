@@ -1,5 +1,5 @@
 resource "google_storage_bucket" "c" {
-name = "gcp-test-bucket-c"
+name = "c"
 location ="AU"
 
 ip_filter {

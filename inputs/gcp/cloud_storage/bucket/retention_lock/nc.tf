@@ -1,5 +1,5 @@
 resource "google_storage_bucket" "nc" {
-name = "gcp-test-bucket-nc"
+name = "nc"
 location ="AUSTRALIA-SOUTHEAST1"
 
 retention_policy {

@@ -1,5 +1,5 @@
 resource "google_storage_bucket_acl" "nc" {
-  bucket      = "nc-bucket"
+  bucket      = "nc"
   default_acl = "projectPrivate"
 }
 

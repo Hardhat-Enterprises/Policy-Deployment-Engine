@@ -1,5 +1,5 @@
 resource "google_storage_bucket" "nc" {
-  name     = "noncompliant-retention"
+  name     = "nc"
   location = "US"
   force_destroy = true
 

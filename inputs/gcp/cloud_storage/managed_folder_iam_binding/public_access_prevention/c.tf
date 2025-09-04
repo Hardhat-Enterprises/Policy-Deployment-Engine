@@ -1,5 +1,5 @@
 resource "google_storage_bucket" "bucket" {
-  name                        = "my-bucket-c"
+  name                        = "c"
   location                    = "EU"
   uniform_bucket_level_access = true
 }

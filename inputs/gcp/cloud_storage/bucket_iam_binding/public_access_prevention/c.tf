@@ -1,5 +1,5 @@
 resource "google_storage_bucket" "image-store_c" {
-  name     = "image-store-bucket-c"
+  name     = "c"
   location = "EU"
 }
 

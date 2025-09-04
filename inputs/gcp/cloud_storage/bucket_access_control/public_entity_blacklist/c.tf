@@ -1,5 +1,5 @@
 resource "google_storage_bucket" "bucket_c" {
-  name     = "example-bucket-c"
+  name     = "c"
   location = "US"
 }
 
