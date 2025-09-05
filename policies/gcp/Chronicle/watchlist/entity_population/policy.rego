@@ -14,9 +14,9 @@ conditions := [
     },
     {
   "condition": "Block known-bad label IDs",
-  "attribute_path": ["data_access_label_id"],
+  "attribute_path": ["entity_population_mechanism",0],
   "values": [{}],
-  "policy_type": "blacklist"
+  "policy_type": "whitelist"
 }
 
   ]

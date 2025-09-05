@@ -3,7 +3,6 @@ package terraform.gcp.security.Chronicle.rule_deployment.enabled
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.Chronicle.rule_deployment.vars
 
-# Conditions array to hold scenarios
 conditions := [
     [
         {
@@ -17,7 +16,7 @@ conditions := [
             "condition": "Test if rule deployment is enabled",
             "attribute_path": ["enabled"],
             "values": [true],
-            "policy_type": "whitelist"  # 'enabled' should be true to ensure the rule is active
+            "policy_type": "whitelist" 
         }
     ],
     [
@@ -32,7 +31,7 @@ conditions := [
             "condition": "Test if rule deployment is disabled",
             "attribute_path": ["enabled"],
             "values": [false],
-            "policy_type": "blacklist"  # 'enabled' should not be false unless explicitly archived
+            "policy_type": "blacklist" 
         }
     ]
 ]

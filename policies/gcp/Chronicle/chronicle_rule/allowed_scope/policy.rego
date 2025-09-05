@@ -1,4 +1,4 @@
-package terraform.gcp.security.Chronicle.chronicle_rule.scope
+package terraform.gcp.security.Chronicle.chronicle_rule.allowed_scope
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.Chronicle.chronicle_rule.vars
@@ -17,7 +17,7 @@ conditions := [
     {
       "condition": "Missing or empty 'scope'",
       "attribute_path": ["scope"],
-      "values": [""],
+      "values": ["", null],
       "policy_type": "whitelist"
     }
   ],
@@ -33,7 +33,13 @@ conditions := [
     {
       "condition": "Invalid 'scope' format",
       "attribute_path": ["scope"],
-      "values": ["^projects/[^/]+/locations/[^/]+/instances/[^/]+/dataAccessScopes/[^/]+$"],
+      "values": ["projects/*/locations/*/instances/*/dataAccessScopes/*", 
+      [
+        ["*"],
+        ["us"],  
+        ["*"], 
+        ["legitimatescope", "scope legit"]   
+      ]],
       "policy_type": "pattern whitelist"
     }
   ]

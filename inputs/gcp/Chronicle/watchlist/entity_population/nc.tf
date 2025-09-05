@@ -2,7 +2,7 @@ resource "google_chronicle_watchlist" "nc" {
   project       = "fake-project"  
   location      = "us"
   instance      = "00000000-0000-0000-0000-000000000000"
-  watchlist_id  = "manual-watchlist"
+  watchlist_id  = "manual-watchlist -nc"
   description   = "Non-compliant watchlist with manual entity population"
   display_name  = "manual-watchlist"
   multiplying_factor = 1

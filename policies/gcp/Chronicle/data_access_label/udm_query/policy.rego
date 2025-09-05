@@ -13,12 +13,12 @@ conditions := [
       "condition": "Only specific values are allowed in UDM query",
       "attribute_path": ["udm_query"],
       "values": [
-        "principal.hostname=\"example.com\"",
-        "principal.user_email=\"admin@example.com\"",
-        "principal.hostname=\"google.com\""
+        "principal.hostname=\"malicious.com\"",
+        "principal.user_email=\"admin@malicious.com\"",
+        "principal.hostname=\"malicious.com\""
         
       ],
-      "policy_type": "whitelist"
+      "policy_type": "blacklist"
     }
   ],
 ]

@@ -1,8 +1,8 @@
 resource "google_chronicle_data_access_scope" "compliant_scope_id" {
-  project            = "fake-test-project" # ← Added for test purposes
+  project            = "fake-test-project"
   location           = "us"
-  instance           = "00000000-0000-0000-0000-000000000000"
-  data_access_scope_id = "scope-compliant-01"
+  instance           = "123e4567-e89b-12d3-a456-426614174000"
+  data_access_scope_id = "Valid instance -c"
   description        = "Compliant data access scope with valid ID"
 
   allowed_data_access_labels {

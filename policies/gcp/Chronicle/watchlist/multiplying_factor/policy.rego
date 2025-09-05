@@ -15,7 +15,7 @@ conditions := [
         {
             "condition": "Ensure multiplying_factor is greater than or equal to 1.0",
             "attribute_path": ["multiplying_factor"],
-            "values": [1.0, null],  # Minimum 1.0, no upper bound
+            "values": [1.0, null], 
             "policy_type": "range"
         }
     ]

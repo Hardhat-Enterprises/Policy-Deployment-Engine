@@ -1,8 +1,8 @@
 resource "google_chronicle_data_access_scope" "noncompliant_scope" {
-  project             = "fake-test-project" # ← Added for test purposes
+  project             = "fake-test-project" 
   location            = "jaipur"
   instance            = "00000000-0000-0000-0000-000000000000"
-  data_access_scope_id = "1Invalid-Scope_ID!"  # Non-compliant: starts with digit, uppercase, underscore, exclamation mark
+  data_access_scope_id = "Invalid instance spotted -nc"  
   description         = "Noncompliant data access scope with invalid ID"
 
   allowed_data_access_labels {

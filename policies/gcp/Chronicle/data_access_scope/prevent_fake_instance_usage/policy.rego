@@ -1,4 +1,4 @@
-package terraform.gcp.security.Chronicle.data_access_scope.scope_id
+package terraform.gcp.security.Chronicle.data_access_scope.prevent_fake_instance_usage
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.Chronicle.data_access_scope.vars
