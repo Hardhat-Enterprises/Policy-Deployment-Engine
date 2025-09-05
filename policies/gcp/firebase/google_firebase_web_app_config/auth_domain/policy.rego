@@ -9,9 +9,9 @@ conditions := [
     "remedies":[ "Use a company-approved domain ","remove extra domains"]},
     {
         "condition": "Company domain only",
-        "attribute_path" : ["auth_domain"], # An array of strings and indicies eg. ["rsa",0,"key"]
-        "values" : ["ankitacompany.com"], # Values to compare against
-        "policy_type" : "whitelist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
+        "attribute_path" : ["auth_domain"], 
+        "values" : ["ankitacompany.com"], 
+        "policy_type" : "whitelist"
     }
     ]
 ]
@@ -19,7 +19,5 @@ conditions := [
 
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
-
-
 
 details := helpers.get_multi_summary(conditions, vars.variables).details
