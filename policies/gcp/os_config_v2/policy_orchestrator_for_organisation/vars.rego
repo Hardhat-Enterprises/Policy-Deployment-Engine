@@ -3,5 +3,5 @@ package terraform.gcp.security.os_config_v2.policy_orchestrator_for_organization
 variables := {
     "friendly_resource_name": "Policy Orchestrator for Organizations", 
     "resource_type": "google_os_config_v2_policy_orchestrator_for_organization", 
-    "resource_value_name" : "policy_orchestrator_id" 
+    "resource_value_name" : "name" 
 }
