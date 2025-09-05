@@ -1,5 +1,5 @@
 resource "google_parallelstore_instance" "c" {
-  instance_id       = "good-instance"
+  instance_id       = "c"
   location     = "australia-southeast1"
   capacity_gib = 1200
 
