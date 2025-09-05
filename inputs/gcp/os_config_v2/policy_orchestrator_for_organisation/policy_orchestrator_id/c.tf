@@ -1,5 +1,5 @@
 resource "google_os_config_v2_policy_orchestrator_for_organization" "c" {
-    policy_orchestrator_id = "google-osconfig_v2-policy_orchestrator-id-1"
+    policy_orchestrator_id = "google-gcp-production-a1"
     organization_id = "123456789"
 
     state = "ACTIVE"

@@ -1,6 +1,5 @@
 resource "google_os_config_v2_policy_orchestrator_for_organization" "nc" {
-    policy_orchestrator_id = "-$AH"
-
+    policy_orchestrator_id = "bankofamerica-gcp-production-a1"
     organization_id = "123456789"
 
     state = "ACTIVE"
