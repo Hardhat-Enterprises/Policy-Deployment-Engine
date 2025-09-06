@@ -13,10 +13,6 @@ get_resource_name(this_nc_resource, value_name) = resource_name if
     resource_name := this_nc_resource.values[value_name]
 }
 
-get_resource_name(this_nc_resource, value_name) = resource_name if
-{
-    resource_name := this_nc_resource[value_name] # i.e., vars.rego: "resource_value_name": "name"
-}
 
 # if elem is an array; checks if elem contains any blacklisted items. e.g., elem=[w, r, a], arr=[a] -> true
 array_contains(arr, elem, pol) if {
