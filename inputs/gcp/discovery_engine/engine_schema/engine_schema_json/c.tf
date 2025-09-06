@@ -1,5 +1,3 @@
-#This is the schema, or plan/model for the discovery engine.
-#This is the most basic format it can take.
 
 resource "google_discovery_engine_schema" "c" {
   project       = "735927692082"

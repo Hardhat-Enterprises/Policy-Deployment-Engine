@@ -5,6 +5,6 @@ package terraform.gcp.security.discovery_engine.chat_engine.vars
 variables := {
     "friendly_resource_name": "Chat Engine",
     "resource_type":  "google_discovery_engine_chat_engine",
-    "resource_value_name" : "engine_id" # eg., "name"
+    "resource_value_name" : "engine_id"
     # Not sure if the above line is needed, its not in the tutorial.
 }

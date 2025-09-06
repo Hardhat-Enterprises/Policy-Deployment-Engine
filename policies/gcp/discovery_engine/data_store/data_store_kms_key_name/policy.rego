@@ -1,4 +1,4 @@
-package terraform.gcp.security.discovery_engine.data_store.data_store_kms_key_name # Edit here 
+package terraform.gcp.security.discovery_engine.data_store.data_store_kms_key_name
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.discovery_engine.data_store.vars
 

@@ -1,4 +1,4 @@
-package terraform.gcp.security.discovery_engine.recommendation_engine.recommendation_engine_data_store_ids # Edit here 
+package terraform.gcp.security.discovery_engine.recommendation_engine.recommendation_engine_data_store_ids 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.discovery_engine.recommendation_engine.vars
 
