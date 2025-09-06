@@ -5,7 +5,7 @@
 resource "google_discovery_engine_data_store" "c" {
 
   location                     = "eu"
-  data_store_id                = "c-data-store-id"
+  data_store_id                = "c"
   display_name                 = "tf-test-structured-datastore"
   industry_vertical            = "GENERIC"
   content_config               = "CONTENT_REQUIRED"

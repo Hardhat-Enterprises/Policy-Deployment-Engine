@@ -6,7 +6,7 @@
 
 resource "google_discovery_engine_cmek_config" "nc" {
   location       = "eu"
-  cmek_config_id = "cmek_config_kms_key_test1_nc"
+  cmek_config_id = "nc"
 
   kms_key        = "wrong_key"
 

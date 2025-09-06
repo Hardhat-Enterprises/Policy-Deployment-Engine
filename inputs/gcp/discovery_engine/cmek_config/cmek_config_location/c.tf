@@ -6,7 +6,7 @@
 
 resource "google_discovery_engine_cmek_config" "c" {
   location       = "eu"
-  cmek_config_id = "cmek_config_kms_location_test1_c"
+  cmek_config_id = "c"
 
   kms_key        = "my-crypto-key"
 

@@ -13,7 +13,7 @@ resource "google_discovery_engine_data_store" "c" {
   }
 
 resource "google_discovery_engine_chat_engine" "c" {
-  engine_id = "nc-chat-engine-id"
+  engine_id = "c"
   collection_id ="default_collection"
   location = google_discovery_engine_data_store.c.location
   display_name = "Chat engine"

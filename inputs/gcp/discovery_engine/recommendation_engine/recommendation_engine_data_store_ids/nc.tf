@@ -3,7 +3,7 @@
 
 resource "google_discovery_engine_recommendation_engine" "nc" {
   project                      = "735927692082"
-  engine_id                    = "nc-recommendation-engine-id"
+  engine_id                    = "nc"
   location                     = google_discovery_engine_data_store.notcompliant.location
   display_name                 = "Example Recommendation Engine"
   data_store_ids               = [google_discovery_engine_data_store.notcompliant.data_store_id]

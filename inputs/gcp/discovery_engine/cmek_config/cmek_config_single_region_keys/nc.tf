@@ -6,7 +6,7 @@
 
 resource "google_discovery_engine_cmek_config" "nc" {
   location       = "eu" # multi-region scope
-  cmek_config_id = "cmek_config_kms_key_region_test1_nc"
+  cmek_config_id = "nc"
 
   # Default CMEK for multi-regional "eu"
   kms_key        = "Wrong_Key"

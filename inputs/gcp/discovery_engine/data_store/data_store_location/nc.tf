@@ -6,7 +6,7 @@
 resource "google_discovery_engine_data_store" "nc" {
 project = "735927692082"
   location                     = "global"
-  data_store_id                = "nc-data-store-location"
+  data_store_id                = "nc"
   display_name                 = "tf-test-structured-datastore"
   industry_vertical            = "GENERIC"
   content_config               = "NO_CONTENT"

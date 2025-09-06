@@ -6,7 +6,7 @@
 resource "google_discovery_engine_data_store" "c" {
 project = "735927692082"
   location                    = "us"
-  data_store_id               = "c-data-store-keyname"
+  data_store_id               = "c"
   display_name                = "tf-test-structured-datastore"
   industry_vertical           = "GENERIC"
   content_config              = "NO_CONTENT"
