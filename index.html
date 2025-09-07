@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Docs/GCP Contents</title>
+  </head>
+  <body>
+    <h1>Docs/GCP Contents</h1>
+    <script>
+      (async () => {
+        try {
+          const branch = "documentation/initialstructure"; // 👈 change this
+          const path = "docs/gcp";
+          const url = `https://api.github.com/repos/Hardhat-Enterprises/Policy-Deployment-Engine/contents/${path}?ref=${branch}`;
+
+          const response = await fetch(url);
+          if (!response.ok) throw new Error('Network response was not ok');
+
+          const data = await response.json();
+          let htmlString = '<ul>';
+          for (let file of data) {
+            htmlString += `<li><a href="/${file.path}" target="_blank">${file.name}</a></li>`;
+          }
+          htmlString += '</ul>';
+          document.body.innerHTML += htmlString;
+        } catch (error) {
+          document.body.innerHTML += `<p>Error: ${error.message}</p>`;
+        }
+      })()
+    </script>
+  </body>
+</html>
