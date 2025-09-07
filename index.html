@@ -18,25 +18,31 @@
 
           const data = await response.json();
           let htmlString = '<ul>';
-
           let level1Count = 0;
+
           for (let file of data) {
-            if (level1Count++ >= 2) break; // ✅ limit to 2 items at level 1
+            if (level1Count >= 2) break;
             htmlString += `<li><a href="/Policy-Deployment-Engine/${file.path}" target="_blank">${file.name}</a></li>`;
 
             const suburl = `https://api.github.com/repos/Hardhat-Enterprises/Policy-Deployment-Engine/contents/${file.path}?ref=${branch}`;
-            const response = await fetch(suburl);
-            if (!response.ok) throw new Error('Network response was not ok');
+            const subResponse = await fetch(suburl);
+            if (!subResponse.ok) throw new Error('Network response was not ok');
 
-            const data = await response.json();
-
+            const subData = await subResponse.json();
             let level2Count = 0;
-            for (let file of data) {
-              if (level2Count++ >= 2) break; // ✅ limit to 2 items at level 2
-              htmlString += `<li style="margin-left:20px;"><a href="/Policy-Deployment-Engine/${file.path}" target="_blank">${file.name}</a></li>`;
-            }
-          }
 
+            for (let subFile of subData) {
+              if (level2Count >= 2) break;
+              // remove ".md" from display name only
+              let displayName = subFile.name.endsWith(".md") 
+                ? subFile.name.slice(0, -3) 
+                : subFile.name;
+
+              htmlString += `<li><a href="/Policy-Deployment-Engine/${subFile.path}" target="_blank">${displayName}</a></li>`;
+              level2Count++;
+            }
+            level1Count++;
+          }
           htmlString += '</ul>';
           document.body.innerHTML += htmlString;
         } catch (error) {
