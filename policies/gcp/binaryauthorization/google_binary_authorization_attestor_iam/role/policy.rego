@@ -4,22 +4,20 @@ import data.terraform.gcp.helpers
 import data.terraform.gcp.security.binary_authorization.google_binary_authorization_attestor_iam.vars
 
 conditions := [
-
   [
     {
-      "situation_description": "IAM binding must use the correct role for attestors",
+      "situation_description": "IAM binding is not using the required attestor role",
       "remedies": [
-        "Set the role to `roles/containeranalysis.notes.attacher` in the google_binary_authorization_attestor_iam resource"
+        "Set the `role` field to `roles/containeranalysis.notes.attacher` to allow proper note signing in Binary Authorization"
       ]
     },
     {
-      "condition": "Role must equal roles/containeranalysis.notes.attacher",
+      "condition": "`role` must be set to `roles/containeranalysis.notes.attacher`",
       "attribute_path": ["role"],
-      "values": ["roles/containeranalysis.notes.attacher"],   # only this role is allowed
+      "values": ["roles/containeranalysis.notes.attacher"],
       "policy_type": "whitelist"
     }
   ]
-
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
