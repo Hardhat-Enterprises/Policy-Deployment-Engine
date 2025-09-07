@@ -85,43 +85,43 @@
     (async () => {
       try {
         const branch = "documentation/initialstructure"; // 👈 change this
-        const path = "docs/gcp";
-        const url = `https://api.github.com/repos/Hardhat-Enterprises/Policy-Deployment-Engine/contents/${path}?ref=${branch}`;
+        const url = `https://api.github.com/repos/Hardhat-Enterprises/Policy-Deployment-Engine/git/trees/${branch}?recursive=1`;
 
         const response = await fetch(url);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
 
-        let htmlString = '';
+        // Get only files inside docs/gcp/
+        const files = data.tree.filter(item => 
+          item.path.startsWith("docs/gcp/") && item.type === "blob"
+        );
+
+        let htmlString = "";
         let level1Count = 0;
 
-        for (let file of data) {
-          if (level1Count >= 2) break;
-          htmlString += `<li><a href="/Policy-Deployment-Engine/${file.path}" target="_blank">${file.name}</a></li>`;
+        // Top-level only (limit 2)
+        const topLevel = [...new Set(files.map(f => f.path.split("/")[2]))];
+        for (let folder of topLevel.slice(0, 2)) {
+          htmlString += `<li><strong>${folder}</strong></li>`;
 
-          const suburl = `https://api.github.com/repos/Hardhat-Enterprises/Policy-Deployment-Engine/contents/${file.path}?ref=${branch}`;
-          const subResponse = await fetch(suburl);
-          if (!subResponse.ok) throw new Error('Network response was not ok');
-          const subData = await subResponse.json();
-
-          let level2Count = 0;
-          for (let subFile of subData) {
-            if (level2Count >= 2) break;
-            let displayName = subFile.name.endsWith(".md") 
-              ? subFile.name.slice(0, -3) 
-              : subFile.name;
-            let cleanPath = subFile.path.endsWith(".md") 
-              ? subFile.path.slice(0, -3) 
+          // Sub-files inside that folder (limit 2)
+          const subFiles = files.filter(f => f.path.split("/")[2] === folder).slice(0, 2);
+          for (let subFile of subFiles) {
+            let displayName = subFile.path.endsWith(".md")
+              ? subFile.path.split("/").pop().slice(0, -3)
+              : subFile.path.split("/").pop();
+            let cleanPath = subFile.path.endsWith(".md")
+              ? subFile.path.slice(0, -3)
               : subFile.path;
-            htmlString += `<li><a href="/Policy-Deployment-Engine/${cleanPath}" target="_blank">${displayName}</a></li>`;
-            level2Count++;
+
+            htmlString += `<li style="margin-left:20px;"><a href="/Policy-Deployment-Engine/${cleanPath}" target="_blank">${displayName}</a></li>`;
           }
           level1Count++;
         }
 
         document.getElementById("fileList").innerHTML = htmlString;
 
-        // Search filter
+        // 🔍 Search filter
         const searchBox = document.getElementById("searchBox");
         searchBox.addEventListener("input", function () {
           const filter = searchBox.value.toLowerCase();
