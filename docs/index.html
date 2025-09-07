@@ -1,42 +1,18 @@
 <html>
   <body>
-    <h1>Docs Index</h1>
-    <div id="file-list"></div>
-
     <script>
-      const user = "JSchwab100";   // 👈 replace with your GitHub username
-      const repo = "Hardhat-Enterprises/Policy-Deployment-Engine";       // 👈 replace with your repo name
-      const branch = "documentation/initialstructure";          // or "master" depending on your default branch
-
-      async function fetchContents(path = "docs") {
-        const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}?ref=${branch}`;
-        const response = await fetch(url);
-        return await response.json();
-      }
-
-      async function renderFolder(path = "docs") {
-        const items = await fetchContents(path);
-        let html = "<ul>";
-
-        for (let item of items) {
-          if (item.type === "dir") {
-            html += `<li><strong>${item.name}</strong>`;
-            html += await renderFolder(item.path); // 🔁 recurse into folder
-            html += "</li>";
-          } else {
-            // raw.githubusercontent.com gives you the actual file contents
-            const fileUrl = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${item.path}`;
-            html += `<li><a href="${fileUrl}" target="_blank">${item.name}</a></li>`;
-          }
+      (async () => {
+        const response = await fetch('https://api.github.com/repos/JSchwab100/Hardhat-Enterprises/Policy-Deployment-Engine/contents/');
+        const data = await response.json();
+        let htmlString = '<ul>';
+        
+        for (let file of data) {
+          htmlString += `<li><a href="${file.path}">${file.name}</a></li>`;
         }
 
-        html += "</ul>";
-        return html;
-      }
-
-      (async () => {
-        document.getElementById("file-list").innerHTML = await renderFolder("docs");
-      })();
+        htmlString += '</ul>';
+        document.getElementsByTagName('body')[0].innerHTML = htmlString;
+      })()
     </script>
-  </body>
+  <body>
 </html>
