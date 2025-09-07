@@ -1,6 +1,6 @@
 resource "google_apihub_curation" "c1" {
   location = "us-central1"
-  curation_id = "test-c1"
+  curation_id = "c1"
   project = "PDE"
   display_name = "API Hub Curation Endpoint Compliant Test C1"
   endpoint {
