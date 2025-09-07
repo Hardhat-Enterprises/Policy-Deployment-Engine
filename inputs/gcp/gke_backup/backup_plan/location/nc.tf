@@ -1,4 +1,4 @@
-resource "google_gke_backup_backup_plan" "nc" {
+resource "google_gke_backup_backup_plan" "nc1" {
   name     = "location-noncompliant-plan"
   location = "asia-southeast1"  # Non-approved location
   cluster  = "projects/fluent-coder-468700-h4/locations/asia-southeast1/clusters/my-cluster"

@@ -10,7 +10,7 @@ conditions := [
         },
         {
             "condition": "Check for backup schedule configuration",
-            "attribute_path": ["backup_schedule"],  # Check if block exists
+            "attribute_path": ["backup_schedule"],
             "values": [null, []],
             "policy_type": "blacklist"
         }
