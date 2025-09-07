@@ -1,0 +1,117 @@
+## 🛡️ Policy Deployment Engine: `access_context_manager_service_perimeter_egress_policy`
+
+This section provides a concise policy evaluation for the `access_context_manager_service_perimeter_egress_policy` resource in GCP.
+
+Reference: [Terraform Registry – access_context_manager_service_perimeter_egress_policy](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/access_context_manager_service_perimeter_egress_policy)
+
+---
+
+## 1. Argument Reference
+
+### `perimeter`
+- Description: (Required) The name of the Service Perimeter to add this resource to.
+- Required: 
+- Policy Condition?: 
+- Decision / Rationale: 
+
+### `egress_from`
+- Description: (Optional) Defines conditions on the source of a request causing this `EgressPolicy` to apply. Structure is [documented below](#nested_egress_from).
+- Required: 
+- Policy Condition?: 
+- Decision / Rationale: 
+
+### `egress_to`
+- Description: (Optional) Defines the conditions on the `ApiOperation` and destination resources that cause this `EgressPolicy` to apply. Structure is [documented below](#nested_egress_to).
+- Required: 
+- Policy Condition?: 
+- Decision / Rationale: 
+
+### `title`
+- Description: (Optional) Human readable title. Must be unique within the perimeter. Does not affect behavior. <a name="nested_egress_from"></a>The `egress_from` block supports:
+- Required: 
+- Policy Condition?: 
+- Decision / Rationale: 
+
+### `identity_type`
+- Description: (Optional) Specifies the type of identities that are allowed access to outside the perimeter. If left unspecified, then members of `identities` field will be allowed access. Possible values are: `ANY_IDENTITY`, `ANY_USER_ACCOUNT`, `ANY_SERVICE_ACCOUNT`.
+- Required: 
+- Policy Condition?: 
+- Decision / Rationale: 
+
+### `identities`
+- Description: (Optional) Identities can be an individual user, service account, Google group, or third-party identity. For third-party identity, only single identities are supported and other identity types are not supported.The v1 identities that have the prefix user, group and serviceAccount in https://cloud.google.com/iam/docs/principal-identifiers#v1 are supported.
+- Required: 
+- Policy Condition?: 
+- Decision / Rationale: 
+
+### `sources`
+- Description: (Optional) Sources that this EgressPolicy authorizes access from. Structure is [documented below](#nested_egress_from_sources).
+- Required: 
+- Policy Condition?: 
+- Decision / Rationale: 
+
+### `source_restriction`
+- Description: (Optional) Whether to enforce traffic restrictions based on `sources` field. If the `sources` field is non-empty, then this field must be set to `SOURCE_RESTRICTION_ENABLED`. Possible values are: `SOURCE_RESTRICTION_UNSPECIFIED`, `SOURCE_RESTRICTION_ENABLED`, `SOURCE_RESTRICTION_DISABLED`. <a name="nested_egress_from_sources"></a>The `sources` block supports:
+- Required: 
+- Policy Condition?: 
+- Decision / Rationale: 
+
+### `access_level`
+- Description: (Optional) An AccessLevel resource name that allows resources outside the ServicePerimeter to be accessed from the inside.
+- Required: 
+- Policy Condition?: 
+- Decision / Rationale: 
+
+### `resource`
+- Description: (Optional) A Google Cloud resource that is allowed to egress the perimeter. Requests from these resources are allowed to access data outside the perimeter. Currently only projects are allowed. Project format: `projects/{project_number}`. The resource may be in any Google Cloud organization, not just the organization that the perimeter is defined in. `*` is not allowed, the case of allowing all Google Cloud resources only is not supported. <a name="nested_egress_to"></a>The `egress_to` block supports:
+- Required: 
+- Policy Condition?: 
+- Decision / Rationale: 
+
+### `resources`
+- Description: (Optional) A list of resources, currently only projects in the form `projects/<projectnumber>`, that match this to stanza. A request matches if it contains a resource in this list. If * is specified for resources, then this `EgressTo` rule will authorize access to all resources outside the perimeter.
+- Required: 
+- Policy Condition?: 
+- Decision / Rationale: 
+
+### `external_resources`
+- Description: (Optional) A list of external resources that are allowed to be accessed. A request matches if it contains an external resource in this list (Example: s3://bucket/path). Currently '*' is not allowed.
+- Required: 
+- Policy Condition?: 
+- Decision / Rationale: 
+
+### `roles`
+- Description: (Optional) A list of IAM roles that represent the set of operations that the sources specified in the corresponding `EgressFrom` are allowed to perform.
+- Required: 
+- Policy Condition?: 
+- Decision / Rationale: 
+
+### `operations`
+- Description: (Optional) A list of `ApiOperations` that this egress rule applies to. A request matches if it contains an operation/service in this list. Structure is [documented below](#nested_egress_to_operations). <a name="nested_egress_to_operations"></a>The `operations` block supports:
+- Required: 
+- Policy Condition?: 
+- Decision / Rationale: 
+
+### `service_name`
+- Description: (Optional) The name of the API whose methods or permissions the `IngressPolicy` or `EgressPolicy` want to allow. A single `ApiOperation` with serviceName field set to `*` will allow all methods AND permissions for all services.
+- Required: 
+- Policy Condition?: 
+- Decision / Rationale: 
+
+### `method_selectors`
+- Description: (Optional) API methods or permissions to allow. Method or permission must belong to the service specified by `serviceName` field. A single MethodSelector entry with `*` specified for the `method` field will allow all methods AND permissions for the service specified in `serviceName`. Structure is [documented below](#nested_egress_to_operations_operations_method_selectors). <a name="nested_egress_to_operations_operations_method_selectors"></a>The `method_selectors` block supports:
+- Required: 
+- Policy Condition?: 
+- Decision / Rationale: 
+
+### `method`
+- Description: (Optional) Value for `method` should be a valid method name for the corresponding `serviceName` in `ApiOperation`. If `*` used as value for method, then ALL methods and permissions are allowed.
+- Required: 
+- Policy Condition?: 
+- Decision / Rationale: 
+
+### `permission`
+- Description: (Optional) Value for permission should be a valid Cloud IAM permission for the corresponding `serviceName` in `ApiOperation`.
+- Required: 
+- Policy Condition?: 
+- Decision / Rationale: 

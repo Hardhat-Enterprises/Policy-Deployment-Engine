@@ -1,0 +1,21 @@
+## 🛡️ Policy Deployment Engine: `access_context_manager_service_perimeter_resource`
+
+This section provides a concise policy evaluation for the `access_context_manager_service_perimeter_resource` resource in GCP.
+
+Reference: [Terraform Registry – access_context_manager_service_perimeter_resource](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/access_context_manager_service_perimeter_resource)
+
+---
+
+## 1. Argument Reference
+
+### `resource`
+- Description: (Required) A GCP resource that is inside of the service perimeter. Currently only projects are allowed. Format: projects/{project_number}
+- Required: 
+- Policy Condition?: 
+- Decision / Rationale: 
+
+### `perimeter_name`
+- Description: (Required) The name of the Service Perimeter to add this resource to.
+- Required: 
+- Policy Condition?: 
+- Decision / Rationale: 
