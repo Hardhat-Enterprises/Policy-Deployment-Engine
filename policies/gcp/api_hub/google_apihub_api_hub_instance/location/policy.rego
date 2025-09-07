@@ -10,7 +10,7 @@ conditions := [
         {
             "condition": "Check if location is allowed",
             "attribute_path" : ["location"], 
-            "values" : ["us-central1"], 
+            "values" : ["australia-southeast1", "australia-southeast2"], 
             "policy_type" : "whitelist" 
         }
     ]

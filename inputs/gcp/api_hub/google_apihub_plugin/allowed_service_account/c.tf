@@ -2,7 +2,7 @@ resource "google_apihub_plugin" "c"{
   location = "us-central1"
   display_name = "Test Plugin c"
   project  = "PDE"
-  plugin_id = "plugin-full-c1"
+  plugin_id = "c1"
   plugin_category = "API_GATEWAY"
     actions_config {
     id = "sync-metadata-c"
