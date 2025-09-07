@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Docs/GCP Contents</title>
+  <title>Policy Deployment Engine Wiki</title>
   <style>
     body {
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -14,9 +14,16 @@
 
     h1 {
       text-align: center;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
       font-size: 2rem;
       color: #343a40;
+    }
+
+    .warning {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #d9534f;
+      margin-bottom: 2rem;
     }
 
     .search-container {
@@ -73,7 +80,11 @@
   </style>
 </head>
 <body>
-  <h1>Docs/GCP Contents</h1>
+  <h1>Policy Deployment Engine Wiki</h1>
+  <p class="warning">
+    ⚠️ This wiki uses GitHub Pages and only allows for 60 API calls per hour per ID.  
+    If you use this website often, you may need to try a different device or wait.
+  </p>
   
   <div class="search-container">
     <input type="text" id="searchBox" placeholder="Search files...">
@@ -97,14 +108,14 @@
         );
 
         let htmlString = "";
-        let level1Count = 0;
+        const folderMap = {};
 
-        // Top-level only (limit 2)
+        // Group files under their top-level folder
         const topLevel = [...new Set(files.map(f => f.path.split("/")[2]))];
         for (let folder of topLevel) {
-          htmlString += `<li><strong>${folder}</strong></li>`;
+          htmlString += `<li class="folder"><strong>${folder}</strong><ul>`;
+          folderMap[folder] = [];
 
-          // Sub-files inside that folder (limit 2)
           const subFiles = files.filter(f => f.path.split("/")[2] === folder);
           for (let subFile of subFiles) {
             let displayName = subFile.path.endsWith(".md")
@@ -114,21 +125,42 @@
               ? subFile.path.slice(0, -3)
               : subFile.path;
 
-            htmlString += `<li style="margin-left:20px;"><a href="/Policy-Deployment-Engine/${cleanPath}" target="_blank">${displayName}</a></li>`;
+            const subItem = `<li class="subfile"><a href="/Policy-Deployment-Engine/${cleanPath}" target="_blank">${displayName}</a></li>`;
+            folderMap[folder].push(subItem);
+            htmlString += subItem;
           }
-          level1Count++;
+          htmlString += `</ul></li>`;
         }
 
         document.getElementById("fileList").innerHTML = htmlString;
 
-        // 🔍 Search filter
+        // 🔍 Search filter (folder appears if any child matches)
         const searchBox = document.getElementById("searchBox");
         searchBox.addEventListener("input", function () {
           const filter = searchBox.value.toLowerCase();
-          const items = document.querySelectorAll("#fileList li");
-          items.forEach(item => {
-            const text = item.textContent.toLowerCase();
-            item.style.display = text.includes(filter) ? "" : "none";
+          const folders = document.querySelectorAll("#fileList .folder");
+
+          folders.forEach(folder => {
+            let folderVisible = false;
+            const subfiles = folder.querySelectorAll(".subfile");
+
+            subfiles.forEach(sub => {
+              const text = sub.textContent.toLowerCase();
+              if (text.includes(filter)) {
+                sub.style.display = "";
+                folderVisible = true;
+              } else {
+                sub.style.display = "none";
+              }
+            });
+
+            // Folder name match OR any subfile matched
+            const folderName = folder.textContent.toLowerCase();
+            if (folderName.includes(filter) || folderVisible) {
+              folder.style.display = "";
+            } else {
+              folder.style.display = "none";
+            }
           });
         });
 
