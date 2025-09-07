@@ -3,54 +3,30 @@
   <head>
     <meta charset="UTF-8">
     <title>Docs/GCP Contents</title>
-    <style>
-      body { font-family: Arial, sans-serif; }
-      ul { list-style-type: none; padding-left: 20px; }
-      li strong { color: #2c3e50; }
-    </style>
   </head>
   <body>
     <h1>Docs/GCP Contents</h1>
-    <div id="file-list">Loading...</div>
-
     <script>
-      const user = "Hardhat-Enterprises";
-      const repo = "Policy-Deployment-Engine";
-      const branch = "documentation/initialstructure"; // 👈 your branch name
-
-      async function fetchContents(path) {
-        const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}?ref=${branch}`;
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`Failed to fetch ${path}`);
-        return await response.json();
-      }
-
-      async function renderFolder(path) {
-        const items = await fetchContents(path);
-        let html = "<ul>";
-
-        for (let item of items) {
-          if (item.type === "dir") {
-            html += `<li><strong>${item.name}</strong>`;
-            html += await renderFolder(item.path); // 🔁 recurse into subfolder
-            html += "</li>`;
-          } else {
-            const fileUrl = `https://github.com/${user}/${repo}/blob/${branch}/${item.path}`;
-            html += `<li><a href="${fileUrl}" target="_blank">${item.name}</a></li>`;
-          }
-        }
-
-        html += "</ul>";
-        return html;
-      }
-
       (async () => {
         try {
-          document.getElementById("file-list").innerHTML = await renderFolder("docs/gcp");
+          const branch = "documentation/initialstructure"; // 👈 change this
+          const path = "docs/gcp";
+          const url = `https://api.github.com/repos/Hardhat-Enterprises/Policy-Deployment-Engine/contents/${path}?ref=${branch}`;
+
+          const response = await fetch(url);
+          if (!response.ok) throw new Error('Network response was not ok');
+
+          const data = await response.json();
+          let htmlString = '<ul>';
+          for (let file of data) {
+            htmlString += `<li><a href="gcp/${file.path}" target="_blank">${file.name}</a></li>`;
+          }
+          htmlString += '</ul>';
+          document.body.innerHTML += htmlString;
         } catch (error) {
-          document.getElementById("file-list").innerHTML = `<p>Error: ${error.message}</p>`;
+          document.body.innerHTML += `<p>Error: ${error.message}</p>`;
         }
-      })();
+      })()
     </script>
   </body>
 </html>
