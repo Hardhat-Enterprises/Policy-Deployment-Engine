@@ -263,7 +263,7 @@ def main():
     for input_dir, policy_dir in pairs:
         result = run_policy_check_pair(input_dir, policy_dir, policies_root, verbose=args.verbose)
         results.append(result)
-        
+
     # Grouped summary by service -> resource
     grouped: dict[str, dict[str, list[dict]]] = {}
     for r in results:
@@ -291,6 +291,6 @@ def main():
                         print(f"{res['failure']['reason']}")
                         print()
         sys.exit(1)
- 
+# Example change
 if __name__ == "__main__":
     main()

@@ -1,11 +1,11 @@
 # Describe your resource type here
 # Keep "c" as the name to indicate that this resource and its attributes are compliant
 
-resource "google_privateca_certificate_authority" "compliant" {
+resource "google_privateca_certificate_authority" "c" {
     pool = "ca-pool"
     project = "PDE-project"
     location = "us-central1"
-    certificate_authority_id = "compliant"
+    certificate_authority_id = "c"
     deletion_protection = true
     config {
         subject_config {
