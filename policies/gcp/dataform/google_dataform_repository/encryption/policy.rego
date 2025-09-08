@@ -15,6 +15,71 @@ conditions := [
       "policy_type": "blacklist"
     }
   ]
+  ,
+  [
+    {
+      "situation_description": "Repository must use a customer-managed encryption key (CMEK)",
+      "remedies": ["Set kms_key_name to a valid CMEK resource", "Rotate keys per org policy"]
+    },
+    {
+      "condition": "kms_key_name must reference a CMEK",
+      "attribute_path": ["kms_key_name"],
+      "values": ["projects/*/locations/*/keyRings/*/cryptoKeys/*"],
+      "policy_type": "pattern whitelist"
+    }
+  ]
+  ,
+  [
+    {
+      "situation_description": "FORCE deletion risks accidental data loss",
+      "remedies": ["Set deletion_policy to DELETE", "Require manual cleanup for child resources"]
+    },
+    {
+      "condition": "Disallow FORCE deletion policy",
+      "attribute_path": ["deletion_policy"],
+      "values": ["FORCE"],
+      "policy_type": "blacklist"
+    }
+  ]
+  ,
+  [
+    {
+      "situation_description": "Git integration configured without a remote URL",
+      "remedies": ["Provide git_remote_settings.url", "Verify default_branch matches remote"]
+    },
+    {
+      "condition": "Require git remote URL when Git is configured",
+      "attribute_path": ["git_remote_settings", 0, "url"],
+      "values": ["*"],
+      "policy_type": "pattern whitelist"
+    }
+  ]
+  ,
+  [
+    {
+      "situation_description": "Git integration missing default branch",
+      "remedies": ["Set git_remote_settings.default_branch (e.g., main)"]
+    },
+    {
+      "condition": "Require default_branch when git remote is set",
+      "attribute_path": ["git_remote_settings", 0, "default_branch"],
+      "values": ["*"],
+      "policy_type": "pattern whitelist"
+    }
+  ]
+  ,
+  [
+    {
+      "situation_description": "workspace_compilation_overrides present but default_database not set",
+      "remedies": ["Set default_database to a valid GCP project ID used by BigQuery"]
+    },
+    {
+      "condition": "Require default_database when overrides are used",
+      "attribute_path": ["workspace_compilation_overrides", 0, "default_database"],
+      "values": ["*"],
+      "policy_type": "pattern whitelist"
+    }
+  ]
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
