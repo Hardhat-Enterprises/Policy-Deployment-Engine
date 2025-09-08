@@ -1,5 +1,5 @@
 resource "google_storage_bucket" "bucket" {
-  name                        = "c"
+  name                        = "c123"
   location                    = "EU"
   uniform_bucket_level_access = true
   hierarchical_namespace {
@@ -7,13 +7,9 @@ resource "google_storage_bucket" "bucket" {
   }
 }
 
-resource "google_storage_folder" "folder" {
+resource "google_storage_folder" "c123" {
   bucket        = google_storage_bucket.bucket.name
   name          = "parent-folder/"
   
 }
 
-resource "google_storage_folder" "subfolder" {
-  bucket        = google_storage_bucket.bucket.name
-  name          = "${google_storage_folder.folder.name}subfolder/"
-}

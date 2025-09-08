@@ -1,7 +1,7 @@
-package terraform.gcp.security.storage.anywhere_cache.zone_whitelist
+package terraform.gcp.security.cloud_storage.anywhere_cache.zone_whitelist
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.storage.anywhere_cache.zone_whitelist.vars
+import data.terraform.gcp.security.cloud_storage.anywhere_cache.vars
 
 conditions := [
     [

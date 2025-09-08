@@ -1,13 +1,13 @@
 resource "google_storage_bucket" "bucket_nc" {
-  name     = "nc"
+  name     = "nc123"
   location = "AU"
 }
 
-resource "google_storage_bucket_acl" "nc" {
+resource "google_storage_bucket_acl" "nc123" {
   bucket = google_storage_bucket.bucket_nc.name
 
   role_entity = [
-    "allUsers",
+    "OWNER:allUsers",
     "user:unauthorized@example.com"
   ]
 }

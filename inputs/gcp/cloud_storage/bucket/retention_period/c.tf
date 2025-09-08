@@ -1,5 +1,5 @@
-resource "google_storage_bucket" "c" {
-  name     = "c"
+resource "google_storage_bucket" "c123" {
+  name     = "c123"
   location = "US"
   force_destroy = true
 

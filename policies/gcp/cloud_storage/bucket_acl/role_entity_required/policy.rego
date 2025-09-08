@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_storage.bucket_acl.role_entity_protection
+package terraform.gcp.security.cloud_storage.bucket_acl.role_entity_required
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.cloud_storage.bucket_acl.vars
@@ -14,7 +14,7 @@ conditions := [
     },
     {
       "condition": "Disallow OWNER or WRITER roles for wildcard entities",
-      "attribute_path": ["role_entity"],
+      "attribute_path": ["role_entity",0],
       "policy_type": "blacklist",
       "values": [
         "OWNER:allUsers",
