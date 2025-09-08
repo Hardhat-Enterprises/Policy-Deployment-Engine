@@ -6,40 +6,12 @@ Reference: [Terraform Registry – dataplex_entry_group](https://registry.terraf
 
 ---
 
-## 1. Argument Reference
-
-### `description`
-- Description: (Optional) Description of the EntryGroup.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `display_name`
-- Description: (Optional) User friendly display name.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `labels`
-- Description: (Optional) User-defined labels for the EntryGroup. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Optional) The location where entry group will be created in.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `entry_group_id`
-- Description: (Optional) The entry group id of the entry group.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `description` | Description of the EntryGroup. | false | None | None |
+| `display_name` | User friendly display name. | false | None | None |
+| `labels` | User-defined labels for the EntryGroup. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | None | None |
+| `location` | The location where entry group will be created in. | false | None | None |
+| `entry_group_id` | The entry group id of the entry group. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

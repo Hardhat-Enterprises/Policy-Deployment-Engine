@@ -6,22 +6,9 @@ Reference: [Terraform Registry – apigee_envgroup](https://registry.terraform.i
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: (Required) The resource ID of the environment group.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `org_id`
-- Description: (Required) The Apigee Organization associated with the Apigee environment group, in the format `organizations/{{org_name}}`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `hostnames`
-- Description: (Optional) Hostnames of the environment group.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | The resource ID of the environment group. | true | None | None |
+| `org_id` | The Apigee Organization associated with the Apigee environment group, in the format `organizations/{{org_name}}`. | true | None | None |
+| `hostnames` | Hostnames of the environment group. | false | None | None |

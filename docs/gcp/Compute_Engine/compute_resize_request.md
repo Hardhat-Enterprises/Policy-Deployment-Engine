@@ -6,58 +6,18 @@ Reference: [Terraform Registry – compute_resize_request](https://registry.terr
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | The name of this resize request. The name must be 1-63 characters long, and comply with RFC1035. | true | None | None |
+| `resize_by` | The number of instances to be created by this resize request. The group's target size will be increased by this number. | true | None | None |
+| `instance_group_manager` | The reference of the instance group manager this ResizeRequest is a part of. | true | None | None |
+| `description` | An optional description of this resize-request. | false | None | None |
+| `zone` | The reference of the compute zone scoping this request. If it is not provided, the provider zone is used. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |
 
-### `name`
-- Description: (Required) The name of this resize request. The name must be 1-63 characters long, and comply with RFC1035.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `resize_by`
-- Description: (Required) The number of instances to be created by this resize request. The group's target size will be increased by this number.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `instance_group_manager`
-- Description: (Required) The reference of the instance group manager this ResizeRequest is a part of.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: (Optional) An optional description of this resize-request.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `requested_run_duration`
-- Description: (Optional) Requested run duration for instances that will be created by this request. At the end of the run duration instance will be deleted. Structure is [documented below](#nested_requested_run_duration).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `zone`
-- Description: (Optional) The reference of the compute zone scoping this request. If it is not provided, the provider zone is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used. <a name="nested_requested_run_duration"></a>The `requested_run_duration` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `seconds`
-- Description: (Required) Span of time at a resolution of a second. Must be from 600 to 604800 inclusive. Note: minimum and maximum allowed range for requestedRunDuration is 10 minutes (600 seconds) and 7 days(604800 seconds) correspondingly.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `nanos`
-- Description: (Optional) Span of time that's a fraction of a second at nanosecond resolution. Durations less than one second are represented with a 0 seconds field and a positive nanos field. Must be from 0 to 999,999,999 inclusive.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### requested_run_duration Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `seconds` | Span of time at a resolution of a second. Must be from 600 to 604800 inclusive. Note: minimum and maximum allowed range for requestedRunDuration is 10 minutes (600 seconds) and 7 days(604800 seconds) correspondingly. | true | None | None |
+| `nanos` | Span of time that's a fraction of a second at nanosecond resolution. Durations less than one second are represented with a 0 seconds field and a positive nanos field. Must be from 0 to 999,999,999 inclusive. | false | None | None |

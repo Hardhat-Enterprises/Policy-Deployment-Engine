@@ -6,28 +6,10 @@ Reference: [Terraform Registry – os_login_ssh_public_key](https://registry.ter
 
 ---
 
-## 1. Argument Reference
-
-### `key`
-- Description: (Required) Public key text in SSH format, defined by RFC4253 section 6.6.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `user`
-- Description: (Required) The user email.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `expiration_time_usec`
-- Description: (Optional) An expiration time in microseconds since epoch.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: (Optional) The project ID of the Google Cloud Platform project.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `key` | Public key text in SSH format, defined by RFC4253 section 6.6. | true | None | None |
+| `user` | The user email. | true | None | None |
+| `expiration_time_usec` | An expiration time in microseconds since epoch. | false | None | None |
+| `project` | The project ID of the Google Cloud Platform project. | false | None | None |

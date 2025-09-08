@@ -6,40 +6,12 @@ Reference: [Terraform Registry – dataproc_cluster_iam](https://registry.terraf
 
 ---
 
-## 1. Argument Reference
-
-### `cluster`
-- Description: For `google_dataproc_cluster_iam_member` or `google_dataproc_cluster_iam_binding`:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `member/members`
-- Description: Each entry can have one of the following values: * **allUsers**: A special identifier that represents anyone who is on the internet; with or without a Google account. * **allAuthenticatedUsers**: A special identifier that represents anyone who is authenticated with a Google account or a service account. * **user:{emailid}**: An email address that represents a specific Google account. For example, alice@gmail.com or joe@example.com. * **serviceAccount:{emailid}**: An email address that represents a service account. For example, my-other-app@appspot.gserviceaccount.com. * **group:{emailid}**: An email address that represents a Google group. For example, admins@example.com. * **domain:{domain}**: A G Suite domain (primary, instead of alias) name that represents all the users of that domain. For example, google.com or example.com.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `role`
-- Description: `google_dataproc_cluster_iam_binding` can be used per role. Note that custom roles must be of the format `[projects|organizations]/{parent-name}/roles/{role-name}`. `google_dataproc_cluster_iam_policy` only:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `policy_data`
-- Description: - - -
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: is not provided, Terraform will use the provider default.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `region`
-- Description: is not provided, Terraform will use the provider default.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `cluster` | For `google_dataproc_cluster_iam_member` or `google_dataproc_cluster_iam_binding`: | none | None | None |
+| `member/members` | Each entry can have one of the following values: * **allUsers**: A special identifier that represents anyone who is on the internet; with or without a Google account. * **allAuthenticatedUsers**: A special identifier that represents anyone who is authenticated with a Google account or a service account. * **user:{emailid}**: An email address that represents a specific Google account. For example, alice@gmail.com or joe@example.com. * **serviceAccount:{emailid}**: An email address that represents a service account. For example, my-other-app@appspot.gserviceaccount.com. * **group:{emailid}**: An email address that represents a Google group. For example, admins@example.com. * **domain:{domain}**: A G Suite domain (primary, instead of alias) name that represents all the users of that domain. For example, google.com or example.com. | none | None | None |
+| `role` | `google_dataproc_cluster_iam_binding` can be used per role. Note that custom roles must be of the format `[projects|organizations]/{parent-name}/roles/{role-name}`. `google_dataproc_cluster_iam_policy` only: | none | None | None |
+| `policy_data` | - - - | none | None | None |
+| `project` | is not provided, Terraform will use the provider default. | none | None | None |
+| `region` | is not provided, Terraform will use the provider default. | none | None | None |

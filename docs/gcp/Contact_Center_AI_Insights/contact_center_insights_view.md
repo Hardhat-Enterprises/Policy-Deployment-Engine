@@ -6,28 +6,10 @@ Reference: [Terraform Registry – contact_center_insights_view](https://registr
 
 ---
 
-## 1. Argument Reference
-
-### `location`
-- Description: (Required) Location of the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `display_name`
-- Description: (Optional) The human-readable display name of the view.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `value`
-- Description: (Optional) A filter to reduce conversation results to a specific subset. Refer to https://cloud.google.com/contact-center/insights/docs/filtering for details.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `location` | Location of the resource. | true | None | None |
+| `display_name` | The human-readable display name of the view. | false | None | None |
+| `value` | A filter to reduce conversation results to a specific subset. Refer to https://cloud.google.com/contact-center/insights/docs/filtering for details. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

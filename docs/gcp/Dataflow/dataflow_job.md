@@ -6,136 +6,28 @@ Reference: [Terraform Registry – dataflow_job](https://registry.terraform.io/p
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `template_gcs_path`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `temp_gcs_location`
-- Description: - - -
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `parameters`
-- Description: case-sensitive based on the language on which the pipeline is coded, mostly Java. **Note**: do not configure Dataflow options here in parameters.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `labels`
-- Description: specified in the [labeling restrictions](https://cloud.google.com/compute/docs/labeling-resources#restrictions) page. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `terraform_labels`
-- Description: The combination of labels configured directly on the resource and default labels configured on the provider.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `effective_labels`
-- Description: All of labels (key/value pairs) present on the resource in GCP, including the labels configured through Terraform, other clients and services.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `transform_name_mapping`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `max_workers`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `on_delete`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `skip_wait_on_job_termination`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `zone`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `region`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `service_account_email`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `network`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `subnetwork`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `machine_type`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `kms_key_name`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `ip_configuration`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `additional_experiments`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `enable_streaming_engine`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` |  | none | None | None |
+| `template_gcs_path` |  | none | None | None |
+| `temp_gcs_location` | - - - | none | None | None |
+| `parameters` | case-sensitive based on the language on which the pipeline is coded, mostly Java. **Note**: do not configure Dataflow options here in parameters. | none | None | None |
+| `labels` | specified in the [labeling restrictions](https://cloud.google.com/compute/docs/labeling-resources#restrictions) page. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | none | None | None |
+| `terraform_labels` | The combination of labels configured directly on the resource and default labels configured on the provider. | none | None | None |
+| `effective_labels` | All of labels (key/value pairs) present on the resource in GCP, including the labels configured through Terraform, other clients and services. | none | None | None |
+| `transform_name_mapping` |  | none | None | None |
+| `max_workers` |  | none | None | None |
+| `on_delete` |  | none | None | None |
+| `skip_wait_on_job_termination` |  | none | None | None |
+| `project` |  | none | None | None |
+| `zone` |  | none | None | None |
+| `region` |  | none | None | None |
+| `service_account_email` |  | none | None | None |
+| `network` |  | none | None | None |
+| `subnetwork` |  | none | None | None |
+| `machine_type` |  | none | None | None |
+| `kms_key_name` |  | none | None | None |
+| `ip_configuration` |  | none | None | None |
+| `additional_experiments` |  | none | None | None |
+| `enable_streaming_engine` |  | none | None | None |

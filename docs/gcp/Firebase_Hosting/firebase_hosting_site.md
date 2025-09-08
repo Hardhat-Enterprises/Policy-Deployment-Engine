@@ -6,22 +6,9 @@ Reference: [Terraform Registry – firebase_hosting_site](https://registry.terra
 
 ---
 
-## 1. Argument Reference
-
-### `app_id`
-- Description: (Optional) Optional. The [ID of a Web App](https://firebase.google.com/docs/reference/firebase-management/rest/v1beta1/projects.webApps#WebApp.FIELDS.app_id) associated with the Hosting site.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `site_id`
-- Description: (Optional) Required. Immutable. A globally unique identifier for the Hosting site. This identifier is used to construct the Firebase-provisioned subdomains for the site, so it must also be a valid domain name label.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `app_id` | Optional. The [ID of a Web App](https://firebase.google.com/docs/reference/firebase-management/rest/v1beta1/projects.webApps#WebApp.FIELDS.app_id) associated with the Hosting site. | false | None | None |
+| `site_id` | Required. Immutable. A globally unique identifier for the Hosting site. This identifier is used to construct the Firebase-provisioned subdomains for the site, so it must also be a valid domain name label. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

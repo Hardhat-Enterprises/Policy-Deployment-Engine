@@ -6,16 +6,8 @@ Reference: [Terraform Registry – access_context_manager_egress_policy](https:/
 
 ---
 
-## 1. Argument Reference
-
-### `resource`
-- Description: (Required) A GCP resource that is inside of the service perimeter.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `egress_policy_name`
-- Description: (Required) The name of the Service Perimeter to add this resource to.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `resource` | A GCP resource that is inside of the service perimeter. | true | None | None |
+| `egress_policy_name` | The name of the Service Perimeter to add this resource to. | true | None | None |

@@ -6,34 +6,11 @@ Reference: [Terraform Registry – bigquery_reservation_assignment](https://regi
 
 ---
 
-## 1. Argument Reference
-
-### `assignee`
-- Description: (Required) The resource which will use the reservation. E.g. projects/myproject, folders/123, organizations/456.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `job_type`
-- Description: (Required) Types of job, which could be specified when using the reservation. Possible values: JOB_TYPE_UNSPECIFIED, PIPELINE, QUERY, CONTINUOUS
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `reservation`
-- Description: (Required) The reservation for the resource
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Optional) The location for the resource
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `assignee` | The resource which will use the reservation. E.g. projects/myproject, folders/123, organizations/456. | true | None | None |
+| `job_type` | Types of job, which could be specified when using the reservation. Possible values: JOB_TYPE_UNSPECIFIED, PIPELINE, QUERY, CONTINUOUS | true | None | None |
+| `reservation` | The reservation for the resource | true | None | None |
+| `location` | The location for the resource | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

@@ -6,22 +6,9 @@ Reference: [Terraform Registry – storage_bucket_access_control](https://regist
 
 ---
 
-## 1. Argument Reference
-
-### `bucket`
-- Description: (Required) The name of the bucket.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `entity`
-- Description: (Required) The entity holding the permission, in one of the following forms: user-userId user-email group-groupId group-email domain-domain project-team-projectId allUsers allAuthenticatedUsers Examples: The user liz@example.com would be user-liz@example.com. The group example@googlegroups.com would be group-example@googlegroups.com. To refer to all members of the Google Apps for Business domain example.com, the entity would be domain-example.com.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `role`
-- Description: (Optional) The access permission for the entity. Possible values are: `OWNER`, `READER`, `WRITER`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `bucket` | The name of the bucket. | true | None | None |
+| `entity` | The entity holding the permission, in one of the following forms: user-userId user-email group-groupId group-email domain-domain project-team-projectId allUsers allAuthenticatedUsers Examples: The user liz@example.com would be user-liz@example.com. The group example@googlegroups.com would be group-example@googlegroups.com. To refer to all members of the Google Apps for Business domain example.com, the entity would be domain-example.com. | true | None | None |
+| `role` | The access permission for the entity. Possible values are: `OWNER`, `READER`, `WRITER`. | false | None | None |

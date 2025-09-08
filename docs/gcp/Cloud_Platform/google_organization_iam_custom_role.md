@@ -6,34 +6,11 @@ Reference: [Terraform Registry – google_organization_iam_custom_role](https://
 
 ---
 
-## 1. Argument Reference
-
-### `role_id`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `org_id`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `title`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `stage`
-- Description: Defaults to `GA`. List of possible stages is [here](https://cloud.google.com/iam/reference/rest/v1/organizations.roles#Role.RoleLaunchStage).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `role_id` |  | none | None | None |
+| `org_id` |  | none | None | None |
+| `title` | * `permissions` (Required) The names of the permissions this role grants when bound in an IAM policy. At least one permission must be specified. | none | None | None |
+| `stage` | Defaults to `GA`. List of possible stages is [here](https://cloud.google.com/iam/reference/rest/v1/organizations.roles#Role.RoleLaunchStage). | none | None | None |
+| `description` |  | none | None | None |

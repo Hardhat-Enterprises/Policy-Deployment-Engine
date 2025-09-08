@@ -6,22 +6,9 @@ Reference: [Terraform Registry – apigee_environment_keyvaluemaps_entries](http
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: (Required) Required. Resource URI that can be used to identify the scope of the key value map entries.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `value`
-- Description: (Required) Required. Data or payload that is being retrieved and associated with the unique key.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `env_keyvaluemap_id`
-- Description: (Required) The Apigee environment keyvalumaps Id associated with the Apigee environment, in the format `organizations/{{org_name}}/environments/{{env_name}}/keyvaluemaps/{{keyvaluemap_name}}`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | Required. Resource URI that can be used to identify the scope of the key value map entries. | true | None | None |
+| `value` | Required. Data or payload that is being retrieved and associated with the unique key. | true | None | None |
+| `env_keyvaluemap_id` | The Apigee environment keyvalumaps Id associated with the Apigee environment, in the format `organizations/{{org_name}}/environments/{{env_name}}/keyvaluemaps/{{keyvaluemap_name}}`. | true | None | None |

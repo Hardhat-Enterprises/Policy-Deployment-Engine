@@ -6,16 +6,8 @@ Reference: [Terraform Registry – compute_project_default_network_tier](https:/
 
 ---
 
-## 1. Argument Reference
-
-### `network_tier`
-- Description: This field can take the following values: `PREMIUM` or `STANDARD`. - - -
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `network_tier` | This field can take the following values: `PREMIUM` or `STANDARD`. - - - | none | None | None |
+| `project` | is not provided, the provider project is used. | none | None | None |

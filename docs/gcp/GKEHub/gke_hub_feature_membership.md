@@ -6,514 +6,166 @@ Reference: [Terraform Registry – gke_hub_feature_membership](https://registry.
 
 ---
 
-## 1. Argument Reference
-
-### `configmanagement`
-- Description: (Optional) Config Management-specific spec. Structure is [documented below](#nested_configmanagement).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `mesh`
-- Description: (Optional) Service mesh specific spec. Structure is [documented below](#nested_mesh).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `policycontroller`
-- Description: (Optional) Policy Controller-specific spec. Structure is [documented below](#nested_policycontroller).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `feature`
-- Description: (Optional) The name of the feature
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Optional) The location of the feature
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `membership`
-- Description: (Optional) The name of the membership
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `membership_location`
-- Description: (Optional) The location of the membership, for example, "us-central1". Default is "global".
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: (Optional) The project of the feature <a name="nested_configmanagement"></a>The `configmanagement` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `config_sync`
-- Description: (Optional) Config Sync configuration for the cluster. Structure is [documented below](#nested_config_sync).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `management`
-- Description: (Optional) Set this field to MANAGEMENT_AUTOMATIC to enable [Config Sync auto-upgrades](http://cloud/kubernetes-engine/enterprise/config-sync/docs/how-to/upgrade-config-sync#auto-upgrade-config), and set this field to MANAGEMENT_MANUAL or MANAGEMENT_UNSPECIFIED to disable Config Sync auto-upgrades. This field was introduced in Terraform version [5.41.0](https://github.com/hashicorp/terraform-provider-google/releases/tag/v5.41.0).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `version`
-- Description: (Optional) Version of Config Sync installed.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `binauthz`
-- Description: (Optional, Deprecated) Binauthz configuration for the cluster. Structure is [documented below](#nested_binauthz). This field will be ignored and should not be set.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `hierarchy_controller`
-- Description: (Optional) Hierarchy Controller configuration for the cluster. Structure is [documented below](#nested_hierarchy_controller). Configuring Hierarchy Controller through the configmanagement feature is no longer recommended. Use open source Kubernetes [Hierarchical Namespace Controller (HNC)](https://github.com/kubernetes-sigs/hierarchical-namespaces) instead. Follow the [instructions](https://cloud.google.com/kubernetes-engine/enterprise/config-sync/docs/how-to/migrate-hierarchy-controller) to migrate from Hierarchy Controller to HNC.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `policy_controller`
-- Description: (Optional) Policy Controller configuration for the cluster. Structure is [documented below](#nested_policy_controller). Configuring Policy Controller through the configmanagement feature is no longer recommended. Use the policycontroller feature instead. <a name="nested_binauthz"></a>The `binauthz` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `enabled`
-- Description: (Optional) Whether binauthz is enabled in this cluster. <a name="nested_config_sync"></a>The `config_sync` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `enabled`
-- Description: (Optional) Whether Config Sync is enabled in the cluster. This field was introduced in Terraform version [5.41.0](https://github.com/hashicorp/terraform-provider-google/releases/tag/v5.41.0), and needs to be set to `true` explicitly to install Config Sync.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `git`
-- Description: (Optional) Structure is [documented below](#nested_git).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `oci`
-- Description: (Optional) Supported from Config Sync versions 1.12.0 onwards. Structure is [documented below](#nested_oci). Use either `git` or `oci` config option.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `prevent_drift`
-- Description: (Optional) Supported from Config Sync versions 1.10.0 onwards. Set to `true` to enable the Config Sync admission webhook to prevent drifts. If set to `false`, disables the Config Sync admission webhook and does not prevent drifts.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `source_format`
-- Description: (Optional) Specifies whether the Config Sync Repo is in "hierarchical" or "unstructured" mode.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `stop_syncing`
-- Description: (Optional) Set to `true` to stop syncing configurations for a single cluster. This field is only available on clusters using Config Sync [auto-upgrades](http://cloud/kubernetes-engine/enterprise/config-sync/docs/how-to/upgrade-config-sync#auto-upgrade-config) or on Config Sync version 1.20.0 or later. Defaults: `false`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `deployment_overrides`
-- Description: (Optional) The override configurations for the Config Sync Deployments. Structure is [documented below](#nested_deployment_overrides). The field is only available on Config Sync version 1.20.1 or later. <a name="nested_git"></a>The `git` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `gcp_service_account_email`
-- Description: (Optional) The GCP Service Account Email used for auth when secretType is gcpServiceAccount.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `https_proxy`
-- Description: (Optional) URL for the HTTPS proxy to be used when communicating with the Git repo.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `policy_dir`
-- Description: (Optional) The path within the Git repository that represents the top level of the repo to sync. Default: the root directory of the repository.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `secret_type`
-- Description: (Optional) Type of secret configured for access to the Git repo.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `sync_branch`
-- Description: (Optional) The branch of the repository to sync from. Default: master.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `sync_repo`
-- Description: (Optional) The URL of the Git repository to use as the source of truth.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `sync_rev`
-- Description: (Optional) Git revision (tag or hash) to check out. Default HEAD.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `sync_wait_secs`
-- Description: (Optional) Period in seconds between consecutive syncs. Default: 15. <a name="nested_deployment_overrides"></a>The `deployment_overrides` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `deployment_name`
-- Description: (Optional) The name of the Deployment.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `deployment_namespace`
-- Description: (Optional) The namespace of the Deployment.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `containers`
-- Description: (Optional) The override configurations for the containers in the Deployment. Structure is [documented below](#nested_deployment_overrides_containers). <a name="nested_deployment_overrides_containers"></a>The `containers` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `container_name`
-- Description: (Optional) The name of the container.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `cpu_request`
-- Description: (Optional) The CPU request of the container.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `memory_request`
-- Description: (Optional) The memory request of the container.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `cpu_limit`
-- Description: (Optional) The CPU limit of the container.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `memory_limit`
-- Description: (Optional) The memory limit of the container. <a name="nested_oci"></a>The `oci` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `gcp_service_account_email`
-- Description: (Optional) The GCP Service Account Email used for auth when secret_type is gcpserviceaccount.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `policy_dir`
-- Description: (Optional) The absolute path of the directory that contains the local resources. Default: the root directory of the image.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `secret_type`
-- Description: (Optional) Type of secret configured for access to the OCI Image. Must be one of gcenode, gcpserviceaccount or none.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `sync_repo`
-- Description: (Optional) The OCI image repository URL for the package to sync from. e.g. LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY_NAME/PACKAGE_NAME.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `sync_wait_secs`
-- Description: (Optional) Period in seconds(int64 format) between consecutive syncs. Default: 15. <a name="nested_hierarchy_controller"></a>The `hierarchy_controller` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `enable_hierarchical_resource_quota`
-- Description: (Optional) Whether hierarchical resource quota is enabled in this cluster.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `enable_pod_tree_labels`
-- Description: (Optional) Whether pod tree labels are enabled in this cluster.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `enabled`
-- Description: (Optional) Whether Hierarchy Controller is enabled in this cluster. <a name="nested_policy_controller"></a>The `policy_controller` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `audit_interval_seconds`
-- Description: (Optional) Sets the interval for Policy Controller Audit Scans (in seconds). When set to 0, this disables audit functionality altogether.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `enabled`
-- Description: (Optional) Enables the installation of Policy Controller. If false, the rest of PolicyController fields take no effect.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `exemptable_namespaces`
-- Description: (Optional) The set of namespaces that are excluded from Policy Controller checks. Namespaces do not need to currently exist on the cluster.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `log_denies_enabled`
-- Description: (Optional) Logs all denies and dry run failures.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `referential_rules_enabled`
-- Description: (Optional) Enables the ability to use Constraint Templates that reference to objects other than the object currently being evaluated.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `template_library_installed`
-- Description: (Optional) Installs the default template library along with Policy Controller.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `mutation_enabled`
-- Description: (Optional) Enables mutation in policy controller. If true, mutation CRDs, webhook, and controller deployment will be deployed to the cluster.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `monitoring`
-- Description: (Optional) Specifies the backends Policy Controller should export metrics to. For example, to specify metrics should be exported to Cloud Monitoring and Prometheus, specify backends: ["cloudmonitoring", "prometheus"]. Default: ["cloudmonitoring", "prometheus"] <a name="nested_mesh"></a>The `mesh` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `management`
-- Description: (Optional) Whether to automatically manage Service Mesh. Can either be `MANAGEMENT_AUTOMATIC` or `MANAGEMENT_MANUAL`. <a name="nested_policycontroller"></a>The `policycontroller` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `version`
-- Description: (Optional) Version of Policy Controller to install. Defaults to the latest version.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `policy_controller_hub_config`
-- Description: Policy Controller configuration for the cluster. Structure is [documented below](#nested_policy_controller_hub_config). <a name="nested_policy_controller_hub_config"></a>The `policy_controller_hub_config` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `install_spec`
-- Description: (Optional) Configures the mode of the Policy Controller installation. Must be one of `INSTALL_SPEC_NOT_INSTALLED`, `INSTALL_SPEC_ENABLED`, `INSTALL_SPEC_SUSPENDED` or `INSTALL_SPEC_DETACHED`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `exemptable_namespaces`
-- Description: (Optional) The set of namespaces that are excluded from Policy Controller checks. Namespaces do not need to currently exist on the cluster.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `referential_rules_enabled`
-- Description: (Optional) Enables the ability to use Constraint Templates that reference to objects other than the object currently being evaluated.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `log_denies_enabled`
-- Description: (Optional) Logs all denies and dry run failures.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `mutation_enabled`
-- Description: (Optional) Enables mutation in policy controller. If true, mutation CRDs, webhook, and controller deployment will be deployed to the cluster.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `monitoring`
-- Description: (Optional) Specifies the backends Policy Controller should export metrics to. Structure is [documented below](#nested_monitoring).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `audit_interval_seconds`
-- Description: (Optional) Sets the interval for Policy Controller Audit Scans (in seconds). When set to 0, this disables audit functionality altogether.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `constraint_violation_limit`
-- Description: (Optional) The maximum number of audit violations to be stored in a constraint. If not set, the  default of 20 will be used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `deployment_configs`
-- Description: (Optional) Map of deployment configs to deployments ("admission", "audit", "mutation").
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `policy_content`
-- Description: (Optional) Specifies the desired policy content on the cluster. Structure is [documented below](#nested_policy_content). <a name="nested_monitoring"></a>The `monitoring` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `component_name`
-- Description: (Required) The name of the component. One of `admission` `audit` or `mutation`
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `container_resources`
-- Description: (Optional) Container resource requirements.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `pod_affinity`
-- Description: (Optional) Pod affinity configuration. Possible values: AFFINITY_UNSPECIFIED, NO_AFFINITY, ANTI_AFFINITY
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `pod_tolerations`
-- Description: (Optional) Pod tolerations of node taints.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `replica_count`
-- Description: (Optional) Pod replica count. <a name="nested_container_resources"></a>The `container_resources` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `limits`
-- Description: (Optional) Limits describes the maximum amount of compute resources allowed for use by the running container.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `requests`
-- Description: (Optional) Requests describes the amount of compute resources reserved for the container by the kube-scheduler. <a name="nested_limits"></a>The `limits` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `cpu`
-- Description: (Optional) CPU requirement expressed in Kubernetes resource units.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `memory`
-- Description: (Optional) Memory requirement expressed in Kubernetes resource units. <a name="nested_requests"></a>The `requests` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `cpu`
-- Description: (Optional) CPU requirement expressed in Kubernetes resource units.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `memory`
-- Description: (Optional) Memory requirement expressed in Kubernetes resource units. <a name="nested_pod_tolerations"></a>The `pod_tolerations` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `effect`
-- Description: (Optional) Matches a taint effect.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `key`
-- Description: (Optional) Matches a taint key (not necessarily unique).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `operator`
-- Description: (Optional) Matches a taint operator.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `value`
-- Description: (Optional) Matches a taint value. <a name="nested_policy_content"></a>The `policy_content` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `bundles`
-- Description: (Optional) map of bundle name to BundleInstallSpec. The bundle name maps to the `bundleName` key in the `policycontroller.gke.io/constraintData` annotation on a constraint.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `bundle_name`
-- Description: (Required) The name of the bundle.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `exempted_namespaces`
-- Description: (Optional) The set of namespaces to be exempted from the bundle. <a name="nested_template_library"></a>The `template_library` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `feature` | The name of the feature | false | None | None |
+| `location` | The location of the feature | false | None | None |
+| `membership` | The name of the membership | false | None | None |
+| `membership_location` | The location of the membership, for example, "us-central1". Default is "global". | false | None | None |
+| `project` | The project of the feature | false | None | None |
+| `monitoring` |  | none | None | None |
+| `template_library` |  | none | None | None |
+
+### configmanagement Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `config_sync` | Config Sync configuration for the cluster. Structure is [documented below](#nested_config_sync). | false | None | None |
+| `management` | Set this field to MANAGEMENT_AUTOMATIC to enable [Config Sync auto-upgrades](http://cloud/kubernetes-engine/enterprise/config-sync/docs/how-to/upgrade-config-sync#auto-upgrade-config), and set this field to MANAGEMENT_MANUAL or MANAGEMENT_UNSPECIFIED to disable Config Sync auto-upgrades. This field was introduced in Terraform version [5.41.0](https://github.com/hashicorp/terraform-provider-google/releases/tag/v5.41.0). | false | None | None |
+| `version` | Version of Config Sync installed. | false | None | None |
+| `binauthz` | , Deprecated) Binauthz configuration for the cluster. Structure is [documented below](#nested_binauthz). This field will be ignored and should not be set. | false | None | None |
+| `hierarchy_controller` | Hierarchy Controller configuration for the cluster. Structure is [documented below](#nested_hierarchy_controller). Configuring Hierarchy Controller through the configmanagement feature is no longer recommended. Use open source Kubernetes [Hierarchical Namespace Controller (HNC)](https://github.com/kubernetes-sigs/hierarchical-namespaces) instead. Follow the [instructions](https://cloud.google.com/kubernetes-engine/enterprise/config-sync/docs/how-to/migrate-hierarchy-controller) to migrate from Hierarchy Controller to HNC. | false | None | None |
+| `policy_controller` | Policy Controller configuration for the cluster. Structure is [documented below](#nested_policy_controller). Configuring Policy Controller through the configmanagement feature is no longer recommended. Use the policycontroller feature instead. | false | None | None |
+
+### mesh Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `management` | Whether to automatically manage Service Mesh. Can either be `MANAGEMENT_AUTOMATIC` or `MANAGEMENT_MANUAL`. | false | None | None |
+
+### policycontroller Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `version` | Version of Policy Controller to install. Defaults to the latest version. | false | None | None |
+| `policy_controller_hub_config` | Policy Controller configuration for the cluster. Structure is [documented below](#nested_policy_controller_hub_config). | none | None | None |
+
+### binauthz Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `enabled` | Whether binauthz is enabled in this cluster. | false | None | None |
+
+### config_sync Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `enabled` | Whether Config Sync is enabled in the cluster. This field was introduced in Terraform version [5.41.0](https://github.com/hashicorp/terraform-provider-google/releases/tag/v5.41.0), and needs to be set to `true` explicitly to install Config Sync. | false | None | None |
+| `git` | Structure is [documented below](#nested_git). | false | None | None |
+| `oci` | Supported from Config Sync versions 1.12.0 onwards. Structure is [documented below](#nested_oci). Use either `git` or `oci` config option. | false | None | None |
+| `prevent_drift` | Supported from Config Sync versions 1.10.0 onwards. Set to `true` to enable the Config Sync admission webhook to prevent drifts. If set to `false`, disables the Config Sync admission webhook and does not prevent drifts. | false | None | None |
+| `source_format` | Specifies whether the Config Sync Repo is in "hierarchical" or "unstructured" mode. | false | None | None |
+| `stop_syncing` | Set to `true` to stop syncing configurations for a single cluster. This field is only available on clusters using Config Sync [auto-upgrades](http://cloud/kubernetes-engine/enterprise/config-sync/docs/how-to/upgrade-config-sync#auto-upgrade-config) or on Config Sync version 1.20.0 or later. Defaults: `false`. | false | None | None |
+| `deployment_overrides` | The override configurations for the Config Sync Deployments. Structure is [documented below](#nested_deployment_overrides). The field is only available on Config Sync version 1.20.1 or later. | false | None | None |
+
+### git Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `gcp_service_account_email` | The GCP Service Account Email used for auth when secretType is gcpServiceAccount. | false | None | None |
+| `https_proxy` | URL for the HTTPS proxy to be used when communicating with the Git repo. | false | None | None |
+| `policy_dir` | The path within the Git repository that represents the top level of the repo to sync. Default: the root directory of the repository. | false | None | None |
+| `secret_type` | Type of secret configured for access to the Git repo. | false | None | None |
+| `sync_branch` | The branch of the repository to sync from. Default: master. | false | None | None |
+| `sync_repo` | The URL of the Git repository to use as the source of truth. | false | None | None |
+| `sync_rev` | Git revision (tag or hash) to check out. Default HEAD. | false | None | None |
+| `sync_wait_secs` | Period in seconds between consecutive syncs. Default: 15. | false | None | None |
+
+### deployment_overrides Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `deployment_name` | The name of the Deployment. | false | None | None |
+| `deployment_namespace` | The namespace of the Deployment. | false | None | None |
+| `containers` | The override configurations for the containers in the Deployment. Structure is [documented below](#nested_deployment_overrides_containers). | false | None | None |
+
+### containers Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `container_name` | The name of the container. | false | None | None |
+| `cpu_request` | The CPU request of the container. | false | None | None |
+| `memory_request` | The memory request of the container. | false | None | None |
+| `cpu_limit` | The CPU limit of the container. | false | None | None |
+| `memory_limit` | The memory limit of the container. | false | None | None |
+
+### oci Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `gcp_service_account_email` | The GCP Service Account Email used for auth when secret_type is gcpserviceaccount. | false | None | None |
+| `policy_dir` | The absolute path of the directory that contains the local resources. Default: the root directory of the image. | false | None | None |
+| `secret_type` | Type of secret configured for access to the OCI Image. Must be one of gcenode, gcpserviceaccount or none. | false | None | None |
+| `sync_repo` | The OCI image repository URL for the package to sync from. e.g. LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY_NAME/PACKAGE_NAME. | false | None | None |
+| `sync_wait_secs` | Period in seconds(int64 format) between consecutive syncs. Default: 15. | false | None | None |
+
+### hierarchy_controller Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `enable_hierarchical_resource_quota` | Whether hierarchical resource quota is enabled in this cluster. | false | None | None |
+| `enable_pod_tree_labels` | Whether pod tree labels are enabled in this cluster. | false | None | None |
+| `enabled` | Whether Hierarchy Controller is enabled in this cluster. | false | None | None |
+
+### policy_controller Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `audit_interval_seconds` | Sets the interval for Policy Controller Audit Scans (in seconds). When set to 0, this disables audit functionality altogether. | false | None | None |
+| `enabled` | Enables the installation of Policy Controller. If false, the rest of PolicyController fields take no effect. | false | None | None |
+| `exemptable_namespaces` | The set of namespaces that are excluded from Policy Controller checks. Namespaces do not need to currently exist on the cluster. | false | None | None |
+| `log_denies_enabled` | Logs all denies and dry run failures. | false | None | None |
+| `referential_rules_enabled` | Enables the ability to use Constraint Templates that reference to objects other than the object currently being evaluated. | false | None | None |
+| `template_library_installed` | Installs the default template library along with Policy Controller. | false | None | None |
+| `mutation_enabled` | Enables mutation in policy controller. If true, mutation CRDs, webhook, and controller deployment will be deployed to the cluster. | false | None | None |
+| `monitoring` | Specifies the backends Policy Controller should export metrics to. For example, to specify metrics should be exported to Cloud Monitoring and Prometheus, specify backends: ["cloudmonitoring", "prometheus"]. Default: ["cloudmonitoring", "prometheus"] | false | None | None |
+
+### policy_controller_hub_config Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `install_spec` | Configures the mode of the Policy Controller installation. Must be one of `INSTALL_SPEC_NOT_INSTALLED`, `INSTALL_SPEC_ENABLED`, `INSTALL_SPEC_SUSPENDED` or `INSTALL_SPEC_DETACHED`. | false | None | None |
+| `exemptable_namespaces` | The set of namespaces that are excluded from Policy Controller checks. Namespaces do not need to currently exist on the cluster. | false | None | None |
+| `referential_rules_enabled` | Enables the ability to use Constraint Templates that reference to objects other than the object currently being evaluated. | false | None | None |
+| `log_denies_enabled` | Logs all denies and dry run failures. | false | None | None |
+| `mutation_enabled` | Enables mutation in policy controller. If true, mutation CRDs, webhook, and controller deployment will be deployed to the cluster. | false | None | None |
+| `monitoring` | Specifies the backends Policy Controller should export metrics to. Structure is [documented below](#nested_monitoring). | false | None | None |
+| `audit_interval_seconds` | Sets the interval for Policy Controller Audit Scans (in seconds). When set to 0, this disables audit functionality altogether. | false | None | None |
+| `constraint_violation_limit` | The maximum number of audit violations to be stored in a constraint. If not set, the  default of 20 will be used. | false | None | None |
+| `deployment_configs` | Map of deployment configs to deployments ("admission", "audit", "mutation"). | false | None | None |
+| `policy_content` | Specifies the desired policy content on the cluster. Structure is [documented below](#nested_policy_content). | false | None | None |
+
+### deployment_configs Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `component_name` | The name of the component. One of `admission` `audit` or `mutation` | true | None | None |
+| `container_resources` | Container resource requirements. | false | None | None |
+| `pod_affinity` | Pod affinity configuration. Possible values: AFFINITY_UNSPECIFIED, NO_AFFINITY, ANTI_AFFINITY | false | None | None |
+| `pod_tolerations` | Pod tolerations of node taints. | false | None | None |
+| `replica_count` | Pod replica count. | false | None | None |
+
+### container_resources Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `limits` | Limits describes the maximum amount of compute resources allowed for use by the running container. | false | None | None |
+| `requests` | Requests describes the amount of compute resources reserved for the container by the kube-scheduler. | false | None | None |
+
+### limits Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `cpu` | CPU requirement expressed in Kubernetes resource units. | false | None | None |
+| `memory` | Memory requirement expressed in Kubernetes resource units. | false | None | None |
+
+### requests Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `cpu` | CPU requirement expressed in Kubernetes resource units. | false | None | None |
+| `memory` | Memory requirement expressed in Kubernetes resource units. | false | None | None |
+
+### pod_tolerations Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `effect` | Matches a taint effect. | false | None | None |
+| `key` | Matches a taint key (not necessarily unique). | false | None | None |
+| `operator` | Matches a taint operator. | false | None | None |
+| `value` | Matches a taint value. | false | None | None |
+
+### policy_content Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `bundles` | map of bundle name to BundleInstallSpec. The bundle name maps to the `bundleName` key in the `policycontroller.gke.io/constraintData` annotation on a constraint. * `template_library` (Optional) Configures the installation of the Template Library. Structure is [documented below](#nested_template_library). | false | None | None |
+
+### bundles Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `bundle_name` | The name of the bundle. | true | None | None |
+| `exempted_namespaces` | The set of namespaces to be exempted from the bundle. | false | None | None |

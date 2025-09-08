@@ -6,10 +6,7 @@ Reference: [Terraform Registry – firebase_project](https://registry.terraform.
 
 ---
 
-## 1. Argument Reference
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `project` | If it is not provided, the provider project is used. | none | None | None |

@@ -6,76 +6,18 @@ Reference: [Terraform Registry – secure_source_manager_branch_rule](https://re
 
 ---
 
-## 1. Argument Reference
-
-### `include_pattern`
-- Description: (Required) The BranchRule matches branches based on the specified regular expression. Use .* to match all branches.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `branch_rule_id`
-- Description: (Required) The ID for the BranchRule.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Required) The location for the Repository.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `repository_id`
-- Description: (Required) The ID for the Repository.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `disabled`
-- Description: (Optional) Determines if the branch rule is disabled or not.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `require_pull_request`
-- Description: (Optional) Determines if the branch rule requires a pull request or not.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `minimum_reviews_count`
-- Description: (Optional) The minimum number of reviews required for the branch rule to be matched.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `minimum_approvals_count`
-- Description: (Optional) The minimum number of approvals required for the branch rule to be matched.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `require_comments_resolved`
-- Description: (Optional) Determines if require comments resolved before merging to the branch.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `allow_stale_reviews`
-- Description: (Optional) Determines if allow stale reviews or approvals before merging to the branch.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `require_linear_history`
-- Description: (Optional) Determines if require linear history before merging to the branch.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `include_pattern` | The BranchRule matches branches based on the specified regular expression. Use .* to match all branches. | true | None | None |
+| `branch_rule_id` | The ID for the BranchRule. | true | None | None |
+| `location` | The location for the Repository. | true | None | None |
+| `repository_id` | The ID for the Repository. | true | None | None |
+| `disabled` | Determines if the branch rule is disabled or not. | false | None | None |
+| `require_pull_request` | Determines if the branch rule requires a pull request or not. | false | None | None |
+| `minimum_reviews_count` | The minimum number of reviews required for the branch rule to be matched. | false | None | None |
+| `minimum_approvals_count` | The minimum number of approvals required for the branch rule to be matched. | false | None | None |
+| `require_comments_resolved` | Determines if require comments resolved before merging to the branch. | false | None | None |
+| `allow_stale_reviews` | Determines if allow stale reviews or approvals before merging to the branch. | false | None | None |
+| `require_linear_history` | Determines if require linear history before merging to the branch. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

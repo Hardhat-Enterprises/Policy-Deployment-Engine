@@ -6,16 +6,8 @@ Reference: [Terraform Registry – project_service_identity](https://registry.te
 
 ---
 
-## 1. Argument Reference
-
-### `service`
-- Description: (Required) The service to generate identity for. - - -
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `service` | The service to generate identity for. - - - | true | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

@@ -6,418 +6,117 @@ Reference: [Terraform Registry – storage_bucket](https://registry.terraform.io
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: - - -
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `force_destroy`
-- Description: boolean option will delete all contained objects. If you try to delete a bucket that contains objects, Terraform will fail that run.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `storage_class`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `autoclass`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `lifecycle_rule`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `versioning`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `website`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `cors`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `default_event_based_hold`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `retention_policy`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `labels`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `logging`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `encryption`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `enable_object_retention`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `requester_pays`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `rpo`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `uniform_bucket_level_access`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `public_access_prevention`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `custom_placement_config`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `soft_delete_policy`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `hierarchical_namespace`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `time_created`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `updated`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `ip_filter`
-- Description: <a name="nested_lifecycle_rule"></a>The `lifecycle_rule` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `action`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `condition`
-- Description: <a name="nested_action"></a>The `action` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `type`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `storage_class`
-- Description: <a name="nested_condition"></a>The `condition` block supports the following elements, and requires at least one to be defined. If you specify multiple conditions in a rule, an object has to match all of the conditions for the action to be taken:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `age`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `created_before`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `with_state`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `matches_storage_class`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `matches_prefix`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `matches_suffix`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `num_newer_versions`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `send_num_newer_versions_if_zero`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `custom_time_before`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `days_since_custom_time`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `send_age_if_zero`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `send_days_since_custom_time_if_zero`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `days_since_noncurrent_time`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `send_days_since_noncurrent_time_if_zero`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `noncurrent_time_before`
-- Description: <a name="nested_autoclass"></a>The `autoclass` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `enabled`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `terminal_storage_class`
-- Description: <a name="nested_versioning"></a>The `versioning` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `enabled`
-- Description: <a name="nested_website"></a>The `website` block supports the following elements, and requires at least one to be defined:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `main_page_suffix`
-- Description: missing objects are treated as potential directories.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `not_found_page`
-- Description: resource is not found. <a name="nested_cors"></a>The `cors` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `origin`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `method`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `response_header`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `max_age_seconds`
-- Description: <a name="nested_retention_policy"></a>The `retention_policy` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `is_locked`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `retention_period`
-- Description: <a name="nested_logging"></a>The `logging` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `log_bucket`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `log_object_prefix`
-- Description: by default GCS sets this to this bucket's name. <a name="nested_encryption"></a>The `encryption` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `data_locations`
-- Description: <a name="nested_soft_delete_policy"></a>The `soft_delete_policy` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `retention_duration_seconds`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `effective_time`
-- Description: <a name="nested_hierarchical_namespace"></a>The `hierarchical_namespace` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `enabled`
-- Description: <a name="nested_ip_filter"></a>The `ip_filter` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `mode`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `allow_cross_org_vpcs`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `public_network_source`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `vpc_network_sources`
-- Description: <a name="nested_public_network_source"></a>The `public_network_source` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `allowed_ip_cidr_ranges`
-- Description: <a name="nested_vpc_network_sources"></a>The `vpc_network_sources` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `network`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `allowed_ip_cidr_ranges`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` |  | none | None | None |
+| `location` | - - - | none | None | None |
+| `force_destroy` | boolean option will delete all contained objects. If you try to delete a bucket that contains objects, Terraform will fail that run. | none | None | None |
+| `project` | is not provided, the provider project is used. | none | None | None |
+| `storage_class` |  | none | None | None |
+| `website` |  | none | None | None |
+| `default_event_based_hold` |  | none | None | None |
+| `labels` |  | none | None | None |
+| `encryption` |  | none | None | None |
+| `enable_object_retention` |  | none | None | None |
+| `requester_pays` |  | none | None | None |
+| `rpo` |  | none | None | None |
+| `uniform_bucket_level_access` |  | none | None | None |
+| `public_access_prevention` |  | none | None | None |
+| `time_created` |  | none | None | None |
+| `updated` |  | none | None | None |
+
+### autoclass Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `enabled` |  | none | None | None |
+| `terminal_storage_class` |  | none | None | None |
+
+### lifecycle_rule Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `action` |  | none | None | None |
+| `condition` |  | none | None | None |
+
+### versioning Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `enabled` | The `website` block supports the following elements, and requires at least one to be defined: | none | None | None |
+| `main_page_suffix` | missing objects are treated as potential directories. | none | None | None |
+| `not_found_page` | resource is not found. | none | None | None |
+
+### cors Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `origin` |  | none | None | None |
+| `method` |  | none | None | None |
+| `response_header` |  | none | None | None |
+| `max_age_seconds` |  | none | None | None |
+
+### retention_policy Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `is_locked` |  | none | None | None |
+| `retention_period` |  | none | None | None |
+
+### logging Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `log_bucket` |  | none | None | None |
+| `log_object_prefix` | by default GCS sets this to this bucket's name. | none | None | None |
+
+### custom_placement_config Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `data_locations` |  | none | None | None |
+
+### soft_delete_policy Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `retention_duration_seconds` |  | none | None | None |
+| `effective_time` |  | none | None | None |
+
+### hierarchical_namespace Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `enabled` |  | none | None | None |
+
+### ip_filter Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `mode` |  | none | None | None |
+| `allow_cross_org_vpcs` | * `allow_all_service_agent_access` (Optional) While set `true`, allows all service agents to access the bucket regardless of the IP filter configuration. | none | None | None |
+| `public_network_source` |  | none | None | None |
+| `vpc_network_sources` |  | none | None | None |
+
+### action Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `type` |  | none | None | None |
+| `storage_class` | The `condition` block supports the following elements, and requires at least one to be defined. If you specify multiple conditions in a rule, an object has to match all of the conditions for the action to be taken: | none | None | None |
+| `age` |  | none | None | None |
+| `created_before` |  | none | None | None |
+| `with_state` |  | none | None | None |
+| `matches_storage_class` |  | none | None | None |
+| `matches_prefix` |  | none | None | None |
+| `matches_suffix` |  | none | None | None |
+| `num_newer_versions` |  | none | None | None |
+| `send_num_newer_versions_if_zero` |  | none | None | None |
+| `custom_time_before` |  | none | None | None |
+| `days_since_custom_time` |  | none | None | None |
+| `send_age_if_zero` |  | none | None | None |
+| `send_days_since_custom_time_if_zero` |  | none | None | None |
+| `days_since_noncurrent_time` |  | none | None | None |
+| `send_days_since_noncurrent_time_if_zero` |  | none | None | None |
+| `noncurrent_time_before` |  | none | None | None |
+
+### public_network_source Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `allowed_ip_cidr_ranges` |  | none | None | None |
+
+### vpc_network_sources Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `network` |  | none | None | None |
+| `allowed_ip_cidr_ranges` |  | none | None | None |

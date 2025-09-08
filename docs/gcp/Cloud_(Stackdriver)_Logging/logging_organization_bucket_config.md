@@ -6,52 +6,17 @@ Reference: [Terraform Registry – logging_organization_bucket_config](https://r
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `organization` |  | none | None | None |
+| `location` |  | none | None | None |
+| `bucket_id` |  | none | None | None |
+| `description` |  | none | None | None |
+| `retention_days` |  | none | None | None |
 
-### `organization`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `bucket_id`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `retention_days`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `index_configs`
-- Description: <a name="nested_index_configs"></a>The `index_configs` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `field_path`
-- Description: Note that some paths are automatically indexed, and other paths are not eligible for indexing. See [indexing documentation](https://cloud.google.com/logging/docs/analyze/custom-index) for details.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `type`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### index_configs Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `field_path` | Note that some paths are automatically indexed, and other paths are not eligible for indexing. See [indexing documentation](https://cloud.google.com/logging/docs/analyze/custom-index) for details. | none | None | None |
+| `type` |  | none | None | None |

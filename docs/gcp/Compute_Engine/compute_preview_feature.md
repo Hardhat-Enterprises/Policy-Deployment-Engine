@@ -6,40 +6,19 @@ Reference: [Terraform Registry – compute_preview_feature](https://registry.ter
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `activation_status` | The activation status of the preview feature. Possible values are: `ENABLED`, `DISABLED`. | true | None | None |
+| `name` | The name of the preview feature. | true | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |
 
-### `activation_status`
-- Description: (Required) The activation status of the preview feature. Possible values are: `ENABLED`, `DISABLED`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### rollout_operation Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `rollout_input` | The input for the rollout operation. Structure is [documented below](#nested_rollout_operation_rollout_input). | false | None | None |
 
-### `name`
-- Description: (Required) The name of the preview feature.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `rollout_operation`
-- Description: (Optional) The rollout operation of the feature. Structure is [documented below](#nested_rollout_operation).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used. <a name="nested_rollout_operation"></a>The `rollout_operation` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `rollout_input`
-- Description: (Optional) The input for the rollout operation. Structure is [documented below](#nested_rollout_operation_rollout_input). <a name="nested_rollout_operation_rollout_input"></a>The `rollout_input` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `predefined_rollout_plan`
-- Description: (Required) Predefined rollout plans. Possible values are: `ROLLOUT_PLAN_FAST_ROLLOUT`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### rollout_input Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `predefined_rollout_plan` | Predefined rollout plans. Possible values are: `ROLLOUT_PLAN_FAST_ROLLOUT`. | true | None | None |

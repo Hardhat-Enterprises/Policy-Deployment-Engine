@@ -6,34 +6,11 @@ Reference: [Terraform Registry – eventarc_channel](https://registry.terraform.
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: (Required) The resource name of the channel. Must be unique within the location on the project.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Required) The location for the resource
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `third_party_provider`
-- Description: (Optional) The name of the event provider (e.g. Eventarc SaaS partner) associated with the channel. This provider will be granted permissions to publish events to the channel. Format: `projects/{project}/locations/{location}/providers/{provider_id}`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `crypto_key_name`
-- Description: (Optional) Resource name of a KMS crypto key (managed by the user) used to encrypt/decrypt their event data. It must match the pattern `projects/*/locations/*/keyRings/*/cryptoKeys/*`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | The resource name of the channel. Must be unique within the location on the project. | true | None | None |
+| `location` | The location for the resource | true | None | None |
+| `third_party_provider` | The name of the event provider (e.g. Eventarc SaaS partner) associated with the channel. This provider will be granted permissions to publish events to the channel. Format: `projects/{project}/locations/{location}/providers/{provider_id}`. | false | None | None |
+| `crypto_key_name` | Resource name of a KMS crypto key (managed by the user) used to encrypt/decrypt their event data. It must match the pattern `projects/*/locations/*/keyRings/*/cryptoKeys/*`. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

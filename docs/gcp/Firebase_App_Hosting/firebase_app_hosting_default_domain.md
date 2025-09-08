@@ -6,34 +6,11 @@ Reference: [Terraform Registry – firebase_app_hosting_default_domain](https://
 
 ---
 
-## 1. Argument Reference
-
-### `location`
-- Description: (Required) The location of the Backend that this Domain is associated with
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `backend`
-- Description: (Required) The ID of the Backend that this Domain is associated with
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `domain_id`
-- Description: (Required) Id of the domain. For default domain, it should be {{backend}}--{{project_id}}.{{location}}.hosted.app
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `disabled`
-- Description: (Optional) Whether the domain is disabled. Defaults to false.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `location` | The location of the Backend that this Domain is associated with | true | None | None |
+| `backend` | The ID of the Backend that this Domain is associated with | true | None | None |
+| `domain_id` | Id of the domain. For default domain, it should be {{backend}}--{{project_id}}.{{location}}.hosted.app | true | None | None |
+| `disabled` | Whether the domain is disabled. Defaults to false. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

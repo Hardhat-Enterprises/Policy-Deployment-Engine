@@ -6,16 +6,8 @@ Reference: [Terraform Registry – apigee_env_keystore](https://registry.terrafo
 
 ---
 
-## 1. Argument Reference
-
-### `env_id`
-- Description: (Required) The Apigee environment group associated with the Apigee environment, in the format `organizations/{{org_name}}/environments/{{env_name}}`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `name`
-- Description: (Optional) The name of the newly created keystore.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `env_id` | The Apigee environment group associated with the Apigee environment, in the format `organizations/{{org_name}}/environments/{{env_name}}`. | true | None | None |
+| `name` | The name of the newly created keystore. | false | None | None |

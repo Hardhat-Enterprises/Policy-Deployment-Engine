@@ -6,34 +6,11 @@ Reference: [Terraform Registry – app_engine_firewall_rule](https://registry.te
 
 ---
 
-## 1. Argument Reference
-
-### `source_range`
-- Description: (Required) IP address or range, defined using CIDR notation, of requests that this rule applies to.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `action`
-- Description: (Required) The action to take if this rule matches. Possible values are: `UNSPECIFIED_ACTION`, `ALLOW`, `DENY`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: (Optional) An optional string description of this rule.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `priority`
-- Description: (Optional) A positive integer that defines the order of rule evaluation. Rules with the lowest priority are evaluated first. A default rule at priority Int32.MaxValue matches all IPv4 and IPv6 traffic when no previous rule matches. Only the action of this rule can be modified by the user.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `source_range` | IP address or range, defined using CIDR notation, of requests that this rule applies to. | true | None | None |
+| `action` | The action to take if this rule matches. Possible values are: `UNSPECIFIED_ACTION`, `ALLOW`, `DENY`. | true | None | None |
+| `description` | An optional string description of this rule. | false | None | None |
+| `priority` | A positive integer that defines the order of rule evaluation. Rules with the lowest priority are evaluated first. A default rule at priority Int32.MaxValue matches all IPv4 and IPv6 traffic when no previous rule matches. Only the action of this rule can be modified by the user. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

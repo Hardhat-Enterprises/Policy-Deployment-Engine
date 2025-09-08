@@ -6,46 +6,13 @@ Reference: [Terraform Registry – securityposture_posture_deployment](https://r
 
 ---
 
-## 1. Argument Reference
-
-### `target_resource`
-- Description: (Required) The resource on which the posture should be deployed. This can be in one of the following formats: projects/{project_number}, folders/{folder_number}, organizations/{organization_id}
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `posture_id`
-- Description: (Required) Relative name of the posture which needs to be deployed. It should be in the format: organizations/{organization_id}/locations/{location}/postures/{posture_id}
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `posture_revision_id`
-- Description: (Required) Revision_id the posture which needs to be deployed.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `parent`
-- Description: (Required) The parent of the resource, an organization. Format should be `organizations/{organization_id}`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Required) The location of the resource, eg. global`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `posture_deployment_id`
-- Description: (Required) ID of the posture deployment.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: (Optional) Description of the posture deployment.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `target_resource` | The resource on which the posture should be deployed. This can be in one of the following formats: projects/{project_number}, folders/{folder_number}, organizations/{organization_id} | true | None | None |
+| `posture_id` | Relative name of the posture which needs to be deployed. It should be in the format: organizations/{organization_id}/locations/{location}/postures/{posture_id} | true | None | None |
+| `posture_revision_id` | Revision_id the posture which needs to be deployed. | true | None | None |
+| `parent` | The parent of the resource, an organization. Format should be `organizations/{organization_id}`. | true | None | None |
+| `location` | The location of the resource, eg. global`. | true | None | None |
+| `posture_deployment_id` | ID of the posture deployment. | true | None | None |
+| `description` | Description of the posture deployment. | false | None | None |

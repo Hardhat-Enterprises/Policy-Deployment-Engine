@@ -6,28 +6,10 @@ Reference: [Terraform Registry – compute_resource_policy_attachment](https://r
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: (Required) The resource policy to be attached to the instance for scheduling start/stop operations. Do not specify the self link.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `instance`
-- Description: (Required) The name of the instance in which the resource policies are attached to.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `zone`
-- Description: (Optional) A reference to the zone where the instance resides.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | The resource policy to be attached to the instance for scheduling start/stop operations. Do not specify the self link. | true | None | None |
+| `instance` | The name of the instance in which the resource policies are attached to. | true | None | None |
+| `zone` | A reference to the zone where the instance resides. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

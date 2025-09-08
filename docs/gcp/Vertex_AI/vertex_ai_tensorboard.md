@@ -6,46 +6,16 @@ Reference: [Terraform Registry – vertex_ai_tensorboard](https://registry.terra
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `display_name` | User provided name of this Tensorboard. | true | None | None |
+| `description` | Description of this Tensorboard. | false | None | None |
+| `labels` | The labels with user-defined metadata to organize your Tensorboards. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | None | None |
+| `region` | The region of the tensorboard. eg us-central1 | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |
 
-### `display_name`
-- Description: (Required) User provided name of this Tensorboard.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: (Optional) Description of this Tensorboard.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `encryption_spec`
-- Description: (Optional) Customer-managed encryption key spec for a Tensorboard. If set, this Tensorboard and all sub-resources of this Tensorboard will be secured by this key. Structure is [documented below](#nested_encryption_spec).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `labels`
-- Description: (Optional) The labels with user-defined metadata to organize your Tensorboards. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `region`
-- Description: (Optional) The region of the tensorboard. eg us-central1
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used. <a name="nested_encryption_spec"></a>The `encryption_spec` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `kms_key_name`
-- Description: (Required) The Cloud KMS resource identifier of the customer managed encryption key used to protect a resource. Has the form: projects/my-project/locations/my-region/keyRings/my-kr/cryptoKeys/my-key. The key needs to be in the same region as where the resource is created.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### encryption_spec Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `kms_key_name` | The Cloud KMS resource identifier of the customer managed encryption key used to protect a resource. Has the form: projects/my-project/locations/my-region/keyRings/my-kr/cryptoKeys/my-key. The key needs to be in the same region as where the resource is created. | true | None | None |

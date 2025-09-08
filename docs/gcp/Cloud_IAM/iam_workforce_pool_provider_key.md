@@ -6,70 +6,20 @@ Reference: [Terraform Registry – iam_workforce_pool_provider_key](https://regi
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `use` | The purpose of the key. Possible values are: `ENCRYPTION`. | true | None | None |
+| `location` | The location for the resource. | true | None | None |
+| `workforce_pool_id` | The ID of the workforce pool. | true | None | None |
+| `provider_id` | The ID of the provider. | true | None | None |
+| `key_id` | The ID to use for the key, which becomes the final component of the resource name. This value must be 4-32 characters, and may contain the characters [a-z0-9-]. | true | None | None |
 
-### `key_data`
-- Description: (Required) Immutable. Public half of the asymmetric key. Structure is [documented below](#nested_key_data).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `use`
-- Description: (Required) The purpose of the key. Possible values are: `ENCRYPTION`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Required) The location for the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `workforce_pool_id`
-- Description: (Required) The ID of the workforce pool.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `provider_id`
-- Description: (Required) The ID of the provider.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `key_id`
-- Description: (Required) The ID to use for the key, which becomes the final component of the resource name. This value must be 4-32 characters, and may contain the characters [a-z0-9-]. <a name="nested_key_data"></a>The `key_data` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `format`
-- Description: (Output) The format of the key.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `not_before_time`
-- Description: (Output) Earliest timestamp when this key is valid. Attempts to use this key before this time will fail. Only present if the key data represents a X.509 certificate. Uses RFC 3339, where generated output will always be Z-normalized and uses 0, 3, 6 or 9 fractional digits. Offsets other than "Z" are also accepted. Examples: "2014-10-02T15:01:23Z", "2014-10-02T15:01:23.045123456Z" or "2014-10-02T15:01:23+05:30".
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `not_after_time`
-- Description: (Output) Latest timestamp when this key is valid. Attempts to use this key after this time will fail. Only present if the key data represents a X.509 certificate. Uses RFC 3339, where generated output will always be Z-normalized and uses 0, 3, 6 or 9 fractional digits. Offsets other than "Z" are also accepted. Examples: "2014-10-02T15:01:23Z", "2014-10-02T15:01:23.045123456Z" or "2014-10-02T15:01:23+05:30".
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `key`
-- Description: (Output) The key data. The format of the key is represented by the format field.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `key_spec`
-- Description: (Required) The specifications for the key. Possible values are: `RSA_2048`, `RSA_3072`, `RSA_4096`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### key_data Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `format` | (Output) The format of the key. | none | None | None |
+| `not_before_time` | (Output) Earliest timestamp when this key is valid. Attempts to use this key before this time will fail. Only present if the key data represents a X.509 certificate. Uses RFC 3339, where generated output will always be Z-normalized and uses 0, 3, 6 or 9 fractional digits. Offsets other than "Z" are also accepted. Examples: "2014-10-02T15:01:23Z", "2014-10-02T15:01:23.045123456Z" or "2014-10-02T15:01:23+05:30". | none | None | None |
+| `not_after_time` | (Output) Latest timestamp when this key is valid. Attempts to use this key after this time will fail. Only present if the key data represents a X.509 certificate. Uses RFC 3339, where generated output will always be Z-normalized and uses 0, 3, 6 or 9 fractional digits. Offsets other than "Z" are also accepted. Examples: "2014-10-02T15:01:23Z", "2014-10-02T15:01:23.045123456Z" or "2014-10-02T15:01:23+05:30". | none | None | None |
+| `key` | (Output) The key data. The format of the key is represented by the format field. | none | None | None |
+| `key_spec` | The specifications for the key. Possible values are: `RSA_2048`, `RSA_3072`, `RSA_4096`. | true | None | None |

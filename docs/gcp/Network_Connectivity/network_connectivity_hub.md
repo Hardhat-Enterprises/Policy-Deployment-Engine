@@ -6,59 +6,13 @@ Reference: [Terraform Registry – network_connectivity_hub](https://registry.te
 
 ---
 
-### 🔍 Legend
-
-- **Argument Required?**
-  - ✅ Required
-  - 🟡 Optional
-
-- **Policy Needed?**
-  - 🛡️ Policy Needed
-  - 🌐 Global Policy Applies
-  - ⚪ Not Needed
-
----
-
-## 1. Argument Reference
-
-### `name`
-- Description: Immutable. The name of the hub. Hub names must be unique. Format: `projects/{project_number}/locations/global/hubs/{hub_id}`
-- Argument Required?: ✅ Required
-- Policy Needed?: 🌐 Global Policy Applies
-- Decision / Rationale: `name` covered by global policies.
-
-### `labels`
-- Description: Optional labels in key:value format. Refer to [Requirements for labels](https://cloud.google.com/resource-manager/docs/creating-managing-labels#requirements).
-- Argument Required?: 🟡 Optional
-- Policy Needed?: ⚪ Not Needed
-- Decision / Rationale: Labels hold no security impact.
-
-### `description`
-- Description: An optional description of the hub.
-- Argument Required?: 🟡 Optional
-- Policy Needed?: ⚪ Not Needed
-- Decision / Rationale: Description holds no security impact.
-
-### `preset_topology`
-- Description: Optional. Used only when `policyMode = PRESET`. Values: `MESH`, `STAR`.
-- Argument Required?: 🟡 Optional
-- Policy Needed?: 🛡️ Policy Needed
-- Decision / Rationale: MESH is picked by default, but  MESH or STAR should be picked explicity as MESH increases the attack surface.
-
-### `policy_mode`
-- Description: Optional. Can be `PRESET` or `CUSTOM`. Defaults to `PRESET`.
-- Argument Required?: 🟡 Optional
-- Policy Needed?: ⚪ Not Needed
-- Decision / Rationale: Business should be able to pick their policy mode as either PRESET or CUSTOM.
-
-### `export_psc`
-- Description: Optional. Enables Private Service Connect transitivity between VPC spokes.
-- Argument Required?: 🟡 Optional
-- Policy Needed?: ⚪ Not Needed
-- Decision / Rationale: Business requires the need to toggle export_psc on or off.
-
-### `project`
-- Description: If not set, the provider project is used.
-- Argument Required?: 🟡 Optional
-- Policy Needed?: ⚪ Not Needed
-- Decision / Rationale: Not security related.
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | Immutable. The name of the hub. Hub names must be unique. They use the following form: `projects/{project_number}/locations/global/hubs/{hub_id}` | true | None | None |
+| `labels` | Optional labels in key:value format. For more information about labels, see [Requirements for labels](https://cloud.google.com/resource-manager/docs/creating-managing-labels#requirements). **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | None | None |
+| `description` | An optional description of the hub. | false | None | None |
+| `preset_topology` | Optional. The topology implemented in this hub. Currently, this field is only used when policyMode = PRESET. The available preset topologies are MESH and STAR. If presetTopology is unspecified and policyMode = PRESET, the presetTopology defaults to MESH. When policyMode = CUSTOM, the presetTopology is set to PRESET_TOPOLOGY_UNSPECIFIED. Possible values are: `MESH`, `STAR`. | false | None | None |
+| `policy_mode` | Optional. The policy mode of this hub. This field can be either PRESET or CUSTOM. If unspecified, the policyMode defaults to PRESET. Possible values are: `CUSTOM`, `PRESET`. | false | None | None |
+| `export_psc` | Whether Private Service Connect transitivity is enabled for the hub. If true, Private Service Connect endpoints in VPC spokes attached to the hub are made accessible to other VPC spokes attached to the hub. The default value is false. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

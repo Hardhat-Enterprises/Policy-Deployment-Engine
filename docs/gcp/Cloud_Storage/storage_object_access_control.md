@@ -6,28 +6,10 @@ Reference: [Terraform Registry – storage_object_access_control](https://regist
 
 ---
 
-## 1. Argument Reference
-
-### `bucket`
-- Description: (Required) The name of the bucket.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `entity`
-- Description: (Required) The entity holding the permission, in one of the following forms: * user-{{userId}} * user-{{email}} (such as "user-liz@example.com") * group-{{groupId}} * group-{{email}} (such as "group-example@googlegroups.com") * domain-{{domain}} (such as "domain-example.com") * project-team-{{projectId}} * allUsers * allAuthenticatedUsers
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `object`
-- Description: (Required) The name of the object to apply the access control to.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `role`
-- Description: (Required) The access permission for the entity. Possible values are: `OWNER`, `READER`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `bucket` | The name of the bucket. | true | None | None |
+| `entity` | The entity holding the permission, in one of the following forms: * user-{{userId}} * user-{{email}} (such as "user-liz@example.com") * group-{{groupId}} * group-{{email}} (such as "group-example@googlegroups.com") * domain-{{domain}} (such as "domain-example.com") * project-team-{{projectId}} * allUsers * allAuthenticatedUsers | true | None | None |
+| `object` | The name of the object to apply the access control to. | true | None | None |
+| `role` | The access permission for the entity. Possible values are: `OWNER`, `READER`. | true | None | None |

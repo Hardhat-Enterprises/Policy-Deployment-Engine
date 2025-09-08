@@ -6,22 +6,9 @@ Reference: [Terraform Registry – biglake_catalog](https://registry.terraform.i
 
 ---
 
-## 1. Argument Reference
-
-### `location`
-- Description: (Required) The geographic location where the Catalog should reside.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `name`
-- Description: (Required) The name of the Catalog. Format: projects/{project_id_or_number}/locations/{locationId}/catalogs/{catalogId}
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `location` | The geographic location where the Catalog should reside. | true | None | None |
+| `name` | The name of the Catalog. Format: projects/{project_id_or_number}/locations/{locationId}/catalogs/{catalogId} | true | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

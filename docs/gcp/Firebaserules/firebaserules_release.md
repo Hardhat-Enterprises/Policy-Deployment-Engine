@@ -6,22 +6,9 @@ Reference: [Terraform Registry – firebaserules_release](https://registry.terra
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: (Required) Format: `projects/{project_id}/releases/{release_id}`\Firestore Rules Releases will **always** have the name 'cloud.firestore'
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `ruleset_name`
-- Description: (Required) Name of the `Ruleset` referred to by this `Release`. The `Ruleset` must exist for the `Release` to be created. - - -
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: (Optional) The project for the resource
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | Format: `projects/{project_id}/releases/{release_id}`\Firestore Rules Releases will **always** have the name 'cloud.firestore' | true | None | None |
+| `ruleset_name` | Name of the `Ruleset` referred to by this `Release`. The `Ruleset` must exist for the `Release` to be created. - - - | true | None | None |
+| `project` | The project for the resource | false | None | None |

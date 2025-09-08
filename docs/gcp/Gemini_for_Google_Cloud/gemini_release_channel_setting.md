@@ -6,34 +6,11 @@ Reference: [Terraform Registry – gemini_release_channel_setting](https://regis
 
 ---
 
-## 1. Argument Reference
-
-### `location`
-- Description: (Required) Resource ID segment making up resource `name`. It identifies the resource within its parent collection as described in https://google.aip.dev/122.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `release_channel_setting_id`
-- Description: (Required) Id of the Release Channel Setting.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `labels`
-- Description: (Optional) Labels as key value pairs. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `release_channel`
-- Description: (Optional) Release channel to be used. Possible values: STABLE EXPERIMENTAL
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `location` | Resource ID segment making up resource `name`. It identifies the resource within its parent collection as described in https://google.aip.dev/122. | true | None | None |
+| `release_channel_setting_id` | Id of the Release Channel Setting. | true | None | None |
+| `labels` | Labels as key value pairs. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | None | None |
+| `release_channel` | Release channel to be used. Possible values: STABLE EXPERIMENTAL | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

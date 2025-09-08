@@ -6,34 +6,11 @@ Reference: [Terraform Registry – compute_region_network_firewall_policy_associ
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: (Required) The name for an association.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `attachment_target`
-- Description: (Required) The target that the firewall policy is attached to.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `firewall_policy`
-- Description: (Required) The firewall policy of the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `region`
-- Description: (Optional) The location of this resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | The name for an association. | true | None | None |
+| `attachment_target` | The target that the firewall policy is attached to. | true | None | None |
+| `firewall_policy` | The firewall policy of the resource. | true | None | None |
+| `region` | The location of this resource. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

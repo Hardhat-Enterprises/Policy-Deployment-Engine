@@ -6,34 +6,11 @@ Reference: [Terraform Registry – data_catalog_entry_group](https://registry.te
 
 ---
 
-## 1. Argument Reference
-
-### `entry_group_id`
-- Description: (Required) The id of the entry group to create. The id must begin with a letter or underscore, contain only English letters, numbers and underscores, and be at most 64 characters.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `display_name`
-- Description: (Optional) A short name to identify the entry group, for example, "analytics data - jan 2011".
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: (Optional) Entry group description, which can consist of several sentences or paragraphs that describe entry group contents.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `region`
-- Description: (Optional) EntryGroup location region.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `entry_group_id` | The id of the entry group to create. The id must begin with a letter or underscore, contain only English letters, numbers and underscores, and be at most 64 characters. | true | None | None |
+| `display_name` | A short name to identify the entry group, for example, "analytics data - jan 2011". | false | None | None |
+| `description` | Entry group description, which can consist of several sentences or paragraphs that describe entry group contents. | false | None | None |
+| `region` | EntryGroup location region. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

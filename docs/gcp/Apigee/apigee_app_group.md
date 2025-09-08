@@ -6,58 +6,18 @@ Reference: [Terraform Registry – apigee_app_group](https://registry.terraform.
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | Name of the AppGroup. Characters you can use in the name are restricted to: A-Z0-9._-$ %. | true | None | None |
+| `org_id` | The Apigee Organization associated with the Apigee app group, in the format `organizations/{{org_name}}`. | true | None | None |
+| `channel_uri` | A reference to the associated storefront/marketplace. | false | None | None |
+| `channel_id` | Channel identifier identifies the owner maintaining this grouping. | false | None | None |
+| `display_name` | App group name displayed in the UI | false | None | None |
+| `status` | Valid values are active or inactive. Note that the status of the AppGroup should be updated via UpdateAppGroupRequest by setting the action as active or inactive. Possible values are: `active`, `inactive`. | false | None | None |
 
-### `name`
-- Description: (Required) Name of the AppGroup. Characters you can use in the name are restricted to: A-Z0-9._-$ %.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `org_id`
-- Description: (Required) The Apigee Organization associated with the Apigee app group, in the format `organizations/{{org_name}}`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `channel_uri`
-- Description: (Optional) A reference to the associated storefront/marketplace.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `channel_id`
-- Description: (Optional) Channel identifier identifies the owner maintaining this grouping.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `display_name`
-- Description: (Optional) App group name displayed in the UI
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `status`
-- Description: (Optional) Valid values are active or inactive. Note that the status of the AppGroup should be updated via UpdateAppGroupRequest by setting the action as active or inactive. Possible values are: `active`, `inactive`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `attributes`
-- Description: (Optional) A list of attributes Structure is [documented below](#nested_attributes). <a name="nested_attributes"></a>The `attributes` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `name`
-- Description: (Optional) Key of the attribute
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `value`
-- Description: (Optional) Value of the attribute
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### attributes Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | Key of the attribute | false | None | None |
+| `value` | Value of the attribute | false | None | None |

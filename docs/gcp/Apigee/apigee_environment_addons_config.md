@@ -6,16 +6,8 @@ Reference: [Terraform Registry – apigee_environment_addons_config](https://reg
 
 ---
 
-## 1. Argument Reference
-
-### `env_id`
-- Description: (Required) The Apigee environment group associated with the Apigee environment, in the format `organizations/{{org_name}}/environments/{{env_name}}`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `analytics_enabled`
-- Description: (Optional) Flag to enable/disable Analytics.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `env_id` | The Apigee environment group associated with the Apigee environment, in the format `organizations/{{org_name}}/environments/{{env_name}}`. | true | None | None |
+| `analytics_enabled` | Flag to enable/disable Analytics. | false | None | None |

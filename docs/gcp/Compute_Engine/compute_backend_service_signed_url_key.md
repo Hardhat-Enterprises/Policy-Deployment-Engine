@@ -6,28 +6,10 @@ Reference: [Terraform Registry – compute_backend_service_signed_url_key](https
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: (Required) Name of the signed URL key.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `key_value`
-- Description: (Required) 128-bit key value used for signing the URL. The key value must be a valid RFC 4648 Section 5 base64url encoded string. **Note**: This property is sensitive and will not be displayed in the plan.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `backend_service`
-- Description: (Required) The backend service this signed URL key belongs.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | Name of the signed URL key. | true | None | None |
+| `key_value` | 128-bit key value used for signing the URL. The key value must be a valid RFC 4648 Section 5 base64url encoded string. **Note**: This property is sensitive and will not be displayed in the plan. | true | None | None |
+| `backend_service` | The backend service this signed URL key belongs. | true | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

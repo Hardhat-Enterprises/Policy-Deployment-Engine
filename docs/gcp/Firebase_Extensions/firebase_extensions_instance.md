@@ -6,76 +6,21 @@ Reference: [Terraform Registry – firebase_extensions_instance](https://registr
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `instance_id` | The ID to use for the Extension Instance, which will become the final component of the instance's name. | true | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |
 
-### `config`
-- Description: (Required) The current Config of the Extension Instance. Structure is [documented below](#nested_config).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `instance_id`
-- Description: (Required) The ID to use for the Extension Instance, which will become the final component of the instance's name.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used. <a name="nested_config"></a>The `config` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `name`
-- Description: (Output) The unique identifier for this configuration.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `create_time`
-- Description: (Output) The time at which the Extension Instance Config was created.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `params`
-- Description: (Required) Environment variables that may be configured for the Extension
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `system_params`
-- Description: (Optional) Params whose values are only available at deployment time. Unlike other params, these will not be set as environment variables on functions. See a full list of system parameters at https://firebase.google.com/docs/extensions/publishers/parameters#system_parameters
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `extension_ref`
-- Description: (Required) The ref of the Extension from the Registry (e.g. publisher-id/awesome-extension)
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `extension_version`
-- Description: (Optional) The version of the Extension from the Registry (e.g. 1.0.3). If left blank, latest is assumed.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `allowed_event_types`
-- Description: (Optional) List of extension events selected by consumer that extension is allowed to emit, identified by their types.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `eventarc_channel`
-- Description: (Optional) Fully qualified Eventarc resource name that consumers should use for event triggers.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `populated_postinstall_content`
-- Description: (Output) Postinstall instructions to be shown for this Extension, with template strings representing function and parameter values substituted with actual values. These strings include: ${param:FOO}, ${function:myFunc.url}, ${function:myFunc.name}, and ${function:myFunc.location}
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### config Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | (Output) The unique identifier for this configuration. | none | None | None |
+| `create_time` | (Output) The time at which the Extension Instance Config was created. | none | None | None |
+| `params` | Environment variables that may be configured for the Extension | true | None | None |
+| `system_params` | Params whose values are only available at deployment time. Unlike other params, these will not be set as environment variables on functions. See a full list of system parameters at https://firebase.google.com/docs/extensions/publishers/parameters#system_parameters | false | None | None |
+| `extension_ref` | The ref of the Extension from the Registry (e.g. publisher-id/awesome-extension) | true | None | None |
+| `extension_version` | The version of the Extension from the Registry (e.g. 1.0.3). If left blank, latest is assumed. | false | None | None |
+| `allowed_event_types` | List of extension events selected by consumer that extension is allowed to emit, identified by their types. | false | None | None |
+| `eventarc_channel` | Fully qualified Eventarc resource name that consumers should use for event triggers. | false | None | None |
+| `populated_postinstall_content` | (Output) Postinstall instructions to be shown for this Extension, with template strings representing function and parameter values substituted with actual values. These strings include: ${param:FOO}, ${function:myFunc.url}, ${function:myFunc.name}, and ${function:myFunc.location} | none | None | None |

@@ -6,112 +6,33 @@ Reference: [Terraform Registry – secret_manager_regional_secret](https://regis
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `location` | The location of the regional secret. eg us-central1 | true | None | None |
+| `secret_id` | This must be unique within the project. | true | None | None |
+| `labels` | The labels assigned to this regional secret. Label keys must be between 1 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, and must conform to the following PCRE regular expression: [\p{Ll}\p{Lo}][\p{Ll}\p{Lo}\p{N}_-]{0,62} Label values must be between 0 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, and must conform to the following PCRE regular expression: [\p{Ll}\p{Lo}\p{N}_-]{0,63} No more than 64 labels can be assigned to a given resource. An object containing a list of "key": value pairs. Example: { "name": "wrench", "mass": "1.3kg", "count": "3" }. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | None | None |
+| `annotations` | Custom metadata about the regional secret. Annotations are distinct from various forms of labels. Annotations exist to allow client tools to store their own state information without requiring a database. Annotation keys must be between 1 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, begin and end with an alphanumeric character ([a-z0-9A-Z]), and may have dashes (-), underscores (_), dots (.), and alphanumerics in between these symbols. The total size of annotation keys and values must be less than 16KiB. An object containing a list of "key": value pairs. Example: { "name": "wrench", "mass": "1.3kg", "count": "3" }. **Note**: This field is non-authoritative, and will only manage the annotations present in your configuration. Please refer to the field `effective_annotations` for all of the annotations present on the resource. | false | None | None |
+| `version_aliases` | Mapping from version alias to version name. A version alias is a string with a maximum length of 63 characters and can contain uppercase and lowercase letters, numerals, and the hyphen (-) and underscore ('_') characters. An alias string must start with a letter and cannot be the string 'latest' or 'NEW'. No more than 50 aliases can be assigned to a given secret. An object containing a list of "key": value pairs. Example: { "name": "wrench", "mass": "1.3kg", "count": "3" }. | false | None | None |
+| `expire_time` | Timestamp in UTC when the regional secret is scheduled to expire. This is always provided on output, regardless of what was sent on input. A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits. Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z". Only one of `expire_time` or `ttl` can be provided. | false | None | None |
+| `ttl` | The TTL for the regional secret. A duration in seconds with up to nine fractional digits, terminated by 's'. Example: "3.5s". Only one of `ttl` or `expire_time` can be provided. | false | None | None |
+| `version_destroy_ttl` | Secret Version TTL after destruction request. This is a part of the delayed delete feature on Secret Version. For secret with versionDestroyTtl>0, version destruction doesn't happen immediately on calling destroy instead the version goes to a disabled state and the actual destruction happens after this TTL expires. It must be atleast 24h. | false | None | None |
+| `tags` | A map of resource manager tags. Resource manager tag keys and values have the same definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id}, and values are in the format tagValues/{tag_value_id}. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |
+| `deletion_protection` | When the field is set to true in Terraform state, a `terraform apply` or `terraform destroy` that would delete the federation will fail. | none | None | None |
 
-### `location`
-- Description: (Required) The location of the regional secret. eg us-central1
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### customer_managed_encryption Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `kms_key_name` | The resource name of the Cloud KMS CryptoKey used to encrypt secret payloads. | true | None | None |
 
-### `secret_id`
-- Description: (Required) This must be unique within the project.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### topics Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | The resource name of the Pub/Sub topic that will be published to, in the following format: projects/*/topics/*. For publication to succeed, the Secret Manager Service Agent service account must have pubsub.publisher permissions on the topic. | true | None | None |
 
-### `labels`
-- Description: (Optional) The labels assigned to this regional secret. Label keys must be between 1 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, and must conform to the following PCRE regular expression: [\p{Ll}\p{Lo}][\p{Ll}\p{Lo}\p{N}_-]{0,62} Label values must be between 0 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, and must conform to the following PCRE regular expression: [\p{Ll}\p{Lo}\p{N}_-]{0,63} No more than 64 labels can be assigned to a given resource. An object containing a list of "key": value pairs. Example: { "name": "wrench", "mass": "1.3kg", "count": "3" }. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `annotations`
-- Description: (Optional) Custom metadata about the regional secret. Annotations are distinct from various forms of labels. Annotations exist to allow client tools to store their own state information without requiring a database. Annotation keys must be between 1 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, begin and end with an alphanumeric character ([a-z0-9A-Z]), and may have dashes (-), underscores (_), dots (.), and alphanumerics in between these symbols. The total size of annotation keys and values must be less than 16KiB. An object containing a list of "key": value pairs. Example: { "name": "wrench", "mass": "1.3kg", "count": "3" }. **Note**: This field is non-authoritative, and will only manage the annotations present in your configuration. Please refer to the field `effective_annotations` for all of the annotations present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `version_aliases`
-- Description: (Optional) Mapping from version alias to version name. A version alias is a string with a maximum length of 63 characters and can contain uppercase and lowercase letters, numerals, and the hyphen (-) and underscore ('_') characters. An alias string must start with a letter and cannot be the string 'latest' or 'NEW'. No more than 50 aliases can be assigned to a given secret. An object containing a list of "key": value pairs. Example: { "name": "wrench", "mass": "1.3kg", "count": "3" }.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `customer_managed_encryption`
-- Description: (Optional) The customer-managed encryption configuration of the regional secret. Structure is [documented below](#nested_customer_managed_encryption).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `topics`
-- Description: (Optional) A list of up to 10 Pub/Sub topics to which messages are published when control plane operations are called on the regional secret or its versions. Structure is [documented below](#nested_topics).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `rotation`
-- Description: (Optional) The rotation time and period for a regional secret. At `next_rotation_time`, Secret Manager will send a Pub/Sub notification to the topics configured on the Secret. `topics` must be set to configure rotation. Structure is [documented below](#nested_rotation).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `expire_time`
-- Description: (Optional) Timestamp in UTC when the regional secret is scheduled to expire. This is always provided on output, regardless of what was sent on input. A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits. Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z". Only one of `expire_time` or `ttl` can be provided.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `ttl`
-- Description: (Optional) The TTL for the regional secret. A duration in seconds with up to nine fractional digits, terminated by 's'. Example: "3.5s". Only one of `ttl` or `expire_time` can be provided.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `version_destroy_ttl`
-- Description: (Optional) Secret Version TTL after destruction request. This is a part of the delayed delete feature on Secret Version. For secret with versionDestroyTtl>0, version destruction doesn't happen immediately on calling destroy instead the version goes to a disabled state and the actual destruction happens after this TTL expires. It must be atleast 24h.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `tags`
-- Description: (Optional) A map of resource manager tags. Resource manager tag keys and values have the same definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id}, and values are in the format tagValues/{tag_value_id}.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `deletion_protection`
-- Description: When the field is set to true in Terraform state, a `terraform apply` or `terraform destroy` that would delete the federation will fail. <a name="nested_customer_managed_encryption"></a>The `customer_managed_encryption` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `kms_key_name`
-- Description: (Required) The resource name of the Cloud KMS CryptoKey used to encrypt secret payloads. <a name="nested_topics"></a>The `topics` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `name`
-- Description: (Required) The resource name of the Pub/Sub topic that will be published to, in the following format: projects/*/topics/*. For publication to succeed, the Secret Manager Service Agent service account must have pubsub.publisher permissions on the topic. <a name="nested_rotation"></a>The `rotation` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `next_rotation_time`
-- Description: (Optional) Timestamp in UTC at which the Secret is scheduled to rotate. A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits. Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `rotation_period`
-- Description: (Optional) The Duration between rotation notifications. Must be in seconds and at least 3600s (1h) and at most 3153600000s (100 years). If rotationPeriod is set, `next_rotation_time` must be set. `next_rotation_time` will be advanced by this period when the service automatically sends rotation notifications.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### rotation Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `next_rotation_time` | Timestamp in UTC at which the Secret is scheduled to rotate. A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits. Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z". | false | None | None |
+| `rotation_period` | The Duration between rotation notifications. Must be in seconds and at least 3600s (1h) and at most 3153600000s (100 years). If rotationPeriod is set, `next_rotation_time` must be set. `next_rotation_time` will be advanced by this period when the service automatically sends rotation notifications. | false | None | None |

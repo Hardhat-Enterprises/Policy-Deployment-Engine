@@ -6,166 +6,54 @@ Reference: [Terraform Registry – healthcare_fhir_store](https://registry.terra
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | The resource name for the FhirStore. ** Changing this property may recreate the FHIR store (removing all data) ** | true | None | None |
+| `dataset` | Identifies the dataset addressed by this request. Must be in the format 'projects/{project}/locations/{location}/datasets/{dataset}' | true | None | None |
+| `version` | The FHIR specification version. Default value is `STU3`. Possible values are: `DSTU2`, `STU3`, `R4`. | false | None | None |
+| `complex_data_type_reference_parsing` | Enable parsing of references within complex FHIR data types such as Extensions. If this value is set to ENABLED, then features like referential integrity and Bundle reference rewriting apply to all references. If this flag has not been specified the behavior of the FHIR store will not change, references in complex data types will not be parsed. New stores will have this value set to ENABLED by default after a notification period. Warning: turning on this flag causes processing existing resources to fail if they contain references to non-existent resources. Possible values are: `COMPLEX_DATA_TYPE_REFERENCE_PARSING_UNSPECIFIED`, `DISABLED`, `ENABLED`. | false | None | None |
+| `enable_update_create` | Whether this FHIR store has the updateCreate capability. This determines if the client can use an Update operation to create a new resource with a client-specified ID. If false, all IDs are server-assigned through the Create operation and attempts to Update a non-existent resource will return errors. Please treat the audit logs with appropriate levels of care if client-specified resource IDs contain sensitive data such as patient identifiers, those IDs will be part of the FHIR resource path recorded in Cloud audit logs and Cloud Pub/Sub notifications. | false | None | None |
+| `disable_referential_integrity` | Whether to disable referential integrity in this FHIR store. This field is immutable after FHIR store creation. The default value is false, meaning that the API will enforce referential integrity and fail the requests that will result in inconsistent state in the FHIR store. When this field is set to true, the API will skip referential integrity check. Consequently, operations that rely on references, such as Patient.get$everything, will not return all the results if broken references exist. ** Changing this property may recreate the FHIR store (removing all data) ** | false | None | None |
+| `disable_resource_versioning` | Whether to disable resource versioning for this FHIR store. This field can not be changed after the creation of FHIR store. If set to false, which is the default behavior, all write operations will cause historical versions to be recorded automatically. The historical versions can be fetched through the history APIs, but cannot be updated. If set to true, no historical versions will be kept. The server will send back errors for attempts to read the historical versions. ** Changing this property may recreate the FHIR store (removing all data) ** | false | None | None |
+| `enable_history_import` | Whether to allow the bulk import API to accept history bundles and directly insert historical resource versions into the FHIR store. Importing resource histories creates resource interactions that appear to have occurred in the past, which clients may not want to allow. If set to false, history bundles within an import will fail with an error. ** Changing this property may recreate the FHIR store (removing all data) ** ** This property can be changed manually in the Google Cloud Healthcare admin console without recreating the FHIR store ** | false | None | None |
+| `enable_history_modifications` | , [Beta](https://terraform.io/docs/providers/google/guides/provider_versions.html)) Whether to allow the ExecuteBundle API to accept history bundles, and directly insert and overwrite historical resource versions into the FHIR store. If set to false, using history bundles fails with an error. | false | None | None |
+| `labels` | User-supplied key-value pairs used to organize FHIR stores. Label keys must be between 1 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, and must conform to the following PCRE regular expression: [\p{Ll}\p{Lo}][\p{Ll}\p{Lo}\p{N}_-]{0,62} Label values are optional, must be between 1 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, and must conform to the following PCRE regular expression: [\p{Ll}\p{Lo}\p{N}_-]{0,63} No more than 64 labels can be associated with a given store. An object containing a list of "key": value pairs. Example: { "name": "wrench", "mass": "1.3kg", "count": "3" }. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | None | None |
+| `default_search_handling_strict` | If true, overrides the default search behavior for this FHIR store to handling=strict which returns an error for unrecognized search parameters. If false, uses the FHIR specification default handling=lenient which ignores unrecognized search parameters. The handling can always be changed from the default on an individual API call by setting the HTTP header Prefer: handling=strict or Prefer: handling=lenient. | false | None | None |
 
-### `name`
-- Description: (Required) The resource name for the FhirStore. ** Changing this property may recreate the FHIR store (removing all data) **
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### notification_config Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `pubsub_topic` | The Cloud Pub/Sub topic that notifications of changes are published on. Supplied by the client. PubsubMessage.Data will contain the resource name. PubsubMessage.MessageId is the ID of this message. It is guaranteed to be unique within the topic. PubsubMessage.PublishTime is the time at which the message was published. Notifications are only sent if the topic is non-empty. Topic names must be scoped to a project. service-PROJECT_NUMBER@gcp-sa-healthcare.iam.gserviceaccount.com must have publisher permissions on the given Cloud Pub/Sub topic. Not having adequate permissions will cause the calls that send notifications to fail. | true | None | None |
 
-### `dataset`
-- Description: (Required) Identifies the dataset addressed by this request. Must be in the format 'projects/{project}/locations/{location}/datasets/{dataset}'
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### stream_configs Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `resource_types` | Supply a FHIR resource type (such as "Patient" or "Observation"). See https://www.hl7.org/fhir/valueset-resource-types.html for a list of all FHIR resource types. The server treats an empty list as an intent to stream all the supported resource types in this FHIR store. | false | None | None |
+| `bigquery_destination` | The destination BigQuery structure that contains both the dataset location and corresponding schema config. The output is organized in one table per resource type. The server reuses the existing tables (if any) that are named after the resource types, e.g. "Patient", "Observation". When there is no existing table for a given resource type, the server attempts to create one. See the [streaming config reference](https://cloud.google.com/healthcare/docs/reference/rest/v1beta1/projects.locations.datasets.fhirStores#streamconfig) for more details. Structure is [documented below](#nested_stream_configs_stream_configs_bigquery_destination). | true | None | None |
 
-### `version`
-- Description: (Optional) The FHIR specification version. Default value is `STU3`. Possible values are: `DSTU2`, `STU3`, `R4`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### notification_configs Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `pubsub_topic` | The Cloud Pub/Sub topic that notifications of changes are published on. Supplied by the client. PubsubMessage.Data will contain the resource name. PubsubMessage.MessageId is the ID of this message. It is guaranteed to be unique within the topic. PubsubMessage.PublishTime is the time at which the message was published. Notifications are only sent if the topic is non-empty. Topic names must be scoped to a project. service-PROJECT_NUMBER@gcp-sa-healthcare.iam.gserviceaccount.com must have publisher permissions on the given Cloud Pub/Sub topic. Not having adequate permissions will cause the calls that send notifications to fail. | true | None | None |
+| `send_full_resource` | Whether to send full FHIR resource to this Pub/Sub topic for Create and Update operation. Note that setting this to true does not guarantee that all resources will be sent in the format of full FHIR resource. When a resource change is too large or during heavy traffic, only the resource name will be sent. Clients should always check the "payloadType" label from a Pub/Sub message to determine whether it needs to fetch the full resource as a separate operation. | false | None | None |
+| `send_previous_resource_on_delete` | Whether to send full FHIR resource to this Pub/Sub topic for deleting FHIR resource. Note that setting this to true does not guarantee that all previous resources will be sent in the format of full FHIR resource. When a resource change is too large or during heavy traffic, only the resource name will be sent. Clients should always check the "payloadType" label from a Pub/Sub message to determine whether it needs to fetch the full previous resource as a separate operation. | false | None | None |
 
-### `complex_data_type_reference_parsing`
-- Description: (Optional) Enable parsing of references within complex FHIR data types such as Extensions. If this value is set to ENABLED, then features like referential integrity and Bundle reference rewriting apply to all references. If this flag has not been specified the behavior of the FHIR store will not change, references in complex data types will not be parsed. New stores will have this value set to ENABLED by default after a notification period. Warning: turning on this flag causes processing existing resources to fail if they contain references to non-existent resources. Possible values are: `COMPLEX_DATA_TYPE_REFERENCE_PARSING_UNSPECIFIED`, `DISABLED`, `ENABLED`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### bigquery_destination Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `dataset_uri` | BigQuery URI to a dataset, up to 2000 characters long, in the format bq://projectId.bqDatasetId | true | None | None |
+| `schema_config` | The configuration for the exported BigQuery schema. Structure is [documented below](#nested_stream_configs_stream_configs_bigquery_destination_schema_config). | true | None | None |
 
-### `enable_update_create`
-- Description: (Optional) Whether this FHIR store has the updateCreate capability. This determines if the client can use an Update operation to create a new resource with a client-specified ID. If false, all IDs are server-assigned through the Create operation and attempts to Update a non-existent resource will return errors. Please treat the audit logs with appropriate levels of care if client-specified resource IDs contain sensitive data such as patient identifiers, those IDs will be part of the FHIR resource path recorded in Cloud audit logs and Cloud Pub/Sub notifications.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### schema_config Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `schema_type` | Specifies the output schema type. * ANALYTICS: Analytics schema defined by the FHIR community. See https://github.com/FHIR/sql-on-fhir/blob/master/sql-on-fhir.md. * ANALYTICS_V2: Analytics V2, similar to schema defined by the FHIR community, with added support for extensions with one or more occurrences and contained resources in stringified JSON. * LOSSLESS: A data-driven schema generated from the fields present in the FHIR data being exported, with no additional simplification. Default value is `ANALYTICS`. Possible values are: `ANALYTICS`, `ANALYTICS_V2`, `LOSSLESS`. | false | None | None |
+| `recursive_structure_depth` | The depth for all recursive structures in the output analytics schema. For example, concept in the CodeSystem resource is a recursive structure; when the depth is 2, the CodeSystem table will have a column called concept.concept but not concept.concept.concept. If not specified or set to 0, the server will use the default value 2. The maximum depth allowed is 5. | true | None | None |
+| `last_updated_partition_config` | The configuration for exported BigQuery tables to be partitioned by FHIR resource's last updated time column. Structure is [documented below](#nested_stream_configs_stream_configs_bigquery_destination_schema_config_last_updated_partition_config). | false | None | None |
 
-### `disable_referential_integrity`
-- Description: (Optional) Whether to disable referential integrity in this FHIR store. This field is immutable after FHIR store creation. The default value is false, meaning that the API will enforce referential integrity and fail the requests that will result in inconsistent state in the FHIR store. When this field is set to true, the API will skip referential integrity check. Consequently, operations that rely on references, such as Patient.get$everything, will not return all the results if broken references exist. ** Changing this property may recreate the FHIR store (removing all data) **
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `disable_resource_versioning`
-- Description: (Optional) Whether to disable resource versioning for this FHIR store. This field can not be changed after the creation of FHIR store. If set to false, which is the default behavior, all write operations will cause historical versions to be recorded automatically. The historical versions can be fetched through the history APIs, but cannot be updated. If set to true, no historical versions will be kept. The server will send back errors for attempts to read the historical versions. ** Changing this property may recreate the FHIR store (removing all data) **
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `enable_history_import`
-- Description: (Optional) Whether to allow the bulk import API to accept history bundles and directly insert historical resource versions into the FHIR store. Importing resource histories creates resource interactions that appear to have occurred in the past, which clients may not want to allow. If set to false, history bundles within an import will fail with an error. ** Changing this property may recreate the FHIR store (removing all data) ** ** This property can be changed manually in the Google Cloud Healthcare admin console without recreating the FHIR store **
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `enable_history_modifications`
-- Description: (Optional, [Beta](https://terraform.io/docs/providers/google/guides/provider_versions.html)) Whether to allow the ExecuteBundle API to accept history bundles, and directly insert and overwrite historical resource versions into the FHIR store. If set to false, using history bundles fails with an error.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `labels`
-- Description: (Optional) User-supplied key-value pairs used to organize FHIR stores. Label keys must be between 1 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, and must conform to the following PCRE regular expression: [\p{Ll}\p{Lo}][\p{Ll}\p{Lo}\p{N}_-]{0,62} Label values are optional, must be between 1 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, and must conform to the following PCRE regular expression: [\p{Ll}\p{Lo}\p{N}_-]{0,63} No more than 64 labels can be associated with a given store. An object containing a list of "key": value pairs. Example: { "name": "wrench", "mass": "1.3kg", "count": "3" }. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `notification_config`
-- Description: (Optional, Deprecated) A nested object resource. Structure is [documented below](#nested_notification_config). ~> **Warning:** `notification_config` is deprecated and will be removed in a future major release. Use `notification_configs` instead.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `stream_configs`
-- Description: (Optional) A list of streaming configs that configure the destinations of streaming export for every resource mutation in this FHIR store. Each store is allowed to have up to 10 streaming configs. After a new config is added, the next resource mutation is streamed to the new location in addition to the existing ones. When a location is removed from the list, the server stops streaming to that location. Before adding a new config, you must add the required bigquery.dataEditor role to your project's Cloud Healthcare Service Agent service account. Some lag (typically on the order of dozens of seconds) is expected before the results show up in the streaming destination. Structure is [documented below](#nested_stream_configs).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `default_search_handling_strict`
-- Description: (Optional) If true, overrides the default search behavior for this FHIR store to handling=strict which returns an error for unrecognized search parameters. If false, uses the FHIR specification default handling=lenient which ignores unrecognized search parameters. The handling can always be changed from the default on an individual API call by setting the HTTP header Prefer: handling=strict or Prefer: handling=lenient.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `notification_configs`
-- Description: (Optional) A list of notifcation configs that configure the notification for every resource mutation in this FHIR store. Structure is [documented below](#nested_notification_configs). <a name="nested_notification_config"></a>The `notification_config` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `pubsub_topic`
-- Description: (Required) The Cloud Pub/Sub topic that notifications of changes are published on. Supplied by the client. PubsubMessage.Data will contain the resource name. PubsubMessage.MessageId is the ID of this message. It is guaranteed to be unique within the topic. PubsubMessage.PublishTime is the time at which the message was published. Notifications are only sent if the topic is non-empty. Topic names must be scoped to a project. service-PROJECT_NUMBER@gcp-sa-healthcare.iam.gserviceaccount.com must have publisher permissions on the given Cloud Pub/Sub topic. Not having adequate permissions will cause the calls that send notifications to fail. <a name="nested_stream_configs"></a>The `stream_configs` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `resource_types`
-- Description: (Optional) Supply a FHIR resource type (such as "Patient" or "Observation"). See https://www.hl7.org/fhir/valueset-resource-types.html for a list of all FHIR resource types. The server treats an empty list as an intent to stream all the supported resource types in this FHIR store.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `bigquery_destination`
-- Description: (Required) The destination BigQuery structure that contains both the dataset location and corresponding schema config. The output is organized in one table per resource type. The server reuses the existing tables (if any) that are named after the resource types, e.g. "Patient", "Observation". When there is no existing table for a given resource type, the server attempts to create one. See the [streaming config reference](https://cloud.google.com/healthcare/docs/reference/rest/v1beta1/projects.locations.datasets.fhirStores#streamconfig) for more details. Structure is [documented below](#nested_stream_configs_stream_configs_bigquery_destination). <a name="nested_stream_configs_stream_configs_bigquery_destination"></a>The `bigquery_destination` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `dataset_uri`
-- Description: (Required) BigQuery URI to a dataset, up to 2000 characters long, in the format bq://projectId.bqDatasetId
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `schema_config`
-- Description: (Required) The configuration for the exported BigQuery schema. Structure is [documented below](#nested_stream_configs_stream_configs_bigquery_destination_schema_config). <a name="nested_stream_configs_stream_configs_bigquery_destination_schema_config"></a>The `schema_config` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `schema_type`
-- Description: (Optional) Specifies the output schema type. * ANALYTICS: Analytics schema defined by the FHIR community. See https://github.com/FHIR/sql-on-fhir/blob/master/sql-on-fhir.md. * ANALYTICS_V2: Analytics V2, similar to schema defined by the FHIR community, with added support for extensions with one or more occurrences and contained resources in stringified JSON. * LOSSLESS: A data-driven schema generated from the fields present in the FHIR data being exported, with no additional simplification. Default value is `ANALYTICS`. Possible values are: `ANALYTICS`, `ANALYTICS_V2`, `LOSSLESS`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `recursive_structure_depth`
-- Description: (Required) The depth for all recursive structures in the output analytics schema. For example, concept in the CodeSystem resource is a recursive structure; when the depth is 2, the CodeSystem table will have a column called concept.concept but not concept.concept.concept. If not specified or set to 0, the server will use the default value 2. The maximum depth allowed is 5.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `last_updated_partition_config`
-- Description: (Optional) The configuration for exported BigQuery tables to be partitioned by FHIR resource's last updated time column. Structure is [documented below](#nested_stream_configs_stream_configs_bigquery_destination_schema_config_last_updated_partition_config). <a name="nested_stream_configs_stream_configs_bigquery_destination_schema_config_last_updated_partition_config"></a>The `last_updated_partition_config` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `type`
-- Description: (Required) Type of partitioning. Possible values are: `PARTITION_TYPE_UNSPECIFIED`, `HOUR`, `DAY`, `MONTH`, `YEAR`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `expiration_ms`
-- Description: (Optional) Number of milliseconds for which to keep the storage for a partition. <a name="nested_notification_configs"></a>The `notification_configs` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `pubsub_topic`
-- Description: (Required) The Cloud Pub/Sub topic that notifications of changes are published on. Supplied by the client. PubsubMessage.Data will contain the resource name. PubsubMessage.MessageId is the ID of this message. It is guaranteed to be unique within the topic. PubsubMessage.PublishTime is the time at which the message was published. Notifications are only sent if the topic is non-empty. Topic names must be scoped to a project. service-PROJECT_NUMBER@gcp-sa-healthcare.iam.gserviceaccount.com must have publisher permissions on the given Cloud Pub/Sub topic. Not having adequate permissions will cause the calls that send notifications to fail.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `send_full_resource`
-- Description: (Optional) Whether to send full FHIR resource to this Pub/Sub topic for Create and Update operation. Note that setting this to true does not guarantee that all resources will be sent in the format of full FHIR resource. When a resource change is too large or during heavy traffic, only the resource name will be sent. Clients should always check the "payloadType" label from a Pub/Sub message to determine whether it needs to fetch the full resource as a separate operation.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `send_previous_resource_on_delete`
-- Description: (Optional) Whether to send full FHIR resource to this Pub/Sub topic for deleting FHIR resource. Note that setting this to true does not guarantee that all previous resources will be sent in the format of full FHIR resource. When a resource change is too large or during heavy traffic, only the resource name will be sent. Clients should always check the "payloadType" label from a Pub/Sub message to determine whether it needs to fetch the full previous resource as a separate operation.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### last_updated_partition_config Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `type` | Type of partitioning. Possible values are: `PARTITION_TYPE_UNSPECIFIED`, `HOUR`, `DAY`, `MONTH`, `YEAR`. | true | None | None |
+| `expiration_ms` | Number of milliseconds for which to keep the storage for a partition. | false | None | None |

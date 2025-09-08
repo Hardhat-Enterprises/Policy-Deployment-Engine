@@ -6,22 +6,9 @@ Reference: [Terraform Registry – kms_secret_ciphertext](https://registry.terra
 
 ---
 
-## 1. Argument Reference
-
-### `plaintext`
-- Description: (Required) The plaintext to be encrypted. **Note**: This property is sensitive and will not be displayed in the plan.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `crypto_key`
-- Description: (Required) The full name of the CryptoKey that will be used to encrypt the provided plaintext. Format: `'projects/{{project}}/locations/{{location}}/keyRings/{{keyRing}}/cryptoKeys/{{cryptoKey}}'`
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `additional_authenticated_data`
-- Description: (Optional) The additional authenticated data used for integrity checks during encryption and decryption. **Note**: This property is sensitive and will not be displayed in the plan.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `plaintext` | The plaintext to be encrypted. **Note**: This property is sensitive and will not be displayed in the plan. | true | None | None |
+| `crypto_key` | The full name of the CryptoKey that will be used to encrypt the provided plaintext. Format: `'projects/{{project}}/locations/{{location}}/keyRings/{{keyRing}}/cryptoKeys/{{cryptoKey}}'` | true | None | None |
+| `additional_authenticated_data` | The additional authenticated data used for integrity checks during encryption and decryption. **Note**: This property is sensitive and will not be displayed in the plan. | false | None | None |

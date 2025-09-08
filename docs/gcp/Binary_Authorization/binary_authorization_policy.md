@@ -6,88 +6,29 @@ Reference: [Terraform Registry – binary_authorization_policy](https://registry
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `description` | A descriptive comment. | false | None | None |
+| `global_policy_evaluation_mode` | Controls the evaluation of a Google-maintained global admission policy for common system-level images. Images not covered by the global policy will be subject to the project admission policy. Possible values are: `ENABLE`, `DISABLE`. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |
 
-### `default_admission_rule`
-- Description: (Required) Default admission rule for a cluster without a per-cluster admission rule. Structure is [documented below](#nested_default_admission_rule).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### default_admission_rule Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `evaluation_mode` | How this admission rule will be evaluated. Possible values are: `ALWAYS_ALLOW`, `REQUIRE_ATTESTATION`, `ALWAYS_DENY`. | true | None | None |
+| `require_attestations_by` | The resource names of the attestors that must attest to a container image. If the attestor is in a different project from the policy, it should be specified in the format `projects/*/attestors/*`. Each attestor must exist before a policy can reference it. To add an attestor to a policy the principal issuing the policy change request must be able to read the attestor resource. Note: this field must be non-empty when the evaluation_mode field specifies REQUIRE_ATTESTATION, otherwise it must be empty. | false | None | None |
+| `enforcement_mode` | The action when a pod creation is denied by the admission rule. Possible values are: `ENFORCED_BLOCK_AND_AUDIT_LOG`, `DRYRUN_AUDIT_LOG_ONLY`. | true | None | None |
 
-### `description`
-- Description: (Optional) A descriptive comment.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### admission_whitelist_patterns Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name_pattern` | An image name pattern to whitelist, in the form `registry/path/to/image`. This supports a trailing * as a wildcard, but this is allowed only in text after the registry/ part. | true | None | None |
 
-### `global_policy_evaluation_mode`
-- Description: (Optional) Controls the evaluation of a Google-maintained global admission policy for common system-level images. Images not covered by the global policy will be subject to the project admission policy. Possible values are: `ENABLE`, `DISABLE`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `admission_whitelist_patterns`
-- Description: (Optional) A whitelist of image patterns to exclude from admission rules. If an image's name matches a whitelist pattern, the image's admission requests will always be permitted regardless of your admission rules. Structure is [documented below](#nested_admission_whitelist_patterns).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `cluster_admission_rules`
-- Description: (Optional) Per-cluster admission rules. An admission rule specifies either that all container images used in a pod creation request must be attested to by one or more attestors, that all pod creations will be allowed, or that all pod creations will be denied. There can be at most one admission rule per cluster spec. Identifier format: `{{location}}.{{clusterId}}`. A location is either a compute zone (e.g. `us-central1-a`) or a region (e.g. `us-central1`). Structure is [documented below](#nested_cluster_admission_rules).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used. <a name="nested_default_admission_rule"></a>The `default_admission_rule` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `evaluation_mode`
-- Description: (Required) How this admission rule will be evaluated. Possible values are: `ALWAYS_ALLOW`, `REQUIRE_ATTESTATION`, `ALWAYS_DENY`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `require_attestations_by`
-- Description: (Optional) The resource names of the attestors that must attest to a container image. If the attestor is in a different project from the policy, it should be specified in the format `projects/*/attestors/*`. Each attestor must exist before a policy can reference it. To add an attestor to a policy the principal issuing the policy change request must be able to read the attestor resource. Note: this field must be non-empty when the evaluation_mode field specifies REQUIRE_ATTESTATION, otherwise it must be empty.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `enforcement_mode`
-- Description: (Required) The action when a pod creation is denied by the admission rule. Possible values are: `ENFORCED_BLOCK_AND_AUDIT_LOG`, `DRYRUN_AUDIT_LOG_ONLY`. <a name="nested_admission_whitelist_patterns"></a>The `admission_whitelist_patterns` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `name_pattern`
-- Description: (Required) An image name pattern to whitelist, in the form `registry/path/to/image`. This supports a trailing * as a wildcard, but this is allowed only in text after the registry/ part. <a name="nested_cluster_admission_rules"></a>The `cluster_admission_rules` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `cluster`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `evaluation_mode`
-- Description: (Required) How this admission rule will be evaluated. Possible values are: `ALWAYS_ALLOW`, `REQUIRE_ATTESTATION`, `ALWAYS_DENY`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `require_attestations_by`
-- Description: (Optional) The resource names of the attestors that must attest to a container image. If the attestor is in a different project from the policy, it should be specified in the format `projects/*/attestors/*`. Each attestor must exist before a policy can reference it. To add an attestor to a policy the principal issuing the policy change request must be able to read the attestor resource. Note: this field must be non-empty when the evaluation_mode field specifies REQUIRE_ATTESTATION, otherwise it must be empty.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `enforcement_mode`
-- Description: (Required) The action when a pod creation is denied by the admission rule. Possible values are: `ENFORCED_BLOCK_AND_AUDIT_LOG`, `DRYRUN_AUDIT_LOG_ONLY`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### cluster_admission_rules Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `cluster` |  | none | None | None |
+| `evaluation_mode` | How this admission rule will be evaluated. Possible values are: `ALWAYS_ALLOW`, `REQUIRE_ATTESTATION`, `ALWAYS_DENY`. | true | None | None |
+| `require_attestations_by` | The resource names of the attestors that must attest to a container image. If the attestor is in a different project from the policy, it should be specified in the format `projects/*/attestors/*`. Each attestor must exist before a policy can reference it. To add an attestor to a policy the principal issuing the policy change request must be able to read the attestor resource. Note: this field must be non-empty when the evaluation_mode field specifies REQUIRE_ATTESTATION, otherwise it must be empty. | false | None | None |
+| `enforcement_mode` | The action when a pod creation is denied by the admission rule. Possible values are: `ENFORCED_BLOCK_AND_AUDIT_LOG`, `DRYRUN_AUDIT_LOG_ONLY`. | true | None | None |

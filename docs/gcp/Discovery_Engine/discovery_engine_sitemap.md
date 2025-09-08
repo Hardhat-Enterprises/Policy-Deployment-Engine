@@ -6,28 +6,10 @@ Reference: [Terraform Registry – discovery_engine_sitemap](https://registry.te
 
 ---
 
-## 1. Argument Reference
-
-### `location`
-- Description: (Required) The geographic location where the data store should reside. The value can only be one of "global", "us" and "eu".
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `data_store_id`
-- Description: (Required) The unique id of the data store.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `uri`
-- Description: (Optional) Public URI for the sitemap, e.g. "www.example.com/sitemap.xml".
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `location` | The geographic location where the data store should reside. The value can only be one of "global", "us" and "eu". | true | None | None |
+| `data_store_id` | The unique id of the data store. | true | None | None |
+| `uri` | Public URI for the sitemap, e.g. "www.example.com/sitemap.xml". | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

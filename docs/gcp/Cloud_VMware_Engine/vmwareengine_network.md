@@ -6,34 +6,11 @@ Reference: [Terraform Registry – vmwareengine_network](https://registry.terraf
 
 ---
 
-## 1. Argument Reference
-
-### `type`
-- Description: (Required) VMware Engine network type. Possible values are: `LEGACY`, `STANDARD`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Required) The location where the VMwareEngineNetwork should reside.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `name`
-- Description: (Required) The ID of the VMwareEngineNetwork.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: (Optional) User-provided description for this VMware Engine network.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `type` | VMware Engine network type. Possible values are: `LEGACY`, `STANDARD`. | true | None | None |
+| `location` | The location where the VMwareEngineNetwork should reside. | true | None | None |
+| `name` | The ID of the VMwareEngineNetwork. | true | None | None |
+| `description` | User-provided description for this VMware Engine network. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

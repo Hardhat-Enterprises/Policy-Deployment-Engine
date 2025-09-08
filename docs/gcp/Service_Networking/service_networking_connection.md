@@ -6,34 +6,11 @@ Reference: [Terraform Registry – service_networking_connection](https://regist
 
 ---
 
-## 1. Argument Reference
-
-### `network`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `service`
-- Description: service provider organization. For Google services that support this functionality it is 'servicenetworking.googleapis.com'.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `reserved_peering_ranges`
-- Description: this service provider. Note that invoking this method with a different range when connection is already established will not reallocate already provisioned service producer subnetworks.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `deletion_policy`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `update_on_creation_fail`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `network` |  | none | None | None |
+| `service` | service provider organization. For Google services that support this functionality it is 'servicenetworking.googleapis.com'. | none | None | None |
+| `reserved_peering_ranges` | this service provider. Note that invoking this method with a different range when connection is already established will not reallocate already provisioned service producer subnetworks. | none | None | None |
+| `deletion_policy` |  | none | None | None |
+| `update_on_creation_fail` |  | none | None | None |

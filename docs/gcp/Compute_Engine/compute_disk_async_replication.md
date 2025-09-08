@@ -6,28 +6,10 @@ Reference: [Terraform Registry – compute_disk_async_replication](https://regis
 
 ---
 
-## 1. Argument Reference
-
-### `primary_disk`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `secondary_disk`
-- Description: The `secondary_disk` block includes:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `disk`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `state`
-- Description: - - -
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `primary_disk` |  | none | None | None |
+| `secondary_disk` | The `secondary_disk` block includes: | none | None | None |
+| `disk` |  | none | None | None |
+| `state` | - - - | none | None | None |

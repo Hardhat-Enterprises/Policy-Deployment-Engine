@@ -6,16 +6,8 @@ Reference: [Terraform Registry – iap_client](https://registry.terraform.io/pro
 
 ---
 
-## 1. Argument Reference
-
-### `display_name`
-- Description: (Required) Human-friendly name given to the OAuth client.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `brand`
-- Description: (Required) Identifier of the brand to which this client is attached to. The format is `projects/{project_number}/brands/{brand_id}`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `display_name` | Human-friendly name given to the OAuth client. | true | None | None |
+| `brand` | Identifier of the brand to which this client is attached to. The format is `projects/{project_number}/brands/{brand_id}`. | true | None | None |

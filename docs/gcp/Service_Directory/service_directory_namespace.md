@@ -6,28 +6,10 @@ Reference: [Terraform Registry – service_directory_namespace](https://registry
 
 ---
 
-## 1. Argument Reference
-
-### `location`
-- Description: (Required) The location for the Namespace. A full list of valid locations can be found by running `gcloud beta service-directory locations list`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `namespace_id`
-- Description: (Required) The Resource ID must be 1-63 characters long, including digits, lowercase letters or the hyphen character.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `labels`
-- Description: (Optional) Resource labels associated with this Namespace. No more than 64 user labels can be associated with a given resource. Label keys and values can be no longer than 63 characters. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `location` | The location for the Namespace. A full list of valid locations can be found by running `gcloud beta service-directory locations list`. | true | None | None |
+| `namespace_id` | The Resource ID must be 1-63 characters long, including digits, lowercase letters or the hyphen character. | true | None | None |
+| `labels` | Resource labels associated with this Namespace. No more than 64 user labels can be associated with a given resource. Label keys and values can be no longer than 63 characters. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

@@ -6,28 +6,10 @@ Reference: [Terraform Registry – storage_bucket_acl](https://registry.terrafor
 
 ---
 
-## 1. Argument Reference
-
-### `bucket`
-- Description: - - -
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `predefined_acl`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `role_entity`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `default_acl`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `bucket` | - - - | none | None | None |
+| `predefined_acl` |  | none | None | None |
+| `role_entity` |  | none | None | None |
+| `default_acl` |  | none | None | None |

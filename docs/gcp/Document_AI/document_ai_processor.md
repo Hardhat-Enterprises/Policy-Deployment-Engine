@@ -6,34 +6,11 @@ Reference: [Terraform Registry – document_ai_processor](https://registry.terra
 
 ---
 
-## 1. Argument Reference
-
-### `type`
-- Description: (Required) The type of processor. For possible types see the [official list](https://cloud.google.com/document-ai/docs/reference/rest/v1/projects.locations/fetchProcessorTypes#google.cloud.documentai.v1.DocumentProcessorService.FetchProcessorTypes)
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `display_name`
-- Description: (Required) The display name. Must be unique.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Required) The location of the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `kms_key_name`
-- Description: (Optional) The KMS key used for encryption/decryption in CMEK scenarios. See https://cloud.google.com/security-key-management.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `type` | The type of processor. For possible types see the [official list](https://cloud.google.com/document-ai/docs/reference/rest/v1/projects.locations/fetchProcessorTypes#google.cloud.documentai.v1.DocumentProcessorService.FetchProcessorTypes) | true | None | None |
+| `display_name` | The display name. Must be unique. | true | None | None |
+| `location` | The location of the resource. | true | None | None |
+| `kms_key_name` | The KMS key used for encryption/decryption in CMEK scenarios. See https://cloud.google.com/security-key-management. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

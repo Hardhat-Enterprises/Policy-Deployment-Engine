@@ -6,22 +6,9 @@ Reference: [Terraform Registry – sql_ssl_cert](https://registry.terraform.io/p
 
 ---
 
-## 1. Argument Reference
-
-### `instance`
-- Description: forces a new resource to be created.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `common_name`
-- Description: client. Constrained to [a-zA-Z.-_ ]+. Changing this forces a new resource to be created.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `instance` | forces a new resource to be created. | none | None | None |
+| `common_name` | client. Constrained to [a-zA-Z.-_ ]+. Changing this forces a new resource to be created. | none | None | None |
+| `project` | is not provided, the provider project is used. | none | None | None |

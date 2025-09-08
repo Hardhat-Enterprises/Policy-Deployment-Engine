@@ -6,34 +6,11 @@ Reference: [Terraform Registry – network_security_firewall_endpoint](https://r
 
 ---
 
-## 1. Argument Reference
-
-### `billing_project_id`
-- Description: (Required) Project to bill on endpoint uptime usage.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `name`
-- Description: (Required) The name of the firewall endpoint resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Required) The location (zone) of the firewall endpoint.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `parent`
-- Description: (Required) The name of the parent this firewall endpoint belongs to. Format: organizations/{organization_id}.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `labels`
-- Description: (Optional) A map of key/value label pairs to assign to the resource. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `billing_project_id` | Project to bill on endpoint uptime usage. | true | None | None |
+| `name` | The name of the firewall endpoint resource. | true | None | None |
+| `location` | The location (zone) of the firewall endpoint. | true | None | None |
+| `parent` | The name of the parent this firewall endpoint belongs to. Format: organizations/{organization_id}. | true | None | None |
+| `labels` | A map of key/value label pairs to assign to the resource. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | None | None |

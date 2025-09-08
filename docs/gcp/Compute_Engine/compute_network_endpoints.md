@@ -6,46 +6,16 @@ Reference: [Terraform Registry – compute_network_endpoints](https://registry.t
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `network_endpoint_group` | The network endpoint group these endpoints are part of. | true | None | None |
+| `zone` | Zone where the containing network endpoint group is located. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |
 
-### `network_endpoint_group`
-- Description: (Required) The network endpoint group these endpoints are part of.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `network_endpoints`
-- Description: (Optional) The network endpoints to be added to the enclosing network endpoint group (NEG). Each endpoint specifies an IP address and port, along with additional information depending on the NEG type. Structure is [documented below](#nested_network_endpoints).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `zone`
-- Description: (Optional) Zone where the containing network endpoint group is located.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used. <a name="nested_network_endpoints"></a>The `network_endpoints` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `instance`
-- Description: (Optional) The name for a specific VM instance that the IP address belongs to. This is required for network endpoints of type GCE_VM_IP_PORT. The instance must be in the same zone as the network endpoint group.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `port`
-- Description: (Optional) Port number of network endpoint. **Note** `port` is required unless the Network Endpoint Group is created with the type of `GCE_VM_IP`
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `ip_address`
-- Description: (Required) IPv4 address of network endpoint. The IP address must belong to a VM in GCE (either the primary IP or as part of an aliased IP range).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### network_endpoints Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `instance` | The name for a specific VM instance that the IP address belongs to. This is required for network endpoints of type GCE_VM_IP_PORT. The instance must be in the same zone as the network endpoint group. | false | None | None |
+| `port` | Port number of network endpoint. **Note** `port` is required unless the Network Endpoint Group is created with the type of `GCE_VM_IP` | false | None | None |
+| `ip_address` | IPv4 address of network endpoint. The IP address must belong to a VM in GCE (either the primary IP or as part of an aliased IP range). | true | None | None |

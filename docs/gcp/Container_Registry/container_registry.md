@@ -6,16 +6,8 @@ Reference: [Terraform Registry – container_registry](https://registry.terrafor
 
 ---
 
-## 1. Argument Reference
-
-### `location`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `location` |  | none | None | None |
+| `project` |  | none | None | None |

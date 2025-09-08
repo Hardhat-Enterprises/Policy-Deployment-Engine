@@ -6,22 +6,9 @@ Reference: [Terraform Registry – storage_managed_folder](https://registry.terr
 
 ---
 
-## 1. Argument Reference
-
-### `bucket`
-- Description: (Required) The name of the bucket that contains the managed folder.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `name`
-- Description: (Required) The name of the managed folder expressed as a path. Must include trailing '/'. For example, `example_dir/example_dir2/`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `force_destroy`
-- Description: objects. If a non-empty managed folder is deleted, any objects within the folder will remain in a simulated folder with the same name.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `bucket` | The name of the bucket that contains the managed folder. | true | None | None |
+| `name` | The name of the managed folder expressed as a path. Must include trailing '/'. For example, `example_dir/example_dir2/`. | true | None | None |
+| `force_destroy` | objects. If a non-empty managed folder is deleted, any objects within the folder will remain in a simulated folder with the same name. | none | None | None |

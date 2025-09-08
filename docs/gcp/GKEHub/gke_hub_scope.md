@@ -6,28 +6,10 @@ Reference: [Terraform Registry – gke_hub_scope](https://registry.terraform.io/
 
 ---
 
-## 1. Argument Reference
-
-### `scope_id`
-- Description: (Required) The client-provided identifier of the scope.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `namespace_labels`
-- Description: (Optional) Scope-level cluster namespace labels. For the member clusters bound to the Scope, these labels are applied to each namespace under the Scope. Scope-level labels take precedence over Namespace-level labels (`namespace_labels` in the Fleet Namespace resource) if they share a key. Keys and values must be Kubernetes-conformant.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `labels`
-- Description: (Optional) Labels for this Scope. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `scope_id` | The client-provided identifier of the scope. | true | None | None |
+| `namespace_labels` | Scope-level cluster namespace labels. For the member clusters bound to the Scope, these labels are applied to each namespace under the Scope. Scope-level labels take precedence over Namespace-level labels (`namespace_labels` in the Fleet Namespace resource) if they share a key. Keys and values must be Kubernetes-conformant. | false | None | None |
+| `labels` | Labels for this Scope. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

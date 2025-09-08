@@ -6,16 +6,8 @@ Reference: [Terraform Registry – access_context_manager_service_perimeter_dry_
 
 ---
 
-## 1. Argument Reference
-
-### `resource`
-- Description: (Required) A GCP resource that is inside of the service perimeter. Currently only projects are allowed. Format: projects/{project_number}
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `perimeter_name`
-- Description: (Required) The name of the Service Perimeter to add this resource to.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `resource` | A GCP resource that is inside of the service perimeter. Currently only projects are allowed. Format: projects/{project_number} | true | None | None |
+| `perimeter_name` | The name of the Service Perimeter to add this resource to. | true | None | None |

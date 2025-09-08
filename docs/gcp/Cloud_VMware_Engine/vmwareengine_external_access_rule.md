@@ -6,88 +6,26 @@ Reference: [Terraform Registry – vmwareengine_external_access_rule](https://re
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `priority` | External access rule priority, which determines the external access rule to use when multiple rules apply. | true | None | None |
+| `action` | The action that the external access rule performs. Possible values are: `ALLOW`, `DENY`. | true | None | None |
+| `ip_protocol` | The IP protocol to which the external access rule applies. | true | None | None |
+| `source_ports` | A list of source ports to which the external access rule applies. | true | None | None |
+| `destination_ports` | A list of destination ports to which the external access rule applies. | true | None | None |
+| `parent` | The resource name of the network policy. Resource names are schemeless URIs that follow the conventions in https://cloud.google.com/apis/design/resource_names. For example: projects/my-project/locations/us-west1-a/networkPolicies/my-policy | true | None | None |
+| `name` | The ID of the external access rule. | true | None | None |
+| `description` | User-provided description for the external access rule. | false | None | None |
 
-### `priority`
-- Description: (Required) External access rule priority, which determines the external access rule to use when multiple rules apply.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### source_ip_ranges Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `ip_address` | A single IP address. | false | None | None |
+| `ip_address_range` | An IP address range in the CIDR format. | false | None | None |
 
-### `action`
-- Description: (Required) The action that the external access rule performs. Possible values are: `ALLOW`, `DENY`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `ip_protocol`
-- Description: (Required) The IP protocol to which the external access rule applies.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `source_ip_ranges`
-- Description: (Required) If source ranges are specified, the external access rule applies only to traffic that has a source IP address in these ranges. Structure is [documented below](#nested_source_ip_ranges).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `source_ports`
-- Description: (Required) A list of source ports to which the external access rule applies.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `destination_ip_ranges`
-- Description: (Required) If destination ranges are specified, the external access rule applies only to traffic that has a destination IP address in these ranges. Structure is [documented below](#nested_destination_ip_ranges).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `destination_ports`
-- Description: (Required) A list of destination ports to which the external access rule applies.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `parent`
-- Description: (Required) The resource name of the network policy. Resource names are schemeless URIs that follow the conventions in https://cloud.google.com/apis/design/resource_names. For example: projects/my-project/locations/us-west1-a/networkPolicies/my-policy
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `name`
-- Description: (Required) The ID of the external access rule.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: (Optional) User-provided description for the external access rule. <a name="nested_source_ip_ranges"></a>The `source_ip_ranges` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `ip_address`
-- Description: (Optional) A single IP address.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `ip_address_range`
-- Description: (Optional) An IP address range in the CIDR format. <a name="nested_destination_ip_ranges"></a>The `destination_ip_ranges` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `ip_address_range`
-- Description: (Optional) An IP address range in the CIDR format.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `external_address`
-- Description: (Optional) The name of an `ExternalAddress` resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### destination_ip_ranges Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `ip_address_range` | An IP address range in the CIDR format. | false | None | None |
+| `external_address` | The name of an `ExternalAddress` resource. | false | None | None |

@@ -6,22 +6,9 @@ Reference: [Terraform Registry – resource_manager_capability](https://registry
 
 ---
 
-## 1. Argument Reference
-
-### `parent`
-- Description: (Required) Folder on which Capability needs to be updated in the format folders/folder_id.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `capability_name`
-- Description: (Required) Capability name that should be updated on the folder.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `value`
-- Description: (Required) Capability Value.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `parent` | Folder on which Capability needs to be updated in the format folders/folder_id. | true | None | None |
+| `capability_name` | Capability name that should be updated on the folder. | true | None | None |
+| `value` | Capability Value. | true | None | None |

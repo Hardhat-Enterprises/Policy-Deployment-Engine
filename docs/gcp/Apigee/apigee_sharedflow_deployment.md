@@ -6,34 +6,11 @@ Reference: [Terraform Registry – apigee_sharedflow_deployment](https://registr
 
 ---
 
-## 1. Argument Reference
-
-### `org_id`
-- Description: (Required) The Apigee Organization associated with the Sharedflow
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `environment`
-- Description: (Required) The resource ID of the environment.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `sharedflow_id`
-- Description: (Required) Id of the Sharedflow to be deployed.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `revision`
-- Description: (Required) Revision of the Sharedflow to be deployed. - - -
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `service_account`
-- Description: (Optional) The service account represents the identity of the deployed proxy, and determines what permissions it has. The format must be {ACCOUNT_ID}@{PROJECT}.iam.gserviceaccount.com.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `org_id` | The Apigee Organization associated with the Sharedflow | true | None | None |
+| `environment` | The resource ID of the environment. | true | None | None |
+| `sharedflow_id` | Id of the Sharedflow to be deployed. | true | None | None |
+| `revision` | Revision of the Sharedflow to be deployed. - - - | true | None | None |
+| `service_account` | The service account represents the identity of the deployed proxy, and determines what permissions it has. The format must be {ACCOUNT_ID}@{PROJECT}.iam.gserviceaccount.com. | false | None | None |

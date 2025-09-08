@@ -6,52 +6,14 @@ Reference: [Terraform Registry – netapp_backup](https://registry.terraform.io/
 
 ---
 
-## 1. Argument Reference
-
-### `location`
-- Description: (Required) Location of the backup.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `vault_name`
-- Description: (Required) Name of the backup vault to store the backup in.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `name`
-- Description: (Required) The resource name of the backup. Needs to be unique per location.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: (Optional) A description of the backup with 2048 characters or less. Requests with longer descriptions will be rejected.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `source_volume`
-- Description: (Optional) ID of volumes this backup belongs to. Format: `projects/{{projects_id}}/locations/{{location}}/volumes/{{name}}``
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `labels`
-- Description: (Optional) Labels as key value pairs. Example: `{ "owner": "Bob", "department": "finance", "purpose": "testing" }`. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `source_snapshot`
-- Description: (Optional) If specified, backup will be created from the given snapshot. If not specified, there will be a new snapshot taken to initiate the backup creation. Format: `projects/{{projectId}}/locations/{{location}}/volumes/{{volumename}}/snapshots/{{snapshotname}}``
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `location` | Location of the backup. | true | None | None |
+| `vault_name` | Name of the backup vault to store the backup in. | true | None | None |
+| `name` | The resource name of the backup. Needs to be unique per location. | true | None | None |
+| `description` | A description of the backup with 2048 characters or less. Requests with longer descriptions will be rejected. | false | None | None |
+| `source_volume` | ID of volumes this backup belongs to. Format: `projects/{{projects_id}}/locations/{{location}}/volumes/{{name}}`` | false | None | None |
+| `labels` | Labels as key value pairs. Example: `{ "owner": "Bob", "department": "finance", "purpose": "testing" }`. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | None | None |
+| `source_snapshot` | If specified, backup will be created from the given snapshot. If not specified, there will be a new snapshot taken to initiate the backup creation. Format: `projects/{{projectId}}/locations/{{location}}/volumes/{{volumename}}/snapshots/{{snapshotname}}`` | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

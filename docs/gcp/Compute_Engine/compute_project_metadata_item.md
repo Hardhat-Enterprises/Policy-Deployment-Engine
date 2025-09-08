@@ -6,22 +6,9 @@ Reference: [Terraform Registry – compute_project_metadata_item](https://regist
 
 ---
 
-## 1. Argument Reference
-
-### `key`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `value`
-- Description: - - -
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `key` |  | none | None | None |
+| `value` | - - - | none | None | None |
+| `project` | is not provided, the provider project is used. | none | None | None |

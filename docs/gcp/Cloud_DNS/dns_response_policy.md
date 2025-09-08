@@ -6,46 +6,19 @@ Reference: [Terraform Registry – dns_response_policy](https://registry.terrafo
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `response_policy_name` | The user assigned name for this Response Policy, such as `myresponsepolicy`. | true | None | None |
+| `description` | The description of the response policy, such as `My new response policy`. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |
 
-### `response_policy_name`
-- Description: (Required) The user assigned name for this Response Policy, such as `myresponsepolicy`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### networks Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `network_url` | The fully qualified URL of the VPC network to bind to. This should be formatted like `https://www.googleapis.com/compute/v1/projects/{project}/global/networks/{network}` | true | None | None |
 
-### `description`
-- Description: (Optional) The description of the response policy, such as `My new response policy`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `networks`
-- Description: (Optional) The list of network names specifying networks to which this policy is applied. Structure is [documented below](#nested_networks).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `gke_clusters`
-- Description: (Optional) The list of Google Kubernetes Engine clusters that can see this zone. Structure is [documented below](#nested_gke_clusters).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used. <a name="nested_networks"></a>The `networks` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `network_url`
-- Description: (Required) The fully qualified URL of the VPC network to bind to. This should be formatted like `https://www.googleapis.com/compute/v1/projects/{project}/global/networks/{network}` <a name="nested_gke_clusters"></a>The `gke_clusters` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `gke_cluster_name`
-- Description: (Required) The resource name of the cluster to bind this ManagedZone to. This should be specified in the format like `projects/*/locations/*/clusters/*`
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### gke_clusters Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `gke_cluster_name` | The resource name of the cluster to bind this ManagedZone to. This should be specified in the format like `projects/*/locations/*/clusters/*` | true | None | None |

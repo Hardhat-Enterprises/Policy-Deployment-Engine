@@ -6,28 +6,10 @@ Reference: [Terraform Registry – kms_key_handle](https://registry.terraform.io
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: (Required) The resource name for the KeyHandle.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `resource_type_selector`
-- Description: (Required) Selector of the resource type where we want to protect resources. For example, `storage.googleapis.com/Bucket`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Required) The location for the KeyHandle. A full list of valid locations can be found by running `gcloud kms locations list`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | The resource name for the KeyHandle. | true | None | None |
+| `resource_type_selector` | Selector of the resource type where we want to protect resources. For example, `storage.googleapis.com/Bucket`. | true | None | None |
+| `location` | The location for the KeyHandle. A full list of valid locations can be found by running `gcloud kms locations list`. | true | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

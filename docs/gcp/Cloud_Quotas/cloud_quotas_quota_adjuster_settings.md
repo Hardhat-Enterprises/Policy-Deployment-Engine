@@ -6,16 +6,8 @@ Reference: [Terraform Registry – cloud_quotas_quota_adjuster_settings](https:/
 
 ---
 
-## 1. Argument Reference
-
-### `enablement`
-- Description: (Required) Required. The configured value of the enablement at the given resource. Possible values are: `ENABLED`, `DISABLED`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `parent`
-- Description: (Required) The parent of the quota preference. Allowed parent format is "projects/[project-id / number]".
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `enablement` | Required. The configured value of the enablement at the given resource. Possible values are: `ENABLED`, `DISABLED`. | true | None | None |
+| `parent` | The parent of the quota preference. Allowed parent format is "projects/[project-id / number]". | true | None | None |

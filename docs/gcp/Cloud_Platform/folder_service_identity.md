@@ -6,16 +6,8 @@ Reference: [Terraform Registry – folder_service_identity](https://registry.ter
 
 ---
 
-## 1. Argument Reference
-
-### `service`
-- Description: (Required) The service to generate identity for. - - -
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `folder`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `service` | The service to generate identity for. - - - | true | None | None |
+| `folder` |  | none | None | None |

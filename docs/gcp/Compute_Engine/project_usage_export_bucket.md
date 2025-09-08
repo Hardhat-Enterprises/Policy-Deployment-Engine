@@ -6,4 +6,6 @@ Reference: [Terraform Registry – project_usage_export_bucket](https://registry
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|

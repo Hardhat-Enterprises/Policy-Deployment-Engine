@@ -6,64 +6,16 @@ Reference: [Terraform Registry – vmwareengine_network_peering](https://registr
 
 ---
 
-## 1. Argument Reference
-
-### `peer_network`
-- Description: (Required) The relative resource name of the network to peer with a standard VMware Engine network. The provided network can be a consumer VPC network or another standard VMware Engine network.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `peer_network_type`
-- Description: (Required) The type of the network to peer with the VMware Engine network. Possible values are: `STANDARD`, `VMWARE_ENGINE_NETWORK`, `PRIVATE_SERVICES_ACCESS`, `NETAPP_CLOUD_VOLUMES`, `THIRD_PARTY_SERVICE`, `DELL_POWERSCALE`, `GOOGLE_CLOUD_NETAPP_VOLUMES`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `vmware_engine_network`
-- Description: (Required) The relative resource name of the VMware Engine network. Specify the name in the following form: projects/{project}/locations/{location}/vmwareEngineNetworks/{vmwareEngineNetworkId} where {project} can either be a project number or a project ID.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `name`
-- Description: (Required) The ID of the Network Peering.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `export_custom_routes`
-- Description: (Optional) True if custom routes are exported to the peered network; false otherwise.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `import_custom_routes`
-- Description: (Optional) True if custom routes are imported from the peered network; false otherwise.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `export_custom_routes_with_public_ip`
-- Description: (Optional) True if all subnet routes with a public IP address range are exported; false otherwise.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `import_custom_routes_with_public_ip`
-- Description: (Optional) True if custom routes are imported from the peered network; false otherwise.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: (Optional) User-provided description for this network peering.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `peer_network` | The relative resource name of the network to peer with a standard VMware Engine network. The provided network can be a consumer VPC network or another standard VMware Engine network. | true | None | None |
+| `peer_network_type` | The type of the network to peer with the VMware Engine network. Possible values are: `STANDARD`, `VMWARE_ENGINE_NETWORK`, `PRIVATE_SERVICES_ACCESS`, `NETAPP_CLOUD_VOLUMES`, `THIRD_PARTY_SERVICE`, `DELL_POWERSCALE`, `GOOGLE_CLOUD_NETAPP_VOLUMES`. | true | None | None |
+| `vmware_engine_network` | The relative resource name of the VMware Engine network. Specify the name in the following form: projects/{project}/locations/{location}/vmwareEngineNetworks/{vmwareEngineNetworkId} where {project} can either be a project number or a project ID. | true | None | None |
+| `name` | The ID of the Network Peering. | true | None | None |
+| `export_custom_routes` | True if custom routes are exported to the peered network; false otherwise. | false | None | None |
+| `import_custom_routes` | True if custom routes are imported from the peered network; false otherwise. | false | None | None |
+| `export_custom_routes_with_public_ip` | True if all subnet routes with a public IP address range are exported; false otherwise. | false | None | None |
+| `import_custom_routes_with_public_ip` | True if custom routes are imported from the peered network; false otherwise. | false | None | None |
+| `description` | User-provided description for this network peering. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

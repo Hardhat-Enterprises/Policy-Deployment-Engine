@@ -6,478 +6,172 @@ Reference: [Terraform Registry – transcoder_job](https://registry.terraform.io
 
 ---
 
-## 1. Argument Reference
-
-### `location`
-- Description: (Required) The location of the transcoding job resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `labels`
-- Description: (Optional) The labels associated with this job. You can use these to organize and group your jobs. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `template_id`
-- Description: (Optional) Specify the templateId to use for populating Job.config. The default is preset/web-hd, which is the only supported preset.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `config`
-- Description: (Optional) The configuration for this template. Structure is [documented below](#nested_config).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used. <a name="nested_config"></a>The `config` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `inputs`
-- Description: (Optional) List of input assets stored in Cloud Storage. Structure is [documented below](#nested_config_inputs).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `edit_list`
-- Description: (Optional) List of input assets stored in Cloud Storage. Structure is [documented below](#nested_config_edit_list).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `elementary_streams`
-- Description: (Optional) List of input assets stored in Cloud Storage. Structure is [documented below](#nested_config_elementary_streams).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `mux_streams`
-- Description: (Optional) Multiplexing settings for output stream. Structure is [documented below](#nested_config_mux_streams).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `manifests`
-- Description: (Optional) Manifest configuration. Structure is [documented below](#nested_config_manifests).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `output`
-- Description: (Optional) Location of output file(s) in a Cloud Storage bucket. Structure is [documented below](#nested_config_output).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `ad_breaks`
-- Description: (Optional) Ad break. Structure is [documented below](#nested_config_ad_breaks).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `pubsub_destination`
-- Description: (Optional) Pub/Sub destination. Structure is [documented below](#nested_config_pubsub_destination).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `overlays`
-- Description: (Optional) List of overlays on the output video, in descending Z-order. Structure is [documented below](#nested_config_overlays).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `encryptions`
-- Description: (Optional) List of encryption configurations for the content. Structure is [documented below](#nested_config_encryptions). <a name="nested_config_inputs"></a>The `inputs` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `key`
-- Description: (Optional) A unique key for this input. Must be specified when using advanced mapping and edit lists.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `uri`
-- Description: (Optional) URI of the media. Input files must be at least 5 seconds in duration and stored in Cloud Storage (for example, gs://bucket/inputs/file.mp4). If empty, the value is populated from Job.input_uri. <a name="nested_config_edit_list"></a>The `edit_list` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `key`
-- Description: (Optional) A unique key for this atom.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `inputs`
-- Description: (Optional) List of values identifying files that should be used in this atom.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `start_time_offset`
-- Description: (Optional) Start time in seconds for the atom, relative to the input file timeline. The default is `0s`. <a name="nested_config_elementary_streams"></a>The `elementary_streams` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `key`
-- Description: (Optional) A unique key for this atom.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `video_stream`
-- Description: (Optional) Encoding of a video stream. Structure is [documented below](#nested_config_elementary_streams_elementary_streams_video_stream).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `audio_stream`
-- Description: (Optional) Encoding of an audio stream. Structure is [documented below](#nested_config_elementary_streams_elementary_streams_audio_stream). <a name="nested_config_elementary_streams_elementary_streams_video_stream"></a>The `video_stream` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `h264`
-- Description: (Optional) H264 codec settings Structure is [documented below](#nested_config_elementary_streams_elementary_streams_video_stream_h264). <a name="nested_config_elementary_streams_elementary_streams_video_stream_h264"></a>The `h264` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `width_pixels`
-- Description: (Optional) The width of the video in pixels.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `height_pixels`
-- Description: (Optional) The height of the video in pixels.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `frame_rate`
-- Description: (Required) The target video frame rate in frames per second (FPS).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `bitrate_bps`
-- Description: (Required) The video bitrate in bits per second.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `pixel_format`
-- Description: (Optional) Pixel format to use. The default is `yuv420p`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `rate_control_mode`
-- Description: (Optional) Specify the mode. The default is `vbr`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `crf_level`
-- Description: (Optional) Target CRF level. The default is `21`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `vbv_size_bits`
-- Description: (Optional) Size of the Video Buffering Verifier (VBV) buffer in bits.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `vbv_fullness_bits`
-- Description: (Optional) Initial fullness of the Video Buffering Verifier (VBV) buffer in bits.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `entropy_coder`
-- Description: (Optional) The entropy coder to use. The default is `cabac`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `profile`
-- Description: (Optional) Enforces the specified codec profile.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `preset`
-- Description: (Optional) Enforces the specified codec preset. The default is `veryfast`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `gop_duration`
-- Description: (Optional) Select the GOP size based on the specified duration. The default is `3s`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `sdr`
-- Description: (Optional) SDR color format setting for H264.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `hlg`
-- Description: (Optional) HLG color format setting for H264. <a name="nested_config_elementary_streams_elementary_streams_audio_stream"></a>The `audio_stream` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `codec`
-- Description: (Optional) The codec for this audio stream. The default is `aac`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `bitrate_bps`
-- Description: (Required) Audio bitrate in bits per second.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `channel_count`
-- Description: (Optional) Number of audio channels. The default is `2`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `channel_layout`
-- Description: (Optional) A list of channel names specifying layout of the audio channels. The default is ["fl", "fr"].
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `sample_rate_hertz`
-- Description: (Optional) The audio sample rate in Hertz. The default is `48000`. <a name="nested_config_mux_streams"></a>The `mux_streams` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `key`
-- Description: (Optional) A unique key for this multiplexed stream.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `file_name`
-- Description: (Optional) The name of the generated file.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `container`
-- Description: (Optional) The container format. The default is `mp4`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `elementary_streams`
-- Description: (Optional) List of ElementaryStream.key values multiplexed in this stream.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `segment_settings`
-- Description: (Optional) Segment settings for ts, fmp4 and vtt. Structure is [documented below](#nested_config_mux_streams_mux_streams_segment_settings).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `encryption_id`
-- Description: (Optional) Identifier of the encryption configuration to use. <a name="nested_config_mux_streams_mux_streams_segment_settings"></a>The `segment_settings` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `segment_duration`
-- Description: (Optional) Duration of the segments in seconds. The default is `6.0s`. <a name="nested_config_manifests"></a>The `manifests` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `file_name`
-- Description: (Optional) The name of the generated file. The default is `manifest`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `type`
-- Description: (Required) Type of the manifest. Possible values are: `MANIFEST_TYPE_UNSPECIFIED`, `HLS`, `DASH`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `mux_streams`
-- Description: (Optional) List of user supplied MuxStream.key values that should appear in this manifest. <a name="nested_config_output"></a>The `output` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `uri`
-- Description: (Optional) URI for the output file(s). For example, gs://my-bucket/outputs/. <a name="nested_config_ad_breaks"></a>The `ad_breaks` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `start_time_offset`
-- Description: (Optional) Start time in seconds for the ad break, relative to the output file timeline <a name="nested_config_pubsub_destination"></a>The `pubsub_destination` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `topic`
-- Description: (Optional) The name of the Pub/Sub topic to publish job completion notification to. For example: projects/{project}/topics/{topic}. <a name="nested_config_overlays"></a>The `overlays` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `image`
-- Description: (Optional) Image overlay. Structure is [documented below](#nested_config_overlays_overlays_image).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `animations`
-- Description: (Optional) List of animations. The list should be chronological, without any time overlap. Structure is [documented below](#nested_config_overlays_overlays_animations). <a name="nested_config_overlays_overlays_image"></a>The `image` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `uri`
-- Description: (Required) URI of the image in Cloud Storage. For example, gs://bucket/inputs/image.png. <a name="nested_config_overlays_overlays_animations"></a>The `animations` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `animation_fade`
-- Description: (Optional) Display overlay object with fade animation. Structure is [documented below](#nested_config_overlays_overlays_animations_animations_animation_fade). <a name="nested_config_overlays_overlays_animations_animations_animation_fade"></a>The `animation_fade` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `xy`
-- Description: (Optional) Normalized coordinates based on output video resolution. Structure is [documented below](#nested_config_overlays_overlays_animations_animations_animation_fade_xy).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `start_time_offset`
-- Description: (Optional) The time to start the fade animation, in seconds.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `end_time_offset`
-- Description: (Optional) The time to end the fade animation, in seconds.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `fade_type`
-- Description: (Required) Required. Type of fade animation: `FADE_IN` or `FADE_OUT`. The possible values are:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `x`
-- Description: (Optional) Normalized x coordinate.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `y`
-- Description: (Optional) Normalized y coordinate. <a name="nested_config_encryptions"></a>The `encryptions` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `id`
-- Description: (Required) Identifier for this set of encryption options.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `drm_systems`
-- Description: (Optional) DRM system(s) to use; at least one must be specified. If a DRM system is omitted, it is considered disabled. Structure is [documented below](#nested_config_encryptions_encryptions_drm_systems).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `aes128`
-- Description: (Optional) Configuration for AES-128 encryption.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `sample_aes`
-- Description: (Optional) Configuration for SAMPLE-AES encryption.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `mpeg_cenc`
-- Description: (Optional) Configuration for MPEG Common Encryption (MPEG-CENC). Structure is [documented below](#nested_config_encryptions_encryptions_mpeg_cenc).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `secret_manager_key_source`
-- Description: (Optional) Configuration for secrets stored in Google Secret Manager. Structure is [documented below](#nested_config_encryptions_encryptions_secret_manager_key_source). <a name="nested_config_encryptions_encryptions_drm_systems"></a>The `drm_systems` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `widevine`
-- Description: (Optional) Widevine configuration.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `fairplay`
-- Description: (Optional) Fairplay configuration.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `playready`
-- Description: (Optional) Playready configuration.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `clearkey`
-- Description: (Optional) Clearkey configuration. <a name="nested_config_encryptions_encryptions_mpeg_cenc"></a>The `mpeg_cenc` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `scheme`
-- Description: (Required) Specify the encryption scheme. <a name="nested_config_encryptions_encryptions_secret_manager_key_source"></a>The `secret_manager_key_source` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `secret_version`
-- Description: (Required) The name of the Secret Version containing the encryption key in the following format: projects/{project}/secrets/{secret_id}/versions/{version_number}.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `location` | The location of the transcoding job resource. | true | None | None |
+| `labels` | The labels associated with this job. You can use these to organize and group your jobs. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | None | None |
+| `template_id` | Specify the templateId to use for populating Job.config. The default is preset/web-hd, which is the only supported preset. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |
+
+### config Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `inputs` | List of input assets stored in Cloud Storage. Structure is [documented below](#nested_config_inputs). | false | None | None |
+| `edit_list` | List of input assets stored in Cloud Storage. Structure is [documented below](#nested_config_edit_list). | false | None | None |
+| `elementary_streams` | List of input assets stored in Cloud Storage. Structure is [documented below](#nested_config_elementary_streams). | false | None | None |
+| `mux_streams` | Multiplexing settings for output stream. Structure is [documented below](#nested_config_mux_streams). | false | None | None |
+| `manifests` | Manifest configuration. Structure is [documented below](#nested_config_manifests). | false | None | None |
+| `output` | Location of output file(s) in a Cloud Storage bucket. Structure is [documented below](#nested_config_output). | false | None | None |
+| `ad_breaks` | Ad break. Structure is [documented below](#nested_config_ad_breaks). | false | None | None |
+| `pubsub_destination` | Pub/Sub destination. Structure is [documented below](#nested_config_pubsub_destination). | false | None | None |
+| `overlays` | List of overlays on the output video, in descending Z-order. Structure is [documented below](#nested_config_overlays). | false | None | None |
+| `encryptions` | List of encryption configurations for the content. Structure is [documented below](#nested_config_encryptions). | false | None | None |
+
+### inputs Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `key` | A unique key for this input. Must be specified when using advanced mapping and edit lists. | false | None | None |
+| `uri` | URI of the media. Input files must be at least 5 seconds in duration and stored in Cloud Storage (for example, gs://bucket/inputs/file.mp4). If empty, the value is populated from Job.input_uri. | false | None | None |
+
+### edit_list Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `key` | A unique key for this atom. | false | None | None |
+| `inputs` | List of values identifying files that should be used in this atom. | false | None | None |
+| `start_time_offset` | Start time in seconds for the atom, relative to the input file timeline. The default is `0s`. | false | None | None |
+
+### elementary_streams Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `key` | A unique key for this atom. | false | None | None |
+| `video_stream` | Encoding of a video stream. Structure is [documented below](#nested_config_elementary_streams_elementary_streams_video_stream). | false | None | None |
+| `audio_stream` | Encoding of an audio stream. Structure is [documented below](#nested_config_elementary_streams_elementary_streams_audio_stream). | false | None | None |
+
+### video_stream Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `h264` | H264 codec settings Structure is [documented below](#nested_config_elementary_streams_elementary_streams_video_stream_h264). | false | None | None |
+
+### h264 Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `width_pixels` | The width of the video in pixels. | false | None | None |
+| `height_pixels` | The height of the video in pixels. | false | None | None |
+| `frame_rate` | The target video frame rate in frames per second (FPS). | true | None | None |
+| `bitrate_bps` | The video bitrate in bits per second. | true | None | None |
+| `pixel_format` | Pixel format to use. The default is `yuv420p`. | false | None | None |
+| `rate_control_mode` | Specify the mode. The default is `vbr`. | false | None | None |
+| `crf_level` | Target CRF level. The default is `21`. | false | None | None |
+| `vbv_size_bits` | Size of the Video Buffering Verifier (VBV) buffer in bits. | false | None | None |
+| `vbv_fullness_bits` | Initial fullness of the Video Buffering Verifier (VBV) buffer in bits. | false | None | None |
+| `entropy_coder` | The entropy coder to use. The default is `cabac`. | false | None | None |
+| `profile` | Enforces the specified codec profile. | false | None | None |
+| `preset` | Enforces the specified codec preset. The default is `veryfast`. | false | None | None |
+| `gop_duration` | Select the GOP size based on the specified duration. The default is `3s`. | false | None | None |
+| `sdr` | SDR color format setting for H264. | false | None | None |
+| `hlg` | HLG color format setting for H264. | false | None | None |
+
+### audio_stream Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `codec` | The codec for this audio stream. The default is `aac`. | false | None | None |
+| `bitrate_bps` | Audio bitrate in bits per second. | true | None | None |
+| `channel_count` | Number of audio channels. The default is `2`. | false | None | None |
+| `channel_layout` | A list of channel names specifying layout of the audio channels. The default is ["fl", "fr"]. | false | None | None |
+| `sample_rate_hertz` | The audio sample rate in Hertz. The default is `48000`. | false | None | None |
+
+### mux_streams Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `key` | A unique key for this multiplexed stream. | false | None | None |
+| `file_name` | The name of the generated file. | false | None | None |
+| `container` | The container format. The default is `mp4`. | false | None | None |
+| `elementary_streams` | List of ElementaryStream.key values multiplexed in this stream. | false | None | None |
+| `segment_settings` | Segment settings for ts, fmp4 and vtt. Structure is [documented below](#nested_config_mux_streams_mux_streams_segment_settings). | false | None | None |
+| `encryption_id` | Identifier of the encryption configuration to use. | false | None | None |
+
+### segment_settings Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `segment_duration` | Duration of the segments in seconds. The default is `6.0s`. | false | None | None |
+
+### manifests Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `file_name` | The name of the generated file. The default is `manifest`. | false | None | None |
+| `type` | Type of the manifest. Possible values are: `MANIFEST_TYPE_UNSPECIFIED`, `HLS`, `DASH`. | true | None | None |
+| `mux_streams` | List of user supplied MuxStream.key values that should appear in this manifest. | false | None | None |
+
+### output Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `uri` | URI for the output file(s). For example, gs://my-bucket/outputs/. | false | None | None |
+
+### ad_breaks Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `start_time_offset` | Start time in seconds for the ad break, relative to the output file timeline | false | None | None |
+
+### pubsub_destination Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `topic` | The name of the Pub/Sub topic to publish job completion notification to. For example: projects/{project}/topics/{topic}. | false | None | None |
+
+### overlays Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `image` | Image overlay. Structure is [documented below](#nested_config_overlays_overlays_image). | false | None | None |
+| `animations` | List of animations. The list should be chronological, without any time overlap. Structure is [documented below](#nested_config_overlays_overlays_animations). | false | None | None |
+
+### image Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `uri` | URI of the image in Cloud Storage. For example, gs://bucket/inputs/image.png. | true | None | None |
+
+### animations Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `animation_fade` | Display overlay object with fade animation. Structure is [documented below](#nested_config_overlays_overlays_animations_animations_animation_fade). | false | None | None |
+
+### animation_fade Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `xy` | Normalized coordinates based on output video resolution. Structure is [documented below](#nested_config_overlays_overlays_animations_animations_animation_fade_xy). | false | None | None |
+| `start_time_offset` | The time to start the fade animation, in seconds. | false | None | None |
+| `end_time_offset` | The time to end the fade animation, in seconds. | false | None | None |
+| `fade_type` | Required. Type of fade animation: `FADE_IN` or `FADE_OUT`. The possible values are: * `FADE_TYPE_UNSPECIFIED`: The fade type is not specified. * `FADE_IN`: Fade the overlay object into view. * `FADE_OUT`: Fade the overlay object out of view. Possible values are: `FADE_TYPE_UNSPECIFIED`, `FADE_IN`, `FADE_OUT`. | true | None | None |
+
+### xy Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `x` | Normalized x coordinate. | false | None | None |
+| `y` | Normalized y coordinate. | false | None | None |
+
+### encryptions Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `id` | Identifier for this set of encryption options. | true | None | None |
+| `drm_systems` | DRM system(s) to use; at least one must be specified. If a DRM system is omitted, it is considered disabled. Structure is [documented below](#nested_config_encryptions_encryptions_drm_systems). | false | None | None |
+| `aes128` | Configuration for AES-128 encryption. | false | None | None |
+| `sample_aes` | Configuration for SAMPLE-AES encryption. | false | None | None |
+| `mpeg_cenc` | Configuration for MPEG Common Encryption (MPEG-CENC). Structure is [documented below](#nested_config_encryptions_encryptions_mpeg_cenc). | false | None | None |
+| `secret_manager_key_source` | Configuration for secrets stored in Google Secret Manager. Structure is [documented below](#nested_config_encryptions_encryptions_secret_manager_key_source). | false | None | None |
+
+### drm_systems Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `widevine` | Widevine configuration. | false | None | None |
+| `fairplay` | Fairplay configuration. | false | None | None |
+| `playready` | Playready configuration. | false | None | None |
+| `clearkey` | Clearkey configuration. | false | None | None |
+
+### mpeg_cenc Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `scheme` | Specify the encryption scheme. | true | None | None |
+
+### secret_manager_key_source Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `secret_version` | The name of the Secret Version containing the encryption key in the following format: projects/{project}/secrets/{secret_id}/versions/{version_number}. | true | None | None |

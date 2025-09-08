@@ -6,46 +6,16 @@ Reference: [Terraform Registry – bigquery_bi_reservation](https://registry.ter
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `location` | LOCATION_DESCRIPTION | true | None | None |
+| `size` | Size of a reservation, in bytes. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |
 
-### `location`
-- Description: (Required) LOCATION_DESCRIPTION
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `size`
-- Description: (Optional) Size of a reservation, in bytes.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `preferred_tables`
-- Description: (Optional) Preferred tables to use BI capacity for. Structure is [documented below](#nested_preferred_tables).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used. <a name="nested_preferred_tables"></a>The `preferred_tables` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project_id`
-- Description: (Optional) The assigned project ID of the project.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `dataset_id`
-- Description: (Optional) The ID of the dataset in the above project.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `table_id`
-- Description: (Optional) The ID of the table in the above dataset.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### preferred_tables Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `project_id` | The assigned project ID of the project. | false | None | None |
+| `dataset_id` | The ID of the dataset in the above project. | false | None | None |
+| `table_id` | The ID of the table in the above dataset. | false | None | None |

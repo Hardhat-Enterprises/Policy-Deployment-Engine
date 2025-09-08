@@ -6,34 +6,11 @@ Reference: [Terraform Registry – logging_folder_exclusion](https://registry.te
 
 ---
 
-## 1. Argument Reference
-
-### `folder`
-- Description: accepted.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `name`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `disabled`
-- Description: false.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `filter`
-- Description: See [Advanced Log Filters](https://cloud.google.com/logging/docs/view/advanced-filters) for information on how to write a filter.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `folder` | accepted. | none | None | None |
+| `name` |  | none | None | None |
+| `description` |  | none | None | None |
+| `disabled` | false. | none | None | None |
+| `filter` | See [Advanced Log Filters](https://cloud.google.com/logging/docs/view/advanced-filters) for information on how to write a filter. | none | None | None |

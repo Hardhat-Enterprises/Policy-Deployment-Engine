@@ -6,64 +6,22 @@ Reference: [Terraform Registry – network_services_edge_cache_keyset](https://r
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | Name of the resource; provided by the client when the resource is created. The name must be 1-64 characters long, and match the regular expression [a-zA-Z][a-zA-Z0-9_-]* which means the first character must be a letter, and all following characters must be a dash, underscore, letter or digit. | true | None | None |
+| `description` | A human-readable description of the resource. | false | None | None |
+| `labels` | Set of label tags associated with the EdgeCache resource. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |
 
-### `name`
-- Description: (Required) Name of the resource; provided by the client when the resource is created. The name must be 1-64 characters long, and match the regular expression [a-zA-Z][a-zA-Z0-9_-]* which means the first character must be a letter, and all following characters must be a dash, underscore, letter or digit.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### public_key Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `id` | The ID of the public key. The ID must be 1-63 characters long, and comply with RFC1035. The name must be 1-64 characters long, and match the regular expression [a-zA-Z][a-zA-Z0-9_-]* which means the first character must be a letter, and all following characters must be a dash, underscore, letter or digit. | true | None | None |
+| `value` | The base64-encoded value of the Ed25519 public key. The base64 encoding can be padded (44 bytes) or unpadded (43 bytes). Representations or encodings of the public key other than this will be rejected with an error. **Note**: This property is sensitive and will not be displayed in the plan. | false | None | None |
+| `managed` | Set to true to have the CDN automatically manage this public key value. | false | None | None |
 
-### `description`
-- Description: (Optional) A human-readable description of the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `labels`
-- Description: (Optional) Set of label tags associated with the EdgeCache resource. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `public_key`
-- Description: (Optional) An ordered list of Ed25519 public keys to use for validating signed requests. You must specify `public_keys` or `validation_shared_keys` (or both). The keys in `public_keys` are checked first. You may specify no more than one Google-managed public key. If you specify `public_keys`, you must specify at least one (1) key and may specify up to three (3) keys. Ed25519 public keys are not secret, and only allow Google to validate a request was signed by your corresponding private key. Ensure that the private key is kept secret, and that only authorized users can add public keys to a keyset. Structure is [documented below](#nested_public_key).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `validation_shared_keys`
-- Description: (Optional) An ordered list of shared keys to use for validating signed requests. Shared keys are secret.  Ensure that only authorized users can add `validation_shared_keys` to a keyset. You can rotate keys by appending (pushing) a new key to the list of `validation_shared_keys` and removing any superseded keys. You must specify `public_keys` or `validation_shared_keys` (or both). The keys in `public_keys` are checked first. Structure is [documented below](#nested_validation_shared_keys).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used. <a name="nested_public_key"></a>The `public_key` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `id`
-- Description: (Required) The ID of the public key. The ID must be 1-63 characters long, and comply with RFC1035. The name must be 1-64 characters long, and match the regular expression [a-zA-Z][a-zA-Z0-9_-]* which means the first character must be a letter, and all following characters must be a dash, underscore, letter or digit.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `value`
-- Description: (Optional) The base64-encoded value of the Ed25519 public key. The base64 encoding can be padded (44 bytes) or unpadded (43 bytes). Representations or encodings of the public key other than this will be rejected with an error. **Note**: This property is sensitive and will not be displayed in the plan.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `managed`
-- Description: (Optional) Set to true to have the CDN automatically manage this public key value. <a name="nested_validation_shared_keys"></a>The `validation_shared_keys` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `secret_version`
-- Description: (Required) The name of the secret version in Secret Manager. The resource name of the secret version must be in the format `projects/*/secrets/*/versions/*` where the `*` values are replaced by the secrets themselves. The secrets must be at least 16 bytes large.  The recommended secret size depends on the signature algorithm you are using. * If you are using HMAC-SHA1, we suggest 20-byte secrets. * If you are using HMAC-SHA256, we suggest 32-byte secrets. See RFC 2104, Section 3 for more details on these recommendations.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### validation_shared_keys Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `secret_version` | The name of the secret version in Secret Manager. The resource name of the secret version must be in the format `projects/*/secrets/*/versions/*` where the `*` values are replaced by the secrets themselves. The secrets must be at least 16 bytes large.  The recommended secret size depends on the signature algorithm you are using. * If you are using HMAC-SHA1, we suggest 20-byte secrets. * If you are using HMAC-SHA256, we suggest 32-byte secrets. See RFC 2104, Section 3 for more details on these recommendations. | true | None | None |

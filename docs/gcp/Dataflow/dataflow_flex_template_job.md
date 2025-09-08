@@ -6,166 +6,33 @@ Reference: [Terraform Registry – dataflow_flex_template_job](https://registry.
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `container_spec_gcs_path`
-- Description: Template. - - -
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `additional_experiments`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `additional_pipeline_options`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `autoscaling_algorithm`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `parameters`
-- Description: case-sensitive based on the language on which the pipeline is coded, mostly Java. **Note**: do not configure Dataflow options here in parameters.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `enable_streaming_engine`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `ip_configuration`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `kms_key_name`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `labels`
-- Description: should follow the restrictions specified in the [labeling restrictions](https://cloud.google.com/compute/docs/labeling-resources#restrictions) page. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `terraform_labels`
-- Description: The combination of labels configured directly on the resource and default labels configured on the provider.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `effective_labels`
-- Description: All of labels (key/value pairs) present on the resource in GCP, including the labels configured through Terraform, other clients and services.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `launcher_machine_type`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `machine_type`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `max_workers`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `network`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `num_workers`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `on_delete`
-- Description: deletion during `terraform destroy`.  See above note.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `region`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `sdk_container_image`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `service_account_email`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `skip_wait_on_job_termination`
-- Description: treat `DRAINING` and `CANCELLING` as terminal states when deleting the resource, and will remove the resource from terraform state and move on.  See above note.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `staging_location`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `subnetwork`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `temp_location`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `transform_name_mapping`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` |  | none | None | None |
+| `container_spec_gcs_path` | Template. - - - | none | None | None |
+| `additional_experiments` |  | none | None | None |
+| `additional_pipeline_options` |  | none | None | None |
+| `autoscaling_algorithm` |  | none | None | None |
+| `parameters` | case-sensitive based on the language on which the pipeline is coded, mostly Java. **Note**: do not configure Dataflow options here in parameters. | none | None | None |
+| `enable_streaming_engine` |  | none | None | None |
+| `ip_configuration` |  | none | None | None |
+| `kms_key_name` |  | none | None | None |
+| `labels` | should follow the restrictions specified in the [labeling restrictions](https://cloud.google.com/compute/docs/labeling-resources#restrictions) page. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | none | None | None |
+| `terraform_labels` | The combination of labels configured directly on the resource and default labels configured on the provider. | none | None | None |
+| `effective_labels` | All of labels (key/value pairs) present on the resource in GCP, including the labels configured through Terraform, other clients and services. | none | None | None |
+| `launcher_machine_type` |  | none | None | None |
+| `machine_type` |  | none | None | None |
+| `max_workers` |  | none | None | None |
+| `network` |  | none | None | None |
+| `num_workers` |  | none | None | None |
+| `on_delete` | deletion during `terraform destroy`.  See above note. | none | None | None |
+| `project` | provided, the provider project is used. | none | None | None |
+| `region` |  | none | None | None |
+| `sdk_container_image` |  | none | None | None |
+| `service_account_email` |  | none | None | None |
+| `skip_wait_on_job_termination` | treat `DRAINING` and `CANCELLING` as terminal states when deleting the resource, and will remove the resource from terraform state and move on.  See above note. | none | None | None |
+| `staging_location` |  | none | None | None |
+| `subnetwork` |  | none | None | None |
+| `temp_location` |  | none | None | None |
+| `transform_name_mapping` |  | none | None | None |

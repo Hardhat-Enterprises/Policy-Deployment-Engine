@@ -6,34 +6,11 @@ Reference: [Terraform Registry – logging_log_scope](https://registry.terraform
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: (Required) The resource name of the log scope. For example: \`projects/my-project/locations/global/logScopes/my-log-scope\`
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `resource_names`
-- Description: (Required) Names of one or more parent resources : *  \`projects/[PROJECT_ID]\` May alternatively be one or more views : * \`projects/[PROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID]\` A log scope can include a maximum of 50 projects and a maximum of 100 resources in total.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: (Optional) Describes this log scopes.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `parent`
-- Description: (Optional) The parent of the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Optional) The location of the resource. The only supported location is global so far.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | The resource name of the log scope. For example: \`projects/my-project/locations/global/logScopes/my-log-scope\` | true | None | None |
+| `resource_names` | Names of one or more parent resources : *  \`projects/[PROJECT_ID]\` May alternatively be one or more views : * \`projects/[PROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID]\` A log scope can include a maximum of 50 projects and a maximum of 100 resources in total. | true | None | None |
+| `description` | Describes this log scopes. | false | None | None |
+| `parent` | The parent of the resource. | false | None | None |
+| `location` | The location of the resource. The only supported location is global so far. | false | None | None |

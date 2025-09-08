@@ -6,22 +6,9 @@ Reference: [Terraform Registry – compute_shared_vpc_service_project](https://r
 
 ---
 
-## 1. Argument Reference
-
-### `host_project`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `service_project`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `deletion_policy`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `host_project` |  | none | None | None |
+| `service_project` |  | none | None | None |
+| `deletion_policy` |  | none | None | None |

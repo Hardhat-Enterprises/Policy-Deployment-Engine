@@ -6,40 +6,12 @@ Reference: [Terraform Registry – network_security_intercept_endpoint_group](ht
 
 ---
 
-## 1. Argument Reference
-
-### `intercept_deployment_group`
-- Description: (Required) The deployment group that this endpoint group is connected to, for example: `projects/123456789/locations/global/interceptDeploymentGroups/my-dg`. See https://google.aip.dev/124.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Required) The cloud location of the endpoint group, currently restricted to `global`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `intercept_endpoint_group_id`
-- Description: (Required) The ID to use for the endpoint group, which will become the final component of the endpoint group's resource name.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `labels`
-- Description: (Optional) Labels are key/value pairs that help to organize and filter resources. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: (Optional) User-provided description of the endpoint group. Used as additional context for the endpoint group.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `intercept_deployment_group` | The deployment group that this endpoint group is connected to, for example: `projects/123456789/locations/global/interceptDeploymentGroups/my-dg`. See https://google.aip.dev/124. | true | None | None |
+| `location` | The cloud location of the endpoint group, currently restricted to `global`. | true | None | None |
+| `intercept_endpoint_group_id` | The ID to use for the endpoint group, which will become the final component of the endpoint group's resource name. | true | None | None |
+| `labels` | Labels are key/value pairs that help to organize and filter resources. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | None | None |
+| `description` | User-provided description of the endpoint group. Used as additional context for the endpoint group. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

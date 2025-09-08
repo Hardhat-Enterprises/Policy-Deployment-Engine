@@ -6,34 +6,11 @@ Reference: [Terraform Registry – compute_network_edge_security_service](https:
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: (Required) Name of the resource. Provided by the client when the resource is created.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: (Optional) Free-text description of the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `security_policy`
-- Description: (Optional) The resource URL for the network edge security service associated with this network edge security service.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `region`
-- Description: (Optional) The region of the gateway security policy.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | Name of the resource. Provided by the client when the resource is created. | true | None | None |
+| `description` | Free-text description of the resource. | false | None | None |
+| `security_policy` | The resource URL for the network edge security service associated with this network edge security service. | false | None | None |
+| `region` | The region of the gateway security policy. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

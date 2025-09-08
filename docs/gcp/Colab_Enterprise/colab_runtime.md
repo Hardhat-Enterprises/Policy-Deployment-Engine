@@ -6,64 +6,19 @@ Reference: [Terraform Registry – colab_runtime](https://registry.terraform.io/
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `runtime_user` | The user email of the NotebookRuntime. | true | None | None |
+| `display_name` | Required. The display name of the Runtime. | true | None | None |
+| `location` | The location for the resource: https://cloud.google.com/colab/docs/locations | true | None | None |
+| `description` | The description of the Runtime. | false | None | None |
+| `name` | The resource name of the Runtime | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |
+| `desired_state` |  | none | None | None |
+| `auto_upgrade` |  | none | None | None |
 
-### `runtime_user`
-- Description: (Required) The user email of the NotebookRuntime.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `display_name`
-- Description: (Required) Required. The display name of the Runtime.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Required) The location for the resource: https://cloud.google.com/colab/docs/locations
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `notebook_runtime_template_ref`
-- Description: (Optional) 'Runtime specific information used for NotebookRuntime creation.' Structure is [documented below](#nested_notebook_runtime_template_ref).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: (Optional) The description of the Runtime.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `name`
-- Description: (Optional) The resource name of the Runtime
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `desired_state`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `auto_upgrade`
-- Description: <a name="nested_notebook_runtime_template_ref"></a>The `notebook_runtime_template_ref` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `notebook_runtime_template`
-- Description: (Required) The resource name of the NotebookRuntimeTemplate based on which a NotebookRuntime will be created.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### notebook_runtime_template_ref Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `notebook_runtime_template` | The resource name of the NotebookRuntimeTemplate based on which a NotebookRuntime will be created. | true | None | None |

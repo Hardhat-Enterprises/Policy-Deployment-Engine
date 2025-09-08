@@ -6,88 +6,31 @@ Reference: [Terraform Registry – redis_cluster_user_created_connections](https
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | The name of the Redis cluster these endpoints should be added to. | true | None | None |
+| `region` | The name of the region of the Redis cluster these endpoints should be added to. | true | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |
 
-### `name`
-- Description: (Required) The name of the Redis cluster these endpoints should be added to.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### cluster_endpoints Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `connections` | Structure is [documented below](#nested_cluster_endpoints_cluster_endpoints_connections). | false | None | None |
 
-### `region`
-- Description: (Required) The name of the region of the Redis cluster these endpoints should be added to.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### connections Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `psc_connection` | Detailed information of a PSC connection that is created by the customer who owns the cluster. Structure is [documented below](#nested_cluster_endpoints_cluster_endpoints_connections_connections_psc_connection). | false | None | None |
 
-### `cluster_endpoints`
-- Description: (Optional) A list of cluster endpoints Structure is [documented below](#nested_cluster_endpoints).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used. <a name="nested_cluster_endpoints"></a>The `cluster_endpoints` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `connections`
-- Description: (Optional) Structure is [documented below](#nested_cluster_endpoints_cluster_endpoints_connections). <a name="nested_cluster_endpoints_cluster_endpoints_connections"></a>The `connections` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `psc_connection`
-- Description: (Optional) Detailed information of a PSC connection that is created by the customer who owns the cluster. Structure is [documented below](#nested_cluster_endpoints_cluster_endpoints_connections_connections_psc_connection). <a name="nested_cluster_endpoints_cluster_endpoints_connections_connections_psc_connection"></a>The `psc_connection` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `psc_connection_id`
-- Description: (Required) The PSC connection id of the forwarding rule connected to the service attachment.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `address`
-- Description: (Required) The IP allocated on the consumer network for the PSC forwarding rule.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `forwarding_rule`
-- Description: (Required) The URI of the consumer side forwarding rule. Format: projects/{project}/regions/{region}/forwardingRules/{forwarding_rule}
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project_id`
-- Description: (Optional) The consumer project_id where the forwarding rule is created from.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `network`
-- Description: (Required) The consumer network where the IP address resides, in the form of projects/{project_id}/global/networks/{network_id}.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `service_attachment`
-- Description: (Required) The service attachment which is the target of the PSC connection, in the form of projects/{project-id}/regions/{region}/serviceAttachments/{service-attachment-id}.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `psc_connection_status`
-- Description: (Output) Output Only. The status of the PSC connection: whether a connection exists and ACTIVE or it no longer exists. Possible values: ACTIVE NOT_FOUND
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `connection_type`
-- Description: (Output) Output Only. Type of a PSC Connection. Possible values: CONNECTION_TYPE_DISCOVERY CONNECTION_TYPE_PRIMARY CONNECTION_TYPE_READER
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### psc_connection Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `psc_connection_id` | The PSC connection id of the forwarding rule connected to the service attachment. | true | None | None |
+| `address` | The IP allocated on the consumer network for the PSC forwarding rule. | true | None | None |
+| `forwarding_rule` | The URI of the consumer side forwarding rule. Format: projects/{project}/regions/{region}/forwardingRules/{forwarding_rule} | true | None | None |
+| `project_id` | The consumer project_id where the forwarding rule is created from. | false | None | None |
+| `network` | The consumer network where the IP address resides, in the form of projects/{project_id}/global/networks/{network_id}. | true | None | None |
+| `service_attachment` | The service attachment which is the target of the PSC connection, in the form of projects/{project-id}/regions/{region}/serviceAttachments/{service-attachment-id}. | true | None | None |
+| `psc_connection_status` | (Output) Output Only. The status of the PSC connection: whether a connection exists and ACTIVE or it no longer exists. Possible values: ACTIVE NOT_FOUND | none | None | None |
+| `connection_type` | (Output) Output Only. Type of a PSC Connection. Possible values: CONNECTION_TYPE_DISCOVERY CONNECTION_TYPE_PRIMARY CONNECTION_TYPE_READER | none | None | None |

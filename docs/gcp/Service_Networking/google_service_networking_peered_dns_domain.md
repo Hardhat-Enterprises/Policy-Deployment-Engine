@@ -6,34 +6,11 @@ Reference: [Terraform Registry – google_service_networking_peered_dns_domain](
 
 ---
 
-## 1. Argument Reference
-
-### `project`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `name`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `network`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `dns_suffix`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `service`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `project` |  | none | None | None |
+| `name` |  | none | None | None |
+| `network` |  | none | None | None |
+| `dns_suffix` |  | none | None | None |
+| `service` |  | none | None | None |

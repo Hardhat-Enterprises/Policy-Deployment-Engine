@@ -6,34 +6,11 @@ Reference: [Terraform Registry – apigee_security_monitoring_condition](https:/
 
 ---
 
-## 1. Argument Reference
-
-### `profile`
-- Description: (Required) ID of security profile of the security monitoring condition.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `scope`
-- Description: (Required) ID of security profile of the security monitoring condition.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `org_id`
-- Description: (Required) The Apigee Organization associated with the Apigee Security Monitoring Condition, in the format `organizations/{{org_name}}`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `condition_id`
-- Description: (Required) Resource ID of the security monitoring condition.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `include_all_resources`
-- Description: (Optional) A nested object resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `profile` | ID of security profile of the security monitoring condition. | true | None | None |
+| `scope` | ID of security profile of the security monitoring condition. | true | None | None |
+| `org_id` | The Apigee Organization associated with the Apigee Security Monitoring Condition, in the format `organizations/{{org_name}}`. | true | None | None |
+| `condition_id` | Resource ID of the security monitoring condition. | true | None | None |
+| `include_all_resources` | A nested object resource. | false | None | None |

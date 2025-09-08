@@ -6,28 +6,10 @@ Reference: [Terraform Registry – apigee_endpoint_attachment](https://registry.
 
 ---
 
-## 1. Argument Reference
-
-### `location`
-- Description: (Required) Location of the endpoint attachment.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `service_attachment`
-- Description: (Required) Format: projects/*/regions/*/serviceAttachments/*
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `org_id`
-- Description: (Required) The Apigee Organization associated with the Apigee instance, in the format `organizations/{{org_name}}`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `endpoint_attachment_id`
-- Description: (Required) ID of the endpoint attachment.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `location` | Location of the endpoint attachment. | true | None | None |
+| `service_attachment` | Format: projects/*/regions/*/serviceAttachments/* | true | None | None |
+| `org_id` | The Apigee Organization associated with the Apigee instance, in the format `organizations/{{org_name}}`. | true | None | None |
+| `endpoint_attachment_id` | ID of the endpoint attachment. | true | None | None |

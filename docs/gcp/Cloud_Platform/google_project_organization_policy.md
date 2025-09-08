@@ -6,76 +6,27 @@ Reference: [Terraform Registry – google_project_organization_policy](https://r
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `project` |  | none | None | None |
+| `constraint` | - - - | none | None | None |
+| `version` |  | none | None | None |
 
-### `project`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### boolean_policy Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `enforced` |  | none | None | None |
 
-### `constraint`
-- Description: - - -
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### list_policy Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `suggested_value` |  | none | None | None |
+| `inherit_from_parent` | are inherited, meaning the values set in this Policy are added to the values inherited up the hierarchy. The `allow` or `deny` blocks support: | none | None | None |
+| `all` |  | none | None | None |
+| `values` |  | none | None | None |
 
-### `version`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `boolean_policy`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `list_policy`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `restore_policy`
-- Description: ~> **Note:** If none of [`boolean_policy`, `list_policy`, `restore_policy`] are defined the policy for a given constraint will effectively be unset. This is represented in the UI as the constraint being 'Inherited'. - - - <a name="nested_boolean_policy"></a>The `boolean_policy` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `enforced`
-- Description: <a name="nested_list_policy"></a>The `list_policy` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `suggested_value`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `inherit_from_parent`
-- Description: are inherited, meaning the values set in this Policy are added to the values inherited up the hierarchy. The `allow` or `deny` blocks support:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `all`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `values`
-- Description: <a name="nested_restore_policy"></a>The `restore_policy` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `default`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### restore_policy Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `default` |  | none | None | None |

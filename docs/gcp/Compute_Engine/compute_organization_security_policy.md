@@ -6,28 +6,10 @@ Reference: [Terraform Registry – compute_organization_security_policy](https:/
 
 ---
 
-## 1. Argument Reference
-
-### `display_name`
-- Description: (Required) A textual name of the security policy.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `parent`
-- Description: (Required) The parent of this OrganizationSecurityPolicy in the Cloud Resource Hierarchy. Format: organizations/{organization_id} or folders/{folder_id}
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: (Optional) A textual description for the organization security policy.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `type`
-- Description: (Optional) The type indicates the intended use of the security policy. For organization security policies, the only supported type is "FIREWALL". Default value is `FIREWALL`. Possible values are: `FIREWALL`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `display_name` | A textual name of the security policy. | true | None | None |
+| `parent` | The parent of this OrganizationSecurityPolicy in the Cloud Resource Hierarchy. Format: organizations/{organization_id} or folders/{folder_id} | true | None | None |
+| `description` | A textual description for the organization security policy. | false | None | None |
+| `type` | The type indicates the intended use of the security policy. For organization security policies, the only supported type is "FIREWALL". Default value is `FIREWALL`. Possible values are: `FIREWALL`. | false | None | None |

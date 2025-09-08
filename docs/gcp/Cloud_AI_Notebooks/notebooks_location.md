@@ -6,16 +6,8 @@ Reference: [Terraform Registry – notebooks_location](https://registry.terrafor
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: (Optional) Name of the Location resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | Name of the Location resource. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

@@ -6,16 +6,8 @@ Reference: [Terraform Registry – apigee_environment_keyvaluemaps](https://regi
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: (Required) Required. ID of the key value map.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `env_id`
-- Description: (Required) The Apigee environment group associated with the Apigee environment, in the format `organizations/{{org_name}}/environments/{{env_name}}`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | Required. ID of the key value map. | true | None | None |
+| `env_id` | The Apigee environment group associated with the Apigee environment, in the format `organizations/{{org_name}}/environments/{{env_name}}`. | true | None | None |

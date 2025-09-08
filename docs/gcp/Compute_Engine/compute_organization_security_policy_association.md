@@ -6,22 +6,9 @@ Reference: [Terraform Registry – compute_organization_security_policy_associat
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: (Required) The name for an association.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `attachment_id`
-- Description: (Required) The resource that the security policy is attached to.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `policy_id`
-- Description: (Required) The security policy ID of the association.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | The name for an association. | true | None | None |
+| `attachment_id` | The resource that the security policy is attached to. | true | None | None |
+| `policy_id` | The security policy ID of the association. | true | None | None |

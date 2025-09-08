@@ -6,46 +6,13 @@ Reference: [Terraform Registry – apigee_keystores_aliases_key_cert_file](https
 
 ---
 
-## 1. Argument Reference
-
-### `org_id`
-- Description: (Required) Organization ID associated with the alias, without organization/ prefix
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `environment`
-- Description: (Required) Environment associated with the alias
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `keystore`
-- Description: (Required) Keystore Name
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `alias`
-- Description: (Required) Alias Name
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `cert`
-- Description: (Required) Cert content - - -
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `key`
-- Description: (Optional) Private Key content, omit if uploading to truststore
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `password`
-- Description: (Optional) Password for the Private Key if it's encrypted
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `org_id` | Organization ID associated with the alias, without organization/ prefix | true | None | None |
+| `environment` | Environment associated with the alias | true | None | None |
+| `keystore` | Keystore Name | true | None | None |
+| `alias` | Alias Name | true | None | None |
+| `cert` | Cert content - - - | true | None | None |
+| `key` | Private Key content, omit if uploading to truststore | false | None | None |
+| `password` | Password for the Private Key if it's encrypted | false | None | None |

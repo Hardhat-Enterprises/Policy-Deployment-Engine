@@ -6,16 +6,8 @@ Reference: [Terraform Registry – document_ai_processor_default_version](https:
 
 ---
 
-## 1. Argument Reference
-
-### `version`
-- Description: (Required) The version to set. Using `stable` or `rc` will cause the API to return the latest version in that release channel. Apply `lifecycle.ignore_changes` to the `version` field to suppress this diff.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `processor`
-- Description: (Required) The processor to set the version on.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `version` | The version to set. Using `stable` or `rc` will cause the API to return the latest version in that release channel. Apply `lifecycle.ignore_changes` to the `version` field to suppress this diff. | true | None | None |
+| `processor` | The processor to set the version on. | true | None | None |

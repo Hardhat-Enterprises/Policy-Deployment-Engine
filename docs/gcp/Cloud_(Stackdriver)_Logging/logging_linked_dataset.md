@@ -6,34 +6,11 @@ Reference: [Terraform Registry – logging_linked_dataset](https://registry.terr
 
 ---
 
-## 1. Argument Reference
-
-### `link_id`
-- Description: (Required) The id of the linked dataset.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `bucket`
-- Description: (Required) The bucket to which the linked dataset is attached.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: (Optional) Describes this link. The maximum length of the description is 8000 characters.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `parent`
-- Description: (Optional) The parent of the linked dataset.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Optional) The location of the linked dataset.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `link_id` | The id of the linked dataset. | true | None | None |
+| `bucket` | The bucket to which the linked dataset is attached. | true | None | None |
+| `description` | Describes this link. The maximum length of the description is 8000 characters. | false | None | None |
+| `parent` | The parent of the linked dataset. | false | None | None |
+| `location` | The location of the linked dataset. | false | None | None |

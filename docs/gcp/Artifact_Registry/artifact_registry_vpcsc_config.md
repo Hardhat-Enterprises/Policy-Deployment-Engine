@@ -6,22 +6,9 @@ Reference: [Terraform Registry – artifact_registry_vpcsc_config](https://regis
 
 ---
 
-## 1. Argument Reference
-
-### `vpcsc_policy`
-- Description: (Optional) The VPC SC policy for project and location. Possible values are: `DENY`, `ALLOW`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Optional) The name of the location this config is located in.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `vpcsc_policy` | The VPC SC policy for project and location. Possible values are: `DENY`, `ALLOW`. | false | None | None |
+| `location` | The name of the location this config is located in. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

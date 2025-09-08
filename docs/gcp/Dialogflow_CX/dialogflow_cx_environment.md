@@ -6,34 +6,14 @@ Reference: [Terraform Registry – dialogflow_cx_environment](https://registry.t
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `display_name` | The human-readable name of the environment (unique in an agent). Limit of 64 characters. | true | None | None |
+| `description` | The human-readable description of the environment. The maximum length is 500 characters. If exceeded, the request is rejected. | false | None | None |
+| `parent` | The Agent to create an Environment for. Format: projects/<Project ID>/locations/<Location ID>/agents/<Agent ID>. | false | None | None |
 
-### `display_name`
-- Description: (Required) The human-readable name of the environment (unique in an agent). Limit of 64 characters.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `version_configs`
-- Description: (Required) A list of configurations for flow versions. You should include version configs for all flows that are reachable from [Start Flow][Agent.start_flow] in the agent. Otherwise, an error will be returned. Structure is [documented below](#nested_version_configs).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: (Optional) The human-readable description of the environment. The maximum length is 500 characters. If exceeded, the request is rejected.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `parent`
-- Description: (Optional) The Agent to create an Environment for. Format: projects/<Project ID>/locations/<Location ID>/agents/<Agent ID>. <a name="nested_version_configs"></a>The `version_configs` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `version`
-- Description: (Required) Format: projects/{{project}}/locations/{{location}}/agents/{{agent}}/flows/{{flow}}/versions/{{version}}.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### version_configs Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `version` | Format: projects/{{project}}/locations/{{location}}/agents/{{agent}}/flows/{{flow}}/versions/{{version}}. | true | None | None |

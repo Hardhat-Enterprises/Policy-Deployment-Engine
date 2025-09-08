@@ -6,34 +6,11 @@ Reference: [Terraform Registry – logging_organization_exclusion](https://regis
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `org_id`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `disabled`
-- Description: false.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `filter`
-- Description: See [Advanced Log Filters](https://cloud.google.com/logging/docs/view/advanced-filters) for information on how to write a filter.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` |  | none | None | None |
+| `org_id` |  | none | None | None |
+| `description` |  | none | None | None |
+| `disabled` | false. | none | None | None |
+| `filter` | See [Advanced Log Filters](https://cloud.google.com/logging/docs/view/advanced-filters) for information on how to write a filter. | none | None | None |

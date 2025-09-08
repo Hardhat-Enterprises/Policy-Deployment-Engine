@@ -6,480 +6,151 @@ Reference: [Terraform Registry – storage_transfer_job](https://registry.terraf
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `transfer_spec`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `replication_spec`
-- Description: - - -
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `schedule`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `event_stream`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `status`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `notification_config`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `logging_config`
-- Description: <a name="nested_transfer_spec"></a>The `transfer_spec` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `source_agent_pool_name`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `sink_agent_pool_name`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `gcs_data_sink`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `posix_data_sink`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `object_conditions`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `transfer_options`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `gcs_data_source`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `posix_data_source`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `aws_s3_data_source`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `http_data_source`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `azure_blob_storage_data_source`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `hdfs_data_source`
-- Description: <a name="nested_replication_spec"></a>The `replication_spec` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `gcs_data_sink`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `gcs_data_source`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `object_conditions`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `transfer_options`
-- Description: <a name="nested_schedule"></a>The `schedule` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `schedule_start_date`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `schedule_end_date`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `start_time_of_day`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `repeat_interval`
-- Description: <a name="nested_event_stream"></a>The `event_stream` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `name`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `event_stream_start_time`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `event_stream_expiration_time`
-- Description: <a name="nested_object_conditions"></a>The `object_conditions` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `max_time_elapsed_since_last_modification`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `min_time_elapsed_since_last_modification`
-- Description: A duration in seconds with up to nine fractional digits, terminated by 's'. Example: "3.5s".
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `include_prefixes`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `exclude_prefixes`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `last_modified_since`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `last_modified_before`
-- Description: <a name="nested_transfer_options"></a>The `transfer_options` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `overwrite_objects_already_existing_in_sink`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `delete_objects_unique_in_sink`
-- Description: `delete_objects_from_source_after_transfer` are mutually exclusive.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `delete_objects_from_source_after_transfer`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `overwrite_when`
-- Description: <a name="nested_gcs_data_sink"></a>The `gcs_data_sink` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `bucket_name`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `path`
-- Description: <a name="nested_gcs_data_source"></a>The `gcs_data_source` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `bucket_name`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `path`
-- Description: <a name="nested_posix_data_sink"></a>The `posix_data_sink` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `root_directory`
-- Description: <a name="nested_posix_data_source"></a>The `posix_data_source` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `root_directory`
-- Description: <a name="nested_hdfs_data_source"></a>The `hdfs_data_source` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `path`
-- Description: <a name="nested_aws_s3_data_source"></a>The `aws_s3_data_source` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `bucket_name`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `path`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `aws_access_key`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `role_arn`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `managed_private_network`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `cloudfront_domain`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
----
-
-## 2. `aws_access_key` Block
-
-### `access_key_id`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `secret_access_key`
-- Description: <a name="nested_http_data_source"></a>The `http_data_source` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `list_url`
-- Description: <a name="nested_azure_blob_storage_data_source"></a>The `azure_blob_storage_data_source` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `storage_account`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `container`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `path`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `credentials_secret`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `azure_credentials`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
----
-
-## 2. `azure_credentials` Block
-
-### `sas_token`
-- Description: <a name="nested_schedule_start_end_date"></a>The `schedule_start_date` and `schedule_end_date` blocks support:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `year`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `month`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `day`
-- Description: <a name="nested_start_time_of_day"></a>The `start_time_of_day` blocks support:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `hours`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `minutes`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `seconds`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `nanos`
-- Description: <a name="nested_notification_config"></a>The `notification_config` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `pubsub_topic`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `event_types`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `payload_format`
-- Description: <a name="nested_logging_config"></a>The `loggin_config` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `log_actions`
-- Description: Each action may be one of `FIND`, `DELETE`, and `COPY`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `log_action_states`
-- Description: Each action state may be one of `SUCCEEDED`, and `FAILED`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `enable_on_prem_gcs_transfer`
-- Description: Defaults to false.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` |  | none | None | None |
+| `description` |  | none | None | None |
+| `project` | is not provided, the provider project is used. | none | None | None |
+| `status` |  | none | None | None |
+| `logging_config` |  | none | None | None |
+
+### transfer_spec Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `source_agent_pool_name` |  | none | None | None |
+| `sink_agent_pool_name` |  | none | None | None |
+| `gcs_data_sink` |  | none | None | None |
+| `posix_data_sink` |  | none | None | None |
+| `object_conditions` |  | none | None | None |
+| `transfer_options` |  | none | None | None |
+| `gcs_data_source` |  | none | None | None |
+| `posix_data_source` |  | none | None | None |
+| `aws_s3_data_source` |  | none | None | None |
+| `http_data_source` |  | none | None | None |
+| `azure_blob_storage_data_source` |  | none | None | None |
+| `hdfs_data_source` |  | none | None | None |
+
+### replication_spec Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `gcs_data_sink` |  | none | None | None |
+| `gcs_data_source` |  | none | None | None |
+| `object_conditions` |  | none | None | None |
+| `transfer_options` |  | none | None | None |
+
+### schedule Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `schedule_start_date` |  | none | None | None |
+| `schedule_end_date` |  | none | None | None |
+| `start_time_of_day` |  | none | None | None |
+| `repeat_interval` |  | none | None | None |
+
+### event_stream Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` |  | none | None | None |
+| `event_stream_start_time` |  | none | None | None |
+| `event_stream_expiration_time` |  | none | None | None |
+
+### notification_config Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `pubsub_topic` |  | none | None | None |
+| `event_types` |  | none | None | None |
+| `payload_format` |  | none | None | None |
+
+### object_conditions Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `max_time_elapsed_since_last_modification` |  | none | None | None |
+| `min_time_elapsed_since_last_modification` | A duration in seconds with up to nine fractional digits, terminated by 's'. Example: "3.5s". | none | None | None |
+| `include_prefixes` |  | none | None | None |
+| `exclude_prefixes` |  | none | None | None |
+| `last_modified_since` |  | none | None | None |
+| `last_modified_before` |  | none | None | None |
+
+### transfer_options Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `overwrite_objects_already_existing_in_sink` |  | none | None | None |
+| `delete_objects_unique_in_sink` | `delete_objects_from_source_after_transfer` are mutually exclusive. | none | None | None |
+| `delete_objects_from_source_after_transfer` |  | none | None | None |
+| `overwrite_when` |  | none | None | None |
+
+### gcs_data_sink Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `bucket_name` |  | none | None | None |
+| `path` |  | none | None | None |
+
+### gcs_data_source Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `bucket_name` |  | none | None | None |
+| `path` |  | none | None | None |
+
+### posix_data_sink Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `root_directory` |  | none | None | None |
+
+### posix_data_source Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `root_directory` |  | none | None | None |
+
+### hdfs_data_source Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `path` |  | none | None | None |
+
+### aws_s3_data_source Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `bucket_name` |  | none | None | None |
+| `path` |  | none | None | None |
+| `aws_access_key` |  | none | None | None |
+| `role_arn` |  | none | None | None |
+| `managed_private_network` |  | none | None | None |
+| `cloudfront_domain` |  | none | None | None |
+
+### aws_access_key Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `access_key_id` |  | none | None | None |
+| `secret_access_key` |  | none | None | None |
+
+### http_data_source Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `list_url` |  | none | None | None |
+
+### azure_blob_storage_data_source Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `storage_account` |  | none | None | None |
+| `container` |  | none | None | None |
+| `path` |  | none | None | None |
+| `credentials_secret` |  | none | None | None |
+| `azure_credentials` |  | none | None | None |
+
+### azure_credentials Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `sas_token` | The `schedule_start_date` and `schedule_end_date` blocks support: | none | None | None |
+| `year` |  | none | None | None |
+| `month` |  | none | None | None |
+| `day` | The `start_time_of_day` blocks support: | none | None | None |
+| `hours` |  | none | None | None |
+| `minutes` |  | none | None | None |
+| `seconds` |  | none | None | None |
+| `nanos` |  | none | None | None |
+
+### loggin_config Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `log_actions` | Each action may be one of `FIND`, `DELETE`, and `COPY`. | none | None | None |
+| `log_action_states` | Each action state may be one of `SUCCEEDED`, and `FAILED`. | none | None | None |
+| `enable_on_prem_gcs_transfer` | Defaults to false. | none | None | None |

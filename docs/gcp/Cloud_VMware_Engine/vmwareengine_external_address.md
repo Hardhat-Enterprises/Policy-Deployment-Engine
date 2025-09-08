@@ -6,28 +6,10 @@ Reference: [Terraform Registry – vmwareengine_external_address](https://regist
 
 ---
 
-## 1. Argument Reference
-
-### `internal_ip`
-- Description: (Required) The internal IP address of a workload VM.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `parent`
-- Description: (Required) The resource name of the private cloud to create a new external address in. Resource names are schemeless URIs that follow the conventions in https://cloud.google.com/apis/design/resource_names. For example: projects/my-project/locations/us-west1-a/privateClouds/my-cloud
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `name`
-- Description: (Required) The ID of the external IP Address.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: (Optional) User-provided description for this resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `internal_ip` | The internal IP address of a workload VM. | true | None | None |
+| `parent` | The resource name of the private cloud to create a new external address in. Resource names are schemeless URIs that follow the conventions in https://cloud.google.com/apis/design/resource_names. For example: projects/my-project/locations/us-west1-a/privateClouds/my-cloud | true | None | None |
+| `name` | The ID of the external IP Address. | true | None | None |
+| `description` | User-provided description for this resource. | false | None | None |

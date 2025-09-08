@@ -6,10 +6,7 @@ Reference: [Terraform Registry – compute_shared_vpc_host_project](https://regi
 
 ---
 
-## 1. Argument Reference
-
-### `project`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `project` |  | none | None | None |

@@ -6,46 +6,13 @@ Reference: [Terraform Registry – gemini_data_sharing_with_google_setting_bindi
 
 ---
 
-## 1. Argument Reference
-
-### `target`
-- Description: (Required) Target of the binding.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `data_sharing_with_google_setting_id`
-- Description: (Required) Resource ID segment making up resource `name`. It identifies the resource within its parent collection as described in https://google.aip.dev/122.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `setting_binding_id`
-- Description: (Required) Required. Id of the setting binding.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `product`
-- Description: (Optional) Product type of the setting binding. Values include GEMINI_IN_BIGQUERY, GEMINI_CLOUD_ASSIST, etc. See [product reference](https://cloud.google.com/gemini/docs/api/reference/rest/v1/projects.locations.dataSharingWithGoogleSettings.settingBindings) for a complete list.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `labels`
-- Description: (Optional) Labels as key value pairs. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Optional) Resource ID segment making up resource `name`. It identifies the resource within its parent collection as described in https://google.aip.dev/122.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `target` | Target of the binding. | true | None | None |
+| `data_sharing_with_google_setting_id` | Resource ID segment making up resource `name`. It identifies the resource within its parent collection as described in https://google.aip.dev/122. | true | None | None |
+| `setting_binding_id` | Required. Id of the setting binding. | true | None | None |
+| `product` | Product type of the setting binding. Values include GEMINI_IN_BIGQUERY, GEMINI_CLOUD_ASSIST, etc. See [product reference](https://cloud.google.com/gemini/docs/api/reference/rest/v1/projects.locations.dataSharingWithGoogleSettings.settingBindings) for a complete list. | false | None | None |
+| `labels` | Labels as key value pairs. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | None | None |
+| `location` | Resource ID segment making up resource `name`. It identifies the resource within its parent collection as described in https://google.aip.dev/122. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

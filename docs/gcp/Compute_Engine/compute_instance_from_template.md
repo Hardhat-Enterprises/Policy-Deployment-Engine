@@ -6,22 +6,9 @@ Reference: [Terraform Registry – compute_instance_from_template](https://regis
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: Changing this forces a new resource to be created.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `source_instance_template`
-- Description: template to create the instance based on. It is recommended to reference instance templates through their unique id (`self_link_unique` attribute). - - -
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `zone`
-- Description: set, the provider zone is used. In addition to these, all arguments from `google_compute_instance` are supported as a way to override the properties in the template. All exported attributes from `google_compute_instance` are likewise exported here. To support removal of Optional/Computed fields in Terraform 0.12 the following fields are marked [Attributes as Blocks](/docs/configuration/attr-as-blocks.html):
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | Changing this forces a new resource to be created. | none | None | None |
+| `source_instance_template` | template to create the instance based on. It is recommended to reference instance templates through their unique id (`self_link_unique` attribute). - - - | none | None | None |
+| `zone` | set, the provider zone is used. In addition to these, all arguments from `google_compute_instance` are supported as a way to override the properties in the template. All exported attributes from `google_compute_instance` are likewise exported here. To support removal of Optional/Computed fields in Terraform 0.12 the following fields are marked [Attributes as Blocks](/docs/configuration/attr-as-blocks.html): * `attached_disk` * `guest_accelerator` * `service_account` * `scratch_disk` * `network_interface.alias_ip_range` * `network_interface.access_config` | none | None | None |

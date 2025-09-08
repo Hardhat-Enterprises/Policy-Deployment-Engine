@@ -6,34 +6,11 @@ Reference: [Terraform Registry – logging_billing_account_exclusion](https://re
 
 ---
 
-## 1. Argument Reference
-
-### `billing_account`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `name`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `disabled`
-- Description: false.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `filter`
-- Description: See [Advanced Log Filters](https://cloud.google.com/logging/docs/view/advanced-filters) for information on how to write a filter.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `billing_account` |  | none | None | None |
+| `name` |  | none | None | None |
+| `description` |  | none | None | None |
+| `disabled` | false. | none | None | None |
+| `filter` | See [Advanced Log Filters](https://cloud.google.com/logging/docs/view/advanced-filters) for information on how to write a filter. | none | None | None |

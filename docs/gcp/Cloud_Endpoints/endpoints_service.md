@@ -6,4 +6,6 @@ Reference: [Terraform Registry – endpoints_service](https://registry.terraform
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|

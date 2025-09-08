@@ -6,28 +6,13 @@ Reference: [Terraform Registry – compute_instance_settings](https://registry.t
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `zone` | A reference to the zone where the machine resides. | true | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |
 
-### `zone`
-- Description: (Required) A reference to the zone where the machine resides.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `metadata`
-- Description: (Optional) The metadata key/value pairs assigned to all the instances in the corresponding scope. Structure is [documented below](#nested_metadata).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used. <a name="nested_metadata"></a>The `metadata` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `items`
-- Description: (Optional) A metadata key/value items map. The total size of all keys and values must be less than 512KB
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### metadata Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `items` | A metadata key/value items map. The total size of all keys and values must be less than 512KB | false | None | None |

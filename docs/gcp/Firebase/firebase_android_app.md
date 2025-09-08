@@ -6,46 +6,13 @@ Reference: [Terraform Registry – firebase_android_app](https://registry.terraf
 
 ---
 
-## 1. Argument Reference
-
-### `display_name`
-- Description: (Required) The user-assigned display name of the AndroidApp.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `package_name`
-- Description: (Required) The canonical package name of the Android app as would appear in the Google Play Developer Console.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `sha1_hashes`
-- Description: (Optional) The SHA1 certificate hashes for the AndroidApp.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `sha256_hashes`
-- Description: (Optional) The SHA256 certificate hashes for the AndroidApp.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `api_key_id`
-- Description: (Optional) The globally unique, Google-assigned identifier (UID) for the Firebase API key associated with the AndroidApp. If apiKeyId is not set during creation, then Firebase automatically associates an apiKeyId with the AndroidApp. This auto-associated key may be an existing valid key or, if no valid key exists, a new one will be provisioned.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `deletion_policy`
-- Description: rather than deleted upon `terraform destroy`. This is useful because the AndroidApp may be serving traffic. Set to `DELETE` to delete the AndroidApp. Defaults to `DELETE`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `display_name` | The user-assigned display name of the AndroidApp. | true | None | None |
+| `package_name` | The canonical package name of the Android app as would appear in the Google Play Developer Console. | true | None | None |
+| `sha1_hashes` | The SHA1 certificate hashes for the AndroidApp. | false | None | None |
+| `sha256_hashes` | The SHA256 certificate hashes for the AndroidApp. | false | None | None |
+| `api_key_id` | The globally unique, Google-assigned identifier (UID) for the Firebase API key associated with the AndroidApp. If apiKeyId is not set during creation, then Firebase automatically associates an apiKeyId with the AndroidApp. This auto-associated key may be an existing valid key or, if no valid key exists, a new one will be provisioned. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |
+| `deletion_policy` | rather than deleted upon `terraform destroy`. This is useful because the AndroidApp may be serving traffic. Set to `DELETE` to delete the AndroidApp. Defaults to `DELETE`. | none | None | None |

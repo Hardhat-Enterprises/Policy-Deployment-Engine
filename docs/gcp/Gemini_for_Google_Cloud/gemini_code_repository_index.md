@@ -6,40 +6,12 @@ Reference: [Terraform Registry – gemini_code_repository_index](https://registr
 
 ---
 
-## 1. Argument Reference
-
-### `location`
-- Description: (Required) The location of the Code Repository Index, for example `us-central1`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `code_repository_index_id`
-- Description: (Required) Required. Id of the Code Repository Index.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `labels`
-- Description: (Optional) Optional. Labels as key value pairs. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `kms_key`
-- Description: (Optional) Optional. Immutable. Customer-managed encryption key name, in the format `projects/*/locations/*/keyRings/*/cryptoKeys/*`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `force_destroy`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `location` | The location of the Code Repository Index, for example `us-central1`. | true | None | None |
+| `code_repository_index_id` | Required. Id of the Code Repository Index. | true | None | None |
+| `labels` | Optional. Labels as key value pairs. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | None | None |
+| `kms_key` | Optional. Immutable. Customer-managed encryption key name, in the format `projects/*/locations/*/keyRings/*/cryptoKeys/*`. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |
+| `force_destroy` |  | none | None | None |

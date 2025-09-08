@@ -6,64 +6,16 @@ Reference: [Terraform Registry – bigtable_table](https://registry.terraform.io
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `instance_name`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `split_keys`
-- Description: !> **Warning:** Modifying the `split_keys` of an existing table will cause Terraform to delete/recreate the entire `google_bigtable_table` resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `column_family`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `deletion_protection`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `change_stream_retention`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `automated_backup_policy`
-- Description: ----- `column_family` supports the following arguments:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `family`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `type`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` |  | none | None | None |
+| `instance_name` |  | none | None | None |
+| `split_keys` | !> **Warning:** Modifying the `split_keys` of an existing table will cause Terraform to delete/recreate the entire `google_bigtable_table` resource. | none | None | None |
+| `column_family` |  | none | None | None |
+| `project` | is not provided, the provider project is used. | none | None | None |
+| `deletion_protection` |  | none | None | None |
+| `change_stream_retention` |  | none | None | None |
+| `automated_backup_policy` | ----- `column_family` supports the following arguments: | none | None | None |
+| `family` |  | none | None | None |
+| `type` |  | none | None | None |

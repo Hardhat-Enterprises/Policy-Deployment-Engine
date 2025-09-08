@@ -6,16 +6,8 @@ Reference: [Terraform Registry – apigee_envgroup_attachment](https://registry.
 
 ---
 
-## 1. Argument Reference
-
-### `environment`
-- Description: (Required) The resource ID of the environment.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `envgroup_id`
-- Description: (Required) The Apigee environment group associated with the Apigee environment, in the format `organizations/{{org_name}}/envgroups/{{envgroup_name}}`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `environment` | The resource ID of the environment. | true | None | None |
+| `envgroup_id` | The Apigee environment group associated with the Apigee environment, in the format `organizations/{{org_name}}/envgroups/{{envgroup_name}}`. | true | None | None |

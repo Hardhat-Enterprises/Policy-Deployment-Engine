@@ -6,64 +6,23 @@ Reference: [Terraform Registry – biglake_table](https://registry.terraform.io/
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | Output only. The name of the Table. Format: projects/{project_id_or_number}/locations/{locationId}/catalogs/{catalogId}/databases/{databaseId}/tables/{tableId} | true | None | None |
+| `type` | The database type. Possible values are: `HIVE`. | false | None | None |
+| `database` | The id of the parent database. | false | None | None |
 
-### `name`
-- Description: (Required) Output only. The name of the Table. Format: projects/{project_id_or_number}/locations/{locationId}/catalogs/{catalogId}/databases/{databaseId}/tables/{tableId}
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### hive_options Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `parameters` | Stores user supplied Hive table parameters. An object containing a list of "key": value pairs. Example: { "name": "wrench", "mass": "1.3kg", "count": "3" }. | false | None | None |
+| `table_type` | Hive table type. For example, MANAGED_TABLE, EXTERNAL_TABLE. | false | None | None |
+| `storage_descriptor` | Stores physical storage information on the data. Structure is [documented below](#nested_hive_options_storage_descriptor). | false | None | None |
 
-### `type`
-- Description: (Optional) The database type. Possible values are: `HIVE`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `hive_options`
-- Description: (Optional) Options of a Hive table. Structure is [documented below](#nested_hive_options).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `database`
-- Description: (Optional) The id of the parent database. <a name="nested_hive_options"></a>The `hive_options` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `parameters`
-- Description: (Optional) Stores user supplied Hive table parameters. An object containing a list of "key": value pairs. Example: { "name": "wrench", "mass": "1.3kg", "count": "3" }.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `table_type`
-- Description: (Optional) Hive table type. For example, MANAGED_TABLE, EXTERNAL_TABLE.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `storage_descriptor`
-- Description: (Optional) Stores physical storage information on the data. Structure is [documented below](#nested_hive_options_storage_descriptor). <a name="nested_hive_options_storage_descriptor"></a>The `storage_descriptor` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location_uri`
-- Description: (Optional) Cloud Storage folder URI where the table data is stored, starting with "gs://".
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `input_format`
-- Description: (Optional) The fully qualified Java class name of the input format.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `output_format`
-- Description: (Optional) The fully qualified Java class name of the output format.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### storage_descriptor Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `location_uri` | Cloud Storage folder URI where the table data is stored, starting with "gs://". | false | None | None |
+| `input_format` | The fully qualified Java class name of the input format. | false | None | None |
+| `output_format` | The fully qualified Java class name of the output format. | false | None | None |

@@ -6,34 +6,11 @@ Reference: [Terraform Registry – compute_instance_group_named_port](https://re
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: (Required) The name for this named port. The name must be 1-63 characters long, and comply with RFC1035.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `port`
-- Description: (Required) The port number, which can be a value between 1 and 65535.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `group`
-- Description: (Required) The name of the instance group.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `zone`
-- Description: (Optional) The zone of the instance group.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | The name for this named port. The name must be 1-63 characters long, and comply with RFC1035. | true | None | None |
+| `port` | The port number, which can be a value between 1 and 65535. | true | None | None |
+| `group` | The name of the instance group. | true | None | None |
+| `zone` | The zone of the instance group. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

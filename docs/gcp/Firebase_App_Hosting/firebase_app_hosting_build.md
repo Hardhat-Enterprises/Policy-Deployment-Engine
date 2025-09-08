@@ -6,136 +6,38 @@ Reference: [Terraform Registry – firebase_app_hosting_build](https://registry.
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `location` | The location of the Backend that this Build applies to | true | None | None |
+| `backend` | The ID of the Backend that this Build applies to | true | None | None |
+| `build_id` | The user-specified ID of the build being created. | true | None | None |
+| `display_name` | Human-readable name. 63 character limit. | false | None | None |
+| `annotations` | Unstructured key value map that may be set by external tools to store and arbitrary metadata. They are not queryable and should be preserved when modifying objects. **Note**: This field is non-authoritative, and will only manage the annotations present in your configuration. Please refer to the field `effective_annotations` for all of the annotations present on the resource. | false | None | None |
+| `labels` | Unstructured key value map that can be used to organize and categorize objects. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |
 
-### `source`
-- Description: (Required) The source for the build. Structure is [documented below](#nested_source).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### source Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `container` | The URI of an Artifact Registry [container image](https://cloud.google.com/artifact-registry/docs/reference/rest/v1/projects.locations.repositories.dockerImages) to use as the build source. Structure is [documented below](#nested_source_container). | false | None | None |
+| `codebase` | A codebase source, representing the state of the codebase that the build will be created at. Structure is [documented below](#nested_source_codebase). | false | None | None |
 
-### `location`
-- Description: (Required) The location of the Backend that this Build applies to
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### container Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `image` | A URI representing a container for the backend to use. | true | None | None |
 
-### `backend`
-- Description: (Required) The ID of the Backend that this Build applies to
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `build_id`
-- Description: (Required) The user-specified ID of the build being created.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `display_name`
-- Description: (Optional) Human-readable name. 63 character limit.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `annotations`
-- Description: (Optional) Unstructured key value map that may be set by external tools to store and arbitrary metadata. They are not queryable and should be preserved when modifying objects. **Note**: This field is non-authoritative, and will only manage the annotations present in your configuration. Please refer to the field `effective_annotations` for all of the annotations present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `labels`
-- Description: (Optional) Unstructured key value map that can be used to organize and categorize objects. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used. <a name="nested_source"></a>The `source` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `container`
-- Description: (Optional) The URI of an Artifact Registry [container image](https://cloud.google.com/artifact-registry/docs/reference/rest/v1/projects.locations.repositories.dockerImages) to use as the build source. Structure is [documented below](#nested_source_container).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `codebase`
-- Description: (Optional) A codebase source, representing the state of the codebase that the build will be created at. Structure is [documented below](#nested_source_codebase). <a name="nested_source_container"></a>The `container` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `image`
-- Description: (Required) A URI representing a container for the backend to use. <a name="nested_source_codebase"></a>The `codebase` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `display_name`
-- Description: (Output) The human-friendly name to use for this Codebase when displaying a build. We use the first eight characters of the SHA-1 hash for GitHub.com.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `hash`
-- Description: (Output) The full SHA-1 hash of a Git commit, if available.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `commit_message`
-- Description: (Output) The message of a codebase change.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `uri`
-- Description: (Output) A URI linking to the codebase on an hosting provider's website. May not be valid if the commit has been rebased or force-pushed out of existence in the linked repository.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `author`
-- Description: (Output) Version control metadata for a user associated with a resolved codebase. Currently assumes a Git user. Structure is [documented below](#nested_source_codebase_author).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `commit_time`
-- Description: (Output) The time the change was made.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `branch`
-- Description: (Optional) The branch in the codebase to build from, using the latest commit.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `commit`
-- Description: (Optional) The commit in the codebase to build from. <a name="nested_source_codebase_author"></a>The `author` block contains:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `display_name`
-- Description: (Output) The 'name' field in a Git user's git.config. Required by Git.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `email`
-- Description: (Output) The 'email' field in a Git user's git.config, if available.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `image_uri`
-- Description: (Output) The URI of an image file associated with the user's account in an external source control provider, if available.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### codebase Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `display_name` | (Output) The 'name' field in a Git user's git.config. Required by Git. | none | None | None |
+| `hash` | (Output) The full SHA-1 hash of a Git commit, if available. | none | None | None |
+| `commit_message` | (Output) The message of a codebase change. | none | None | None |
+| `uri` | (Output) A URI linking to the codebase on an hosting provider's website. May not be valid if the commit has been rebased or force-pushed out of existence in the linked repository. | none | None | None |
+| `author` | (Output) Version control metadata for a user associated with a resolved codebase. Currently assumes a Git user. Structure is [documented below](#nested_source_codebase_author). | none | None | None |
+| `commit_time` | (Output) The time the change was made. | none | None | None |
+| `branch` | The branch in the codebase to build from, using the latest commit. | false | None | None |
+| `commit` | The commit in the codebase to build from. The `author` block contains: | false | None | None |
+| `email` | (Output) The 'email' field in a Git user's git.config, if available. | none | None | None |
+| `image_uri` | (Output) The URI of an image file associated with the user's account in an external source control provider, if available. | none | None | None |

@@ -6,94 +6,27 @@ Reference: [Terraform Registry – logging_organization_sink](https://registry.t
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` |  | none | None | None |
+| `org_id` |  | none | None | None |
+| `destination` | - `storage.googleapis.com/[GCS_BUCKET]` - `bigquery.googleapis.com/projects/[PROJECT_ID]/datasets/[DATASET]` - `pubsub.googleapis.com/projects/[PROJECT_ID]/topics/[TOPIC_ID]` - `logging.googleapis.com/projects/[PROJECT_ID]/locations/global/buckets/[BUCKET_ID]` - `logging.googleapis.com/projects/[PROJECT_ID]` The writer associated with the sink must have access to write to the above resource. | none | None | None |
+| `filter` | See [Advanced Log Filters](https://cloud.google.com/logging/docs/view/advanced_filters) for information on how to write a filter. | none | None | None |
+| `description` |  | none | None | None |
+| `disabled` |  | none | None | None |
+| `include_children` | associated with child projects are also exported; otherwise only logs relating to the provided organization are included. | none | None | None |
+| `intercept_children` | match with sinks in child resources, except _Required sinks. This sink will be visible to child resources when listing sinks. | none | None | None |
 
-### `name`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### bigquery_options Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `use_partitioned_tables` | By default, Logging creates dated tables based on the log entries' timestamps, e.g. syslog_20170523. With partitioned tables the date suffix is no longer present and [special query syntax](https://cloud.google.com/bigquery/docs/querying-partitioned-tables) has to be used instead. In both cases, tables are sharded based on UTC timezone. | none | None | None |
 
-### `org_id`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `destination`
-- Description: - `storage.googleapis.com/[GCS_BUCKET]` - `bigquery.googleapis.com/projects/[PROJECT_ID]/datasets/[DATASET]` - `pubsub.googleapis.com/projects/[PROJECT_ID]/topics/[TOPIC_ID]` - `logging.googleapis.com/projects/[PROJECT_ID]/locations/global/buckets/[BUCKET_ID]` - `logging.googleapis.com/projects/[PROJECT_ID]` The writer associated with the sink must have access to write to the above resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `filter`
-- Description: See [Advanced Log Filters](https://cloud.google.com/logging/docs/view/advanced_filters) for information on how to write a filter.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `disabled`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `include_children`
-- Description: associated with child projects are also exported; otherwise only logs relating to the provided organization are included.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `intercept_children`
-- Description: match with sinks in child resources, except _Required sinks. This sink will be visible to child resources when listing sinks.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `bigquery_options`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `exclusions`
-- Description: <a name="nested_bigquery_options"></a>The `bigquery_options` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `use_partitioned_tables`
-- Description: By default, Logging creates dated tables based on the log entries' timestamps, e.g. syslog_20170523. With partitioned tables the date suffix is no longer present and [special query syntax](https://cloud.google.com/bigquery/docs/querying-partitioned-tables) has to be used instead. In both cases, tables are sharded based on UTC timezone. <a name="nested_exclusions"></a>The `exclusions` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `name`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `filter`
-- Description: write a filter.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `disabled`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### exclusions Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` |  | none | None | None |
+| `description` |  | none | None | None |
+| `filter` | write a filter. | none | None | None |
+| `disabled` |  | none | None | None |

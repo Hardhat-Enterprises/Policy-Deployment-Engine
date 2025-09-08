@@ -6,54 +6,20 @@ Reference: [Terraform Registry – firebaserules_ruleset](https://registry.terra
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
 
-### `source`
-- Description: (Required) `Source` for the `Ruleset`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### source Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `files` | `File` set constituting the `Source` bundle. | true | None | None |
+| `language` | `Language` of the `Source` bundle. If unspecified, the language will default to `FIREBASE_RULES`. Possible values: LANGUAGE_UNSPECIFIED, FIREBASE_RULES, EVENT_FLOW_TRIGGERS - - - | false | None | None |
+| `project` | The project for the resource | false | None | None |
 
----
-
-## 2. `source` Block
-
-### `files`
-- Description: (Required) `File` set constituting the `Source` bundle.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `language`
-- Description: (Optional) `Language` of the `Source` bundle. If unspecified, the language will default to `FIREBASE_RULES`. Possible values: LANGUAGE_UNSPECIFIED, FIREBASE_RULES, EVENT_FLOW_TRIGGERS - - -
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: (Optional) The project for the resource
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
----
-
-## 2. `files` Block
-
-### `content`
-- Description: (Required) Textual Content.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `fingerprint`
-- Description: (Optional) Fingerprint (e.g. github sha) associated with the `File`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `name`
-- Description: (Required) File name.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### files Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `content` | Textual Content. | true | None | None |
+| `fingerprint` | Fingerprint (e.g. github sha) associated with the `File`. | false | None | None |
+| `name` | File name. | true | None | None |

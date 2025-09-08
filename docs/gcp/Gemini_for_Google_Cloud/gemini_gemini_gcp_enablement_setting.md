@@ -6,46 +6,13 @@ Reference: [Terraform Registry – gemini_gemini_gcp_enablement_setting](https:/
 
 ---
 
-## 1. Argument Reference
-
-### `location`
-- Description: (Required) Resource ID segment making up resource `name`. It identifies the resource within its parent collection as described in https://google.aip.dev/122.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `gemini_gcp_enablement_setting_id`
-- Description: (Required) Id of the Gemini Gcp Enablement setting.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `labels`
-- Description: (Optional) Labels as key value pairs. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `enable_customer_data_sharing`
-- Description: (Optional) Whether customer data sharing should be enabled.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `disable_web_grounding`
-- Description: (Optional, Deprecated) Whether web grounding should be disabled. ~> **Warning:** `disable_web_grounding` is deprecated. Use `web_grounding_type` instead.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `web_grounding_type`
-- Description: (Optional) Web grounding type. Possible values: GROUNDING_WITH_GOOGLE_SEARCH WEB_GROUNDING_FOR_ENTERPRISE
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `location` | Resource ID segment making up resource `name`. It identifies the resource within its parent collection as described in https://google.aip.dev/122. | true | None | None |
+| `gemini_gcp_enablement_setting_id` | Id of the Gemini Gcp Enablement setting. | true | None | None |
+| `labels` | Labels as key value pairs. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | None | None |
+| `enable_customer_data_sharing` | Whether customer data sharing should be enabled. | false | None | None |
+| `disable_web_grounding` | , Deprecated) Whether web grounding should be disabled. ~> **Warning:** `disable_web_grounding` is deprecated. Use `web_grounding_type` instead. | false | None | None |
+| `web_grounding_type` | Web grounding type. Possible values: GROUNDING_WITH_GOOGLE_SEARCH WEB_GROUNDING_FOR_ENTERPRISE | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

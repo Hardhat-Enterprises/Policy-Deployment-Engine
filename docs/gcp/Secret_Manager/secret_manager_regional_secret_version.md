@@ -6,34 +6,11 @@ Reference: [Terraform Registry – secret_manager_regional_secret_version](https
 
 ---
 
-## 1. Argument Reference
-
-### `secret_data`
-- Description: (Required) The secret data. Must be no larger than 64KiB. **Note**: This property is sensitive and will not be displayed in the plan.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `secret`
-- Description: (Required) Secret Manager regional secret resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `enabled`
-- Description: (Optional) The current state of the regional secret version.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `deletion_policy`
-- Description: to be abandoned rather than deleted. Setting `DISABLE` allows the resource to be disabled rather than deleted. Default is `DELETE`. Possible values are: * DELETE * DISABLE * ABANDON
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `is_secret_data_base64`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `secret_data` | The secret data. Must be no larger than 64KiB. **Note**: This property is sensitive and will not be displayed in the plan. | true | None | None |
+| `secret` | Secret Manager regional secret resource. | true | None | None |
+| `enabled` | The current state of the regional secret version. | false | None | None |
+| `deletion_policy` | to be abandoned rather than deleted. Setting `DISABLE` allows the resource to be disabled rather than deleted. Default is `DELETE`. Possible values are: * DELETE * DISABLE * ABANDON | none | None | None |
+| `is_secret_data_base64` |  | none | None | None |

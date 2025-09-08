@@ -6,16 +6,8 @@ Reference: [Terraform Registry – firebase_storage_bucket](https://registry.ter
 
 ---
 
-## 1. Argument Reference
-
-### `bucket_id`
-- Description: (Optional) Required. Immutable. The ID of the underlying Google Cloud Storage bucket
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `bucket_id` | Required. Immutable. The ID of the underlying Google Cloud Storage bucket | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

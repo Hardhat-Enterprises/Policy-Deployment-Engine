@@ -6,28 +6,10 @@ Reference: [Terraform Registry – certificate_manager_certificate_map](https://
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: (Required) A user-defined name of the Certificate Map. Certificate Map names must be unique globally and match the pattern `projects/*/locations/*/certificateMaps/*`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: (Optional) A human-readable description of the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `labels`
-- Description: (Optional) Set of labels associated with a Certificate Map resource. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | A user-defined name of the Certificate Map. Certificate Map names must be unique globally and match the pattern `projects/*/locations/*/certificateMaps/*`. | true | None | None |
+| `description` | A human-readable description of the resource. | false | None | None |
+| `labels` | Set of labels associated with a Certificate Map resource. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

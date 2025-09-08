@@ -6,16 +6,8 @@ Reference: [Terraform Registry – compute_project_cloud_armor_tier](https://reg
 
 ---
 
-## 1. Argument Reference
-
-### `cloud_armor_tier`
-- Description: (Required) Managed protection tier to be set. Possible values are: `CA_STANDARD`, `CA_ENTERPRISE_PAYGO`, `CA_ENTERPRISE_ANNUAL`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `cloud_armor_tier` | Managed protection tier to be set. Possible values are: `CA_STANDARD`, `CA_ENTERPRISE_PAYGO`, `CA_ENTERPRISE_ANNUAL`. | true | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

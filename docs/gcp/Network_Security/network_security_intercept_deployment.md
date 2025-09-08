@@ -6,46 +6,13 @@ Reference: [Terraform Registry – network_security_intercept_deployment](https:
 
 ---
 
-## 1. Argument Reference
-
-### `forwarding_rule`
-- Description: (Required) The regional forwarding rule that fronts the interceptors, for example: `projects/123456789/regions/us-central1/forwardingRules/my-rule`. See https://google.aip.dev/124.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `intercept_deployment_group`
-- Description: (Required) The deployment group that this deployment is a part of, for example: `projects/123456789/locations/global/interceptDeploymentGroups/my-dg`. See https://google.aip.dev/124.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Required) The cloud location of the deployment, e.g. `us-central1-a` or `asia-south1-b`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `intercept_deployment_id`
-- Description: (Required) The ID to use for the new deployment, which will become the final component of the deployment's resource name.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `labels`
-- Description: (Optional) Labels are key/value pairs that help to organize and filter resources. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: (Optional) User-provided description of the deployment. Used as additional context for the deployment.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `forwarding_rule` | The regional forwarding rule that fronts the interceptors, for example: `projects/123456789/regions/us-central1/forwardingRules/my-rule`. See https://google.aip.dev/124. | true | None | None |
+| `intercept_deployment_group` | The deployment group that this deployment is a part of, for example: `projects/123456789/locations/global/interceptDeploymentGroups/my-dg`. See https://google.aip.dev/124. | true | None | None |
+| `location` | The cloud location of the deployment, e.g. `us-central1-a` or `asia-south1-b`. | true | None | None |
+| `intercept_deployment_id` | The ID to use for the new deployment, which will become the final component of the deployment's resource name. | true | None | None |
+| `labels` | Labels are key/value pairs that help to organize and filter resources. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | None | None |
+| `description` | User-provided description of the deployment. Used as additional context for the deployment. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

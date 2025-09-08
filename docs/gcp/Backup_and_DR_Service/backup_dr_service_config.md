@@ -6,22 +6,9 @@ Reference: [Terraform Registry – backup_dr_service_config](https://registry.te
 
 ---
 
-## 1. Argument Reference
-
-### `resource_type`
-- Description: (Required) The resource type to which the default service config will be applied.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Required) The location in which the Service config is to be initialized.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `resource_type` | The resource type to which the default service config will be applied. | true | None | None |
+| `location` | The location in which the Service config is to be initialized. | true | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

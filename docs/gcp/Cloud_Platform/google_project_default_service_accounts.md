@@ -6,4 +6,6 @@ Reference: [Terraform Registry – google_project_default_service_accounts](http
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|

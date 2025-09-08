@@ -6,16 +6,8 @@ Reference: [Terraform Registry – kms_autokey_config](https://registry.terrafor
 
 ---
 
-## 1. Argument Reference
-
-### `folder`
-- Description: (Required) The folder for which to retrieve config.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `key_project`
-- Description: (Optional) The target key project for a given folder where KMS Autokey will provision a CryptoKey for any new KeyHandle the Developer creates. Should have the form `projects/<project_id_or_number>`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `folder` | The folder for which to retrieve config. | true | None | None |
+| `key_project` | The target key project for a given folder where KMS Autokey will provision a CryptoKey for any new KeyHandle the Developer creates. Should have the form `projects/<project_id_or_number>`. | false | None | None |

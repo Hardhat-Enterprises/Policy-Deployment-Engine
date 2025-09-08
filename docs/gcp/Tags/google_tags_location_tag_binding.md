@@ -6,22 +6,9 @@ Reference: [Terraform Registry – google_tags_location_tag_binding](https://reg
 
 ---
 
-## 1. Argument Reference
-
-### `parent`
-- Description: (Required) The full resource name of the resource the TagValue is bound to. E.g. //cloudresourcemanager.googleapis.com/projects/123
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `tag_value`
-- Description: (Required) The TagValue of the TagBinding. Must be of the form tagValues/456.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Required) Location of the target resource. - - -
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `parent` | The full resource name of the resource the TagValue is bound to. E.g. //cloudresourcemanager.googleapis.com/projects/123 | true | None | None |
+| `tag_value` | The TagValue of the TagBinding. Must be of the form tagValues/456. | true | None | None |
+| `location` | Location of the target resource. - - - | true | None | None |

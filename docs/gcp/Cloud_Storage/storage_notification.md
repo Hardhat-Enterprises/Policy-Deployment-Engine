@@ -6,40 +6,12 @@ Reference: [Terraform Registry – storage_notification](https://registry.terraf
 
 ---
 
-## 1. Argument Reference
-
-### `bucket`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `payload_format`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `topic`
-- Description: topic name, assumed to belong to the default GCP provider project, or the project-level name, i.e. `projects/my-gcp-project/topics/my-topic` or `my-topic`. If the project is not set in the provider, you will need to use the project-level name. - - -
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `custom_attributes`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `event_types`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `object_name_prefix`
-- Description: 
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `bucket` |  | none | None | None |
+| `payload_format` |  | none | None | None |
+| `topic` | topic name, assumed to belong to the default GCP provider project, or the project-level name, i.e. `projects/my-gcp-project/topics/my-topic` or `my-topic`. If the project is not set in the provider, you will need to use the project-level name. - - - | none | None | None |
+| `custom_attributes` |  | none | None | None |
+| `event_types` |  | none | None | None |
+| `object_name_prefix` |  | none | None | None |

@@ -6,22 +6,9 @@ Reference: [Terraform Registry – storage_hmac_key](https://registry.terraform.
 
 ---
 
-## 1. Argument Reference
-
-### `service_account_email`
-- Description: (Required) The email address of the key's associated service account.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `state`
-- Description: (Optional) The state of the key. Can be set to one of ACTIVE, INACTIVE. Default value is `ACTIVE`. Possible values are: `ACTIVE`, `INACTIVE`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `service_account_email` | The email address of the key's associated service account. | true | None | None |
+| `state` | The state of the key. Can be set to one of ACTIVE, INACTIVE. Default value is `ACTIVE`. Possible values are: `ACTIVE`, `INACTIVE`. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

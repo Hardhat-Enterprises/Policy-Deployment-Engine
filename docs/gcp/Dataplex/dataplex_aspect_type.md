@@ -6,46 +6,13 @@ Reference: [Terraform Registry – dataplex_aspect_type](https://registry.terraf
 
 ---
 
-## 1. Argument Reference
-
-### `description`
-- Description: (Optional) Description of the AspectType.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `display_name`
-- Description: (Optional) User friendly display name.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `labels`
-- Description: (Optional) User-defined labels for the AspectType. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `metadata_template`
-- Description: (Optional) MetadataTemplate of the Aspect.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Optional) The location where aspect type will be created in.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `aspect_type_id`
-- Description: (Optional) The aspect type id of the aspect type.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `description` | Description of the AspectType. | false | None | None |
+| `display_name` | User friendly display name. | false | None | None |
+| `labels` | User-defined labels for the AspectType. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | None | None |
+| `metadata_template` | MetadataTemplate of the Aspect. | false | None | None |
+| `location` | The location where aspect type will be created in. | false | None | None |
+| `aspect_type_id` | The aspect type id of the aspect type. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

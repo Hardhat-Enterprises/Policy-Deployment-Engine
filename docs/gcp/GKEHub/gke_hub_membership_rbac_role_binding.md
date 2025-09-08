@@ -6,46 +6,16 @@ Reference: [Terraform Registry – gke_hub_membership_rbac_role_binding](https:/
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `membership_rbac_role_binding_id` | The client-provided identifier of the RBAC Role Binding. | true | None | None |
+| `user` | Principal that is be authorized in the cluster (at least of one the oneof is required). Updating one will unset the other automatically. user is the name of the user as seen by the kubernetes cluster, example "alice" or "alice@domain.tld" | true | None | None |
+| `membership_id` | Id of the membership | true | None | None |
+| `location` | Location of the Membership | true | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |
 
-### `membership_rbac_role_binding_id`
-- Description: (Required) The client-provided identifier of the RBAC Role Binding.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `user`
-- Description: (Required) Principal that is be authorized in the cluster (at least of one the oneof is required). Updating one will unset the other automatically. user is the name of the user as seen by the kubernetes cluster, example "alice" or "alice@domain.tld"
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `role`
-- Description: (Required) Role to bind to the principal. Structure is [documented below](#nested_role).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `membership_id`
-- Description: (Required) Id of the membership
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Required) Location of the Membership
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used. <a name="nested_role"></a>The `role` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `predefined_role`
-- Description: (Required) PredefinedRole is an ENUM representation of the default Kubernetes Roles Possible values are: `UNKNOWN`, `ADMIN`, `EDIT`, `VIEW`, `ANTHOS_SUPPORT`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### role Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `predefined_role` | PredefinedRole is an ENUM representation of the default Kubernetes Roles Possible values are: `UNKNOWN`, `ADMIN`, `EDIT`, `VIEW`, `ANTHOS_SUPPORT`. | true | None | None |

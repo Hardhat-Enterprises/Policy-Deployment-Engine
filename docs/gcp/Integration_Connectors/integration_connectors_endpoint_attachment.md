@@ -6,46 +6,13 @@ Reference: [Terraform Registry – integration_connectors_endpoint_attachment](h
 
 ---
 
-## 1. Argument Reference
-
-### `service_attachment`
-- Description: (Required) The path of the service attachment.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Required) Location in which Endpoint Attachment needs to be created.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `name`
-- Description: (Required) Name of Endpoint Attachment needs to be created.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: (Optional) Description of the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `labels`
-- Description: (Optional) Resource labels to represent user provided metadata. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `endpoint_global_access`
-- Description: (Optional) Enable global access for endpoint attachment.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `service_attachment` | The path of the service attachment. | true | None | None |
+| `location` | Location in which Endpoint Attachment needs to be created. | true | None | None |
+| `name` | Name of Endpoint Attachment needs to be created. | true | None | None |
+| `description` | Description of the resource. | false | None | None |
+| `labels` | Resource labels to represent user provided metadata. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | None | None |
+| `endpoint_global_access` | Enable global access for endpoint attachment. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

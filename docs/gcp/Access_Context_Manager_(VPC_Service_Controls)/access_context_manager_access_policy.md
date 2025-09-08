@@ -6,22 +6,9 @@ Reference: [Terraform Registry – access_context_manager_access_policy](https:/
 
 ---
 
-## 1. Argument Reference
-
-### `parent`
-- Description: (Required) The parent of this AccessPolicy in the Cloud Resource Hierarchy. Format: 'organizations/{{organization_id}}'
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `title`
-- Description: (Required) Human readable title. Does not affect behavior.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `scopes`
-- Description: (Optional) Folder or project on which this policy is applicable. Format: 'folders/{{folder_id}}' or 'projects/{{project_number}}'
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `parent` | The parent of this AccessPolicy in the Cloud Resource Hierarchy. Format: 'organizations/{{organization_id}}' | true | None | None |
+| `title` | Human readable title. Does not affect behavior. | true | None | None |
+| `scopes` | Folder or project on which this policy is applicable. Format: 'folders/{{folder_id}}' or 'projects/{{project_number}}' | false | None | None |

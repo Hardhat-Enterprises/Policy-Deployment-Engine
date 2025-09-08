@@ -6,22 +6,9 @@ Reference: [Terraform Registry – apigee_sharedflow](https://registry.terraform
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: (Required) The ID of the shared flow.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `org_id`
-- Description: (Required) The Apigee Organization name associated with the Apigee instance.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `config_bundle`
-- Description: (Required) Path to the config zip bundle. - - -
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | The ID of the shared flow. | true | None | None |
+| `org_id` | The Apigee Organization name associated with the Apigee instance. | true | None | None |
+| `config_bundle` | Path to the config zip bundle. - - - | true | None | None |

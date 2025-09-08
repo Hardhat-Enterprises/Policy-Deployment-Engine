@@ -6,22 +6,9 @@ Reference: [Terraform Registry – vmwareengine_subnet](https://registry.terrafo
 
 ---
 
-## 1. Argument Reference
-
-### `ip_cidr_range`
-- Description: (Required) The IP address range of the subnet in CIDR format.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `parent`
-- Description: (Required) The resource name of the private cloud to create a new subnet in. Resource names are schemeless URIs that follow the conventions in https://cloud.google.com/apis/design/resource_names. For example: projects/my-project/locations/us-west1-a/privateClouds/my-cloud
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `name`
-- Description: (Required) The ID of the subnet. For userDefined subnets, this name should be in the format of "service-n", where n ranges from 1 to 5.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `ip_cidr_range` | The IP address range of the subnet in CIDR format. | true | None | None |
+| `parent` | The resource name of the private cloud to create a new subnet in. Resource names are schemeless URIs that follow the conventions in https://cloud.google.com/apis/design/resource_names. For example: projects/my-project/locations/us-west1-a/privateClouds/my-cloud | true | None | None |
+| `name` | The ID of the subnet. For userDefined subnets, this name should be in the format of "service-n", where n ranges from 1 to 5. | true | None | None |

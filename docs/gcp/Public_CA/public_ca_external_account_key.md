@@ -6,16 +6,8 @@ Reference: [Terraform Registry – public_ca_external_account_key](https://regis
 
 ---
 
-## 1. Argument Reference
-
-### `location`
-- Description: (Optional) Location for the externalAccountKey. Currently only `global` is supported.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `location` | Location for the externalAccountKey. Currently only `global` is supported. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

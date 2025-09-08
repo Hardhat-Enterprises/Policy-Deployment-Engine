@@ -6,22 +6,9 @@ Reference: [Terraform Registry – apigee_nat_address](https://registry.terrafor
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: (Required) Resource ID of the NAT address.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `instance_id`
-- Description: (Required) The Apigee instance associated with the Apigee environment, in the format `organizations/{{org_name}}/instances/{{instance_name}}`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `activate`
-- Description: (Optional) Flag that specifies whether the reserved NAT address should be activate.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | Resource ID of the NAT address. | true | None | None |
+| `instance_id` | The Apigee instance associated with the Apigee environment, in the format `organizations/{{org_name}}/instances/{{instance_name}}`. | true | None | None |
+| `activate` | Flag that specifies whether the reserved NAT address should be activate. | false | None | None |

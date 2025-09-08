@@ -6,28 +6,13 @@ Reference: [Terraform Registry – dialogflow_encryption_spec](https://registry.
 
 ---
 
-## 1. Argument Reference
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `location` | The location in which the encryptionSpec is to be initialized. | true | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |
 
-### `encryption_spec`
-- Description: (Required) A nested object resource. Structure is [documented below](#nested_encryption_spec).
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Required) The location in which the encryptionSpec is to be initialized.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used. <a name="nested_encryption_spec"></a>The `encryption_spec` block supports:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `kms_key`
-- Description: (Required) The name of customer-managed encryption key that is used to secure a resource and its sub-resources. If empty, the resource is secured by the default Google encryption key. Only the key in the same location as this resource is allowed to be used for encryption. Format: projects/{project}/locations/{location}/keyRings/{keyRing}/cryptoKeys/{key}
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+### encryption_spec Block
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `kms_key` | The name of customer-managed encryption key that is used to secure a resource and its sub-resources. If empty, the resource is secured by the default Google encryption key. Only the key in the same location as this resource is allowed to be used for encryption. Format: projects/{project}/locations/{location}/keyRings/{keyRing}/cryptoKeys/{key} | true | None | None |

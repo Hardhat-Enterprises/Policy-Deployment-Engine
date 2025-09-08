@@ -6,16 +6,8 @@ Reference: [Terraform Registry – apigee_instance_attachment](https://registry.
 
 ---
 
-## 1. Argument Reference
-
-### `environment`
-- Description: (Required) The resource ID of the environment.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `instance_id`
-- Description: (Required) The Apigee instance associated with the Apigee environment, in the format `organizations/{{org_name}}/instances/{{instance_name}}`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `environment` | The resource ID of the environment. | true | None | None |
+| `instance_id` | The Apigee instance associated with the Apigee environment, in the format `organizations/{{org_name}}/instances/{{instance_name}}`. | true | None | None |

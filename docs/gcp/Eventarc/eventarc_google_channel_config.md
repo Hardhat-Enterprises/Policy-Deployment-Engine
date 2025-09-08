@@ -6,28 +6,10 @@ Reference: [Terraform Registry – eventarc_google_channel_config](https://regis
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: (Required) Required. The resource name of the config. Must be in the format of, `projects/{project}/locations/{location}/googleChannelConfig`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Required) The location for the resource
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `crypto_key_name`
-- Description: (Optional) Optional. Resource name of a KMS crypto key (managed by the user) used to encrypt/decrypt their event data. It must match the pattern `projects/*/locations/*/keyRings/*/cryptoKeys/*`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | Required. The resource name of the config. Must be in the format of, `projects/{project}/locations/{location}/googleChannelConfig`. | true | None | None |
+| `location` | The location for the resource | true | None | None |
+| `crypto_key_name` | Optional. Resource name of a KMS crypto key (managed by the user) used to encrypt/decrypt their event data. It must match the pattern `projects/*/locations/*/keyRings/*/cryptoKeys/*`. | false | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

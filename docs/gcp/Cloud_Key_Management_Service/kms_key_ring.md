@@ -6,22 +6,9 @@ Reference: [Terraform Registry – kms_key_ring](https://registry.terraform.io/p
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: (Required) The resource name for the KeyRing.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `location`
-- Description: (Required) The location for the KeyRing. A full list of valid locations can be found by running `gcloud kms locations list`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | The resource name for the KeyRing. | true | None | None |
+| `location` | The location for the KeyRing. A full list of valid locations can be found by running `gcloud kms locations list`. | true | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

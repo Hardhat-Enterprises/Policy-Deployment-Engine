@@ -6,16 +6,8 @@ Reference: [Terraform Registry – site_verification_owner](https://registry.ter
 
 ---
 
-## 1. Argument Reference
-
-### `web_resource_id`
-- Description: (Required) The id of of the web resource to which the owner will be added, in the form `webResource/<resource_id>`, such as `webResource/https://www.example.com/`
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `email`
-- Description: (Required) The email of the user to be added as an owner. - - - ## Timeouts This resource provides the following [Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options: - `create` - Default is 20 minutes. - `delete` - Default is 20 minutes. ## Import Owner can be imported using this format:
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `web_resource_id` | The id of of the web resource to which the owner will be added, in the form `webResource/<resource_id>`, such as `webResource/https://www.example.com/` | true | None | None |
+| `email` | The email of the user to be added as an owner. - - - ## Timeouts This resource provides the following [Timeouts](https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/retries-and-customizable-timeouts) configuration options: - `create` - Default is 20 minutes. - `delete` - Default is 20 minutes. ## Import Owner can be imported using this format: * `webResource/{{web_resource_id}}/{{email}}` In Terraform v1.5.0 and later, use an [`import` block](https://developer.hashicorp.com/terraform/language/import) to import a site owner using the format above. For example: ```tf import { id = "webResource/{{web_resource_id}}/{{email}}" to = google_site_verification_web_resource.default } ``` When using the [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import), Site owners can be imported using the format above. For example: ``` $ terraform import google_site_verification_web_resource.default webResource/{{web_resource_id}}/{{email}} ``` ~> **Note:** While verified owners can be successfully imported, attempting to later delete the imported resource will fail. The only way to remove verified owners is to delete the web resource itself. ## User Project Overrides This resource supports [User Project Overrides](https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/provider_reference#user_project_override). | true | None | None |

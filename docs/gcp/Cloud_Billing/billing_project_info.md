@@ -6,16 +6,8 @@ Reference: [Terraform Registry – billing_project_info](https://registry.terraf
 
 ---
 
-## 1. Argument Reference
-
-### `billing_account`
-- Description: (Required) The ID of the billing account associated with the project, if any. Set to empty string to disable billing for the project. For example, `"012345-567890-ABCDEF"` or `""`.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: If it is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `billing_account` | The ID of the billing account associated with the project, if any. Set to empty string to disable billing for the project. For example, `"012345-567890-ABCDEF"` or `""`. | true | None | None |
+| `project` | If it is not provided, the provider project is used. | none | None | None |

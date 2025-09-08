@@ -6,22 +6,9 @@ Reference: [Terraform Registry – runtimeconfig_config](https://registry.terraf
 
 ---
 
-## 1. Argument Reference
-
-### `name`
-- Description: - - -
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `project`
-- Description: is not provided, the provider project is used.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
-
-### `description`
-- Description: config.
-- Required: 
-- Policy Condition?: 
-- Decision / Rationale: 
+## Argument Reference
+| Argument | Description | Mandatory | Security Impact | Rationale |
+|----------|------------|-----------|----------------|-----------|
+| `name` | - - - | none | None | None |
+| `project` | is not provided, the provider project is used. | none | None | None |
+| `description` | config. | none | None | None |
