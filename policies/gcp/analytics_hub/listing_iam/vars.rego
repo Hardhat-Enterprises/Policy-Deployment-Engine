@@ -1,10 +1,10 @@
-package terraform.gcp.analytics_hub.listing_iam
+package terraform.gcp.security.analytics_hub.listing_iam
 
-# Allowed location
-default allowed_locations = ["us"]
-
-# Roles considered too permissive
-default disallowed_roles = ["roles/owner", "roles/editor"]
-
-# Disallowed members
-default disallowed_members = ["allUsers", "allAuthenticatedUsers"]
+variables := {
+    "friendly_resource_name": "BigQuery Analytics Hub Listing IAM",
+    "resource_type": "google_bigquery_analytics_hub_listing_iam_binding",
+    "resource_value_name": "location",
+    "allowed_locations": ["us"],
+    "disallowed_roles": ["roles/owner", "roles/editor"],
+    "disallowed_members": ["allUsers", "allAuthenticatedUsers"]
+}

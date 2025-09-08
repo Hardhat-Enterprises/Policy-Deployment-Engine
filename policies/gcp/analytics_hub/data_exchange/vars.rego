@@ -1,10 +1,8 @@
-package terraform.gcp.analytics_hub.data_exchange.vars
+package terraform.gcp.security.analytics_hub.data_exchange
 
-# Required prefix for display_name
-prefix := "de-"
-
-# Whitelisted GCP projects
-allowed_projects := {
-  "focus-dragon-406513-m2",
-  "secure-project-2"
+variables := {
+    "friendly_resource_name": "BigQuery Analytics Hub Data Exchange",
+    "resource_type": "google_bigquery_analytics_hub_data_exchange",
+    "resource_value_name": "display_name",
+    "prefix": "de-"
 }
