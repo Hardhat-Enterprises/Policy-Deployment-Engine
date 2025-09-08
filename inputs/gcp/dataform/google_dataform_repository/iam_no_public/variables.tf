@@ -1,7 +1,0 @@
-variable "project" { type = string }
-
-
-
-
-
-
