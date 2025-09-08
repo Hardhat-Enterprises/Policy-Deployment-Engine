@@ -1,5 +1,5 @@
 resource "google_cloudfunctions2_function" "nc" {
-  name     = "test-noncompliant"
+  name     = "nc"
    location = "us-central1"
 
   build_config {

@@ -1,6 +1,6 @@
 
 resource "google_cloudfunctions2_function_iam_member" "c" {
-  project        = "google_cloudfunctions2_function"
+  project        = "c"
   location       = "us-central1"
   cloud_function = "google_cloudfunctions2_function_01"
   role           = "roles/cloudfunctions.invoker"

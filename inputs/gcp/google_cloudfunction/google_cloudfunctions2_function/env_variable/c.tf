@@ -1,5 +1,5 @@
 resource "google_cloudfunctions2_function" "c" {
-  name     = "test-compliant"
+  name     = "c"
   location = "us-central1"
 
   build_config {

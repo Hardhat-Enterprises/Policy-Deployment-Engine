@@ -1,6 +1,7 @@
 resource "google_cloudfunctions2_function" "c" {
-  name     = "test-function"
+  name     = "c"
   location = "us-central1"
+  project = "c project"
 
   build_config {
     runtime     = "python311"
