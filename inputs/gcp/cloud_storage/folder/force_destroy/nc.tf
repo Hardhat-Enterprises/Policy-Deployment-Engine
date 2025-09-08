@@ -9,7 +9,7 @@ resource "google_storage_bucket" "bucket-nc" {
 
 resource "google_storage_folder" "nc123" {
   bucket        = google_storage_bucket.bucket-nc.name
-  name          = "parent-folder/"
+  name          = "parent-folders/"
   force_destroy = true
 }
 
