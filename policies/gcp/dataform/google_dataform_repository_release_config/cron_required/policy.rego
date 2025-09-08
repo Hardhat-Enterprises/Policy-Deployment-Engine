@@ -1,0 +1,23 @@
+package terraform.gcp.security.dataform.google_dataform_repository_release_config.cron_required
+
+import data.terraform.gcp.helpers
+import data.terraform.gcp.security.dataform.google_dataform_repository_release_config.vars
+
+conditions := [
+    [
+        {"situation_description" : "Release configs must define a cron schedule",
+        "remedies": ["Set cron_schedule to a valid cron string (e.g., '0 2 * * *')"]},
+        {
+            "condition": "cron_schedule must be set to 0 2 * * *",
+            "attribute_path" : ["cron_schedule"],
+            "values" : ["0 2 * * *"],
+            "policy_type" : "whitelist"
+        }
+    ]
+]
+
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details
+
+
+
