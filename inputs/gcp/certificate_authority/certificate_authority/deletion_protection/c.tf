@@ -6,7 +6,7 @@ resource "google_privateca_certificate_authority" "c" {
     project = "PDE-project"
     location = "us-central1"
     certificate_authority_id = "c"
-    deletion_protection = true
+    deletion_protection = false
     config {
         subject_config {
             subject {

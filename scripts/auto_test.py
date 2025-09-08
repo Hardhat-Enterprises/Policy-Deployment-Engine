@@ -11,11 +11,11 @@ def extract_path_parts(path: Path):
         sys.exit(f"Invalid path: {path}")
     return path.parts[-3], path.parts[-2], path.parts[-1]  # service, resource, attribute
 
-def make_failure(attribute: str, reason: str) -> dict:
-    return {"policy": str(attribute), "passed": False, "failure": {"reason": reason}}
+def make_failure(attribute: str, reason: str, service: str, resource: str) -> dict:
+    return {"service": str(service), "resource": str(resource), "policy": str(attribute), "passed": False, "failure": {"reason": reason}}
 
-def make_success(attribute: str) -> dict:
-    return {"policy": str(attribute), "passed": True}
+def make_success(attribute: str, service: str, resource: str) -> dict:
+    return {"service": str(service), "resource": str(resource), "policy": str(attribute), "passed": True}
 
 def opa_eval_value(policies_root: Path, plan_json_path: Path, query: str):
     """Evaluate an OPA query and return the expression value from JSON output or None."""
@@ -159,7 +159,7 @@ def log_messages(verbose: bool, message_query: str, messages: list[str]) -> None
     for m in messages:
         print(m)
 
-def validate_policy_output(attribute: str, resource_type: str | None, plan_path: Path, messages: list[str], verbose: bool) -> dict:
+def validate_policy_output(attribute: str, resource_type: str | None, plan_path: Path, messages: list[str], verbose: bool, service: str, resource: str) -> dict:
     unique_names = get_unique_resource_names(plan_path, str(resource_type))
     matched = match_names_in_messages(messages, unique_names)
 
@@ -167,7 +167,8 @@ def validate_policy_output(attribute: str, resource_type: str | None, plan_path:
     nc_pattern = re.compile(r"^nc\d*$", re.IGNORECASE)
     non_nc_in_output = {n.strip() for n in matched if not nc_pattern.fullmatch(n)}
     if non_nc_in_output:
-        return make_failure(attribute, f"Resources in output other than 'nc' found: {', '.join(sorted(non_nc_in_output))}")
+        print(f"Check failed: Resources in output other than 'nc' found: {', '.join(sorted(non_nc_in_output))}\n")
+        return make_failure(attribute, f"Resources in output other than 'nc' found: {', '.join(sorted(non_nc_in_output))}", service, resource)
 
     # Ensure all resources are mentioned, except 'c*' which can be omitted
     missing = unique_names - matched
@@ -183,14 +184,14 @@ def validate_policy_output(attribute: str, resource_type: str | None, plan_path:
 
     if missing_non_c:
         if verbose:
-            print(f"Check failed: Unmentioned resources other than 'c' found: {', '.join(sorted(missing_non_c))}")
-        return make_failure(attribute, f"Unmentioned resources other than 'c' found: {', '.join(sorted(missing_non_c))}")
+            print(f"Check failed: Unmentioned resources other than 'c' found: {', '.join(sorted(missing_non_c))}\n")
+        return make_failure(attribute, f"Unmentioned resources other than 'c' found: {', '.join(sorted(missing_non_c))}", service, resource)
 
     if missing and missing == {"c"} and verbose:
         print("Only compliant resources are unmentioned; ignoring")
     if verbose:
         print("Check passed\n")
-    return make_success(attribute)
+    return make_success(attribute, service, resource)
 
 def run_policy_check_pair(input_dir: Path, policy_dir: Path, policies_root: Path, verbose: bool = False):
     # Extract data about services and filesystem paths
@@ -199,20 +200,24 @@ def run_policy_check_pair(input_dir: Path, policy_dir: Path, policies_root: Path
     # Runs TF commands and returns abs path to plan.json
     plan_path = run_terraform_commands(abs_input_dir, verbose)
     if plan_path is None:
-        return {"policy": str(attribute), "passed": False, "failure" : { "reason" : "Terraform failed to compile!" }}
+        res = make_failure(attribute, "Terraform failed to compile!", service, resource)
+        return res
     
     message_query, vars_resource_type_query = get_policy_metadata(policy_dir, service, resource, attribute)
 
     resource_type = get_resource_type(policies_root, plan_path, vars_resource_type_query)
     if resource_type is None:
-        return make_failure(attribute, "Could not find any resources!")
+        res = make_failure(attribute, "Could not find any resources!", service, resource)
+        return res
     
     messages = get_policy_messages(policies_root, plan_path, message_query)
     if not messages:
-        return make_failure(attribute, "Could not run OPA query!")
+        res = make_failure(attribute, "Could not run OPA query!", service, resource)
+        return res
     
     log_messages(verbose, message_query, messages)
-    return validate_policy_output(attribute, resource_type, plan_path, messages, verbose)
+    res = validate_policy_output(attribute, resource_type, plan_path, messages, verbose, service, resource)
+    return res
 
 def find_matching_pairs(inputs_root: Path, policies_root: Path):
     def is_leaf_terraform_dir(directory: Path) -> bool:
@@ -258,22 +263,34 @@ def main():
     for input_dir, policy_dir in pairs:
         result = run_policy_check_pair(input_dir, policy_dir, policies_root, verbose=args.verbose)
         results.append(result)
+        
+    # Grouped summary by service -> resource
+    grouped: dict[str, dict[str, list[dict]]] = {}
+    for r in results:
+        grouped.setdefault(r.get("service", "unknown"), {}).setdefault(r.get("resource", "unknown"), []).append(r)
+
     print("\nSummary of policy checks:")
-    for res in results:
-        if res["passed"]:
-            status = "✅"
-        else:
-            status = "❌"
-            failure_flag = True
-        print(f"Policy: {res['policy']} - {status}")
+    for service in sorted(grouped):
+        print(f"Service: {service}")
+        for resource in sorted(grouped[service]):
+            print(f"  Resource: {resource}")
+            for res in grouped[service][resource]:
+                status = "✅" if res["passed"] else "❌"
+                if not res["passed"]:
+                    failure_flag = True
+                print(f"    Policy: {res['policy']} - {status}")
+        print()
 
     if failure_flag:
-        print("\n")
-        for res in results:
-            if not res["passed"]:
-                print(f"Policy: {res['policy']} failed due to: ")
-                print(f"{res["failure"]["reason"]}")
+        print("\nFailures:")
+        for service in sorted(grouped):
+            for resource in sorted(grouped[service]):
+                for res in grouped[service][resource]:
+                    if not res["passed"]:
+                        print(f"Service: {service} | Resource: {resource} | Policy: {res['policy']}")
+                        print(f"{res['failure']['reason']}")
+                        print()
         sys.exit(1)
-
+ 
 if __name__ == "__main__":
     main()
