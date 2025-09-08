@@ -1,0 +1,26 @@
+resource "google_privileged_access_manager_entitlement" "nc" {
+  entitlement_id       = "non-compliant-entitlement"
+  location             = "global"
+  max_request_duration = "43200s"
+  parent               = "projects/my-project-name"
+
+  requester_justification_config {
+    unstructured {}
+  }
+
+  eligible_users {
+    principals = ["group:test@google.com"]
+  }
+
+  privileged_access {
+    gcp_iam_access {
+      resource_type = "cloudresourcemanager.googleapis.com/Project"
+      resource      = "//cloudresourcemanager.googleapis.com/projects/my-project-name"
+
+      role_bindings {
+        role                 = "roles/storage.admin"
+        condition_expression = "request.time < timestamp(\"2024-04-23T18:30:00.000Z\")"
+      }
+    }
+  }
+}

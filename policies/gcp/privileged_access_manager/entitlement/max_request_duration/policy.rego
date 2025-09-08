@@ -1,0 +1,22 @@
+package terraform.gcp.security.privileged_access_manager.entitlement.max_request_duration
+
+import data.terraform.gcp.helpers
+import data.terraform.gcp.security.privileged_access_manager.entitlement.vars
+
+conditions := [
+  [
+    {
+      "situation_description": "Privileged Access max duration must not exceed 1 hour",
+      "remedies": ["Set max_request_duration to 3600s (1 hour) or less"]
+    },
+    {
+      "condition": "Check if max_request_duration is at or below 3600 seconds",
+      "attribute_path": ["max_request_duration"],
+      "values": [3600],
+      "policy_type": "range"
+    }
+  ]
+]
+
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details
