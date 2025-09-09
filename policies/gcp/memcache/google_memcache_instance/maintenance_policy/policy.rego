@@ -2,7 +2,6 @@ package terraform.gcp.security.memcache.google_memcache_instance.maintenance_pol
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.memcache.google_memcache_instance.vars
 
-
 conditions := [
     [
         {

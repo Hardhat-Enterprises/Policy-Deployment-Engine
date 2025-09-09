@@ -7,6 +7,7 @@ resource "google_memcache_instance" "nc-1" {
         cpu_count      = 1
         memory_size_mb = 1024
     }
+
 }
 
 resource "google_memcache_instance" "nc-2" {
@@ -18,6 +19,6 @@ resource "google_memcache_instance" "nc-2" {
         cpu_count      = 1
         memory_size_mb = 1024
     }
-    
-    authorized_network = "default"
+
+    reserved_ip_range_id = []
 }
