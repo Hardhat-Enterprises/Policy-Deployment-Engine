@@ -1,2 +1,2 @@
 # Policy-Deployment-Engine
-<google/service/dataproc_metastore>
+<google/service/google_dataproc_on_gdc>
