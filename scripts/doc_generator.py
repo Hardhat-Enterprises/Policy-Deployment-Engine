@@ -63,7 +63,9 @@ def extract_arguments(lines, current_parent=None):
                     "description": "",
                     "required": None,
                     "security_impact": None,
-                    "decision_rationale": None,
+                    "rationale": None,
+                    "compliant": None,
+                    "non-compliant": None,
                     "parent": current_parent,
                     "arguments": nested_args
                 }
@@ -98,7 +100,9 @@ def extract_arguments(lines, current_parent=None):
                 "description": full_desc,
                 "required": required_val,
                 "security_impact": None,
-                "decision_rationale": None,
+                "rationale": None,
+                "compliant": None,
+                "non-compliant": None,
                 "parent": current_parent
             }
 
