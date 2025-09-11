@@ -2,13 +2,11 @@ package terraform.gcp.security.discovery_engine.engine_schema.engine_schema_json
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.discovery_engine.engine_schema.vars
 
-#engine_schema_location
+#engine_schema_json
 
-#And Block, If it only triggers one then its compliant, if both triggered, its not compliant
-#OR block, If one condition is triggered, the whole thing fails. under conditions[square brackets]
+#Check
 
 conditions := [
-#Situation (OR Block)
     [
     {
         "situation_description": "Json is not set up correctly",
@@ -18,16 +16,8 @@ conditions := [
       #And Block
         "condition": "Json is mis-configured",
         "attribute_path": ["json_schema"],
-        "values": ["{\"$schema\":\"https://google.com\"}"],
-        "policy_type": "whitelist"
-      },
-      #Comma needed
-      {
-      #And Block
-        "condition": "Json is mis-configured",
-        "attribute_path": ["location"],
-        "values": ["eu"],
-        "policy_type": "whitelist"
+        "values": ["{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"datetime_detection\"*,\"type\":\"object\",\"geolocation_detection\"*}",[["true","false"],["true"]]],
+        "policy_type": "pattern whitelist"
       }
     ]
 ]

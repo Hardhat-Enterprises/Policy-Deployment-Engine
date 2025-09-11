@@ -1,4 +1,3 @@
-
 #CMEK CONFIG Region C
 
 resource "google_discovery_engine_cmek_config" "c" {
@@ -13,13 +12,6 @@ resource "google_discovery_engine_cmek_config" "c" {
 
   # Single-region CMEKs
   single_region_keys {
-    kms_key = "projects/735927692082/locations/europe-west1/keyRings/my-ring/cryptoKeys/my-ew1-key"
-  }
-
-  single_region_keys {
-    kms_key = "projects/735927692082/locations/europe-north1/keyRings/my-ring/cryptoKeys/my-en1-key"
+    kms_key = "projects/735927692082/locations/europe-west1/keyRings/my-ring/cryptoKeys/my-eu1-key"
   }
 }
-
-
-

@@ -4,8 +4,7 @@ import data.terraform.gcp.security.discovery_engine.recommendation_engine.vars
 
 #recommendation_engine_data_store_ids
 
-#And Block, If it only triggers one then its compliant, if both triggered, its not compliant
-#OR block, If one condition is triggered, the whole thing fails. under conditions[square brackets]
+#Remove?
 
 conditions := [
     [

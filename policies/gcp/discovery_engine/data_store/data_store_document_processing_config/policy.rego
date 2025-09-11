@@ -4,6 +4,8 @@ import data.terraform.gcp.security.discovery_engine.data_store.vars
 
 #document_processing_config
 
+#check
+
 conditions := [
     [
     {

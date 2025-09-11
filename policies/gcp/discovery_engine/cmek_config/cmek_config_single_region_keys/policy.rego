@@ -4,6 +4,7 @@ import data.terraform.gcp.security.discovery_engine.cmek_config.vars
 
 #cmek_config_single_region_keys
 
+#change to pattern whitelist
 
 conditions := [
     [
@@ -14,8 +15,8 @@ conditions := [
       {
         "condition": "single_region_keys is mis-configured",
         "attribute_path": ["single_region_keys", 0, "kms_key"],
-        "values": ["projects/735927692082/locations/eu/keyRings/my-ring/cryptoKeys/my-eu-key", "projects/735927692082/locations/europe-west1/keyRings/my-ring/cryptoKeys/my-ew1-key", "projects/735927692082/locations/europe-north1/keyRings/my-ring/cryptoKeys/my-en1-key"],
-        "policy_type": "whitelist"
+        "values": ["projects/735927692082/locations/*/keyRings/my-ring/cryptoKeys/* ",[["europe-west1","europe-north1","eu"],["my-eu-key","my-eu-key1","my-eu-key2"]]],
+        "policy_type": "pattern whitelist"
       }
     ]
 ]
