@@ -69,12 +69,12 @@ Nested arguments can be added under an "arguments" object for their parent.
 Once your JSON files are updated, run:
 
 ```bash
-python3 scripts/create_markdown.py <service_name>
+python3 scripts/docgen/create_markdown.py <service_name>
 ```
 
 Example
 ```bash
-python3 scripts/create_markdown.py alloydb
+python3 scripts/docgen/create_markdown.py alloydb
 ```
 
 This will (automatically):
@@ -92,7 +92,7 @@ This will (automatically):
 4. Run:
 
 ```bash
-python3 scripts/create_markdown.py alloydb
+python3 scripts/docgen/create_markdown.py alloydb
 ```
 5. Review the generated `.md` files files in `docs/gcp/alloydb/`
 
