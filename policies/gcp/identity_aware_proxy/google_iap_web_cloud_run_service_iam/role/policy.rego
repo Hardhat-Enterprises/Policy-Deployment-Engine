@@ -1,7 +1,7 @@
 package terraform.gcp.security.identity_aware_proxy.google_iap_web_cloud_run_service_iam.role
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.identity_aware_proxy.google_iap_web_cloud_run_service_iam.vars
+import data.terraform.gcp.security.identity_aware_proxy.google_iap_web_cloud_run_service_iam as vars
 
 conditions := [
   [

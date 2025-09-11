@@ -1,7 +1,7 @@
 package terraform.gcp.security.identity_aware_proxy.google_iap_web_type_compute_iam.member
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.identity_aware_proxy.google_iap_web_type_compute_iam.vars
+import data.terraform.gcp.security.identity_aware_proxy.google_iap_web_type_compute_iam as vars
 
 # Exact-match conditions (helper-friendly)
 conditions := [

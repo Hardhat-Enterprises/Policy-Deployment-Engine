@@ -1,7 +1,7 @@
 package terraform.gcp.security.identity_aware_proxy.google_iap_web_iam.role
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.identity_aware_proxy.google_iap_web_iam.vars
+import data.terraform.gcp.security.identity_aware_proxy.google_iap_web_iam as vars
 
 # Enforce least-privilege role for IAP Web access.
 
