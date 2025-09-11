@@ -15,7 +15,7 @@ conditions := [
     {
       "condition": "Function location must not be empty.",
       "attribute_path": ["location"],
-      "values": ["us-central1"],
+      "values": ["australia-southeast1"],
       "policy_type": "whitelist"
     }
   ]
