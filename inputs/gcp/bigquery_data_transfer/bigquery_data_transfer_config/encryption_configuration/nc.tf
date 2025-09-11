@@ -1,4 +1,4 @@
-resource "google_bigquery_data_transfer_config" "encryption_NC" {
+resource "google_bigquery_data_transfer_config" "nc" {
 
   project                = "my_project_id"
   display_name           = "Not BQ Transfer"
@@ -6,7 +6,7 @@ resource "google_bigquery_data_transfer_config" "encryption_NC" {
   destination_dataset_id = "my_dataset"
   schedule               = "every 24 hours"
 
-  service_account_name = "service-123456789012@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com"
+  service_account_name = "service-1234567890@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com"
 
   params = {
     query                            = "SELECT 'insecure';"

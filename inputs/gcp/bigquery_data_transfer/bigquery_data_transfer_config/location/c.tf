@@ -1,11 +1,10 @@
-resource "google_bigquery_data_transfer_config" "C" {
-
+resource "google_bigquery_data_transfer_config" "c" {
   display_name           = "my-query"
   location               = "australia-southeast1"
   data_source_id         = "scheduled_query"
   schedule               = "first sunday of quarter 00:00"
   destination_dataset_id = "my_dataset"
-  project                = "my_project_id"
+  project                = "project_id"
 
   params = {
     destination_table_name_template = "my_table"

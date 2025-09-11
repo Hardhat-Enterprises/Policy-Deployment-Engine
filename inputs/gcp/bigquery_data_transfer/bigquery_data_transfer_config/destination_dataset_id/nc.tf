@@ -1,4 +1,4 @@
-resource "google_bigquery_data_transfer_config" "NC" {
+resource "google_bigquery_data_transfer_config" "nc" {
   project                = "my_project_id"
   display_name           = "Chhunly Data Transfer"
   data_source_id         = "scheduled_query"

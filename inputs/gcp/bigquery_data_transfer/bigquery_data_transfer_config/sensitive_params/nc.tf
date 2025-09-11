@@ -1,4 +1,4 @@
-resource "google_bigquery_data_transfer_config" "NC_transfer" {
+resource "google_bigquery_data_transfer_config" "nc" {
   project                = "civil-lightning-468910-m1"
   display_name           = "Noncompliant Amazon S3 Transfer"
   data_source_id         = "amazon_s3"

@@ -1,8 +1,3 @@
-variable "project_id" {
-  type        = string
-  default     = "civil-lightning-468910-m1"
-}
-
 variable "aws_access_key_id" {
   type        = string
   sensitive   = true
@@ -13,9 +8,9 @@ variable "aws_secret_access_key" {
   sensitive   = true
 }
 
-resource "google_bigquery_data_transfer_config" "C_transfer" {
-  project                = "my_project_id"
-  display_name           = "Secure S3 Transfer"
+resource "google_bigquery_data_transfer_config" "c" {
+  project                = "project_id"
+  display_name           = "Complaint S3 Transfer"
   data_source_id         = "amazon_s3"
   destination_dataset_id = "secure_dataset"
   schedule               = "every 24 hours"

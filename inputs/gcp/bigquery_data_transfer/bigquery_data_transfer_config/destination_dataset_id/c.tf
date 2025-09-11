@@ -1,15 +1,5 @@
-variable "project_id" {
-  description = "GCP Project ID"
-  type        = string
-  default     = "civil-lightning-468910-m1"
-}
-
-data "google_project" "project" {
-  project_id = var.project_id
-}
-
-resource "google_bigquery_data_transfer_config" "C" {
-  project                = "my_project_id"
+resource "google_bigquery_data_transfer_config" "c" {
+  project                = "project_id"
   display_name           = "Chhunly Data Transfer"
   data_source_id         = "scheduled_query"
   destination_dataset_id = "bq_customerdata"
@@ -22,5 +12,5 @@ resource "google_bigquery_data_transfer_config" "C" {
     write_disposition              = "WRITE_TRUNCATE"
   }
 
-  service_account_name = "service-${data.google_project.project.number}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com"
+  service_account_name = "service-1234567890@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com"
 }

@@ -8,7 +8,7 @@ data "google_project" "project" {
   project_id = var.project_id
 }
 
-resource "google_project_iam_member" "permissions_C" {
+resource "google_project_iam_member" "c" {
   project = var.project_id
   role    = "roles/iam.serviceAccountTokenCreator"
   member  = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com"

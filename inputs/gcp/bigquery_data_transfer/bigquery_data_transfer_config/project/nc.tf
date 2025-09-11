@@ -1,4 +1,4 @@
-resource "google_project_iam_member" "permissions_NC" {
+resource "google_project_iam_member" "nc" {
   project = "civil-lightning-468910-m1"  
   role    = "roles/iam.serviceAccountTokenCreator"
 
