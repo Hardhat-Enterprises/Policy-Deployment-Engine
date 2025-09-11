@@ -8,8 +8,8 @@ resource "google_storage_bucket" "bucket" {
 }
 
 resource "google_storage_folder" "c123" {
-  bucket        = google_storage_bucket.bucket.name
-  name          = "parent-folders/"
-  
+  bucket = google_storage_bucket.bucket.name
+  name   = "parent-folders/"
+
 }
 

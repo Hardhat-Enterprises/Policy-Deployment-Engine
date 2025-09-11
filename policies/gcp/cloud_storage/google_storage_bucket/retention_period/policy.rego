@@ -1,7 +1,7 @@
-package terraform.gcp.security.cloud_storage.bucket.retention_period
+package terraform.gcp.security.cloud_storage.google_storage_bucket.retention_period
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.cloud_storage.bucket.vars
+import data.terraform.gcp.security.cloud_storage.google_storage_bucket.vars
 
 conditions := [
     [

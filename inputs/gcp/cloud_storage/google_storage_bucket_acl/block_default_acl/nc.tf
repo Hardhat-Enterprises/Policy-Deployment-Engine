@@ -4,6 +4,6 @@ resource "google_storage_bucket_acl" "nc123" {
 }
 
 resource "google_storage_bucket_acl" "nc1234" {
-  bucket      = "nc1234"
+  bucket         = "nc1234"
   predefined_acl = "publicReadWrite"
 }

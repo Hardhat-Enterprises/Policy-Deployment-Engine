@@ -15,5 +15,5 @@ resource "google_storage_object_acl" "nc123" {
 
   role_entity = [
     "READER:allUsers"
-]
+  ]
 }

@@ -5,6 +5,6 @@ resource "google_storage_bucket" "bucket" {
 }
 
 resource "google_storage_managed_folder" "c123" {
-  bucket        = google_storage_bucket.bucket.name
-  name          = "managed/folder/name/"
+  bucket = google_storage_bucket.bucket.name
+  name   = "managed/folder/name/"
 }
