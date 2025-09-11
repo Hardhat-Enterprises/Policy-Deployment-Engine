@@ -2,24 +2,19 @@
 resource "google_discovery_engine_recommendation_engine" "c" {
   project       = "735927692082"
   engine_id                    = "c"
-  location                     = google_discovery_engine_data_store.compliant.location
+  location                     = google_discovery_engine_data_store.c.location
   display_name                 = "Example Recommendation Engine"
-  data_store_ids               = [google_discovery_engine_data_store.compliant.data_store_id]
-  industry_vertical            = "GENERIC"
-  common_config {
-    company_name               = "test-company"
-  }
+  data_store_ids               = [google_discovery_engine_data_store.c.data_store_id]
+
+
  }
 
- resource "google_discovery_engine_data_store" "compliant" {
+ resource "google_discovery_engine_data_store" "c" {
   project                      = "735927692082"
   location                     = "eu"
   data_store_id                = "c-recommendation-datastore-id"
   display_name                 = "tf-test-structured-datastore"
   industry_vertical            = "GENERIC"
   content_config               = "NO_CONTENT"
-  solution_types               = ["SOLUTION_TYPE_RECOMMENDATION"]
-  create_advanced_site_search  = false
-  skip_default_schema_creation = false
 }
 #Note, it needed to link to a data store.
