@@ -1,5 +1,5 @@
-resource "google_iap_app_engine_service_iam_member" "c_iap_member" {
-  app_id  = "my-gcp-project"
+resource "google_iap_app_engine_service_iam_member" "c" {
+  app_id  = "c"
   service = "default"
   role    = "roles/iap.httpsResourceAccessor"
   member  = "user:jane@example.com"  
