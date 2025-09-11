@@ -27,7 +27,7 @@ Example: `docs/gcp/alloydb/resource_json/instance.json`
     "instance_id": {
       "description": "The ID of the instance.",
       "required": true,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": "Instance ID follows naming convention",
       "non-compliant": "Instance ID uses invalid characters",
@@ -36,7 +36,7 @@ Example: `docs/gcp/alloydb/resource_json/instance.json`
     "display_name": {
       "description": "The display name of the instance.",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": "Clear and descriptive name",
       "non-compliant": "Empty or misleading name",
@@ -50,9 +50,9 @@ Each argument should include these keys:
 
 - description — a clear explanation of the argument.
 
-- required — boolean true or false.
+- required — boolean `true` or `false`.
 
-- security_impact — descriptive string or null.
+- security_impact — boolean `true` or `false`.
 
 - rationale — explanation or null.
 
@@ -60,7 +60,7 @@ Each argument should include these keys:
 
 - non-compliant — what a non-compliant value looks like, or null.
 
-- parent — do not edit.
+- parent — `do not edit.`
 
 Nested arguments can be added under an "arguments" object for their parent.
 
