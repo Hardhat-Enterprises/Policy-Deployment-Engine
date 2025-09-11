@@ -4,8 +4,6 @@ import data.terraform.gcp.security.discovery_engine.engine_schema.vars
 
 #engine_schema_json
 
-#Check
-
 conditions := [
     [
     {
@@ -16,7 +14,7 @@ conditions := [
       #And Block
         "condition": "Json is mis-configured",
         "attribute_path": ["json_schema"],
-        "values": ["{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"datetime_detection\"*,\"type\":\"object\",\"geolocation_detection\"*}",[["true","false"],["true"]]],
+        "values": ["*", ["{\"$schema\":\"https://google/cschema\"}"]],
         "policy_type": "pattern whitelist"
       }
     ]

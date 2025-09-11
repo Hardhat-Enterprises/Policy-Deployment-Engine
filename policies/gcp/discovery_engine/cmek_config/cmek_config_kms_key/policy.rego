@@ -8,16 +8,17 @@ import data.terraform.gcp.security.discovery_engine.cmek_config.vars
 conditions := [
     [
     {
-        "situation_description": "cmek_config key is set to the wrong key!!!",
+        "situation_description": "cmek_config key end is set to the wrong id!!!",
         "remedies": ["Ensure that it is set to our key"]
         },
       {
         "condition": "allow_cross_region is mis-configured",
         "attribute_path": ["kms_key"],
-        "values": ["my-crypto-key"],
-        "policy_type": "whitelist"
+        "values": ["*-*-*", [["my"],["crypto"],["key"]]],
+        "policy_type": "pattern whitelist"
       }
     ]
+
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
