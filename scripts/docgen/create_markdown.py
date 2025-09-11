@@ -4,30 +4,31 @@ import sys
 
 # Paths
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-REPO_ROOT = os.path.dirname(SCRIPT_DIR)
-JSON_BASE_DIR = os.path.join(REPO_ROOT, "docs", "gcp")  # base dir containing subcategories
+REPO_ROOT = os.path.dirname(os.path.dirname(SCRIPT_DIR))  # two levels up to repo root
+JSON_BASE_DIR = os.path.join(REPO_ROOT, "docs", "gcp")  # base dir containing service folders
 OUTPUT_DIR = JSON_BASE_DIR  # markdown files will go next to resource_json folders
 
 def validate_argument(details):
     """
     Validate and normalize argument fields.
     """
-    # normalize required
+    # normalize 'required'
     if isinstance(details.get("required"), str):
         details["required"] = details["required"].lower() == "true"
     elif not isinstance(details.get("required"), bool):
         details["required"] = False
 
-    # normalize security_impact
-    if not details.get("security_impact"):
-        details["security_impact"] = "none"
+    # normalize 'security_impact' as boolean
+    if isinstance(details.get("security_impact"), str):
+        details["security_impact"] = details["security_impact"].lower() == "true"
+    elif not isinstance(details.get("security_impact"), bool):
+        details["security_impact"] = False
 
     # set defaults
     details.setdefault("rationale", "")
     details.setdefault("description", "")
     details.setdefault("compliant", "")
     details.setdefault("non-compliant", "")
-
 
 def generate_top_level_table(args_dict, resource_name=None):
     """
@@ -42,12 +43,11 @@ def generate_top_level_table(args_dict, resource_name=None):
 
         md += (
             f"| `{arg}` | {details['description']} | {str(details['required']).lower()} "
-            f"| {details['security_impact']} | {details.get('rationale','')} "
+            f"| {str(details['security_impact']).lower()} | {details.get('rationale','')} "
             f"| {details['compliant']} | {details['non-compliant']} |\n"
         )
 
     return md
-
 
 def generate_nested_blocks(args_dict, level=0, resource_name=None):
     """
@@ -73,7 +73,7 @@ def generate_nested_blocks(args_dict, level=0, resource_name=None):
 
                 md += (
                     f"{indent}| `{sub_arg}` | {sub_details['description']} | {str(sub_details['required']).lower()} "
-                    f"| {sub_details['security_impact']} | {sub_details.get('rationale','')} "
+                    f"| {str(sub_details['security_impact']).lower()} | {sub_details.get('rationale','')} "
                     f"| {sub_details['compliant']} | {sub_details['non-compliant']} |\n"
                 )
 
@@ -81,7 +81,6 @@ def generate_nested_blocks(args_dict, level=0, resource_name=None):
             md += generate_nested_blocks(details["arguments"], level=level + 1, resource_name=resource_name)
 
     return md
-
 
 def generate_markdown_from_json(resource_json):
     resource_name = resource_json["resource_name"]
@@ -105,7 +104,6 @@ Reference: [Terraform Registry – {resource_name}]({registry_url})
     md += generate_nested_blocks(resource_json["arguments"], resource_name=resource_name)
 
     return md
-
 
 def main():
     if len(sys.argv) < 2:
@@ -142,7 +140,6 @@ def main():
             out.write(markdown_out)
 
         print(f"✅ Markdown built for: {new_name}")
-
 
 if __name__ == "__main__":
     main()
