@@ -109,7 +109,7 @@ Reference: [Terraform Registry – {resource_name}]({registry_url})
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python markdown_builder.py <service_name>")
+        print("Usage: python create_markdown.py <service_name>")
         sys.exit(1)
 
     service_name = sys.argv[1]
