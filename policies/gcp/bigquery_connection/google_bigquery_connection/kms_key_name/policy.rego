@@ -1,24 +1,19 @@
 package terraform.gcp.security.bigquery_connection.google_bigquery_connection.kms_key_name
-
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.bigquery_connection.google_bigquery_connection.vars
 
 conditions := [[
   {
-    "situation_description": "Require CMEK key in approved AU regions",
-    "remedies": [
-      "Set kms_key_name to a Cloud KMS key in australia-southeast1 or australia-southeast2"
-    ]
+    "situation_description": "Disallow unapproved KMS keys for BigQuery connections",
+    "remedies": ["Use kms_key_name from approved AU regions"]
   },
   {
-    "condition": "kms_key_name must match AU KMS key resource pattern",
+    "condition": "kms_key_name must not be in the disallowed list",
     "attribute_path": ["kms_key_name"],
     "values": [
-       "projects/my-project-c/locations/australia-southeast2/keyRings/australia-southeast2/cryptoKeys/bq-key", 
-       "projects/my-project-c/locations/australia-southeast1/keyRings/australia-southeast1/cryptoKeys/bq-key"
-
+      "projects/my-project-nc/locations/us-central1/keyRings/kr/cryptoKeys/bq-key-us"
     ],
-    "policy_type": "whitelist"
+    "policy_type": "blacklist"
   }
 ]]
 

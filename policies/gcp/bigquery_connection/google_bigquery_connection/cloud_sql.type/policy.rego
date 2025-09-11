@@ -1,4 +1,4 @@
-package terraform.gcp.security.bigquery_connection.google_bigquery_connection.cloud_sql.type # Edit here 
+package terraform.gcp.security.bigquery_connection.google_bigquery_connection.cloud_sql.type 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.bigquery_connection.google_bigquery_connection.vars
 
@@ -9,9 +9,9 @@ conditions := [
     "remedies":[ "Set cloud_sql.type to POSTGRES or MYSQL" ]},
     {
         "condition": "cloud_sql.type must be one of the approved values",
-        "attribute_path" : ["cloud_sql", 0, "type"], # An array of strings and indicies eg. ["rsa",0,"key"]
-        "values" : ["POSTGRES","MYSQL"], # Values to compare against
-        "policy_type" : "whitelist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
+        "attribute_path" : ["cloud_sql", 0, "type"], 
+        "values" : ["POSTGRES","MYSQL"], 
+        "policy_type" : "whitelist" 
     }
     ]
 ]

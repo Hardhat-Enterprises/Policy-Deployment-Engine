@@ -1,7 +1,9 @@
 resource "google_bigquery_connection" "nc" {
-  connection_id = "noncompliant-conn"
-  location      = "US"
-  kms_key_name  = "projects/my-project-nc/locations/US/keyRings/US/cryptoKeys/bq-key"
   project       = "my-project-nc"
+  location      = "australia-southeast2"
+  connection_id = "cmek-conn-nc"
+
+  kms_key_name  = "projects/my-project-nc/locations/us-central1/keyRings/kr/cryptoKeys/bq-key-us"
+
   cloud_resource {}
 }

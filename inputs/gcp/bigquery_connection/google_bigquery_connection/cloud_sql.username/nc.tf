@@ -2,16 +2,16 @@ resource "google_bigquery_connection" "nc" {
   connection_id = "conn-nc"
   location      = "australia-southeast2"
   friendly_name = "non-compliant connection"
-  description   = "cloud_sql.type policy  non-compliant"
+  description   = "cloud_sql.username policy – non-compliant"
   project       = "my project nc"
 
   cloud_sql {
     instance_id = "my-project:australia-southeast1:pg-app"
     database    = "appdb_prod"
-    type        = "DATABASE_TYPE_UNSPECIFIED"  
+    type        = "POSTGRES"
 
     credential {
-      username = "bq_proxy_app"
+      username = "root"
       password = "REDACTED"
     }
   }
