@@ -1,0 +1,252 @@
+{
+  "resource_name": "vertex_ai_feature_online_store_featureview",
+  "subcategory": "Vertex AI",
+  "arguments": {
+    "feature_online_store": {
+      "description": "The name of the FeatureOnlineStore to use for the featureview.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "region": {
+      "description": "The region for the resource. It should be the same as the featureonlinestore region.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "name": {
+      "description": "Name of the FeatureView. This value may be up to 60 characters, and valid characters are [a-z0-9_]. The first character cannot be a number.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "labels": {
+      "description": "A set of key/value label pairs to assign to this FeatureView. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "sync_config": {
+      "description": "Configures when data is to be synced/updated for this FeatureView. At the end of the sync the latest featureValues for each entityId of this FeatureView are made ready for online serving. Structure is [documented below](#nested_sync_config).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "cron": {
+          "description": "Cron schedule (https://en.wikipedia.org/wiki/Cron) to launch scheduled runs. To explicitly set a timezone to the cron tab, apply a prefix in the cron tab: \"CRON_TZ=${IANA_TIME_ZONE}\" or \"TZ=${IANA_TIME_ZONE}\".",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "sync_config"
+        }
+      }
+    },
+    "big_query_source": {
+      "description": "Configures how data is supposed to be extracted from a BigQuery source to be loaded onto the FeatureOnlineStore. Structure is [documented below](#nested_big_query_source).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "uri": {
+          "description": "The BigQuery view URI that will be materialized on each sync trigger based on FeatureView.SyncConfig.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "big_query_source"
+        },
+        "entity_id_columns": {
+          "description": "Columns to construct entityId / row keys. Start by supporting 1 only.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "big_query_source"
+        }
+      }
+    },
+    "feature_registry_source": {
+      "description": "Configures the features from a Feature Registry source that need to be loaded onto the FeatureOnlineStore. Structure is [documented below](#nested_feature_registry_source).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "feature_groups": {
+          "description": "List of features that need to be synced to Online Store. Structure is [documented below](#nested_feature_registry_source_feature_groups).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "feature_registry_source"
+        },
+        "project_number": {
+          "description": "The project number of the parent project of the feature Groups.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "feature_registry_source"
+        }
+      }
+    },
+    "vector_search_config": {
+      "description": ", [Beta](https://terraform.io/docs/providers/google/guides/provider_versions.html)) Configuration for vector search. It contains the required configurations to create an index from source data, so that approximate nearest neighbor (a.k.a ANN) algorithms search can be performed during online serving. Structure is [documented below](#nested_vector_search_config).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "embedding_column": {
+          "description": "Column of embedding. This column contains the source data to create index for vector search.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "vector_search_config"
+        },
+        "filter_columns": {
+          "description": "Columns of features that are used to filter vector search results.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "vector_search_config"
+        },
+        "crowding_column": {
+          "description": "Column of crowding. This column contains crowding attribute which is a constraint on a neighbor list produced by nearest neighbor search requiring that no more than some value k' of the k neighbors returned have the same value of crowdingAttribute.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "vector_search_config"
+        },
+        "distance_measure_type": {
+          "description": "The distance measure used in nearest neighbor search. For details on allowed values, see the [API documentation](https://cloud.google.com/vertex-ai/docs/reference/rest/v1beta1/projects.locations.featureOnlineStores.featureViews#DistanceMeasureType). Possible values are: `SQUARED_L2_DISTANCE`, `COSINE_DISTANCE`, `DOT_PRODUCT_DISTANCE`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "vector_search_config"
+        },
+        "tree_ah_config": {
+          "description": "Configuration options for the tree-AH algorithm (Shallow tree + Asymmetric Hashing). Please refer to this paper for more details: https://arxiv.org/abs/1908.10396 Structure is [documented below](#nested_vector_search_config_tree_ah_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "vector_search_config"
+        },
+        "brute_force_config": {
+          "description": "Configuration options for using brute force search, which simply implements the standard linear search in the database for each query. It is primarily meant for benchmarking and to generate the ground truth for approximate search.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "vector_search_config"
+        },
+        "embedding_dimension": {
+          "description": "The number of dimensions of the input embedding.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "vector_search_config"
+        }
+      }
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "feature_groups": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "feature_group_id": {
+          "description": "Identifier of the feature group.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "feature_groups"
+        },
+        "feature_ids": {
+          "description": "Identifiers of features under the feature group.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "feature_groups"
+        }
+      }
+    },
+    "tree_ah_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "leaf_node_embedding_count": {
+          "description": "Number of embeddings on each leaf node. The default value is 1000 if not set.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "tree_ah_config"
+        }
+      }
+    }
+  }
+}

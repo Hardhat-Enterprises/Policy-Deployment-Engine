@@ -1,0 +1,1253 @@
+{
+  "resource_name": "data_loss_prevention_discovery_config",
+  "subcategory": "Data Loss Prevention",
+  "arguments": {
+    "parent": {
+      "description": "The parent of the discovery config in any of the following formats: * `projects/{{project}}/locations/{{location}}` * `organizations/{{organization_id}}/locations/{{location}}`",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "location": {
+      "description": "Location to create the discovery config in.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "organization_id": {
+          "description": "The ID of an organization to scan",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "location"
+        },
+        "folder_id": {
+          "description": "The ID for the folder within an organization to scan",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "location"
+        }
+      }
+    },
+    "display_name": {
+      "description": "Display Name (max 1000 Chars)",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "org_config": {
+      "description": "A nested object resource. Structure is [documented below](#nested_org_config).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "project_id": {
+          "description": "The project that will run the scan. The DLP service account that exists within this project must have access to all resources that are profiled, and the cloud DLP API must be enabled.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "org_config"
+        },
+        "location": {
+          "description": "The data to scan folder org or project Structure is [documented below](#nested_org_config_location).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "org_config"
+        }
+      }
+    },
+    "inspect_templates": {
+      "description": "Detection logic for profile generation",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "actions": {
+      "description": "Actions to execute at the completion of scanning Structure is [documented below](#nested_actions).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "export_data": {
+          "description": "Export data profiles into a provided location Structure is [documented below](#nested_actions_actions_export_data).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "actions"
+        },
+        "pub_sub_notification": {
+          "description": "Publish a message into the Pub/Sub topic. Structure is [documented below](#nested_actions_actions_pub_sub_notification).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "actions"
+        },
+        "tag_resources": {
+          "description": "Publish a message into the Pub/Sub topic. Structure is [documented below](#nested_actions_actions_tag_resources).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "actions"
+        }
+      }
+    },
+    "targets": {
+      "description": "Target to match against for determining what to scan and how frequently Structure is [documented below](#nested_targets).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "big_query_target": {
+          "description": "BigQuery target for Discovery. The first target to match a table will be the one applied. Structure is [documented below](#nested_targets_targets_big_query_target).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "targets"
+        },
+        "cloud_sql_target": {
+          "description": "Cloud SQL target for Discovery. The first target to match a table will be the one applied. Structure is [documented below](#nested_targets_targets_cloud_sql_target).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "targets"
+        },
+        "secrets_target": {
+          "description": "Discovery target that looks for credentials and secrets stored in cloud resource metadata and reports them as vulnerabilities to Security Command Center. Only one target of this type is allowed.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "targets"
+        },
+        "cloud_storage_target": {
+          "description": "Cloud Storage target for Discovery. The first target to match a bucket will be the one applied. Structure is [documented below](#nested_targets_targets_cloud_storage_target).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "targets"
+        }
+      }
+    },
+    "status": {
+      "description": "Required. A status for this configuration Possible values are: `RUNNING`, `PAUSED`.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "export_data": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "profile_table": {
+          "description": "Store all table and column profiles in an existing table or a new table in an existing dataset. Each re-generation will result in a new row in BigQuery Structure is [documented below](#nested_actions_actions_export_data_profile_table).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "export_data"
+        }
+      }
+    },
+    "profile_table": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "project_id": {
+          "description": "The Google Cloud Platform project ID of the project containing the table. If omitted, the project ID is inferred from the API call.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "profile_table"
+        },
+        "dataset_id": {
+          "description": "Dataset Id of the table",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "profile_table"
+        },
+        "table_id": {
+          "description": "Name of the table",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "profile_table"
+        }
+      }
+    },
+    "pub_sub_notification": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "topic": {
+          "description": "Cloud Pub/Sub topic to send notifications to. Format is projects/{project}/topics/{topic}.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "pub_sub_notification"
+        },
+        "event": {
+          "description": "The type of event that triggers a Pub/Sub. At most one PubSubNotification per EventType is permitted. Possible values are: `NEW_PROFILE`, `CHANGED_PROFILE`, `SCORE_INCREASED`, `ERROR_CHANGED`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "pub_sub_notification"
+        },
+        "pubsub_condition": {
+          "description": "Conditions for triggering pubsub Structure is [documented below](#nested_actions_actions_pub_sub_notification_pubsub_condition).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "pub_sub_notification"
+        },
+        "detail_of_message": {
+          "description": "How much data to include in the pub/sub message. Possible values are: `TABLE_PROFILE`, `RESOURCE_NAME`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "pub_sub_notification"
+        }
+      }
+    },
+    "pubsub_condition": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "expressions": {
+          "description": "An expression Structure is [documented below](#nested_actions_actions_pub_sub_notification_pubsub_condition_expressions).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "pubsub_condition"
+        }
+      }
+    },
+    "expressions": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "logical_operator": {
+          "description": "The operator to apply to the collection of conditions Possible values are: `OR`, `AND`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "expressions"
+        },
+        "conditions": {
+          "description": "Conditions to apply to the expression Structure is [documented below](#nested_actions_actions_pub_sub_notification_pubsub_condition_expressions_conditions).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "expressions"
+        }
+      }
+    },
+    "conditions": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "minimum_risk_score": {
+          "description": "The minimum data risk score that triggers the condition. Possible values are: `HIGH`, `MEDIUM_OR_HIGH`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "conditions"
+        },
+        "minimum_sensitivity_score": {
+          "description": "The minimum sensitivity level that triggers the condition. Possible values are: `HIGH`, `MEDIUM_OR_HIGH`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "conditions"
+        },
+        "created_after": {
+          "description": "File store must have been created after this date. Used to avoid backfilling. A timestamp in RFC3339 UTC \"Zulu\" format with nanosecond resolution and upto nine fractional digits.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "conditions"
+        },
+        "or_conditions": {
+          "description": "At least one of the conditions must be true for a table to be scanned. Structure is [documented below](#nested_targets_targets_big_query_target_conditions_or_conditions).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "conditions"
+        },
+        "types": {
+          "description": "Data profiles will only be generated for the database resource types specified in this field. If not specified, defaults to [DATABASE_RESOURCE_TYPE_ALL_SUPPORTED_TYPES]. Each value may be one of: `DATABASE_RESOURCE_TYPE_ALL_SUPPORTED_TYPES`, `DATABASE_RESOURCE_TYPE_TABLE`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "conditions"
+        },
+        "type_collection": {
+          "description": "Restrict discovery to categories of table types. Currently view, materialized view, snapshot and non-biglake external tables are supported. Possible values are: `BIG_QUERY_COLLECTION_ALL_TYPES`, `BIG_QUERY_COLLECTION_ONLY_SUPPORTED_TYPES`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "conditions"
+        },
+        "database_engines": {
+          "description": "Database engines that should be profiled. Optional. Defaults to ALL_SUPPORTED_DATABASE_ENGINES if unspecified. Each value may be one of: `ALL_SUPPORTED_DATABASE_ENGINES`, `MYSQL`, `POSTGRES`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "conditions"
+        },
+        "min_age": {
+          "description": "Duration format. Minimum age a file store must have. If set, the value must be 1 hour or greater.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "conditions"
+        },
+        "cloud_storage_conditions": {
+          "description": "Cloud Storage conditions. Structure is [documented below](#nested_targets_targets_cloud_storage_target_conditions_cloud_storage_conditions).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "conditions"
+        }
+      }
+    },
+    "tag_resources": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "tag_conditions": {
+          "description": "The tags to associate with different conditions. Structure is [documented below](#nested_actions_actions_tag_resources_tag_conditions).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "tag_resources"
+        },
+        "profile_generations_to_tag": {
+          "description": "The profile generations for which the tag should be attached to resources. If you attach a tag to only new profiles, then if the sensitivity score of a profile subsequently changes, its tag doesn't change. By default, this field includes only new profiles. To include both new and updated profiles for tagging, this field should explicitly include both `PROFILE_GENERATION_NEW` and `PROFILE_GENERATION_UPDATE`. Each value may be one of: `PROFILE_GENERATION_NEW`, `PROFILE_GENERATION_UPDATE`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "tag_resources"
+        },
+        "lower_data_risk_to_low": {
+          "description": "Whether applying a tag to a resource should lower the risk of the profile for that resource. For example, in conjunction with an [IAM deny policy](https://cloud.google.com/iam/docs/deny-overview), you can deny all principals a permission if a tag value is present, mitigating the risk of the resource. This also lowers the data risk of resources at the lower levels of the resource hierarchy. For example, reducing the data risk of a table data profile also reduces the data risk of the constituent column data profiles.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "tag_resources"
+        }
+      }
+    },
+    "tag_conditions": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "tag": {
+          "description": "The tag value to attach to resources. Structure is [documented below](#nested_actions_actions_tag_resources_tag_conditions_tag_conditions_tag).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "tag_conditions"
+        },
+        "sensitivity_score": {
+          "description": "Conditions attaching the tag to a resource on its profile having this sensitivity score. Structure is [documented below](#nested_actions_actions_tag_resources_tag_conditions_tag_conditions_sensitivity_score).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "tag_conditions"
+        }
+      }
+    },
+    "tag": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "namespaced_value": {
+          "description": "The namespaced name for the tag value to attach to resources. Must be in the format `{parent_id}/{tag_key_short_name}/{short_name}`, for example, \"123456/environment/prod\".",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "tag"
+        }
+      }
+    },
+    "sensitivity_score": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "score": {
+          "description": "The sensitivity score applied to the resource. Possible values are: `SENSITIVITY_LOW`, `SENSITIVITY_MODERATE`, `SENSITIVITY_HIGH`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "sensitivity_score"
+        }
+      }
+    },
+    "big_query_target": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "filter": {
+          "description": "Required. The tables the discovery cadence applies to. The first target with a matching filter will be the one to apply to a table Structure is [documented below](#nested_targets_targets_big_query_target_filter).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "big_query_target"
+        },
+        "conditions": {
+          "description": "In addition to matching the filter, these conditions must be true before a profile is generated Structure is [documented below](#nested_targets_targets_big_query_target_conditions).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "big_query_target"
+        },
+        "cadence": {
+          "description": "How often and when to update profiles. New tables that match both the fiter and conditions are scanned as quickly as possible depending on system capacity. Structure is [documented below](#nested_targets_targets_big_query_target_cadence).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "big_query_target"
+        },
+        "disabled": {
+          "description": "Tables that match this filter will not have profiles created.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "big_query_target"
+        }
+      }
+    },
+    "filter": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "tables": {
+          "description": "A specific set of tables for this filter to apply to. A table collection must be specified in only one filter per config. Structure is [documented below](#nested_targets_targets_big_query_target_filter_tables).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "filter"
+        },
+        "other_tables": {
+          "description": "Catch-all. This should always be the last filter in the list because anything above it will apply first.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "filter"
+        },
+        "table_reference": {
+          "description": "The table to scan. Discovery configurations including this can only include one DiscoveryTarget (the DiscoveryTarget with this TableReference). Structure is [documented below](#nested_targets_targets_big_query_target_filter_table_reference).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "filter"
+        },
+        "collection": {
+          "description": "A specific set of buckets for this filter to apply to. Structure is [documented below](#nested_targets_targets_cloud_storage_target_filter_collection).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "filter"
+        },
+        "others": {
+          "description": "Match discovery resources not covered by any other filter.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "filter"
+        },
+        "database_resource_reference": {
+          "description": "The database resource to scan. Targets including this can only include one target (the target with this database resource reference). Structure is [documented below](#nested_targets_targets_cloud_sql_target_filter_database_resource_reference).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "filter"
+        },
+        "cloud_storage_resource_reference": {
+          "description": "The bucket to scan. Targets including this can only include one target (the target with this bucket). This enables profiling the contents of a single bucket, while the other options allow for easy profiling of many buckets within a project or an organization. Structure is [documented below](#nested_targets_targets_cloud_storage_target_filter_cloud_storage_resource_reference).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "filter"
+        }
+      }
+    },
+    "tables": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "include_regexes": {
+          "description": "A collection of regular expressions to match a BQ table against. Structure is [documented below](#nested_targets_targets_big_query_target_filter_tables_include_regexes).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "tables"
+        }
+      }
+    },
+    "include_regexes": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "patterns": {
+          "description": "The group of regular expression patterns to match against one or more file stores. Maximum of 100 entries. The sum of all lengths of regular expressions can't exceed 10 KiB. Structure is [documented below](#nested_targets_targets_cloud_storage_target_filter_collection_include_regexes_patterns).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "include_regexes"
+        }
+      }
+    },
+    "patterns": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "project_id_regex": {
+          "description": "For organizations, if unset, will match all projects. Has no effect for data profile configurations created within a project.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "patterns"
+        },
+        "dataset_id_regex": {
+          "description": "if unset, this property matches all datasets",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "patterns"
+        },
+        "table_id_regex": {
+          "description": "if unset, this property matches all tables",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "patterns"
+        },
+        "instance_regex": {
+          "description": "Regex to test the instance name against. If empty, all instances match.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "patterns"
+        },
+        "database_regex": {
+          "description": "Regex to test the database name against. If empty, all databases match.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "patterns"
+        },
+        "database_resource_name_regex": {
+          "description": "Regex to test the database resource's name against. An example of a database resource name is a table's name. Other database resource names like view names could be included in the future. If empty, all database resources match.'",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "patterns"
+        },
+        "cloud_storage_regex": {
+          "description": "Regex for Cloud Storage. Structure is [documented below](#nested_targets_targets_cloud_storage_target_filter_collection_include_regexes_patterns_patterns_cloud_storage_regex).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "patterns"
+        }
+      }
+    },
+    "table_reference": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "dataset_id": {
+          "description": "Dataset ID of the table.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "table_reference"
+        },
+        "table_id": {
+          "description": "Name of the table.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "table_reference"
+        }
+      }
+    },
+    "or_conditions": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "min_age": {
+          "description": "Duration format. The minimum age a table must have before Cloud DLP can profile it. Value greater than 1.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "or_conditions"
+        },
+        "min_row_count": {
+          "description": "Minimum number of rows that should be present before Cloud DLP profiles as a table.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "or_conditions"
+        }
+      }
+    },
+    "types": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "types": {
+          "description": "A set of BiqQuery table types Each value may be one of: `BIG_QUERY_TABLE_TYPE_TABLE`, `BIG_QUERY_TABLE_TYPE_EXTERNAL_BIG_LAKE`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "types"
+        }
+      }
+    },
+    "cadence": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "schema_modified_cadence": {
+          "description": "Governs when to update data profiles when a schema is modified Structure is [documented below](#nested_targets_targets_big_query_target_cadence_schema_modified_cadence).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cadence"
+        },
+        "table_modified_cadence": {
+          "description": "Governs when to update profile when a table is modified. Structure is [documented below](#nested_targets_targets_big_query_target_cadence_table_modified_cadence).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cadence"
+        },
+        "inspect_template_modified_cadence": {
+          "description": "Governs when to update data profiles when the inspection rules defined by the `InspectTemplate` change. If not set, changing the template will not cause a data profile to update. Structure is [documented below](#nested_targets_targets_big_query_target_cadence_inspect_template_modified_cadence).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cadence"
+        }
+      }
+    },
+    "schema_modified_cadence": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "types": {
+          "description": "The types of schema modifications to consider. Defaults to NEW_COLUMNS. Each value may be one of: `NEW_COLUMNS`, `REMOVED_COLUMNS`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "schema_modified_cadence"
+        },
+        "frequency": {
+          "description": "Frequency to regenerate data profiles when the schema is modified. Defaults to monthly. Possible values are: `UPDATE_FREQUENCY_NEVER`, `UPDATE_FREQUENCY_DAILY`, `UPDATE_FREQUENCY_MONTHLY`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "schema_modified_cadence"
+        }
+      }
+    },
+    "table_modified_cadence": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "types": {
+          "description": "The type of events to consider when deciding if the table has been modified and should have the profile updated. Defaults to MODIFIED_TIMESTAMP Each value may be one of: `TABLE_MODIFIED_TIMESTAMP`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "table_modified_cadence"
+        },
+        "frequency": {
+          "description": "How frequently data profiles can be updated when tables are modified. Defaults to never. Possible values are: `UPDATE_FREQUENCY_NEVER`, `UPDATE_FREQUENCY_DAILY`, `UPDATE_FREQUENCY_MONTHLY`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "table_modified_cadence"
+        }
+      }
+    },
+    "inspect_template_modified_cadence": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "frequency": {
+          "description": "How frequently data profiles can be updated when the template is modified. Defaults to never. Possible values are: `UPDATE_FREQUENCY_NEVER`, `UPDATE_FREQUENCY_DAILY`, `UPDATE_FREQUENCY_MONTHLY`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "inspect_template_modified_cadence"
+        }
+      }
+    },
+    "cloud_sql_target": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "filter": {
+          "description": "Required. The tables the discovery cadence applies to. The first target with a matching filter will be the one to apply to a table. Structure is [documented below](#nested_targets_targets_cloud_sql_target_filter).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_sql_target"
+        },
+        "conditions": {
+          "description": "In addition to matching the filter, these conditions must be true before a profile is generated. Structure is [documented below](#nested_targets_targets_cloud_sql_target_conditions).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_sql_target"
+        },
+        "generation_cadence": {
+          "description": "How often and when to update profiles. New tables that match both the filter and conditions are scanned as quickly as possible depending on system capacity. Structure is [documented below](#nested_targets_targets_cloud_sql_target_generation_cadence).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_sql_target"
+        },
+        "disabled": {
+          "description": "Disable profiling for database resources that match this filter.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_sql_target"
+        }
+      }
+    },
+    "collection": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "include_regexes": {
+          "description": "A collection of regular expressions to match a file store against. Structure is [documented below](#nested_targets_targets_cloud_storage_target_filter_collection_include_regexes).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "collection"
+        }
+      }
+    },
+    "database_resource_reference": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "project_id": {
+          "description": "Required. If within a project-level config, then this must match the config's project ID.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "database_resource_reference"
+        },
+        "instance": {
+          "description": "Required. The instance where this resource is located. For example: Cloud SQL instance ID.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "database_resource_reference"
+        },
+        "database": {
+          "description": "Required. Name of a database within the instance.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "database_resource_reference"
+        },
+        "database_resource": {
+          "description": "Required. Name of a database resource, for example, a table within the database.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "database_resource_reference"
+        }
+      }
+    },
+    "generation_cadence": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "schema_modified_cadence": {
+          "description": "Governs when to update data profiles when a schema is modified Structure is [documented below](#nested_targets_targets_cloud_sql_target_generation_cadence_schema_modified_cadence).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "generation_cadence"
+        },
+        "refresh_frequency": {
+          "description": "Data changes in Cloud Storage can't trigger reprofiling. If you set this field, profiles are refreshed at this frequency regardless of whether the underlying buckets have changes. Defaults to never. Possible values are: `UPDATE_FREQUENCY_NEVER`, `UPDATE_FREQUENCY_DAILY`, `UPDATE_FREQUENCY_MONTHLY`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "generation_cadence"
+        },
+        "inspect_template_modified_cadence": {
+          "description": "Governs when to update data profiles when the inspection rules defined by the `InspectTemplate` change. If not set, changing the template will not cause a data profile to update. Structure is [documented below](#nested_targets_targets_cloud_storage_target_generation_cadence_inspect_template_modified_cadence).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "generation_cadence"
+        }
+      }
+    },
+    "cloud_storage_target": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "filter": {
+          "description": "The buckets the generation_cadence applies to. The first target with a matching filter will be the one to apply to a bucket. Structure is [documented below](#nested_targets_targets_cloud_storage_target_filter).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_storage_target"
+        },
+        "conditions": {
+          "description": "In addition to matching the filter, these conditions must be true before a profile is generated. Structure is [documented below](#nested_targets_targets_cloud_storage_target_conditions).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_storage_target"
+        },
+        "generation_cadence": {
+          "description": "How often and when to update profiles. New buckets that match both the filter and conditions are scanned as quickly as possible depending on system capacity. Structure is [documented below](#nested_targets_targets_cloud_storage_target_generation_cadence).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_storage_target"
+        },
+        "disabled": {
+          "description": "Disable profiling for buckets that match this filter.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_storage_target"
+        }
+      }
+    },
+    "cloud_storage_regex": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "project_id_regex": {
+          "description": "For organizations, if unset, will match all projects.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_storage_regex"
+        },
+        "bucket_name_regex": {
+          "description": "Regex to test the bucket name against. If empty, all buckets match. Example: \"marketing2021\" or \"(marketing)\\d{4}\" will both match the bucket gs://marketing2021",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_storage_regex"
+        }
+      }
+    },
+    "cloud_storage_resource_reference": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "bucket_name": {
+          "description": "The bucket to scan.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_storage_resource_reference"
+        },
+        "project_id": {
+          "description": "If within a project-level config, then this must match the config's project id.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_storage_resource_reference"
+        }
+      }
+    },
+    "cloud_storage_conditions": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "included_object_attributes": {
+          "description": "Only objects with the specified attributes will be scanned. If an object has one of the specified attributes but is inside an excluded bucket, it will not be scanned. Defaults to [ALL_SUPPORTED_OBJECTS]. A profile will be created even if no objects match the included_object_attributes. Each value may be one of: `ALL_SUPPORTED_OBJECTS`, `STANDARD`, `NEARLINE`, `COLDLINE`, `ARCHIVE`, `REGIONAL`, `MULTI_REGIONAL`, `DURABLE_REDUCED_AVAILABILITY`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_storage_conditions"
+        },
+        "included_bucket_attributes": {
+          "description": "Only objects with the specified attributes will be scanned. Defaults to [ALL_SUPPORTED_BUCKETS] if unset. Each value may be one of: `ALL_SUPPORTED_BUCKETS`, `AUTOCLASS_DISABLED`, `AUTOCLASS_ENABLED`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_storage_conditions"
+        }
+      }
+    }
+  }
+}
