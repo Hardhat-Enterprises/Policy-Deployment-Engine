@@ -1,10 +1,6 @@
-# Describe your resource type here
-# Keep "c" as the name to indicate that this resource and its attributes are compliant
-
-
 resource "google_dataproc_metastore_federation" "c" {
   version = "3.1.2"   
-  federation_id = "metastore-fed" # good format
+  federation_id = "metastore-fed" 
   location = "australia-southeast2"
   project = 2 
 

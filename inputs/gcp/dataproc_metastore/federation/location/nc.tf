@@ -1,8 +1,5 @@
-# Describe your resource type here
-# Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
-
 resource "google_dataproc_metastore_federation" "nc" {
-  version = "3.0.0"   # less than 3.1.2
+  version = "3.0.0"   
   federation_id = "metastore-fed"
   location = "global"
   project = 2 

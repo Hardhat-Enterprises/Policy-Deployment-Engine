@@ -9,9 +9,9 @@ conditions := [
     "remedies":[ "Change kms key location to reside in australia-southeast1 or australia-southeast2 "]},
     {
         "condition": "A message about what the condition does",
-        "attribute_path" : ["encryption_config", 0, "kms_key"], # An array of strings and indicies eg. ["rsa",0,"key"]
-        "values" : ["projects-example/*/dpm-ring/metastore-cmek/",[["australia-southeast1", "australia-southeast2"]]], # Values to compare against
-        "policy_type" : "patern_whitelist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
+        "attribute_path" : ["encryption_config", 0, "kms_key"], 
+        "values" : ["projects-example/*/dpm-ring/metastore-cmek/",[["australia-southeast1", "australia-southeast2"]]], 
+        "policy_type" : "patern_whitelist" 
     }
     ]
 ]

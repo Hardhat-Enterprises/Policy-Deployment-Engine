@@ -1,4 +1,4 @@
-package terraform.gcp.security.dataproc_metastore.service.metadata_integration # Edit here 
+package terraform.gcp.security.dataproc_metastore.service.metadata_integration 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.dataproc_metastore.service.vars
 

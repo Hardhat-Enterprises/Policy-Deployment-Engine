@@ -11,7 +11,7 @@ conditions := [
   },
   {
     "condition": "Check if the metastore is protected against accidental deletion.",
-    "attribute_path": ["planned_values", "root_module", "resources", "values", 0, "deletion_protection"],
+    "attribute_path": ["deletion_protection"],
     "values": [true],
     "policy_type": "whitelist"
   }

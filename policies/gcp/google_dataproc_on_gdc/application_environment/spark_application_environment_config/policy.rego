@@ -1,4 +1,4 @@
-package terraform.gcp.security.google_dataproc_on_gdc.application_environment.spark_application_environment_config # Edit here 
+package terraform.gcp.security.google_dataproc_on_gdc.application_environment.spark_application_environment_config  
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.google_dataproc_on_gdc.application_environment.vars
 

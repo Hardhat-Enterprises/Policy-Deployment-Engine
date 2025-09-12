@@ -1,4 +1,3 @@
-
 resource "google_dataproc_gdc_application_environment" "nc" {
      location        = "us1"
      serviceinstance = "do-not-delete-dataproc-gdc-instance"

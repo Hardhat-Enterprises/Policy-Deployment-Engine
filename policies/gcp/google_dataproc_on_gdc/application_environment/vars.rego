@@ -2,7 +2,7 @@ package terraform.gcp.security.google_dataproc_on_gdc.application_environment.va
 
 
 variables := {
-    "friendly_resource_name": "DP on GDC", # eg., "GCS Bucket",
-    "resource_type":  "google_dataproc_gdc_application_environment", # eg., "google_storage_bucket"
-    "resource_value_name" : "name" # eg., "name"
+    "friendly_resource_name": "DP on GDC", 
+    "resource_type":  "google_dataproc_gdc_application_environment", 
+    "resource_value_name" : "name" 
 }

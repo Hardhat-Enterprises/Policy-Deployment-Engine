@@ -10,7 +10,7 @@ conditions := [
     },
     {
       "condition": "Checks location is in Australia",
-      "attribute_path": ["location"],   # your helpers read top-level keys via object.get
+      "attribute_path": ["location"],   
       "values": ["australia-southeast2", "australia-southeast1"],
       "policy_type": "whitelist"
     }
