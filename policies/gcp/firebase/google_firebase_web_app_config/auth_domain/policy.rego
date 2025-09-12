@@ -9,8 +9,8 @@ conditions := [
     "remedies":[ "Use a company-approved domain ","remove extra domains"]},
     {
         "condition": "Company domain only",
-        "attribute_path" : ["auth_domain"], 
-        "values" : ["ankitacompany.com"], 
+        "attribute_path": ["values", "auth_domain"],  
+        "values" : ["ankita-firebase-web-app.firebaseapp.com], 
         "policy_type" : "whitelist"
     }
     ]
