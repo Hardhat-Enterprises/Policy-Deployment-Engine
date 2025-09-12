@@ -17,6 +17,7 @@ resource "google_cloudfunctions2_function" "nc" {
     max_instance_count = 2
     available_memory   = "1024M"
     timeout_seconds    = 120
+    ingress_settings   = "ALLOW_ALL"
     environment_variables = {
       GREETING = "Hello"
     }

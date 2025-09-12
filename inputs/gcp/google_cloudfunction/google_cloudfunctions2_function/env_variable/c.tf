@@ -1,25 +1,14 @@
 resource "google_cloudfunctions2_function" "c" {
-  name     = "c"
+
+  name = ""
   location = "us-central1"
+  description = "a new function"
 
   build_config {
-    runtime     = "python311"
-    entry_point = "hello_world"
-    source {
-      storage_source {
-        bucket = "dummy-bucket" 
-        object = "source.zip"   
-      }
-    }
-  }
-
-  service_config {
-    max_instance_count = 2
-    available_memory   = "512M"
-    timeout_seconds    = 120
-    ingress_settings   = "ALLOW_ALL"
+    runtime     = "nodejs20"
+    entry_point = "entryPoint" # Set the entry point in the code
     environment_variables = {
-      GREETING = "Hello"
+      BUILD_CONFIG_TEST = "build_test"
     }
   }
 }

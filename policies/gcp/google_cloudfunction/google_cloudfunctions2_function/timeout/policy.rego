@@ -9,7 +9,7 @@ conditions := [
     "remedies":[ "Ensure timeout_seconds is 120,300 seconds"]},
     {
         "condition": "Test if timeout_seconds  is within 120 to 300 seconds",
-        "attribute_path" : ["service_config[_]", "timeout_seconds"],
+        "attribute_path" : ["service_config", 0, "timeout_seconds"],
         "values" : [120,300],
         "policy_type" : "range" 
     }

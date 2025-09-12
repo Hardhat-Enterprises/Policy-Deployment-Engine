@@ -13,7 +13,7 @@ conditions := [
     },
     {
       "condition": "Function ingress must not allow public access.",
-      "attribute_path": ["ingress_settings"],
+      "attribute_path": ["service_config", 0, "ingress_settings"],
       "values": ["ALLOW_INTERNAL_ONLY"],
       "policy_type": "whitelist"
     }

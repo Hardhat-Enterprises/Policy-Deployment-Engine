@@ -6,16 +6,18 @@ import data.terraform.gcp.security.google_cloudfunction.google_cloudfunctions2_f
 conditions := [
   [
     {
-      "situation_description": "Function is missing a VPC connector, which may expose it to public internet egress.",
+      "situation_description": "Function must specify a VPC connector to route traffic through a private network.",
       "remedies": [
-        "Specify a 'vpc_connector' in the 'service_config' block to route traffic through a private network."
+        "Specify a 'vpc_connector' in the 'service_config' block using an approved connector."
       ]
     },
     {
-      "condition": "Function must specify a VPC connector.",
-      "attribute_path": ["vpc_connector"],
-       "values": [""],
-      "policy_type": "blacklist"
+      "condition": "Function must use an approved VPC connector.",
+      "attribute_path": ["service_config", 0, "vpc_connector"],
+      "values": [
+        "projects/my-project/locations/us-central1/connectors/my-vpc-connector"
+      ],
+      "policy_type": "whitelist"
     }
   ]
 ]
