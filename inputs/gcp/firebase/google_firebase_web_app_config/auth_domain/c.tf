@@ -1,18 +1,9 @@
-# This is for demonstrates a compliant case for the allowed domain policy only.
-# Keep "c" as the name to indicate that this resource and its attributes are compliant
 
-resource "google_firebase_web_app" "c" {
-  provider     = google-beta
-  display_name  = "Firebase Web App C"
-  project       = "ankita-firebase-web-app"
+
+
+data "google_firebase_web_app_config" "compliant_app" {
+  project    = "ankita-firebase-web-app"
+    web_app_id = "1:770781975275:web:a0378fe3345633f1f324ae"
+
+  provider   = google-beta
 }
-
-data "google_firebase_web_app_config" "c" {
-  provider     = google-beta
-  project    = google_firebase_web_app.c.project
-  web_app_id = google_firebase_web_app.c.app_id
-}
-
-  output "firebase_auth_domain_c" {
-    value = data.google_firebase_web_app_config.c.auth_domain
-  }

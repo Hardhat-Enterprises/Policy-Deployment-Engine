@@ -1,19 +1,6 @@
-# Non-compliant firebase web app configuration
-# This is for demonstrating a non-compliant case for the allowed-domains policy.
-# Keep "nc" as the name to indicate non-compliant attributes
 
-resource "google_firebase_web_app" "nc" {
-  provider      = google-beta
-  display_name  = "Firebase Web App NC"
-  project       = "reas-bd5ca"
-}
-
-data "google_firebase_web_app_config" "nc" {
+data "google_firebase_web_app_config" "noncompliant_app" {
+  project    = "reas-bd5ca"
+  web_app_id = "1:76952834086:web:d8e0f6cb5b7f73c47ad6e7"
   provider   = google-beta
-  project    = google_firebase_web_app.nc.project
-  web_app_id = google_firebase_web_app.nc.app_id
-}
-
-output "firebase_auth_domain_nc" {
-  value = data.google_firebase_web_app_config.nc.auth_domain
 }
