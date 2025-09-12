@@ -1,6 +1,7 @@
 # Describe your resource type here
 # Keep "c" as the name to indicate that this resource and its attributes are compliant
 
+# Compliant Project
 resource "google_project" "project" {
   project_id      = "tf-test-compliant"
   name            = "tf-test-compliant"
@@ -9,9 +10,10 @@ resource "google_project" "project" {
   provider        = google-beta
 }
 
+# Compliant Kafka Cluster
 resource "google_managed_kafka_cluster" "gmk_cluster" {
   project    = google_project.project.project_id
-  cluster_id = "my-cluster"
+  cluster_id = "compliant-kafka-cluster"
   location   = "us-central1"
 
   capacity_config {
@@ -22,7 +24,7 @@ resource "google_managed_kafka_cluster" "gmk_cluster" {
   gcp_config {
     access_config {
       network_configs {
-        subnet = "projects/${google_project.project.project_id}/regions/us-central1/subnetworks/default"
+        subnet = "projects/${google_project.project.project_id}/regions/us-central1/subnetworks/private-subnet"
       }
     }
   }
@@ -30,11 +32,12 @@ resource "google_managed_kafka_cluster" "gmk_cluster" {
   provider = google-beta
 }
 
+# ✅ Compliant Kafka Connect Cluster (No public exposure)
 resource "google_managed_kafka_connect_cluster" "c" {
-  project            = google_project.project.project_id
-  connect_cluster_id = "compliant-connect-cluster"
-  kafka_cluster      = "projects/${google_project.project.project_id}/locations/us-central1/clusters/${google_managed_kafka_cluster.gmk_cluster.cluster_id}"
-  location           = "us-central1"
+  project             = google_project.project.project_id
+  connect_cluster_id  = "compliant-connect-cluster"
+  kafka_cluster       = "projects/${google_project.project.project_id}/locations/us-central1/clusters/${google_managed_kafka_cluster.gmk_cluster.cluster_id}"
+  location            = "us-central1"
 
   capacity_config {
     vcpu_count   = 4
@@ -44,16 +47,15 @@ resource "google_managed_kafka_connect_cluster" "c" {
   gcp_config {
     access_config {
       network_configs {
-        primary_subnet   = "projects/${google_project.project.project_id}/regions/us-central1/subnetworks/default"
-        dns_domain_names = ["internal.managed.kafka"]
+        primary_subnet   = "projects/${google_project.project.project_id}/regions/us-central1/subnetworks/private-subnet"
+        
       }
     }
   }
 
   labels = {
-    environment = "production"
+    security = "compliant"
   }
 
   provider = google-beta
 }
-
