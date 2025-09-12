@@ -1,4 +1,4 @@
-package terraform.gcp.security.Chronicle.data_access_scope.vars
+package terraform.gcp.security.chronicle.data_access_scope.vars
 
 variables := {
   "friendly_resource_name": "Data Access Scope",

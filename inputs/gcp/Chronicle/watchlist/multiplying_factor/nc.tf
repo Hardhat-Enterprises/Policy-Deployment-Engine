@@ -1,8 +1,8 @@
 resource "google_chronicle_watchlist" "nc" {
   project       = "fake-project"  
-  location      = "us"
+  location      = "australia-southeast1"
   instance      = "00000000-0000-0000-0000-000000000000"
-  watchlist_id  = "low-risk-watchlist"
+  watchlist_id  = "nc"
   description   = "Watchlist with too low multiplier"
   display_name  = "Low Risk List"
   multiplying_factor = 0.3

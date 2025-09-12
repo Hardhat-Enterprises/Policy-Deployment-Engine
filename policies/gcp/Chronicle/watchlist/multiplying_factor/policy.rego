@@ -1,7 +1,7 @@
-package terraform.gcp.security.Chronicle.watchlist.multiplying_factor
+package terraform.gcp.security.chronicle.watchlist.multiplying_factor
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.Chronicle.watchlist.vars
+import data.terraform.gcp.security.chronicle.watchlist.vars
 
 conditions := [
     [

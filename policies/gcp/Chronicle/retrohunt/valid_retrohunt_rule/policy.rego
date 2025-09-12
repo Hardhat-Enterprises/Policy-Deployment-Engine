@@ -1,7 +1,7 @@
-package terraform.gcp.security.Chronicle.retrohunt.valid_retrohunt_rule
+package terraform.gcp.security.chronicle.retrohunt.valid_retrohunt_rule
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.Chronicle.retrohunt.vars
+import data.terraform.gcp.security.chronicle.retrohunt.vars
 
 conditions := [[
   {

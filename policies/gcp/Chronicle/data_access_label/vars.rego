@@ -1,4 +1,4 @@
-package terraform.gcp.security.Chronicle.data_access_label.vars
+package terraform.gcp.security.chronicle.data_access_label.vars
 
 variables := {
   "friendly_resource_name": "Data Access Label",

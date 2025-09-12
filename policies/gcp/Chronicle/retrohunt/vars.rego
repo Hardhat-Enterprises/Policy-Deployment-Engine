@@ -1,4 +1,4 @@
-package terraform.gcp.security.Chronicle.retrohunt.vars
+package terraform.gcp.security.chronicle.retrohunt.vars
 
 variables := {
   "friendly_resource_name": "Retrohunt",

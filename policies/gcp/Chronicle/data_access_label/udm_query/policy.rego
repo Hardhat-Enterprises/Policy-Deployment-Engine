@@ -1,7 +1,7 @@
-package terraform.gcp.security.Chronicle.data_access_label.udm_query
+package terraform.gcp.security.chronicle.data_access_label.udm_query
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.Chronicle.data_access_label.vars
+import data.terraform.gcp.security.chronicle.data_access_label.vars
 
 conditions := [
   [

@@ -1,4 +1,4 @@
-package terraform.gcp.security.Chronicle.reference_list.vars
+package terraform.gcp.security.chronicle.reference_list.vars
 
 variables := {
     "friendly_resource_name": "Chronicle Reference List",

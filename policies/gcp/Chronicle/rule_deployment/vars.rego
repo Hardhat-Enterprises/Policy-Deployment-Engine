@@ -1,4 +1,4 @@
-package terraform.gcp.security.Chronicle.rule_deployment.vars
+package terraform.gcp.security.chronicle.rule_deployment.vars
 
 variables := {
     "friendly_resource_name": "Chronicle Rule Deployment",

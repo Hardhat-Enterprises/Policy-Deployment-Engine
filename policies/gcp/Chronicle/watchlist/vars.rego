@@ -1,4 +1,4 @@
-package terraform.gcp.security.Chronicle.watchlist.vars
+package terraform.gcp.security.chronicle.watchlist.vars
 
 variables := {
     "friendly_resource_name": "Chronicle Watchlist",
