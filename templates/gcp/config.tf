@@ -1,11 +1,11 @@
 # ##### DO NOT EDIT ######
 
-# terraform {
-#   required_providers {
-#     google = {
-#       source  = "hashicorp/google"
-#     }
-#   }
-# }
+terraform {
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+    }
+  }
+}
 
-# provider "google" {}
+provider "google" {}

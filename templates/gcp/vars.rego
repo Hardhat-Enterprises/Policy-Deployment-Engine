@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_platform_service.<resource_type>.vars
+package terraform.gcp.security.<service>.<resource_type>.vars
 
 
 variables := {

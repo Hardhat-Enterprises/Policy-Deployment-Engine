@@ -1,25 +1,23 @@
-package terraform.gcp.security.cloud_platform_service.google_folder.deletion_protection
-
+package terraform.gcp.security.<service>.<resource_type>.<policy_name> # Edit here 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.cloud_platform_service.google_folder.vars
+import data.terraform.gcp.security.<service>.<resource_type>.vars
 
 # STEP 1: STUDY YOUR RESOURCE AND ITS ATTRIBUTES, THEN FILL IN THE VARS FILE
 
 # STEP 2: CREATE SCENARIOS (can be simple (one condition) or complex (multiple linked conditions) )
 conditions := [
     [
-    {"situation_description": "Folders must have deletion protection enabled",
-     "remedies": ["Set deletion_protection = true to prevent accidental deletion"]},
+    {"situation_description" : "A self documenting message about the conditions within",
+    "remedies":[ "Something that fixes the issues in this situation","You can have multiple items in the array"]},
     {
-      "condition": "Require deletion_protection to be true",
-      "attribute_path": ["deletion_protection"],
-      "values": [true],
-      "policy_type": "whitelist"
+        "condition": "A message about what the condition does",
+        "attribute_path" : [], # An array of strings and indicies eg. ["rsa",0,"key"]
+        "values" : [], # Values to compare against
+        "policy_type" : "" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
     }
-  ]
+    ]
 ]
- 
-```
+    """
     Examples
     Remove this in actual policies
 
@@ -111,7 +109,7 @@ conditions := [
         "policy_type" : "pattern blacklist" # Can be any value but root
     }
     ]
-```
+    """
 
 # Displays a general message about policy compliance
 # Use 'opa eval ... "data.terraform.gcp.security.<service>.<resource_type>.<policy_name>.message"
@@ -121,4 +119,3 @@ message := helpers.get_multi_summary(conditions, vars.variables).message
 # Useful for debugging
 # Use 'opa eval ... "data.terraform.gcp.security.<service>.<resource_type>.<policy_name>.details"
 details := helpers.get_multi_summary(conditions, vars.variables).details
-
