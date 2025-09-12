@@ -2,6 +2,7 @@
 # Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
 
 
+# Non-Compliant Project
 resource "google_project" "project_nc" {
   project_id      = "tf-test-noncompliant"
   name            = "tf-test-noncompliant"
@@ -10,21 +11,20 @@ resource "google_project" "project_nc" {
   provider        = google-beta
 }
 
+# Non-Compliant Kafka Cluster
 resource "google_managed_kafka_cluster" "gmk_cluster_nc" {
   project    = google_project.project_nc.project_id
-  cluster_id = "my-cluster"
+  cluster_id = "noncompliant-kafka-cluster"
   location   = "us-central1"
 
   capacity_config {
     vcpu_count   = 3
     memory_bytes = 3221225472
-
   }
 
   gcp_config {
     access_config {
       network_configs {
-
         subnet = "projects/${google_project.project_nc.project_id}/regions/us-central1/subnetworks/default"
       }
     }
@@ -33,34 +33,30 @@ resource "google_managed_kafka_cluster" "gmk_cluster_nc" {
   provider = google-beta
 }
 
+# ❌ Non-Compliant Kafka Connect Cluster (Publicly exposed)
 resource "google_managed_kafka_connect_cluster" "nc" {
-  project            = google_project.project_nc.project_id
-  connect_cluster_id = "noncompliant-connect-cluster"
-  kafka_cluster      = "projects/${google_project.project_nc.project_id}/locations/us-central1/clusters/${google_managed_kafka_cluster.gmk_cluster_nc.cluster_id}"
-  location           = "us-central1"
+  project             = google_project.project_nc.project_id
+  connect_cluster_id  = "noncompliant-connect-cluster"
+  kafka_cluster       = "projects/${google_project.project_nc.project_id}/locations/us-central1/clusters/${google_managed_kafka_cluster.gmk_cluster_nc.cluster_id}"
+  location            = "us-central1"
 
   capacity_config {
-    vcpu_count   = 2                       # ❌ Below min CPU
-    memory_bytes = 2147483648             # ❌ Below min memory
-
+    vcpu_count   = 4
+    memory_bytes = 4294967296
   }
 
   gcp_config {
     access_config {
       network_configs {
-
         primary_subnet   = "projects/${google_project.project_nc.project_id}/regions/us-central1/subnetworks/default"
-        dns_domain_names = ["${google_managed_kafka_cluster.gmk_cluster_nc.cluster_id}.us-central1.managedkafka.${google_project.project_nc.project_id}.cloud.goog"]  # ❌ Public DNS
-
+        
       }
     }
   }
 
   labels = {
-
-    environment = "testing"
+    security = "noncompliant"
   }
 
   provider = google-beta
-
 }
