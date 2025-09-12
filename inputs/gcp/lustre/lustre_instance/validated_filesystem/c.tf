@@ -6,11 +6,11 @@ resource "google_compute_network" "lustre-network1" {
 }
 
 # Create Google Lustre instance
-resource "google_lustre_instance" "compliant_filesystem" {
+resource "google_lustre_instance" "c" {
   project                     = "fake-project"
   instance_id                 = "my-instance"
-  location                    = "us-central1-a"
-  description                 = "lustre filesystem-c"
+  location                    = "australia-southeast1-a"
+  description                 = "c"
   filesystem                  = "fs2"
   capacity_gib                = 18000
   network                     = google_compute_network.lustre-network1.id

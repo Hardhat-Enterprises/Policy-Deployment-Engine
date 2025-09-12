@@ -1,11 +1,11 @@
 # Create VPC network named "my-network1"
 
 # Create Google Lustre instance
-resource "google_lustre_instance" "compliant_network" {
+resource "google_lustre_instance" "c" {
   project                     = "fake-project"
   instance_id                 = "my-instance"
-  location                    = "us-central1-a"
-  description                 = "lustre network-c"
+  location                    = "australia-southeast1-a"
+  description                 = "c"
   filesystem                  = "fs2"
   capacity_gib                = 18000
   network                     = "projects/fs1/global/networks/nw1"

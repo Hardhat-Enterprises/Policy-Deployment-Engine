@@ -1,10 +1,10 @@
 
 # Create Google Lustre instance
-resource "google_lustre_instance" "compliant_gke_support" {
+resource "google_lustre_instance" "c" {
   project                     = "fake-project"
   instance_id                 = "my-instance"
   location                    = "us-central1-a"
-  description                 = "lustre gke_support_enabled-c"
+  description                 = "c"
   filesystem                  = "fs2"
   capacity_gib                = 18000
   network                     = "network1"
