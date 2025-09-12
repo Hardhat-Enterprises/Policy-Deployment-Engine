@@ -2,13 +2,18 @@
 # This is for demonstrating a non-compliant case for the allowed-domains policy.
 # Keep "nc" as the name to indicate non-compliant attributes
 
-resource "google_firebase_web_app" "c" {
+resource "google_firebase_web_app" "nc" {
   provider      = google-beta
-  project       = "ankita-firebase-web-app"
-  display_name  = "Firebase Web App C"
+  display_name  = "Firebase Web App NC"
+  project       = "reas-bd5ca"
 }
 
-data "google_firebase_web_app_config" "c" {
+data "google_firebase_web_app_config" "nc" {
   provider   = google-beta
-  web_app_id = google_firebase_web_app.c.app_id
+  project    = google_firebase_web_app.nc.project
+  web_app_id = google_firebase_web_app.nc.app_id
+}
+
+output "firebase_auth_domain_nc" {
+  value = data.google_firebase_web_app_config.nc.auth_domain
 }
