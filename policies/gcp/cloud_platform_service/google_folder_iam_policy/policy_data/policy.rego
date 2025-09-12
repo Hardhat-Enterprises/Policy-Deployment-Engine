@@ -4,7 +4,7 @@ import data.terraform.gcp.security.cloud_platform_service.google_folder_iam_poli
 
 conditions := [
 
-  # 2a.Block Owner/Editor roles in full policy data.
+  # Block Owner/Editor roles in full policy data.
   [
   {"situation_description": "Folder IAM policy must not grant overly broad roles",
    "remedies": ["Remove roles/owner or roles/editor from policy_data"]},
@@ -18,12 +18,6 @@ conditions := [
 ]
 
 
-# Displays a general message about policy compliance
-# Use 'opa eval ... "data.terraform.gcp.security.<service>.<resource_type>.<policy_name>.message"
 message := helpers.get_multi_summary(conditions, vars.variables).message
-
-# Displays a detailed summary of each resources compliance to every condition and situation
-# Useful for debugging
-# Use 'opa eval ... "data.terraform.gcp.security.<service>.<resource_type>.<policy_name>.details"
 details := helpers.get_multi_summary(conditions, vars.variables).details
 

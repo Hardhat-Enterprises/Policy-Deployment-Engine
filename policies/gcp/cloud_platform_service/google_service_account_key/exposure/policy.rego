@@ -27,7 +27,7 @@ conditions := [
     },
     {
       "condition": "Missing key rotation configuration",
-      "attribute_path": "keepers",  # change from nested path
+      "attribute_path": "keepers", 
       "values": [null],
       "policy_type": "blacklist"
     }

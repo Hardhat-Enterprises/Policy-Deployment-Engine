@@ -4,8 +4,6 @@ import data.terraform.gcp.security.cloud_platform_service.google_folder_iam_audi
 
 
 conditions := [
-
-  # 2d. Require logging, block exemptions.
   # s1: whitelist required log types. e.g., admin-read, data-read, data-write
   [
   {"situation_description": "Audit logging must be enabled for all services",
@@ -25,7 +23,7 @@ conditions := [
   {
     "condition": "Block exempted members in audit logging",
     "attribute_path": ["audit_log_config",0,"exempted_members",0],
-    "values": ["*", [["user:*", "group:.*", "serviceAccount:.*"]]],   # any exemption is blocked
+    "values": ["*", [["user:*", "group:.*", "serviceAccount:.*"]]],  
     "policy_type": "pattern blacklist"
   }
 ]

@@ -4,7 +4,7 @@ import data.terraform.gcp.security.cloud_platform_service.google_folder_iam_memb
 
 conditions := [
 
-  # 2c.Same as binding — block risky roles, check members.
+  # Same as binding — block risky roles, check members.
   [
   {"situation_description": "IAM member must not have overly broad roles",
    "remedies": ["Reassign to least-privilege roles"]},
@@ -17,13 +17,6 @@ conditions := [
 ]
 ]
 
-
-# Displays a general message about policy compliance
-# Use 'opa eval ... "data.terraform.gcp.security.<service>.<resource_type>.<policy_name>.message"
 message := helpers.get_multi_summary(conditions, vars.variables).message
-
-# Displays a detailed summary of each resources compliance to every condition and situation
-# Useful for debugging
-# Use 'opa eval ... "data.terraform.gcp.security.<service>.<resource_type>.<policy_name>.details"
 details := helpers.get_multi_summary(conditions, vars.variables).details
 

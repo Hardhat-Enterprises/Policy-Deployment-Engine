@@ -3,5 +3,5 @@ package terraform.gcp.security.cloud_platform_service.google_folder_iam_member.v
 variables := {
   "friendly_resource_name": "Google Folder IAM Member",
   "resource_type": "google_folder_iam_member",
-  "resource_value_name": "member"  # each instance uniquely tied to its member
+  "resource_value_name": "member" 
 }

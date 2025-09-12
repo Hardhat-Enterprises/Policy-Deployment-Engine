@@ -3,5 +3,5 @@ package terraform.gcp.security.cloud_platform_service.google_folder_iam_binding.
 variables := {
   "friendly_resource_name": "Google Folder IAM Binding",
   "resource_type": "google_folder_iam_binding",
-  "resource_value_name": "role"  # role makes it easy to validate least-privilege checks.
+  "resource_value_name": "role" 
 }
