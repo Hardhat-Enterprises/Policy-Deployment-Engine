@@ -1,3 +1,4 @@
+
 # Describe your resource type here
 # Keep "c" as the name to indicate that this resource and its attributes are compliant
 
@@ -17,11 +18,13 @@ resource "google_managed_kafka_cluster" "gmk_cluster" {
   capacity_config {
     vcpu_count   = 3
     memory_bytes = 3221225472
+
   }
 
   gcp_config {
     access_config {
       network_configs {
+
         subnet = "projects/${google_project.project.project_id}/regions/us-central1/subnetworks/default"
       }
     }
@@ -39,21 +42,26 @@ resource "google_managed_kafka_connect_cluster" "c" {
   capacity_config {
     vcpu_count   = 4
     memory_bytes = 4294967296
+
   }
 
   gcp_config {
     access_config {
       network_configs {
+
         primary_subnet   = "projects/${google_project.project.project_id}/regions/us-central1/subnetworks/default"
         dns_domain_names = ["internal.managed.kafka"]
+
       }
     }
   }
 
   labels = {
+
     environment = "production"
   }
 
   provider = google-beta
 }
 
+   

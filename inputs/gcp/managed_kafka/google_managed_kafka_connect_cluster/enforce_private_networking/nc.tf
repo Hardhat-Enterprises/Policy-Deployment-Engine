@@ -27,7 +27,9 @@ resource "google_managed_kafka_cluster" "gmk_cluster_nc" {
   provider = google-beta
 }
 
+
 resource "google_managed_kafka_connect_cluster" "nc" {
+
   project             = google_project.project_nc.project_id
   connect_cluster_id  = "noncompliant-connect-cluster"
   kafka_cluster       = "projects/${google_project.project_nc.project_id}/locations/us-central1/clusters/${google_managed_kafka_cluster.gmk_cluster_nc.cluster_id}"
