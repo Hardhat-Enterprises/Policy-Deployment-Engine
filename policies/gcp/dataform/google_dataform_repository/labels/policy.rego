@@ -9,26 +9,32 @@ conditions := [
       "remedies": ["Set labels.environment and labels.owner to non-empty values."]
     },
     {
+      "condition": "effective_labels must exist",
+      "attribute_path": ["effective_labels"],
+      "policy_type": "pattern whitelist",
+      "values": ["*"]
+    },
+    {
       "condition": "environment label must exist",
-      "attribute_path": ["effective_labels", "environment"],
+      "attribute_path": ["environment"],
       "values": ["", null],
       "policy_type": "blacklist"
     },
     {
       "condition": "owner label must exist",
-      "attribute_path": ["effective_labels", "owner"],
+      "attribute_path": ["owner"],
       "values": ["", null],
       "policy_type": "blacklist"
     },
     {
       "condition": "cost_center label must exist",
-      "attribute_path": ["effective_labels", "cost_center"],
+      "attribute_path": ["cost_center"],
       "values": ["", null],
       "policy_type": "blacklist"
     },
     {
       "condition": "team label must exist",
-      "attribute_path": ["effective_labels", "team"],
+      "attribute_path": ["team"],
       "values": ["", null],
       "policy_type": "blacklist"
     }

@@ -8,8 +8,14 @@ conditions := [
         {"situation_description" : "Workflow configs must define an invocation_config.service_account",
         "remedies": ["Set invocation_config.service_account to a valid service account email"]},
         {
+            "condition": "invocation_config must exist",
+            "attribute_path" : ["invocation_config", 0],
+            "policy_type" : "pattern whitelist",
+            "values" : ["*"]
+        },
+        {
             "condition": "service_account is required",
-            "attribute_path" : ["invocation_config", 0, "service_account"],
+            "attribute_path" : ["service_account"],
             "policy_type" : "pattern whitelist",
             "values" : ["*"]
         }
@@ -19,8 +25,14 @@ conditions := [
         {"situation_description" : "Fully refreshing incremental tables can be destructive",
         "remedies": ["Set fully_refresh_incremental_tables_enabled to false"]},
         {
+            "condition": "invocation_config must exist",
+            "attribute_path" : ["invocation_config", 0],
+            "policy_type" : "pattern whitelist",
+            "values" : ["*"]
+        },
+        {
             "condition": "Disallow full refresh of incremental tables",
-            "attribute_path" : ["invocation_config", 0, "fully_refresh_incremental_tables_enabled"],
+            "attribute_path" : ["fully_refresh_incremental_tables_enabled"],
             "policy_type" : "blacklist",
             "values" : [true]
         }
@@ -36,8 +48,20 @@ conditions := [
             "values" : ["*"]
         },
         {
+            "condition": "invocation_config must exist",
+            "attribute_path" : ["invocation_config", 0],
+            "policy_type" : "pattern whitelist",
+            "values" : ["*"]
+        },
+        {
+            "condition": "included_targets must exist",
+            "attribute_path" : ["included_targets", 0],
+            "policy_type" : "pattern whitelist",
+            "values" : ["*"]
+        },
+        {
             "condition": "At least one included target",
-            "attribute_path" : ["invocation_config", 0, "included_targets", 0, "name"],
+            "attribute_path" : ["name"],
             "policy_type" : "pattern whitelist",
             "values" : ["*"]
         }
@@ -47,14 +71,20 @@ conditions := [
         {"situation_description" : "Transitive dependency/dependent execution is risky",
         "remedies": ["Turn transitive flags off unless explicitly justified"]},
         {
+            "condition": "invocation_config must exist",
+            "attribute_path" : ["invocation_config", 0],
+            "policy_type" : "pattern whitelist",
+            "values" : ["*"]
+        },
+        {
             "condition": "Disallow transitive dependencies",
-            "attribute_path" : ["invocation_config", 0, "transitive_dependencies_included"],
+            "attribute_path" : ["transitive_dependencies_included"],
             "policy_type" : "blacklist",
             "values" : [true]
         },
         {
             "condition": "Disallow transitive dependents",
-            "attribute_path" : ["invocation_config", 0, "transitive_dependents_included"],
+            "attribute_path" : ["transitive_dependents_included"],
             "policy_type" : "blacklist",
             "values" : [true]
         }

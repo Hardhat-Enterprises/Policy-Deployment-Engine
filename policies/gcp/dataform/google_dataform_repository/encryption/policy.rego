@@ -48,8 +48,14 @@ conditions := [
       "remedies": ["Provide git_remote_settings.url", "Verify default_branch matches remote"]
     },
     {
+      "condition": "git_remote_settings must exist",
+      "attribute_path": ["git_remote_settings", 0],
+      "policy_type": "pattern whitelist",
+      "values": ["*"]
+    },
+    {
       "condition": "Require git remote URL when Git is configured",
-      "attribute_path": ["git_remote_settings", 0, "url"],
+      "attribute_path": ["url"],
       "policy_type": "pattern whitelist",
       "values": ["*"]
     }
@@ -61,8 +67,14 @@ conditions := [
       "remedies": ["Set git_remote_settings.default_branch (e.g., main)"]
     },
     {
+      "condition": "git_remote_settings must exist",
+      "attribute_path": ["git_remote_settings", 0],
+      "policy_type": "pattern whitelist",
+      "values": ["*"]
+    },
+    {
       "condition": "Require default_branch when git remote is set",
-      "attribute_path": ["git_remote_settings", 0, "default_branch"],
+      "attribute_path": ["default_branch"],
       "policy_type": "pattern whitelist",
       "values": ["*"]
     }
@@ -74,8 +86,14 @@ conditions := [
       "remedies": ["Set default_database to a valid GCP project ID used by BigQuery"]
     },
     {
+      "condition": "workspace_compilation_overrides must exist",
+      "attribute_path": ["workspace_compilation_overrides", 0],
+      "policy_type": "pattern whitelist",
+      "values": ["*"]
+    },
+    {
       "condition": "Require default_database when overrides are used",
-      "attribute_path": ["workspace_compilation_overrides", 0, "default_database"],
+      "attribute_path": ["default_database"],
       "policy_type": "pattern whitelist",
       "values": ["*"]
     }

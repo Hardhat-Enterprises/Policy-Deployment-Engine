@@ -19,8 +19,14 @@ conditions := [
         {"situation_description" : "Default BigQuery location must be approved",
         "remedies": ["Set code_compilation_config.default_location to an approved region"]},
         {
+            "condition": "code_compilation_config must exist",
+            "attribute_path" : ["code_compilation_config", 0],
+            "policy_type" : "pattern whitelist",
+            "values" : ["*"]
+        },
+        {
             "condition": "Allowlist default_location",
-            "attribute_path" : ["code_compilation_config", 0, "default_location"],
+            "attribute_path" : ["default_location"],
             "policy_type" : "whitelist",
             "values" : ["US", "EU", "AU"]
         }
@@ -47,8 +53,14 @@ conditions := [
         {"situation_description" : "Compilation config present but default_schema missing",
         "remedies": ["Set code_compilation_config.default_schema to a valid BigQuery dataset ID"]},
         {
+            "condition": "code_compilation_config must exist",
+            "attribute_path" : ["code_compilation_config", 0],
+            "policy_type" : "pattern whitelist",
+            "values" : ["*"]
+        },
+        {
             "condition": "Require default_schema",
-            "attribute_path" : ["code_compilation_config", 0, "default_schema"],
+            "attribute_path" : ["default_schema"],
             "policy_type" : "pattern whitelist",
             "values" : ["*"]
         }
@@ -58,20 +70,26 @@ conditions := [
         {"situation_description" : "Suffix/prefix must follow naming convention",
         "remedies": ["Align naming to org standards"]},
         {
+            "condition": "code_compilation_config must exist",
+            "attribute_path" : ["code_compilation_config", 0],
+            "policy_type" : "pattern whitelist",
+            "values" : ["*"]
+        },
+        {
             "condition": "database_suffix must end with -df",
-            "attribute_path" : ["code_compilation_config", 0, "database_suffix"],
+            "attribute_path" : ["database_suffix"],
             "policy_type" : "pattern whitelist",
             "values" : ["*-df"]
         },
         {
             "condition": "schema_suffix must end with -df",
-            "attribute_path" : ["code_compilation_config", 0, "schema_suffix"],
+            "attribute_path" : ["schema_suffix"],
             "policy_type" : "pattern whitelist",
             "values" : ["*-df"]
         },
         {
             "condition": "table_prefix must start with df_",
-            "attribute_path" : ["code_compilation_config", 0, "table_prefix"],
+            "attribute_path" : ["table_prefix"],
             "policy_type" : "pattern whitelist",
             "values" : ["df_*"]
         }
