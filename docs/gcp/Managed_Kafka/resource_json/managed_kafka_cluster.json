@@ -3,225 +3,109 @@
   "subcategory": "Managed Kafka",
   "arguments": {
     "gcp_config": {
-      "description": "Configuration properties for a Kafka cluster deployed to Google Cloud Platform. Structure is [documented below](#nested_gcp_config).",
+      "description": "Configuration properties for a Kafka cluster deployed to Google Cloud Platform.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Defines networking and encryption aspects that directly affect cluster confidentiality and access controls.",
+      "compliant": ["Internal subnets defined", "KMS key specified"],
+      "non-compliant": ["Public access", "Missing KMS key"],
       "parent": null,
       "arguments": {
         "access_config": {
-          "description": "The configuration of access to the Kafka cluster. Structure is [documented below](#nested_gcp_config_access_config).",
+          "description": "The configuration of access to the Kafka cluster.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Improper access can expose internal systems.",
+          "compliant": ["Restricts access to internal subnets"],
+          "non-compliant": ["Open public access"],
           "parent": "gcp_config"
         },
         "kms_key": {
-          "description": "The Cloud KMS Key name to use for encryption. The key must be located in the same region as the cluster and cannot be changed. Must be in the format `projects/PROJECT_ID/locations/LOCATION/keyRings/KEY_RING/cryptoKeys/KEY`.",
+          "description": "The Cloud KMS Key name to use for encryption.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Ensures data-at-rest encryption compliance.",
+          "compliant": ["Valid CMK from same-region KMS"],
+          "non-compliant": ["KMS not used or wrongly scoped"],
           "parent": "gcp_config"
         }
       }
     },
     "capacity_config": {
-      "description": "A capacity configuration of a Kafka cluster. Structure is [documented below](#nested_capacity_config).",
+      "description": "A capacity configuration of a Kafka cluster.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Insufficient capacity may lead to instability and service denial.",
+      "compliant": ["At least 3 vCPUs", "Memory between 1-8 GiB per vCPU"],
+      "non-compliant": ["Less than 3 vCPUs", "Memory outside limits"],
       "parent": null,
       "arguments": {
         "vcpu_count": {
           "description": "The number of vCPUs to provision for the cluster. The minimum is 3.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Low vCPU count may affect availability under load.",
+          "compliant": ["3 or more vCPUs"],
+          "non-compliant": ["< 3 vCPUs"],
           "parent": "capacity_config"
         },
         "memory_bytes": {
-          "description": "The memory to provision for the cluster in bytes. The value must be between 1 GiB and 8 GiB per vCPU. Ex. 1024Mi, 4Gi.",
+          "description": "The memory to provision for the cluster in bytes (1 GiB to 8 GiB per vCPU).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Too little or too much memory allocation can destabilize workloads.",
+          "compliant": ["Between 1-8 GiB per vCPU"],
+          "non-compliant": ["Outside supported range"],
           "parent": "capacity_config"
-        }
-      }
-    },
-    "location": {
-      "description": "ID of the location of the Kafka resource. See https://cloud.google.com/managed-kafka/docs/locations for a list of supported locations.",
-      "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "cluster_id": {
-      "description": "The ID to use for the cluster, which will become the final component of the cluster's name. The ID must be 1-63 characters long, and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` to comply with RFC 1035. This value is structured like: `my-cluster-id`.",
-      "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "labels": {
-      "description": "List of label KEY=VALUE pairs to add. Keys must start with a lowercase character and contain only hyphens (-), underscores (\u00a0), lowercase characters, and numbers. Values must contain only hyphens (-), underscores (\u00a0), lowercase characters, and numbers. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "rebalance_config": {
-      "description": "Defines rebalancing behavior of a Kafka cluster. Structure is [documented below](#nested_rebalance_config).",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "mode": {
-          "description": "The rebalance behavior for the cluster. When not specified, defaults to `NO_REBALANCE`. Possible values: `MODE_UNSPECIFIED`, `NO_REBALANCE`, `AUTO_REBALANCE_ON_SCALE_UP`.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "rebalance_config"
         }
       }
     },
     "tls_config": {
-      "description": "TLS configuration for the Kafka cluster. This is used to configure mTLS authentication. To clear our a TLS configuration that has been previously set, please explicitly add an empty `tls_config` block. Structure is [documented below](#nested_tls_config).",
+      "description": "TLS configuration for the Kafka cluster. This is used to configure mTLS authentication.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Protects Kafka clients and brokers with encryption and identity validation.",
+      "compliant": ["mTLS enabled with trusted CA"],
+      "non-compliant": ["No TLS/mTLS"],
       "parent": null,
       "arguments": {
         "trust_config": {
-          "description": "The configuration of the broker truststore. If specified, clients can use mTLS for authentication. Structure is [documented below](#nested_tls_config_trust_config).",
+          "description": "The configuration of the broker truststore.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Validates identities through certificate chains.",
+          "compliant": ["Defined with trusted CA pools"],
+          "non-compliant": ["Omitted or invalid trust store"],
           "parent": "tls_config"
         },
         "ssl_principal_mapping_rules": {
-          "description": "The rules for mapping mTLS certificate Distinguished Names (DNs) to shortened principal names for Kafka ACLs. This field corresponds exactly to the ssl.principal.mapping.rules broker config and matches the format and syntax defined in the Apache Kafka documentation. Setting or modifying this field will trigger a rolling restart of the Kafka brokers to apply the change. An empty string means that the default Kafka behavior is used. Example: `RULE:^CN=(.?),OU=ServiceUsers.$/$1@example.com/,DEFAULT`",
+          "description": "Rules for mapping mTLS certificate DNs to principal names for Kafka ACLs.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Weak or default rules may allow identity spoofing.",
+          "compliant": ["Explicit mapping using regex"],
+          "non-compliant": ["Defaults or overly broad patterns"],
           "parent": "tls_config"
-        }
-      }
-    },
-    "project": {
-      "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "access_config": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "network_configs": {
-          "description": "Virtual Private Cloud (VPC) subnets where IP addresses for the Kafka cluster are allocated. To make the cluster available in a VPC, you must specify at least one `network_configs` block. Max of 10 subnets per cluster. Additional subnets may be specified with additional `network_configs` blocks. Structure is [documented below](#nested_gcp_config_access_config_network_configs).",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "access_config"
         }
       }
     },
     "network_configs": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "Defines the subnets where the Kafka cluster is accessible.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Improper subnet configuration can expose cluster externally.",
+      "compliant": ["Private subnet from secure VPC"],
+      "non-compliant": ["Public subnet or undefined"],
       "parent": null,
       "arguments": {
         "subnet": {
-          "description": "Name of the VPC subnet from which the cluster is accessible. Both broker and bootstrap server IP addresses and DNS entries are automatically created in the subnet. There can only be one subnet per network, and the subnet must be located in the same region as the cluster. The project may differ. The name of the subnet must be in the format `projects/PROJECT_ID/regions/REGION/subnetworks/SUBNET`.",
+          "description": "Name of the VPC subnet.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Subnets influence traffic routing and access visibility.",
+          "compliant": ["Private subnet in isolated VPC"],
+          "non-compliant": ["Untrusted or shared subnet"],
           "parent": "network_configs"
-        }
-      }
-    },
-    "trust_config": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "cas_configs": {
-          "description": "Configuration for the Google Certificate Authority Service. To support mTLS, you must specify at least one `cas_configs` block. A maximum of 10 CA pools can be specified. Additional CA pools may be specified with additional `cas_configs` blocks. Structure is [documented below](#nested_tls_config_trust_config_cas_configs).",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "trust_config"
-        }
-      }
-    },
-    "cas_configs": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "ca_pool": {
-          "description": "The name of the CA pool to pull CA certificates from. The CA pool does not need to be in the same project or location as the Kafka cluster. Must be in the format `projects/PROJECT_ID/locations/LOCATION/caPools/CA_POOL_ID.",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "cas_configs"
         }
       }
     }
