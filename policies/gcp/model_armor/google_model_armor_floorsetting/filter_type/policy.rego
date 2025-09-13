@@ -3,7 +3,6 @@ package terraform.gcp.security.model_Armor.google_model_armor_floorsetting.filte
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.model_Armor.google_model_armor_floorsetting.vars
 
-valid_filter_types := {"DANGEROUS", "VIOLENCE_AND_HATE", "SEXUAL", "TOXICITY"}
 
 conditions := [
   [
@@ -14,7 +13,7 @@ conditions := [
     {
       "condition": "rai_filters.filter_type must be valid",
       "attribute_path": ["filter_config",0,"rai_settings",0,"rai_filters",0,"filter_type"],
-      "values": [t | t := valid_filter_types[_]],
+      "values": ["DANGEROUS", "VIOLENCE_AND_HATE", "SEXUAL", "TOXICITY"],
       "policy_type": "whitelist"
     }
   ]

@@ -7,7 +7,7 @@ resource "google_model_armor_template" "c" {
      rai_settings {
          rai_filters {
         filter_type      = "DANGEROUS"
-        confidence_level = "LOW_AND_ABOVE"
+        confidence_level = "MEDIUM_AND_ABOVE"
       }
      }
   }

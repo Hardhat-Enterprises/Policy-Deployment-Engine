@@ -4,8 +4,6 @@ import data.terraform.gcp.helpers
 import data.terraform.gcp.security.model_Armor.google_model_armor_template.vars
 
 
-valid_confidence_levels := {"LOW_AND_ABOVE", "MEDIUM_AND_ABOVE", "HIGH_ONLY"}
-
 conditions := [
 [
     {
@@ -15,7 +13,7 @@ conditions := [
     {
       "condition": "template rai_filters.confidence_level must be valid",
       "attribute_path": ["filter_config",0,"rai_settings",0,"rai_filters",0,"confidence_level"],
-      "values": [t | t := valid_confidence_levels[_]],
+      "values": ["LOW_AND_ABOVE", "MEDIUM_AND_ABOVE","HIGH_ONLY"],
       "policy_type": "whitelist"
     }
   ],
