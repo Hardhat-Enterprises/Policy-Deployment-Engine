@@ -1,4 +1,4 @@
-# ##### DO NOT EDIT ######
+##### DO NOT EDIT ######
 
 terraform {
   required_providers {
