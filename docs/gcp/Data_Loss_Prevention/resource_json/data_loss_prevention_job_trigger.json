@@ -1,0 +1,1740 @@
+{
+  "resource_name": "data_loss_prevention_job_trigger",
+  "subcategory": "Data Loss Prevention",
+  "arguments": {
+    "triggers": {
+      "description": "What event needs to occur for a new job to be started. Structure is [documented below](#nested_triggers).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "schedule": {
+          "description": "Schedule for triggered jobs Structure is [documented below](#nested_triggers_triggers_schedule).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "triggers"
+        },
+        "manual": {
+          "description": "For use with hybrid jobs. Jobs must be manually created and finished.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "triggers"
+        }
+      }
+    },
+    "parent": {
+      "description": "The parent of the trigger, either in the format `projects/{{project}}` or `projects/{{project}}/locations/{{location}}`",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "A description of the job trigger.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "display_name": {
+      "description": "User set display name of the job trigger.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "trigger_id": {
+      "description": "The trigger id can contain uppercase and lowercase letters, numbers, and hyphens; that is, it must match the regular expression: [a-zA-Z\\d-_]+. The maximum length is 100 characters. Can be empty to allow the system to generate one.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "status": {
+      "description": "Whether the trigger is currently active. Default value is `HEALTHY`. Possible values are: `PAUSED`, `HEALTHY`, `CANCELLED`.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "inspect_job": {
+      "description": "Controls what and how to inspect for findings. Structure is [documented below](#nested_inspect_job).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "inspect_template_name": {
+          "description": "The name of the template to run when this job is triggered.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "inspect_job"
+        },
+        "inspect_config": {
+          "description": "The core content of the template. Structure is [documented below](#nested_inspect_job_inspect_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "inspect_job"
+        },
+        "storage_config": {
+          "description": "Information on where to inspect Structure is [documented below](#nested_inspect_job_storage_config).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "inspect_job"
+        },
+        "actions": {
+          "description": "Configuration block for the actions to execute on the completion of a job. Can be specified multiple times, but only one for each type. Each action block supports fields documented below. This argument is processed in [attribute-as-blocks mode](https://www.terraform.io/docs/configuration/attr-as-blocks.html). Structure is [documented below](#nested_inspect_job_actions).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "inspect_job"
+        }
+      }
+    },
+    "schedule": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "recurrence_period_duration": {
+          "description": "With this option a job is started a regular periodic basis. For example: every day (86400 seconds). A scheduled start time will be skipped if the previous execution has not ended when its scheduled time occurs. This value must be set to a time duration greater than or equal to 1 day and can be no longer than 60 days. A duration in seconds with up to nine fractional digits, terminated by 's'. Example: \"3.5s\".",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "schedule"
+        }
+      }
+    },
+    "inspect_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "exclude_info_types": {
+          "description": "When true, excludes type information of the findings.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "inspect_config"
+        },
+        "include_quote": {
+          "description": "When true, a contextual quote from the data that triggered a finding is included in the response.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "inspect_config"
+        },
+        "min_likelihood": {
+          "description": "Only returns findings equal or above this threshold. See https://cloud.google.com/dlp/docs/likelihood for more info Default value is `POSSIBLE`. Possible values are: `VERY_UNLIKELY`, `UNLIKELY`, `POSSIBLE`, `LIKELY`, `VERY_LIKELY`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "inspect_config"
+        },
+        "limits": {
+          "description": "Configuration to control the number of findings returned. Structure is [documented below](#nested_inspect_job_inspect_config_limits).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "inspect_config"
+        },
+        "info_types": {
+          "description": "Restricts what infoTypes to look for. The values must correspond to InfoType values returned by infoTypes.list or listed at https://cloud.google.com/dlp/docs/infotypes-reference. When no InfoTypes or CustomInfoTypes are specified in a request, the system may automatically choose what detectors to run. By default this may be all types, but may change over time as detectors are updated. Structure is [documented below](#nested_inspect_job_inspect_config_info_types).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "inspect_config"
+        },
+        "rule_set": {
+          "description": "Set of rules to apply to the findings for this InspectConfig. Exclusion rules, contained in the set are executed in the end, other rules are executed in the order they are specified for each info type. Structure is [documented below](#nested_inspect_job_inspect_config_rule_set).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "inspect_config"
+        },
+        "custom_info_types": {
+          "description": "Custom info types to be used. See https://cloud.google.com/dlp/docs/creating-custom-infotypes to learn more. Structure is [documented below](#nested_inspect_job_inspect_config_custom_info_types).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "inspect_config"
+        }
+      }
+    },
+    "limits": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "max_findings_per_item": {
+          "description": "Max number of findings that will be returned for each item scanned. The maximum returned is 2000.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "limits"
+        },
+        "max_findings_per_request": {
+          "description": "Max number of findings that will be returned per request/job. The maximum returned is 2000.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "limits"
+        },
+        "max_findings_per_info_type": {
+          "description": "Configuration of findings limit given for specified infoTypes. Structure is [documented below](#nested_inspect_job_inspect_config_limits_max_findings_per_info_type).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "limits"
+        }
+      }
+    },
+    "max_findings_per_info_type": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "info_type": {
+          "description": "Type of information the findings limit applies to. Only one limit per infoType should be provided. If InfoTypeLimit does not have an infoType, the DLP API applies the limit against all infoTypes that are found but not specified in another InfoTypeLimit. Structure is [documented below](#nested_inspect_job_inspect_config_limits_max_findings_per_info_type_max_findings_per_info_type_info_type).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "max_findings_per_info_type"
+        },
+        "max_findings": {
+          "description": "Max findings limit for the given infoType.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "max_findings_per_info_type"
+        }
+      }
+    },
+    "info_type": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "name": {
+          "description": "Name of the information type. Either a name of your choosing when creating a CustomInfoType, or one of the names listed at https://cloud.google.com/dlp/docs/infotypes-reference when specifying a built-in type.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "info_type"
+        },
+        "version": {
+          "description": "Version of the information type to use. By default, the version is set to stable.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "info_type"
+        },
+        "sensitivity_score": {
+          "description": "Optional custom sensitivity for this InfoType. This only applies to data profiling. Structure is [documented below](#nested_inspect_job_inspect_config_custom_info_types_custom_info_types_info_type_sensitivity_score).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "info_type"
+        }
+      }
+    },
+    "sensitivity_score": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "score": {
+          "description": "The sensitivity score applied to the resource. Possible values are: `SENSITIVITY_LOW`, `SENSITIVITY_MODERATE`, `SENSITIVITY_HIGH`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "sensitivity_score"
+        }
+      }
+    },
+    "info_types": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "name": {
+          "description": "Name of the information type. Either a name of your choosing when creating a CustomInfoType, or one of the names listed at https://cloud.google.com/dlp/docs/infotypes-reference when specifying a built-in type.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "info_types"
+        },
+        "version": {
+          "description": "Version of the information type to use. By default, the version is set to stable.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "info_types"
+        },
+        "sensitivity_score": {
+          "description": "Optional custom sensitivity for this InfoType. This only applies to data profiling. Structure is [documented below](#nested_inspect_job_inspect_config_rule_set_rule_set_rules_rules_exclusion_rule_exclude_info_types_info_types_info_types_sensitivity_score).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "info_types"
+        }
+      }
+    },
+    "rule_set": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "info_types": {
+          "description": "List of infoTypes this rule set is applied to. Structure is [documented below](#nested_inspect_job_inspect_config_rule_set_rule_set_info_types).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rule_set"
+        },
+        "rules": {
+          "description": "Set of rules to be applied to infoTypes. The rules are applied in order. Structure is [documented below](#nested_inspect_job_inspect_config_rule_set_rule_set_rules).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rule_set"
+        }
+      }
+    },
+    "rules": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "hotword_rule": {
+          "description": "Hotword-based detection rule. Structure is [documented below](#nested_inspect_job_inspect_config_rule_set_rule_set_rules_rules_hotword_rule).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        },
+        "exclusion_rule": {
+          "description": "The rule that specifies conditions when findings of infoTypes specified in InspectionRuleSet are removed from results. Structure is [documented below](#nested_inspect_job_inspect_config_rule_set_rule_set_rules_rules_exclusion_rule).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        }
+      }
+    },
+    "hotword_rule": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "hotword_regex": {
+          "description": "Regular expression pattern defining what qualifies as a hotword. Structure is [documented below](#nested_inspect_job_inspect_config_rule_set_rule_set_rules_rules_hotword_rule_hotword_regex).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "hotword_rule"
+        },
+        "proximity": {
+          "description": "Proximity of the finding within which the entire hotword must reside. The total length of the window cannot exceed 1000 characters. Note that the finding itself will be included in the window, so that hotwords may be used to match substrings of the finding itself. For example, the certainty of a phone number regex `(\\d{3}) \\d{3}-\\d{4}` could be adjusted upwards if the area code is known to be the local area code of a company office using the hotword regex `(xxx)`, where `xxx` is the area code in question. Structure is [documented below](#nested_inspect_job_inspect_config_rule_set_rule_set_rules_rules_hotword_rule_proximity).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "hotword_rule"
+        },
+        "likelihood_adjustment": {
+          "description": "Likelihood adjustment to apply to all matching findings. Structure is [documented below](#nested_inspect_job_inspect_config_rule_set_rule_set_rules_rules_hotword_rule_likelihood_adjustment).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "hotword_rule"
+        }
+      }
+    },
+    "hotword_regex": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "pattern": {
+          "description": "Pattern defining the regular expression. Its syntax (https://github.com/google/re2/wiki/Syntax) can be found under the google/re2 repository on GitHub.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "hotword_regex"
+        },
+        "group_indexes": {
+          "description": "The index of the submatch to extract as findings. When not specified, the entire match is returned. No more than 3 may be included.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "hotword_regex"
+        }
+      }
+    },
+    "proximity": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "window_before": {
+          "description": "Number of characters before the finding to consider. Either this or window_after must be specified",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "proximity"
+        },
+        "window_after": {
+          "description": "Number of characters after the finding to consider. Either this or window_before must be specified",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "proximity"
+        }
+      }
+    },
+    "likelihood_adjustment": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "fixed_likelihood": {
+          "description": "Set the likelihood of a finding to a fixed value. Either this or relative_likelihood can be set. Possible values are: `VERY_UNLIKELY`, `UNLIKELY`, `POSSIBLE`, `LIKELY`, `VERY_LIKELY`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "likelihood_adjustment"
+        },
+        "relative_likelihood": {
+          "description": "Increase or decrease the likelihood by the specified number of levels. For example, if a finding would be POSSIBLE without the detection rule and relativeLikelihood is 1, then it is upgraded to LIKELY, while a value of -1 would downgrade it to UNLIKELY. Likelihood may never drop below VERY_UNLIKELY or exceed VERY_LIKELY, so applying an adjustment of 1 followed by an adjustment of -1 when base likelihood is VERY_LIKELY will result in a final likelihood of LIKELY. Either this or fixed_likelihood can be set.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "likelihood_adjustment"
+        }
+      }
+    },
+    "exclusion_rule": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "matching_type": {
+          "description": "How the rule is applied. See the documentation for more information: https://cloud.google.com/dlp/docs/reference/rest/v2/InspectConfig#MatchingType Possible values are: `MATCHING_TYPE_FULL_MATCH`, `MATCHING_TYPE_PARTIAL_MATCH`, `MATCHING_TYPE_INVERSE_MATCH`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "exclusion_rule"
+        },
+        "dictionary": {
+          "description": "Dictionary which defines the rule. Structure is [documented below](#nested_inspect_job_inspect_config_rule_set_rule_set_rules_rules_exclusion_rule_dictionary).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "exclusion_rule"
+        },
+        "regex": {
+          "description": "Regular expression which defines the rule. Structure is [documented below](#nested_inspect_job_inspect_config_rule_set_rule_set_rules_rules_exclusion_rule_regex).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "exclusion_rule"
+        },
+        "exclude_info_types": {
+          "description": "Set of infoTypes for which findings would affect this rule. Structure is [documented below](#nested_inspect_job_inspect_config_rule_set_rule_set_rules_rules_exclusion_rule_exclude_info_types).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "exclusion_rule"
+        },
+        "exclude_by_hotword": {
+          "description": "Drop if the hotword rule is contained in the proximate context. Structure is [documented below](#nested_inspect_job_inspect_config_rule_set_rule_set_rules_rules_exclusion_rule_exclude_by_hotword).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "exclusion_rule"
+        }
+      }
+    },
+    "dictionary": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "word_list": {
+          "description": "List of words or phrases to search for. Structure is [documented below](#nested_inspect_job_inspect_config_custom_info_types_custom_info_types_dictionary_word_list).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "dictionary"
+        },
+        "cloud_storage_path": {
+          "description": "Newline-delimited file of words in Cloud Storage. Only a single file is accepted. Structure is [documented below](#nested_inspect_job_inspect_config_custom_info_types_custom_info_types_dictionary_cloud_storage_path).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "dictionary"
+        }
+      }
+    },
+    "word_list": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "words": {
+          "description": "Words or phrases defining the dictionary. The dictionary must contain at least one phrase and every phrase must contain at least 2 characters that are letters or digits.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "word_list"
+        }
+      }
+    },
+    "cloud_storage_path": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "path": {
+          "description": "A url representing a file or path (no wildcards) in Cloud Storage. Example: `gs://[BUCKET_NAME]/dictionary.txt`",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_storage_path"
+        }
+      }
+    },
+    "regex": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "pattern": {
+          "description": "Pattern defining the regular expression. Its syntax (https://github.com/google/re2/wiki/Syntax) can be found under the google/re2 repository on GitHub.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "regex"
+        },
+        "group_indexes": {
+          "description": "The index of the submatch to extract as findings. When not specified, the entire match is returned. No more than 3 may be included.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "regex"
+        }
+      }
+    },
+    "exclude_info_types": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "info_types": {
+          "description": "If a finding is matched by any of the infoType detectors listed here, the finding will be excluded from the scan results. Structure is [documented below](#nested_inspect_job_inspect_config_rule_set_rule_set_rules_rules_exclusion_rule_exclude_info_types_info_types).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "exclude_info_types"
+        }
+      }
+    },
+    "exclude_by_hotword": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "hotword_regex": {
+          "description": "Regular expression pattern defining what qualifies as a hotword. Structure is [documented below](#nested_inspect_job_inspect_config_rule_set_rule_set_rules_rules_exclusion_rule_exclude_by_hotword_hotword_regex).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "exclude_by_hotword"
+        },
+        "proximity": {
+          "description": "Proximity of the finding within which the entire hotword must reside. The total length of the window cannot exceed 1000 characters. Note that the finding itself will be included in the window, so that hotwords may be used to match substrings of the finding itself. For example, the certainty of a phone number regex `(\\d{3}) \\d{3}-\\d{4}` could be adjusted upwards if the area code is known to be the local area code of a company office using the hotword regex `(xxx)`, where `xxx` is the area code in question. Structure is [documented below](#nested_inspect_job_inspect_config_rule_set_rule_set_rules_rules_exclusion_rule_exclude_by_hotword_proximity).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "exclude_by_hotword"
+        }
+      }
+    },
+    "custom_info_types": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "info_type": {
+          "description": "CustomInfoType can either be a new infoType, or an extension of built-in infoType, when the name matches one of existing infoTypes and that infoType is specified in `info_types` field. Specifying the latter adds findings to the one detected by the system. If built-in info type is not specified in `info_types` list then the name is treated as a custom info type. Structure is [documented below](#nested_inspect_job_inspect_config_custom_info_types_custom_info_types_info_type).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "custom_info_types"
+        },
+        "likelihood": {
+          "description": "Likelihood to return for this CustomInfoType. This base value can be altered by a detection rule if the finding meets the criteria specified by the rule. Default value is `VERY_LIKELY`. Possible values are: `VERY_UNLIKELY`, `UNLIKELY`, `POSSIBLE`, `LIKELY`, `VERY_LIKELY`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "custom_info_types"
+        },
+        "exclusion_type": {
+          "description": "If set to EXCLUSION_TYPE_EXCLUDE this infoType will not cause a finding to be returned. It still can be used for rules matching. Possible values are: `EXCLUSION_TYPE_EXCLUDE`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "custom_info_types"
+        },
+        "sensitivity_score": {
+          "description": "Optional custom sensitivity for this InfoType. This only applies to data profiling. Structure is [documented below](#nested_inspect_job_inspect_config_custom_info_types_custom_info_types_sensitivity_score).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "custom_info_types"
+        },
+        "regex": {
+          "description": "Regular expression which defines the rule. Structure is [documented below](#nested_inspect_job_inspect_config_custom_info_types_custom_info_types_regex).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "custom_info_types"
+        },
+        "dictionary": {
+          "description": "Dictionary which defines the rule. Structure is [documented below](#nested_inspect_job_inspect_config_custom_info_types_custom_info_types_dictionary).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "custom_info_types"
+        },
+        "stored_type": {
+          "description": "A reference to a StoredInfoType to use with scanning. Structure is [documented below](#nested_inspect_job_inspect_config_custom_info_types_custom_info_types_stored_type).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "custom_info_types"
+        },
+        "surrogate_type": {
+          "description": "Message for detecting output from deidentification transformations that support reversing.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "custom_info_types"
+        }
+      }
+    },
+    "stored_type": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "name": {
+          "description": "Resource name of the requested StoredInfoType, for example `organizations/433245324/storedInfoTypes/432452342` or `projects/project-id/storedInfoTypes/432452342`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "stored_type"
+        },
+        "create_time": {
+          "description": "(Output) The creation timestamp of an inspectTemplate. Set by the server.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "stored_type"
+        }
+      }
+    },
+    "storage_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "timespan_config": {
+          "description": "Configuration of the timespan of the items to include in scanning Structure is [documented below](#nested_inspect_job_storage_config_timespan_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "storage_config"
+        },
+        "datastore_options": {
+          "description": "Options defining a data set within Google Cloud Datastore. Structure is [documented below](#nested_inspect_job_storage_config_datastore_options).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "storage_config"
+        },
+        "cloud_storage_options": {
+          "description": "Options defining a file or a set of files within a Google Cloud Storage bucket. Structure is [documented below](#nested_inspect_job_storage_config_cloud_storage_options).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "storage_config"
+        },
+        "big_query_options": {
+          "description": "Options defining BigQuery table and row identifiers. Structure is [documented below](#nested_inspect_job_storage_config_big_query_options).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "storage_config"
+        },
+        "hybrid_options": {
+          "description": "Configuration to control jobs where the content being inspected is outside of Google Cloud Platform. Structure is [documented below](#nested_inspect_job_storage_config_hybrid_options).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "storage_config"
+        }
+      }
+    },
+    "timespan_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "start_time": {
+          "description": "Exclude files, tables, or rows older than this value. If not set, no lower time limit is applied.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "timespan_config"
+        },
+        "end_time": {
+          "description": "Exclude files, tables, or rows newer than this value. If not set, no upper time limit is applied.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "timespan_config"
+        },
+        "enable_auto_population_of_timespan_config": {
+          "description": "When the job is started by a JobTrigger we will automatically figure out a valid startTime to avoid scanning files that have not been modified since the last time the JobTrigger executed. This will be based on the time of the execution of the last run of the JobTrigger or the timespan endTime used in the last run of the JobTrigger.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "timespan_config"
+        },
+        "timestamp_field": {
+          "description": "Specification of the field containing the timestamp of scanned items. Structure is [documented below](#nested_inspect_job_storage_config_timespan_config_timestamp_field).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "timespan_config"
+        }
+      }
+    },
+    "timestamp_field": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "name": {
+          "description": "Specification of the field containing the timestamp of scanned items. Used for data sources like Datastore and BigQuery. For BigQuery: Required to filter out rows based on the given start and end times. If not specified and the table was modified between the given start and end times, the entire table will be scanned. The valid data types of the timestamp field are: INTEGER, DATE, TIMESTAMP, or DATETIME BigQuery column. For Datastore. Valid data types of the timestamp field are: TIMESTAMP. Datastore entity will be scanned if the timestamp property does not exist or its value is empty or invalid.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "timestamp_field"
+        }
+      }
+    },
+    "datastore_options": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "partition_id": {
+          "description": "Datastore partition ID. A partition ID identifies a grouping of entities. The grouping is always by project and namespace, however the namespace ID may be empty. Structure is [documented below](#nested_inspect_job_storage_config_datastore_options_partition_id).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "datastore_options"
+        },
+        "kind": {
+          "description": "A representation of a Datastore kind. Structure is [documented below](#nested_inspect_job_storage_config_datastore_options_kind).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "datastore_options"
+        }
+      }
+    },
+    "partition_id": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "project_id": {
+          "description": "The ID of the project to which the entities belong.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "partition_id"
+        },
+        "namespace_id": {
+          "description": "If not empty, the ID of the namespace to which the entities belong.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "partition_id"
+        }
+      }
+    },
+    "kind": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "name": {
+          "description": "The name of the Datastore kind.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "kind"
+        }
+      }
+    },
+    "cloud_storage_options": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "file_set": {
+          "description": "Set of files to scan. Structure is [documented below](#nested_inspect_job_storage_config_cloud_storage_options_file_set).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_storage_options"
+        },
+        "bytes_limit_per_file": {
+          "description": "Max number of bytes to scan from a file. If a scanned file's size is bigger than this value then the rest of the bytes are omitted.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_storage_options"
+        },
+        "bytes_limit_per_file_percent": {
+          "description": "Max percentage of bytes to scan from a file. The rest are omitted. The number of bytes scanned is rounded down. Must be between 0 and 100, inclusively. Both 0 and 100 means no limit.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_storage_options"
+        },
+        "files_limit_percent": {
+          "description": "Limits the number of files to scan to this percentage of the input FileSet. Number of files scanned is rounded down. Must be between 0 and 100, inclusively. Both 0 and 100 means no limit.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_storage_options"
+        },
+        "file_types": {
+          "description": "List of file type groups to include in the scan. If empty, all files are scanned and available data format processors are applied. In addition, the binary content of the selected files is always scanned as well. Images are scanned only as binary if the specified region does not support image inspection and no fileTypes were specified. Each value may be one of: `BINARY_FILE`, `TEXT_FILE`, `IMAGE`, `WORD`, `PDF`, `AVRO`, `CSV`, `TSV`, `POWERPOINT`, `EXCEL`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_storage_options"
+        },
+        "sample_method": {
+          "description": "How to sample bytes if not all bytes are scanned. Meaningful only when used in conjunction with bytesLimitPerFile. If not specified, scanning would start from the top. Possible values are: `TOP`, `RANDOM_START`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_storage_options"
+        }
+      }
+    },
+    "file_set": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "url": {
+          "description": "The Cloud Storage url of the file(s) to scan, in the format `gs://<bucket>/<path>`. Trailing wildcard in the path is allowed. If the url ends in a trailing slash, the bucket or directory represented by the url will be scanned non-recursively (content in sub-directories will not be scanned). This means that `gs://mybucket/` is equivalent to `gs://mybucket/*`, and `gs://mybucket/directory/` is equivalent to `gs://mybucket/directory/*`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "file_set"
+        },
+        "regex_file_set": {
+          "description": "The regex-filtered set of files to scan. Structure is [documented below](#nested_inspect_job_storage_config_cloud_storage_options_file_set_regex_file_set).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "file_set"
+        }
+      }
+    },
+    "regex_file_set": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "bucket_name": {
+          "description": "The name of a Cloud Storage bucket.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "regex_file_set"
+        },
+        "include_regex": {
+          "description": "A list of regular expressions matching file paths to include. All files in the bucket that match at least one of these regular expressions will be included in the set of files, except for those that also match an item in excludeRegex. Leaving this field empty will match all files by default (this is equivalent to including .* in the list)",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "regex_file_set"
+        },
+        "exclude_regex": {
+          "description": "A list of regular expressions matching file paths to exclude. All files in the bucket that match at least one of these regular expressions will be excluded from the scan.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "regex_file_set"
+        }
+      }
+    },
+    "big_query_options": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "table_reference": {
+          "description": "Set of files to scan. Structure is [documented below](#nested_inspect_job_storage_config_big_query_options_table_reference).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "big_query_options"
+        },
+        "rows_limit": {
+          "description": "Max number of rows to scan. If the table has more rows than this value, the rest of the rows are omitted. If not set, or if set to 0, all rows will be scanned. Only one of rowsLimit and rowsLimitPercent can be specified. Cannot be used in conjunction with TimespanConfig.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "big_query_options"
+        },
+        "rows_limit_percent": {
+          "description": "Max percentage of rows to scan. The rest are omitted. The number of rows scanned is rounded down. Must be between 0 and 100, inclusively. Both 0 and 100 means no limit. Defaults to 0. Only one of rowsLimit and rowsLimitPercent can be specified. Cannot be used in conjunction with TimespanConfig.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "big_query_options"
+        },
+        "sample_method": {
+          "description": "How to sample rows if not all rows are scanned. Meaningful only when used in conjunction with either rowsLimit or rowsLimitPercent. If not specified, rows are scanned in the order BigQuery reads them. If TimespanConfig is set, set this to an empty string to avoid using the default value. Default value is `TOP`. Possible values are: `TOP`, `RANDOM_START`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "big_query_options"
+        },
+        "identifying_fields": {
+          "description": "Specifies the BigQuery fields that will be returned with findings. If not specified, no identifying fields will be returned for findings. Structure is [documented below](#nested_inspect_job_storage_config_big_query_options_identifying_fields).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "big_query_options"
+        },
+        "included_fields": {
+          "description": "Limit scanning only to these fields. Structure is [documented below](#nested_inspect_job_storage_config_big_query_options_included_fields).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "big_query_options"
+        },
+        "excluded_fields": {
+          "description": "References to fields excluded from scanning. This allows you to skip inspection of entire columns which you know have no findings. Structure is [documented below](#nested_inspect_job_storage_config_big_query_options_excluded_fields).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "big_query_options"
+        }
+      }
+    },
+    "table_reference": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "project_id": {
+          "description": "The Google Cloud Platform project ID of the project containing the table.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "table_reference"
+        },
+        "dataset_id": {
+          "description": "The dataset ID of the table.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "table_reference"
+        },
+        "table_id": {
+          "description": "The name of the table.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "table_reference"
+        }
+      }
+    },
+    "identifying_fields": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "name": {
+          "description": "Name describing the field.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "identifying_fields"
+        }
+      }
+    },
+    "included_fields": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "name": {
+          "description": "Name describing the field to which scanning is limited.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "included_fields"
+        }
+      }
+    },
+    "excluded_fields": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "name": {
+          "description": "Name describing the field excluded from scanning.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "excluded_fields"
+        }
+      }
+    },
+    "hybrid_options": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "description": {
+          "description": "A short description of where the data is coming from. Will be stored once in the job. 256 max length.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "hybrid_options"
+        },
+        "required_finding_label_keys": {
+          "description": "These are labels that each inspection request must include within their 'finding_labels' map. Request may contain others, but any missing one of these will be rejected. Label keys must be between 1 and 63 characters long and must conform to the following regular expression: `[a-z]([-a-z0-9]*[a-z0-9])?`. No more than 10 keys can be required.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "hybrid_options"
+        },
+        "table_options": {
+          "description": "If the container is a table, additional information to make findings meaningful such as the columns that are primary keys. Structure is [documented below](#nested_inspect_job_storage_config_hybrid_options_table_options).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "hybrid_options"
+        },
+        "labels": {
+          "description": "To organize findings, these labels will be added to each finding. Label keys must be between 1 and 63 characters long and must conform to the following regular expression: `[a-z]([-a-z0-9]*[a-z0-9])?`. Label values must be between 0 and 63 characters long and must conform to the regular expression `([a-z]([-a-z0-9]*[a-z0-9])?)?`. No more than 10 labels can be associated with a given finding. Examples: * `\"environment\" : \"production\"` * `\"pipeline\" : \"etl\"`",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "hybrid_options"
+        }
+      }
+    },
+    "table_options": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "identifying_fields": {
+          "description": "The columns that are the primary keys for table objects included in ContentItem. A copy of this cell's value will stored alongside alongside each finding so that the finding can be traced to the specific row it came from. No more than 3 may be provided. Structure is [documented below](#nested_inspect_job_storage_config_hybrid_options_table_options_identifying_fields).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "table_options"
+        }
+      }
+    },
+    "actions": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "save_findings": {
+          "description": "If set, the detailed findings will be persisted to the specified OutputStorageConfig. Only a single instance of this action can be specified. Compatible with: Inspect, Risk Structure is [documented below](#nested_inspect_job_actions_actions_save_findings).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "actions"
+        },
+        "pub_sub": {
+          "description": "Publish a message into a given Pub/Sub topic when the job completes. Structure is [documented below](#nested_inspect_job_actions_actions_pub_sub).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "actions"
+        },
+        "publish_summary_to_cscc": {
+          "description": "Publish the result summary of a DlpJob to the Cloud Security Command Center.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "actions"
+        },
+        "publish_findings_to_cloud_data_catalog": {
+          "description": "Publish findings of a DlpJob to Data Catalog.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "actions"
+        },
+        "job_notification_emails": {
+          "description": "Sends an email when the job completes. The email goes to IAM project owners and technical Essential Contacts.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "actions"
+        },
+        "deidentify": {
+          "description": "Create a de-identified copy of the requested table or files. Structure is [documented below](#nested_inspect_job_actions_actions_deidentify).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "actions"
+        },
+        "publish_to_stackdriver": {
+          "description": "Enable Stackdriver metric dlp.googleapis.com/findingCount.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "actions"
+        }
+      }
+    },
+    "save_findings": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "output_config": {
+          "description": "Information on where to store output Structure is [documented below](#nested_inspect_job_actions_actions_save_findings_output_config).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "save_findings"
+        }
+      }
+    },
+    "output_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "table": {
+          "description": "Information on the location of the target BigQuery Table. Structure is [documented below](#nested_inspect_job_actions_actions_save_findings_output_config_table).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "output_config"
+        },
+        "output_schema": {
+          "description": "Schema used for writing the findings for Inspect jobs. This field is only used for Inspect and must be unspecified for Risk jobs. Columns are derived from the Finding object. If appending to an existing table, any columns from the predefined schema that are missing will be added. No columns in the existing table will be deleted. If unspecified, then all available columns will be used for a new table or an (existing) table with no schema, and no changes will be made to an existing table that has a schema. Only for use with external storage. Possible values are: `BASIC_COLUMNS`, `GCS_COLUMNS`, `DATASTORE_COLUMNS`, `BIG_QUERY_COLUMNS`, `ALL_COLUMNS`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "output_config"
+        }
+      }
+    },
+    "table": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "project_id": {
+          "description": "The ID of the project containing this table.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "table"
+        },
+        "dataset_id": {
+          "description": "The ID of the dataset containing this table.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "table"
+        },
+        "table_id": {
+          "description": "The ID of the table. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "table"
+        }
+      }
+    },
+    "pub_sub": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "topic": {
+          "description": "Cloud Pub/Sub topic to send notifications to.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "pub_sub"
+        }
+      }
+    },
+    "deidentify": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "cloud_storage_output": {
+          "description": "User settable Cloud Storage bucket and folders to store de-identified files. This field must be set for cloud storage deidentification. The output Cloud Storage bucket must be different from the input bucket. De-identified files will overwrite files in the output path. Form of: gs://bucket/folder/ or gs://bucket",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "deidentify"
+        },
+        "file_types_to_transform": {
+          "description": "List of user-specified file type groups to transform. If specified, only the files with these filetypes will be transformed. If empty, all supported files will be transformed. Supported types may be automatically added over time. If a file type is set in this field that isn't supported by the Deidentify action then the job will fail and will not be successfully created/started. Each value may be one of: `IMAGE`, `TEXT_FILE`, `CSV`, `TSV`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "deidentify"
+        },
+        "transformation_config": {
+          "description": "User specified deidentify templates and configs for structured, unstructured, and image files. Structure is [documented below](#nested_inspect_job_actions_actions_deidentify_transformation_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "deidentify"
+        },
+        "transformation_details_storage_config": {
+          "description": "Config for storing transformation details. Structure is [documented below](#nested_inspect_job_actions_actions_deidentify_transformation_details_storage_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "deidentify"
+        }
+      }
+    },
+    "transformation_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "deidentify_template": {
+          "description": "If this template is specified, it will serve as the default de-identify template.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "transformation_config"
+        },
+        "structured_deidentify_template": {
+          "description": "If this template is specified, it will serve as the de-identify template for structured content such as delimited files and tables.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "transformation_config"
+        },
+        "image_redact_template": {
+          "description": "If this template is specified, it will serve as the de-identify template for images.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "transformation_config"
+        }
+      }
+    },
+    "transformation_details_storage_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "table": {
+          "description": "The BigQuery table in which to store the output. Structure is [documented below](#nested_inspect_job_actions_actions_deidentify_transformation_details_storage_config_table).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "transformation_details_storage_config"
+        }
+      }
+    }
+  }
+}
