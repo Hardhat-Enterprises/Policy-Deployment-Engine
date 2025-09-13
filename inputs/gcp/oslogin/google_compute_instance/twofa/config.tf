@@ -7,6 +7,6 @@ terraform {
 }
 
 provider "google" {
-  project = "dummy-project"          # 👈 fake project ID, just for plan generation
+  project = "dummy-project"         
   region  = "australia-southeast1"
 }
