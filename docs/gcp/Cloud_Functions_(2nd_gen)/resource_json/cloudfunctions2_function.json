@@ -5,8 +5,8 @@
     "name": {
       "description": "A user-defined name of the function. Function names must be unique globally and match pattern `projects/*/locations/*/functions/*`.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The function name only identifies the resource and does not impact security.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,10 +14,10 @@
     "location": {
       "description": "The location of this cloud function.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Choosing the correct region is important for compliance and data residency. An incorrect or non-compliant region can violate organizational security policies or regulatory requirements.",
+      "compliant": "australia-southeast1",
+      "non-compliant": " ",
       "parent": null
     },
     "description": {
@@ -86,10 +86,10 @@
         "environment_variables": {
           "description": "User-provided build-time environment variables for the function.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Environment variables can contain secrets or configuration values. They must not expose sensitive information in plain text.",
+          "compliant": "BUILD_CONFIG_TEST",
+          "non-compliant": "API_KEY",
           "parent": "build_config"
         },
         "docker_repository": {
@@ -151,10 +151,10 @@
         "timeout_seconds": {
           "description": "The function execution timeout. Execution is considered failed and can be terminated if the function is not completed at the end of the timeout period. Defaults to 60 seconds.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Setting an appropriate timeout helps prevent resource exhaustion or denial-of-service scenarios.",
+          "compliant": 120,
+          "non-compliant": 600,
           "parent": "service_config"
         },
         "available_memory": {
@@ -214,10 +214,10 @@
         "vpc_connector": {
           "description": "The Serverless VPC Access connector that this cloud function can connect to.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Configuring a VPC connector allows the function to securely access internal resources without exposing them to the public internet.",
+          "compliant": "projects/my-project/locations/us-central1/connectors/my-vpc-connector",
+          "non-compliant": " ",
           "parent": "service_config"
         },
         "vpc_connector_egress_settings": {
@@ -232,10 +232,10 @@
         "ingress_settings": {
           "description": "Available ingress settings. Defaults to \"ALLOW_ALL\" if unspecified. Default value is `ALLOW_ALL`. Possible values are: `ALLOW_ALL`, `ALLOW_INTERNAL_ONLY`, `ALLOW_INTERNAL_AND_GCLB`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Restricting ingress reduces exposure to unauthorized external access.",
+          "compliant": "ALLOW_INTERNAL_ONLY",
+          "non-compliant": "ALLOW_ALL",
           "parent": "service_config"
         },
         "uri": {
