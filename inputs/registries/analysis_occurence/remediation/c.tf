@@ -1,22 +1,18 @@
-# Compliant Resource for Analysis Occurrence (c)
-# This resource will be compliant if serialized_payload, signature, and public_key_id are provided correctly
-
+# Compliant Container Analysis Occurrence (remediation)
 resource "google_container_analysis_occurrence" "c" {
-  # URI that represents the resource for which the occurrence applies (example of Docker image)
-  resource_uri = "https://gcr.io/project/image@sha256:123abc"
+  resource_uri = "https://gcr.io/sixth-oxygen-468910-f1/image@sha256:123abc"
+  note_name    = "projects/sixth-oxygen-468910-f1/notes/example-note"
 
-  # The associated analysis note
-  note_name = "projects/my-test-project-id/notes/example-note"
-
-  # Attestation block
   attestation {
-    serialized_payload = "dGVzdCBwYXlsb2FkCg=="  # base64 encoded example payload
+    # base64 payload (example)
+    serialized_payload = "dGVzdCBwYXlsb2FkCg=="
 
     signatures {
-      signature    = "U2lnbmVkUmVzcG9uc2VXaXRoVGVzdFNpZ25hdHVyZQ=="  # Example signature (base64)
-      public_key_id = "openpgp4fpr:74FAF3B861BDA0870C7B6DEF607E48D2A663AEEA"  # Example public key ID
+      # base64 signature (example)
+      signature     = "U2lnbmVkUmVzcG9uc2VXaXRoVGVzdFNpZ25hdHVyZQ=="
+      public_key_id = "openpgp4fpr:74FAF3B861BDA0870C7B6DEF607E48D2A663AEEA"
     }
   }
 
-  project = "my-test-project-id"  # Replace with your actual project ID
+  project = "sixth-oxygen-468910-f1"
 }

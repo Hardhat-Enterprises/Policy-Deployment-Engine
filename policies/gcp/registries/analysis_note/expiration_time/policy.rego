@@ -1,21 +1,43 @@
-package terraform.gcp.security.registries.google_container_analysis_note.expiration_time
+package terraform.gcp.security.analysis_note.expiration_time
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.analysis_note.expiration_time.vars
 
-expiration_time_range := {"lower_bound": 1, "upper_bound": 365}
+banned_values := vars.variables["banned_expiration_time_values"]
+max_year      := vars.variables["max_expiration_year"]
 
 conditions := [
-    [
-        {"situation_description": "Expiration time is not within the valid range of 1 to 365 days.",
-        "remedies": ["Ensure expiration time is between 1 and 365 days."]},
-        {
-            "condition": "Check if expiration time is within the valid range",
-            "attribute_path": ["expiration_time"],
-            "values": [expiration_time_range["lower_bound"], expiration_time_range["upper_bound"]],
-            "policy_type": "range"
-        }
-    ]
+  [
+    {
+      "situation_description": "The 'expiration_time' is empty or invalid (placeholder/epoch).",
+      "remedies": [
+        "Set a real ISO-8601 UTC timestamp (e.g., 2030-12-31T23:59:59Z).",
+        "Use finite lifetimes to enforce periodic rotation."
+      ],
+    },
+    {
+      "condition": "expiration_time is NOT empty/placeholder",
+      "attribute_path": ["expiration_time"],
+      "values": banned_values,
+      "policy_type": "blacklist"
+    },
+  ],
+  [
+    {
+      "situation_description": "The 'expiration_time' is set unreasonably far in the future.",
+      "remedies": [
+        "Choose a nearer expiry within the org’s maximum window."
+      ],
+    },
+    {
+      # Helpers expect range: [min, max]
+      # min = null (no lower bound), max = max_year
+      "condition": "expiration_time is NOT set beyond the allowed maximum year",
+      "attribute_path": ["expiration_time"],
+      "values": [null, max_year],
+      "policy_type": "range"
+    },
+  ],
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
