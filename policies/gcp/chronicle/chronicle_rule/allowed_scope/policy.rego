@@ -8,10 +8,10 @@ conditions := [
   # 1. Missing or empty scope
   [
     {
-      "situation_description": "The Chronicle rule does not have a 'scope' defined, resulting in unrestricted access.",
+      "situation_description": "It does not specify 'location' giving potentially unrestricted regional access",
       "remedies": [
-        "Define a valid 'scope' to restrict the rule’s access to specific data using a data access scope.",
-        "Ensure the scope is compatible with any reference lists used in the rule."
+       "Define a valid 'location' for the Chronicle rule to ensure it targets specific regions.",
+        "Avoid using empty strings or null values in the 'location' attribute."
       ]
     },
     {
@@ -25,13 +25,14 @@ conditions := [
   # 2. Invalid format of scope
   [
     {
-      "situation_description": "The 'scope' attribute format is invalid — follow standard resource path format.",
+      "situation_description": "The 'location' attribute is not in the list of approved regions.",
       "remedies": [
-        "Ensure the scope for:projects/{project}/locations/{location}/instances/{instance}/dataAccessScopes/{scope_id}."
+        "Ensure the 'location' attribute contains only allowed regions like 'australia-southeast1'.",
+        "Avoid using wildcard or non-standard values in the location field."
       ]
     },
     {
-      "condition": "Invalid 'scope' format",
+      "condition": "Invalid or disallowed 'location' value",
       "attribute_path": ["scope"],
       "values": ["projects/fake-project/locations/*/instances/audit-log-activity/dataAccessScopes/legitimatescope", 
       [["australia-southeast1"]]],
