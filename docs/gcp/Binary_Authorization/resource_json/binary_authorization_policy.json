@@ -1,0 +1,138 @@
+{
+  "resource_name": "binary_authorization_policy",
+  "subcategory": "Binary Authorization",
+  "arguments": {
+    "default_admission_rule": {
+      "description": "Default admission rule for a cluster without a per-cluster admission rule. Structure is [documented below](#nested_default_admission_rule).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "evaluation_mode": {
+          "description": "How this admission rule will be evaluated. Possible values are: `ALWAYS_ALLOW`, `REQUIRE_ATTESTATION`, `ALWAYS_DENY`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "default_admission_rule"
+        },
+        "require_attestations_by": {
+          "description": "The resource names of the attestors that must attest to a container image. If the attestor is in a different project from the policy, it should be specified in the format `projects/*/attestors/*`. Each attestor must exist before a policy can reference it. To add an attestor to a policy the principal issuing the policy change request must be able to read the attestor resource. Note: this field must be non-empty when the evaluation_mode field specifies REQUIRE_ATTESTATION, otherwise it must be empty.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "default_admission_rule"
+        },
+        "enforcement_mode": {
+          "description": "The action when a pod creation is denied by the admission rule. Possible values are: `ENFORCED_BLOCK_AND_AUDIT_LOG`, `DRYRUN_AUDIT_LOG_ONLY`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "default_admission_rule"
+        }
+      }
+    },
+    "description": {
+      "description": "A descriptive comment.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "global_policy_evaluation_mode": {
+      "description": "Controls the evaluation of a Google-maintained global admission policy for common system-level images. Images not covered by the global policy will be subject to the project admission policy. Possible values are: `ENABLE`, `DISABLE`.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "admission_whitelist_patterns": {
+      "description": "A whitelist of image patterns to exclude from admission rules. If an image's name matches a whitelist pattern, the image's admission requests will always be permitted regardless of your admission rules. Structure is [documented below](#nested_admission_whitelist_patterns).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "name_pattern": {
+          "description": "An image name pattern to whitelist, in the form `registry/path/to/image`. This supports a trailing * as a wildcard, but this is allowed only in text after the registry/ part.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "admission_whitelist_patterns"
+        }
+      }
+    },
+    "cluster_admission_rules": {
+      "description": "Per-cluster admission rules. An admission rule specifies either that all container images used in a pod creation request must be attested to by one or more attestors, that all pod creations will be allowed, or that all pod creations will be denied. There can be at most one admission rule per cluster spec. Identifier format: `{{location}}.{{clusterId}}`. A location is either a compute zone (e.g. `us-central1-a`) or a region (e.g. `us-central1`). Structure is [documented below](#nested_cluster_admission_rules).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "cluster": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cluster_admission_rules"
+        },
+        "evaluation_mode": {
+          "description": "How this admission rule will be evaluated. Possible values are: `ALWAYS_ALLOW`, `REQUIRE_ATTESTATION`, `ALWAYS_DENY`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cluster_admission_rules"
+        },
+        "require_attestations_by": {
+          "description": "The resource names of the attestors that must attest to a container image. If the attestor is in a different project from the policy, it should be specified in the format `projects/*/attestors/*`. Each attestor must exist before a policy can reference it. To add an attestor to a policy the principal issuing the policy change request must be able to read the attestor resource. Note: this field must be non-empty when the evaluation_mode field specifies REQUIRE_ATTESTATION, otherwise it must be empty.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cluster_admission_rules"
+        },
+        "enforcement_mode": {
+          "description": "The action when a pod creation is denied by the admission rule. Possible values are: `ENFORCED_BLOCK_AND_AUDIT_LOG`, `DRYRUN_AUDIT_LOG_ONLY`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cluster_admission_rules"
+        }
+      }
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    }
+  }
+}
