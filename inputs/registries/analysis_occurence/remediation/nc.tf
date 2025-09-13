@@ -1,22 +1,15 @@
-# Non-Compliant Resource for Analysis Occurrence (nc)
-# This resource will be non-compliant if serialized_payload, signature, or public_key_id are invalid or missing
-
+# Non-compliant: empty payload, invalid-base64 signature, email-like public_key_id
 resource "google_container_analysis_occurrence" "nc" {
-  # URI that represents the resource for which the occurrence applies (example of Docker image)
-  resource_uri = "https://gcr.io/project/image@sha256:456def"
+  resource_uri = "https://gcr.io/sixth-oxygen-468910-f1/image@sha256:456def"
+  note_name    = "projects/sixth-oxygen-468910-f1/notes/example-note-nc"
 
-  # The associated analysis note
-  note_name = "projects/my-test-project-id/notes/example-note-nc"
-
-  # Attestation block with missing/invalid data
   attestation {
-    serialized_payload = ""  # Empty serialized payload (non-compliant)
-
+    serialized_payload = ""              # banned empty value
     signatures {
-      signature    = ""  # Empty signature (non-compliant)
-      public_key_id = ""  # Empty public key ID (non-compliant)
+      signature     = "not$$base64??"    # contains invalid chars -> blacklisted
+      public_key_id = "user@example.com" # email-like -> blacklisted
     }
   }
 
-  project = "my-test-project-id"  # Replace with your actual project ID
+  project = "sixth-oxygen-468910-f1"
 }
