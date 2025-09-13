@@ -1,6 +1,6 @@
-resource "google_privileged_access_manager_entitlement" "nc" {
-  entitlement_id       = "non-compliant-entitlement"
-  location             = "global"
+resource "google_privileged_access_manager_entitlement" "nc123" {
+  entitlement_id       = "nc123"
+  location             = "australia-southeast1"
   max_request_duration = "43200s"
   parent               = "projects/my-project-name"
 

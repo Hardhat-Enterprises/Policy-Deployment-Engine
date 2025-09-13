@@ -1,5 +1,5 @@
-resource "google_privileged_access_manager_entitlement" "nc" {
-  entitlement_id       = "non-compliant-entitlement"
+resource "google_privileged_access_manager_entitlement" "nc123" {
+  entitlement_id       = "nc123"
   location             = "global"
   max_request_duration = "43200s"
   parent               = "projects/my-project-name"

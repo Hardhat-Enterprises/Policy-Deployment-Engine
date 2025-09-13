@@ -10,10 +10,10 @@ conditions := [
             "remedies": ["Add an additional_notification_targets block with appropriate email recipients for admin and requester notifications"]
         },
         {
-            "condition": "Check if additional_notification_targets is present",
+            "condition": "Check if additional_notification_targets is present and not empty",
             "attribute_path": ["additional_notification_targets"],
-            "values": [],
-            "policy_type": "whitelist"
+            "values": [null, {}],
+            "policy_type": "blacklist"
         }
     ]
 ]

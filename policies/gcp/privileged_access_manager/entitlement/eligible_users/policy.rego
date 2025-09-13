@@ -5,8 +5,10 @@ import data.terraform.gcp.security.privileged_access_manager.entitlement.vars
 
 conditions := [
     [
-        {"situation_description": "Eligible users contains overly broad principals that allow public access",
-         "remedies": ["Replace broad principals with specific users/groups/service accounts"]},
+        {
+            "situation_description": "Eligible users contains overly broad principals that allow public access",
+            "remedies": ["Replace broad principals with specific users/groups/service accounts"]
+        },
         {
             "condition": "Check for allUsers or allAuthenticatedUsers principal",
             "attribute_path": ["eligible_users", 0, "principals"],
@@ -15,14 +17,15 @@ conditions := [
         }
     ],
     [
-        {"situation_description": "Eligible users contains invalid IAM principal formats",
-         "remedies": ["Use proper prefixes: user:, group:, serviceAccount:"]},
         {
-            "condition": "Check for principals without proper IAM prefix",
-            "attribute_path": ["eligible_users", 0, "principals"],
+            "situation_description": "Eligible users contains invalid IAM principal formats",
+            "remedies": ["Use proper prefixes: user:, group:, serviceAccount:"]
+        },
+        {
+            "condition": "Check for principals with proper IAM prefix",
+            "attribute_path": ["eligible_users", "*", "principals"],
             "values": ["user:", "group:", "serviceAccount:"],
-            "policy_type": "blacklist",
-            "inverse": true 
+            "policy_type": "pattern whitelist"
         }
     ]
 ]

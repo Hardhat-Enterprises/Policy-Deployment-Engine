@@ -10,13 +10,14 @@ conditions := [
             "remedies": ["Add an approval_workflow block with appropriate approval steps"]
         },
         {
-            "condition": "Check if approval_workflow array length is greater than 0",
+            "condition": "Check if approval_workflow is configured",
             "attribute_path": ["approval_workflow"],
-            "values": [0],
-            "policy_type": "range"
+            "values": [null, {}],
+            "policy_type": "blacklist"
         }
     ]
 ]
+
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
 details := helpers.get_multi_summary(conditions, vars.variables).details

@@ -2,17 +2,16 @@ package terraform.gcp.security.privileged_access_manager.entitlement.location
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.privileged_access_manager.entitlement.vars
 
-
 conditions := [
     [
         {
-            "situation_description": "Entitlement location is not in the approved Australia regions",
-            "remedies": ["Change location to 'australia-southeast1' or 'australia-southeast2'"]
+            "situation_description": "Entitlement location must be 'global' for Privileged Access Manager entitlements",
+            "remedies": ["Change location to 'global'"]
         },
         {
-            "condition": "Check if entitlement location is not compliant",
+            "condition": "Check if entitlement location is not 'global'",
             "attribute_path": ["location"],
-            "values": ["australia-southeast1", "australia-southeast2"],
+            "values": ["global"],
             "policy_type": "whitelist"
         }
     ]

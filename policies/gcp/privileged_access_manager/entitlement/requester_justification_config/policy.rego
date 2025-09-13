@@ -5,23 +5,23 @@ import data.terraform.gcp.security.privileged_access_manager.entitlement.vars
 
 conditions := [
     [
-        {"situation_description": "Requester justification is not configured or is set to not mandatory",
-         "remedies": ["Configure requester_justification_config with 'unstructured{}' to require justification"]},
+        {"situation_description": "Requester justification configuration is missing entirely",
+         "remedies": ["Add requester_justification_config block with either 'unstructured{}' or 'not_mandatory{}'"]},
         {
-            "condition": "Check if justification config is missing or set to not mandatory",
+            "condition": "Check if requester_justification_config is missing",
             "attribute_path": ["requester_justification_config"],
-            "values": [null, {"not_mandatory": {}}],
+            "values": [null],
             "policy_type": "blacklist"
         }
     ],
     [
-        {"situation_description": "Requester justification should be properly configured with unstructured method",
-         "remedies": ["Use 'unstructured{}' in requester_justification_config to require free-text justification"]},
+        {"situation_description": "Requester justification is configured but neither unstructured nor not_mandatory is specified",
+         "remedies": ["Specify either 'unstructured{}' to require justification or 'not_mandatory{}' to make it optional"]},
         {
-            "condition": "Check if unstructured justification is NOT configured",
-            "attribute_path": ["requester_justification_config", "unstructured"],
-            "values": [null],
-            "policy_type": "whitelist"  
+            "condition": "Check if requester_justification_config exists but has no valid sub-configuration",
+            "attribute_path": ["requester_justification_config"],
+            "values": [{}],
+            "policy_type": "blacklist"
         }
     ]
 ]

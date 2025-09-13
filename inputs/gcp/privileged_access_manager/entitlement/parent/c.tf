@@ -1,5 +1,5 @@
-resource "google_privileged_access_manager_entitlement" "c" {
-  entitlement_id       = "compliant-entitlement"
+resource "google_privileged_access_manager_entitlement" "c123" {
+  entitlement_id       = "c123"
   location             = "global"
   max_request_duration = "43200s"
   parent               = "projects/my-project"
