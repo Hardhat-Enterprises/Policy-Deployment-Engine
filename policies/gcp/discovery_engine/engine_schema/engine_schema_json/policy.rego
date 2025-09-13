@@ -11,11 +11,11 @@ conditions := [
         "remedies": ["Ensure The Json is set up correctly according to rules"]
         },
       {
-      #And Block
-        "condition": "Json is mis-configured",
+      
+        "condition": "Json is mis-configured, ensure that geolocation is on and datetime",
         "attribute_path": ["json_schema"],
-        "values": ["*", ["{\"$schema\":\"https://google/cschema\"}"]],
-        "policy_type": "pattern whitelist"
+        "values": ["{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"datetime_detection\":true,\"geolocation_detection\":true,\"type\":\"object\"}"],
+        "policy_type": "whitelist"
       }
     ]
 ]
