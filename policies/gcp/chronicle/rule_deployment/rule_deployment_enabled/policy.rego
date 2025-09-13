@@ -18,21 +18,6 @@ conditions := [
             "values": [true],
             "policy_type": "whitelist" 
         }
-    ],
-    [
-        {
-            "situation_description": "Rule should not be disabled if it's needed for production.",
-            "remedies": [
-                "Ensure 'enabled' is not set to false when the rule is required for monitoring",
-                "If not needed, consider archiving the rule instead of disabling it"
-            ]
-        },
-        {
-            "condition": "Test if rule deployment is disabled",
-            "attribute_path": ["enabled"],
-            "values": [false],
-            "policy_type": "blacklist" 
-        }
     ]
 ]
 
