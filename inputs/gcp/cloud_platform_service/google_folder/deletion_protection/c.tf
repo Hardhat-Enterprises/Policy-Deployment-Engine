@@ -9,3 +9,5 @@ resource "google_folder" "C2" {
   parent              = "DepartmentA/1234567"
   deletion_protection = true   # ✅ Enforced
 }
+
+
