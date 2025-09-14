@@ -1,0 +1,346 @@
+{
+  "resource_name": "compute_reservation",
+  "subcategory": "Compute Engine",
+  "arguments": {
+    "name": {
+      "description": "Name of the resource. Provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "specific_reservation": {
+      "description": "Reservation for instances with specific machine shapes. Structure is [documented below](#nested_specific_reservation).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "count": {
+          "description": "The number of resources that are allocated.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "specific_reservation"
+        },
+        "in_use_count": {
+          "description": "(Output) How many instances are in use.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "specific_reservation"
+        },
+        "instance_properties": {
+          "description": "The instance properties for the reservation. Structure is [documented below](#nested_specific_reservation_instance_properties).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "specific_reservation"
+        },
+        "source_instance_template": {
+          "description": "Specifies the instance template to create the reservation. If you use this field, you must exclude the instanceProperties field.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "specific_reservation"
+        }
+      }
+    },
+    "zone": {
+      "description": "The zone where the reservation is made.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "An optional description of this resource.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "specific_reservation_required": {
+      "description": "When set to true, only VMs that target this reservation by name can consume this reservation. Otherwise, it can be consumed by VMs with affinity for any reservation. Defaults to false.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "share_settings": {
+      "description": "The share setting for reservations. Structure is [documented below](#nested_share_settings).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "share_type": {
+          "description": "Type of sharing for this shared-reservation Possible values are: `LOCAL`, `SPECIFIC_PROJECTS`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "share_settings"
+        },
+        "project_map": {
+          "description": "A map of project number and project config. This is only valid when shareType's value is SPECIFIC_PROJECTS. Structure is [documented below](#nested_share_settings_project_map).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "share_settings"
+        },
+        "projects": {
+          "description": ", [Beta](https://terraform.io/docs/providers/google/guides/provider_versions.html)) List of project IDs with which the reservation is shared.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "share_settings"
+        }
+      }
+    },
+    "delete_at_time": {
+      "description": "Absolute time in future when the reservation will be auto-deleted by Compute Engine. Timestamp is represented in RFC3339 text format. Cannot be used with delete_after_duration.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "delete_after_duration": {
+      "description": "Duration after which the reservation will be auto-deleted by Compute Engine. Cannot be used with delete_at_time. Structure is [documented below](#nested_delete_after_duration).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "seconds": {
+          "description": "Number of seconds for the auto-delete duration.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "delete_after_duration"
+        },
+        "nanos": {
+          "description": "Number of nanoseconds for the auto-delete duration.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "delete_after_duration"
+        }
+      }
+    },
+    "reservation_sharing_policy": {
+      "description": "Sharing policy for reservations with Google Cloud managed services. Structure is [documented below](#nested_reservation_sharing_policy).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "service_share_type": {
+          "description": "Sharing config for all Google Cloud services. Possible values are: `ALLOW_ALL`, `DISALLOW_ALL`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "reservation_sharing_policy"
+        }
+      }
+    },
+    "enable_emergent_maintenance": {
+      "description": ", [Beta](https://terraform.io/docs/providers/google/guides/provider_versions.html)) Indicates if this group of VMs have emergent maintenance enabled.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "instance_properties": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "machine_type": {
+          "description": "The name of the machine type to reserve.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "instance_properties"
+        },
+        "min_cpu_platform": {
+          "description": "The minimum CPU platform for the reservation. For example, `\"Intel Skylake\"`. See the CPU platform availability reference](https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform#availablezones) for information on available CPU platforms.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "instance_properties"
+        },
+        "guest_accelerators": {
+          "description": "Guest accelerator type and count. Structure is [documented below](#nested_specific_reservation_instance_properties_guest_accelerators).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "instance_properties"
+        },
+        "local_ssds": {
+          "description": "The amount of local ssd to reserve with each instance. This reserves disks of type `local-ssd`. Structure is [documented below](#nested_specific_reservation_instance_properties_local_ssds).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "instance_properties"
+        },
+        "maintenance_interval": {
+          "description": ", [Beta](https://terraform.io/docs/providers/google/guides/provider_versions.html)) Specifies the frequency of planned maintenance events. Possible values are: `AS_NEEDED`, `PERIODIC`, `RECURRENT`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "instance_properties"
+        }
+      }
+    },
+    "guest_accelerators": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "accelerator_type": {
+          "description": "The full or partial URL of the accelerator type to attach to this instance. For example: `projects/my-project/zones/us-central1-c/acceleratorTypes/nvidia-tesla-p100` If you are creating an instance template, specify only the accelerator name.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "guest_accelerators"
+        },
+        "accelerator_count": {
+          "description": "The number of the guest accelerator cards exposed to this instance.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "guest_accelerators"
+        }
+      }
+    },
+    "local_ssds": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "interface": {
+          "description": "The disk interface to use for attaching this disk. Default value is `SCSI`. Possible values are: `SCSI`, `NVME`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "local_ssds"
+        },
+        "disk_size_gb": {
+          "description": "The size of the disk in base-2 GB.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "local_ssds"
+        }
+      }
+    },
+    "project_map": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "id": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "project_map"
+        },
+        "project_id": {
+          "description": "The project id/number, should be same as the key of this project config in the project map.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "project_map"
+        }
+      }
+    }
+  }
+}
