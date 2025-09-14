@@ -4,14 +4,14 @@ import data.terraform.gcp.security.developer_connect.google_developer_connect_ac
 
 conditions := [
     [
-    {"situation_description" : "Scopes must be least-privilege",
+    {"situation_description" : "Scopes must be least-privilege (only repo allowed)",
     "remedies":["Use only the repo scope"]
     },
     {
-        "condition": "Forbidden scopes present",
+        "condition": "Scope is not allowed",
         "attribute_path" : ["provider_oauth_config", 0, "scopes", 0],
-        "values" : ["admin:org","delete_repo","*"],
-        "policy_type" : "blacklist"
+        "values" : ["repo"],
+        "policy_type" : "whitelist"
     }
     ]
 ]
