@@ -19,7 +19,5 @@ EOF
     }
   }
 
-  labels = {
-    env = "prod"
-  }
+  delete_policy = "DELETE"
 }
