@@ -11,8 +11,8 @@ conditions := [
     },
     {
         "condition": "Check if allow_anonymous is false",
-        "attribute_path" : ["allow_anonymous"],
-        "values" : [false],
+        "attribute_path" : ["values","triggers","allow_anonymous"],
+        "values" : ["false"],
         "policy_type" : "whitelist"
     }
     ]
