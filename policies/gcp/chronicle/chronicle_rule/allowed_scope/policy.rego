@@ -5,7 +5,6 @@ import data.terraform.gcp.security.chronicle.chronicle_rule.vars
 
 conditions := [
 
-  # 1. Missing or empty scope
   [
     {
       "situation_description": "It does not specify 'location' giving potentially unrestricted regional access",
@@ -22,7 +21,7 @@ conditions := [
     }
   ],
 
-  # 2. Invalid format of scope
+  
   [
     {
       "situation_description": "The 'location' attribute is not in the list of approved regions.",
