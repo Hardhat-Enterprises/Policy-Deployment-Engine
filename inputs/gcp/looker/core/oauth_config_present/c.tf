@@ -1,20 +1,12 @@
-# Compliant Looker Core instance with OAuth config present
-# This resource is compliant because oauth_config block is properly configured
+variable "project" {
+  type = string
+}
 
-resource "google_looker_instance" "c" {
-  name              = "looker-core-compliant-oauth-config"
-  platform_edition  = "LOOKER_CORE_STANDARD_ANNUAL"
-  region            = "us-central1"
-  public_ip_enabled = false
-  project           = var.project
-  
-  # Required fields for Looker Core
+resource "google_looker_instance" "ok" {
+  name    = "ok"
+  project = var.project
   oauth_config {
     client_id     = "test-client-id"
     client_secret = "test-client-secret"
   }
-}
-
-variable "project" {
-  type = string
 }

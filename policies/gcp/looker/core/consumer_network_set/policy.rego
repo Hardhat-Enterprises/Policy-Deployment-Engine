@@ -13,10 +13,10 @@ conditions := [
       ]
     },
     {
-      "condition": "Require consumer_network when using private connectivity (whitelist: consumerNetwork must be set)",
+      "condition": "consumer_network must be set",
       "attribute_path": ["consumer_network"],
-      "values": ["*"], # Any non-empty string
-      "policy_type": "whitelist"
+      "values": [null, ""], # Violates when missing or empty
+      "policy_type": "blacklist"
     }
   ]
 ]

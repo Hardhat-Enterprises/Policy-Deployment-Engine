@@ -1,37 +1,55 @@
+# policies/gcp/looker/core/psc_mode_hygiene/policy.rego
 package terraform.gcp.security.looker.core.psc_mode_hygiene
+
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.looker.core.vars
 
+# Intent: If PSC is enabled, BOTH public_ip_enabled and private_ip_enabled must be false.
+
 conditions := [
+  # Situation A: PSC ON ∧ public_ip_enabled == true  → violation
   [
     {
-      "situation_description": "PSC mode hygiene violation: when pscEnabled=true, publicIpEnabled and privateIpEnabled must both be false",
+      "situation_description": "PSC enabled but Public IP is still enabled",
       "remedies": [
-        "When using PSC (psc_enabled=true), ensure public_ip_enabled is set to false",
-        "When using PSC (psc_enabled=true), ensure private_ip_enabled is set to false",
-        "PSC requires exclusivity - no other IP connectivity methods should be enabled"
+        "Set public_ip_enabled=false when psc_enabled=true",
+        "PSC requires exclusivity; disable other connectivity modes"
       ]
     },
     {
-      "condition": "Disallow public IP when PSC is enabled (blacklist: pscEnabled=true AND publicIpEnabled=true)",
-      "attribute_path": ["psc_enabled", "public_ip_enabled"],
-      "values": [[true, true]],
-      "policy_type": "blacklist"
+      "condition": "Guard: PSC is ON",
+      "attribute_path": ["psc_enabled"],
+      "policy_type": "blacklist",
+      "values": [true]
+    },
+    {
+      "condition": "Public IP must be OFF when PSC is ON",
+      "attribute_path": ["public_ip_enabled"],
+      "policy_type": "blacklist",
+      "values": [true]
     }
   ],
+
+  # Situation B: PSC ON ∧ private_ip_enabled == true → violation
   [
     {
-      "situation_description": "PSC mode hygiene violation: when pscEnabled=true, privateIpEnabled must be false",
+      "situation_description": "PSC enabled but Private IP is still enabled",
       "remedies": [
-        "When using PSC (psc_enabled=true), ensure private_ip_enabled is set to false",
-        "PSC requires exclusivity - no other IP connectivity methods should be enabled"
+        "Set private_ip_enabled=false when psc_enabled=true",
+        "PSC requires exclusivity; disable other connectivity modes"
       ]
     },
     {
-      "condition": "Disallow private IP when PSC is enabled (blacklist: pscEnabled=true AND privateIpEnabled=true)",
-      "attribute_path": ["psc_enabled", "private_ip_enabled"],
-      "values": [[true, true]],
-      "policy_type": "blacklist"
+      "condition": "Guard: PSC is ON",
+      "attribute_path": ["psc_enabled"],
+      "policy_type": "blacklist",
+      "values": [true]
+    },
+    {
+      "condition": "Private IP must be OFF when PSC is ON",
+      "attribute_path": ["private_ip_enabled"],
+      "policy_type": "blacklist",
+      "values": [true]
     }
   ]
 ]

@@ -13,10 +13,10 @@ conditions := [
       ]
     },
     {
-      "condition": "Require maintenance window configuration (whitelist: maintenanceWindow must be present)",
+      "condition": "maintenance_window.day_of_week must be set",
       "attribute_path": ["maintenance_window", 0, "day_of_week"],
-      "values": ["*"], # Any non-empty string
-      "policy_type": "whitelist"
+      "values": [null, ""], # Violates when missing or empty
+      "policy_type": "blacklist"
     }
   ]
 ]

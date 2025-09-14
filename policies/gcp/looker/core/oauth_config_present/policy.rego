@@ -13,10 +13,10 @@ conditions := [
       ]
     },
     {
-      "condition": "Require oauth_config block with non-empty client_id and client_secret",
+      "condition": "oauth_config.client_id must be set",
       "attribute_path": ["oauth_config", 0, "client_id"],
-      "values": ["*"], # Any non-empty string
-      "policy_type": "whitelist"
+      "values": [null, ""], # Violates when missing or empty
+      "policy_type": "blacklist"
     }
   ]
 ]

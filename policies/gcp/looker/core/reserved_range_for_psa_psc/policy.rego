@@ -13,10 +13,10 @@ conditions := [
       ]
     },
     {
-      "condition": "Require reserved_range when using private connectivity (whitelist: reservedRange must be set)",
+      "condition": "reserved_range must be set",
       "attribute_path": ["reserved_range"],
-      "values": ["*"], # Any non-empty string
-      "policy_type": "whitelist"
+      "values": [null, ""], # Violates when missing or empty
+      "policy_type": "blacklist"
     }
   ]
 ]

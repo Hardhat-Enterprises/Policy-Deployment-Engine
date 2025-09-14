@@ -13,10 +13,10 @@ conditions := [
       ]
     },
     {
-      "condition": "Require CMEK configuration (whitelist: encryption_config.kms_key_name must be non-empty)",
+      "condition": "encryption_config.kms_key_name must be set",
       "attribute_path": ["encryption_config", 0, "kms_key_name"],
-      "values": ["*"], # Any non-empty string
-      "policy_type": "whitelist"
+      "values": [null, ""], # Violates when missing or empty
+      "policy_type": "blacklist"
     }
   ]
 ]

@@ -1,16 +1,12 @@
-# Non-compliant Looker Core instance with minimal OAuth config
-# This resource is non-compliant because oauth_config has empty client_id and client_secret
+variable "project" {
+  type = string
+}
 
-resource "google_looker_instance" "nc" {
-  name              = "looker-core-noncompliant-no-oauth-config"
-  platform_edition  = "LOOKER_CORE_STANDARD_ANNUAL"
-  region            = "us-central1"
-  public_ip_enabled = false
-  project           = var.project
-  
-  # Minimal oauth_config block - violates policy (should be properly configured)
+resource "google_looker_instance" "bad" {
+  name    = "bad" 
+  project = var.project
   oauth_config {
-    client_id     = ""
-    client_secret = ""
+    client_id     = ""  # Empty client_id to trigger failure
+    client_secret = "test-client-secret"
   }
 }
