@@ -1,4 +1,4 @@
-package terraform.gcp.security.developer_connect.google_developer_connect_account_connector.location
+package terraform.gcp.security.developer_connect.google_developer_connect_account_connector.approved_location
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.developer_connect.google_developer_connect_account_connector.vars
 
