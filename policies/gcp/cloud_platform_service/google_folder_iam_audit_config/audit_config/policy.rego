@@ -4,29 +4,38 @@ import data.terraform.gcp.security.cloud_platform_service.google_folder_iam_audi
 
 
 conditions := [
-  # s1: whitelist required log types. e.g., admin-read, data-read, data-write
+  # whitelist required log types. e.g., admin-read, data-read, data-write
   [
-  {"situation_description": "Audit logging must be enabled for all services",
-   "remedies": ["Enable ADMIN_READ, DATA_READ, DATA_WRITE logs"]},
-  {
-    "condition": "Whitelist required audit log types",
-    "attribute_path": ["audit_log_config",0,"log_type",0, "constant_value"],
-    "values": ["ADMIN_READ", "DATA_READ", "DATA_WRITE"],
-    "policy_type": "whitelist"
-  }
-],
+    {"situation_description": "Audit logging must include ADMIN_READ",
+     "remedies": ["Enable ADMIN_READ log"]},
+    {
+      "condition": "Must include ADMIN_READ",
+      "attribute_path": ["audit_log_config",0,"log_type"],
+      "values": ["ADMIN_READ"],
+      "policy_type": "whitelist"
+    }
+  ],
+  [
+    {"situation_description": "Audit logging must include DATA_READ",
+     "remedies": ["Enable DATA_READ log"]},
+    {
+      "condition": "Must include DATA_READ",
+      "attribute_path": ["audit_log_config",1,"log_type"],
+      "values": ["DATA_READ"],
+      "policy_type": "whitelist"
+    }
+  ],
+  [
+    {"situation_description": "Audit logging must include DATA_WRITE",
+     "remedies": ["Enable DATA_WRITE log"]},
+    {
+      "condition": "Must include DATA_WRITE",
+      "attribute_path": ["audit_log_config",2,"log_type"],
+      "values": ["DATA_WRITE"],
+      "policy_type": "whitelist"
+    }
+  ]
 
-# s2: blacklist exemptions. e.g., blocked expemted members
-[
-  {"situation_description": "Audit logs must not exempt members",
-   "remedies": ["Remove exempted_members from audit config"]},
-  {
-    "condition": "Block exempted members in audit logging",
-    "attribute_path": ["audit_log_config",0,"exempted_members",0],
-    "values": ["*", [["user:*", "group:.*", "serviceAccount:.*"]]],  
-    "policy_type": "pattern blacklist"
-  }
-]
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
