@@ -11,7 +11,7 @@ conditions := [
     },
     {
       "condition": "Service must be in the allowlist.",
-      "attribute_path": ["service"],   # ✅ not ["values","service"]
+      "attribute_path": ["service"],   
       "values": ["web", "api"],
       "policy_type": "whitelist"
     }
@@ -23,7 +23,7 @@ conditions := [
     },
     {
       "condition": "Blocklist critical service names.",
-      "attribute_path": ["service"],   # ✅
+      "attribute_path": ["service"],   
       "values": ["auth", "payments", "default"],
       "policy_type": "blacklist"
     }
@@ -35,7 +35,7 @@ conditions := [
     },
     {
       "condition": "migrate_traffic must be true.",
-      "attribute_path": ["migrate_traffic"],   # ✅
+      "attribute_path": ["migrate_traffic"],   
       "values": [true],
       "policy_type": "whitelist"
     }

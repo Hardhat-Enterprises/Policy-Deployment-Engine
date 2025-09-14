@@ -16,8 +16,8 @@ conditions := [
     },
     {
       "condition": "Domain name is approved",
-      "attribute_path": ["values", "domain_name"],
-      "values": ["secure-service.example.com"],   # add more approved names here if needed
+      "attribute_path": ["domain_name"],
+      "values": ["secure-service.example.com"],  
       "policy_type": "whitelist"
     }
   ],

@@ -3,14 +3,14 @@ package terraform.gcp.security.app_engine.google_app_engine_domain_mapping.ssl_s
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.app_engine.google_app_engine_domain_mapping.vars
 
-# Variables to pass into helper
+
 local_vars := {
   "friendly_resource_name": vars.variables.friendly_resource_name,
   "resource_type":          vars.variables.resource_type,
   "resource_value_name":    "domain_name"
 }
 
-# Define conditions for evaluation
+
 conditions := [
   [
     {
@@ -28,6 +28,6 @@ conditions := [
   ]
 ]
 
-# Summaries
+
 message := helpers.get_multi_summary(conditions, local_vars).message
 details := helpers.get_multi_summary(conditions, local_vars).details
