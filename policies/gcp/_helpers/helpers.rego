@@ -1,4 +1,5 @@
 package terraform.gcp.helpers
+# tested on OPA Version: 1.2.0, Rego Version: v1
 
 # Defines the types of policies capable of being processed
 policy_types := ["blacklist", "whitelist", "range", "pattern blacklist", "pattern whitelist"]
@@ -9,10 +10,12 @@ policy_types := ["blacklist", "whitelist", "range", "pattern blacklist", "patter
 
 # Get resource's name; if not in values, take default "name". Checked!
 get_resource_name(this_nc_resource, value_name) = resource_name if {
-    this_nc_resource.values[value_name]
+    this_nc_resource.values[value_name] 
     resource_name := this_nc_resource.values[value_name]
 } else = resource_name if {
     resource_name := this_nc_resource[value_name]
+} else = null if {
+    print(sprintf("Resource name for '%s' was not found! Your 'resource_value_name' in vars is wrong. Try 'resource_value_name': 'name'.", [this_nc_resource.type]))
 }
 
 # if elem is an array; checks if elem contains any blacklisted items. e.g., elem=[w, r, a], arr=[a] -> true
@@ -32,7 +35,7 @@ array_contains(arr, elem, pol) if {
     #print(sprintf("%s", ["ww"]))
     arr_to_set = {x | x := arr[_]}
     elem_to_set = {x | x := elem[_]}
-    object.subset(elem_to_set, arr_to_set)
+    object.subset(arr_to_set, elem_to_set)
 }
 
 # Generic helper functions:
