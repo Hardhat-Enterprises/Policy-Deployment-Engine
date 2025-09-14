@@ -20,21 +20,6 @@ conditions := [
       ],
       "policy_type": "whitelist"
     }
-  ],
-  [
-    {
-      "situation_description": "Block default or empty network",
-      "remedies": ["Use an approved non-default VPC."]
-    },
-    {
-      "condition": "network must not be default or empty",
-      "attribute_path": ["network"],
-      "values": [
-        "",
-        "projects/deakin-lab-123/global/networks/default"
-      ],
-      "policy_type": "blacklist"
-    }
   ]
 ]
 

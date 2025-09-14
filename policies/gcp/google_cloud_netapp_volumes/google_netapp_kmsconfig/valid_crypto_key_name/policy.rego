@@ -20,18 +20,6 @@ conditions := [
       ],
       "policy_type": "whitelist"
     }
-  ],
-  [
-    {
-      "situation_description": "Block empty crypto key name",
-      "remedies": ["Provide a valid approved CMEK resource path."]
-    },
-    {
-      "condition": "crypto_key_name must not be empty",
-      "attribute_path": ["crypto_key_name"],
-      "values": [""],
-      "policy_type": "blacklist"
-    }
   ]
 ]
 

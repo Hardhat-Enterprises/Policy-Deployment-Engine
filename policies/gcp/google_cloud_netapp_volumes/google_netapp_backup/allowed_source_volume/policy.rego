@@ -20,18 +20,6 @@ conditions := [
       ],
       "policy_type": "whitelist"
     }
-  ],
-  [
-    {
-      "situation_description": "Block empty/undefined source volume",
-      "remedies": ["Provide a valid full resource ID for source_volume."]
-    },
-    {
-      "condition": "source_volume must not be empty",
-      "attribute_path": ["source_volume"],
-      "values": [""],
-      "policy_type": "blacklist"
-    }
   ]
 ]
 

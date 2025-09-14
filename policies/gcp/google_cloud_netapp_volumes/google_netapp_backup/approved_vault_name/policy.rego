@@ -20,18 +20,6 @@ conditions := [
       ],
       "policy_type": "whitelist"
     }
-  ],
-  [
-    {
-      "situation_description": "Vault name must not be empty",
-      "remedies": ["Provide a valid approved vault name."]
-    },
-    {
-      "condition": "vault_name must not be empty",
-      "attribute_path": ["vault_name"],
-      "values": [""],
-      "policy_type": "blacklist"
-    }
   ]
 ]
 
