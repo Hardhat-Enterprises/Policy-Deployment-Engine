@@ -1,9 +1,21 @@
-package terraform.gcp.security.developer_connect.google_developer_connect_connection.restrict_secret_version_path
+package terraform.gcp.security.developer_connect.google_developer_connect_connection.github_config_sub_attributes
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.developer_connect.google_developer_connect_connection.vars
 
-# Enforce Secret Manager path: project/org + allowed secret + version
 conditions := [
+  [
+    {
+      "situation_description": "Only the approved GitHub App is allowed",
+      "remedies": ["Set github_config.github_app to DEVELOPER_CONNECT"]
+    },
+    {
+      "condition": "GitHub App is not approved",
+      "attribute_path": ["github_config", 0, "github_app"],
+      "values": ["DEVELOPER_CONNECT"],
+      "policy_type": "whitelist"
+    }
+  ],
+
   [
     {
       "situation_description": "OAuth token secret must come from approved Secret Manager path",
