@@ -6,19 +6,34 @@ import data.terraform.gcp.security.binary_authorization.google_binary_authorizat
 conditions := [
   [
     {
-      "situation_description": "Cluster admission rule allows all images (ALWAYS_ALLOW)",
+      "situation_description": "Default admission rule allows all images (ALWAYS_ALLOW)",
       "remedies": [
-        "Use REQUIRE_ATTESTATION or at least enforce DENY for untrusted clusters"
+        "Set `evaluation_mode` to REQUIRE_ATTESTATION for secure cluster admission"
       ]
     },
     {
-      "condition": "Cluster admission rule must not be set to ALWAYS_ALLOW",
-      "attribute_path": ["cluster_admission_rules", 0, "evaluation_mode"],
+      "condition": "Default admission rule must not be set to ALWAYS_ALLOW",
+      "attribute_path": ["default_admission_rule", "evaluation_mode"],
       "values": ["ALWAYS_ALLOW"],
+      "policy_type": "blacklist"
+    }
+  ],
+  [
+    {
+      "situation_description": "Admission whitelist pattern is empty or null",
+      "remedies": [
+        "Provide a valid `name_pattern` to whitelist trusted images"
+      ]
+    },
+    {
+      "condition": "name_pattern must not be empty or null",
+      "attribute_path": ["admission_whitelist_patterns", 0, "name_pattern"],
+      "values": ["", null],
       "policy_type": "blacklist"
     }
   ]
 ]
 
+# Generate summary message and details
 message := helpers.get_multi_summary(conditions, vars.variables).message
 details := helpers.get_multi_summary(conditions, vars.variables).details

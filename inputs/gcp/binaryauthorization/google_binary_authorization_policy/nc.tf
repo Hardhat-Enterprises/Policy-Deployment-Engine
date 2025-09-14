@@ -2,13 +2,12 @@ resource "google_binary_authorization_policy" "bad_policy" {
   project = "my-gcp-project"
 
   default_admission_rule {
-    evaluation_mode  = "REQUIRE_ATTESTATION"
-    enforcement_mode = "ENFORCED_BLOCK_AND_AUDIT_LOG"
-    require_attestations_by = ["projects/my-gcp-project/attestors/test-attestor"]
+    evaluation_mode  = "ALWAYS_ALLOW"   # Non-compliant: too permissive
+    enforcement_mode = "DRYRUN"         # Non-compliant: does not block
+    require_attestations_by = []        # Non-compliant: no attestors
   }
 
-  # Bad: empty name_pattern (Terraform accepts, OPA will flag)
   admission_whitelist_patterns {
-    name_pattern = ""
+    name_pattern = ""  # Non-compliant: empty string
   }
 }

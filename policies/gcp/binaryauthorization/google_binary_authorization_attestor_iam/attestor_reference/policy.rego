@@ -6,16 +6,16 @@ import data.terraform.gcp.security.binary_authorization.google_binary_authorizat
 conditions := [
   [
     {
-      "situation_description": "IAM binding has an invalid attestor reference format",
+      "situation_description": "IAM binding attestor reference missing or malformed",
       "remedies": [
-        "Ensure `attestor` follows the format `projects/<project-id>/attestors/<attestor-id>`"
+        "Set `attestor` to a valid attestor path: projects/<project-id>/attestors/<attestor-id>"
       ]
     },
     {
-      "condition": "Attestor must follow the required GCP format",
+      "condition": "attestor must follow the attestor resource pattern",
       "attribute_path": ["attestor"],
-      "regex": "^projects/[a-z0-9-]+/attestors/[a-zA-Z0-9_-]+$",
-      "policy_type": "regex"
+      "values": ["projects/*/attestors/*"],
+      "policy_type": "pattern whitelist"
     }
   ]
 ]

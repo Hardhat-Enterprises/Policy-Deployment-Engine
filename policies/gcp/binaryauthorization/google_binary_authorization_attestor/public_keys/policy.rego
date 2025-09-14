@@ -13,7 +13,7 @@ conditions := [
     },
     {
       "condition": "At least one public key must be defined",
-      "attribute_path": ["public_keys"],
+      "attribute_path": ["attestation_authority_note", 0, "public_keys"],
       "values": [null, []],
       "policy_type": "blacklist"
     }

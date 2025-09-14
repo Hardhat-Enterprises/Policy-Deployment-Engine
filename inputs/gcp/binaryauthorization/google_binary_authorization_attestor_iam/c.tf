@@ -1,8 +1,7 @@
-resource "google_binary_authorization_attestor_iam_binding" "good_binding" {
-  attestor = "projects/my-secure-project/attestors/good-attestor"
-  role     = "roles/containeranalysis.notes.attacher"
+resource "google_binary_authorization_attestor_iam_member" "good_iam_member" {
+  project  = "my-gcp-project"
+  attestor = "projects/my-gcp-project/attestors/good-attestor"
 
-  member = [
-    "serviceAccount:secure-attestor@my-secure-project.iam.gserviceaccount.com"
-  ]
+  role   = "roles/containeranalysis.notes.attacher"
+  member = "serviceAccount:good-sa@my-gcp-project.iam.gserviceaccount.com"
 }

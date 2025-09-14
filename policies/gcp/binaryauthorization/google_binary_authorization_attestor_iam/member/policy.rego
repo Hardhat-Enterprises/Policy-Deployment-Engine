@@ -6,15 +6,15 @@ import data.terraform.gcp.security.binary_authorization.google_binary_authorizat
 conditions := [
   [
     {
-      "situation_description": "IAM binding has no members defined",
+      "situation_description": "IAM binding has an invalid or empty member",
       "remedies": [
-        "Add a valid `member` identity such as a service account"
+        "Add a valid `member` identity such as `serviceAccount:<sa>@<project>.iam.gserviceaccount.com` or `user:<user>@example.com`"
       ]
     },
     {
-      "condition": "`member` must be non-empty and valid",
+      "condition": "`member` must not be empty",
       "attribute_path": ["member"],
-      "values": [null, ""],
+      "values": [""],
       "policy_type": "blacklist"
     }
   ]

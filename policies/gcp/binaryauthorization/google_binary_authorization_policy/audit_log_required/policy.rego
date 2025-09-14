@@ -1,4 +1,4 @@
-package terraform.gcp.security.binary_authorization.google_binary_authorization_policy.audit_logging
+package terraform.gcp.security.binary_authorization.google_binary_authorization_policy.audit_log_required
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.binary_authorization.google_binary_authorization_policy.vars
@@ -6,15 +6,15 @@ import data.terraform.gcp.security.binary_authorization.google_binary_authorizat
 conditions := [
   [
     {
-      "situation_description": "Audit logging is disabled in Binary Authorization policy",
+      "situation_description": "Audit logging is not properly configured in Binary Authorization policy",
       "remedies": [
         "Enable audit logging to track image deployments"
       ]
     },
     {
-      "condition": "Audit logging must be enabled",
-      "attribute_path": ["admission_whitelist_patterns"], # placeholder (no direct flag in Terraform, simulate by requiring a log config attribute)
-      "values": [null],
+      "condition": "Audit logging must not be null or empty",
+      "attribute_path": ["name_pattern"],  
+      "values": [null, ""],
       "policy_type": "blacklist"
     }
   ]
