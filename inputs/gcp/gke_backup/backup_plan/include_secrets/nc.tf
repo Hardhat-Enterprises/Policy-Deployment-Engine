@@ -1,10 +1,10 @@
-resource "google_gke_backup_backup_plan" "c" {
-  name     = "c"
+resource "google_gke_backup_backup_plan" "nc" {
+  name     = "nc"
   cluster  = "projects/fluent-coder-468700-h4/locations/australia-southeast1/clusters/test-cluster"
   location = "australia-southeast1"
   
   backup_config {
-    include_secrets = true
+    include_secrets = false
     all_namespaces  = true
   }
 }
