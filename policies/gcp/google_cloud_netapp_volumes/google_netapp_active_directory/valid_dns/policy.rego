@@ -8,15 +8,13 @@ conditions := [
     {"situation_description": "DNS must point to approved internal resolvers",
      "remedies": [
        "Set dns to one of the approved pairs, e.g.:",
-       "\"10.10.0.10\" (Melbourne)",
-       "\"10.10.0.11\" (Sydney)"
+       "\"10.10.0.10\" (Melbourne)"
      ]},
     {
       "condition": "dns equals an approved resolver pair",
       "attribute_path": ["dns"],
       "values": [
-        "10.10.0.10",
-        "10.10.0.11"
+        "10.10.0.10"
       ],
       "policy_type": "whitelist"
     }
