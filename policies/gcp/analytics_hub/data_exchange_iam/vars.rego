@@ -1,4 +1,5 @@
-package terraform.gcp.blockchain.data_exchange.iam
+package terraform.gcp.security.analytics_hub.data_exchange_iam.naming_standard
+
 
 variables := {
     "friendly_resource_name": "BigQuery Analytics Hub Data Exchange IAM Binding",

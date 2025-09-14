@@ -1,7 +1,7 @@
-package terraform.gcp.blockchain.data_exchange.iam
+package terraform.gcp.security.analytics_hub.data_exchange_iam.naming_standard
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.blockchain.data_exchange.iam.vars
+import data.terraform.gcp.security.analytics_hub.data_exchange_iam.vars
 
 # STEP 1: STUDY YOUR RESOURCE AND ITS ATTRIBUTES, THEN FILL IN THE VARS FILE
 
@@ -18,8 +18,8 @@ conditions := [
         {
             "condition": "Check if data_exchange_id starts with the allowed prefix",
             "attribute_path": ["data_exchange_id"],
-            "values": [vars.variables.prefix],
-            "policy_type": "pattern whitelist"
+            "values": [sprintf("^%s.*", [vars.variables.prefix])], # regex enforces prefix
+            "policy_type": "whitelist"
         }
     ]
 ]

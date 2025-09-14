@@ -1,19 +1,30 @@
-package terraform.gcp.blockchain_node_engine.blockchain_nodes.naming_standard
+package terraform.gcp.security.blockchain_node_engine.blockchain_nodes.naming_standard
 
-# Collect all violations as an ARRAY of objects
-deny := [r |
-  rc := input.resource_changes[_]
-  rc.type == "google_blockchain_node_engine_blockchain_nodes"
-  ex := rc.change.after
+import data.terraform.gcp.helpers
+import data.terraform.gcp.security.blockchain_node_engine.blockchain_nodes.vars
 
-  # Enforce node_id naming convention
-  not regex.match("^[a-z0-9\\-]+$", ex.blockchain_node_id)
-
-  r := {
-    "msg": sprintf(
-      "resource %s: Blockchain node_id '%s' must be lowercase alphanumeric with hyphens",
-      [rc.address, ex.blockchain_node_id]
-    ),
-    "resource": rc.type,
-  }
+# STEP 1: Define the naming standard conditions
+conditions := [
+  [
+    {
+      "situation_description": "The blockchain_node_id does not follow the required naming convention.",
+      "remedies": [
+        "Ensure blockchain_node_id only contains lowercase letters, numbers, and hyphens"
+      ]
+    },
+    {
+      "condition": "Check if blockchain_node_id matches '^[a-z0-9\\-]+$'",
+      "attribute_path": ["blockchain_node_id"],
+      "values": ["^[a-z0-9\\-]+$"],
+      "policy_type": "pattern whitelist"
+    }
+  ]
 ]
+
+# Displays a general message about policy compliance
+# Example: opa eval ... "data.terraform.gcp.security.blockchain_node_engine.blockchain_nodes.naming_standard.message"
+message := helpers.get_multi_summary(conditions, vars.variables).message
+
+# Displays a detailed summary of each resource's compliance to every condition
+# Example: opa eval ... "data.terraform.gcp.security.blockchain_node_engine.blockchain_nodes.naming_standard.details"
+details := helpers.get_multi_summary(conditions, vars.variables).details

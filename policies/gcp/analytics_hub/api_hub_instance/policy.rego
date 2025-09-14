@@ -1,15 +1,30 @@
-package terraform.gcp.analytics_hub.data_exchange.naming_standard
+package terraform.gcp.security.analytics_hub.data_exchange.naming_standard
 
-# Deny if display_name does not start with required prefix
-deny := [r | 
-  rc := input.resource_changes[_]
-  rc.type == "google_bigquery_analytics_hub_data_exchange"
+import data.terraform.gcp.helpers
+import data.terraform.gcp.security.analytics_hub.data_exchange.vars
 
-  ex := rc.change.after
-  not startswith(ex.display_name, "de-")
-
-  r := {
-    "msg": sprintf("resource %s: display_name '%s' must start with 'de-'", [rc.address, ex.display_name]),
-    "resource": rc.type,
-  }
+# STEP 1: Define the conditions for naming standard
+conditions := [
+  [
+    {
+      "situation_description": "The display_name does not follow the required naming convention.",
+      "remedies": [
+        "Ensure the display_name starts with the prefix 'de-'"
+      ]
+    },
+    {
+      "condition": "Check if display_name starts with 'de-'",
+      "attribute_path": ["display_name"],
+      "values": ["de-*"],
+      "policy_type": "pattern whitelist"
+    }
+  ]
 ]
+
+# Displays a general message about policy compliance
+# Use: opa eval ... "data.terraform.gcp.security.analytics_hub.data_exchange.naming_standard.message"
+message := helpers.get_multi_summary(conditions, vars.variables).message
+
+# Displays a detailed summary of each resource's compliance to every condition
+# Use: opa eval ... "data.terraform.gcp.security.analytics_hub.data_exchange.naming_standard.details"
+details := helpers.get_multi_summary(conditions, vars.variables).details
