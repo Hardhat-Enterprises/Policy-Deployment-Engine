@@ -9,11 +9,11 @@ conditions := [
     {"situation_description": "Allowed Domains must be enabled",
      "remedies": ["Set access_settings.allowed_domains_settings.enable = true"]},
     {
-      "condition": "allowed domains feature enabled",
-      "attribute_path": ["access_settings", 0, "allowed_domains_settings", 0, "enable"],
-      "values": ["true"],
-      "policy_type": "whitelist"
-    }
+  "condition": "allowed domains feature enabled",
+  "attribute_path": ["access_settings", 0, "allowed_domains_settings", 0, "enable"],
+  "values": [true],
+  "policy_type": "whitelist"
+}
   ],
   [
     {"situation_description": "Only corporate domains are permitted",
