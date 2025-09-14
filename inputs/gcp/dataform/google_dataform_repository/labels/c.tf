@@ -1,18 +1,16 @@
-# Google Dataform Repository — compliant (labels policy: required labels present)
+# Google Dataform Repository — compliant labels (required labels)
 
 resource "google_dataform_repository" "c" {
   provider       = google-beta
   project        = var.project
-  region         = "us-central1"
-  name           = "labels-good"
-  display_name   = "dataform-compliant-labels"
-
+  region         = "australia-southeast1"
+  name           = "labels-compliant"
+  display_name   = "c"
+  
   labels = {
-    environment = "dev"
-    owner       = "team-a"
-    cost_center = "cc-1234"
-    team        = "data-platform"
+    environment   = "production"
+    owner         = "data-team"
+    cost_center   = "engineering"
+    team          = "data-platform"
   }
 }
-
-

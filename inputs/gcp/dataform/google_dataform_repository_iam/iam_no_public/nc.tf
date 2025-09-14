@@ -5,7 +5,7 @@ resource "google_dataform_repository" "repo_nc" {
   project      = var.project
   region       = "us-central1"
   name         = "iam-policy-parent-nc"
-  display_name = "dataform-repo-noncompliant-iam"
+  display_name = "nc"
 }
 
 resource "google_dataform_repository_iam_binding" "nc" {

@@ -1,0 +1,20 @@
+# Google Dataform Repository — compliant git_ssh_auth (SSH key secret & host key required)
+
+resource "google_dataform_repository" "c" {
+  provider       = google-beta
+  project        = var.project
+  region         = "australia-southeast1"
+  name           = "git-ssh-compliant"
+  display_name   = "c"
+  
+  git_remote_settings {
+    url            = "ssh://git@github.com/example/repo.git"
+    default_branch = "main"
+    
+    ssh_authentication_config {
+      user_private_key_secret_version = "projects/EX/secrets/ssh-key/versions/1"
+      host_public_key                 = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC..."
+    }
+  }
+}
+

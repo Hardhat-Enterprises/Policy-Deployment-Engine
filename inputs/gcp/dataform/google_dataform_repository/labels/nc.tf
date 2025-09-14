@@ -1,13 +1,16 @@
-# Google Dataform Repository — non-compliant (labels policy: required labels missing)
+# Google Dataform Repository — non-compliant labels (required labels)
 
 resource "google_dataform_repository" "nc" {
   provider       = google-beta
   project        = var.project
-  region         = "us-central1"
-  name           = "labels-bad"
-  display_name   = "dataform-noncompliant-labels"
-
-  labels = {}
+  region         = "australia-southeast1"
+  name           = "labels-non-compliant"
+  display_name   = "nc"
+  
+  labels = {
+    environment   = "production"
+    owner         = "data-team"
+    cost_center   = ""
+    team          = "data-platform"
+  }
 }
-
-

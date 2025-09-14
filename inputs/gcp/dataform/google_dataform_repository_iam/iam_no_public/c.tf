@@ -5,7 +5,7 @@ resource "google_dataform_repository" "repo_c" {
   project      = var.project
   region       = "australia-southeast1"
   name         = "iam-policy-parent"
-  display_name = "dataform-repo-compliant-iam"
+  display_name = "c"
 }
 
 resource "google_dataform_repository_iam_binding" "c" {
@@ -13,7 +13,7 @@ resource "google_dataform_repository_iam_binding" "c" {
   project    = var.project
   region     = google_dataform_repository.repo_c.region
   repository = "projects/${var.project}/locations/${google_dataform_repository.repo_c.region}/repositories/${google_dataform_repository.repo_c.name}"
-  role       = "roles/viewer"
+  role       = "roles/dataform.viewer"
   members    = [
     "user:alice@example.com"
   ]

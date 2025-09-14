@@ -1,110 +1,40 @@
 package terraform.gcp.security.dataform.google_dataform_repository.encryption
+
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.dataform.google_dataform_repository.vars
 
 conditions := [
   [
     {
-      "situation_description": "Dataform repository must use customer-managed encryption key (CMEK).",
-      "remedies": ["Set kms_key_name to a valid CMEK path matching the repository region."]
+      "situation_description": "CMEK must be set (kms_key_name cannot be empty or null).",
+      "remedies": [
+        "Populate kms_key_name with a valid CMEK path.",
+        "Ensure key exists in the same/approved region."
+      ]
     },
     {
-      "condition": "kms_key_name must be set (non-empty)",
+      "condition": "kms_key_name must not be empty",
       "attribute_path": ["kms_key_name"],
-      "policy_type": "blacklist",
-      "values": ["", null]
+      "values": [null, ""],
+      "policy_type": "blacklist"
     }
-  ]
-  ,
+  ],
   [
     {
-      "situation_description": "Repository must use a customer-managed encryption key (CMEK)",
-      "remedies": ["Set kms_key_name to a valid CMEK resource", "Rotate keys per org policy"]
+      "situation_description": "CMEK key path must match required format.",
+      "remedies": [
+        "Use projects/*/locations/*/keyRings/*/cryptoKeys/*.",
+        "Verify region segment matches repository region."
+      ]
     },
     {
-      "condition": "kms_key_name must reference a CMEK",
+      "condition": "kms_key_name must match CMEK resource format",
       "attribute_path": ["kms_key_name"],
-      "policy_type": "pattern whitelist",
-      "values": ["projects/*/locations/*/keyRings/*/cryptoKeys/*"]
-    }
-  ]
-  ,
-  [
-    {
-      "situation_description": "FORCE deletion risks accidental data loss",
-      "remedies": ["Set deletion_policy to DELETE", "Require manual cleanup for child resources"]
-    },
-    {
-      "condition": "Disallow FORCE deletion policy",
-      "attribute_path": ["deletion_policy"],
-      "policy_type": "blacklist",
-      "values": ["FORCE"]
-    }
-  ]
-  ,
-  [
-    {
-      "situation_description": "Git integration configured without a remote URL",
-      "remedies": ["Provide git_remote_settings.url", "Verify default_branch matches remote"]
-    },
-    {
-      "condition": "git_remote_settings must exist",
-      "attribute_path": ["git_remote_settings", 0],
-      "policy_type": "pattern whitelist",
-      "values": ["*"]
-    },
-    {
-      "condition": "Require git remote URL when Git is configured",
-      "attribute_path": ["url"],
-      "policy_type": "pattern whitelist",
-      "values": ["*"]
-    }
-  ]
-  ,
-  [
-    {
-      "situation_description": "Git integration missing default branch",
-      "remedies": ["Set git_remote_settings.default_branch (e.g., main)"]
-    },
-    {
-      "condition": "git_remote_settings must exist",
-      "attribute_path": ["git_remote_settings", 0],
-      "policy_type": "pattern whitelist",
-      "values": ["*"]
-    },
-    {
-      "condition": "Require default_branch when git remote is set",
-      "attribute_path": ["default_branch"],
-      "policy_type": "pattern whitelist",
-      "values": ["*"]
-    }
-  ]
-  ,
-  [
-    {
-      "situation_description": "workspace_compilation_overrides present but default_database not set",
-      "remedies": ["Set default_database to a valid GCP project ID used by BigQuery"]
-    },
-    {
-      "condition": "workspace_compilation_overrides must exist",
-      "attribute_path": ["workspace_compilation_overrides", 0],
-      "policy_type": "pattern whitelist",
-      "values": ["*"]
-    },
-    {
-      "condition": "Require default_database when overrides are used",
-      "attribute_path": ["default_database"],
-      "policy_type": "pattern whitelist",
-      "values": ["*"]
+      "values": ["projects/*/locations/*/keyRings/*/cryptoKeys/*"],
+      "policy_type": "pattern whitelist"
     }
   ]
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
 details := helpers.get_multi_summary(conditions, vars.variables).details
-
-
-
-
-
-

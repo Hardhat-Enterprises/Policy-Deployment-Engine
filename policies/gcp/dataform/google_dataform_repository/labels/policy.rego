@@ -1,47 +1,54 @@
 package terraform.gcp.security.dataform.google_dataform_repository.labels
+
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.dataform.google_dataform_repository.vars
 
 conditions := [
   [
-    {
-      "situation_description": "Repository must include mandatory labels (environment, owner).",
-      "remedies": ["Set labels.environment and labels.owner to non-empty values."]
-    },
-    {
-      "condition": "effective_labels must exist",
-      "attribute_path": ["effective_labels"],
-      "policy_type": "pattern whitelist",
-      "values": ["*"]
-    },
-    {
-      "condition": "environment label must exist",
-      "attribute_path": ["environment"],
-      "values": ["", null],
-      "policy_type": "blacklist"
-    },
-    {
-      "condition": "owner label must exist",
-      "attribute_path": ["owner"],
-      "values": ["", null],
-      "policy_type": "blacklist"
-    },
-    {
-      "condition": "cost_center label must exist",
-      "attribute_path": ["cost_center"],
-      "values": ["", null],
-      "policy_type": "blacklist"
-    },
-    {
-      "condition": "team label must exist",
-      "attribute_path": ["team"],
-      "values": ["", null],
-      "policy_type": "blacklist"
-    }
+    {"situation_description": "Repository must have environment label.",
+     "remedies": [
+       "Add environment label with non-empty value.",
+       "Use values like 'production', 'staging', 'development'."
+     ]},
+    {"condition": "environment label must not be empty",
+     "attribute_path": ["labels","environment"],
+     "values": [null, ""],
+     "policy_type": "blacklist"}
+  ],
+  [
+    {"situation_description": "Repository must have owner label.",
+     "remedies": [
+       "Add owner label with non-empty value.",
+       "Use team name or individual email."
+     ]},
+    {"condition": "owner label must not be empty",
+     "attribute_path": ["labels","owner"],
+     "values": [null, ""],
+     "policy_type": "blacklist"}
+  ],
+  [
+    {"situation_description": "Repository must have cost_center label.",
+     "remedies": [
+       "Add cost_center label with non-empty value.",
+       "Use department or cost center identifier."
+     ]},
+    {"condition": "cost_center label must not be empty",
+     "attribute_path": ["labels","cost_center"],
+     "values": [null, ""],
+     "policy_type": "blacklist"}
+  ],
+  [
+    {"situation_description": "Repository must have team label.",
+     "remedies": [
+       "Add team label with non-empty value.",
+       "Use team name or project identifier."
+     ]},
+    {"condition": "team label must not be empty",
+     "attribute_path": ["labels","team"],
+     "values": [null, ""],
+     "policy_type": "blacklist"}
   ]
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
 details := helpers.get_multi_summary(conditions, vars.variables).details
-
-

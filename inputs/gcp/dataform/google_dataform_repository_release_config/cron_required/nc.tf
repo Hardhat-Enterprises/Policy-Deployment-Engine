@@ -5,7 +5,7 @@ resource "google_dataform_repository" "repo_nc" {
   project      = var.project
   region       = "us-central1"
   name         = "release-config-parent-nc"
-  display_name = "dataform-repo-noncompliant-cron"
+  display_name = "nc"
 }
 
 resource "google_dataform_repository_release_config" "nc" {
@@ -13,7 +13,7 @@ resource "google_dataform_repository_release_config" "nc" {
   project       = var.project
   region        = google_dataform_repository.repo_nc.region
   repository    = "projects/${var.project}/locations/${google_dataform_repository.repo_nc.region}/repositories/${google_dataform_repository.repo_nc.name}"
-  name          = "release-config-bad"
+  name          = "nc"
   git_commitish = "main"
   # cron_schedule intentionally omitted to fail policy
 }

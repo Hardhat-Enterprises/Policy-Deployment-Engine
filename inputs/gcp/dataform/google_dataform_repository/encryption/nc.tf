@@ -1,12 +1,10 @@
-# Google Dataform Repository — non-compliant (encryption policy: kms_key_name is missing)
+# Google Dataform Repository — non-compliant encryption (CMEK required)
 
 resource "google_dataform_repository" "nc" {
   provider       = google-beta
   project        = var.project
-  region         = "us-central1"
-  name           = "cmek-bad"
-  display_name   = "dataform-noncompliant-encryption"
+  region         = "australia-southeast1"
+  name           = "cmek-non-compliant"
+  display_name   = "nc"
   kms_key_name   = ""
 }
-
-

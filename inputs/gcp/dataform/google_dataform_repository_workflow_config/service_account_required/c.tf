@@ -5,7 +5,7 @@ resource "google_dataform_repository" "repo_c" {
   project      = var.project
   region       = "australia-southeast1"
   name         = "workflow-config-parent"
-  display_name = "dataform-repo-compliant-workflow-sa"
+  display_name = "c"
 }
 
 resource "google_dataform_repository_release_config" "rel_c" {
@@ -23,7 +23,7 @@ resource "google_dataform_repository_workflow_config" "c" {
   project       = var.project
   region        = google_dataform_repository.repo_c.region
   repository    = "projects/${var.project}/locations/${google_dataform_repository.repo_c.region}/repositories/${google_dataform_repository.repo_c.name}"
-  name          = "workflow-config-good"
+  name          = "c"
   release_config = google_dataform_repository_release_config.rel_c.name
 
   invocation_config {

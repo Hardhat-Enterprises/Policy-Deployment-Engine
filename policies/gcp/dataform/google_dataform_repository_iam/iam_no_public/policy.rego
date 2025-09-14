@@ -5,59 +5,28 @@ import data.terraform.gcp.security.dataform.google_dataform_repository_iam.vars
 
 conditions := [
     [
-        {"situation_description" : "Repository IAM bindings must not include allUsers",
-        "remedies": ["Remove allUsers from members"]},
         {
-            "condition": "Disallow allUsers member",
-            "attribute_path" : ["members", 0],
-            "policy_type" : "blacklist",
-            "values" : ["allUsers"]
+            "situation_description": "Repository IAM bindings must not include allUsers",
+            "remedies": ["Remove allUsers from members"]
         },
         {
             "condition": "Disallow allUsers member",
-            "attribute_path" : ["members", 1],
-            "policy_type" : "blacklist",
-            "values" : ["allUsers"]
-        },
-        {
-            "condition": "Disallow allUsers member",
-            "attribute_path" : ["members", 2],
-            "policy_type" : "blacklist",
-            "values" : ["allUsers"]
+            "attribute_path": ["members"],
+            "values": ["allUsers", "allAuthenticatedUsers"],
+            "policy_type": "blacklist"
         }
     ]
     ,
     [
-        {"situation_description" : "Only approved roles may be bound at repository scope",
-        "remedies": ["Use approved role mappings or custom org roles"]},
         {
-            "condition": "Restrict role allowlist",
-            "attribute_path" : ["role"],
-            "policy_type" : "whitelist",
-            "values" : ["roles/dataform.admin", "roles/dataform.editor", "roles/dataform.viewer"]
-        }
-    ]
-    ,
-    [
-        {"situation_description" : "Member principal type must be allowed",
-        "remedies": ["Normalize identities to supported types (user/serviceAccount/group/domain)"]},
-        {
-            "condition": "Member[0] prefix allowlist",
-            "attribute_path" : ["members", 0],
-            "policy_type" : "pattern whitelist",
-            "values" : ["user:", "serviceAccount:", "group:", "domain:"]
+            "situation_description": "Only approved roles may be bound at repository scope",
+            "remedies": ["Use approved role mappings or custom org roles"]
         },
         {
-            "condition": "Member[1] prefix allowlist",
-            "attribute_path" : ["members", 1],
-            "policy_type" : "pattern whitelist",
-            "values" : ["user:", "serviceAccount:", "group:", "domain:"]
-        },
-        {
-            "condition": "Member[2] prefix allowlist",
-            "attribute_path" : ["members", 2],
-            "policy_type" : "pattern whitelist",
-            "values" : ["user:", "serviceAccount:", "group:", "domain:"]
+            "condition": "role must be approved dataform role",
+            "attribute_path": ["role"],
+            "values": ["roles/dataform.admin", "roles/dataform.editor", "roles/dataform.viewer"],
+            "policy_type": "whitelist"
         }
     ]
 ]
