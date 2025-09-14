@@ -3,5 +3,5 @@ package terraform.gcp.security.cloud_platform_service.google_folder_organization
 variables := {
   "friendly_resource_name": "Google Folder Organization Policy",
   "resource_type": "google_folder_organization_policy",
-  "resource_value_name": "constraint"  
+  "resource_value_name": "name"  
 }

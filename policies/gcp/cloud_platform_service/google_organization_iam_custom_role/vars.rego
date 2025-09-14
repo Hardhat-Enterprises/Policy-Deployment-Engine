@@ -3,5 +3,5 @@ package terraform.gcp.security.cloud_platform_service.google_organization_iam_cu
 variables := {
   "friendly_resource_name": "Google Organization IAM Custom Role",
   "resource_type": "google_organization_iam_custom_role",
-  "resource_value_name": "role_id"   
+  "resource_value_name": "name"   
 }

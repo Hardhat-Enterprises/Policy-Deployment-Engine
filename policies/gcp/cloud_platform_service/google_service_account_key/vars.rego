@@ -4,5 +4,5 @@ package terraform.gcp.security.cloud_platform_service.google_service_account_key
 variables := {
     "friendly_resource_name": "Service account key",
     "resource_type":  "google_service_account_key", 
-    "resource_value_name" : "service_account_id" 
+    "resource_value_name" : "name" 
 }
