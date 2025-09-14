@@ -1,0 +1,670 @@
+{
+  "resource_name": "gke_backup_restore_plan",
+  "subcategory": "Backup for GKE",
+  "arguments": {
+    "name": {
+      "description": "The full name of the BackupPlan Resource.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "backup_plan": {
+      "description": "A reference to the BackupPlan from which Backups may be used as the source for Restores created via this RestorePlan.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "cluster": {
+      "description": "The source cluster from which Restores will be created via this RestorePlan.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "restore_config": {
+      "description": "Defines the configuration of Restores created via this RestorePlan. Structure is [documented below](#nested_restore_config).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "all_namespaces": {
+          "description": "If True, restore all namespaced resources in the Backup. Setting this field to False will result in an error.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "restore_config"
+        },
+        "excluded_namespaces": {
+          "description": "A list of selected namespaces excluded from restoration. All namespaces except those in this list will be restored. Structure is [documented below](#nested_restore_config_excluded_namespaces).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "restore_config"
+        },
+        "selected_namespaces": {
+          "description": "A list of selected namespaces to restore from the Backup. The listed Namespaces and all resources contained in them will be restored. Structure is [documented below](#nested_restore_config_selected_namespaces).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "restore_config"
+        },
+        "selected_applications": {
+          "description": "A list of selected ProtectedApplications to restore. The listed ProtectedApplications and all the resources to which they refer will be restored. Structure is [documented below](#nested_restore_config_selected_applications).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "restore_config"
+        },
+        "no_namespaces": {
+          "description": "Do not restore any namespaced resources if set to \"True\". Specifying this field to \"False\" is not allowed.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "restore_config"
+        },
+        "namespaced_resource_restore_mode": {
+          "description": "Defines the behavior for handling the situation where sets of namespaced resources being restored already exist in the target cluster. This MUST be set to a value other than `NAMESPACED_RESOURCE_RESTORE_MODE_UNSPECIFIED` if the `namespacedResourceRestoreScope` is anything other than `noNamespaces`. See https://cloud.google.com/kubernetes-engine/docs/add-on/backup-for-gke/reference/rest/v1/RestoreConfig#namespacedresourcerestoremode for more information on each mode. Possible values are: `DELETE_AND_RESTORE`, `FAIL_ON_CONFLICT`, `MERGE_SKIP_ON_CONFLICT`, `MERGE_REPLACE_VOLUME_ON_CONFLICT`, `MERGE_REPLACE_ON_CONFLICT`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "restore_config"
+        },
+        "volume_data_restore_policy": {
+          "description": "Specifies the mechanism to be used to restore volume data. This should be set to a value other than `NAMESPACED_RESOURCE_RESTORE_MODE_UNSPECIFIED` if the `namespacedResourceRestoreScope` is anything other than `noNamespaces`. If not specified, it will be treated as `NO_VOLUME_DATA_RESTORATION`. See https://cloud.google.com/kubernetes-engine/docs/add-on/backup-for-gke/reference/rest/v1/RestoreConfig#VolumeDataRestorePolicy for more information on each policy option. Possible values are: `RESTORE_VOLUME_DATA_FROM_BACKUP`, `REUSE_VOLUME_HANDLE_FROM_BACKUP`, `NO_VOLUME_DATA_RESTORATION`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "restore_config"
+        },
+        "cluster_resource_restore_scope": {
+          "description": "Identifies the cluster-scoped resources to restore from the Backup. Structure is [documented below](#nested_restore_config_cluster_resource_restore_scope).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "restore_config"
+        },
+        "cluster_resource_conflict_policy": {
+          "description": "Defines the behavior for handling the situation where cluster-scoped resources being restored already exist in the target cluster. This MUST be set to a value other than `CLUSTER_RESOURCE_CONFLICT_POLICY_UNSPECIFIED` if `clusterResourceRestoreScope` is anyting other than `noGroupKinds`. See https://cloud.google.com/kubernetes-engine/docs/add-on/backup-for-gke/reference/rest/v1/RestoreConfig#clusterresourceconflictpolicy for more information on each policy option. Possible values are: `USE_EXISTING_VERSION`, `USE_BACKUP_VERSION`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "restore_config"
+        },
+        "transformation_rules": {
+          "description": "A list of transformation rules to be applied against Kubernetes resources as they are selected for restoration from a Backup. Rules are executed in order defined - this order matters, as changes made by a rule may impact the filtering logic of subsequent rules. An empty list means no transformation will occur. Structure is [documented below](#nested_restore_config_transformation_rules).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "restore_config"
+        },
+        "volume_data_restore_policy_bindings": {
+          "description": "A table that binds volumes by their scope to a restore policy. Bindings must have a unique scope. Any volumes not scoped in the bindings are subject to the policy defined in volume_data_restore_policy. Structure is [documented below](#nested_restore_config_volume_data_restore_policy_bindings).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "restore_config"
+        },
+        "restore_order": {
+          "description": "It contains custom ordering to use on a Restore. Structure is [documented below](#nested_restore_config_restore_order).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "restore_config"
+        }
+      }
+    },
+    "location": {
+      "description": "The region of the Restore Plan.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "User specified descriptive string for this RestorePlan.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "labels": {
+      "description": "Description: A set of custom labels supplied by the user. A list of key->value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "excluded_namespaces": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "namespaces": {
+          "description": "A list of Kubernetes Namespaces.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "excluded_namespaces"
+        }
+      }
+    },
+    "selected_namespaces": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "namespaces": {
+          "description": "A list of Kubernetes Namespaces.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "selected_namespaces"
+        }
+      }
+    },
+    "selected_applications": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "namespaced_names": {
+          "description": "A list of namespaced Kubernetes resources. Structure is [documented below](#nested_restore_config_selected_applications_namespaced_names).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "selected_applications"
+        }
+      }
+    },
+    "namespaced_names": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "namespace": {
+          "description": "The namespace of a Kubernetes Resource.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "namespaced_names"
+        },
+        "name": {
+          "description": "The name of a Kubernetes Resource.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "namespaced_names"
+        }
+      }
+    },
+    "cluster_resource_restore_scope": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "all_group_kinds": {
+          "description": "If True, all valid cluster-scoped resources will be restored. Mutually exclusive to any other field in `clusterResourceRestoreScope`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cluster_resource_restore_scope"
+        },
+        "excluded_group_kinds": {
+          "description": "A list of cluster-scoped resource group kinds to NOT restore from the backup. If specified, all valid cluster-scoped resources will be restored except for those specified in the list. Mutually exclusive to any other field in `clusterResourceRestoreScope`. Structure is [documented below](#nested_restore_config_cluster_resource_restore_scope_excluded_group_kinds).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cluster_resource_restore_scope"
+        },
+        "selected_group_kinds": {
+          "description": "A list of cluster-scoped resource group kinds to restore from the backup. If specified, only the selected resources will be restored. Mutually exclusive to any other field in the `clusterResourceRestoreScope`. Structure is [documented below](#nested_restore_config_cluster_resource_restore_scope_selected_group_kinds).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cluster_resource_restore_scope"
+        },
+        "no_group_kinds": {
+          "description": "If True, no cluster-scoped resources will be restored. Mutually exclusive to any other field in `clusterResourceRestoreScope`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cluster_resource_restore_scope"
+        }
+      }
+    },
+    "excluded_group_kinds": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "resource_group": {
+          "description": "API Group string of a Kubernetes resource, e.g. \"apiextensions.k8s.io\", \"storage.k8s.io\", etc. Use empty string for core group.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "excluded_group_kinds"
+        },
+        "resource_kind": {
+          "description": "Kind of a Kubernetes resource, e.g. \"CustomResourceDefinition\", \"StorageClass\", etc.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "excluded_group_kinds"
+        }
+      }
+    },
+    "selected_group_kinds": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "resource_group": {
+          "description": "API Group string of a Kubernetes resource, e.g. \"apiextensions.k8s.io\", \"storage.k8s.io\", etc. Use empty string for core group.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "selected_group_kinds"
+        },
+        "resource_kind": {
+          "description": "Kind of a Kubernetes resource, e.g. \"CustomResourceDefinition\", \"StorageClass\", etc.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "selected_group_kinds"
+        }
+      }
+    },
+    "transformation_rules": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "description": {
+          "description": "The description is a user specified string description of the transformation rule.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "transformation_rules"
+        },
+        "resource_filter": {
+          "description": "This field is used to specify a set of fields that should be used to determine which resources in backup should be acted upon by the supplied transformation rule actions, and this will ensure that only specific resources are affected by transformation rule actions. Structure is [documented below](#nested_restore_config_transformation_rules_transformation_rules_resource_filter).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "transformation_rules"
+        },
+        "field_actions": {
+          "description": "A list of transformation rule actions to take against candidate resources. Actions are executed in order defined - this order matters, as they could potentially interfere with each other and the first operation could affect the outcome of the second operation. Structure is [documented below](#nested_restore_config_transformation_rules_transformation_rules_field_actions).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "transformation_rules"
+        }
+      }
+    },
+    "resource_filter": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "namespaces": {
+          "description": "(Filtering parameter) Any resource subject to transformation must be contained within one of the listed Kubernetes Namespace in the Backup. If this field is not provided, no namespace filtering will be performed (all resources in all Namespaces, including all cluster-scoped resources, will be candidates for transformation). To mix cluster-scoped and namespaced resources in the same rule, use an empty string (\"\") as one of the target namespaces.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "resource_filter"
+        },
+        "group_kinds": {
+          "description": "(Filtering parameter) Any resource subject to transformation must belong to one of the listed \"types\". If this field is not provided, no type filtering will be performed (all resources of all types matching previous filtering parameters will be candidates for transformation). Structure is [documented below](#nested_restore_config_transformation_rules_transformation_rules_resource_filter_group_kinds).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "resource_filter"
+        },
+        "json_path": {
+          "description": "This is a JSONPath expression that matches specific fields of candidate resources and it operates as a filtering parameter (resources that are not matched with this expression will not be candidates for transformation).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "resource_filter"
+        }
+      }
+    },
+    "group_kinds": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "resource_group": {
+          "description": "API Group string of a Kubernetes resource, e.g. \"apiextensions.k8s.io\", \"storage.k8s.io\", etc. Use empty string for core group.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "group_kinds"
+        },
+        "resource_kind": {
+          "description": "Kind of a Kubernetes resource, e.g. \"CustomResourceDefinition\", \"StorageClass\", etc.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "group_kinds"
+        }
+      }
+    },
+    "field_actions": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "op": {
+          "description": "Specifies the operation to perform. Possible values are: `REMOVE`, `MOVE`, `COPY`, `ADD`, `TEST`, `REPLACE`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "field_actions"
+        },
+        "from_path": {
+          "description": "A string containing a JSON Pointer value that references the location in the target document to move the value from.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "field_actions"
+        },
+        "path": {
+          "description": "A string containing a JSON-Pointer value that references a location within the target document where the operation is performed.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "field_actions"
+        },
+        "value": {
+          "description": "A string that specifies the desired value in string format to use for transformation.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "field_actions"
+        }
+      }
+    },
+    "volume_data_restore_policy_bindings": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "policy": {
+          "description": "Specifies the mechanism to be used to restore this volume data. See https://cloud.google.com/kubernetes-engine/docs/add-on/backup-for-gke/reference/rest/v1/RestoreConfig#VolumeDataRestorePolicy for more information on each policy option. Possible values are: `RESTORE_VOLUME_DATA_FROM_BACKUP`, `REUSE_VOLUME_HANDLE_FROM_BACKUP`, `NO_VOLUME_DATA_RESTORATION`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "volume_data_restore_policy_bindings"
+        },
+        "volume_type": {
+          "description": "The volume type, as determined by the PVC's bound PV, to apply the policy to. Possible values are: `GCE_PERSISTENT_DISK`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "volume_data_restore_policy_bindings"
+        }
+      }
+    },
+    "restore_order": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "group_kind_dependencies": {
+          "description": "A list of group kind dependency pairs that is used by Backup for GKE to generate a group kind restore order. Structure is [documented below](#nested_restore_config_restore_order_group_kind_dependencies).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "restore_order"
+        }
+      }
+    },
+    "group_kind_dependencies": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "satisfying": {
+          "description": "The satisfying group kind must be restored first in order to satisfy the dependency. Structure is [documented below](#nested_restore_config_restore_order_group_kind_dependencies_group_kind_dependencies_satisfying).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "group_kind_dependencies"
+        },
+        "requiring": {
+          "description": "The requiring group kind requires that the satisfying group kind be restored first. Structure is [documented below](#nested_restore_config_restore_order_group_kind_dependencies_group_kind_dependencies_requiring).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "group_kind_dependencies"
+        }
+      }
+    },
+    "satisfying": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "resource_group": {
+          "description": "API Group of a Kubernetes resource, e.g. \"apiextensions.k8s.io\", \"storage.k8s.io\", etc. Use empty string for core group.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "satisfying"
+        },
+        "resource_kind": {
+          "description": "Kind of a Kubernetes resource, e.g. \"CustomResourceDefinition\", \"StorageClass\", etc.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "satisfying"
+        }
+      }
+    },
+    "requiring": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "resource_group": {
+          "description": "API Group of a Kubernetes resource, e.g. \"apiextensions.k8s.io\", \"storage.k8s.io\", etc. Use empty string for core group.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "requiring"
+        },
+        "resource_kind": {
+          "description": "Kind of a Kubernetes resource, e.g. \"CustomResourceDefinition\", \"StorageClass\", etc.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "requiring"
+        }
+      }
+    }
+  }
+}

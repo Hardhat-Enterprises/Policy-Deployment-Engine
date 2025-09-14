@@ -1,0 +1,3052 @@
+{
+  "resource_name": "container_cluster",
+  "subcategory": "Kubernetes (Container) Engine",
+  "arguments": {
+    "name": {
+      "description": "location. - - -",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "location": {
+      "description": "master will be created, as well as the default node location. If you specify a zone (such as `us-central1-a`), the cluster will be a zonal cluster with a single cluster master. If you specify a region (such as `us-west1`), the cluster will be a regional cluster with multiple masters spread across zones in the region, and with default node locations in those zones as well",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "node_locations": {
+      "description": "are located. Nodes must be in the region of their regional cluster or in the same region as their cluster's zone for zonal clusters. If this is specified for a zonal cluster, omit the cluster's zone. -> A \"multi-zonal\" cluster is a zonal cluster with at least one additional zone defined; in a multi-zonal cluster, the cluster master is only present in a single zone while nodes are present in each of the primary zone and the node locations. In contrast, in a regional cluster, cluster master nodes are present in multiple zones in the region. For that reason, regional clusters should be preferred.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "deletion_protection": {
+      "description": "destroying the cluster.  Deleting this cluster via `terraform destroy` or `terraform apply` will only succeed if this field is `false` in the Terraform state.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "addons_config": {
+      "description": "Structure is [documented below](#nested_addons_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "horizontal_pod_autoscaling": {
+          "description": "addon, which increases or decreases the number of replica pods a replication controller has based on the resource usage of the existing pods. It is enabled by default; set `disabled = true` to disable.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "addons_config"
+        },
+        "http_load_balancing": {
+          "description": "controller addon, which makes it easy to set up HTTP load balancers for services in a cluster. It is enabled by default; set `disabled = true` to disable.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "addons_config"
+        },
+        "network_policy_config": {
+          "description": "for the master.  This must be enabled in order to enable network policy for the nodes. To enable this, you must also define a [`network_policy`](#network_policy) block, otherwise nothing will happen. It can only be disabled if the nodes already do not have network policies enabled. Defaults to disabled; set `disabled = false` to enable.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "addons_config"
+        },
+        "gcp_filestore_csi_driver_config": {
+          "description": "which allows the usage of filestore instance as volumes. It is disabled by default; set `enabled = true` to enable.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "addons_config"
+        },
+        "gcs_fuse_csi_driver_config": {
+          "description": "which allows the usage of a gcs bucket as volumes. It is disabled by default for Standard clusters; set `enabled = true` to enable. It is enabled by default for Autopilot clusters with version 1.24 or later; set `enabled = true` to enable it explicitly. See [Enable the Cloud Storage FUSE CSI driver](https://cloud.google.com/kubernetes-engine/docs/how-to/persistent-volumes/cloud-storage-fuse-csi-driver#enable) for more information.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "addons_config"
+        },
+        "cloudrun_config": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "addons_config"
+        },
+        "istio_config": {
+          "description": "Structure is [documented below](#nested_istio_config).",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "addons_config"
+        },
+        "dns_cache_config": {
+          "description": "The status of the NodeLocal DNSCache addon. It is disabled by default. Set `enabled = true` to enable. **Enabling/Disabling NodeLocal DNSCache in an existing cluster is a disruptive operation. All cluster nodes running GKE 1.15 and higher are recreated.**",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "addons_config"
+        },
+        "gce_persistent_disk_csi_driver_config": {
+          "description": "Whether this cluster should enable the Google Compute Engine Persistent Disk Container Storage Interface (CSI) Driver. Set `enabled = true` to enable. **Note:** The Compute Engine persistent disk CSI Driver is enabled by default on newly created clusters for the following versions: Linux clusters: GKE version 1.18.10-gke.2100 or later, or 1.19.3-gke.2100 or later.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "addons_config"
+        },
+        "gke_backup_agent_config": {
+          "description": "The status of the Backup for GKE agent addon. It is disabled by default; Set `enabled = true` to enable.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "addons_config"
+        },
+        "kalm_config": {
+          "description": "Configuration for the KALM addon, which manages the lifecycle of k8s. It is disabled by default; Set `enabled = true` to enable.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "addons_config"
+        },
+        "config_connector_config": {
+          "description": "The status of the ConfigConnector addon. It is disabled by default; Set `enabled = true` to enable.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "addons_config"
+        },
+        "stateful_ha_config": {
+          "description": "The status of the Stateful HA addon, which provides automatic configurable failover for stateful applications. It is disabled by default for Standard clusters. Set `enabled = true` to enable.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "addons_config"
+        },
+        "ray_operator_config": {
+          "description": "addon](https://cloud.google.com/kubernetes-engine/docs/add-on/ray-on-gke/concepts/overview). It is disabled by default. Set `enabled = true` to enable. The minimum cluster version to enable Ray is 1.30.0-gke.1747000. Ray Operator config has optional subfields `ray_cluster_logging_config.enabled` and `ray_cluster_monitoring_config.enabled` which control Ray Cluster logging and monitoring respectively. See [Collect and view logs and metrics for Ray clusters on GKE](https://cloud.google.com/kubernetes-engine/docs/add-on/ray-on-gke/how-to/collect-view-logs-metrics) for more information.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "addons_config"
+        },
+        "parallelstore_csi_driver_config": {
+          "description": "which allows the usage of a Parallelstore instances as volumes. It is disabled by default for Standard clusters; set `enabled = true` to enable. It is enabled by default for Autopilot clusters with version 1.29 or later; set `enabled = true` to enable it explicitly. See [Enable the Parallelstore CSI driver](https://cloud.google.com/kubernetes-engine/docs/how-to/persistent-volumes/parallelstore-csi-new-volume#enable) for more information.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "addons_config"
+        },
+        "lustre_csi_driver_config": {
+          "description": "which allows the usage of a Lustre instances as volumes. It is disabled by default for Standard clusters; set `enabled = true` to enable. It is disabled by default for Autopilot clusters; set `enabled = true` to enable. Lustre CSI Driver Config has optional subfield `enable_legacy_lustre_port` which allows the Lustre CSI driver to initialize LNet (the virtual networklayer for Lustre kernel module) using port 6988. This flag is required to workaround a port conflict with the gke-metadata-server on GKE nodes. See [Enable Lustre CSI driver](https://cloud.google.com/kubernetes-engine/docs/how-to/persistent-volumes/lustre-csi-driver-new-volume) for more information. This example `addons_config` disables two addons: ```hcl addons_config { http_load_balancing { disabled = true } horizontal_pod_autoscaling { disabled = true } } ```",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "addons_config"
+        }
+      }
+    },
+    "allow_net_admin": {
+      "description": "`false`. This field should only be enabled for Autopilot clusters (`enable_autopilot` set to `true`).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "cluster_ipv4_cidr": {
+      "description": "in this cluster in CIDR notation (e.g. `10.96.0.0/14`). Leave blank to have one automatically chosen or specify a `/14` block in `10.0.0.0/8`. This field will default a new cluster to routes-based, where `ip_allocation_policy` is not defined.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "cluster_autoscaling": {
+      "description": "Per-cluster configuration of Node Auto-Provisioning with Cluster Autoscaler to automatically adjust the size of the cluster and create/delete node pools based on the current needs of the cluster's workload. See the [guide to using Node Auto-Provisioning](https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-provisioning) for more details. Structure is [documented below](#nested_cluster_autoscaling).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enabled": {
+          "description": "for autopilot clusters. Resource limits for `cpu` and `memory` must be defined to enable node auto-provisioning for GKE Standard.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cluster_autoscaling"
+        },
+        "resource_limits": {
+          "description": "cluster. Configuring the `cpu` and `memory` types is required if node auto-provisioning is enabled. These limits will apply to node pool autoscaling in addition to node auto-provisioning. Structure is [documented below](#nested_resource_limits).",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cluster_autoscaling"
+        },
+        "auto_provisioning_defaults": {
+          "description": "GKE Autopilot clusters. Structure is [documented below](#nested_auto_provisioning_defaults).",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cluster_autoscaling"
+        },
+        "auto_provisioning_locations": {
+          "description": "[zones](https://cloud.google.com/compute/docs/zones#available) in which the NodePool's nodes can be created by NAP.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cluster_autoscaling"
+        },
+        "autoscaling_profile": {
+          "description": "options for the [Autoscaling profile](https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-autoscaler#autoscaling_profiles) feature, which lets you choose whether the cluster autoscaler should optimize for resource utilization or resource availability when deciding to remove nodes from a cluster. Can be `BALANCED` or `OPTIMIZE_UTILIZATION`. Defaults to `BALANCED`.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cluster_autoscaling"
+        }
+      }
+    },
+    "binary_authorization": {
+      "description": "Authorization feature. Structure is [documented below](#nested_binary_authorization).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enabled": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "binary_authorization"
+        },
+        "evaluation_mode": {
+          "description": "and `PROJECT_SINGLETON_POLICY_ENFORCE`.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "binary_authorization"
+        }
+      }
+    },
+    "service_external_ips_config": {
+      "description": "Structure is [documented below](#nested_service_external_ips_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enabled": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "service_external_ips_config"
+        }
+      }
+    },
+    "mesh_certificates": {
+      "description": "Structure is [documented below](#nested_mesh_encryption).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enable_certificates": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "mesh_certificates"
+        }
+      }
+    },
+    "database_encryption": {
+      "description": "Structure is [documented below](#nested_database_encryption).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "state": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "database_encryption"
+        },
+        "key_name": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "database_encryption"
+        }
+      }
+    },
+    "description": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "default_max_pods_per_node": {
+      "description": "per node in this cluster. This doesn't work on \"routes-based\" clusters, clusters that don't have IP Aliasing enabled. See the [official documentation](https://cloud.google.com/kubernetes-engine/docs/how-to/flexible-pod-cidr) for more information.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "enable_kubernetes_alpha": {
+      "description": "this cluster. Note that when this option is enabled, the cluster cannot be upgraded and will be automatically deleted after 30 days.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "enable_k8s_beta_apis": {
+      "description": "Structure is [documented below](#nested_enable_k8s_beta_apis).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enabled_apis": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "enable_k8s_beta_apis"
+        }
+      }
+    },
+    "enable_tpu": {
+      "description": "See the [official documentation](https://cloud.google.com/tpu/docs/kubernetes-engine-setup).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "enable_legacy_abac": {
+      "description": "When enabled, identities in the system, including service accounts, nodes, and controllers, will have statically granted permissions beyond those provided by the RBAC configuration or IAM. Defaults to `false`",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "enable_shielded_nodes": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "enable_autopilot": {
+      "description": "Note that when this option is enabled, certain features of Standard GKE are not available. See the [official documentation](https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview#comparison) for available features.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "initial_node_count": {
+      "description": "cluster's default node pool. In regional or multi-zonal clusters, this is the number of nodes per zone. Must be set if `node_pool` is not set. If you're using `google_container_node_pool` objects with no default node pool, you'll need to set this to a value of at least `1`, alongside setting `remove_default_node_pool` to `true`.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "ip_allocation_policy": {
+      "description": "VPC-native clusters. If this block is unset during creation, it will be set by the GKE backend. Structure is [documented below](#nested_ip_allocation_policy).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "cluster_secondary_range_name": {
+          "description": "range in the cluster's subnetwork to use for pod IP addresses. Alternatively, `cluster_ipv4_cidr_block` can be used to automatically create a GKE-managed one.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "ip_allocation_policy"
+        },
+        "services_secondary_range_name": {
+          "description": "secondary range in the cluster's subnetwork to use for service `ClusterIP`s. Alternatively, `services_ipv4_cidr_block` can be used to automatically create a GKE-managed one.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "ip_allocation_policy"
+        },
+        "cluster_ipv4_cidr_block": {
+          "description": "Set to blank to have a range chosen with the default size. Set to /netmask (e.g. /14) to have a range chosen with a specific netmask. Set to a CIDR notation (e.g. 10.96.0.0/14) from the RFC-1918 private networks (e.g. 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) to pick a specific range to use.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "ip_allocation_policy"
+        },
+        "services_ipv4_cidr_block": {
+          "description": "Set to blank to have a range chosen with the default size. Set to /netmask (e.g. /14) to have a range chosen with a specific netmask. Set to a CIDR notation (e.g. 10.96.0.0/14) from the RFC-1918 private networks (e.g. 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) to pick a specific range to use.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "ip_allocation_policy"
+        },
+        "stack_type": {
+          "description": "Default value is `IPV4`. Possible values are `IPV4` and `IPV4_IPV6`.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "ip_allocation_policy"
+        },
+        "additional_pod_ranges_config": {
+          "description": "the cluster level. Used for Autopilot clusters and Standard clusters with which control of the secondary Pod IP address assignment to node pools isn't needed. Structure is [documented below](#nested_additional_pod_ranges_config).",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "ip_allocation_policy"
+        },
+        "additional_ip_ranges_config": {
+          "description": "Structure is [documented below](#nested_additional_ip_ranges_config).",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "ip_allocation_policy"
+        }
+      }
+    },
+    "networking_mode": {
+      "description": "Options are `VPC_NATIVE` or `ROUTES`. `VPC_NATIVE` enables [IP aliasing](https://cloud.google.com/kubernetes-engine/docs/how-to/ip-aliases). Newly created clusters will default to `VPC_NATIVE`.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "logging_config": {
+      "description": "Structure is [documented below](#nested_logging_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enable_components": {
+          "description": "`SYSTEM_COMPONENTS`, `APISERVER`, `CONTROLLER_MANAGER`, `SCHEDULER`, and `WORKLOADS`.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "logging_config"
+        }
+      }
+    },
+    "logging_service": {
+      "description": "write logs to. Available options include `logging.googleapis.com`(Legacy Stackdriver), `logging.googleapis.com/kubernetes`(Stackdriver Kubernetes Engine Logging), and `none`. Defaults to `logging.googleapis.com/kubernetes`",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "maintenance_policy": {
+      "description": "[documented below](#nested_maintenance_policy).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "daily_maintenance_window": {
+          "description": "Specify `start_time` in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) format \"HH:MM\u201d, where HH : \\[00-23\\] and MM : \\[00-59\\] GMT. For example: Examples: ```hcl maintenance_policy { daily_maintenance_window { start_time = \"03:00\" } } ```",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "maintenance_policy"
+        },
+        "recurring_window": {
+          "description": "Specify `start_time` and `end_time` in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) \"Zulu\" date format.  The start time's date is the initial date that the window starts, and the end time is used for calculating duration.  Specify `recurrence` in [RFC5545](https://tools.ietf.org/html/rfc5545#section-3.8.5.3) RRULE format, to specify when this recurs. Note that GKE may accept other formats, but will return values in UTC, causing a permanent diff. Examples: ``` maintenance_policy { recurring_window { start_time = \"2019-08-01T02:00:00Z\" end_time = \"2019-08-01T06:00:00Z\" recurrence = \"FREQ=DAILY\" } } ``` ``` maintenance_policy { recurring_window { start_time = \"2019-01-01T09:00:00Z\" end_time = \"2019-01-01T17:00:00Z\" recurrence = \"FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR\" } } ```",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "maintenance_policy"
+        },
+        "maintenance_exclusion": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "maintenance_policy"
+        }
+      }
+    },
+    "master_auth": {
+      "description": "Kubernetes master. Some values in this block are only returned by the API if your service account has permission to get credentials for your GKE cluster. If you see an unexpected diff unsetting your client cert, ensure you have the `container.clusters.getCredentials` permission. Structure is [documented below](#nested_master_auth).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "client_certificate_config": {
+          "description": "```hcl master_auth { client_certificate_config { issue_client_certificate = false } } ``` This block also contains several computed attributes, documented below.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "master_auth"
+        }
+      }
+    },
+    "master_authorized_networks_config": {
+      "description": "configuration options for master authorized networks. Omit the nested `cidr_blocks` attribute to disallow external access (except the cluster node IPs, which GKE automatically whitelists). Structure is [documented below](#nested_master_authorized_networks_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "cidr_blocks": {
+          "description": "Kubernetes cluster master through HTTPS.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "master_authorized_networks_config"
+        },
+        "gcp_public_cidrs_access_enabled": {
+          "description": "accessible via Google Compute Engine Public IPs.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "master_authorized_networks_config"
+        },
+        "private_endpoint_enforcement_enabled": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "master_authorized_networks_config"
+        }
+      }
+    },
+    "min_master_version": {
+      "description": "will auto-update the master to new versions, so this does not guarantee the current master version--use the read-only `master_version` field to obtain that. If unset, the cluster's version will be set by GKE to the version of the most recent official release (which is not necessarily the latest version).  Most users will find the `google_container_engine_versions` data source useful - it indicates which versions are available, and can be use to approximate fuzzy versions in a Terraform-compatible way. If you intend to specify versions manually, [the docs](https://cloud.google.com/kubernetes-engine/versioning-and-upgrades#specifying_cluster_version) describe the various acceptable formats for this field. -> If you are using the `google_container_engine_versions` datasource with a regional cluster, ensure that you have provided a `location` to the datasource. A region can have a different set of supported versions than its corresponding zones, and not all zones in a region are guaranteed to support the same version.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "monitoring_config": {
+      "description": "Structure is [documented below](#nested_monitoring_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enable_components": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "monitoring_config"
+        },
+        "managed_prometheus": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "monitoring_config"
+        },
+        "advanced_datapath_observability_config": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "monitoring_config"
+        }
+      }
+    },
+    "monitoring_service": {
+      "description": "should write metrics to. Automatically send metrics from pods in the cluster to the Google Cloud Monitoring API. VM metrics will be collected by Google Compute Engine regardless of this setting Available options include `monitoring.googleapis.com`(Legacy Stackdriver), `monitoring.googleapis.com/kubernetes`(Stackdriver Kubernetes Engine Monitoring), and `none`. Defaults to `monitoring.googleapis.com/kubernetes`",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "network": {
+      "description": "network to which the cluster is connected. For Shared VPC, set this to the self link of the shared network.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "network_policy": {
+      "description": "[NetworkPolicy](https://kubernetes.io/docs/concepts/services-networking/networkpolicies/) feature. Structure is [documented below](#nested_network_policy).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "provider": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "network_policy"
+        },
+        "enabled": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "network_policy"
+        }
+      }
+    },
+    "node_config": {
+      "description": "Generally, this field should not be used at the same time as a `google_container_node_pool` or a `node_pool` block; this configuration manages the default node pool, which isn't recommended to be used with Terraform. Structure is [documented below](#nested_node_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "boot_disk": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "confidential_nodes": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "disk_size_gb": {
+          "description": "in GB. The smallest allowed disk size is 10GB. Defaults to 100GB. This is being migrated to `boot_disk.size_gb`, and must match if specified in both places. Prefer configuring `boot_disk`.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "disk_type": {
+          "description": "(e.g. 'pd-standard', 'pd-balanced' or 'pd-ssd'). If unspecified, the default disk type is 'pd-balanced' This is being migrated to `boot_disk.disk_type`, and must match if specified in both places. Prefer configuring `boot_disk`.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "enable_confidential_storage": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "local_ssd_encryption_mode": {
+          "description": "Accepted values are: * `STANDARD_ENCRYPTION`: The given node will be encrypted using keys managed by Google infrastructure and the keys wll be deleted when the node is deleted. * `EPHEMERAL_KEY_ENCRYPTION`: The given node will opt-in for using ephemeral key for encrypting Local SSDs. The Local SSDs will not be able to recover data in case of node crash.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "ephemeral_storage_config": {
+          "description": "```hcl ephemeral_storage_config { local_ssd_count = 2 } ```",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "ephemeral_storage_local_ssd_config": {
+          "description": "```hcl ephemeral_storage_local_ssd_config { local_ssd_count = 2 } ```",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "fast_socket": {
+          "description": "Node Pool must enable gvnic. GKE version 1.25.2-gke.1700 or later. Structure is [documented below](#nested_fast_socket).",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "local_nvme_ssd_block_config": {
+          "description": "* `logging_variant` (Optional) Parameter for specifying the type of logging agent used in a node pool. This will override any [cluster-wide default value](#nested_node_pool_defaults). Valid values include DEFAULT and MAX_THROUGHPUT. See [Increasing logging agent throughput](https://cloud.google.com/stackdriver/docs/solutions/gke/managing-logs#throughput) for more information.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "secondary_boot_disks": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "gcfs_config": {
+          "description": "If unspecified, GCFS will not be enabled on the node pool. When enabling this feature you must specify `image_type = \"COS_CONTAINERD\"` and `node_version` from GKE versions 1.19 or later to use it. For GKE versions 1.19, 1.20, and 1.21, the recommended minimum `node_version` would be 1.19.15-gke.1300, 1.20.11-gke.1300, and 1.21.5-gke.1300 respectively. A `machine_type` that has more than 16 GiB of memory is also recommended. GCFS must be enabled in order to use [image streaming](https://cloud.google.com/kubernetes-engine/docs/how-to/image-streaming). Structure is [documented below](#nested_gcfs_config). ```hcl gcfs_config { enabled = true } ```",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "gvnic": {
+          "description": "Installing the gVNIC driver allows for more efficient traffic transmission across the Google network infrastructure. gVNIC is an alternative to the virtIO-based ethernet driver. GKE nodes must use a Container-Optimized OS node image. GKE node version 1.15.11-gke.15 or later Structure is [documented below](#nested_gvnic). ```hcl gvnic { enabled = true } ```",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "guest_accelerator": {
+          "description": "Structure [documented below](#nested_guest_accelerator). **Note**: As of 6.0.0, [argument syntax](https://developer.hashicorp.com/terraform/language/syntax/configuration#arguments) is no longer supported for this field in favor of [block syntax](https://developer.hashicorp.com/terraform/language/syntax/configuration#blocks). To dynamically set a list of guest accelerators, use [dynamic blocks](https://developer.hashicorp.com/terraform/language/expressions/dynamic-blocks). To set an empty list, use a single `guest_accelerator` block with `count = 0`.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "image_type": {
+          "description": "will delete and recreate all nodes in the node pool.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "labels": {
+          "description": "reserved by Kubernetes Core components and cannot be specified.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "resource_labels": {
+          "description": "for how these labels are applied to clusters, node pools and nodes.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "max_run_duration": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "flex_start": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "local_ssd_count": {
+          "description": "attached to each cluster node. Defaults to 0.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "network_performance_config": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "machine_type": {
+          "description": "Defaults to `e2-medium`. To create a custom machine type, value should be set as specified [here](https://cloud.google.com/compute/docs/reference/latest/instances#machineType).",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "metadata": {
+          "description": "the cluster. From GKE `1.12` onwards, `disable-legacy-endpoints` is set to `true` by the API; if `metadata` is set but that default value is not included, Terraform will attempt to unset the value. To avoid this, set the value in your config.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "min_cpu_platform": {
+          "description": "The instance may be scheduled on the specified or newer CPU platform. Applicable values are the friendly names of CPU platforms, such as `Intel Haswell`. See the [official documentation](https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform) for more information.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "oauth_scopes": {
+          "description": "on all of the node VMs under the \"default\" service account. Use the \"https://www.googleapis.com/auth/cloud-platform\" scope to grant access to all APIs. It is recommended that you set `service_account` to a non-default service account and grant IAM roles to that service account for only the resources that it needs. See the [official documentation](https://cloud.google.com/kubernetes-engine/docs/how-to/access-scopes) for information on migrating off of legacy access scopes.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "preemptible": {
+          "description": "are preemptible. See the [official documentation](https://cloud.google.com/container-engine/docs/preemptible-vm) for more information. Defaults to false. * `reservation_affinity` (Optional) The configuration of the desired reservation which instances could take capacity from. Structure is [documented below](#nested_reservation_affinity).",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "spot": {
+          "description": "See the [official documentation](https://cloud.google.com/kubernetes-engine/docs/concepts/spot-vms) for more information. Defaults to false.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "sandbox_config": {
+          "description": "Structure is [documented below](#nested_sandbox_config).",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "boot_disk_kms_key": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "service_account": {
+          "description": "If not specified, the \"default\" service account is used.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "shielded_instance_config": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "storage_pools": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "tags": {
+          "description": "valid sources or targets for network firewalls.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "resource_manager_tags": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "taint": {
+          "description": "[Kubernetes taints](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/) to apply to nodes. This field will only report drift on taint keys that are already managed with Terraform, use `effective_taints` to view the list of GKE-managed taints on the node pool from all sources. Importing this resource will not record any taints as being Terraform-managed, and will cause drift with any configured taints. Structure is [documented below](#nested_taint).",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "workload_metadata_config": {
+          "description": "Structure is [documented below](#nested_workload_metadata_config).",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "kubelet_config": {
+          "description": "Kubelet configuration, currently supported attributes can be found [here](https://cloud.google.com/sdk/gcloud/reference/beta/container/node-pools/create#--system-config-from-file). Structure is [documented below](#nested_kubelet_config). ``` kubelet_config { cpu_manager_policy   = \"static\" cpu_cfs_quota        = true cpu_cfs_quota_period = \"100us\" pod_pids_limit       = 1024 } ```",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "linux_node_config": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "windows_node_config": {
+          "description": "Windows node configuration, currently supporting OSVersion [attribute](https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/NodeConfig#osversion). The value must be one of [OS_VERSION_UNSPECIFIED, OS_VERSION_LTSC2019, OS_VERSION_LTSC2022]. For example: ```hcl windows_node_config { osversion = \"OS_VERSION_LTSC2019\" } ```",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "containerd_config": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "node_group": {
+          "description": "* `sole_tenant_config` (Optional)  Allows specifying multiple [node affinities](https://cloud.google.com/compute/docs/nodes/sole-tenant-nodes#node_affinity_and_anti-affinity) useful for running workloads on [sole tenant nodes](https://cloud.google.com/kubernetes-engine/docs/how-to/sole-tenancy). `node_affinity` structure is [documented below](#nested_node_affinity). ```hcl sole_tenant_config { node_affinity { key = \"compute.googleapis.com/node-group-name\" operator = \"IN\" values = [\"node-group-name\"] } } ```",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "advanced_machine_features": {
+          "description": "advanced machine features. Structure is [documented below](#nested_advanced_machine_features).",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        }
+      }
+    },
+    "node_pool": {
+      "description": "See [google_container_node_pool](container_node_pool.html) for schema. **Warning:** node pools defined inside a cluster can't be changed (or added/removed) after cluster creation without deleting and recreating the entire cluster. Unless you absolutely need the ability to say \"these are the _only_ node pools associated with this cluster\", use the [google_container_node_pool](container_node_pool.html) resource instead of this property.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "node_pool_auto_config": {
+      "description": "[autopilot](https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview#comparison) clusters and [node auto-provisioning](https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-provisioning)-enabled clusters. Structure is [documented below](#nested_node_pool_auto_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "node_kubelet_config": {
+          "description": "Structure is [documented below](#nested_node_kubelet_config).",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_pool_auto_config"
+        },
+        "resource_manager_tags": {
+          "description": "* `network_tags` (Optional) - The network tag config for the cluster's automatically provisioned node pools. Structure is [documented below](#nested_network_tags). * `linux_node_config` (Optional) -  Linux system configuration for the cluster's automatically provisioned node pools. Only `cgroup_mode` field is supported in `node_pool_auto_config`. Structure is [documented below](#nested_linux_node_config).",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_pool_auto_config"
+        }
+      }
+    },
+    "node_pool_defaults": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "node_version": {
+      "description": "or set to the same value as `min_master_version` on create. Defaults to the default version set by GKE which is not necessarily the latest version. This only affects nodes in the default node pool. While a fuzzy version can be specified, it's recommended that you specify explicit versions as Terraform will see spurious diffs when fuzzy versions are used. See the `google_container_engine_versions` data source's `version_prefix` field to approximate fuzzy versions in a Terraform-compatible way. To update nodes in other node pools, use the `version` attribute on the node pool.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "notification_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "confidential_nodes": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "pod_security_policy_config": {
+      "description": "[PodSecurityPolicy](https://cloud.google.com/kubernetes-engine/docs/how-to/pod-security-policies) feature. Structure is [documented below](#nested_pod_security_policy_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "pod_autoscaling": {
+      "description": "Structure is [documented below](#nested_pod_autoscaling).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "secret_manager_config": {
+      "description": "[SecretManagerConfig](https://cloud.google.com/secret-manager/docs/secret-manager-managed-csi-component) feature. Structure is [documented below](#nested_secret_manager_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "authenticator_groups_config": {
+      "description": "[Google Groups for GKE](https://cloud.google.com/kubernetes-engine/docs/how-to/role-based-access-control#groups-setup-gsuite) feature. Structure is [documented below](#nested_authenticator_groups_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "security_group": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "authenticator_groups_config"
+        }
+      }
+    },
+    "user_managed_keys_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "cluster_ca": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "user_managed_keys_config"
+        },
+        "etcd_api_ca": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "user_managed_keys_config"
+        },
+        "etcd_peer_ca": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "user_managed_keys_config"
+        },
+        "aggregation_ca": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "user_managed_keys_config"
+        },
+        "service_account_signing_keys": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "user_managed_keys_config"
+        },
+        "service_account_verification_keys": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "user_managed_keys_config"
+        },
+        "control_plane_disk_encryption_key": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "user_managed_keys_config"
+        },
+        "gkeops_etcd_backup_encryption_key": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "user_managed_keys_config"
+        }
+      }
+    },
+    "control_plane_endpoints_config": {
+      "description": "Structure is [documented below](#nested_control_plane_endpoints_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "dns_endpoint_config": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "control_plane_endpoints_config"
+        },
+        "ip_endpoints_config": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "control_plane_endpoints_config"
+        }
+      }
+    },
+    "private_cluster_config": {
+      "description": "clusters with private nodes. Structure is [documented below](#nested_private_cluster_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "private_endpoint_subnetwork": {
+          "description": "* `master_global_access_config` (Optional) - Controls cluster master global access settings. If unset, Terraform will no longer manage this field and will not modify the previously-set value. Structure is [documented below](#nested_master_global_access_config). In addition, the `private_cluster_config` allows access to the following read-only fields:",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "private_cluster_config"
+        },
+        "peering_name": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "private_cluster_config"
+        },
+        "private_endpoint": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "private_cluster_config"
+        },
+        "public_endpoint": {
+          "description": "!> The Google provider is unable to validate certain configurations of `private_cluster_config` when `enable_private_nodes` is `false`. It's recommended that you omit the block entirely if the field is not set to `true`.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "private_cluster_config"
+        }
+      }
+    },
+    "cluster_telemetry": {
+      "description": "[ClusterTelemetry](https://cloud.google.com/monitoring/kubernetes-engine/installing#controlling_the_collection_of_application_logs) feature, Structure is [documented below](#nested_cluster_telemetry).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "project": {
+      "description": "is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "release_channel": {
+      "description": "Configuration options for the [Release channel](https://cloud.google.com/kubernetes-engine/docs/concepts/release-channels) feature, which provide more control over automatic upgrades of your GKE clusters. When updating this field, GKE imposes specific version requirements. See [Selecting a new release channel](https://cloud.google.com/kubernetes-engine/docs/concepts/release-channels#selecting_a_new_release_channel) for more details; the `google_container_engine_versions` datasource can provide the default version for a channel. Note that removing the `release_channel` field from your config will cause Terraform to stop managing your cluster's release channel, but will not unenroll it. Instead, use the `\"UNSPECIFIED\"` channel. Structure is [documented below](#nested_release_channel).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "channel": {
+          "description": "Accepted values are: * UNSPECIFIED: Not set. * RAPID: Weekly upgrade cadence; Early testers and developers who requires new features. * REGULAR: Multiple per month upgrade cadence; Production users who need features not yet offered in the Stable channel. * STABLE: Every few months upgrade cadence; Production users who need stability above all else, and for whom frequent upgrades are too risky. * EXTENDED: GKE provides extended support for Kubernetes minor versions through the Extended channel. With this channel, you can stay on a minor version for up to 24 months.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "release_channel"
+        }
+      }
+    },
+    "gke_auto_upgrade_config": {
+      "description": "Configuration options for the auto-upgrade patch type feature, which provide more control over the speed of automatic upgrades of your GKE clusters. Structure is [documented below](#nested_gke_auto_upgrade_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "patch_mode": {
+          "description": "Accepted values are: * ACCELERATED: Upgrades to the latest available patch version in a given minor and release channel.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "gke_auto_upgrade_config"
+        }
+      }
+    },
+    "remove_default_node_pool": {
+      "description": "pool upon cluster creation. If you're using `google_container_node_pool` resources with no default node pool, this should be set to `true`, alongside setting `initial_node_count` to at least `1`.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "resource_labels": {
+      "description": "**Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "terraform_labels": {
+      "description": "The combination of labels configured directly on the resource and default labels configured on the provider.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "effective_labels": {
+      "description": "All of labels (key/value pairs) present on the resource in GCP, including the labels configured through Terraform, other clients and services.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "cost_management_config": {
+      "description": "[Cost Allocation](https://cloud.google.com/kubernetes-engine/docs/how-to/cost-allocations) feature. Structure is [documented below](#nested_cost_management_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "resource_usage_export_config": {
+      "description": "[ResourceUsageExportConfig](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-usage-metering) feature. Structure is [documented below](#nested_resource_usage_export_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "subnetwork": {
+      "description": "subnetwork in which the cluster's instances are launched.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "vertical_pod_autoscaling": {
+      "description": "Vertical Pod Autoscaling automatically adjusts the resources of pods controlled by it. Structure is [documented below](#nested_vertical_pod_autoscaling).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "workload_identity_config": {
+      "description": "Workload Identity allows Kubernetes service accounts to act as a user-managed [Google IAM Service Account](https://cloud.google.com/iam/docs/service-accounts#user-managed_service_accounts). Structure is [documented below](#nested_workload_identity_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "identity_service_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enabled": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "identity_service_config"
+        }
+      }
+    },
+    "enable_intranode_visibility": {
+      "description": "Whether Intra-node visibility is enabled for this cluster. This makes same node pod to pod traffic visible for VPC network.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "enable_l4_ilb_subsetting": {
+      "description": "Whether L4ILB Subsetting is enabled for this cluster.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "disable_l4_lb_firewall_reconciliation": {
+      "description": "Disable L4 load balancer VPC firewalls to enable firewall policies.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "enable_multi_networking": {
+      "description": "Whether multi-networking is enabled for this cluster.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "enable_fqdn_network_policy": {
+      "description": "Whether FQDN Network Policy is enabled on this cluster. Users who enable this feature for existing Standard clusters must restart the GKE Dataplane V2 `anetd` DaemonSet after enabling it. See the [Enable FQDN Network Policy in an existing cluster](https://cloud.google.com/kubernetes-engine/docs/how-to/fqdn-network-policies#enable_fqdn_network_policy_in_an_existing_cluster) for more information.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "private_ipv6_google_access": {
+      "description": "The desired state of IPv6 connectivity to Google Services. By default, no private IPv6 access to or from Google Services (all access will be via IPv4).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "datapath_provider": {
+      "description": "The desired datapath provider for this cluster. This is set to `LEGACY_DATAPATH` by default, which uses the IPTables-based kube-proxy implementation. Set to `ADVANCED_DATAPATH` to enable Dataplane v2.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "in_transit_encryption_config": {
+      "description": "Defines the config of in-transit encryption. Valid values are `IN_TRANSIT_ENCRYPTION_DISABLED` and `IN_TRANSIT_ENCRYPTION_INTER_NODE_TRANSPARENT`.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "enable_cilium_clusterwide_network_policy": {
+      "description": "Whether CiliumClusterWideNetworkPolicy is enabled on this cluster. Defaults to false.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "default_snat_status": {
+      "description": "[GKE SNAT](https://cloud.google.com/kubernetes-engine/docs/how-to/ip-masquerade-agent#how_ipmasq_works) DefaultSnatStatus contains the desired state of whether default sNAT should be disabled on the cluster, [API doc](https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1beta1/projects.locations.clusters#networkconfig). Structure is [documented below](#nested_default_snat_status)",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "dns_config": {
+      "description": "Configuration for [Using Cloud DNS for GKE](https://cloud.google.com/kubernetes-engine/docs/how-to/cloud-dns). Structure is [documented below](#nested_dns_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "additive_vpc_scope_dns_domain": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "dns_config"
+        },
+        "cluster_dns": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "dns_config"
+        },
+        "cluster_dns_scope": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "dns_config"
+        },
+        "cluster_dns_domain": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "dns_config"
+        }
+      }
+    },
+    "gateway_api_config": {
+      "description": "Configuration for [GKE Gateway API controller](https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api). Structure is [documented below](#nested_gateway_api_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "channel": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "gateway_api_config"
+        }
+      }
+    },
+    "protect_config": {
+      "description": "Enable/Disable Protect API features for the cluster. Structure is [documented below](#nested_protect_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "workload_config": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "protect_config"
+        },
+        "workload_vulnerability_mode": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "protect_config"
+        }
+      }
+    },
+    "security_posture_config": {
+      "description": "Enable/Disable Security Posture API features for the cluster. Structure is [documented below](#nested_security_posture_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "mode": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "security_posture_config"
+        },
+        "vulnerability_mode": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "security_posture_config"
+        }
+      }
+    },
+    "fleet": {
+      "description": "Fleet configuration for the cluster. Structure is [documented below](#nested_fleet).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "project": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "fleet"
+        }
+      }
+    },
+    "workload_alts_config": {
+      "description": "Configuration for [direct-path (via ALTS) with workload identity.](https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1beta1/projects.locations.clusters#workloadaltsconfig). Structure is [documented below](#nested_workload_alts_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enable_alts": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "workload_alts_config"
+        }
+      }
+    },
+    "enterprise_config": {
+      "description": "Configuration for [Enterprise edition].(https://cloud.google.com/kubernetes-engine/enterprise/docs/concepts/gke-editions). Structure is [documented below](#nested_enterprise_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "desired_tier": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "enterprise_config"
+        }
+      }
+    },
+    "anonymous_authentication_config": {
+      "description": "Configuration for [anonymous authentication restrictions](https://cloud.google.com/kubernetes-engine/docs/how-to/hardening-your-cluster#restrict-anon-access). Structure is [documented below](#anonymous_authentication_config).",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "mode": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "anonymous_authentication_config"
+        }
+      }
+    },
+    "rbac_binding_config": {
+      "description": "RBACBindingConfig allows user to restrict ClusterRoleBindings an RoleBindings that can be created. Structure is [documented below](#nested_rbac_binding_config). The `default_snat_status` block supports",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enable_insecure_binding_system_unauthenticated": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rbac_binding_config"
+        },
+        "enable_insecure_binding_system_authenticated": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rbac_binding_config"
+        }
+      }
+    },
+    "disabled": {
+      "description": "The `cluster_telemetry` block supports",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "type": {
+      "description": "`SYSTEM_ONLY` (Only system components are monitored and logged) is only available in GKE versions 1.15 and later.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "cloudrun_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "disabled": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloudrun_config"
+        },
+        "load_balancer_type": {
+          "description": "Set `load_balancer_type=LOAD_BALANCER_TYPE_INTERNAL` to configure it as internal load balancer.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloudrun_config"
+        }
+      }
+    },
+    "istio_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "disabled": {
+          "description": "cluster. It is disabled by default. Set `disabled = false` to enable.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "istio_config"
+        },
+        "auth": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "istio_config"
+        }
+      }
+    },
+    "resource_limits": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "resource_type": {
+          "description": "`memory`.  See the [guide to using Node Auto-Provisioning](https://cloud.google.com/kubernetes-engine/docs/how-to/node-auto-provisioning) for a list of types.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "resource_limits"
+        },
+        "minimum": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "resource_limits"
+        },
+        "maximum": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "resource_limits"
+        }
+      }
+    },
+    "auto_provisioning_defaults": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "min_cpu_platform": {
+          "description": "Minimum CPU platform to be used for NAP created node pools. The instance may be scheduled on the specified or newer CPU platform. Applicable values are the friendly names of CPU platforms, such as \"Intel Haswell\" or \"Intel Sandy Bridge\".",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "auto_provisioning_defaults"
+        },
+        "oauth_scopes": {
+          "description": "-> `monitoring.write` is always enabled regardless of user input.  `monitoring` and `logging.write` may also be enabled depending on the values for `monitoring_service` and `logging_service`.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "auto_provisioning_defaults"
+        },
+        "service_account": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "auto_provisioning_defaults"
+        },
+        "boot_disk_kms_key": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "auto_provisioning_defaults"
+        },
+        "disk_size": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "auto_provisioning_defaults"
+        },
+        "disk_type": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "auto_provisioning_defaults"
+        },
+        "image_type": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "auto_provisioning_defaults"
+        },
+        "shielded_instance_config": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "auto_provisioning_defaults"
+        },
+        "management": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "auto_provisioning_defaults"
+        }
+      }
+    },
+    "management": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "auto_upgrade": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "management"
+        },
+        "auto_repair": {
+          "description": "This block also contains several computed attributes, documented below.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "management"
+        },
+        "upgrade_settings": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "management"
+        }
+      }
+    },
+    "upgrade_settings": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "strategy": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "upgrade_settings"
+        },
+        "max_surge": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "upgrade_settings"
+        },
+        "max_unavailable": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "upgrade_settings"
+        },
+        "blue_green_settings": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "upgrade_settings"
+        }
+      }
+    },
+    "blue_green_settings": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "node_pool_soak_duration": {
+          "description": "* `standard_rollout_policy`: (Optional) Standard policy for the blue-green upgrade. To be specified when strategy is set to BLUE_GREEN. Structure is [documented below](#nested_standard_rollout_policy).",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "blue_green_settings"
+        }
+      }
+    },
+    "standard_rollout_policy": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "batch_node_count": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "standard_rollout_policy"
+        },
+        "batch_soak_duration": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "standard_rollout_policy"
+        }
+      }
+    },
+    "managed_prometheus": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enabled": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "managed_prometheus"
+        },
+        "auto_monitoring_config": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "managed_prometheus"
+        }
+      }
+    },
+    "auto_monitoring_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "scope": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "auto_monitoring_config"
+        }
+      }
+    },
+    "advanced_datapath_observability_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enable_metrics": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "advanced_datapath_observability_config"
+        },
+        "enable_relay": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "advanced_datapath_observability_config"
+        }
+      }
+    },
+    "maintenance_exclusion": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "exclusion_options": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "maintenance_exclusion"
+        }
+      }
+    },
+    "exclusion_options": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "scope": {
+          "description": "Specify `start_time` and `end_time` in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) \"Zulu\" date format.  The start time's date is the initial date that the window starts, and the end time is used for calculating duration.Specify `recurrence` in [RFC5545](https://tools.ietf.org/html/rfc5545#section-3.8.5.3) RRULE format, to specify when this recurs. Note that GKE may accept other formats, but will return values in UTC, causing a permanent diff. Examples: ``` maintenance_policy { recurring_window { start_time = \"2019-01-01T00:00:00Z\" end_time = \"2019-01-02T00:00:00Z\" recurrence = \"FREQ=DAILY\" } maintenance_exclusion{ exclusion_name = \"batch job\" start_time = \"2019-01-01T00:00:00Z\" end_time = \"2019-01-02T00:00:00Z\" exclusion_options { scope = \"NO_UPGRADES\" } } maintenance_exclusion{ exclusion_name = \"holiday data load\" start_time = \"2019-05-01T00:00:00Z\" end_time = \"2019-05-02T00:00:00Z\" exclusion_options { scope = \"NO_MINOR_UPGRADES\" } } } ```",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "exclusion_options"
+        }
+      }
+    },
+    "additional_pod_ranges_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "pod_range_names": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "additional_pod_ranges_config"
+        }
+      }
+    },
+    "additional_ip_ranges_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "subnetwork": {
+          "description": "* `pod_ipv4_range_names`- (Required) List of secondary ranges names within this subnetwork that can be used for pod IPs.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "additional_ip_ranges_config"
+        }
+      }
+    },
+    "master_authorized_networks_config.cidr_blocks": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "cidr_block": {
+          "description": "Must be specified in CIDR notation.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "master_authorized_networks_config.cidr_blocks"
+        },
+        "display_name": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "master_authorized_networks_config.cidr_blocks"
+        }
+      }
+    },
+    "boot_disk": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "size_gb": {
+          "description": "in GB. The smallest allowed disk size is 10GB. Defaults to 100GB. This is being migrated from `node_config.disk_size_gb`, and must match if specified in both places. Prefer using this field.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "boot_disk"
+        },
+        "disk_type": {
+          "description": "(e.g. 'pd-standard', 'pd-balanced', 'pd-ssd', 'hyperdisk-balanced'). If unspecified, the default disk type is 'pd-balanced' This is being migrated from `node_config.disk_type`, and must match if specified in both places. Prefer using this field.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "boot_disk"
+        },
+        "provisioned_iops": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "boot_disk"
+        },
+        "provisioned_throughput": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "boot_disk"
+        }
+      }
+    },
+    "node_affinity": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "advanced_machine_features": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "threads_per_core": {
+          "description": "* `enable_nested_virtualization`- (Optional) Defines whether the instance should have nested virtualization enabled. Defaults to false.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "advanced_machine_features"
+        },
+        "performance_monitoring_unit": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "advanced_machine_features"
+        }
+      }
+    },
+    "ephemeral_storage_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "ephemeral_storage_local_ssd_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "fast_socket": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "local_nvme_ssd_block_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "secondary_boot_disks": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "gcfs_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "gvnic": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "guest_accelerator": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "gpu_driver_installation_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "gpu_sharing_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "network_performance_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "node_kubelet_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "insecure_kubelet_readonly_port_enabled": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_kubelet_config"
+        }
+      }
+    },
+    "network_tags": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "node_config_defaults": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "pubsub": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "filter": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "rotation_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "control_plane_endpoints_config.dns_endpoint_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "endpoint": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "control_plane_endpoints_config.dns_endpoint_config"
+        },
+        "allow_external_traffic": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "control_plane_endpoints_config.dns_endpoint_config"
+        }
+      }
+    },
+    "control_plane_endpoints_config.ip_endpoints_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enabled": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "control_plane_endpoints_config.ip_endpoints_config"
+        }
+      }
+    },
+    "private_cluster_config.master_global_access_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "reservation_affinity": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "sandbox_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "shielded_instance_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "taint": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "workload_metadata_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "kubelet_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "cpu_manager_policy": {
+          "description": "[K8S CPU Management Policies](https://kubernetes.io/docs/tasks/administer-cluster/cpu-management-policies/). One of `\"none\"` or `\"static\"`. If unset (or set to the empty string `\"\"`), the API will treat the field as if set to \"none\". Prior to the 6.4.0 this field was marked as required. The workaround for the required field is setting the empty string `\"\"`, which will function identically to not setting this field.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "kubelet_config"
+        },
+        "cpu_cfs_quota": {
+          "description": "containers that specify CPU limits.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "kubelet_config"
+        },
+        "cpu_cfs_quota_period": {
+          "description": "as a sequence of decimal numbers, each with optional fraction and a unit suffix, such as `\"300ms\"`. Valid time units are \"ns\", \"us\" (or \"\u00b5s\"), \"ms\", \"s\", \"m\", \"h\". The value must be a positive duration.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "kubelet_config"
+        },
+        "insecure_kubelet_readonly_port_enabled": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "kubelet_config"
+        },
+        "pod_pids_limit": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "kubelet_config"
+        },
+        "container_log_max_size": {
+          "description": "container log file before it is rotated. Specified as a positive number and a unit suffix, such as `\"100Ki\"`, `\"10Mi\"`. Valid units are \"Ki\", \"Mi\", \"Gi\". The value must be between `\"10Mi\"` and `\"500Mi\"`, inclusive. And the total container log size (`container_log_max_size` * `container_log_max_files`) cannot exceed 1% of the total storage of the node.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "kubelet_config"
+        },
+        "container_log_max_files": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "kubelet_config"
+        },
+        "image_gc_low_threshold_percent": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "kubelet_config"
+        },
+        "image_gc_high_threshold_percent": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "kubelet_config"
+        },
+        "image_minimum_gc_age": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "kubelet_config"
+        },
+        "image_maximum_gc_age": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "kubelet_config"
+        },
+        "allowed_unsafe_sysctls": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "kubelet_config"
+        },
+        "single_process_oom_kill": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "kubelet_config"
+        }
+      }
+    },
+    "linux_node_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "sysctls": {
+          "description": "and all pods running on the nodes. Specified as a map from the key, such as `net.core.wmem_max`, to a string value. Currently supported attributes can be found [here](https://cloud.google.com/sdk/gcloud/reference/beta/container/node-pools/create#--system-config-from-file). Note that validations happen all server side. All attributes are optional. ```hcl linux_node_config { sysctls = { \"net.core.netdev_max_backlog\" = \"10000\" \"net.core.rmem_max\"           = \"10000\" } } ```",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "linux_node_config"
+        },
+        "cgroup_mode": {
+          "description": "Accepted values are: * `CGROUP_MODE_UNSPECIFIED`: CGROUP_MODE_UNSPECIFIED is when unspecified cgroup configuration is used. The default for the GKE node OS image will be used. * `CGROUP_MODE_V1`: CGROUP_MODE_V1 specifies to use cgroupv1 for the cgroup configuration on the node image. * `CGROUP_MODE_V2`: CGROUP_MODE_V2 specifies to use cgroupv2 for the cgroup configuration on the node image.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "linux_node_config"
+        },
+        "hugepages_config": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "linux_node_config"
+        }
+      }
+    },
+    "hugepages_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "hugepage_size_2m": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "hugepages_config"
+        },
+        "hugepage_size_1g": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "hugepages_config"
+        }
+      }
+    },
+    "containerd_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "protect_config.workload_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "audit_mode": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "protect_config.workload_config"
+        }
+      }
+    }
+  }
+}
