@@ -6,7 +6,7 @@ import data.terraform.gcp.security.dataproc.autoscaling_policy.vars
 conditions := [
     [
         {"situation_description" : "The maximum number of primary workers is too high, creating a risk of excessive costs.",
-         "remedies": [ "Set 'worker_config.max_instances' to a reasonable limit, such as 100 or less, to control potential spending."]},
+         "remedies": [ "Set 'worker_config.max_instances' to 100 or less to control potential spending."]},
         {
             "condition": "Checks if the maximum number of primary worker instances is greater than 100.",
             "attribute_path" : ["worker_config", 0, "max_instances"],
@@ -15,7 +15,7 @@ conditions := [
         }
     ],
     [
-        {"situation_description" : "The minimum number of primary workers is set below 2, risking poor performance or downtime for critical jobs.",
+        {"situation_description" : "The minimum number of primary workers is set below 2, risking poor performance.",
          "remedies": [ "Set 'worker_config.min_instances' to 2 or more to ensure a baseline level of availability."]},
         {
             "condition": "Checks if the minimum number of primary worker instances is less than 2.",
