@@ -8,16 +8,17 @@ conditions := [
     "remedies" : ["Before Deleting any target resource, please contact administrator"]},
     {
         "condition": "Check if the state is Active",
-        "attribute_path" : ["action"], 
-        "values" : ["DELETE"],
-        "policy_type" : "Blacklist" 
+        "attribute_path" : ["state"], 
+        "values" : ["ACTIVE"],
+        "policy_type" : "blacklist" 
     },
     {
         "condition": "if the state is Active, then DELETE action is not allowed",
-        "attribute_path" : ["state"], 
-        "values" : ["STOPPED"],
-        "policy_type" : "Blacklist" 
-    }
+        "attribute_path" : ["action"], 
+        "values" : ["DELETE"],
+        "policy_type" : "blacklist" 
+    },
+    
     ],
 ]
 
