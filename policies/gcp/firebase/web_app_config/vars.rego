@@ -1,4 +1,4 @@
-package terraform.gcp.security.firebase.web_app_config
+package terraform.gcp.security.firebase.web_app_config.auth_domain
 
 variables := {
   "friendly_resource_name": "Firebase Web App Config",
