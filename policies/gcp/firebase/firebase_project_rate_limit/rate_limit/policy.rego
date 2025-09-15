@@ -14,8 +14,8 @@ conditions := [
         },
         {
             "condition": "Rate limiting must be enabled",
-            "attribute_path": ["values", "triggers", "rate_limit"],
-            "values": [true],
+            "attribute_path": ["values", "content"],
+            "values": ["rate_limit=true"],
             "policy_type": "whitelist"
         }
     ]

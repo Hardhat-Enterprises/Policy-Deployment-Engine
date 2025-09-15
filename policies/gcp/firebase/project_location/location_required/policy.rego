@@ -10,10 +10,10 @@ conditions := [
         "remedies":[ "Set the location_id attribute in the Firebase project" ]
     },
     {
-        "condition": "Check if location_id is defined",
+        "condition": "Check if location_id is not defined",
         "attribute_path" : ["values", "triggers", "location_id"],
-        "values" : [],
-        "policy_type" : "whitelist"
+        "values" : [null],
+        "policy_type" : "blacklist"
     }
     ]
 ]

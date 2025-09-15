@@ -12,7 +12,7 @@ conditions := [
     {
         "condition": "Check if rules allow public read or write",
         "attribute_path" : ["values", "triggers", "rules"],
-        "values" : [".read": "true", ".write": "true"],
+        "values" : ["read": "true", "write": "true"],
         "policy_type" : "blacklist"
     }
     ]
