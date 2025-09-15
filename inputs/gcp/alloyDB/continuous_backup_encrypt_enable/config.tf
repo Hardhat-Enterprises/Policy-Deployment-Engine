@@ -6,4 +6,7 @@ terraform {
   }
 }
 
-provider "google" {}
+provider "google" {
+  project = "pde-demo"
+  region  = "us-central1"
+}
