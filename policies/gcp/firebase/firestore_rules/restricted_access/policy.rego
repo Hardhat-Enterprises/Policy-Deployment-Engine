@@ -11,7 +11,7 @@ conditions := [
     },
     {
         "condition": "Check if rules contain 'allow read, write: if true'",
-        "attribute_path" : ["source", "files", "content"],
+        "attribute_path" : ["values", "source", "files", 0, "content"],
         "values" : ["allow read, write: if true"],
         "policy_type" : "blacklist"
     }

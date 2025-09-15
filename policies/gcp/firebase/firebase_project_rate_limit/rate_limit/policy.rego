@@ -1,7 +1,7 @@
 package terraform.gcp.security.firebase.firebase_project_rate_limit.rate_limit
 
-import data.terraform.gcp.helpers as helpers
-import data.terraform.gcp.security.firebase.firebase_project_rate_limit.google_project_service.vars
+import data.terraform.gcp.helpers
+import data.terraform.gcp.security.firebase.firebase_project_rate_limit.vars
 
 conditions := [
     [
@@ -13,8 +13,8 @@ conditions := [
             ]
         },
         {
-            "condition": "Rate limiting must be enabled with a maximum threshold",
-            "attribute_path": ["rate_limit"],
+            "condition": "Rate limiting must be enabled",
+            "attribute_path": ["values", "triggers", "rate_limit"],
             "values": [true],
             "policy_type": "whitelist"
         }

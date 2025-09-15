@@ -11,8 +11,8 @@ conditions := [
     },
     {
         "condition": "Check if require_ssl is true",
-        "attribute_path" : ["require_ssl"],
-        "values" : [true],
+        "attribute_path" : ["values", "triggers", "require_ssl"],
+        "values" : ["true"],
         "policy_type" : "whitelist"
     }
     ]

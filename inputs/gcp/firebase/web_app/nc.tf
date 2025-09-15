@@ -1,4 +1,6 @@
-resource "google_storage_bucket" "nc" {
-  name     = "noncompliant-bucket-test"
-  location = "EU"
+# Non-compliant Firebase Web App without deletion protection
+resource "google_firebase_web_app" "nc" {
+  project         = "mock-project"
+  display_name    = "non-compliant-web-app"
+  deletion_policy = "DELETE"
 }

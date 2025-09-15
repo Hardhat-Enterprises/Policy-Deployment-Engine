@@ -11,7 +11,7 @@ conditions := [
     },
     {
         "condition": "Check if site domain is in the approved list",
-        "attribute_path" : ["default_url"],
+        "attribute_path" : ["values", "triggers", "default_url"],
         "values" : ["example.com", "app.example.com"],
         "policy_type" : "whitelist"
     }

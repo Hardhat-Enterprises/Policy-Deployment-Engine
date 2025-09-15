@@ -11,7 +11,7 @@ conditions := [
     },
     {
         "condition": "Check if function region is in the allowed list",
-        "attribute_path" : ["region"],
+        "attribute_path" : ["values", "triggers", "region"],
         "values" : ["us-central1", "europe-west1"],
         "policy_type" : "whitelist"
     }

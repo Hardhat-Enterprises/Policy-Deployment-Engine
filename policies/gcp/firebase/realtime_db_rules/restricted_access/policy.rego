@@ -10,9 +10,9 @@ conditions := [
         "remedies":[ "Update database rules to require authentication for read/write" ]
     },
     {
-        "condition": "Check if rules contain ''.read'': true or ''.write'': true'",
-        "attribute_path" : ["rules"],
-        "values" : ["{\".read\": true, \".write\": true}"],
+        "condition": "Check if rules allow public read or write",
+        "attribute_path" : ["values", "triggers", "rules"],
+        "values" : [".read": "true", ".write": "true"],
         "policy_type" : "blacklist"
     }
     ]

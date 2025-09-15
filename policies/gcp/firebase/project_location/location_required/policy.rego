@@ -11,7 +11,7 @@ conditions := [
     },
     {
         "condition": "Check if location_id is defined",
-        "attribute_path" : ["location_id"],
+        "attribute_path" : ["values", "triggers", "location_id"],
         "values" : [],
         "policy_type" : "whitelist"
     }

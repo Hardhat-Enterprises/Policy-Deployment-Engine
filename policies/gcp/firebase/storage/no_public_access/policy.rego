@@ -10,8 +10,8 @@ conditions := [
         "remedies":[ "Restrict bucket IAM policies to authorized users only" ]
     },
     {
-        "condition": "Check if bucket IAM members include allUsers or allAuthenticatedUsers",
-        "attribute_path" : ["iam_members"],
+        "condition": "Check if bucket IAM member is public",
+        "attribute_path" : ["values", "member"],
         "values" : ["allUsers", "allAuthenticatedUsers"],
         "policy_type" : "blacklist"
     }

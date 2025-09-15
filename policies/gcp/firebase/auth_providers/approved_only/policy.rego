@@ -10,8 +10,8 @@ conditions := [
         "remedies":[ "Restrict Firebase authentication to approved providers only (e.g., Google, GitHub)" ]
     },
     {
-        "condition": "Check if provider_id is in the approved list",
-        "attribute_path" : ["provider_id"],
+        "condition": "Check if provider is in the approved list",
+        "attribute_path" : ["values", "provider"],
         "values" : ["google.com", "github.com"],
         "policy_type" : "whitelist"
     }
