@@ -1,0 +1,199 @@
+{
+  "resource_name": "kms_ekm_connection",
+  "subcategory": "Cloud Key Management Service",
+  "arguments": {
+    "name": {
+      "description": "The resource name for the EkmConnection.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "service_resolvers": {
+      "description": "A list of ServiceResolvers where the EKM can be reached. There should be one ServiceResolver per EKM replica. Currently, only a single ServiceResolver is supported Structure is [documented below](#nested_service_resolvers).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "service_directory_service": {
+          "description": "Required. The resource name of the Service Directory service pointing to an EKM replica, in the format projects/*/locations/*/namespaces/*/services/*",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "service_resolvers"
+        },
+        "hostname": {
+          "description": "Required. The hostname of the EKM replica used at TLS and HTTP layers.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "service_resolvers"
+        },
+        "server_certificates": {
+          "description": "Required. A list of leaf server certificates used to authenticate HTTPS connections to the EKM replica. Currently, a maximum of 10 Certificate is supported. Structure is [documented below](#nested_service_resolvers_service_resolvers_server_certificates).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "service_resolvers"
+        },
+        "endpoint_filter": {
+          "description": "Optional. The filter applied to the endpoints of the resolved service. If no filter is specified, all endpoints will be considered. An endpoint will be chosen arbitrarily from the filtered list for each request. For endpoint filter syntax and examples, see https://cloud.google.com/service-directory/docs/reference/rpc/google.cloud.servicedirectory.v1#resolveservicerequest.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "service_resolvers"
+        }
+      }
+    },
+    "location": {
+      "description": "The location for the EkmConnection. A full list of valid locations can be found by running `gcloud kms locations list`.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "key_management_mode": {
+      "description": "Optional. Describes who can perform control plane operations on the EKM. If unset, this defaults to MANUAL Default value is `MANUAL`. Possible values are: `MANUAL`, `CLOUD_KMS`.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "etag": {
+      "description": "Optional. Etag of the currently stored EkmConnection.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "crypto_space_path": {
+      "description": "Optional. Identifies the EKM Crypto Space that this EkmConnection maps to. Note: This field is required if KeyManagementMode is CLOUD_KMS.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "server_certificates": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "raw_der": {
+          "description": "Required. The raw certificate bytes in DER format. A base64-encoded string.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "server_certificates"
+        },
+        "parsed": {
+          "description": "(Output) Output only. True if the certificate was parsed successfully.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "server_certificates"
+        },
+        "issuer": {
+          "description": "(Output) Output only. The issuer distinguished name in RFC 2253 format. Only present if parsed is true.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "server_certificates"
+        },
+        "subject": {
+          "description": "(Output) Output only. The subject distinguished name in RFC 2253 format. Only present if parsed is true.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "server_certificates"
+        },
+        "not_before_time": {
+          "description": "(Output) Output only. The certificate is not valid before this time. Only present if parsed is true. A timestamp in RFC3339 UTC \"Zulu\" format, with nanosecond resolution and up to nine fractional digits. Examples: \"2014-10-02T15:01:23Z\" and \"2014-10-02T15:01:23.045123456Z\".",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "server_certificates"
+        },
+        "not_after_time": {
+          "description": "(Output) Output only. The certificate is not valid after this time. Only present if parsed is true. A timestamp in RFC3339 UTC \"Zulu\" format, with nanosecond resolution and up to nine fractional digits. Examples: \"2014-10-02T15:01:23Z\" and \"2014-10-02T15:01:23.045123456Z\".",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "server_certificates"
+        },
+        "sha256_fingerprint": {
+          "description": "(Output) Output only. The SHA-256 certificate fingerprint as a hex string. Only present if parsed is true.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "server_certificates"
+        },
+        "serial_number": {
+          "description": "(Output) Output only. The certificate serial number as a hex string. Only present if parsed is true.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "server_certificates"
+        },
+        "subject_alternative_dns_names": {
+          "description": "(Output) Output only. The subject Alternative DNS names. Only present if parsed is true.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "server_certificates"
+        }
+      }
+    }
+  }
+}
