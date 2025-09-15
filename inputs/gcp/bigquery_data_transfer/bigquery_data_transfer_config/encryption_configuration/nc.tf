@@ -1,6 +1,6 @@
 resource "google_bigquery_data_transfer_config" "nc" {
   project                = "CH-project"
-  display_name           = "Not BQ Transfer"
+  display_name           = "nc"
   data_source_id         = "scheduled_query"
   destination_dataset_id = "my_dataset"
   schedule               = "every 24 hours"

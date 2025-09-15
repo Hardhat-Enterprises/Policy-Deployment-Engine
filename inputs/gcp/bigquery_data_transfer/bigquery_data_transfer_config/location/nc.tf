@@ -1,5 +1,5 @@
 resource "google_bigquery_data_transfer_config" "nc" {
-  display_name           = "my-query"
+  display_name           = "nc"
   data_source_id         = "scheduled_query"
   location               = "asia-east1"  
   schedule               = "first sunday of quarter 00:00"

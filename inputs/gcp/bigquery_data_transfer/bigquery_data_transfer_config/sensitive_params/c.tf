@@ -10,7 +10,7 @@ variable "aws_secret_access_key" {
 
 resource "google_bigquery_data_transfer_config" "c" {
   project                = "project_id"
-  display_name           = "Complaint S3 Transfer"
+  display_name           = "c"
   data_source_id         = "amazon_s3"
   destination_dataset_id = "secure_dataset"
   schedule               = "every 24 hours"

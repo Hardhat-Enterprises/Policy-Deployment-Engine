@@ -1,6 +1,6 @@
 resource "google_bigquery_data_transfer_config" "c" {
   project                = "CH-project"
-  display_name           = "Chhunly Data Transfer"
+  display_name           = "c"
   data_source_id         = "scheduled_query"
   destination_dataset_id = "bq_customerdata"
   location               = "australia-southeast1"
