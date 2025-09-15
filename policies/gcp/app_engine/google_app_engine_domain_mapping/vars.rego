@@ -1,7 +1,7 @@
-package terraform.gcp.security_app_engine.google_app_engine_domain_mapping.override_strategy.vars
+package terraform.gcp.security.app_engine.google_app_engine_domain_mapping.vars
 
 variables := {
-    "friendly_resource_name": "domain mapping",
-    "resource_type": "google_app_engine_domain_mapping",
-    "resource_value_name": "domain_name"
+  "friendly_resource_name": "App Engine Domain Mapping SSL Settings",
+  "resource_type": "google_app_engine_domain_mapping",
+  "resource_value_name": "domain_name"
 }

@@ -3,8 +3,6 @@ package terraform.gcp.security.app_engine.google_app_engine_domain_mapping.domai
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.app_engine.google_app_engine_domain_mapping.vars
 
-
-
 conditions := [
   [
     {
@@ -16,8 +14,9 @@ conditions := [
     },
     {
       "condition": "Domain name is approved",
+      "resource_value_name": "domain_name",
       "attribute_path": ["domain_name"],
-      "values": ["secure-service.example.com"],  
+      "values": ["secure-service.example.com"],
       "policy_type": "whitelist"
     }
   ],
@@ -31,12 +30,14 @@ conditions := [
     },
     {
       "condition": "SSL management type is AUTOMATIC or MANUAL",
-      "attribute_path": ["values", "ssl_settings", 0, "ssl_management_type"],
+      "attribute_path": ["ssl_settings", 0, "ssl_management_type"],
       "values": ["AUTOMATIC", "MANUAL"],
       "policy_type": "whitelist"
     }
   ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+summary := helpers.get_multi_summary(conditions, vars.variables)
+
+message := summary.message
+details := summary.details
