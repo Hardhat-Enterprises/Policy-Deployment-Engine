@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Policy Deployment Engine Wiki</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 2rem;
+      color: #212529;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 0.5rem;
+      font-size: 2rem;
+      color: #343a40;
+    }
+
+    .warning {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #d9534f;
+      margin-bottom: 2rem;
+    }
+
+    .search-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .search-container input {
+      width: 60%;
+      max-width: 500px;
+      padding: 0.6rem 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    li {
+      margin: 0.5rem 0;
+      padding: 0.8rem 1rem;
+      background: #ffffff;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    li:hover {
+      background: #f1f3f5;
+      transform: translateX(5px);
+    }
+
+    a {
+      text-decoration: none;
+      color: #007bff;
+      font-weight: 500;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .error {
+      color: red;
+      text-align: center;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Policy Deployment Engine Wiki</h1>
+  <p class="warning">
+    ⚠️ This wiki uses GitHub Pages and only allows for 60 API calls per hour per ID.  
+    If you use this website often, you may need to try a different device or wait.
+  </p>
+  
+  <div class="search-container">
+    <input type="text" id="searchBox" placeholder="Search files...">
+  </div>
+
+  <ul id="fileList"></ul>
+
+  <script>
+    (async () => {
+      try {
+        const branch = "documentation/initialstructure"; // 👈 change this
+        const url = `https://api.github.com/repos/Hardhat-Enterprises/Policy-Deployment-Engine/git/trees/${branch}?recursive=1`;
+
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+
+        // Get only files inside docs/gcp/
+        const files = data.tree.filter(item => 
+          item.path.startsWith("docs/gcp/") && item.type === "blob"
+        );
+
+        let htmlString = "";
+        const folderMap = {};
+
+        // Group files under their top-level folder
+        const topLevel = [...new Set(files.map(f => f.path.split("/")[2]))];
+        for (let folder of topLevel) {
+          htmlString += `<li class="folder"><strong>${folder}</strong><ul>`;
+          folderMap[folder] = [];
+
+          const subFiles = files.filter(f => f.path.split("/")[2] === folder);
+          for (let subFile of subFiles) {
+            let displayName = subFile.path.endsWith(".md")
+              ? subFile.path.split("/").pop().slice(0, -3)
+              : subFile.path.split("/").pop();
+            let cleanPath = subFile.path.endsWith(".md")
+              ? subFile.path.slice(0, -3)
+              : subFile.path;
+
+            const subItem = `<li class="subfile"><a href="/Policy-Deployment-Engine/${cleanPath}" target="_blank">${displayName}</a></li>`;
+            folderMap[folder].push(subItem);
+            htmlString += subItem;
+          }
+          htmlString += `</ul></li>`;
+        }
+
+        document.getElementById("fileList").innerHTML = htmlString;
+
+        // 🔍 Search filter (folder appears if any child matches)
+        const searchBox = document.getElementById("searchBox");
+        searchBox.addEventListener("input", function () {
+          const filter = searchBox.value.toLowerCase();
+          const folders = document.querySelectorAll("#fileList .folder");
+
+          folders.forEach(folder => {
+            let folderVisible = false;
+            const subfiles = folder.querySelectorAll(".subfile");
+
+            subfiles.forEach(sub => {
+              const text = sub.textContent.toLowerCase();
+              if (text.includes(filter)) {
+                sub.style.display = "";
+                folderVisible = true;
+              } else {
+                sub.style.display = "none";
+              }
+            });
+
+            // Folder name match OR any subfile matched
+            const folderName = folder.textContent.toLowerCase();
+            if (folderName.includes(filter) || folderVisible) {
+              folder.style.display = "";
+            } else {
+              folder.style.display = "none";
+            }
+          });
+        });
+
+      } catch (error) {
+        document.body.innerHTML += `<p class="error">Error: ${error.message}</p>`;
+      }
+    })()
+  </script>
+</body>
+</html>
