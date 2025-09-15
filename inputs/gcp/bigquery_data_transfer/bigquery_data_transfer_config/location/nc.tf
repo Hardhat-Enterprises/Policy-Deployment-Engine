@@ -4,7 +4,7 @@ resource "google_bigquery_data_transfer_config" "nc" {
   location               = "asia-east1"  
   schedule               = "first sunday of quarter 00:00"
   destination_dataset_id = "my_dataset"
-  project                = "project_id"
+  project                = "CH-project"
 
   params = {
     query            = "SELECT CURRENT_DATE();"

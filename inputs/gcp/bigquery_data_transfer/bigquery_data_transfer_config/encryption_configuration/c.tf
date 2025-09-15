@@ -1,5 +1,5 @@
 resource "google_bigquery_data_transfer_config" "c" {
-  project                = "project_id"
+  project                = "CH-project"
   display_name           = "Encrypted BQ Transfer"
   data_source_id         = "scheduled_query"
   destination_dataset_id = "my_dataset"

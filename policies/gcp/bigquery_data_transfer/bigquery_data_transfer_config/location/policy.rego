@@ -4,13 +4,13 @@ import data.terraform.gcp.security.bigquery_data_transfer.bigquery_data_transfer
 
 conditions := [[
   {
-    "situation_description": "Location must be australia-southeast1 (Australia).",
+    "situation_description": "Location must be australia-southeast1 (Melbourne) and australia-southeast2 (Sydney).",
     "remedies": ["Set google_bigquery_data_transfer_config.location to \"australia-southeast1\"."]
   },
   {
     "condition": "Location is not australia-southeast1",
-    "attribute_path": ["location"],                 # <-- STRING key, not a variable
-    "values": ["australia-southeast1"],             # <-- STRING value, not a variable
+    "attribute_path": ["location"],
+    "values": ["australia-southeast1", "australia-southeast2"],
     "policy_type": "whitelist"
   }
 ]]

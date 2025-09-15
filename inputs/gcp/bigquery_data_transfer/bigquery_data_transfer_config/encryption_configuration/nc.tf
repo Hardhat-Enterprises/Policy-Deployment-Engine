@@ -1,6 +1,5 @@
 resource "google_bigquery_data_transfer_config" "nc" {
-
-  project                = "my_project_id"
+  project                = "CH-project"
   display_name           = "Not BQ Transfer"
   data_source_id         = "scheduled_query"
   destination_dataset_id = "my_dataset"

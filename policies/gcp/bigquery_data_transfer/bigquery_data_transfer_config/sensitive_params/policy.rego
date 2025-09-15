@@ -13,7 +13,7 @@ conditions := [
     },
     {
       "condition": "Detect hardcoded sensitive values like aws_access_key_id or aws_secret_access_key",
-      "attribute_path": ["change", "after", "params"],
+      "attribute_path": ["change", "after", "params", 0],
       "values": ["aws_access_key_id", "aws_secret_access_key"],
       "policy_type": "blacklist"
     }

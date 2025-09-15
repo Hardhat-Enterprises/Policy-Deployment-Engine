@@ -1,9 +1,8 @@
 resource "google_bigquery_data_transfer_config" "nc" {
-  project                = "my_project_id"
+  project                = "CH-project"
   display_name           = "Chhunly Data Transfer"
   data_source_id         = "scheduled_query"
   destination_dataset_id = "my_dataset"
-  schedule               = "every 24 hours"
   location               = "us-central1"
 
   params = {
