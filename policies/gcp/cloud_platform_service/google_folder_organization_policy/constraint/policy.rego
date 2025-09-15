@@ -10,7 +10,7 @@ conditions := [
      "remedies": ["Set boolean_policy.enforced = true for mandatory constraints"]},
     {
       "condition": "Boolean policy must be enforced",
-      "attribute_path": ["boolean_policy","enforced"],
+      "attribute_path": ["boolean_policy",0,"enforced"],
       "values": [true],
       "policy_type": "whitelist"
     }
