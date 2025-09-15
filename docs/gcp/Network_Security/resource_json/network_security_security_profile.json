@@ -1,0 +1,234 @@
+{
+  "resource_name": "network_security_security_profile",
+  "subcategory": "Network Security",
+  "arguments": {
+    "type": {
+      "description": "The type of security profile. Possible values are: `THREAT_PREVENTION`, `CUSTOM_MIRRORING`, `CUSTOM_INTERCEPT`.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "name": {
+      "description": "The name of the security profile resource.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "An optional description of the security profile. The Max length is 512 characters.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "labels": {
+      "description": "A map of key/value label pairs to assign to the resource. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "threat_prevention_profile": {
+      "description": "The threat prevention configuration for the security profile. Structure is [documented below](#nested_threat_prevention_profile).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "severity_overrides": {
+          "description": "The configuration for overriding threats actions by severity match. Structure is [documented below](#nested_threat_prevention_profile_severity_overrides).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "threat_prevention_profile"
+        },
+        "threat_overrides": {
+          "description": "The configuration for overriding threats actions by threat id match. If a threat is matched both by configuration provided in severity overrides and threat overrides, the threat overrides action is applied. Structure is [documented below](#nested_threat_prevention_profile_threat_overrides).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "threat_prevention_profile"
+        },
+        "antivirus_overrides": {
+          "description": "Defines what action to take for antivirus threats per protocol. Structure is [documented below](#nested_threat_prevention_profile_antivirus_overrides).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "threat_prevention_profile"
+        }
+      }
+    },
+    "custom_mirroring_profile": {
+      "description": "The configuration for defining the Mirroring Endpoint Group used to mirror traffic to third-party collectors. Structure is [documented below](#nested_custom_mirroring_profile).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "mirroring_endpoint_group": {
+          "description": "The Mirroring Endpoint Group to which matching traffic should be mirrored. Format: projects/{project_id}/locations/global/mirroringEndpointGroups/{endpoint_group_id}",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "custom_mirroring_profile"
+        }
+      }
+    },
+    "custom_intercept_profile": {
+      "description": "The configuration for defining the Intercept Endpoint Group used to intercept traffic to third-party firewall appliances. Structure is [documented below](#nested_custom_intercept_profile).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "intercept_endpoint_group": {
+          "description": "The Intercept Endpoint Group to which matching traffic should be intercepted. Format: projects/{project_id}/locations/global/interceptEndpointGroups/{endpoint_group_id}",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "custom_intercept_profile"
+        }
+      }
+    },
+    "location": {
+      "description": "The location of the security profile. The default value is `global`.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "parent": {
+      "description": "The name of the parent this security profile belongs to. Format: organizations/{organization_id}.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "severity_overrides": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "action": {
+          "description": "Threat action override. Possible values are: `ALERT`, `ALLOW`, `DEFAULT_ACTION`, `DENY`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "severity_overrides"
+        },
+        "severity": {
+          "description": "Severity level to match. Possible values are: `CRITICAL`, `HIGH`, `INFORMATIONAL`, `LOW`, `MEDIUM`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "severity_overrides"
+        }
+      }
+    },
+    "threat_overrides": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "action": {
+          "description": "Threat action. Possible values are: `ALERT`, `ALLOW`, `DEFAULT_ACTION`, `DENY`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "threat_overrides"
+        },
+        "threat_id": {
+          "description": "Vendor-specific ID of a threat to override.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "threat_overrides"
+        },
+        "type": {
+          "description": "(Output) Type of threat.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "threat_overrides"
+        }
+      }
+    },
+    "antivirus_overrides": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "protocol": {
+          "description": "Required protocol to match. Possible values are: `SMTP`, `SMB`, `POP3`, `IMAP`, `HTTP2`, `HTTP`, `FTP`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "antivirus_overrides"
+        },
+        "action": {
+          "description": "Threat action override. For some threat types, only a subset of actions applies. Possible values are: `ALERT`, `ALLOW`, `DEFAULT_ACTION`, `DENY`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "antivirus_overrides"
+        }
+      }
+    }
+  }
+}

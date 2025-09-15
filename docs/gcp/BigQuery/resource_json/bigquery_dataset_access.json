@@ -1,0 +1,248 @@
+{
+  "resource_name": "bigquery_dataset_access",
+  "subcategory": "BigQuery",
+  "arguments": {
+    "dataset_id": {
+      "description": "A unique ID for this dataset, without the project name. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "role": {
+      "description": "Describes the rights granted to the user specified by the other member of the access object. Basic, predefined, and custom roles are supported. Predefined roles that have equivalent basic roles are swapped by the API to their basic counterparts, and will show a diff post-create. See [official docs](https://cloud.google.com/bigquery/docs/access-control).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "user_by_email": {
+      "description": "An email address of a user to grant access to. For example: fred@example.com",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "group_by_email": {
+      "description": "An email address of a Google Group to grant access to.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "domain": {
+      "description": "A domain to grant access to. Any users signed in with the domain specified will be granted the specified access",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "special_group": {
+      "description": "A special group to grant access to. Possible values include: * `projectOwners`: Owners of the enclosing project. * `projectReaders`: Readers of the enclosing project. * `projectWriters`: Writers of the enclosing project. * `allAuthenticatedUsers`: All authenticated BigQuery users.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "iam_member": {
+      "description": "Some other type of member that appears in the IAM Policy but isn't a user, group, domain, or special group. For example: `allUsers`",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "view": {
+      "description": "A view from a different dataset to grant access to. Queries executed against that view will have read access to tables in this dataset. The role field is not required when this field is set. If that view is updated by any user, access to the view needs to be granted again via an update operation. Structure is [documented below](#nested_view).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "dataset_id": {
+          "description": "The ID of the dataset containing this table.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "view"
+        },
+        "project_id": {
+          "description": "The ID of the project containing this table.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "view"
+        },
+        "table_id": {
+          "description": "The ID of the table. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "view"
+        }
+      }
+    },
+    "dataset": {
+      "description": "Grants all resources of particular types in a particular dataset read access to the current dataset. Structure is [documented below](#nested_dataset).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "dataset": {
+          "description": "The dataset this entry applies to Structure is [documented below](#nested_dataset_dataset).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "dataset"
+        },
+        "target_types": {
+          "description": "Which resources in the dataset this entry applies to. Currently, only views are supported, but additional target types may be added in the future. Possible values: VIEWS",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "dataset"
+        },
+        "dataset_id": {
+          "description": "The ID of the dataset containing this table.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "dataset"
+        },
+        "project_id": {
+          "description": "The ID of the project containing this table.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "dataset"
+        }
+      }
+    },
+    "routine": {
+      "description": "A routine from a different dataset to grant access to. Queries executed against that routine will have read access to tables in this dataset. The role field is not required when this field is set. If that routine is updated by any user, access to the routine needs to be granted again via an update operation. Structure is [documented below](#nested_routine).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "dataset_id": {
+          "description": "The ID of the dataset containing this table.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "routine"
+        },
+        "project_id": {
+          "description": "The ID of the project containing this table.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "routine"
+        },
+        "routine_id": {
+          "description": "The ID of the routine. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 256 characters.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "routine"
+        }
+      }
+    },
+    "condition": {
+      "description": "Condition for the binding. If CEL expression in this field is true, this access binding will be considered. Structure is [documented below](#nested_condition).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "expression": {
+          "description": "Textual representation of an expression in Common Expression Language syntax.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "condition"
+        },
+        "title": {
+          "description": "Title for the expression, i.e. a short string describing its purpose. This can be used e.g. in UIs which allow to enter the expression.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "condition"
+        },
+        "description": {
+          "description": "Description of the expression. This is a longer text which describes the expression, e.g. when hovered over it in a UI.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "condition"
+        },
+        "location": {
+          "description": "String indicating the location of the expression for error reporting, e.g. a file name and a position in the file.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "condition"
+        }
+      }
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    }
+  }
+}

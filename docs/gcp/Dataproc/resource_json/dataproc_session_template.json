@@ -1,0 +1,308 @@
+{
+  "resource_name": "dataproc_session_template",
+  "subcategory": "Dataproc",
+  "arguments": {
+    "name": {
+      "description": "The resource name of the session template in the following format: projects/{project}/locations/{location}/sessionTemplates/{template_id}",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "labels": {
+      "description": "The labels to associate with this session template. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "runtime_config": {
+      "description": "Runtime configuration for the session template. Structure is [documented below](#nested_runtime_config).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "version": {
+          "description": "Version of the session runtime.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "runtime_config"
+        },
+        "container_image": {
+          "description": "Optional custom container image for the job runtime environment. If not specified, a default container image will be used.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "runtime_config"
+        },
+        "properties": {
+          "description": "A mapping of property names to values, which are used to configure workload execution.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "runtime_config"
+        },
+        "effective_properties": {
+          "description": "(Output) A mapping of property names to values, which are used to configure workload execution.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "runtime_config"
+        }
+      }
+    },
+    "environment_config": {
+      "description": "Environment configuration for the session execution. Structure is [documented below](#nested_environment_config).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "execution_config": {
+          "description": "Execution configuration for a workload. Structure is [documented below](#nested_environment_config_execution_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "environment_config"
+        },
+        "peripherals_config": {
+          "description": "Peripherals configuration that workload has access to. Structure is [documented below](#nested_environment_config_peripherals_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "environment_config"
+        }
+      }
+    },
+    "jupyter_session": {
+      "description": "Jupyter configuration for an interactive session. Structure is [documented below](#nested_jupyter_session).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "kernel": {
+          "description": "Kernel to be used with Jupyter interactive session. Possible values are: `PYTHON`, `SCALA`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "jupyter_session"
+        },
+        "display_name": {
+          "description": "Display name, shown in the Jupyter kernelspec card.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "jupyter_session"
+        }
+      }
+    },
+    "spark_connect_session": {
+      "description": "Spark connect configuration for an interactive session.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "location": {
+      "description": "The location in which the session template will be created in.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "execution_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "service_account": {
+          "description": "Service account that used to execute workload.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "execution_config"
+        },
+        "network_tags": {
+          "description": "Tags used for network traffic control.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "execution_config"
+        },
+        "kms_key": {
+          "description": "The Cloud KMS key to use for encryption.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "execution_config"
+        },
+        "idle_ttl": {
+          "description": "The duration to keep the session alive while it's idling. Exceeding this threshold causes the session to terminate. Minimum value is 10 minutes; maximum value is 14 day. Defaults to 1 hour if not set. If both ttl and idleTtl are specified for an interactive session, the conditions are treated as OR conditions: the workload will be terminated when it has been idle for idleTtl or when ttl has been exceeded, whichever occurs first.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "execution_config"
+        },
+        "ttl": {
+          "description": "The duration after which the workload will be terminated. When the workload exceeds this duration, it will be unconditionally terminated without waiting for ongoing work to finish. If ttl is not specified for a session workload, the workload will be allowed to run until it exits naturally (or run forever without exiting). If ttl is not specified for an interactive session, it defaults to 24 hours. If ttl is not specified for a batch that uses 2.1+ runtime version, it defaults to 4 hours. Minimum value is 10 minutes; maximum value is 14 days. If both ttl and idleTtl are specified (for an interactive session), the conditions are treated as OR conditions: the workload will be terminated when it has been idle for idleTtl or when ttl has been exceeded, whichever occurs first.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "execution_config"
+        },
+        "staging_bucket": {
+          "description": "A Cloud Storage bucket used to stage workload dependencies, config files, and store workload output and other ephemeral data, such as Spark history files. If you do not specify a staging bucket, Cloud Dataproc will determine a Cloud Storage location according to the region where your workload is running, and then create and manage project-level, per-location staging and temporary buckets. This field requires a Cloud Storage bucket name, not a gs://... URI to a Cloud Storage bucket.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "execution_config"
+        },
+        "subnetwork_uri": {
+          "description": "Subnetwork configuration for workload execution.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "execution_config"
+        },
+        "authentication_config": {
+          "description": "Authentication configuration for a workload is used to set the default identity for the workload execution. Structure is [documented below](#nested_environment_config_execution_config_authentication_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "execution_config"
+        }
+      }
+    },
+    "authentication_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "user_workload_authentication_type": {
+          "description": "Authentication type for the user workload running in containers. Possible values are: `SERVICE_ACCOUNT`, `END_USER_CREDENTIALS`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "authentication_config"
+        }
+      }
+    },
+    "peripherals_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "metastore_service": {
+          "description": "Resource name of an existing Dataproc Metastore service.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "peripherals_config"
+        },
+        "spark_history_server_config": {
+          "description": "The Spark History Server configuration for the workload. Structure is [documented below](#nested_environment_config_peripherals_config_spark_history_server_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "peripherals_config"
+        }
+      }
+    },
+    "spark_history_server_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "dataproc_cluster": {
+          "description": "Resource name of an existing Dataproc Cluster to act as a Spark History Server for the workload.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "spark_history_server_config"
+        }
+      }
+    }
+  }
+}
