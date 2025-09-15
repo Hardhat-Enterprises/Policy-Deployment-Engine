@@ -1,8 +1,7 @@
 resource "google_kms_crypto_key_version" "nc1" {
 
-  crypto_key = "projects/my-project/locations/global/keyRings/my-keyring/cryptoKeys/my-key"
+  crypto_key = "nc1"
 
-  # Non- Compliant: state is set to DISABLED
   state = "DISABLED"
 }
 

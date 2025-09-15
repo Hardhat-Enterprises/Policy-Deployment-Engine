@@ -9,6 +9,6 @@ resource "google_kms_crypto_key" "nc1" {
 resource "google_kms_crypto_key" "nc2" {
   name     = "nc2"
   key_ring = "example-key-ring"
-  purpose  = "ASYMMETRIC_SIGN"
+  purpose  = "ASYMMETRIC_DECRYPT"
   # no `signing = "true"` label → violation
 }

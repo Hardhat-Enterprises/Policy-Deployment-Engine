@@ -12,11 +12,8 @@ conditions := [
     },
     {
       "condition": "Role must be one of the approved roles",
-      "attribute_path": ["members",0,"role"],
-      "values": [
-        "roles/cloudkms.cryptoKeyEncrypterDecrypter",
-        "roles/cloudkms.viewer"
-      ],
+      "attribute_path": ["role"],
+      "values": ["roles/cloudkms.cryptoKeyEncrypterDecrypter"],
       "policy_type": "whitelist"
     }
     ],

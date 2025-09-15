@@ -6,9 +6,9 @@ import subprocess
 import argparse
 
 
-
+# ---------------------------
 # Error logging
-
+# ---------------------------
 class ErrorLogger:
     def __init__(self):
         self.errors = []
@@ -23,12 +23,12 @@ class ErrorLogger:
         return n
 
 
-
+# ---------------------------
 # Base validator (shared helpers)
-
+# ---------------------------
 class BaseValidator:
     # junk/system files + project-level ignores
-    IGNORE_FILES = {".DS_Store", "Thumbs.db", "desktop.ini", "helpers.rego","plan","plan.json",".terraform.lock.hcl",".terraform"}
+    IGNORE_FILES = {".DS_Store", "Thumbs.db", "desktop.ini", "helpers.rego"}
     PKG_RE = re.compile(r"^\s*package\s+([A-Za-z0-9_.]+)")
     SEGMENT_RE = re.compile(r"^[a-z0-9_]+$")
     RVN_RE = re.compile(r'"resource_value_name"\s*:\s*"([^"]+)"')  # from vars.rego
@@ -38,7 +38,7 @@ class BaseValidator:
         self.logger = logger
         
 
-    # small utilities
+    # ---------- small utilities ----------
     def list_filtered(self, path):
         """os.listdir() minus junk/ignored and Apple '._' files."""
         try:
@@ -222,11 +222,11 @@ class BaseValidator:
 
 
 
-
+# ---------------------------
 # Input validator (Terraform side)
-
+# ---------------------------
 class InputValidator(BaseValidator):
-    REQUIRED = {"c.tf", "nc.tf", "config.tf"}
+    REQUIRED = {"c.tf", "nc.tf", "config.tf", "plan.json", ".terraform.lock.hcl", "plan"}
     VALID_NAME = re.compile(r"^[a-z0-9_]+\.tf$")
 
     def __init__(self, root, logger, policies_root="policies/gcp"):
@@ -298,14 +298,14 @@ class InputValidator(BaseValidator):
                         self.validate_resource_value_names(tf_path, value_key, prefix)
 
 
-
+# ---------------------------
 # Policy validator (Rego side)
-
+# ---------------------------
 class PolicyValidator(BaseValidator):
     DEFAULT_REQUIRED = {"policy.rego", "vars.rego"}
     VALID_NAME = re.compile(r"^[a-z0-9_]+\.rego$")
 
-
+    # public API
     def validate(self):
         """Validate all services under policies/gcp."""
         for service in self.list_filtered(self.root):
@@ -360,8 +360,9 @@ class PolicyValidator(BaseValidator):
                 self.check_package_for_policy(folder, service, resource, policy_name)
 
 
-
-
+# ---------------------------
+# Runner with argparse
+# ---------------------------
 def main():
     parser = argparse.ArgumentParser(description="Run GCP linters for Terraform inputs and OPA policies.")
     parser.add_argument(

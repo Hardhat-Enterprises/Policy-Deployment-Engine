@@ -9,7 +9,7 @@ conditions := [
     {
         "condition": "Check purpose",
         "attribute_path" : ["purpose"],
-        "values" : ["ENCRYPT_DECRYPT"," ASYMMETRIC_DECRYPT"],
+        "values" : ["ENCRYPT_DECRYPT","ASYMMETRIC_SIGN"],
         "policy_type" : "whitelist" 
     }
     ],
@@ -21,7 +21,7 @@ conditions := [
         "condition": "Check purpose",
         "attribute_path" : ["purpose"],
         "values" : ["ASYMMETRIC_SIGN"],
-        "policy_type" : "whitelist" 
+        "policy_type" : "blacklist" 
     },
     {
         "condition": "Check label",

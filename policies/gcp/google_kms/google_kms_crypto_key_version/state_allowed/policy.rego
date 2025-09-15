@@ -13,8 +13,8 @@ conditions :=[
     {
       "condition": "Key version must be ENABLED",
       "attribute_path": ["state"],
-      "values": ["ENABLED"],
-      "policy_type": "whitelist"
+      "values": ["DISABLED"],
+      "policy_type": "blacklist"
     }
    ]
 
