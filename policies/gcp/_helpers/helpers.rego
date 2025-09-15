@@ -35,7 +35,7 @@ array_contains(arr, elem, pol) if {
     #print(sprintf("%s", ["ww"]))
     arr_to_set = {x | x := arr[_]}
     elem_to_set = {x | x := elem[_]}
-    object.subset(arr_to_set, elem_to_set)
+    object.subset(elem_to_set, arr_to_set) # Check if elem_to_set is a subset of arr_to_set (all elements in elem must exist in arr)
 }
 
 # Generic helper functions:
@@ -43,8 +43,14 @@ array_contains(arr, elem, pol) if {
 # Helper: Check if value exists in array
 array_contains(arr, elem, pol) if {
     not is_array(elem)
-    #print(sprintf("%s", ["a2"]))
-    arr[_] == elem
+    pol == "blacklist"
+    contains(elem, arr[i])
+}
+
+array_contains(arr, elem, pol) if {
+    not is_array(elem)
+    pol == "whitelist"  
+    contains(elem, arr[i])
 }
 
 # For resource filtering
