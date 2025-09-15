@@ -1,0 +1,464 @@
+{
+  "resource_name": "iap_settings",
+  "subcategory": "Identity-Aware Proxy",
+  "arguments": {
+    "name": {
+      "description": "The resource name of the IAP protected resource. Name can have below resources: * organizations/{organization_id} * folders/{folder_id} * projects/{project_id} * projects/{project_id}/iap_web * projects/{project_id}/iap_web/compute * projects/{project_id}/iap_web/compute-{region} * projects/{project_id}/iap_web/compute/services/{service_id} * projects/{project_id}/iap_web/compute-{region}/services/{service_id} * projects/{project_id}/iap_web/appengine-{app_id} * projects/{project_id}/iap_web/appengine-{app_id}/services/{service_id} * projects/{project_id}/iap_web/appengine-{app_id}/services/{service_id}/version/{version_id}",
+      "required": true,
+      "security_impact": true,
+      "rationale": "This path defines which surface is protected by the settings. A wrong or malformed name applies settings to the wrong scope.",
+      "compliant": "name = \"projects/my-gcp-project/iap_web\"  or  \"projects/my-gcp-project/iap_web/appengine-myapp/services/default\"",
+      "non-compliant": "name = \"projects/my-gcp-project\" (missing iap_web segment)  or  \"projects/my-gcp-project/iap_web/compute/services/\" (empty service_id)",
+      "parent": null
+    },
+    "access_settings": {
+      "description": "Top level wrapper for all access related setting in IAP. Structure is [documented below](#nested_access_settings).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "gcip_settings": {
+          "description": "GCIP claims and endpoint configurations for 3p identity providers. * Enabling gcipSetting significantly changes the way IAP authenticates users. Identity Platform does not support IAM, so IAP will not enforce any IAM policies for requests to your application. Structure is [documented below](#nested_access_settings_gcip_settings).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "access_settings"
+        },
+        "cors_settings": {
+          "description": "Configuration to allow cross-origin requests via IAP. Structure is [documented below](#nested_access_settings_cors_settings).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "access_settings"
+        },
+        "oauth_settings": {
+          "description": "Settings to configure IAP's OAuth behavior. Structure is [documented below](#nested_access_settings_oauth_settings).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "access_settings"
+        },
+        "reauth_settings": {
+          "description": "Settings to configure reauthentication policies in IAP. Structure is [documented below](#nested_access_settings_reauth_settings).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "access_settings"
+        },
+        "allowed_domains_settings": {
+          "description": "Settings to configure and enable allowed domains. Structure is [documented below](#nested_access_settings_allowed_domains_settings).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "access_settings",
+          "arguments": {
+            "domains": {
+              "description": "List of trusted domains.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "Restrict sign-in to the corporate domain only.",
+              "compliant": "domains = [\"example.com\"]",
+              "non-compliant": "domains = [\"*\"], [\"gmail.com\"], [\"yahoo.com\"]",
+              "parent": "allowed_domains_settings"
+            },
+            "enable": {
+              "description": "Configuration for customers to opt in for the feature.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "Allowed Domains must be enabled to take effect.",
+              "compliant": "enable = true",
+              "non-compliant": "enable = false",
+              "parent": "allowed_domains_settings"
+            }
+          }
+        },
+        "workforce_identity_settings": {
+          "description": "Settings to configure the workforce identity federation, including workforce pools and OAuth 2.0 settings. Structure is [documented below](#nested_access_settings_workforce_identity_settings).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "access_settings"
+        },
+        "identity_sources": {
+          "description": "Identity sources that IAP can use to authenticate the end user. Only one identity source can be configured. The possible values are: * `WORKFORCE_IDENTITY_FEDERATION`: Use external identities set up on Google Cloud Workforce Identity Federation. Each value may be one of: `WORKFORCE_IDENTITY_FEDERATION`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "access_settings"
+        }
+      }
+    },
+    "application_settings": {
+      "description": "Top level wrapper for all application related settings in IAP. Structure is [documented below](#nested_application_settings).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "csm_settings": {
+          "description": "Settings to configure IAP's behavior for a service mesh. Structure is [documented below](#nested_application_settings_csm_settings).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "application_settings"
+        },
+        "access_denied_page_settings": {
+          "description": "Customization for Access Denied page. IAP allows customers to define a custom URI to use as the error page when access is denied to users. If IAP prevents access to this page, the default IAP error page will be displayed instead. Structure is [documented below](#nested_application_settings_access_denied_page_settings).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "application_settings"
+        },
+        "cookie_domain": {
+          "description": "The Domain value to set for cookies generated by IAP. This value is not validated by the API, but will be ignored at runtime if invalid.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Scope IAP cookies to the corporate parent domain.",
+          "compliant": "cookie_domain = \"example.com\"",
+          "non-compliant": "cookie_domain = \"gmail.com\" / \"vendor.io\" / \"example.com \" (trailing space)",
+          "parent": "application_settings"
+        },
+        "attribute_propagation_settings": {
+          "description": "Settings to configure attribute propagation. Structure is [documented below](#nested_application_settings_attribute_propagation_settings).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "application_settings"
+        }
+      }
+    },
+    "gcip_settings": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "tenant_ids": {
+          "description": "GCIP tenant ids that are linked to the IAP resource. tenantIds could be a string beginning with a number character to indicate authenticating with GCIP tenant flow, or in the format of _ to indicate authenticating with GCIP agent flow. If agent flow is used, tenantIds should only contain one single element, while for tenant flow, tenantIds can contain multiple elements.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "gcip_settings"
+        },
+        "login_page_uri": {
+          "description": "Login page URI associated with the GCIP tenants. Typically, all resources within the same project share the same login page, though it could be overridden at the sub resource level.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "gcip_settings"
+        }
+      }
+    },
+    "cors_settings": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "allow_http_options": {
+          "description": "Configuration to allow HTTP OPTIONS calls to skip authorization. If undefined, IAP will not apply any special logic to OPTIONS requests.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cors_settings"
+        }
+      }
+    },
+    "oauth_settings": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "login_hint": {
+          "description": "Domain hint to send as hd=? parameter in OAuth request flow. Enables redirect to primary IDP by skipping Google's login screen. (https://developers.google.com/identity/protocols/OpenIDConnect#hd-param) Note: IAP does not verify that the id token's hd claim matches this value since access behavior is managed by IAM policies. * loginHint setting is not a replacement for access control. Always enforce an appropriate access policy if you want to restrict access to users outside your domain.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "oauth_settings"
+        },
+        "programmatic_clients": {
+          "description": "List of client ids allowed to use IAP programmatically.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "oauth_settings"
+        }
+      }
+    },
+    "reauth_settings": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "method": {
+          "description": "Reauth method requested. The possible values are: * `LOGIN`: Prompts the user to log in again. * `SECURE_KEY`: User must use their secure key 2nd factor device. * `ENROLLED_SECOND_FACTORS`: User can use any enabled 2nd factor. Possible values are: `LOGIN`, `SECURE_KEY`, `ENROLLED_SECOND_FACTORS`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "reauth_settings"
+        },
+        "max_age": {
+          "description": "Reauth session lifetime, how long before a user has to reauthenticate again. A duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.5s\".",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "reauth_settings"
+        },
+        "policy_type": {
+          "description": "How IAP determines the effective policy in cases of hierarchical policies. Policies are merged from higher in the hierarchy to lower in the hierarchy. The possible values are: * `MINIMUM`: This policy acts as a minimum to other policies, lower in the hierarchy. Effective policy may only be the same or stricter. * `DEFAULT`: This policy acts as a default if no other reauth policy is set. Possible values are: `MINIMUM`, `DEFAULT`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "reauth_settings"
+        }
+      }
+    },
+    "allowed_domains_settings": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "domains": {
+          "description": "List of trusted domains.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Restrict sign-in to the corporate domain only.",
+          "compliant": "domains = [\"example.com\"]",
+          "non-compliant": "domains = [\"*\"], [\"gmail.com\"], [\"yahoo.com\"]",
+          "parent": "allowed_domains_settings"
+        },
+        "enable": {
+          "description": "Configuration for customers to opt in for the feature.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Allowed Domains must be enabled to take effect.",
+          "compliant": "enable = true",
+          "non-compliant": "enable = false",
+          "parent": "allowed_domains_settings"
+        }
+      }
+    },
+    "workforce_identity_settings": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "workforce_pools": {
+          "description": "The workforce pool resources. Only one workforce pool is accepted.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "workforce_identity_settings"
+        },
+        "oauth2": {
+          "description": "OAuth 2.0 settings for IAP to perform OIDC flow with workforce identity federation services. Structure is [documented below](#nested_access_settings_workforce_identity_settings_oauth2).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "workforce_identity_settings"
+        }
+      }
+    },
+    "oauth2": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "client_id": {
+          "description": "The OAuth 2.0 client ID registered in the workforce identity federation OAuth 2.0 Server.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "oauth2"
+        },
+        "client_secret": {
+          "description": "Input only. The OAuth 2.0 client secret created while registering the client ID. **Note**: This property is sensitive and will not be displayed in the plan.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "oauth2"
+        },
+        "client_secret_sha256": {
+          "description": "(Output) Output only. SHA256 hash value for the client secret. This field is returned by IAP when the settings are retrieved.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "oauth2"
+        }
+      }
+    },
+    "csm_settings": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "rctoken_aud": {
+          "description": "Audience claim set in the generated RCToken. This value is not validated by IAP.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "csm_settings"
+        }
+      }
+    },
+    "access_denied_page_settings": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "access_denied_page_uri": {
+          "description": "The URI to be redirected to when access is denied.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "access_denied_page_settings"
+        },
+        "generate_troubleshooting_uri": {
+          "description": "Whether to generate a troubleshooting URL on access denied events to this application.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "access_denied_page_settings"
+        },
+        "remediation_token_generation_enabled": {
+          "description": "Whether to generate remediation token on access denied events to this application.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "access_denied_page_settings"
+        }
+      }
+    },
+    "attribute_propagation_settings": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "output_credentials": {
+          "description": "Which output credentials attributes selected by the CEL expression should be propagated in. All attributes will be fully duplicated in each selected output credential. Possible values are: * `HEADER`: Propagate attributes in the headers with \"x-goog-iap-attr-\" prefix. * `JWT`: Propagate attributes in the JWT of the form: \"additional_claims\": { \"my_attribute\": [\"value1\", \"value2\"] } * `RCTOKEN`: Propagate attributes in the RCToken of the form: \" additional_claims\": { \"my_attribute\": [\"value1\", \"value2\"] } Each value may be one of: `HEADER`, `JWT`, `RCTOKEN`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "attribute_propagation_settings"
+        },
+        "expression": {
+          "description": "Raw string CEL expression. Must return a list of attributes. A maximum of 45 attributes can be selected. Expressions can select different attribute types from attributes: attributes.saml_attributes, attributes.iap_attributes.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "attribute_propagation_settings"
+        },
+        "enable": {
+          "description": "Whether the provided attribute propagation settings should be evaluated on user requests. If set to true, attributes returned from the expression will be propagated in the set output credentials.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "attribute_propagation_settings"
+        }
+      }
+    }
+  }
+}

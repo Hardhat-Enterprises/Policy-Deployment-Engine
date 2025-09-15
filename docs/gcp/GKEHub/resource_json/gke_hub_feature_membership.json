@@ -1,0 +1,973 @@
+{
+  "resource_name": "gke_hub_feature_membership",
+  "subcategory": "GKEHub",
+  "arguments": {
+    "configmanagement": {
+      "description": "Config Management-specific spec. Structure is [documented below](#nested_configmanagement).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "config_sync": {
+          "description": "Config Sync configuration for the cluster. Structure is [documented below](#nested_config_sync).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "configmanagement"
+        },
+        "management": {
+          "description": "Set this field to MANAGEMENT_AUTOMATIC to enable [Config Sync auto-upgrades](http://cloud/kubernetes-engine/enterprise/config-sync/docs/how-to/upgrade-config-sync#auto-upgrade-config), and set this field to MANAGEMENT_MANUAL or MANAGEMENT_UNSPECIFIED to disable Config Sync auto-upgrades. This field was introduced in Terraform version [5.41.0](https://github.com/hashicorp/terraform-provider-google/releases/tag/v5.41.0).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "configmanagement"
+        },
+        "version": {
+          "description": "Version of Config Sync installed.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "configmanagement"
+        },
+        "binauthz": {
+          "description": ", Deprecated) Binauthz configuration for the cluster. Structure is [documented below](#nested_binauthz). This field will be ignored and should not be set.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "configmanagement"
+        },
+        "hierarchy_controller": {
+          "description": "Hierarchy Controller configuration for the cluster. Structure is [documented below](#nested_hierarchy_controller). Configuring Hierarchy Controller through the configmanagement feature is no longer recommended. Use open source Kubernetes [Hierarchical Namespace Controller (HNC)](https://github.com/kubernetes-sigs/hierarchical-namespaces) instead. Follow the [instructions](https://cloud.google.com/kubernetes-engine/enterprise/config-sync/docs/how-to/migrate-hierarchy-controller) to migrate from Hierarchy Controller to HNC.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "configmanagement"
+        },
+        "policy_controller": {
+          "description": "Policy Controller configuration for the cluster. Structure is [documented below](#nested_policy_controller). Configuring Policy Controller through the configmanagement feature is no longer recommended. Use the policycontroller feature instead.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "configmanagement"
+        }
+      }
+    },
+    "mesh": {
+      "description": "Service mesh specific spec. Structure is [documented below](#nested_mesh).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "management": {
+          "description": "Whether to automatically manage Service Mesh. Can either be `MANAGEMENT_AUTOMATIC` or `MANAGEMENT_MANUAL`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "mesh"
+        }
+      }
+    },
+    "policycontroller": {
+      "description": "Policy Controller-specific spec. Structure is [documented below](#nested_policycontroller).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "version": {
+          "description": "Version of Policy Controller to install. Defaults to the latest version.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policycontroller"
+        },
+        "policy_controller_hub_config": {
+          "description": "Policy Controller configuration for the cluster. Structure is [documented below](#nested_policy_controller_hub_config).",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policycontroller"
+        }
+      }
+    },
+    "feature": {
+      "description": "The name of the feature",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "location": {
+      "description": "The location of the feature",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "membership": {
+      "description": "The name of the membership",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "membership_location": {
+      "description": "The location of the membership, for example, \"us-central1\". Default is \"global\".",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "project": {
+      "description": "The project of the feature",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "binauthz": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enabled": {
+          "description": "Whether binauthz is enabled in this cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "binauthz"
+        }
+      }
+    },
+    "config_sync": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enabled": {
+          "description": "Whether Config Sync is enabled in the cluster. This field was introduced in Terraform version [5.41.0](https://github.com/hashicorp/terraform-provider-google/releases/tag/v5.41.0), and needs to be set to `true` explicitly to install Config Sync.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "config_sync"
+        },
+        "git": {
+          "description": "Structure is [documented below](#nested_git).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "config_sync"
+        },
+        "oci": {
+          "description": "Supported from Config Sync versions 1.12.0 onwards. Structure is [documented below](#nested_oci). Use either `git` or `oci` config option.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "config_sync"
+        },
+        "prevent_drift": {
+          "description": "Supported from Config Sync versions 1.10.0 onwards. Set to `true` to enable the Config Sync admission webhook to prevent drifts. If set to `false`, disables the Config Sync admission webhook and does not prevent drifts.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "config_sync"
+        },
+        "source_format": {
+          "description": "Specifies whether the Config Sync Repo is in \"hierarchical\" or \"unstructured\" mode.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "config_sync"
+        },
+        "stop_syncing": {
+          "description": "Set to `true` to stop syncing configurations for a single cluster. This field is only available on clusters using Config Sync [auto-upgrades](http://cloud/kubernetes-engine/enterprise/config-sync/docs/how-to/upgrade-config-sync#auto-upgrade-config) or on Config Sync version 1.20.0 or later. Defaults: `false`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "config_sync"
+        },
+        "deployment_overrides": {
+          "description": "The override configurations for the Config Sync Deployments. Structure is [documented below](#nested_deployment_overrides). The field is only available on Config Sync version 1.20.1 or later.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "config_sync"
+        }
+      }
+    },
+    "git": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "gcp_service_account_email": {
+          "description": "The GCP Service Account Email used for auth when secretType is gcpServiceAccount.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "git"
+        },
+        "https_proxy": {
+          "description": "URL for the HTTPS proxy to be used when communicating with the Git repo.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "git"
+        },
+        "policy_dir": {
+          "description": "The path within the Git repository that represents the top level of the repo to sync. Default: the root directory of the repository.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "git"
+        },
+        "secret_type": {
+          "description": "Type of secret configured for access to the Git repo.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "git"
+        },
+        "sync_branch": {
+          "description": "The branch of the repository to sync from. Default: master.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "git"
+        },
+        "sync_repo": {
+          "description": "The URL of the Git repository to use as the source of truth.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "git"
+        },
+        "sync_rev": {
+          "description": "Git revision (tag or hash) to check out. Default HEAD.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "git"
+        },
+        "sync_wait_secs": {
+          "description": "Period in seconds between consecutive syncs. Default: 15.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "git"
+        }
+      }
+    },
+    "deployment_overrides": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "deployment_name": {
+          "description": "The name of the Deployment.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "deployment_overrides"
+        },
+        "deployment_namespace": {
+          "description": "The namespace of the Deployment.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "deployment_overrides"
+        },
+        "containers": {
+          "description": "The override configurations for the containers in the Deployment. Structure is [documented below](#nested_deployment_overrides_containers).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "deployment_overrides"
+        }
+      }
+    },
+    "containers": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "container_name": {
+          "description": "The name of the container.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "containers"
+        },
+        "cpu_request": {
+          "description": "The CPU request of the container.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "containers"
+        },
+        "memory_request": {
+          "description": "The memory request of the container.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "containers"
+        },
+        "cpu_limit": {
+          "description": "The CPU limit of the container.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "containers"
+        },
+        "memory_limit": {
+          "description": "The memory limit of the container.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "containers"
+        }
+      }
+    },
+    "oci": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "gcp_service_account_email": {
+          "description": "The GCP Service Account Email used for auth when secret_type is gcpserviceaccount.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "oci"
+        },
+        "policy_dir": {
+          "description": "The absolute path of the directory that contains the local resources. Default: the root directory of the image.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "oci"
+        },
+        "secret_type": {
+          "description": "Type of secret configured for access to the OCI Image. Must be one of gcenode, gcpserviceaccount or none.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "oci"
+        },
+        "sync_repo": {
+          "description": "The OCI image repository URL for the package to sync from. e.g. LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY_NAME/PACKAGE_NAME.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "oci"
+        },
+        "sync_wait_secs": {
+          "description": "Period in seconds(int64 format) between consecutive syncs. Default: 15.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "oci"
+        }
+      }
+    },
+    "hierarchy_controller": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enable_hierarchical_resource_quota": {
+          "description": "Whether hierarchical resource quota is enabled in this cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "hierarchy_controller"
+        },
+        "enable_pod_tree_labels": {
+          "description": "Whether pod tree labels are enabled in this cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "hierarchy_controller"
+        },
+        "enabled": {
+          "description": "Whether Hierarchy Controller is enabled in this cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "hierarchy_controller"
+        }
+      }
+    },
+    "policy_controller": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "audit_interval_seconds": {
+          "description": "Sets the interval for Policy Controller Audit Scans (in seconds). When set to 0, this disables audit functionality altogether.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller"
+        },
+        "enabled": {
+          "description": "Enables the installation of Policy Controller. If false, the rest of PolicyController fields take no effect.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller"
+        },
+        "exemptable_namespaces": {
+          "description": "The set of namespaces that are excluded from Policy Controller checks. Namespaces do not need to currently exist on the cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller"
+        },
+        "log_denies_enabled": {
+          "description": "Logs all denies and dry run failures.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller"
+        },
+        "referential_rules_enabled": {
+          "description": "Enables the ability to use Constraint Templates that reference to objects other than the object currently being evaluated.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller"
+        },
+        "template_library_installed": {
+          "description": "Installs the default template library along with Policy Controller.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller"
+        },
+        "mutation_enabled": {
+          "description": "Enables mutation in policy controller. If true, mutation CRDs, webhook, and controller deployment will be deployed to the cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller"
+        },
+        "monitoring": {
+          "description": "Specifies the backends Policy Controller should export metrics to. For example, to specify metrics should be exported to Cloud Monitoring and Prometheus, specify backends: [\"cloudmonitoring\", \"prometheus\"]. Default: [\"cloudmonitoring\", \"prometheus\"]",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller"
+        }
+      }
+    },
+    "policy_controller_hub_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "install_spec": {
+          "description": "Configures the mode of the Policy Controller installation. Must be one of `INSTALL_SPEC_NOT_INSTALLED`, `INSTALL_SPEC_ENABLED`, `INSTALL_SPEC_SUSPENDED` or `INSTALL_SPEC_DETACHED`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller_hub_config"
+        },
+        "exemptable_namespaces": {
+          "description": "The set of namespaces that are excluded from Policy Controller checks. Namespaces do not need to currently exist on the cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller_hub_config"
+        },
+        "referential_rules_enabled": {
+          "description": "Enables the ability to use Constraint Templates that reference to objects other than the object currently being evaluated.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller_hub_config"
+        },
+        "log_denies_enabled": {
+          "description": "Logs all denies and dry run failures.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller_hub_config"
+        },
+        "mutation_enabled": {
+          "description": "Enables mutation in policy controller. If true, mutation CRDs, webhook, and controller deployment will be deployed to the cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller_hub_config"
+        },
+        "monitoring": {
+          "description": "Specifies the backends Policy Controller should export metrics to. Structure is [documented below](#nested_monitoring).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller_hub_config"
+        },
+        "audit_interval_seconds": {
+          "description": "Sets the interval for Policy Controller Audit Scans (in seconds). When set to 0, this disables audit functionality altogether.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller_hub_config"
+        },
+        "constraint_violation_limit": {
+          "description": "The maximum number of audit violations to be stored in a constraint. If not set, the  default of 20 will be used.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller_hub_config"
+        },
+        "deployment_configs": {
+          "description": "Map of deployment configs to deployments (\"admission\", \"audit\", \"mutation\").",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller_hub_config"
+        },
+        "policy_content": {
+          "description": "Specifies the desired policy content on the cluster. Structure is [documented below](#nested_policy_content).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller_hub_config"
+        }
+      }
+    },
+    "monitoring": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    },
+    "deployment_configs": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "component_name": {
+          "description": "The name of the component. One of `admission` `audit` or `mutation`",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "deployment_configs"
+        },
+        "container_resources": {
+          "description": "Container resource requirements.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "deployment_configs"
+        },
+        "pod_affinity": {
+          "description": "Pod affinity configuration. Possible values: AFFINITY_UNSPECIFIED, NO_AFFINITY, ANTI_AFFINITY",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "deployment_configs"
+        },
+        "pod_tolerations": {
+          "description": "Pod tolerations of node taints.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "deployment_configs"
+        },
+        "replica_count": {
+          "description": "Pod replica count.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "deployment_configs"
+        }
+      }
+    },
+    "container_resources": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "limits": {
+          "description": "Limits describes the maximum amount of compute resources allowed for use by the running container.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "container_resources"
+        },
+        "requests": {
+          "description": "Requests describes the amount of compute resources reserved for the container by the kube-scheduler.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "container_resources"
+        }
+      }
+    },
+    "limits": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "cpu": {
+          "description": "CPU requirement expressed in Kubernetes resource units.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "limits"
+        },
+        "memory": {
+          "description": "Memory requirement expressed in Kubernetes resource units.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "limits"
+        }
+      }
+    },
+    "requests": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "cpu": {
+          "description": "CPU requirement expressed in Kubernetes resource units.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "requests"
+        },
+        "memory": {
+          "description": "Memory requirement expressed in Kubernetes resource units.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "requests"
+        }
+      }
+    },
+    "pod_tolerations": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "effect": {
+          "description": "Matches a taint effect.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "pod_tolerations"
+        },
+        "key": {
+          "description": "Matches a taint key (not necessarily unique).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "pod_tolerations"
+        },
+        "operator": {
+          "description": "Matches a taint operator.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "pod_tolerations"
+        },
+        "value": {
+          "description": "Matches a taint value.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "pod_tolerations"
+        }
+      }
+    },
+    "policy_content": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "bundles": {
+          "description": "map of bundle name to BundleInstallSpec. The bundle name maps to the `bundleName` key in the `policycontroller.gke.io/constraintData` annotation on a constraint. * `template_library` (Optional) Configures the installation of the Template Library. Structure is [documented below](#nested_template_library).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_content"
+        }
+      }
+    },
+    "bundles": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "bundle_name": {
+          "description": "The name of the bundle.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "bundles"
+        },
+        "exempted_namespaces": {
+          "description": "The set of namespaces to be exempted from the bundle.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "bundles"
+        }
+      }
+    },
+    "template_library": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {}
+    }
+  }
+}

@@ -1,0 +1,431 @@
+{
+  "resource_name": "bigquery_connection",
+  "subcategory": "BigQuery Connection",
+  "arguments": {
+    "connection_id": {
+      "description": "Optional connection id that should be assigned to the created connection.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "location": {
+      "description": "The geographic location where the connection should reside. Cloud SQL instance must be in the same location as the connection with following exceptions: Cloud SQL us-central1 maps to BigQuery US, Cloud SQL europe-west1 maps to BigQuery EU. Examples: US, EU, asia-northeast1, us-central1, europe-west1. Spanner Connections same as spanner region AWS allowed regions are aws-us-east-1 Azure allowed regions are azure-eastus2",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "friendly_name": {
+      "description": "A descriptive name for the connection",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "A descriptive description for the connection",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "kms_key_name": {
+      "description": "Optional. The Cloud KMS key that is used for encryption. Example: projects/[kms_project_id]/locations/[region]/keyRings/[key_region]/cryptoKeys/[key]",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "cloud_sql": {
+      "description": "Connection properties specific to the Cloud SQL. Structure is [documented below](#nested_cloud_sql).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "instance_id": {
+          "description": "Cloud SQL instance ID in the form project:location:instance.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_sql"
+        },
+        "database": {
+          "description": "Database name.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_sql"
+        },
+        "credential": {
+          "description": "Cloud SQL properties. Structure is [documented below](#nested_cloud_sql_credential).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_sql"
+        },
+        "type": {
+          "description": "Type of the Cloud SQL database. Possible values are: `DATABASE_TYPE_UNSPECIFIED`, `POSTGRES`, `MYSQL`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_sql"
+        },
+        "service_account_id": {
+          "description": "(Output) When the connection is used in the context of an operation in BigQuery, this service account will serve as the identity being used for connecting to the CloudSQL instance specified in this connection.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_sql"
+        }
+      }
+    },
+    "aws": {
+      "description": "Connection properties specific to Amazon Web Services. Structure is [documented below](#nested_aws).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "access_role": {
+          "description": "Authentication using Google owned service account to assume into customer's AWS IAM Role. Structure is [documented below](#nested_aws_access_role).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "aws"
+        }
+      }
+    },
+    "azure": {
+      "description": "Container for connection properties specific to Azure. Structure is [documented below](#nested_azure).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "application": {
+          "description": "(Output) The name of the Azure Active Directory Application.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "azure"
+        },
+        "client_id": {
+          "description": "(Output) The client id of the Azure Active Directory Application.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "azure"
+        },
+        "object_id": {
+          "description": "(Output) The object id of the Azure Active Directory Application.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "azure"
+        },
+        "customer_tenant_id": {
+          "description": "The id of customer's directory that host the data.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "azure"
+        },
+        "federated_application_client_id": {
+          "description": "The Azure Application (client) ID where the federated credentials will be hosted.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "azure"
+        },
+        "redirect_uri": {
+          "description": "(Output) The URL user will be redirected to after granting consent during connection setup.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "azure"
+        },
+        "identity": {
+          "description": "(Output) A unique Google-owned and Google-generated identity for the Connection. This identity will be used to access the user's Azure Active Directory Application.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "azure"
+        }
+      }
+    },
+    "cloud_spanner": {
+      "description": "Connection properties specific to Cloud Spanner Structure is [documented below](#nested_cloud_spanner).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "database": {
+          "description": "Cloud Spanner database in the form `project/instance/database'.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_spanner"
+        },
+        "use_parallelism": {
+          "description": "If parallelism should be used when reading from Cloud Spanner.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_spanner"
+        },
+        "max_parallelism": {
+          "description": "Allows setting max parallelism per query when executing on Spanner independent compute resources. If unspecified, default values of parallelism are chosen that are dependent on the Cloud Spanner instance configuration. `useParallelism` and `useDataBoost` must be set when setting max parallelism.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_spanner"
+        },
+        "use_data_boost": {
+          "description": "If set, the request will be executed via Spanner independent compute resources. `use_parallelism` must be set when using data boost.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_spanner"
+        },
+        "database_role": {
+          "description": "Cloud Spanner database role for fine-grained access control. The Cloud Spanner admin should have provisioned the database role with appropriate permissions, such as `SELECT` and `INSERT`. Other users should only use roles provided by their Cloud Spanner admins. The database role name must start with a letter, and can only contain letters, numbers, and underscores. For more details, see https://cloud.google.com/spanner/docs/fgac-about.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_spanner"
+        },
+        "use_serverless_analytics": {
+          "description": ", Deprecated) If the serverless analytics service should be used to read data from Cloud Spanner. `useParallelism` must be set when using serverless analytics. ~> **Warning:** `useServerlessAnalytics` is deprecated and will be removed in a future major release. Use `useDataBoost` instead.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_spanner"
+        }
+      }
+    },
+    "cloud_resource": {
+      "description": "Container for connection properties for delegation of access to GCP resources. Structure is [documented below](#nested_cloud_resource).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "service_account_id": {
+          "description": "(Output) The account ID of the service created for the purpose of this connection.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_resource"
+        }
+      }
+    },
+    "spark": {
+      "description": "Container for connection properties to execute stored procedures for Apache Spark. resources. Structure is [documented below](#nested_spark).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "service_account_id": {
+          "description": "(Output) The account ID of the service created for the purpose of this connection.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "spark"
+        },
+        "metastore_service_config": {
+          "description": "Dataproc Metastore Service configuration for the connection. Structure is [documented below](#nested_spark_metastore_service_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "spark"
+        },
+        "spark_history_server_config": {
+          "description": "Spark History Server configuration for the connection. Structure is [documented below](#nested_spark_spark_history_server_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "spark"
+        }
+      }
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "credential": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "username": {
+          "description": "Username for database.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "credential"
+        },
+        "password": {
+          "description": "Password for database. **Note**: This property is sensitive and will not be displayed in the plan.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "credential"
+        }
+      }
+    },
+    "access_role": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "iam_role_id": {
+          "description": "The user\u2019s AWS IAM Role that trusts the Google-owned AWS IAM user Connection.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "access_role"
+        },
+        "identity": {
+          "description": "(Output) A unique Google-owned and Google-generated identity for the Connection. This identity will be used to access the user's AWS IAM Role.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "access_role"
+        }
+      }
+    },
+    "metastore_service_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "metastore_service": {
+          "description": "Resource name of an existing Dataproc Metastore service in the form of projects/[projectId]/locations/[region]/services/[serviceId].",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "metastore_service_config"
+        }
+      }
+    },
+    "spark_history_server_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "dataproc_cluster": {
+          "description": "Resource name of an existing Dataproc Cluster to act as a Spark History Server for the connection if the form of projects/[projectId]/regions/[region]/clusters/[cluster_name].",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "spark_history_server_config"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "resource_name": "app_engine_firewall_rule",
+  "subcategory": "App Engine",
+  "arguments": {
+    "source_range": {
+      "description": "IP address or range, defined using CIDR notation, of requests that this rule applies to.",
+      "required": true,
+      "security_impact": "Defines which traffic can reach the App Engine service. Misconfigured ranges can expose apps to the public internet.",
+      "rationale": "Restricting source ranges ensures only trusted networks (e.g., internal IPs, corporate ranges, or specific client ranges) can access services.",
+      "compliant": "Use tightly scoped CIDR ranges (e.g., `10.0.0.0/24` or known trusted IP ranges).",
+      "non-compliant": "Using `0.0.0.0/0` or overly broad ranges that allow unrestricted public access.",
+      "parent": null
+    },
+    "action": {
+      "description": "The action to take if this rule matches. Possible values are: `UNSPECIFIED_ACTION`, `ALLOW`, `DENY`.",
+      "required": true,
+      "security_impact": "Determines whether matched traffic is allowed or blocked.",
+      "rationale": "Firewall actions prevent unauthorized access. Explicit deny rules are critical for reducing attack surface.",
+      "compliant": "Use `DENY` for all non-trusted ranges. Allow only for trusted ranges required for business purposes.",
+      "non-compliant": "Allowing all ranges without restrictions, or leaving action unspecified.",
+      "parent": null
+    },
+    "description": {
+      "description": "An optional string description of this rule.",
+      "required": false,
+      "security_impact": "No direct impact, but improves auditability and clarity of firewall configurations.",
+      "rationale": "Documenting rules helps teams understand purpose and avoid misconfigurations.",
+      "compliant": "Description explains purpose, such as 'Allow traffic from corporate VPN'.",
+      "non-compliant": "Description is missing or unclear, making future audits harder.",
+      "parent": null
+    },
+    "priority": {
+      "description": "A positive integer that defines the order of rule evaluation. Rules with the lowest priority are evaluated first. A default rule at priority Int32.MaxValue matches all IPv4 and IPv6 traffic when no previous rule matches. Only the action of this rule can be modified by the user.",
+      "required": false,
+      "security_impact": "Improper priority may cause rules to be bypassed, weakening firewall enforcement.",
+      "rationale": "Firewall rules should be evaluated in a strict order, ensuring critical deny rules are enforced before allow rules.",
+      "compliant": "Deny rules for broad ranges have the lowest numerical priority so they are applied first.",
+      "non-compliant": "Critical deny rules assigned higher numerical values, causing them to be evaluated after allow rules.",
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": "Not security-critical, but incorrect project scoping can lead to rules being applied to the wrong environment.",
+      "rationale": "Always confirm rules are applied to the intended project.",
+      "compliant": "Project field matches the expected App Engine project ID.",
+      "non-compliant": "Omitting or misconfiguring project, applying rules unintentionally elsewhere.",
+      "parent": null
+    }
+  }
+}

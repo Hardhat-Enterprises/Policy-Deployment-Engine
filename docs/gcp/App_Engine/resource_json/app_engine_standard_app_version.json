@@ -1,0 +1,123 @@
+{
+  "resource_name": "app_engine_standard_app_version",
+  "subcategory": "App Engine",
+  "arguments": {
+    "runtime": {
+      "description": "Desired runtime. Example python27.",
+      "required": true,
+      "security_impact": "Defines the language/runtime environment. Deprecated or unsupported runtimes may have unpatched vulnerabilities.",
+      "rationale": "Ensure only actively supported runtimes are used to avoid CVEs.",
+      "compliant": "runtime = \"python39\"",
+      "non-compliant": "runtime = \"python27\" (deprecated).",
+      "parent": null
+    },
+    "deployment": {
+      "description": "Code and application artifacts that make up this version.",
+      "required": true,
+      "security_impact": "Improper deployment packaging may include sensitive files or expose unnecessary binaries.",
+      "rationale": "Deploy only required, reviewed artifacts.",
+      "compliant": "Deployment includes only signed application zip bundle.",
+      "non-compliant": "Deployment bundle includes unused debug files or credentials.",
+      "parent": null
+    },
+    "entrypoint": {
+      "description": "The entrypoint for the application.",
+      "required": true,
+      "security_impact": "Improper entrypoint may bypass authentication logic or allow arbitrary execution.",
+      "rationale": "Entrypoint should be minimal and verified to enforce application logic.",
+      "compliant": "shell = \"gunicorn -b :$PORT main:app\"",
+      "non-compliant": "shell = \"bash debug.sh\"",
+      "parent": null
+    },
+    "service": {
+      "description": "AppEngine service resource",
+      "required": true,
+      "security_impact": "Improperly named services can lead to routing confusion or expose unintended workloads.",
+      "rationale": "Separate services logically for clearer security boundaries.",
+      "compliant": "service = \"payments-api\"",
+      "non-compliant": "service = \"default\" for multiple workloads.",
+      "parent": null
+    },
+    "service_account": {
+      "description": "The identity that the deployed version will run as.",
+      "required": false,
+      "security_impact": "Service account defines runtime permissions. Using broad roles (Editor/Owner) risks privilege escalation.",
+      "rationale": "Always run with least-privilege service accounts.",
+      "compliant": "service_account = \"app-runtime@project.iam.gserviceaccount.com\" with minimal roles.",
+      "non-compliant": "service_account = default App Engine service account with Editor.",
+      "parent": null
+    },
+    "handlers": {
+      "description": "URL-matching patterns applied to requests.",
+      "required": false,
+      "security_impact": "Handlers enforce HTTPS and login. Misconfiguration may expose sensitive endpoints over HTTP.",
+      "rationale": "All admin or internal routes should require authentication and HTTPS.",
+      "compliant": "security_level = \"SECURE_ALWAYS\" and login = \"LOGIN_REQUIRED\".",
+      "non-compliant": "security_level = \"SECURE_NEVER\" for admin URLs.",
+      "parent": null
+    },
+    "env_variables": {
+      "description": "Environment variables available to the app.",
+      "required": false,
+      "security_impact": "Storing secrets in plain environment variables risks leakage.",
+      "rationale": "Use Secret Manager for sensitive keys.",
+      "compliant": "env_variables = { \"LOG_LEVEL\" = \"DEBUG\" }",
+      "non-compliant": "env_variables = { \"DB_PASSWORD\" = \"plaintext\" }",
+      "parent": null
+    },
+    "vpc_access_connector": {
+      "description": "Enables VPC connectivity for standard apps.",
+      "required": false,
+      "security_impact": "Without VPC connector, app traffic may traverse public internet.",
+      "rationale": "Use VPC connectors for private service access.",
+      "compliant": "vpc_access_connector { name = \"/projects/proj/locations/us-central1/connectors/c1\" }",
+      "non-compliant": "Omitting VPC connector for sensitive apps.",
+      "parent": null
+    },
+    "automatic_scaling": {
+      "description": "Automatic scaling configuration.",
+      "required": false,
+      "security_impact": "Improper scaling may exhaust resources or expose app to denial-of-service.",
+      "rationale": "Set sane min/max instances and latency thresholds.",
+      "compliant": "min_idle_instances = 1, max_instances = 20",
+      "non-compliant": "min_idle_instances = 0, unlimited max_instances.",
+      "parent": null
+    },
+    "basic_scaling": {
+      "description": "Basic scaling configuration.",
+      "required": false,
+      "security_impact": "Improper idle timeouts may keep unnecessary instances alive, wasting resources.",
+      "rationale": "Use small idle_timeout for non-critical workloads.",
+      "compliant": "idle_timeout = \"300s\"",
+      "non-compliant": "idle_timeout left default, keeping idle instances indefinitely.",
+      "parent": null
+    },
+    "manual_scaling": {
+      "description": "Manual scaling configuration.",
+      "required": false,
+      "security_impact": "Running continuous instances unnecessarily increases attack surface.",
+      "rationale": "Use manual scaling only when workload requires persistent memory/state.",
+      "compliant": "instances = 2 for long-running services.",
+      "non-compliant": "instances = 50 for low-traffic app.",
+      "parent": null
+    },
+    "libraries": {
+      "description": "Third-party runtime libraries.",
+      "required": false,
+      "security_impact": "Unpinned or outdated libraries may include vulnerabilities.",
+      "rationale": "Pin library versions and update regularly.",
+      "compliant": "library = { name = \"django\", version = \"3.2\" }",
+      "non-compliant": "library = { name = \"django\", version = \"latest\" }",
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": "Explicit scoping avoids accidental deployment into wrong projects.",
+      "rationale": "Always define project ID for clarity.",
+      "compliant": "project = \"secure-app\"",
+      "non-compliant": "Omitting project, relying on provider defaults.",
+      "parent": null
+    }
+  }
+}

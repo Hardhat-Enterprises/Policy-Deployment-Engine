@@ -1,0 +1,97 @@
+{
+  "resource_name": "app_engine_flexible_app_version",
+  "subcategory": "App Engine",
+  "note": "Compliance policies for this resource cannot currently be automated with the existing helpers. The resource has deeply nested arguments (e.g., handlers, network, scaling, resources) which are too complex for the current helper functions to evaluate consistently. Manual review or extended helper logic is required.",
+  "arguments": {
+    "runtime": {
+      "description": "Desired runtime. Example python27.",
+      "required": true,
+      "security_impact": "Controls which language and runtime environment executes the app. Using deprecated or insecure runtimes can introduce vulnerabilities.",
+      "rationale": "Choose only supported and patched runtimes to avoid exposure to CVEs.",
+      "compliant": "Use a supported runtime (e.g., python39, nodejs16).",
+      "non-compliant": "Using legacy runtimes such as python27 which are deprecated.",
+      "parent": null
+    },
+    "readiness_check": {
+      "description": "Configures readiness health checking for instances. Unhealthy instances are not put into the backend traffic rotation.",
+      "required": true,
+      "security_impact": "Ensures only healthy instances serve production traffic. Missing readiness checks can expose unresponsive or insecure instances.",
+      "rationale": "Prevents partially initialized or failing instances from being exposed to end users.",
+      "compliant": "Readiness checks with strict thresholds and low failure tolerance.",
+      "non-compliant": "No readiness checks, allowing unhealthy instances into traffic rotation.",
+      "parent": null
+    },
+    "liveness_check": {
+      "description": "Health checking configuration for VM instances. Unhealthy instances are killed and replaced with new instances.",
+      "required": true,
+      "security_impact": "Prevents long-lived unhealthy instances from being exploited or degrading service availability.",
+      "rationale": "Ensures self-healing by replacing non-functional instances quickly.",
+      "compliant": "Configured liveness check with sensible intervals and thresholds.",
+      "non-compliant": "Disabling liveness checks or using very high thresholds.",
+      "parent": null
+    },
+    "service": {
+      "description": "AppEngine service resource. Can contain numbers, letters, and hyphens.",
+      "required": true,
+      "security_impact": "Identifies the logical grouping of versions. Poorly named or reused service identifiers can cause confusion in routing and logging.",
+      "rationale": "Use clear, unique service names to separate workloads.",
+      "compliant": "service = \"payments-service\"",
+      "non-compliant": "service = \"default\" for all workloads.",
+      "parent": null
+    },
+    "service_account": {
+      "description": "The identity that the deployed version will run as.",
+      "required": false,
+      "security_impact": "Defines the permissions the app runs with. Running as a highly privileged service account risks privilege escalation.",
+      "rationale": "Always run with least-privilege service accounts to reduce blast radius.",
+      "compliant": "service_account = \"app-engine-runtime@project.iam.gserviceaccount.com\" with restricted IAM roles.",
+      "non-compliant": "Using default App Engine service account with Owner/Editor permissions.",
+      "parent": null
+    },
+    "network": {
+      "description": "Extra network settings.",
+      "required": false,
+      "security_impact": "Controls exposure to the public internet. Incorrect configuration may allow unintended inbound traffic.",
+      "rationale": "Use internal-only IPs and VPC connectors where possible.",
+      "compliant": "instance_ip_mode = \"INTERNAL\" with VPC access connector.",
+      "non-compliant": "instance_ip_mode = \"EXTERNAL\" without restrictions.",
+      "parent": null
+    },
+    "handlers": {
+      "description": "An ordered list of URL-matching patterns applied to incoming requests.",
+      "required": false,
+      "security_impact": "Improper handler configuration can expose sensitive endpoints or weaken HTTPS enforcement.",
+      "rationale": "Use handlers with HTTPS (`SECURE_ALWAYS`) and enforce login for sensitive routes.",
+      "compliant": "security_level = \"SECURE_ALWAYS\", login = \"LOGIN_REQUIRED\".",
+      "non-compliant": "security_level = \"SECURE_NEVER\", exposing admin URLs over HTTP.",
+      "parent": null
+    },
+    "env_variables": {
+      "description": "Environment variables available to the application.",
+      "required": false,
+      "security_impact": "Risk of storing secrets or sensitive values in plain text.",
+      "rationale": "Do not hardcode secrets. Use Secret Manager for sensitive values.",
+      "compliant": "env_variables only for non-sensitive configs (e.g., LOG_LEVEL).",
+      "non-compliant": "env_variables with plaintext DB passwords or API keys.",
+      "parent": null
+    },
+    "resources": {
+      "description": "Machine resources for a version.",
+      "required": false,
+      "security_impact": "Improper resource sizing may cause denial-of-service from exhaustion or excessive privilege from unnecessary scaling.",
+      "rationale": "Limit resources to business need, prevent over-provisioning.",
+      "compliant": "cpu=2, memory_gb=4, disk_gb=10.",
+      "non-compliant": "Allocating excessive resources without justification.",
+      "parent": null
+    },
+    "vpc_access_connector": {
+      "description": "Enables VPC connectivity for standard apps.",
+      "required": false,
+      "security_impact": "Critical for connecting securely to internal services. Omitting may force traffic over public internet.",
+      "rationale": "Use VPC connectors to restrict egress to private services.",
+      "compliant": "Configured connector: projects/my-project/locations/us-central1/connectors/app-vpc.",
+      "non-compliant": "No VPC connector, forcing internet egress.",
+      "parent": null
+    }
+  }
+}

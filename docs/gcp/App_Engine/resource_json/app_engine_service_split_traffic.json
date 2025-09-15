@@ -1,0 +1,62 @@
+{
+  "resource_name": "app_engine_service_split_traffic",
+  "subcategory": "App Engine",
+  "arguments": {
+    "service": {
+      "description": "The name of the service these settings apply to.",
+      "required": true,
+      "security_impact": "Incorrect service targeting can route sensitive traffic to unintended services or versions.",
+      "rationale": "Ensure split traffic rules apply to the correct service, especially for production workloads.",
+      "compliant": "service = \"payments-service\" with traffic routed only to approved versions.",
+      "non-compliant": "service = \"default\" shared across multiple apps with traffic split incorrectly.",
+      "parent": null
+    },
+    "split": {
+      "description": "Mapping that defines fractional HTTP traffic diversion to different versions within the service.",
+      "required": true,
+      "security_impact": "Controls how user requests are distributed across versions. Misconfiguration can expose users to unstable or untested versions.",
+      "rationale": "Traffic splitting should follow staged rollout best practices to minimize security and stability risks.",
+      "compliant": "Allocations sum to 1.0 with shard_by set to COOKIE for controlled rollouts.",
+      "non-compliant": "Allocations misconfigured (not summing to 1.0) or shard_by set to RANDOM for sensitive services.",
+      "parent": null,
+      "arguments": {
+        "shard_by": {
+          "description": "Mechanism used to determine which version a request is sent to. Possible values: `UNSPECIFIED`, `COOKIE`, `IP`, `RANDOM`.",
+          "required": false,
+          "security_impact": "Impacts determinism of request routing. `RANDOM` may send users unpredictably to unstable versions.",
+          "rationale": "Use COOKIE for user session consistency or IP for stable routing when COOKIE is not available.",
+          "compliant": "shard_by = \"COOKIE\" for sticky session rollouts.",
+          "non-compliant": "shard_by = \"RANDOM\" for production traffic.",
+          "parent": "split"
+        },
+        "allocations": {
+          "description": "Mapping from version IDs within the service to fractional allocations of traffic for that version. Allocations must sum to 1.",
+          "required": true,
+          "security_impact": "Improper allocations may route too much traffic to untested or vulnerable versions.",
+          "rationale": "Gradually ramp up traffic allocations to new versions after validation.",
+          "compliant": "allocations = { \"v1\": 0.9, \"v2\": 0.1 } with testing version limited.",
+          "non-compliant": "allocations = { \"v2\": 1.0 } immediately, without staged rollout.",
+          "parent": "split"
+        }
+      }
+    },
+    "migrate_traffic": {
+      "description": "If set to true traffic will be migrated to this version.",
+      "required": false,
+      "security_impact": "Forces all traffic to the new version. Risky if the version has not been fully validated.",
+      "rationale": "Enable migrate_traffic only after extensive testing of the new version.",
+      "compliant": "migrate_traffic = true only after canary rollout succeeds.",
+      "non-compliant": "migrate_traffic = true immediately for an untested version.",
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": "Ensures traffic splitting rules are scoped correctly to the intended project.",
+      "rationale": "Explicit project definitions reduce misrouting risk across projects.",
+      "compliant": "project = \"secure-app-project\"",
+      "non-compliant": "Omitting project and relying on provider defaults.",
+      "parent": null
+    }
+  }
+}
