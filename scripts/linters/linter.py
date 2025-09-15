@@ -28,7 +28,7 @@ class ErrorLogger:
 
 class BaseValidator:
     # junk/system files + project-level ignores
-    IGNORE_FILES = {".DS_Store", "Thumbs.db", "desktop.ini", "helpers.rego"}
+    IGNORE_FILES = {".DS_Store", "Thumbs.db", "desktop.ini", "helpers.rego","plan","plan.json",".terraform.lock.hcl",".terraform"}
     PKG_RE = re.compile(r"^\s*package\s+([A-Za-z0-9_.]+)")
     SEGMENT_RE = re.compile(r"^[a-z0-9_]+$")
     RVN_RE = re.compile(r'"resource_value_name"\s*:\s*"([^"]+)"')  # from vars.rego
@@ -226,7 +226,7 @@ class BaseValidator:
 # Input validator (Terraform side)
 
 class InputValidator(BaseValidator):
-    REQUIRED = {"c.tf", "nc.tf", "config.tf", "plan.json", ".terraform.lock.hcl", "plan"}
+    REQUIRED = {"c.tf", "nc.tf", "config.tf"}
     VALID_NAME = re.compile(r"^[a-z0-9_]+\.tf$")
 
     def __init__(self, root, logger, policies_root="policies/gcp"):
