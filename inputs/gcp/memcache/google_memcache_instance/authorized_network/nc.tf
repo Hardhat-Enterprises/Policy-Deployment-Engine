@@ -1,6 +1,6 @@
-resource "google_memcache_instance" "nc-1" {
+resource "google_memcache_instance" "nc1" {
     project        = "abc-12345678"
-    name           = "noncompliant-memcache-1" 
+    name           = "nc1" 
     node_count     = 1
 
     node_config {
@@ -9,9 +9,9 @@ resource "google_memcache_instance" "nc-1" {
     }
 }
 
-resource "google_memcache_instance" "nc-2" {
+resource "google_memcache_instance" "nc2" {
     project        = "abc-12345678"
-    name           = "noncompliant-memcache-2" 
+    name           = "nc2" 
     node_count     = 1
 
     node_config {

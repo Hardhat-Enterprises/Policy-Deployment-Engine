@@ -1,6 +1,6 @@
 resource "google_memcache_instance" "c" {
     project        = "abc-12345678"
-    name           = "compliant-memcache" 
+    name           = "c" 
     node_count     = 1
 
     node_config {
