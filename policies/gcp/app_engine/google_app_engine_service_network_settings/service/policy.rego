@@ -6,20 +6,21 @@ import data.terraform.gcp.security.app_engine.google_app_engine_service_network_
 conditions := [
   [
     {
-      "situation_description": "App Engine service name must be from the approved allowlist.",
+      "situation_description": "App Engine service name must NOT be on the blocked list.",
       "remedies": [
-        "Use one of the approved service names such as 'approved-service'.",
-        "Remove or replace any unapproved service values."
+        "Remove blocked service names.",
+        "Use an allowed service name instead."
       ]
     },
     {
-      "condition": "Service must be in the approved list.",
+      "condition": "Service must not be in the blocked list.",
       "attribute_path": ["service"],
-      "values": ["approved-service"],
-      "policy_type": "whitelist"
+      "values": ["insecure-service-nc", "missing-service-nc"],
+      "policy_type": "blacklist"
     }
   ]
 ]
+
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
 details := helpers.get_multi_summary(conditions, vars.variables).details
