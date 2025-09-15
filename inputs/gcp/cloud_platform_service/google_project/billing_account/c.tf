@@ -1,5 +1,5 @@
 resource "google_project" "c" {
-  name                = "project-with-billing"
+  name                = "c123"
   project_id          = "proj-app-dev"
   org_id              = "123456789"
   auto_create_network = false

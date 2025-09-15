@@ -1,5 +1,5 @@
 resource "google_project" "nc" {
-  name                = "untagged-project"
+  name                = "nc123"
   project_id          = "proj-sec-test"
   org_id              = "123456789"
   auto_create_network = false

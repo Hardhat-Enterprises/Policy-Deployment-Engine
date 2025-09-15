@@ -1,5 +1,5 @@
 resource "google_project" "nc" {
-  name                = "unprotected-project-1"
+  name                = "nc123"
   project_id          = "proj-sec-test"
   org_id              = "123456789"
   auto_create_network = false
@@ -7,7 +7,7 @@ resource "google_project" "nc" {
 }
 
 resource "google_project" "nc2" {
-  name                = "unprotected-project-2"
+  name                = "nc223"
   project_id          = "proj-ops-test"
   org_id              = "123456789"
   auto_create_network = false

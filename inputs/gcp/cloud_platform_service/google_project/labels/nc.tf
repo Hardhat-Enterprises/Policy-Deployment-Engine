@@ -1,5 +1,5 @@
 resource "google_project" "nc" {
-  name       = "noncompliant-project"
+  name       = "nc123"
   project_id = "proj-app-test"
   org_id     = "83838389292"
 

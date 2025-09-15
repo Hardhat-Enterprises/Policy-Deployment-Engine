@@ -1,5 +1,5 @@
 resource "google_project" "c" {
-  name                = "secure-project"
+  name                = "c123"
   project_id          = "proj-app-prod"
   org_id              = "123456789"
   auto_create_network = false   # ✅ secure
