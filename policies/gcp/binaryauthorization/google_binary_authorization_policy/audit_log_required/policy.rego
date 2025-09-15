@@ -8,13 +8,13 @@ conditions := [
     {
       "situation_description": "Audit logging is not properly configured in Binary Authorization policy",
       "remedies": [
-        "Enable audit logging to track image deployments"
+        "Add `audit_log_config` with `log_type` set to `ALL`"
       ]
     },
     {
-      "condition": "Audit logging must not be null or empty",
-      "attribute_path": ["name_pattern"],  
-      "values": [null, ""],
+      "condition": "`audit_log_config` must be defined",
+      "attribute_path": ["name_pattern"],
+      "values": [null, []],
       "policy_type": "blacklist"
     }
   ]

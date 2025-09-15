@@ -8,11 +8,11 @@ conditions := [
     {
       "situation_description": "Attestor has no public keys configured",
       "remedies": [
-        "Add at least one valid public key in the `public_keys` block"
+        "Define at least one valid public key under the `public_keys` block in `attestation_authority_note`"
       ]
     },
     {
-      "condition": "At least one public key must be defined",
+      "condition": "`public_keys` list must contain at least one entry",
       "attribute_path": ["attestation_authority_note", 0, "public_keys"],
       "values": [null, []],
       "policy_type": "blacklist"
