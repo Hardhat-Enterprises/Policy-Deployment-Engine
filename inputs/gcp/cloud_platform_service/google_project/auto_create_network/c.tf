@@ -1,4 +1,4 @@
-resource "google_project" "c" {
+resource "google_project" "c123" {
   name                = "c123"
   project_id          = "proj-app-prod"
   org_id              = "123456789"
