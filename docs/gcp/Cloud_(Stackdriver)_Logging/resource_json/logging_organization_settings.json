@@ -3,39 +3,39 @@
   "subcategory": "Cloud (Stackdriver) Logging",
   "arguments": {
     "organization": {
-      "description": "The organization for which to retrieve or configure settings.",
+      "description": "The organization for which to retrieve or configure settings. This should be the numeric organization ID.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Proper organization specification ensures settings are applied to the correct organizational context with appropriate security controls.",
+      "compliant": "123456789012",
+      "non-compliant": "invalid-org-id",
       "parent": null
     },
     "kms_key_name": {
-      "description": "The resource name for the configured Cloud KMS key.",
+      "description": "The resource name for the configured Cloud KMS key. This key will be used to encrypt log data at rest for the organization.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
+      "security_impact": true,
+      "rationale": "Customer-managed encryption keys provide enhanced security control and compliance with data protection requirements.",
+      "compliant": "projects/my-security-project/locations/global/keyRings/logging-keys/cryptoKeys/log-encryption-key",
       "non-compliant": null,
       "parent": null
     },
     "storage_location": {
-      "description": "The storage location that Cloud Logging will use to create new resources when a location is needed but not explicitly provided.",
+      "description": "The storage location that Cloud Logging will use to create new resources when a location is needed but not explicitly provided. This ensures data residency compliance.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Controlling storage location ensures compliance with data residency requirements and regional data protection regulations.",
+      "compliant": "europe-west1",
+      "non-compliant": "unsupported-region",
       "parent": null
     },
     "disable_default_sink": {
-      "description": "If set to true, the _Default sink in newly created projects and folders will created in a disabled state. This can be used to automatically disable log storage if there is already an aggregated sink configured in the hierarchy. The _Default sink can be re-enabled manually if needed.",
+      "description": "If set to true, the _Default sink in newly created projects and folders will be created in a disabled state. This can be used to automatically disable log storage if there is already an aggregated sink configured in the hierarchy. The _Default sink can be re-enabled manually if needed.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Disabling default sinks prevents duplicate log storage and ensures all logs are routed through centralized, security-controlled sinks.",
+      "compliant": true,
+      "non-compliant": false,
       "parent": null
     }
   }

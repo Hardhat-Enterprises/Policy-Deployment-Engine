@@ -3,48 +3,48 @@
   "subcategory": "Cloud (Stackdriver) Logging",
   "arguments": {
     "name": {
-      "description": "The resource name of the log scope. For example: \\`projects/my-project/locations/global/logScopes/my-log-scope\\`",
+      "description": "The resource name of the log scope. This uniquely identifies the log scope resource within the Google Cloud project and location.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": false,
+      "rationale": "The name is primarily an identifier and follows a structured format, but does not directly impact the security of the log data or access controls.",
+      "compliant": "projects/my-security-project/locations/global/logScopes/security-audit-scope",
+      "non-compliant": "my-log-scope",
       "parent": null
     },
     "resource_names": {
-      "description": "Names of one or more parent resources : *  \\`projects/[PROJECT_ID]\\` May alternatively be one or more views : * \\`projects/[PROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID]\\` A log scope can include a maximum of 50 projects and a maximum of 100 resources in total.",
+      "description": "An array of parent resource names or view names that define the scope of log collection. This can include projects and specific log views, with limits of 50 projects and 100 total resources.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "The resource names define the scope of log collection and must be carefully selected to ensure appropriate log capture without including unauthorized or unintended resources.",
+      "compliant": ["projects/security-audit-project", "projects/compliance-project"],
+      "non-compliant": ["projects/*", "projects/public-project"],
       "parent": null
     },
     "description": {
-      "description": "Describes this log scopes.",
+      "description": "A human-readable description explaining the purpose, scope, and intended use of this log scope configuration.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Clear documentation helps maintain audit trails, ensures proper configuration management, and aids security teams in understanding the purpose and boundaries of the log scope.",
+      "compliant": "Collects security-related logs from all production projects for centralized monitoring and threat detection",
+      "non-compliant": "log scope for some projects",
       "parent": null
     },
     "parent": {
-      "description": "The parent of the resource.",
+      "description": "The parent resource under which this log scope is created. This provides the organizational context and inheritance for the log scope configuration.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
+      "security_impact": true,
+      "rationale": "Proper parent configuration ensures the log scope is created in the correct organizational context and inherits appropriate security policies and permissions.",
+      "compliant": "projects/my-security-project",
       "non-compliant": null,
       "parent": null
     },
     "location": {
-      "description": "The location of the resource. The only supported location is global so far.",
+      "description": "The geographic location where the log scope resource is managed. Currently, only the global location is supported for log scopes.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "While currently limited to global, the location setting may impact future data residency considerations and should be set appropriately for organizational policies.",
+      "compliant": "global",
+      "non-compliant": "us-central1",
       "parent": null
     }
   }
