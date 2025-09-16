@@ -1,4 +1,4 @@
-resource "google_integrations_auth_config" "nc_client_visibility" {
+resource "google_integrations_auth_config" "nc1" {
   display_name = "nc1"
   location     = "us-central1"
   project      = "your-gcp-project-id"
@@ -6,7 +6,7 @@ resource "google_integrations_auth_config" "nc_client_visibility" {
 }
 
 # Non-compliant: visibility NOT SET (null)
-resource "google_integrations_auth_config" "nc_null_visibility" {
+resource "google_integrations_auth_config" "nc2" {
   display_name = "nc2"
   location     = "us-central1"
   project      = "your-gcp-project-id"
