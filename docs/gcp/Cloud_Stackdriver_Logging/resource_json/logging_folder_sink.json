@@ -1,0 +1,145 @@
+{
+  "resource_name": "logging_folder_sink",
+  "subcategory": "Cloud (Stackdriver) Logging",
+  "arguments": {
+    "name": {
+      "description": "The name of the logging sink. Must be unique within the folder and helps identify the purpose of the sink.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "While the name itself doesn't impact security, proper naming conventions help with identification, management, and auditing of logging sinks.",
+      "compliant": "security-audit-logs-to-bigquery",
+      "non-compliant": "sink1",
+      "parent": null
+    },
+    "folder": {
+      "description": "The folder to which this logging sink applies. This specifies the organizational scope where the sink will collect and export logs.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Proper folder scoping ensures that logging sinks only collect logs from intended resources and don't inadvertently capture logs from unrelated parts of the organization.",
+      "compliant": "folders/123456789012",
+      "non-compliant": "projects/my-project",
+      "parent": null
+    },
+    "destination": {
+      "description": "The destination where the logs will be exported. Supported destinations include Cloud Storage, BigQuery, Pub/Sub, and Logging buckets. The sink's service account must have write permissions to the destination.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "The destination choice impacts log security, retention, and accessibility. Secure destinations with proper access controls are essential for protecting sensitive log data.",
+      "compliant": "bigquery.googleapis.com/projects/security-project/datasets/audit_logs",
+      "non-compliant": "storage.googleapis.com/public-bucket",
+      "parent": null
+    },
+    "filter": {
+      "description": "The filter that determines which log entries are exported by this sink. Uses Google Cloud Logging's advanced filter language to specify criteria for log selection.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Proper filtering ensures that only relevant logs are exported, reducing storage costs and ensuring critical security logs are captured without unnecessary noise.",
+      "compliant": "resource.type=\"gce_instance\" AND severity>=WARNING",
+      "non-compliant": "severity<INFO",
+      "parent": null
+    },
+    "description": {
+      "description": "A human-readable description explaining the purpose, scope, and configuration of this logging sink.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Clear documentation of sink purposes helps maintain audit trails, ensures proper configuration management, and aids in security investigations.",
+      "compliant": "Exports all GCE instance warning and error logs to BigQuery for security analysis and compliance auditing",
+      "non-compliant": "export some logs",
+      "parent": null
+    },
+    "disabled": {
+      "description": "Whether the logging sink is disabled. If true, the sink will not export any logs.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Disabled sinks should be carefully monitored as they may indicate broken log collection pipelines or security monitoring gaps.",
+      "compliant": false,
+      "non-compliant": true,
+      "parent": null
+    },
+    "include_children": {
+      "description": "Whether to include logs from all child projects of the folder. If true, logs from child projects are also exported; otherwise only logs relating to the provided folder are included.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "This setting determines the scope of log collection and impacts both cost and security monitoring coverage across the organizational hierarchy.",
+      "compliant": true,
+      "non-compliant": false,
+      "parent": null
+    },
+    "intercept_children": {
+      "description": "Whether this sink should intercept and match with sinks in child resources, except _Required sinks. This sink will be visible to child resources when listing sinks.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Intercepting child sinks can help centralize log management but may conflict with project-specific logging requirements if not properly coordinated.",
+      "compliant": false,
+      "non-compliant": true,
+      "parent": null
+    },
+    "bigquery_options": {
+      "description": "Configuration options for BigQuery destinations. Controls how log data is structured and stored in BigQuery tables.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "BigQuery configuration options impact query performance, cost efficiency, and data accessibility for log analysis and security investigations.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "use_partitioned_tables": {
+          "description": "Whether to use BigQuery partitioned tables instead of date-sharded tables. Partitioned tables require special query syntax but offer better performance and cost management for large datasets.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "This is primarily a performance and cost optimization feature that doesn't directly impact security, though it affects query efficiency for security investigations.",
+          "compliant": true,
+          "non-compliant": false,
+          "parent": "bigquery_options"
+        }
+      }
+    },
+    "exclusions": {
+      "description": "List of exclusion rules that specify which log entries should be excluded from this sink, even if they match the sink's filter.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Exclusions must be carefully configured to avoid inadvertently filtering out security-critical logs while reducing noise and storage costs.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "name": {
+          "description": "The name of the exclusion rule. Must be unique within the sink.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Proper naming helps identify and manage exclusion rules, though the name itself doesn't impact security.",
+          "compliant": "exclude-health-checks",
+          "non-compliant": "exclusion1",
+          "parent": "exclusions"
+        },
+        "description": {
+          "description": "A description explaining why certain log entries are being excluded from the sink.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Documenting exclusion rationales helps maintain audit trails and ensures security teams understand why certain logs are being filtered out.",
+          "compliant": "Excludes high-volume health check logs to reduce storage costs while maintaining security-relevant logging",
+          "non-compliant": "exclude noisy logs",
+          "parent": "exclusions"
+        },
+        "filter": {
+          "description": "The filter that determines which log entries to exclude from the sink. Uses Google Cloud Logging's advanced filter language.",
+          "required": true,
+          "security_impact": true,
+          "rationale": "Exclusion filters must be precise to avoid inadvertently filtering security-critical logs while reducing unnecessary log volume.",
+          "compliant": "resource.type=\"gce_instance\" AND severity<ERROR AND protoPayload.methodName:\"health.check\"",
+          "non-compliant": "resource.type=\"gce_instance\"",
+          "parent": "exclusions"
+        },
+        "disabled": {
+          "description": "Whether the exclusion rule is disabled. If true, the exclusion filter is not applied.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Disabled exclusions should be monitored as they may indicate incomplete logging configuration or security controls.",
+          "compliant": false,
+          "non-compliant": true,
+          "parent": "exclusions"
+        }
+      }
+    }
+  }
+}

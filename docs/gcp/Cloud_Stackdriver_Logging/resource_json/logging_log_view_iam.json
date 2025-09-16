@@ -1,0 +1,107 @@
+{
+  "resource_name": "logging_log_view_iam",
+  "subcategory": "Cloud (Stackdriver) Logging",
+  "arguments": {
+    "parent": {
+      "description": "The parent resource of the log view. This specifies the project and location where the log view is located and determines the scope of the IAM policy.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Proper parent configuration ensures IAM policies are applied to the correct log view resource and inherit appropriate organizational context and security boundaries.",
+      "compliant": "projects/my-project/locations/global/buckets/my-bucket",
+      "non-compliant": "projects/my-project",
+      "parent": null
+    },
+    "location": {
+      "description": "The geographic location of the log view. If not specified, it will be parsed from the parent resource identifier or taken from the provider configuration.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Location specification ensures IAM policies are applied to the correct regional instance of the log view, which may impact data residency and compliance requirements.",
+      "compliant": "global",
+      "non-compliant": "us-central1",
+      "parent": null
+    },
+    "bucket": {
+      "description": "The name of the logging bucket that contains the log view. This identifies the specific bucket resource for IAM policy application.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Correct bucket identification ensures IAM policies are applied to the intended log storage resource and prevents accidental access to unrelated buckets.",
+      "compliant": "my-security-logs-bucket",
+      "non-compliant": "public-logs-bucket",
+      "parent": null
+    },
+    "name": {
+      "description": "The name of the log view to which the IAM policy applies. This specifies the exact log view resource within the bucket.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Precise log view identification ensures IAM policies target the correct log data view and prevent unintended access to other views within the same bucket.",
+      "compliant": "security-audit-view",
+      "non-compliant": null,
+      "parent": null
+    },
+    "member/members": {
+      "description": "The identity or identities that will be granted the privilege specified in the role. Each entry can be a specific user, service account, group, domain, or special identifier.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Proper member specification is critical for implementing the principle of least privilege and ensuring only authorized identities can access sensitive log data.",
+      "compliant": "user:security-admin@example.com",
+      "non-compliant": "allUsers",
+      "parent": null
+    },
+    "role": {
+      "description": "The role that should be applied to the specified members. This can be a predefined role or a custom role following the proper format.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Role assignment must follow the principle of least privilege, granting only the minimum permissions necessary for the intended function.",
+      "compliant": "roles/logging.viewAccessor",
+      "non-compliant": "roles/owner",
+      "parent": null
+    },
+    "policy_data": {
+      "description": "The IAM policy data source that defines the complete policy to be applied to the log view. This allows for complex policy configurations from a data source.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Policy data must be carefully constructed to ensure proper access controls and avoid unintended privilege escalation or access grants.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "condition": {
+      "description": "Optional conditions that specify when the IAM binding is in effect. This allows for time-based or attribute-based access control.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Conditions enable fine-grained access control but must be properly configured to avoid security gaps or unintended access restrictions.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "expression": {
+          "description": "A CEL (Common Expression Language) expression that defines the condition under which the IAM binding is active.",
+          "required": true,
+          "security_impact": true,
+          "rationale": "The expression must be carefully crafted to enforce intended access controls without creating security vulnerabilities or unintended access patterns.",
+          "compliant": "request.time < timestamp('2024-12-31T23:59:59Z')",
+          "non-compliant": "true",
+          "parent": "condition"
+        },
+        "title": {
+          "description": "A short name for the condition, used to identify it in audit logs and error messages.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "While the title itself doesn't impact security, clear naming helps with auditability and management of conditional access policies.",
+          "compliant": "TemporaryAccessUntil2024",
+          "non-compliant": "condition1",
+          "parent": "condition"
+        },
+        "description": {
+          "description": "A detailed description explaining the purpose and scope of the condition. This helps with audit trails and policy management.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Clear documentation of condition purposes ensures proper auditability and helps security teams understand the intent behind conditional access rules.",
+          "compliant": "Temporary access grant for security audit project, expires end of 2024",
+          "non-compliant": "temp access",
+          "parent": "condition"
+        }
+      }
+    }
+  }
+}

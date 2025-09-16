@@ -1,0 +1,51 @@
+{
+  "resource_name": "logging_organization_exclusion",
+  "subcategory": "Cloud (Stackdriver) Logging",
+  "arguments": {
+    "name": {
+      "description": "The name of the logging exclusion. Must be unique within the organization. Names can contain only letters, numbers, underscores, and hyphens.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Proper naming helps identify the purpose of log exclusions and maintain organizational standards for security monitoring.",
+      "compliant": "exclude-health-checks",
+      "non-compliant": "exclusion_with_invalid@characters",
+      "parent": null
+    },
+    "org_id": {
+      "description": "The organization ID for which to create the exclusion. This should be the numeric organization ID.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Proper organization specification ensures log exclusions are created in the correct organizational context.",
+      "compliant": "123456789012",
+      "non-compliant": "invalid-org-id",
+      "parent": null
+    },
+    "description": {
+      "description": "A description of the exclusion, which explains why certain logs are being excluded. This helps maintain auditability of exclusion rules.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Clear descriptions provide justification for exclusions and help maintain security audit trails.",
+      "compliant": "Excludes health check logs to reduce noise in security monitoring",
+      "non-compliant": "",
+      "parent": null
+    },
+    "disabled": {
+      "description": "If set to true, the exclusion is disabled and does not exclude any log entries. Default is false.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Unexpected enabling/disabling of exclusions can affect security monitoring by either including sensitive data or excluding security-relevant logs.",
+      "compliant": false,
+      "non-compliant": true,
+      "parent": null
+    },
+    "filter": {
+      "description": "See [Advanced Log Filters](https://cloud.google.com/logging/docs/view/advanced-filters) for information on how to write a filter. The filter that determines which log entries to exclude.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Carefully crafted filters are essential to avoid excluding security-relevant logs while reducing noise from non-essential logs.",
+      "compliant": "resource.type=\"gce_instance\" AND jsonPayload.MESSAGE:\"Health check\"",
+      "non-compliant": "severity<ERROR",
+      "parent": null
+    }
+  }
+}

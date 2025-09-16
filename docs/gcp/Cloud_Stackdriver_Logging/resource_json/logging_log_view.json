@@ -1,0 +1,60 @@
+{
+  "resource_name": "logging_log_view",
+  "subcategory": "Cloud (Stackdriver) Logging",
+  "arguments": {
+    "name": {
+      "description": "The resource name of the log view. This follows a structured format that includes the project, location, bucket, and view name to uniquely identify the view resource.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "The name is primarily an identifier and follows a structured format, but does not directly impact the security of the log data or access controls.",
+      "compliant": "projects/my-security-project/locations/global/buckets/audit-logs/views/security-events",
+      "non-compliant": "my-view",
+      "parent": null
+    },
+    "bucket": {
+      "description": "The name of the logging bucket that contains this view. This specifies the storage location where the filtered log data will be accessible.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "The bucket configuration determines where sensitive log data is stored and must be properly secured with appropriate access controls and encryption settings.",
+      "compliant": "projects/my-project/locations/global/buckets/security-audit-logs",
+      "non-compliant": "projects/my-project/locations/global/buckets/public-logs",
+      "parent": null
+    },
+    "description": {
+      "description": "A human-readable description explaining the purpose, scope, and filtering criteria of this log view.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Clear documentation helps maintain audit trails, ensures proper configuration management, and aids security teams in understanding the purpose and boundaries of the log view.",
+      "compliant": "View showing only security-critical events from GCE instances for threat monitoring and compliance auditing",
+      "non-compliant": "view for some logs",
+      "parent": null
+    },
+    "filter": {
+      "description": "A filter that restricts which log entries in the bucket are visible through this view. The filter uses a restricted syntax focusing on source, resource type, and log ID for security and performance.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Proper filtering ensures that only appropriate log data is exposed through the view, implementing the principle of least privilege and reducing the risk of exposing sensitive information.",
+      "compliant": "SOURCE(\"projects/security-project\") AND resource.type = \"gce_instance\" AND LOG_ID(\"cloudaudit.googleapis.com/activity\")",
+      "non-compliant": "resource.type = \"gce_instance\"",
+      "parent": null
+    },
+    "parent": {
+      "description": "The parent resource under which this log view is created. This provides the organizational context and inheritance for the view configuration.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Proper parent configuration ensures the log view is created in the correct organizational context and inherits appropriate security policies and permissions.",
+      "compliant": "projects/my-security-project",
+      "non-compliant": null,
+      "parent": null
+    },
+    "location": {
+      "description": "The geographic location where the log view resource is managed. Supported locations include global and various regional options, impacting data residency and compliance.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "The location setting is critical for data sovereignty, compliance with regional data protection laws, and ensuring log data is stored in authorized geographic regions.",
+      "compliant": "global",
+      "non-compliant": "us-central1",
+      "parent": null
+    }
+  }
+}
