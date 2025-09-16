@@ -1,0 +1,932 @@
+{
+  "resource_name": "os_config_patch_deployment",
+  "subcategory": "OS Config",
+  "arguments": {
+    "instance_filter": {
+      "description": "VM instances to patch. Structure is [documented below](#nested_instance_filter).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "all": {
+          "description": "Target all VM instances in the project. If true, no other criteria is permitted.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "instance_filter"
+        },
+        "group_labels": {
+          "description": "Targets VM instances matching ANY of these GroupLabels. This allows targeting of disparate groups of VM instances. Structure is [documented below](#nested_instance_filter_group_labels).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "instance_filter"
+        },
+        "zones": {
+          "description": "Targets VM instances in ANY of these zones. Leave empty to target VM instances in any zone.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "instance_filter"
+        },
+        "instances": {
+          "description": "Targets any of the VM instances specified. Instances are specified by their URI in the `form zones/{{zone}}/instances/{{instance_name}}`, `projects/{{project_id}}/zones/{{zone}}/instances/{{instance_name}}`, or `https://www.googleapis.com/compute/v1/projects/{{project_id}}/zones/{{zone}}/instances/{{instance_name}}`",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "instance_filter"
+        },
+        "instance_name_prefixes": {
+          "description": "Targets VMs whose name starts with one of these prefixes. Similar to labels, this is another way to group VMs when targeting configs, for example prefix=\"prod-\".",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "instance_filter"
+        }
+      }
+    },
+    "patch_deployment_id": {
+      "description": "A name for the patch deployment in the project. When creating a name the following rules apply: * Must contain only lowercase letters, numbers, and hyphens. * Must start with a letter. * Must be between 1-63 characters. * Must end with a number or a letter. * Must be unique within the project.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "Description of the patch deployment. Length of the description is limited to 1024 characters.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "patch_config": {
+      "description": "Patch configuration that is applied. Structure is [documented below](#nested_patch_config).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "mig_instances_allowed": {
+          "description": "Allows the patch job to run on Managed instance groups (MIGs).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "patch_config"
+        },
+        "reboot_config": {
+          "description": "Post-patch reboot settings. Possible values are: `DEFAULT`, `ALWAYS`, `NEVER`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "patch_config"
+        },
+        "apt": {
+          "description": "Apt update settings. Use this setting to override the default apt patch rules. Structure is [documented below](#nested_patch_config_apt).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "patch_config"
+        },
+        "yum": {
+          "description": "Yum update settings. Use this setting to override the default yum patch rules. Structure is [documented below](#nested_patch_config_yum).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "patch_config"
+        },
+        "goo": {
+          "description": "goo update settings. Use this setting to override the default goo patch rules. Structure is [documented below](#nested_patch_config_goo).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "patch_config"
+        },
+        "zypper": {
+          "description": "zypper update settings. Use this setting to override the default zypper patch rules. Structure is [documented below](#nested_patch_config_zypper).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "patch_config"
+        },
+        "windows_update": {
+          "description": "Windows update settings. Use this setting to override the default Windows patch rules. Structure is [documented below](#nested_patch_config_windows_update).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "patch_config"
+        },
+        "pre_step": {
+          "description": "The ExecStep to run before the patch update. Structure is [documented below](#nested_patch_config_pre_step).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "patch_config"
+        },
+        "post_step": {
+          "description": "The ExecStep to run after the patch update. Structure is [documented below](#nested_patch_config_post_step).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "patch_config"
+        }
+      }
+    },
+    "duration": {
+      "description": "Duration of the patch. After the duration ends, the patch times out. A duration in seconds with up to nine fractional digits, terminated by 's'. Example: \"3.5s\"",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "one_time_schedule": {
+      "description": "Schedule a one-time execution. Structure is [documented below](#nested_one_time_schedule).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "execute_time": {
+          "description": "The desired patch job execution time. A timestamp in RFC3339 UTC \"Zulu\" format, accurate to nanoseconds. Example: \"2014-10-02T15:01:23.045123456Z\".",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "one_time_schedule"
+        }
+      }
+    },
+    "recurring_schedule": {
+      "description": "Schedule recurring executions. Structure is [documented below](#nested_recurring_schedule).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "time_zone": {
+          "description": "Defines the time zone that timeOfDay is relative to. The rules for daylight saving time are determined by the chosen time zone. Structure is [documented below](#nested_recurring_schedule_time_zone).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "recurring_schedule"
+        },
+        "start_time": {
+          "description": "The time that the recurring schedule becomes effective. Defaults to createTime of the patch deployment. A timestamp in RFC3339 UTC \"Zulu\" format, accurate to nanoseconds. Example: \"2014-10-02T15:01:23.045123456Z\".",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "recurring_schedule"
+        },
+        "end_time": {
+          "description": "The end time at which a recurring patch deployment schedule is no longer active. A timestamp in RFC3339 UTC \"Zulu\" format, accurate to nanoseconds. Example: \"2014-10-02T15:01:23.045123456Z\".",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "recurring_schedule"
+        },
+        "time_of_day": {
+          "description": "Time of the day to run a recurring deployment. Structure is [documented below](#nested_recurring_schedule_time_of_day).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "recurring_schedule"
+        },
+        "last_execute_time": {
+          "description": "(Output) The time the last patch job ran successfully. A timestamp in RFC3339 UTC \"Zulu\" format, accurate to nanoseconds. Example: \"2014-10-02T15:01:23.045123456Z\".",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "recurring_schedule"
+        },
+        "next_execute_time": {
+          "description": "(Output) The time the next patch job is scheduled to run. A timestamp in RFC3339 UTC \"Zulu\" format, accurate to nanoseconds. Example: \"2014-10-02T15:01:23.045123456Z\".",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "recurring_schedule"
+        },
+        "weekly": {
+          "description": "Schedule with weekly executions. Structure is [documented below](#nested_recurring_schedule_weekly).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "recurring_schedule"
+        },
+        "monthly": {
+          "description": "Schedule with monthly executions. Structure is [documented below](#nested_recurring_schedule_monthly).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "recurring_schedule"
+        }
+      }
+    },
+    "rollout": {
+      "description": "Rollout strategy of the patch job. Structure is [documented below](#nested_rollout).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "mode": {
+          "description": "Mode of the patch rollout. Possible values are: `ZONE_BY_ZONE`, `CONCURRENT_ZONES`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rollout"
+        },
+        "disruption_budget": {
+          "description": "The maximum number (or percentage) of VMs per zone to disrupt at any given moment. The number of VMs calculated from multiplying the percentage by the total number of VMs in a zone is rounded up. During patching, a VM is considered disrupted from the time the agent is notified to begin until patching has completed. This disruption time includes the time to complete reboot and any post-patch steps. A VM contributes to the disruption budget if its patching operation fails either when applying the patches, running pre or post patch steps, or if it fails to respond with a success notification before timing out. VMs that are not running or do not have an active agent do not count toward this disruption budget. For zone-by-zone rollouts, if the disruption budget in a zone is exceeded, the patch job stops, because continuing to the next zone requires completion of the patch process in the previous zone. For example, if the disruption budget has a fixed value of 10, and 8 VMs fail to patch in the current zone, the patch job continues to patch 2 VMs at a time until the zone is completed. When that zone is completed successfully, patching begins with 10 VMs at a time in the next zone. If 10 VMs in the next zone fail to patch, the patch job stops. Structure is [documented below](#nested_rollout_disruption_budget).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rollout"
+        }
+      }
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "group_labels": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "labels": {
+          "description": "Compute Engine instance labels that must be present for a VM instance to be targeted by this filter",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "group_labels"
+        }
+      }
+    },
+    "apt": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "type": {
+          "description": "By changing the type to DIST, the patching is performed using apt-get dist-upgrade instead. Possible values are: `DIST`, `UPGRADE`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "apt"
+        },
+        "excludes": {
+          "description": "List of packages to exclude from update. These packages will be excluded.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "apt"
+        },
+        "exclusive_packages": {
+          "description": "An exclusive list of packages to be updated. These are the only packages that will be updated. If these packages are not installed, they will be ignored. This field cannot be specified with any other patch configuration fields.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "apt"
+        }
+      }
+    },
+    "yum": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "security": {
+          "description": "Adds the --security flag to yum update. Not supported on all platforms.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "yum"
+        },
+        "minimal": {
+          "description": "Will cause patch to run yum update-minimal instead.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "yum"
+        },
+        "excludes": {
+          "description": "List of packages to exclude from update. These packages will be excluded.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "yum"
+        },
+        "exclusive_packages": {
+          "description": "An exclusive list of packages to be updated. These are the only packages that will be updated. If these packages are not installed, they will be ignored. This field cannot be specified with any other patch configuration fields.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "yum"
+        }
+      }
+    },
+    "goo": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enabled": {
+          "description": "goo update settings. Use this setting to override the default goo patch rules.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "goo"
+        }
+      }
+    },
+    "zypper": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "with_optional": {
+          "description": "Adds the --with-optional flag to zypper patch.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "zypper"
+        },
+        "with_update": {
+          "description": "Adds the --with-update flag, to zypper patch.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "zypper"
+        },
+        "categories": {
+          "description": "Install only patches with these categories. Common categories include security, recommended, and feature.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "zypper"
+        },
+        "severities": {
+          "description": "Install only patches with these severities. Common severities include critical, important, moderate, and low.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "zypper"
+        },
+        "excludes": {
+          "description": "List of packages to exclude from update.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "zypper"
+        },
+        "exclusive_patches": {
+          "description": "An exclusive list of patches to be updated. These are the only patches that will be installed using 'zypper patch patch:' command. This field must not be used with any other patch configuration fields.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "zypper"
+        }
+      }
+    },
+    "windows_update": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "classifications": {
+          "description": "Only apply updates of these windows update classifications. If empty, all updates are applied. Each value may be one of: `CRITICAL`, `SECURITY`, `DEFINITION`, `DRIVER`, `FEATURE_PACK`, `SERVICE_PACK`, `TOOL`, `UPDATE_ROLLUP`, `UPDATE`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "windows_update"
+        },
+        "excludes": {
+          "description": "List of KBs to exclude from update.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "windows_update"
+        },
+        "exclusive_patches": {
+          "description": "An exclusive list of kbs to be updated. These are the only patches that will be updated. This field must not be used with other patch configurations.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "windows_update"
+        }
+      }
+    },
+    "pre_step": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "linux_exec_step_config": {
+          "description": "The ExecStepConfig for all Linux VMs targeted by the PatchJob. Structure is [documented below](#nested_patch_config_pre_step_linux_exec_step_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "pre_step"
+        },
+        "windows_exec_step_config": {
+          "description": "The ExecStepConfig for all Windows VMs targeted by the PatchJob. Structure is [documented below](#nested_patch_config_pre_step_windows_exec_step_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "pre_step"
+        }
+      }
+    },
+    "linux_exec_step_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "allowed_success_codes": {
+          "description": "Defaults to [0]. A list of possible return values that the execution can return to indicate a success.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "linux_exec_step_config"
+        },
+        "interpreter": {
+          "description": "The script interpreter to use to run the script. If no interpreter is specified the script will be executed directly, which will likely only succeed for scripts with shebang lines. Possible values are: `SHELL`, `POWERSHELL`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "linux_exec_step_config"
+        },
+        "local_path": {
+          "description": "An absolute path to the executable on the VM.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "linux_exec_step_config"
+        },
+        "gcs_object": {
+          "description": "A Cloud Storage object containing the executable. Structure is [documented below](#nested_patch_config_post_step_linux_exec_step_config_gcs_object).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "linux_exec_step_config"
+        }
+      }
+    },
+    "gcs_object": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "bucket": {
+          "description": "Bucket of the Cloud Storage object.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "gcs_object"
+        },
+        "object": {
+          "description": "Name of the Cloud Storage object.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "gcs_object"
+        },
+        "generation_number": {
+          "description": "Generation number of the Cloud Storage object. This is used to ensure that the ExecStep specified by this PatchJob does not change.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "gcs_object"
+        }
+      }
+    },
+    "windows_exec_step_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "allowed_success_codes": {
+          "description": "Defaults to [0]. A list of possible return values that the execution can return to indicate a success.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "windows_exec_step_config"
+        },
+        "interpreter": {
+          "description": "The script interpreter to use to run the script. If no interpreter is specified the script will be executed directly, which will likely only succeed for scripts with shebang lines. Possible values are: `SHELL`, `POWERSHELL`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "windows_exec_step_config"
+        },
+        "local_path": {
+          "description": "An absolute path to the executable on the VM.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "windows_exec_step_config"
+        },
+        "gcs_object": {
+          "description": "A Cloud Storage object containing the executable. Structure is [documented below](#nested_patch_config_post_step_windows_exec_step_config_gcs_object).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "windows_exec_step_config"
+        }
+      }
+    },
+    "post_step": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "linux_exec_step_config": {
+          "description": "The ExecStepConfig for all Linux VMs targeted by the PatchJob. Structure is [documented below](#nested_patch_config_post_step_linux_exec_step_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "post_step"
+        },
+        "windows_exec_step_config": {
+          "description": "The ExecStepConfig for all Windows VMs targeted by the PatchJob. Structure is [documented below](#nested_patch_config_post_step_windows_exec_step_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "post_step"
+        }
+      }
+    },
+    "time_zone": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "id": {
+          "description": "IANA Time Zone Database time zone, e.g. \"America/New_York\".",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "time_zone"
+        },
+        "version": {
+          "description": "IANA Time Zone Database version number, e.g. \"2019a\".",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "time_zone"
+        }
+      }
+    },
+    "time_of_day": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "hours": {
+          "description": "Hours of day in 24 hour format. Should be from 0 to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "time_of_day"
+        },
+        "minutes": {
+          "description": "Minutes of hour of day. Must be from 0 to 59.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "time_of_day"
+        },
+        "seconds": {
+          "description": "Seconds of minutes of the time. Must normally be from 0 to 59. An API may allow the value 60 if it allows leap-seconds.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "time_of_day"
+        },
+        "nanos": {
+          "description": "Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "time_of_day"
+        }
+      }
+    },
+    "weekly": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "day_of_week": {
+          "description": "IANA Time Zone Database time zone, e.g. \"America/New_York\". Possible values are: `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`, `SUNDAY`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "weekly"
+        }
+      }
+    },
+    "monthly": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "week_day_of_month": {
+          "description": "Week day in a month. Structure is [documented below](#nested_recurring_schedule_monthly_week_day_of_month).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "monthly"
+        },
+        "month_day": {
+          "description": "One day of the month. 1-31 indicates the 1st to the 31st day. -1 indicates the last day of the month. Months without the target day will be skipped. For example, a schedule to run \"every month on the 31st\" will not run in February, April, June, etc.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "monthly"
+        }
+      }
+    },
+    "week_day_of_month": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "week_ordinal": {
+          "description": "Week number in a month. 1-4 indicates the 1st to 4th week of the month. -1 indicates the last week of the month.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "week_day_of_month"
+        },
+        "day_of_week": {
+          "description": "A day of the week. Possible values are: `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`, `SUNDAY`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "week_day_of_month"
+        },
+        "day_offset": {
+          "description": "Represents the number of days before or after the given week day of month that the patch deployment is scheduled for.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "week_day_of_month"
+        }
+      }
+    },
+    "disruption_budget": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "fixed": {
+          "description": "Specifies a fixed value.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "disruption_budget"
+        },
+        "percentage": {
+          "description": "Specifies the relative value defined as a percentage, which will be multiplied by a reference value.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "disruption_budget"
+        }
+      }
+    }
+  }
+}

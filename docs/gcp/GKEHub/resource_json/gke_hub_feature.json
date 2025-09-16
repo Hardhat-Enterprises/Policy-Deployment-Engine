@@ -1,0 +1,1061 @@
+{
+  "resource_name": "gke_hub_feature",
+  "subcategory": "GKEHub",
+  "arguments": {
+    "location": {
+      "description": "The location for the resource",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "name": {
+      "description": "The full, unique name of this Feature resource",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "labels": {
+      "description": "GCP labels for this Feature. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "spec": {
+      "description": "Optional. Hub-wide Feature configuration. If this Feature does not support any Hub-wide configuration, this field may be unused. Structure is [documented below](#nested_spec).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "multiclusteringress": {
+          "description": "Multicluster Ingress-specific spec. Structure is [documented below](#nested_spec_multiclusteringress).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "spec"
+        },
+        "fleetobservability": {
+          "description": "Fleet Observability feature spec. Structure is [documented below](#nested_spec_fleetobservability).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "spec"
+        },
+        "clusterupgrade": {
+          "description": "Clusterupgrade feature spec. Structure is [documented below](#nested_spec_clusterupgrade).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "spec"
+        },
+        "rbacrolebindingactuation": {
+          "description": "RBACRolebinding Actuation feature spec. Structure is [documented below](#nested_spec_rbacrolebindingactuation).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "spec"
+        }
+      }
+    },
+    "fleet_default_member_config": {
+      "description": "Optional. Fleet Default Membership Configuration. Structure is [documented below](#nested_fleet_default_member_config).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "mesh": {
+          "description": "Service Mesh spec Structure is [documented below](#nested_fleet_default_member_config_mesh).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "fleet_default_member_config"
+        },
+        "configmanagement": {
+          "description": "Config Management spec Structure is [documented below](#nested_fleet_default_member_config_configmanagement).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "fleet_default_member_config"
+        },
+        "policycontroller": {
+          "description": "Policy Controller spec Structure is [documented below](#nested_fleet_default_member_config_policycontroller).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "fleet_default_member_config"
+        }
+      }
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "multiclusteringress": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "config_membership": {
+          "description": "Fully-qualified Membership name which hosts the MultiClusterIngress CRD. Example: `projects/foo-proj/locations/global/memberships/bar`",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "multiclusteringress"
+        }
+      }
+    },
+    "fleetobservability": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "logging_config": {
+          "description": "Specified if fleet logging feature is enabled for the entire fleet. If UNSPECIFIED, fleet logging feature is disabled for the entire fleet. Structure is [documented below](#nested_spec_fleetobservability_logging_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "fleetobservability"
+        }
+      }
+    },
+    "logging_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "default_config": {
+          "description": "Specified if applying the default routing config to logs not specified in other configs. Structure is [documented below](#nested_spec_fleetobservability_logging_config_default_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "logging_config"
+        },
+        "fleet_scope_logs_config": {
+          "description": "Specified if applying the routing config to all logs for all fleet scopes. Structure is [documented below](#nested_spec_fleetobservability_logging_config_fleet_scope_logs_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "logging_config"
+        }
+      }
+    },
+    "default_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "mode": {
+          "description": "Specified if fleet logging feature is enabled. Possible values are: `MODE_UNSPECIFIED`, `COPY`, `MOVE`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "default_config"
+        }
+      }
+    },
+    "fleet_scope_logs_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "mode": {
+          "description": "Specified if fleet logging feature is enabled. Possible values are: `MODE_UNSPECIFIED`, `COPY`, `MOVE`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "fleet_scope_logs_config"
+        }
+      }
+    },
+    "clusterupgrade": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "upstream_fleets": {
+          "description": "Specified if other fleet should be considered as a source of upgrades. Currently, at most one upstream fleet is allowed. The fleet name should be either fleet project number or id.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "clusterupgrade"
+        },
+        "post_conditions": {
+          "description": "Post conditions to override for the specified upgrade. Structure is [documented below](#nested_spec_clusterupgrade_post_conditions).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "clusterupgrade"
+        },
+        "gke_upgrade_overrides": {
+          "description": "Configuration overrides for individual upgrades. Structure is [documented below](#nested_spec_clusterupgrade_gke_upgrade_overrides).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "clusterupgrade"
+        }
+      }
+    },
+    "post_conditions": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "soaking": {
+          "description": "Amount of time to \"soak\" after a rollout has been finished before marking it COMPLETE. Cannot exceed 30 days.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "post_conditions"
+        }
+      }
+    },
+    "gke_upgrade_overrides": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "upgrade": {
+          "description": "Which upgrade to override. Structure is [documented below](#nested_spec_clusterupgrade_gke_upgrade_overrides_gke_upgrade_overrides_upgrade).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "gke_upgrade_overrides"
+        },
+        "post_conditions": {
+          "description": "Post conditions to override for the specified upgrade. Structure is [documented below](#nested_spec_clusterupgrade_gke_upgrade_overrides_gke_upgrade_overrides_post_conditions).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "gke_upgrade_overrides"
+        }
+      }
+    },
+    "upgrade": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "name": {
+          "description": "Name of the upgrade, e.g., \"k8s_control_plane\". It should be a valid upgrade name. It must not exceet 99 characters.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "upgrade"
+        },
+        "version": {
+          "description": "Version of the upgrade, e.g., \"1.22.1-gke.100\". It should be a valid version. It must not exceet 99 characters.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "upgrade"
+        }
+      }
+    },
+    "rbacrolebindingactuation": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "allowed_custom_roles": {
+          "description": "The list of allowed custom roles (ClusterRoles). If a custom role is not part of this list, it cannot be used in a fleet scope RBACRoleBinding. If a custom role in this list is in use, it cannot be removed from the list until the scope RBACRolebindings using it are deleted.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rbacrolebindingactuation"
+        }
+      }
+    },
+    "mesh": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "management": {
+          "description": "Whether to automatically manage Service Mesh Possible values are: `MANAGEMENT_UNSPECIFIED`, `MANAGEMENT_AUTOMATIC`, `MANAGEMENT_MANUAL`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "mesh"
+        }
+      }
+    },
+    "configmanagement": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "version": {
+          "description": "Version of Config Sync installed",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "configmanagement"
+        },
+        "management": {
+          "description": "Set this field to MANAGEMENT_AUTOMATIC to enable Config Sync auto-upgrades, and set this field to MANAGEMENT_MANUAL or MANAGEMENT_UNSPECIFIED to disable Config Sync auto-upgrades. Possible values are: `MANAGEMENT_UNSPECIFIED`, `MANAGEMENT_AUTOMATIC`, `MANAGEMENT_MANUAL`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "configmanagement"
+        },
+        "config_sync": {
+          "description": "ConfigSync configuration for the cluster Structure is [documented below](#nested_fleet_default_member_config_configmanagement_config_sync).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "configmanagement"
+        }
+      }
+    },
+    "config_sync": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "source_format": {
+          "description": "Specifies whether the Config Sync Repo is in hierarchical or unstructured mode",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "config_sync"
+        },
+        "enabled": {
+          "description": "Enables the installation of ConfigSync. If set to true, ConfigSync resources will be created and the other ConfigSync fields will be applied if exist. If set to false, all other ConfigSync fields will be ignored, ConfigSync resources will be deleted. If omitted, ConfigSync resources will be managed depends on the presence of the git or oci field.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "config_sync"
+        },
+        "prevent_drift": {
+          "description": "Set to true to enable the Config Sync admission webhook to prevent drifts. If set to `false`, disables the Config Sync admission webhook and does not prevent drifts.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "config_sync"
+        },
+        "metrics_gcp_service_account_email": {
+          "description": "The Email of the Google Cloud Service Account (GSA) used for exporting Config Sync metrics to Cloud Monitoring. The GSA should have the Monitoring Metric Writer(roles/monitoring.metricWriter) IAM role. The Kubernetes ServiceAccount `default` in the namespace `config-management-monitoring` should be bound to the GSA.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "config_sync"
+        },
+        "git": {
+          "description": "Git repo configuration for the cluster Structure is [documented below](#nested_fleet_default_member_config_configmanagement_config_sync_git).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "config_sync"
+        },
+        "oci": {
+          "description": "OCI repo configuration for the cluster Structure is [documented below](#nested_fleet_default_member_config_configmanagement_config_sync_oci).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "config_sync"
+        }
+      }
+    },
+    "git": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "sync_repo": {
+          "description": "The URL of the Git repository to use as the source of truth",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "git"
+        },
+        "sync_branch": {
+          "description": "The branch of the repository to sync from. Default: master",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "git"
+        },
+        "policy_dir": {
+          "description": "The path within the Git repository that represents the top level of the repo to sync",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "git"
+        },
+        "sync_rev": {
+          "description": "Git revision (tag or hash) to check out. Default HEAD",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "git"
+        },
+        "secret_type": {
+          "description": "Type of secret configured for access to the Git repo",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "git"
+        },
+        "https_proxy": {
+          "description": "URL for the HTTPS Proxy to be used when communicating with the Git repo",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "git"
+        },
+        "gcp_service_account_email": {
+          "description": "The Google Cloud Service Account Email used for auth when secretType is gcpServiceAccount",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "git"
+        },
+        "sync_wait_secs": {
+          "description": "Period in seconds between consecutive syncs. Default: 15",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "git"
+        }
+      }
+    },
+    "oci": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "sync_repo": {
+          "description": "The OCI image repository URL for the package to sync from",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "oci"
+        },
+        "policy_dir": {
+          "description": "The absolute path of the directory that contains the local resources. Default: the root directory of the image",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "oci"
+        },
+        "secret_type": {
+          "description": "Type of secret configured for access to the Git repo",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "oci"
+        },
+        "gcp_service_account_email": {
+          "description": "The Google Cloud Service Account Email used for auth when secretType is gcpServiceAccount",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "oci"
+        },
+        "sync_wait_secs": {
+          "description": "Period in seconds between consecutive syncs. Default: 15",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "oci"
+        },
+        "version": {
+          "description": ", Deprecated) Version of Config Sync installed ~> **Warning:** The `configmanagement.config_sync.oci.version` field is deprecated and will be removed in a future major release. Please use `configmanagement.version` field to specify the version of Config Sync installed instead.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "oci"
+        }
+      }
+    },
+    "policycontroller": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "version": {
+          "description": "Configures the version of Policy Controller",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policycontroller"
+        },
+        "policy_controller_hub_config": {
+          "description": "Configuration of Policy Controller Structure is [documented below](#nested_fleet_default_member_config_policycontroller_policy_controller_hub_config).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policycontroller"
+        }
+      }
+    },
+    "policy_controller_hub_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "install_spec": {
+          "description": "Configures the mode of the Policy Controller installation Possible values are: `INSTALL_SPEC_UNSPECIFIED`, `INSTALL_SPEC_NOT_INSTALLED`, `INSTALL_SPEC_ENABLED`, `INSTALL_SPEC_SUSPENDED`, `INSTALL_SPEC_DETACHED`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller_hub_config"
+        },
+        "audit_interval_seconds": {
+          "description": "Interval for Policy Controller Audit scans (in seconds). When set to 0, this disables audit functionality altogether.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller_hub_config"
+        },
+        "exemptable_namespaces": {
+          "description": "The set of namespaces that are excluded from Policy Controller checks. Namespaces do not need to currently exist on the cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller_hub_config"
+        },
+        "log_denies_enabled": {
+          "description": "Logs all denies and dry run failures.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller_hub_config"
+        },
+        "mutation_enabled": {
+          "description": "Enables the ability to mutate resources using Policy Controller.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller_hub_config"
+        },
+        "referential_rules_enabled": {
+          "description": "Enables the ability to use Constraint Templates that reference to objects other than the object currently being evaluated.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller_hub_config"
+        },
+        "monitoring": {
+          "description": "Monitoring specifies the configuration of monitoring Policy Controller. Structure is [documented below](#nested_fleet_default_member_config_policycontroller_policy_controller_hub_config_monitoring).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller_hub_config"
+        },
+        "constraint_violation_limit": {
+          "description": "The maximum number of audit violations to be stored in a constraint. If not set, the internal default of 20 will be used.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller_hub_config"
+        },
+        "deployment_configs": {
+          "description": "Map of deployment configs to deployments (\"admission\", \"audit\", \"mutation\"). Structure is [documented below](#nested_fleet_default_member_config_policycontroller_policy_controller_hub_config_deployment_configs).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller_hub_config"
+        },
+        "policy_content": {
+          "description": "Specifies the desired policy content on the cluster. Structure is [documented below](#nested_fleet_default_member_config_policycontroller_policy_controller_hub_config_policy_content).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_controller_hub_config"
+        }
+      }
+    },
+    "monitoring": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "backends": {
+          "description": "Specifies the list of backends Policy Controller will export to. An empty list would effectively disable metrics export. Each value may be one of: `MONITORING_BACKEND_UNSPECIFIED`, `PROMETHEUS`, `CLOUD_MONITORING`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "monitoring"
+        }
+      }
+    },
+    "deployment_configs": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "component": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "deployment_configs"
+        },
+        "replica_count": {
+          "description": "Pod replica count.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "deployment_configs"
+        },
+        "container_resources": {
+          "description": "Container resource requirements. Structure is [documented below](#nested_fleet_default_member_config_policycontroller_policy_controller_hub_config_deployment_configs_deployment_config_container_resources).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "deployment_configs"
+        },
+        "pod_affinity": {
+          "description": "Pod affinity configuration. Possible values are: `AFFINITY_UNSPECIFIED`, `NO_AFFINITY`, `ANTI_AFFINITY`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "deployment_configs"
+        },
+        "pod_toleration": {
+          "description": "Pod tolerations of node taints. Structure is [documented below](#nested_fleet_default_member_config_policycontroller_policy_controller_hub_config_deployment_configs_deployment_config_pod_toleration).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "deployment_configs"
+        }
+      }
+    },
+    "container_resources": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "limits": {
+          "description": "Limits describes the maximum amount of compute resources allowed for use by the running container. Structure is [documented below](#nested_fleet_default_member_config_policycontroller_policy_controller_hub_config_deployment_configs_deployment_config_container_resources_limits).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "container_resources"
+        },
+        "requests": {
+          "description": "Requests describes the amount of compute resources reserved for the container by the kube-scheduler. Structure is [documented below](#nested_fleet_default_member_config_policycontroller_policy_controller_hub_config_deployment_configs_deployment_config_container_resources_requests).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "container_resources"
+        }
+      }
+    },
+    "limits": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "memory": {
+          "description": "Memory requirement expressed in Kubernetes resource units.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "limits"
+        },
+        "cpu": {
+          "description": "CPU requirement expressed in Kubernetes resource units.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "limits"
+        }
+      }
+    },
+    "requests": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "memory": {
+          "description": "Memory requirement expressed in Kubernetes resource units.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "requests"
+        },
+        "cpu": {
+          "description": "CPU requirement expressed in Kubernetes resource units.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "requests"
+        }
+      }
+    },
+    "pod_toleration": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "key": {
+          "description": "Matches a taint key (not necessarily unique).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "pod_toleration"
+        },
+        "operator": {
+          "description": "Matches a taint operator.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "pod_toleration"
+        },
+        "value": {
+          "description": "Matches a taint value.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "pod_toleration"
+        },
+        "effect": {
+          "description": "Matches a taint effect.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "pod_toleration"
+        }
+      }
+    },
+    "policy_content": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "template_library": {
+          "description": "Configures the installation of the Template Library. Structure is [documented below](#nested_fleet_default_member_config_policycontroller_policy_controller_hub_config_policy_content_template_library).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_content"
+        },
+        "bundles": {
+          "description": "Configures which bundles to install and their corresponding install specs. Structure is [documented below](#nested_fleet_default_member_config_policycontroller_policy_controller_hub_config_policy_content_bundles).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_content"
+        }
+      }
+    },
+    "template_library": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "installation": {
+          "description": "Configures the manner in which the template library is installed on the cluster. Possible values are: `INSTALLATION_UNSPECIFIED`, `NOT_INSTALLED`, `ALL`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "template_library"
+        }
+      }
+    },
+    "bundles": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "bundle": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "bundles"
+        },
+        "exempted_namespaces": {
+          "description": "The set of namespaces to be exempted from the bundle.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "bundles"
+        }
+      }
+    }
+  }
+}

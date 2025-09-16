@@ -1,0 +1,207 @@
+{
+  "resource_name": "compute_packet_mirroring",
+  "subcategory": "Compute Engine",
+  "arguments": {
+    "name": {
+      "description": "The name of the packet mirroring rule",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "network": {
+      "description": "Specifies the mirrored VPC network. Only packets in this network will be mirrored. All mirrored VMs should have a NIC in the given network. All mirrored subnetworks should belong to the given network. Structure is [documented below](#nested_network).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "url": {
+          "description": "The full self_link URL of the network where this rule is active.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "network"
+        }
+      }
+    },
+    "collector_ilb": {
+      "description": "The Forwarding Rule resource (of type load_balancing_scheme=INTERNAL) that will be used as collector for mirrored traffic. The specified forwarding rule must have is_mirroring_collector set to true. Structure is [documented below](#nested_collector_ilb).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "url": {
+          "description": "The URL of the forwarding rule.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "collector_ilb"
+        }
+      }
+    },
+    "mirrored_resources": {
+      "description": "A means of specifying which resources to mirror. Structure is [documented below](#nested_mirrored_resources).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "subnetworks": {
+          "description": "All instances in one of these subnetworks will be mirrored. Structure is [documented below](#nested_mirrored_resources_subnetworks).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "mirrored_resources"
+        },
+        "instances": {
+          "description": "All the listed instances will be mirrored.  Specify at most 50. Structure is [documented below](#nested_mirrored_resources_instances).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "mirrored_resources"
+        },
+        "tags": {
+          "description": "All instances with these tags will be mirrored.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "mirrored_resources"
+        }
+      }
+    },
+    "description": {
+      "description": "A human-readable description of the rule.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "region": {
+      "description": "The Region in which the created address should reside. If it is not provided, the provider region is used.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "priority": {
+      "description": "Since only one rule can be active at a time, priority is used to break ties in the case of two rules that apply to the same instances.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "filter": {
+      "description": "A filter for mirrored traffic.  If unset, all traffic is mirrored. Structure is [documented below](#nested_filter).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "ip_protocols": {
+          "description": "Possible IP protocols including tcp, udp, icmp and esp",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "filter"
+        },
+        "cidr_ranges": {
+          "description": "IP CIDR ranges that apply as a filter on the source (ingress) or destination (egress) IP in the IP header. Only IPv4 is supported.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "filter"
+        },
+        "direction": {
+          "description": "Direction of traffic to mirror. Default value is `BOTH`. Possible values are: `INGRESS`, `EGRESS`, `BOTH`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "filter"
+        }
+      }
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "subnetworks": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "url": {
+          "description": "The URL of the subnetwork where this rule should be active.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "subnetworks"
+        }
+      }
+    },
+    "instances": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "url": {
+          "description": "The URL of the instances where this rule should be active.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "instances"
+        }
+      }
+    }
+  }
+}
