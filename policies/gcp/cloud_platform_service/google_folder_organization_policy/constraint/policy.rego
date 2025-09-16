@@ -3,20 +3,7 @@ import data.terraform.gcp.helpers
 import data.terraform.gcp.security.cloud_platform_service.google_folder_organization_policy.vars
 
 conditions := [
-
-  # 1. Boolean Policy – e.g., disable serial port access
-  [
-    {"situation_description": "Boolean policy must be enforced (e.g., disableSerialPortAccess).",
-     "remedies": ["Set boolean_policy.enforced = true for mandatory constraints"]},
-    {
-      "condition": "Boolean policy must be enforced",
-      "attribute_path": ["boolean_policy",0,"enforced"],
-      "values": [true],
-      "policy_type": "whitelist"
-    }
-  ],
-
-  # 2. List Policy – restrict risky services
+  # 1. List Policy – restrict risky services
   [
     {"situation_description": "Certain APIs or services must not be enabled in this folder.",
      "remedies": ["Deny risky services using list_policy.deny.values (e.g., cloudresourcemanager.googleapis.com)."]},
@@ -28,7 +15,7 @@ conditions := [
     }
   ],
 
-  # 3. Restore Policy – prevent resetting constraints to defaults
+  # 2. Restore Policy – prevent resetting constraints to defaults
   [
     {"situation_description": "Restoring default policies may weaken constraints.",
      "remedies": ["Do not set restore_policy.default = true."]},
@@ -38,9 +25,10 @@ conditions := [
       "values": [true],
       "policy_type": "blacklist"
     }
-  ],
+  ]
+  ,
 
-  # 4. Block inherit_from_parent = true in list_policy
+  # 3. Block inherit_from_parent = true in list_policy
   [
   {
     "situation_description": "List policies must not inherit from parent folder.",
