@@ -5,7 +5,7 @@
     "display_name": {
       "description": "The name of the auth config.",
       "required": true,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -14,16 +14,16 @@
     "location": {
       "description": "Location in which client needs to be provisioned.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Enforcing location restrictions to Australian regions helps maintain data compliance and reduces the risk of unauthorized data access.",
+      "compliant": "australia-southeast1",
+      "non-compliant": "us-central1",
       "parent": null
     },
     "description": {
       "description": "A description of the auth config.",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -32,16 +32,16 @@
     "visibility": {
       "description": "The visibility of the auth config. Possible values are: `PRIVATE`, `CLIENT_VISIBLE`.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Setting visibility to 'PRIVATE' minimizes unauthorized access and exposure.",
+      "compliant": "PRIVATE",
+      "non-compliant": "CLIENT_VISIBLE",
       "parent": null
     },
     "expiry_notification_duration": {
       "description": "User can define the time to receive notification after which the auth config becomes invalid. Support up to 30 days. Support granularity in hours. A duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.5s\".",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -50,34 +50,34 @@
     "override_valid_time": {
       "description": "User provided expiry time to override. For the example of Salesforce, username/password credentials can be valid for 6 months depending on the instance settings. A timestamp in RFC3339 UTC \"Zulu\" format, with nanosecond resolution and up to nine fractional digits. Examples: \"2014-10-02T15:01:23Z\" and \"2014-10-02T15:01:23.045123456Z\".",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "decrypted_credential": {
-      "description": "Raw auth credentials. Structure is [documented below](#nested_decrypted_credential).",
+      "description": "Ensure that credentials are not exposed  to prevent unauthorized access.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Proper handling and encryption of the credentials ensure they remain confidential and accessible only to authorized systems or users",
+      "compliant": "Refer to child argument",
+      "non-compliant": "Refer to child argument",
       "parent": null,
       "arguments": {
         "credential_type": {
           "description": "Credential type associated with auth configs.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Only approved credential types are allowed to ensure strong, secure, and supported authentication methods",
+          "compliant": "oauth2_client_credentials",
+          "non-compliant": "basic_auth",
           "parent": "decrypted_credential"
         },
         "username_and_password": {
-          "description": "Username and password credential. Structure is [documented below](#nested_decrypted_credential_username_and_password).",
+          "description": "Username and password credential.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -86,43 +86,43 @@
         "oauth2_authorization_code": {
           "description": "OAuth2 authorization code credential. Structure is [documented below](#nested_decrypted_credential_oauth2_authorization_code).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
           "parent": "decrypted_credential"
         },
         "oauth2_client_credentials": {
-          "description": "OAuth2 client credentials. Structure is [documented below](#nested_decrypted_credential_oauth2_client_credentials).",
+          "description": "OAuth2 client credentials.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "OAuth2 client credentials provide a secure, standardized method for service-to-service authentication, ensuring that access tokens are issued only to trusted clients",
+          "compliant": "Refer to child argument",
+          "non-compliant": "Refer to child argument",
           "parent": "decrypted_credential"
         },
         "jwt": {
-          "description": "JWT credential. Structure is [documented below](#nested_decrypted_credential_jwt).",
+          "description": "JWT credential.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "JWT enable secure token-based authentication, allowing reliable verification of identity without exposing sensitive credential details",
+          "compliant": "Refer to child argument",
+          "non-compliant": "Refer to child argument",
           "parent": "decrypted_credential"
         },
         "auth_token": {
-          "description": "Auth token credential. Structure is [documented below](#nested_decrypted_credential_auth_token).",
+          "description": "Auth token credential.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Auth tokens provide secure access credentials that reduce the risk of exposing secrets, enhancing overall authentication security.",
+          "compliant": "Refer to child argument",
+          "non-compliant": "Refer to child argument",
           "parent": "decrypted_credential"
         },
         "service_account_credentials": {
           "description": "Service account credential. Structure is [documented below](#nested_decrypted_credential_service_account_credentials).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -131,7 +131,7 @@
         "oidc_token": {
           "description": "Google OIDC ID Token. Structure is [documented below](#nested_decrypted_credential_oidc_token).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -142,7 +142,7 @@
     "client_certificate": {
       "description": "Raw client certificate Structure is [documented below](#nested_client_certificate).",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -151,7 +151,7 @@
         "ssl_certificate": {
           "description": "The ssl certificate encoded in PEM format. This string must include the begin header and end footer lines.",
           "required": true,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -160,7 +160,7 @@
         "encrypted_private_key": {
           "description": "The ssl certificate encoded in PEM format. This string must include the begin header and end footer lines.",
           "required": true,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -169,7 +169,7 @@
         "passphrase": {
           "description": "'passphrase' should be left unset if private key is not encrypted. Note that 'passphrase' is not the password for web server, but an extra layer of security to protected private key.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -179,17 +179,17 @@
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
+      "required": false,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "username_and_password": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
+      "description": "Username and password credential.",
+      "required": false,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -198,7 +198,7 @@
         "username": {
           "description": "Username to be used.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -207,7 +207,7 @@
         "password": {
           "description": "Password to be used.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -216,9 +216,9 @@
       }
     },
     "oauth2_authorization_code": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
+      "description": "OAuth2 authorization code credential. Structure is [documented below](#nested_decrypted_credential_oauth2_authorization_code).",
+      "required": false,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -227,7 +227,7 @@
         "client_id": {
           "description": "The client's id.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -236,7 +236,7 @@
         "client_secret": {
           "description": "The client's secret.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -245,7 +245,7 @@
         "scope": {
           "description": "A space-delimited list of requested scope permissions.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -254,7 +254,7 @@
         "auth_endpoint": {
           "description": "The auth url endpoint to send the auth code request to.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -263,7 +263,7 @@
         "token_endpoint": {
           "description": "The token url endpoint to send the token request to.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -272,18 +272,18 @@
       }
     },
     "oauth2_client_credentials": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "OAuth2 client credentials.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "OAuth2 client credentials provide a secure, standardized method for service-to-service authentication, ensuring that access tokens are issued only to trusted clients",
+      "compliant": "Refer to child argument",
+      "non-compliant": "Refer to child argument",
       "parent": null,
       "arguments": {
         "client_id": {
           "description": "The client's ID.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -292,16 +292,16 @@
         "client_secret": {
           "description": "The client's secret.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Client secrets are critical authentication credentials. Leaving them empty or undefined compromises the OAuth2 flow, potentially allowing unauthorized access or system misconfigurations.",
+          "compliant": "my-secure-client-secret",
+          "non-compliant": "",
           "parent": "oauth2_client_credentials"
         },
         "token_endpoint": {
           "description": "The token endpoint is used by the client to obtain an access token by presenting its authorization grant or refresh token.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -310,7 +310,7 @@
         "scope": {
           "description": "A space-delimited list of requested scope permissions.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -319,7 +319,7 @@
         "token_params": {
           "description": "Token parameters for the auth request. Structure is [documented below](#nested_decrypted_credential_oauth2_client_credentials_token_params).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -328,18 +328,18 @@
         "request_type": {
           "description": "Represent how to pass parameters to fetch access token Possible values are: `REQUEST_TYPE_UNSPECIFIED`, `REQUEST_BODY`, `QUERY_PARAMETERS`, `ENCODED_HEADER`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Only secure request types should be used to transmit credentials. Types like 'ENCODED_HEADER' or 'REQUEST_BODY' ensures safer handling of credentials.",
+          "compliant": "ENCODED_HEADER",
+          "non-compliant": "QUERY_PARAMETERS",
           "parent": "oauth2_client_credentials"
         }
       }
     },
     "token_params": {
       "description": "",
-      "required": null,
-      "security_impact": null,
+      "required": false,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -348,7 +348,7 @@
         "entries": {
           "description": "A list of parameter map entries. Structure is [documented below](#nested_decrypted_credential_oauth2_client_credentials_token_params_entries).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -358,8 +358,8 @@
     },
     "entries": {
       "description": "",
-      "required": null,
-      "security_impact": null,
+      "required": false,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -368,7 +368,7 @@
         "key": {
           "description": "Key of the map entry. Structure is [documented below](#nested_decrypted_credential_oauth2_client_credentials_token_params_entries_entries_key).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -377,7 +377,7 @@
         "value": {
           "description": "Value of the map entry. Structure is [documented below](#nested_decrypted_credential_oauth2_client_credentials_token_params_entries_entries_value).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -387,8 +387,8 @@
     },
     "key": {
       "description": "",
-      "required": null,
-      "security_impact": null,
+      "required": false,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -397,7 +397,7 @@
         "literal_value": {
           "description": "Passing a literal value Structure is [documented below](#nested_decrypted_credential_oauth2_client_credentials_token_params_entries_entries_key_literal_value).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -407,8 +407,8 @@
     },
     "literal_value": {
       "description": "",
-      "required": null,
-      "security_impact": null,
+      "required": false,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -417,7 +417,7 @@
         "string_value": {
           "description": "String.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -427,8 +427,8 @@
     },
     "value": {
       "description": "",
-      "required": null,
-      "security_impact": null,
+      "required": false,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -437,7 +437,7 @@
         "literal_value": {
           "description": "Passing a literal value Structure is [documented below](#nested_decrypted_credential_oauth2_client_credentials_token_params_entries_entries_value_literal_value).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -446,27 +446,27 @@
       }
     },
     "jwt": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "JWT credential",
+      "required": false,
+      "security_impact": true,
+      "rationale": "JWT enable secure token-based authentication, allowing reliable verification of identity without exposing sensitive credential details",
+      "compliant": "Refer to child argument",
+      "non-compliant": "Refer to child argument",
       "parent": null,
       "arguments": {
         "jwt_header": {
           "description": "Identifies which algorithm is used to generate the signature.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Using secure JWT headers ensures proper validation. The 'HS256' algorithm should be used to prevent weak or insecure cryptographic signing, and the type must be set to 'JWT' to maintain standardization and avoid parsing errors or misuse.",
+          "compliant": "{\"alg\": \"HS256\", \"typ\": \"JWT\"}",
+          "non-compliant": "{\"alg\": \"RS256\", \"typ\": \"JWS\"}",
           "parent": "jwt"
         },
         "jwt_payload": {
           "description": "Contains a set of claims. The JWT specification defines seven Registered Claim Names which are the standard fields commonly included in tokens. Custom claims are usually also included, depending on the purpose of the token.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -475,7 +475,7 @@
         "secret": {
           "description": "User's pre-shared secret to sign the token.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -483,8 +483,8 @@
         },
         "jwt": {
           "description": "(Output) The token calculated by the header, payload and signature.",
-          "required": null,
-          "security_impact": null,
+          "required": false,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -493,30 +493,30 @@
       }
     },
     "auth_token": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "Auth token credential.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Auth tokens provide secure access credentials that reduce the risk of exposing secrets, enhancing overall authentication security.",
+      "compliant": "Refer to child argument",
+      "non-compliant": "Refer to child argument",
       "parent": null,
       "arguments": {
         "type": {
-          "description": "Authentication type, e.g. \"Basic\", \"Bearer\", etc.",
+          "description": "Authentication type must be set, e.g. \"Basic\", \"Bearer\", etc.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Using secure authentication token types ensures proper authorization standards are enforced.",
+          "compliant": "Bearer",
+          "non-compliant": "Basic",
           "parent": "auth_token"
         },
         "token": {
           "description": "The token for the auth type.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Providing a token value is critical for secure authentication. Empty tokens can result in unauthorized access, increasing the risk of security breaches.",
+          "compliant": "secure-value-token",
+          "non-compliant": "",
           "parent": "auth_token"
         }
       }
