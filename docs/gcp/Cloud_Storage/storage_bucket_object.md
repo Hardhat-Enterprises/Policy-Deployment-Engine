@@ -19,13 +19,13 @@ Reference: [Terraform Registry – storage_bucket_object](https://registry.terra
 | `content_encoding` |  | false | false | None | None | None |
 | `content_language` |  | false | false | None | None | None |
 | `content_type` |  | false | false | None | None | None |
-| `customer_encryption` | Structure is [documented below](#nested_customer_encryption). | false | true | Encryption should be present either through customer or using kms for data security | my-key | None |
+| `customer_encryption` | Structure is [documented below](#nested_customer_encryption). | false | true | Encryption should be present either through customer or using kms for data security | my-key | null |
 | `retention` |  | false | false | None | None | None |
 | `event_based_hold` |  | false | false | None | None | None |
 | `temporary_hold` |  | false | false | None | None | None |
 | `detect_md5hash` |  | false | false | None | None | None |
 | `storage_class` | Supported values include: `MULTI_REGIONAL`, `REGIONAL`, `NEARLINE`, `COLDLINE`, `ARCHIVE`. If not provided, this defaults to the bucket's default storage class or to a [standard](https://cloud.google.com/storage/docs/storage-classes#standard) class. | false | false | None | None | None |
-| `kms_key_name` |  | false | true | Encryption should be present either through customer or using kms for data security | kms-key | None |
+| `kms_key_name` |  | false | true | Encryption should be present either through customer or using kms for data security | kms-key | null |
 | `source_md5hash` |  | false | false | None | None | None |
 | `force_empty_content_type` |  | false | false | None | None | None |
 | `deletion_policy` | --- | false | false | None | None | None |

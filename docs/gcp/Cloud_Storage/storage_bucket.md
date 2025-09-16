@@ -18,7 +18,7 @@ Reference: [Terraform Registry – storage_bucket](https://registry.terraform.io
 | `lifecycle_rule` |  | false | false | None | None | None |
 | `versioning` |  | false | false | None | None | None |
 | `website` |  | false | false | None | None | None |
-| `cors` |  | false | true | Allowing the wildcard * for CORS methods exposes sensitive operations to any website, enabling potential data theft or manipulation by attackers | None | * |
+| `cors` |  | false | true | Allowing the wildcard * for CORS methods exposes sensitive operations to any website, enabling potential data theft or manipulation by attackers | null | * |
 | `default_event_based_hold` |  | false | false | None | None | None |
 | `retention_policy` |  | false | false | None | None | None |
 | `labels` |  | false | false | None | None | None |
