@@ -360,8 +360,6 @@ class PolicyValidator(BaseValidator):
                 self.check_package_for_policy(folder, service, resource, policy_name)
 
 
-
-
 def main():
     parser = argparse.ArgumentParser(description="Run GCP linters for Terraform inputs and OPA policies.")
     parser.add_argument(
@@ -373,32 +371,37 @@ def main():
 
     logger = ErrorLogger()
 
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    inputs_root = os.path.join(base_dir, "inputs", "gcp")
-    policies_root = os.path.join(base_dir, "policies", "gcp")
+    # Require being CALLED from the Policy-Deployment-Engine root
+    repo_root = os.getcwd()
+    if not (os.path.isdir(os.path.join(repo_root, "inputs")) and
+            os.path.isdir(os.path.join(repo_root, "policies"))):
+        print("[ERROR] Please run this script from the Policy-Deployment-Engine directory "
+              "(the folder that contains 'inputs/' and 'policies/').")
+        sys.exit(2)
+
+    # Build paths relative to where the command is executed
+    inputs_root   = os.path.join(repo_root, "inputs", "gcp")
+    policies_root = os.path.join(repo_root, "policies", "gcp")
 
     inputs = InputValidator(inputs_root, logger, policies_root=policies_root)
     policies = PolicyValidator(policies_root, logger)
 
     if args.gcp:
         print(f"\n🔍 Linting only service: {args.gcp}\n")
-        # Input side
-        print(f"\n🔍 Checking INPUTS folder \n")
+        print("\n🔍 Checking INPUTS folder \n")
         inputs.validate_service(args.gcp)
-        # Policy side
-        print(f"\n🔍 Checking POLICIES folder \n")
+        print("\n🔍 Checking POLICIES folder \n")
         policies.validate_service(args.gcp)
     else:
         print("\n🔍 Linting all GCP services...\n")
-        
-        print(f"\n🔍 Checking INPUTS folder \n")
+        print("\n🔍 Checking INPUTS folder \n")
         inputs.validate()
-        
-        print(f"\n🔍 Checking POLICIES folder \n")
+        print("\n🔍 Checking POLICIES folder \n")
         policies.validate()
 
     if logger.summary():
         sys.exit(1)
+
 
 
 if __name__ == "__main__":
