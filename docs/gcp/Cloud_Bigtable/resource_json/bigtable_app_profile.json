@@ -1,0 +1,129 @@
+{
+  "resource_name": "bigtable_app_profile",
+  "subcategory": "Cloud Bigtable",
+  "arguments": {
+    "app_profile_id": {
+      "description": "The unique name of the app profile in the form `[_a-zA-Z0-9][-_.a-zA-Z0-9]*`.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "Long form description of the use case for this app profile.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "multi_cluster_routing_use_any": {
+      "description": "If true, read/write requests are routed to the nearest cluster in the instance, and will fail over to the nearest cluster that is available in the event of transient errors or delays. Clusters in a region are considered equidistant. Choosing this option sacrifices read-your-writes consistency to improve availability.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "single_cluster_routing": {
+      "description": "Use a single-cluster routing policy. Structure is [documented below](#nested_single_cluster_routing).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "cluster_id": {
+          "description": "The cluster to which read/write requests should be routed.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "single_cluster_routing"
+        },
+        "allow_transactional_writes": {
+          "description": "If true, CheckAndMutateRow and ReadModifyWriteRow requests are allowed by this app profile. It is unsafe to send these requests to the same table/row/column in multiple clusters.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "single_cluster_routing"
+        }
+      }
+    },
+    "standard_isolation": {
+      "description": "The standard options used for isolating this app profile's traffic from other use cases. Structure is [documented below](#nested_standard_isolation).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "priority": {
+          "description": "The priority of requests sent using this app profile. Possible values are: `PRIORITY_LOW`, `PRIORITY_MEDIUM`, `PRIORITY_HIGH`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "standard_isolation"
+        }
+      }
+    },
+    "data_boost_isolation_read_only": {
+      "description": "Specifies that this app profile is intended for read-only usage via the Data Boost feature. Structure is [documented below](#nested_data_boost_isolation_read_only).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "compute_billing_owner": {
+          "description": "The Compute Billing Owner for this Data Boost App Profile. Possible values are: `HOST_PAYS`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "data_boost_isolation_read_only"
+        }
+      }
+    },
+    "instance": {
+      "description": "The name of the instance to create the app profile within.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "ignore_warnings": {
+      "description": "If true, ignore safety checks when deleting/updating the app profile.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    }
+  }
+}

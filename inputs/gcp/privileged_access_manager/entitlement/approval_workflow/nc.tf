@@ -29,10 +29,10 @@ resource "google_privileged_access_manager_entitlement" "nc123" {
 
   approval_workflow {
     manual_approvals {
-      require_approver_justification = true
+      require_approver_justification = false
       steps {
-        approvals_needed          = 1
-        approver_email_recipients = ["security-team@example.com"]
+        approvals_needed          = 0
+        approver_email_recipients = ["audit-team@example.com"]
         approvers {
           principals = ["group:security-approvers@google.com"]
         }

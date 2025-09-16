@@ -1,0 +1,140 @@
+{
+  "resource_name": "certificate_manager_trust_config",
+  "subcategory": "Certificate Manager",
+  "arguments": {
+    "name": {
+      "description": "A user-defined name of the trust config. Trust config names must be unique globally.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "location": {
+      "description": "The trust config location.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "labels": {
+      "description": "Set of label tags associated with the trust config. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "One or more paragraphs of text description of a trust config.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "trust_stores": {
+      "description": "Set of trust stores to perform validation against. This field is supported when TrustConfig is configured with Load Balancers, currently not supported for SPIFFE certificate validation. Structure is [documented below](#nested_trust_stores).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "trust_anchors": {
+          "description": "List of Trust Anchors to be used while performing validation against a given TrustStore. Structure is [documented below](#nested_trust_stores_trust_stores_trust_anchors).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "trust_stores"
+        },
+        "intermediate_cas": {
+          "description": "Set of intermediate CA certificates used for the path building phase of chain validation. The field is currently not supported if trust config is used for the workload certificate feature. Structure is [documented below](#nested_trust_stores_trust_stores_intermediate_cas).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "trust_stores"
+        }
+      }
+    },
+    "allowlisted_certificates": {
+      "description": "Allowlisted PEM-encoded certificates. A certificate matching an allowlisted certificate is always considered valid as long as the certificate is parseable, proof of private key possession is established, and constraints on the certificate's SAN field are met. Structure is [documented below](#nested_allowlisted_certificates).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "pem_certificate": {
+          "description": "PEM certificate that is allowlisted. The certificate can be up to 5k bytes, and must be a parseable X.509 certificate.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "allowlisted_certificates"
+        }
+      }
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "trust_anchors": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "pem_certificate": {
+          "description": "PEM root certificate of the PKI used for validation. Each certificate provided in PEM format may occupy up to 5kB. **Note**: This property is sensitive and will not be displayed in the plan.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "trust_anchors"
+        }
+      }
+    },
+    "intermediate_cas": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "pem_certificate": {
+          "description": "PEM intermediate certificate used for building up paths for validation. Each certificate provided in PEM format may occupy up to 5kB. **Note**: This property is sensitive and will not be displayed in the plan.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "intermediate_cas"
+        }
+      }
+    }
+  }
+}

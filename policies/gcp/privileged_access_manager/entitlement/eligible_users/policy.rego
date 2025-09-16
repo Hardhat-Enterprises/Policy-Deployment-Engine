@@ -6,28 +6,16 @@ import data.terraform.gcp.security.privileged_access_manager.entitlement.vars
 conditions := [
     [
         {
-            "situation_description": "Eligible users contains overly broad principals that allow public access",
-            "remedies": ["Replace broad principals with specific users/groups/service accounts"]
+            "situation_description": "Eligible users contains principals that are not in the approved whitelist",
+            "remedies": ["Replace with principals from the approved whitelist: group:authorized-admins@example.com, user:admin-user@example.com"]
         },
         {
-            "condition": "Check for allUsers or allAuthenticatedUsers principal",
+            "condition": "Check if principals are in approved whitelist",
             "attribute_path": ["eligible_users", 0, "principals"],
-            "values": ["allUsers", "allAuthenticatedUsers"],
-            "policy_type": "blacklist"
+            "values": ["group:authorized-admins@example.com", "user:admin-user@example.com"],
+            "policy_type": "whitelist"
         }
     ],
-    [
-        {
-            "situation_description": "Eligible users contains invalid IAM principal formats",
-            "remedies": ["Use proper prefixes: user:, group:, serviceAccount:"]
-        },
-        {
-            "condition": "Check for principals with proper IAM prefix",
-            "attribute_path": ["eligible_users", "*", "principals"],
-            "values": ["user:", "group:", "serviceAccount:"],
-            "policy_type": "pattern whitelist"
-        }
-    ]
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message

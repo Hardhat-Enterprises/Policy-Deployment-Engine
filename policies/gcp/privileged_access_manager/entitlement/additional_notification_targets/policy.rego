@@ -6,16 +6,16 @@ import data.terraform.gcp.security.privileged_access_manager.entitlement.vars
 conditions := [
     [
         {
-            "situation_description": "Entitlement does not have additional notification targets configured",
-            "remedies": ["Add an additional_notification_targets block with appropriate email recipients for admin and requester notifications"]
+            "situation_description": "Entitlement has additional notification targets but no admin email recipients configured",
+            "remedies": ["Add admin email recipients to additional_notification_targets configuration"]
         },
         {
-            "condition": "Check if additional_notification_targets is present and not empty",
-            "attribute_path": ["additional_notification_targets"],
-            "values": [null, {}],
+            "condition": "Check if admin_email_recipients is null or empty",
+            "attribute_path": ["additional_notification_targets", 0, "admin_email_recipients"],
+            "values": [null],
             "policy_type": "blacklist"
         }
-    ]
+    ],
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message

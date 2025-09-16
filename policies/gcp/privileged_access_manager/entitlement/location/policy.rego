@@ -9,13 +9,14 @@ conditions := [
             "remedies": ["Change location to 'global'"]
         },
         {
-            "condition": "Check if entitlement location is not 'global'",
+            "condition": "Check if entitlement location is 'global'",
             "attribute_path": ["location"],
             "values": ["global"],
             "policy_type": "whitelist"
         }
     ]
 ]
+
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
 details := helpers.get_multi_summary(conditions, vars.variables).details

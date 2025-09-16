@@ -1,7 +1,7 @@
 resource "google_privileged_access_manager_entitlement" "nc123" {
   entitlement_id       = "nc123"
-  location             = "australia-southeast1"
-  max_request_duration = "43200s"
+  location             = "global"
+  max_request_duration = "3600s"
   parent               = "projects/my-project-name"
 
   requester_justification_config {
@@ -10,7 +10,7 @@ resource "google_privileged_access_manager_entitlement" "nc123" {
 
   eligible_users {
     principals = [
-      "user:non-compliant-user@example.com"
+      "allUsers"  
     ]
   }
 

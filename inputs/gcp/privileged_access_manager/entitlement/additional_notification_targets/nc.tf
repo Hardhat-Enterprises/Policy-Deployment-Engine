@@ -23,12 +23,17 @@ resource "google_privileged_access_manager_entitlement" "nc123" {
     }
   }
 
+  additional_notification_targets {
+    admin_email_recipients     = []
+    requester_email_recipients = []
+  }
+
   approval_workflow {
     manual_approvals {
       require_approver_justification = true
       steps {
         approvals_needed          = 1
-        approver_email_recipients = ["audit-team@example.com"]
+        approver_email_recipients = ["security-team@example.com"]
         approvers {
           principals = ["group:security-approvers@google.com"]
         }
@@ -36,3 +41,4 @@ resource "google_privileged_access_manager_entitlement" "nc123" {
     }
   }
 }
+

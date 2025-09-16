@@ -1,4 +1,5 @@
 package terraform.gcp.security.privileged_access_manager.entitlement.max_request_duration
+
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.privileged_access_manager.entitlement.vars
 
@@ -9,10 +10,10 @@ conditions := [
       "remedies": ["Set max_request_duration to 3600s (1 hour) or less"]
     },
     {
-      "condition": "Check if max_request_duration is at or below 3600 seconds",
+      "condition": "Check if max_request_duration exceeds 3600 seconds",
       "attribute_path": ["max_request_duration"],
-      "values": [null, 3600],
-      "policy_type": "range"
+      "values": ["3600s"],
+      "policy_type": "whitelist"
     }
   ]
 ]

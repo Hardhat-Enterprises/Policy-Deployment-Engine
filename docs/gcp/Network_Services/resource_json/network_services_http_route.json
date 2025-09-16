@@ -1,0 +1,888 @@
+{
+  "resource_name": "network_services_http_route",
+  "subcategory": "Network Services",
+  "arguments": {
+    "hostnames": {
+      "description": "Set of hosts that should match against the HTTP host header to select a HttpRoute to process the request.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "rules": {
+      "description": "Rules that define how traffic is routed and handled. Structure is [documented below](#nested_rules).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "matches": {
+          "description": "A list of matches define conditions used for matching the rule against incoming HTTP requests. Each match is independent, i.e. this rule will be matched if ANY one of the matches is satisfied. If no matches field is specified, this rule will unconditionally match traffic. If a default rule is desired to be configured, add a rule with no matches specified to the end of the rules list. Structure is [documented below](#nested_rules_rules_matches).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        },
+        "action": {
+          "description": "The detailed rule defining how to route matched traffic. Structure is [documented below](#nested_rules_rules_action).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        }
+      }
+    },
+    "name": {
+      "description": "Name of the HttpRoute resource.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "labels": {
+      "description": "Set of label tags associated with the HttpRoute resource. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "A free-text description of the resource. Max length 1024 characters.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "meshes": {
+      "description": "Meshes defines a list of meshes this HttpRoute is attached to, as one of the routing rules to route the requests served by the mesh. Each mesh reference should match the pattern: projects/*/locations/global/meshes/<mesh_name>. The attached Mesh should be of a type SIDECAR.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "gateways": {
+      "description": "Gateways defines a list of gateways this HttpRoute is attached to, as one of the routing rules to route the requests served by the gateway. Each gateway reference should match the pattern: projects/*/locations/global/gateways/<gateway_name>",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "matches": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "ignore_case": {
+          "description": "Specifies if prefixMatch and fullPathMatch matches are case sensitive. The default value is false.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "matches"
+        },
+        "full_path_match": {
+          "description": "The HTTP request path value should exactly match this value.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "matches"
+        },
+        "prefix_match": {
+          "description": "The HTTP request path value must begin with specified prefixMatch. prefixMatch must begin with a /.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "matches"
+        },
+        "regex_match": {
+          "description": "The HTTP request path value must satisfy the regular expression specified by regexMatch after removing any query parameters and anchor supplied with the original URL. For regular expression grammar, please see https://github.com/google/re2/wiki/Syntax",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "matches"
+        },
+        "query_parameters": {
+          "description": "Specifies a list of query parameters to match against. Structure is [documented below](#nested_rules_rules_matches_matches_query_parameters).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "matches"
+        },
+        "headers": {
+          "description": "Specifies a list of HTTP request headers to match against. Structure is [documented below](#nested_rules_rules_matches_matches_headers).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "matches"
+        }
+      }
+    },
+    "query_parameters": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "query_parameter": {
+          "description": "The name of the query parameter to match.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "query_parameters"
+        },
+        "exact_match": {
+          "description": "The value of the query parameter must exactly match the contents of exactMatch.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "query_parameters"
+        },
+        "regex_match": {
+          "description": "The value of the query parameter must match the regular expression specified by regexMatch.For regular expression grammar, please see https://github.com/google/re2/wiki/Syntax",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "query_parameters"
+        },
+        "present_match": {
+          "description": "Specifies that the QueryParameterMatcher matches if request contains query parameter, irrespective of whether the parameter has a value or not.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "query_parameters"
+        }
+      }
+    },
+    "headers": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "header": {
+          "description": "The name of the HTTP header to match against.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "headers"
+        },
+        "invert_match": {
+          "description": "If specified, the match result will be inverted before checking. Default value is set to false.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "headers"
+        },
+        "exact_match": {
+          "description": "The value of the header should match exactly the content of exactMatch.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "headers"
+        },
+        "regex_match": {
+          "description": "The value of the header must match the regular expression specified in regexMatch.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "headers"
+        },
+        "prefix_match": {
+          "description": "The value of the header must start with the contents of prefixMatch.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "headers"
+        },
+        "present_match": {
+          "description": "A header with headerName must exist. The match takes place whether or not the header has a value.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "headers"
+        },
+        "suffix_match": {
+          "description": "The value of the header must end with the contents of suffixMatch.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "headers"
+        },
+        "range_match": {
+          "description": "If specified, the rule will match if the request header value is within the range. Structure is [documented below](#nested_rules_rules_matches_matches_headers_headers_range_match).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "headers"
+        }
+      }
+    },
+    "range_match": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "start": {
+          "description": "Start of the range (inclusive).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "range_match"
+        },
+        "end": {
+          "description": "End of the range (exclusive).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "range_match"
+        }
+      }
+    },
+    "action": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "destinations": {
+          "description": "The destination to which traffic should be forwarded. Structure is [documented below](#nested_rules_rules_action_destinations).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "action"
+        },
+        "redirect": {
+          "description": "If set, the request is directed as configured by this field. Structure is [documented below](#nested_rules_rules_action_redirect).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "action"
+        },
+        "fault_injection_policy": {
+          "description": "The specification for fault injection introduced into traffic to test the resiliency of clients to backend service failure. Structure is [documented below](#nested_rules_rules_action_fault_injection_policy).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "action"
+        },
+        "request_header_modifier": {
+          "description": "The specification for modifying the headers of a matching request prior to delivery of the request to the destination. Structure is [documented below](#nested_rules_rules_action_request_header_modifier).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "action"
+        },
+        "response_header_modifier": {
+          "description": "The specification for modifying the headers of a response prior to sending the response back to the client. Structure is [documented below](#nested_rules_rules_action_response_header_modifier).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "action"
+        },
+        "url_rewrite": {
+          "description": "The specification for rewrite URL before forwarding requests to the destination. Structure is [documented below](#nested_rules_rules_action_url_rewrite).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "action"
+        },
+        "timeout": {
+          "description": "Specifies the timeout for selected route.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "action"
+        },
+        "retry_policy": {
+          "description": "Specifies the retry policy associated with this route. Structure is [documented below](#nested_rules_rules_action_retry_policy).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "action"
+        },
+        "request_mirror_policy": {
+          "description": "Specifies the policy on how requests intended for the routes destination are shadowed to a separate mirrored destination. Structure is [documented below](#nested_rules_rules_action_request_mirror_policy).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "action"
+        },
+        "cors_policy": {
+          "description": "The specification for allowing client side cross-origin requests. Structure is [documented below](#nested_rules_rules_action_cors_policy).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "action"
+        }
+      }
+    },
+    "destinations": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "service_name": {
+          "description": "The URL of a BackendService to route traffic to.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "destinations"
+        },
+        "weight": {
+          "description": "Specifies the proportion of requests forwarded to the backend referenced by the serviceName field. This is computed as: weight/Sum(weights in this destination list). For non-zero values, there may be some epsilon from the exact proportion defined here depending on the precision an implementation supports. If only one serviceName is specified and it has a weight greater than 0, 100% of the traffic is forwarded to that backend. If weights are specified for any one service name, they need to be specified for all of them. If weights are unspecified for all services, then, traffic is distributed in equal proportions to all of them.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "destinations"
+        }
+      }
+    },
+    "redirect": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "host_redirect": {
+          "description": "The host that will be used in the redirect response instead of the one that was supplied in the request.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "redirect"
+        },
+        "path_redirect": {
+          "description": "The path that will be used in the redirect response instead of the one that was supplied in the request. pathRedirect can not be supplied together with prefixRedirect. Supply one alone or neither. If neither is supplied, the path of the original request will be used for the redirect.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "redirect"
+        },
+        "prefix_rewrite": {
+          "description": "Indicates that during redirection, the matched prefix (or path) should be swapped with this value.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "redirect"
+        },
+        "response_code": {
+          "description": "The HTTP Status code to use for the redirect.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "redirect"
+        },
+        "https_redirect": {
+          "description": "If set to true, the URL scheme in the redirected request is set to https.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "redirect"
+        },
+        "strip_query": {
+          "description": "If set to true, any accompanying query portion of the original URL is removed prior to redirecting the request.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "redirect"
+        },
+        "port_redirect": {
+          "description": "The port that will be used in the redirected request instead of the one that was supplied in the request.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "redirect"
+        }
+      }
+    },
+    "fault_injection_policy": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "delay": {
+          "description": "Specification of how client requests are delayed as part of fault injection before being sent to a destination. Structure is [documented below](#nested_rules_rules_action_fault_injection_policy_delay).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "fault_injection_policy"
+        },
+        "abort": {
+          "description": "Specification of how client requests are aborted as part of fault injection before being sent to a destination. Structure is [documented below](#nested_rules_rules_action_fault_injection_policy_abort).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "fault_injection_policy"
+        }
+      }
+    },
+    "delay": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "fixed_delay": {
+          "description": "Specify a fixed delay before forwarding the request.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "delay"
+        },
+        "percentage": {
+          "description": "The percentage of traffic on which delay will be injected.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "delay"
+        }
+      }
+    },
+    "abort": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "http_status": {
+          "description": "The HTTP status code used to abort the request.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "abort"
+        },
+        "percentage": {
+          "description": "The percentage of traffic which will be aborted.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "abort"
+        }
+      }
+    },
+    "request_header_modifier": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "set": {
+          "description": "Completely overwrite/replace the headers with given map where key is the name of the header, value is the value of the header.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "request_header_modifier"
+        },
+        "add": {
+          "description": "Add the headers with given map where key is the name of the header, value is the value of the header.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "request_header_modifier"
+        },
+        "remove": {
+          "description": "Remove headers (matching by header names) specified in the list.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "request_header_modifier"
+        }
+      }
+    },
+    "response_header_modifier": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "set": {
+          "description": "Completely overwrite/replace the headers with given map where key is the name of the header, value is the value of the header.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "response_header_modifier"
+        },
+        "add": {
+          "description": "Add the headers with given map where key is the name of the header, value is the value of the header.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "response_header_modifier"
+        },
+        "remove": {
+          "description": "Remove headers (matching by header names) specified in the list.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "response_header_modifier"
+        }
+      }
+    },
+    "url_rewrite": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "path_prefix_rewrite": {
+          "description": "Prior to forwarding the request to the selected destination, the matching portion of the requests path is replaced by this value.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "url_rewrite"
+        },
+        "host_rewrite": {
+          "description": "Prior to forwarding the request to the selected destination, the requests host header is replaced by this value.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "url_rewrite"
+        }
+      }
+    },
+    "retry_policy": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "retry_conditions": {
+          "description": "Specifies one or more conditions when this retry policy applies.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "retry_policy"
+        },
+        "num_retries": {
+          "description": "Specifies the allowed number of retries.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "retry_policy"
+        },
+        "per_try_timeout": {
+          "description": "Specifies a non-zero timeout per retry attempt. A duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.5s\".",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "retry_policy"
+        }
+      }
+    },
+    "request_mirror_policy": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "destination": {
+          "description": "The destination the requests will be mirrored to. Structure is [documented below](#nested_rules_rules_action_request_mirror_policy_destination).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "request_mirror_policy"
+        }
+      }
+    },
+    "destination": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "service_name": {
+          "description": "The URL of a BackendService to route traffic to.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "destination"
+        },
+        "weight": {
+          "description": "Specifies the proportion of requests forwarded to the backend referenced by the serviceName field. This is computed as: weight/Sum(weights in this destination list). For non-zero values, there may be some epsilon from the exact proportion defined here depending on the precision an implementation supports. If only one serviceName is specified and it has a weight greater than 0, 100% of the traffic is forwarded to that backend. If weights are specified for any one service name, they need to be specified for all of them. If weights are unspecified for all services, then, traffic is distributed in equal proportions to all of them.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "destination"
+        }
+      }
+    },
+    "cors_policy": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "allow_origins": {
+          "description": "Specifies the list of origins that will be allowed to do CORS requests.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cors_policy"
+        },
+        "allow_origin_regexes": {
+          "description": "Specifies the regular expression patterns that match allowed origins.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cors_policy"
+        },
+        "allow_methods": {
+          "description": "Specifies the content for Access-Control-Allow-Methods header.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cors_policy"
+        },
+        "allow_headers": {
+          "description": "Specifies the content for Access-Control-Allow-Headers header.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cors_policy"
+        },
+        "expose_headers": {
+          "description": "Specifies the content for Access-Control-Expose-Headers header.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cors_policy"
+        },
+        "max_age": {
+          "description": "Specifies how long result of a preflight request can be cached in seconds.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cors_policy"
+        },
+        "allow_credentials": {
+          "description": "In response to a preflight request, setting this to true indicates that the actual request can include user credentials.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cors_policy"
+        },
+        "disabled": {
+          "description": "If true, the CORS policy is disabled. The default value is false, which indicates that the CORS policy is in effect.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cors_policy"
+        }
+      }
+    }
+  }
+}

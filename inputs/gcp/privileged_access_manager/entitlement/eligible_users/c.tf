@@ -12,7 +12,6 @@ resource "google_privileged_access_manager_entitlement" "c123" {
     principals = [
       "group:authorized-admins@example.com",
       "user:admin-user@example.com",
-      "serviceAccount:my-service-account@my-project.iam.gserviceaccount.com"
     ]
   }
 

@@ -6,14 +6,26 @@ import data.terraform.gcp.security.privileged_access_manager.entitlement.vars
 conditions := [
     [
         {
-            "situation_description": "Entitlement does not have an approval workflow configured",
-            "remedies": ["Add an approval_workflow block with appropriate approval steps"]
+            "situation_description": "Approvals needed is outside the acceptable range (1-3)",
+            "remedies": ["Set approvals_needed to a value between 1 and 3 inclusive"]
         },
         {
-            "condition": "Check if approval_workflow is configured",
-            "attribute_path": ["approval_workflow"],
-            "values": [null, {}],
-            "policy_type": "blacklist"
+            "condition": "Check if approvals_needed is within range 1-3",
+            "attribute_path": ["approval_workflow", 0, "manual_approvals", 0, "steps", 0, "approvals_needed"],
+            "values": [1, 3],
+            "policy_type": "range"
+        }
+    ],
+        [
+        {
+            "situation_description": "Approver justification is not required",
+            "remedies": ["Set require_approver_justification to true"]
+        },
+        {
+            "condition": "Check if require_approver_justification is true",
+            "attribute_path": ["approval_workflow", 0, "manual_approvals", 0, "require_approver_justification"],
+            "values": [true],
+            "policy_type": "whitelist"
         }
     ]
 ]

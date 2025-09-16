@@ -13,7 +13,7 @@ resource "google_privileged_access_manager_entitlement" "nc123" {
       resource_type = "cloudresourcemanager.googleapis.com/Project"
       resource      = "//cloudresourcemanager.googleapis.com/projects/my-project-name"
       role_bindings {
-        role = "roles/owner"
+        role = "roles/privilegedaccessmanager.folderServiceAgent"
       }
     }
   }

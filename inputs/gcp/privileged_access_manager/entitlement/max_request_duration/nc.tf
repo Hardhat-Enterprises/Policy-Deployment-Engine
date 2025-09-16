@@ -2,7 +2,7 @@ resource "google_privileged_access_manager_entitlement" "nc123" {
   entitlement_id       = "nc123"
   location             = "global"
   parent               = "projects/my-project"
-  max_request_duration = "7200s" 
+  max_request_duration = "10,800s" 
 
   requester_justification_config {
     unstructured {}
