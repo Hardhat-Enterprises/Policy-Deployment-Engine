@@ -11,12 +11,12 @@ conditions := [[
             "Use soft delete to allow recovery of objects"
         ]
     },
-    {
-        "condition": "permanent_object_deletion_enabled must not be true",
-        "attribute_path": ["delete_object", 0, "permanent_object_deletion_enabled"],
-        "values": [true],
-        "policy_type": "blacklist"
-    }
+        {
+            "condition": "permanent_object_deletion_enabled must not be true",
+            "attribute_path": ["delete_object", 0, "permanent_object_deletion_enabled"],
+            "policy_type": "blacklist",
+            "values": [true]
+        }
 ]]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message

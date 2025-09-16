@@ -12,12 +12,12 @@ conditions := [[
             "Or omit put_object_hold block entirely"
         ]
     },
-    {
-        "condition": "event_based_hold must not be false",
-        "attribute_path": ["put_object_hold", 0, "event_based_hold"],
-        "values": ["UNSET"],
-        "policy_type": "blacklist"
-    }
+        {
+            "condition": "event_based_hold must not be false",
+            "attribute_path": ["put_object_hold", 0, "event_based_hold"],
+            "policy_type": "blacklist",
+            "values": ["UNSET"]
+        }
 ]]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message

@@ -1,10 +1,7 @@
-# Cloud Storage Batch Operations — non-compliant (rewrite_requires_cmek — missing/empty CMEK key)
-
 resource "google_storage_batch_operations_job" "nc" {
   provider = google-beta
   project  = "test-project"
-  job_id   = "nc-job"
-
+  job_id   = "nc"
   bucket_list {
     buckets {
       bucket = "my-bucket"
@@ -13,7 +10,6 @@ resource "google_storage_batch_operations_job" "nc" {
       }
     }
   }
-
   rewrite_object {
     kms_key = ""
   }

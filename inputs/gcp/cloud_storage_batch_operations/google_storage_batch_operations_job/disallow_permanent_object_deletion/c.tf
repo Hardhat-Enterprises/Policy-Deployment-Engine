@@ -1,9 +1,7 @@
-# Cloud Storage Batch Operations — compliant (disallow_permanent_object_deletion — permanent deletion disabled)
-
 resource "google_storage_batch_operations_job" "c" {
   provider = google-beta
   project  = "test-project"
-  job_id   = "c-job"
+  job_id   = "c"
 
   bucket_list {
     buckets {
