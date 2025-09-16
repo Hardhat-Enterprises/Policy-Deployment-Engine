@@ -5,46 +5,46 @@
     "filter_config": {
       "description": "Filters configuration. Structure is [documented below](#nested_filter_config).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Controls which filters (malicious URI, Responsible AI, sensitive data, prompt-injection) are active. Misconfiguration could allow harmful or sensitive data to pass unchecked.",
+      "compliant": "Properly configured filters covering all required categories.",
+      "non-compliant": "Filters disabled or missing critical protections.",
       "parent": null,
       "arguments": {
         "malicious_uri_filter_settings": {
           "description": "Malicious URI filter settings. Structure is [documented below](#nested_filter_config_malicious_uri_filter_settings).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Prevents injection of malicious URLs. Disabling increases phishing or malware risk.",
+          "compliant": "filter_enforcement set to ENABLED.",
+          "non-compliant": "filter_enforcement set to DISABLED.",
           "parent": "filter_config"
         },
         "rai_settings": {
           "description": "Responsible AI Filter settings. Structure is [documented below](#nested_filter_config_rai_settings).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Helps block hate speech, harassment, or dangerous content from LLM responses.",
+          "compliant": "All required RAI filters enabled.",
+          "non-compliant": "RAI filters missing or disabled.",
           "parent": "filter_config"
         },
         "sdp_settings": {
           "description": "Sensitive Data Protection settings. Structure is [documented below](#nested_filter_config_sdp_settings).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Detects and masks personal or sensitive data. Disabling risks data leakage and compliance violations.",
+          "compliant": "Sensitive data filters enabled with correct templates.",
+          "non-compliant": "Sensitive data filters disabled or incomplete.",
           "parent": "filter_config"
         },
         "pi_and_jailbreak_filter_settings": {
           "description": "Prompt injection and Jailbreak Filter settings. Structure is [documented below](#nested_filter_config_pi_and_jailbreak_filter_settings).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Blocks attempts to override safeguards or exfiltrate data via prompt injection.",
+          "compliant": "filter_enforcement set to ENABLED.",
+          "non-compliant": "filter_enforcement set to DISABLED.",
           "parent": "filter_config"
         }
       }
@@ -52,16 +52,16 @@
     "location": {
       "description": "Resource ID segment making up resource `name`. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Region choice affects data residency and regulatory compliance.",
+      "compliant": "Deployment region meets organization’s compliance requirements.",
+      "non-compliant": "Deployment region violates data residency rules.",
       "parent": null
     },
     "template_id": {
       "description": "Id of the requesting object If auto-generating Id server-side, remove this field and template_id from the method_signature of Create RPC",
       "required": true,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -229,19 +229,19 @@
         "filter_type": {
           "description": "Possible values: SEXUALLY_EXPLICIT HATE_SPEECH HARASSMENT DANGEROUS",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Specifies which harmful content categories to filter. Omitting critical categories can allow unsafe output.",
+          "compliant": "Includes all required categories (e.g., SEXUALLY_EXPLICIT, HATE_SPEECH, HARASSMENT, DANGEROUS).",
+          "non-compliant": "Missing any mandated category or set incorrectly.",
           "parent": "rai_filters"
         },
         "confidence_level": {
           "description": "Possible values: LOW_AND_ABOVE MEDIUM_AND_ABOVE HIGH",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Determines sensitivity of detection. Too low can allow harmful content through; too high can overblock legitimate content.",
+          "compliant": "Configured to MEDIUM_AND_ABOVE or higher per policy.",
+          "non-compliant": "LOW_ONLY",
           "parent": "rai_filters"
         }
       }

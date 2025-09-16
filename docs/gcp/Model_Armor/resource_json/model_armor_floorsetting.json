@@ -5,46 +5,46 @@
     "filter_config": {
       "description": "Filters configuration. Structure is [documented below](#nested_filter_config).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Central configuration for malicious-URI, Responsible-AI, sensitive-data and prompt-injection filters. Misconfiguration may allow harmful or sensitive content to pass unchecked.",
+      "compliant": "MEDIUM_AND_ABOVE",
+      "non-compliant": " ",
       "parent": null,
       "arguments": {
         "malicious_uri_filter_settings": {
           "description": "Malicious URI filter settings. Structure is [documented below](#nested_filter_config_malicious_uri_filter_settings).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Controls detection of malicious links to prevent data exfiltration and phishing.",
+          "compliant": "filter_enforcement set to ENABLED",
+          "non-compliant": "filter_enforcement set to DISABLED",
           "parent": "filter_config"
         },
         "rai_settings": {
           "description": "Responsible AI Filter settings. Structure is [documented below](#nested_filter_config_rai_settings).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Helps ensure generated content adheres to Responsible AI guidelines.",
+          "compliant": "rai_filters defined for all required categories.",
+          "non-compliant": "No rai_filters configured.",
           "parent": "filter_config"
         },
         "sdp_settings": {
           "description": "Sensitive Data Protection settings. Structure is [documented below](#nested_filter_config_sdp_settings).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Prevents exposure of sensitive or regulated information.",
+          "compliant": "basic_config.filter_enforcement = ENABLED",
+          "non-compliant": "All configs disabled.",
           "parent": "filter_config"
         },
         "pi_and_jailbreak_filter_settings": {
           "description": "Prompt injection and Jailbreak Filter settings. Structure is [documented below](#nested_filter_config_pi_and_jailbreak_filter_settings).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Blocks malicious attempts to override system instructions or leak data.",
+          "compliant": "filter_enforcement set to ENABLED",
+          "non-compliant": "filter_enforcement set to DISABLED",
           "parent": "filter_config"
         }
       }
@@ -52,19 +52,19 @@
     "location": {
       "description": "Resource ID segment making up resource `name`. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Determines the region where data is stored and processed, impacting compliance with data-residency and privacy regulations.",
+      "compliant": "global",
+      "non-compliant": "us-east1",
       "parent": null
     },
     "parent": {
       "description": "Will be any one of these: * `projects/{project}` * `folders/{folder}` * `organizations/{organizationId}`",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Ensures policies are attached to the correct project, folder, or organization for proper governance.",
+      "compliant": "projects/my-secure-project",
+      "non-compliant": "projects/wrong-project",
       "parent": null
     },
     "enable_floor_setting_enforcement": {
@@ -195,19 +195,19 @@
         "filter_type": {
           "description": "Possible values: SEXUALLY_EXPLICIT HATE_SPEECH HARASSMENT DANGEROUS",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Determines which harmful content is blocked.",
+          "compliant": "SEXUAL",
+          "non-compliant": "INVALID_TYPE",
           "parent": "rai_filters"
         },
         "confidence_level": {
           "description": "Possible values: LOW_AND_ABOVE MEDIUM_AND_ABOVE HIGH",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Higher thresholds reduce false positives but may allow harmful content if too low.",
+          "compliant": "MEDIUM_AND_ABOVE",
+          "non-compliant": "LOW_ONLY",
           "parent": "rai_filters"
         }
       }
@@ -302,19 +302,19 @@
         "filter_enforcement": {
           "description": "Tells whether Prompt injection and Jailbreak filter is enabled or disabled. Possible values: ENABLED DISABLED",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Disabling increases risk of prompt manipulation.",
+          "compliant": "ENABLED",
+          "non-compliant": "DISABLED",
           "parent": "pi_and_jailbreak_filter_settings"
         },
         "confidence_level": {
           "description": "Possible values: LOW_AND_ABOVE MEDIUM_AND_ABOVE HIGH",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Determines sensitivity to possible prompt injection attempts.",
+          "compliant": "MEDIUM_AND_ABOVE",
+          "non-compliant": "HIGH",
           "parent": "pi_and_jailbreak_filter_settings"
         }
       }
