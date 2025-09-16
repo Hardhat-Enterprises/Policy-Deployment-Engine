@@ -6,5 +6,4 @@ variables := {
     "friendly_resource_name": "cmek_config",
     "resource_type":  "google_discovery_engine_cmek_config",
     "resource_value_name" : "cmek_config_id"
-    # Not sure if the above line is needed, its not in the tutorial.
 }
