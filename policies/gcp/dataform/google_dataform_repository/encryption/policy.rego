@@ -6,7 +6,22 @@ import data.terraform.gcp.security.dataform.google_dataform_repository.vars
 conditions := [
   [
     {
-      "situation_description": "CMEK must be set (kms_key_name cannot be empty or null).",
+      "situation_description": "CMEK must be set (kms_key_name cannot be null).",
+      "remedies": [
+        "Populate kms_key_name with a valid CMEK path.",
+        "Ensure key exists in the same/approved region."
+      ]
+    },
+    {
+      "condition": "kms_key_name must not be null",
+      "attribute_path": ["kms_key_name"],
+      "values": [null],
+      "policy_type": "blacklist"
+    }
+  ],
+  [
+    {
+      "situation_description": "CMEK must be set (kms_key_name cannot be empty).",
       "remedies": [
         "Populate kms_key_name with a valid CMEK path.",
         "Ensure key exists in the same/approved region."
@@ -15,7 +30,7 @@ conditions := [
     {
       "condition": "kms_key_name must not be empty",
       "attribute_path": ["kms_key_name"],
-      "values": [null, ""],
+      "values": [""],
       "policy_type": "blacklist"
     }
   ],
@@ -30,7 +45,7 @@ conditions := [
     {
       "condition": "kms_key_name must match CMEK resource format",
       "attribute_path": ["kms_key_name"],
-      "values": ["projects/*/locations/*/keyRings/*/cryptoKeys/*"],
+      "values": ["projects/*/locations/*/keyRings/*/cryptoKeys/*", ["projects", "*", "locations", "*", "keyRings", "*", "cryptoKeys", "*"]],
       "policy_type": "pattern whitelist"
     }
   ]
