@@ -3,22 +3,22 @@ package terraform.gcp.security.service_networking.network
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.service_networking.network.vars
 
-banned_networks := vars.variables["banned_networks"]
+allowed_networks := vars.variables["allowed_networks"]
 
 conditions := [
   [
     {
-      "situation_description": "The service networking connection is attached to a banned VPC network (default/dev/test).",
+      "situation_description": "The service networking connection must only attach to whitelisted VPC networks.",
       "remedies": [
-        "Attach the service networking connection to an approved shared VPC network.",
-        "Avoid using the default, dev, or test networks for production resources."
+        "Attach the service networking connection to an approved shared or production VPC network.",
+        "Avoid using default, dev, or test networks for production resources."
       ],
     },
     {
-      "condition": "network is NOT a banned value",
-      "attribute_path": ["network"],
-      "values": banned_networks,
-      "policy_type": "blacklist"
+      "condition": "network is a whitelisted value",
+      "attribute_path": ["planned_values", "root_module", "resources", "*", "values", "network"],
+      "values": allowed_networks,
+      "policy_type": "whitelist"
     },
   ]
 ]
