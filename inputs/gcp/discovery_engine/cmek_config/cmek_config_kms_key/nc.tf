@@ -1,5 +1,5 @@
 
-#CMEK CONFIG NC
+#CMEK CONFIG C
 
 resource "google_discovery_engine_cmek_config" "nc" {
   location       = "eu"
@@ -10,4 +10,5 @@ resource "google_discovery_engine_cmek_config" "nc" {
   project        = "735927692082"
   set_default    = true
 }
+
 
