@@ -1,7 +1,3 @@
-variable "project" {
-  type = string
-}
-
 resource "google_looker_instance" "bad" {
   name    = "bad"
   project = var.project

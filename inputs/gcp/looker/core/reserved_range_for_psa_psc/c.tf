@@ -1,8 +1,4 @@
-variable "project" {
-  type = string
-}
-
-resource "google_looker_instance" "ok" {
+﻿resource "google_looker_instance" "ok" {
   name           = "ok"
   project        = var.project
   reserved_range = "projects/test-project-123/global/addresses/test-reserved-range"

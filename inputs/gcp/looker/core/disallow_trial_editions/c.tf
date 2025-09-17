@@ -1,4 +1,4 @@
-# Compliant Looker Core instance with production platform edition
+﻿# Compliant Looker Core instance with production platform edition
 # This resource is compliant because platform_edition is not a trial SKU
 
 resource "google_looker_instance" "c" {
@@ -15,6 +15,3 @@ resource "google_looker_instance" "c" {
   }
 }
 
-variable "project" {
-  type = string
-}

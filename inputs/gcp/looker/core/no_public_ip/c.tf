@@ -1,4 +1,4 @@
-# Compliant Looker Core instance with public IP disabled
+﻿# Compliant Looker Core instance with public IP disabled
 # This resource is compliant because public_ip_enabled is set to false
 
 resource "google_looker_instance" "c" {
@@ -15,6 +15,3 @@ resource "google_looker_instance" "c" {
   }
 }
 
-variable "project" {
-  type = string
-}

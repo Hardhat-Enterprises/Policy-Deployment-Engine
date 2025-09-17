@@ -1,8 +1,4 @@
-variable "project" {
-  type = string
-}
-
-resource "google_looker_instance" "bad" {
+﻿resource "google_looker_instance" "bad" {
   name    = "bad" 
   project = var.project
   oauth_config {
@@ -10,3 +6,4 @@ resource "google_looker_instance" "bad" {
     client_secret = "test-client-secret"
   }
 }
+
