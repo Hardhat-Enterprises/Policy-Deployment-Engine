@@ -1,0 +1,234 @@
+{
+  "resource_name": "discovery_engine_recommendation_engine",
+  "subcategory": "Discovery Engine",
+  "arguments": {
+    "display_name": {
+      "description": "Required. The display name of the engine. Should be human readable. UTF-8 encoded string with limit of 1024 characters.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "data_store_ids": {
+      "description": "The data stores associated with this engine. For SOLUTION_TYPE_RECOMMENDATION type of engines, they can only associate with at most one data store.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "engine_id": {
+      "description": "Unique ID to use for Recommendation Engine.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "location": {
+      "description": "The geographic location where the data store should reside. The value can only be one of \"global\", \"us\" and \"eu\".",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "industry_vertical": {
+      "description": "The industry vertical that the engine registers. The restriction of the Engine industry vertical is based on DataStore: If unspecified, default to GENERIC. Vertical on Engine has to match vertical of the DataStore liniked to the engine. Default value is `GENERIC`. Possible values are: `GENERIC`, `MEDIA`.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "media_recommendation_engine_config": {
+      "description": "Configurations for a Media Recommendation Engine. Only applicable on the data stores with SOLUTION_TYPE_RECOMMENDATION solution type and MEDIA industry vertical. Structure is [documented below](#nested_media_recommendation_engine_config).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "type": {
+          "description": "The type of engine. e.g., `recommended-for-you`. This field together with MediaRecommendationEngineConfig.optimizationObjective describes engine metadata to use to control engine training and serving. Currently supported values: `recommended-for-you`, `others-you-may-like`, `more-like-this`, `most-popular-items`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "media_recommendation_engine_config"
+        },
+        "optimization_objective": {
+          "description": "The optimization objective. e.g., `cvr`. This field together with MediaRecommendationEngineConfig.type describes engine metadata to use to control engine training and serving. Currently supported values: `ctr`, `cvr`. If not specified, we choose default based on engine type. Default depends on type of recommendation: `recommended-for-you` => `ctr` `others-you-may-like` => `ctr`",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "media_recommendation_engine_config"
+        },
+        "optimization_objective_config": {
+          "description": "Name and value of the custom threshold for cvr optimization_objective. For target_field `watch-time`, target_field_value must be an integer value indicating the media progress time in seconds between (0, 86400] (excludes 0, includes 86400) (e.g., 90). For target_field `watch-percentage`, the target_field_value must be a valid float value between (0, 1.0] (excludes 0, includes 1.0) (e.g., 0.5). Structure is [documented below](#nested_media_recommendation_engine_config_optimization_objective_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "media_recommendation_engine_config"
+        },
+        "training_state": {
+          "description": "The training state that the engine is in (e.g. `TRAINING` or `PAUSED`). Since part of the cost of running the service is frequency of training - this can be used to determine when to train engine in order to control cost. If not specified: the default value for `CreateEngine` method is `TRAINING`. The default value for `UpdateEngine` method is to keep the state the same as before. Possible values are: `PAUSED`, `TRAINING`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "media_recommendation_engine_config"
+        },
+        "engine_features_config": {
+          "description": "More feature configs of the selected engine type. Structure is [documented below](#nested_media_recommendation_engine_config_engine_features_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "media_recommendation_engine_config"
+        }
+      }
+    },
+    "common_config": {
+      "description": "Common config spec that specifies the metadata of the engine. Structure is [documented below](#nested_common_config).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "company_name": {
+          "description": "The name of the company, business or entity that is associated with the engine. Setting this may help improve LLM related features.cd",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "common_config"
+        }
+      }
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "optimization_objective_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "target_field": {
+          "description": "The name of the field to target. Currently supported values: `watch-percentage`, `watch-time`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "optimization_objective_config"
+        },
+        "target_field_value_float": {
+          "description": "The threshold to be applied to the target (e.g., 0.5).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "optimization_objective_config"
+        }
+      }
+    },
+    "engine_features_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "recommended_for_you_config": {
+          "description": "Additional feature configurations for creating a `recommended-for-you` engine. Structure is [documented below](#nested_media_recommendation_engine_config_engine_features_config_recommended_for_you_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "engine_features_config"
+        },
+        "most_popular_config": {
+          "description": "Feature configurations that are required for creating a Most Popular engine. Structure is [documented below](#nested_media_recommendation_engine_config_engine_features_config_most_popular_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "engine_features_config"
+        }
+      }
+    },
+    "recommended_for_you_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "context_event_type": {
+          "description": "The type of event with which the engine is queried at prediction time. If set to `generic`, only `view-item`, `media-play`,and `media-complete` will be used as `context-event` in engine training. If set to `view-home-page`, `view-home-page` will also be used as `context-events` in addition to `view-item`, `media-play`, and `media-complete`. Currently supported for the `recommended-for-you` engine. Currently supported values: `view-home-page`, `generic`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "recommended_for_you_config"
+        }
+      }
+    },
+    "most_popular_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "time_window_days": {
+          "description": "The time window of which the engine is queried at training and prediction time. Positive integers only. The value translates to the last X days of events. Currently required for the `most-popular-items` engine.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "most_popular_config"
+        }
+      }
+    }
+  }
+}
