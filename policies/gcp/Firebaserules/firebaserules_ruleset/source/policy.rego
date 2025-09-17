@@ -1,1 +1,0 @@
-package PACKAGE_NAME
