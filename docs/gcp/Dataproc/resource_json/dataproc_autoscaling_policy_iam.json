@@ -3,7 +3,7 @@
   "subcategory": "Dataproc",
   "arguments": {
     "location": {
-      "description": "The default value is `global`. Used to find the parent resource to bind the IAM policy to. If not specified, the value will be parsed from the identifier of the parent resource. If no location is provided in the parent identifier and no location is specified, it is taken from the provider configuration.",
+      "description": "The location where the autoscaling policy resides.",
       "required": null,
       "security_impact": null,
       "rationale": null,
@@ -12,7 +12,7 @@
       "parent": null
     },
     "policy_id": {
-      "description": "",
+      "description": "The ID of the autoscaling policy to which the IAM policy is applied.",
       "required": null,
       "security_impact": null,
       "rationale": null,
@@ -21,7 +21,7 @@
       "parent": null
     },
     "project": {
-      "description": "If it is not provided, the project will be parsed from the identifier of the parent resource. If no project is provided in the parent identifier and no project is specified, the provider project is used.",
+      "description": "The project ID of the parent resource.",
       "required": null,
       "security_impact": null,
       "rationale": null,
@@ -30,30 +30,21 @@
       "parent": null
     },
     "member/members": {
-      "description": "Each entry can have one of the following values: * **allUsers**: A special identifier that represents anyone who is on the internet; with or without a Google account. * **allAuthenticatedUsers**: A special identifier that represents anyone who is authenticated with a Google account or a service account. * **user:{emailid}**: An email address that represents a specific Google account. For example, alice@gmail.com or joe@example.com. * **serviceAccount:{emailid}**: An email address that represents a service account. For example, my-other-app@appspot.gserviceaccount.com. * **group:{emailid}**: An email address that represents a Google group. For example, admins@example.com. * **domain:{domain}**: A G Suite domain (primary, instead of alias) name that represents all the users of that domain. For example, google.com or example.com. * **projectOwner:projectid**: Owners of the given project. For example, \"projectOwner:my-example-project\" * **projectEditor:projectid**: Editors of the given project. For example, \"projectEditor:my-example-project\" * **projectViewer:projectid**: Viewers of the given project. For example, \"projectViewer:my-example-project\"",
+      "description": "Identities that will be granted the privilege in 'role'.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "High. Granting roles to public principals like 'allUsers' could allow anyone to modify cost-impacting scaling configurations, leading to Denial of Wallet attacks.",
+      "rationale": "To prevent unauthorized changes, permissions must only be granted to specific, known identities.",
+      "compliant": "members = [\"user:admin@example.com\"]",
+      "non-compliant": "members = [\"allAuthenticatedUsers\"]",
       "parent": null
     },
     "role": {
-      "description": "`google_dataproc_autoscaling_policy_iam_binding` can be used per role. Note that custom roles must be of the format `[projects|organizations]/{parent-name}/roles/{role-name}`.",
+      "description": "The role that should be applied.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "policy_data": {
-      "description": "a `google_iam_policy` data source.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "High. Granting primitive roles to an autoscaling policy allows users to make changes that could lead to significant cost overruns or service disruptions.",
+      "rationale": "To protect against financial and operational risks, only users with specific Dataproc autoscaling roles should be granted permissions.",
+      "compliant": "role = \"roles/dataproc.autoscalingViewer\"",
+      "non-compliant": "role = \"roles/owner\"",
       "parent": null
     }
   }
