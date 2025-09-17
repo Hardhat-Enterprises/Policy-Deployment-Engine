@@ -4,8 +4,8 @@ resource "google_folder" "nc" {
   deletion_protection = false
 }
 
-resource "google_folder_access_approval_settings" "nc_folder_access_approval" {
-  folder_id = google_folder.nc.folder_id
+resource "google_folder_access_approval_settings" "nc" {
+  folder_id = "nc"
 
   enrolled_services {
     cloud_product = "none"
