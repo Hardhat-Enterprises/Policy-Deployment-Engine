@@ -17,19 +17,7 @@ conditions := [
     ],
 
     
-    # SCENARIO 2 — Ensure valid CA pool exists
-    [
-        {"situation_description": "mTLS requires a valid CA pool to authenticate clients securely.",
-         "remedies": ["Assign a Google Private CA pool for mTLS authentication."]},
-        {
-            "condition": "At least one CA pool must be configured",
-            "attribute_path": ["tls_config", "trust_config", "cas_configs", 0, "ca_pool"],
-            "values": ["projects/my-project/locations/us-central1/caPools/my-ca-pool"],
-            "policy_type": "whitelist"
-        }
-    ],
-
-    # SCENARIO 3 — TLS config must not be empty
+    # SCENARIO 2 — TLS config must not be empty
     [
         {"situation_description": "Clusters without tls_config are vulnerable to plain-text data transmission.",
          "remedies": ["Always define tls_config with CA pools and trust settings."]},
