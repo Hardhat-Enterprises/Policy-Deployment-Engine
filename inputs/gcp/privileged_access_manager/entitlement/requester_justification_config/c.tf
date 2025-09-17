@@ -1,4 +1,4 @@
-resource "google_privileged_access_manager_entitlement" "compliant" {
+resource "google_privileged_access_manager_entitlement" "c123" {
     entitlement_id = "c123"
     location = "global"
     max_request_duration = "43200s"
