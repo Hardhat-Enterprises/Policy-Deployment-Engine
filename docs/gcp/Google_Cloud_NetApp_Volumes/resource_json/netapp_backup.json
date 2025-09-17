@@ -3,21 +3,21 @@
   "subcategory": "Google Cloud NetApp Volumes",
   "arguments": {
     "location": {
-      "description": "Location of the backup.",
+      "description": "Region of the backup resource.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Data residency and compliance.",
+      "compliant": "australia-southeast2",
+      "non-compliant": "us-central1",
       "parent": null
     },
     "vault_name": {
-      "description": "Name of the backup vault to store the backup in.",
+      "description": "Target backup vault name.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Backups must land in an approved vault with correct IAM/retention.",
+      "compliant": "backup-vault",
+      "non-compliant": "test-vault",
       "parent": null
     },
     "name": {
@@ -39,12 +39,12 @@
       "parent": null
     },
     "source_volume": {
-      "description": "ID of volumes this backup belongs to. Format: `projects/{{projects_id}}/locations/{{location}}/volumes/{{name}}``",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "Full resource ID of the volume to back up.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Ensures backups only for approved volumes in approved regions/projects.",
+      "compliant": "projects/deakin-lab-123/locations/australia-southeast2/volumes/backup-volume",
+      "non-compliant": "projects/other-proj/locations/us-central1/volumes/backup-volume",
       "parent": null
     },
     "labels": {
