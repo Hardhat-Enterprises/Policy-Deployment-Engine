@@ -1,4 +1,4 @@
-package terraform.gcp.security.memorystore_redis.instance.authorization_mode
+package terraform.gcp.security.memorystore.instance.authorization_mode
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.memorystore.redis.vars
