@@ -1,4 +1,5 @@
 # auto_test.py Documentation
+# Change to trigger test
 
 ## Overview
 `auto_test.py` automates end‑to‑end validation of Terraform example inputs against corresponding OPA (Open Policy Agent) Rego policies. For every Terraform leaf directory under an inputs root that has a matching directory under a policies root, it:
