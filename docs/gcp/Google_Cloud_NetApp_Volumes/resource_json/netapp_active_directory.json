@@ -5,19 +5,19 @@
     "domain": {
       "description": "Fully qualified domain name for the Active Directory domain.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Ensures join operations target the trusted domain.",
+      "compliant": "deakin.internal",
+      "non-compliant": "ad.internal",
       "parent": null
     },
     "dns": {
-      "description": "Comma separated list of DNS server IP addresses for the Active Directory domain.",
+      "description": "DNS server IPs for the AD domain. (If your policy whitelists a single resolver, enforce that value.)",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Forces lookups to approved internal resolvers; prevents leakage to public DNS.",
+      "compliant": "10.10.0.10",
+      "non-compliant": "8.8.8.8",
       "parent": null
     },
     "net_bios_prefix": {
@@ -30,21 +30,21 @@
       "parent": null
     },
     "username": {
-      "description": "Username for the Active Directory account with permissions to create the compute account within the specified organizational unit.",
+      "description": "AD account with rights to join/create the computer account in the specified OU.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Prevents use of built-in/admin accounts; enforces least privilege.",
+      "compliant": "svc_netapp_joiner@deakin.internal",
+      "non-compliant": "admin",
       "parent": null
     },
     "password": {
-      "description": "Password for specified username. Note - Manual changes done to the password will not be detected. Terraform will not re-apply the password, unless you use a new password in Terraform. **Note**: This property is sensitive and will not be displayed in the plan.",
+      "description": "Password for the join account (store as a sensitive variable, not in VCS).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Strong secrets reduce compromise risk; avoid weak/common values.",
+      "compliant": "Deakin!2025#NetApp",
+      "non-compliant": "pass",
       "parent": null
     },
     "location": {
