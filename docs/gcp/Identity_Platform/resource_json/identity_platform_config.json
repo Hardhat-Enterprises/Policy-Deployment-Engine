@@ -1,0 +1,667 @@
+{
+  "resource_name": "identity_platform_config",
+  "subcategory": "Identity Platform",
+  "arguments": {
+    "autodelete_anonymous_users": {
+      "description": "Whether anonymous users will be auto-deleted after a period of 30 days",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "sign_in": {
+      "description": "Configuration related to local sign in methods. Structure is [documented below](#nested_sign_in).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "email": {
+          "description": "Configuration options related to authenticating a user by their email address. Structure is [documented below](#nested_sign_in_email).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "sign_in"
+        },
+        "phone_number": {
+          "description": "Configuration options related to authenticated a user by their phone number. Structure is [documented below](#nested_sign_in_phone_number).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "sign_in"
+        },
+        "anonymous": {
+          "description": "Configuration options related to authenticating an anonymous user. Structure is [documented below](#nested_sign_in_anonymous).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "sign_in"
+        },
+        "allow_duplicate_emails": {
+          "description": "Whether to allow more than one account to have the same email.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "sign_in"
+        },
+        "hash_config": {
+          "description": "(Output) Output only. Hash config information. Structure is [documented below](#nested_sign_in_hash_config).",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "sign_in"
+        }
+      }
+    },
+    "blocking_functions": {
+      "description": "Configuration related to blocking functions. Structure is [documented below](#nested_blocking_functions).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "triggers": {
+          "description": "Map of Trigger to event type. Key should be one of the supported event types: \"beforeCreate\", \"beforeSignIn\". Structure is [documented below](#nested_blocking_functions_triggers).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "blocking_functions"
+        },
+        "forward_inbound_credentials": {
+          "description": "The user credentials to include in the JWT payload that is sent to the registered Blocking Functions. Structure is [documented below](#nested_blocking_functions_forward_inbound_credentials).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "blocking_functions"
+        }
+      }
+    },
+    "quota": {
+      "description": "Configuration related to quotas. Structure is [documented below](#nested_quota).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "sign_up_quota_config": {
+          "description": "Quota for the Signup endpoint, if overwritten. Signup quota is measured in sign ups per project per hour per IP. None of quota, startTime, or quotaDuration can be skipped. Structure is [documented below](#nested_quota_sign_up_quota_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "quota"
+        }
+      }
+    },
+    "authorized_domains": {
+      "description": "List of domains authorized for OAuth redirects.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "sms_region_config": {
+      "description": "Configures the regions where users are allowed to send verification SMS for the project or tenant. This is based on the calling code of the destination phone number. Structure is [documented below](#nested_sms_region_config).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "allow_by_default": {
+          "description": "A policy of allowing SMS to every region by default and adding disallowed regions to a disallow list. Structure is [documented below](#nested_sms_region_config_allow_by_default).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "sms_region_config"
+        },
+        "allowlist_only": {
+          "description": "A policy of only allowing regions by explicitly adding them to an allowlist. Structure is [documented below](#nested_sms_region_config_allowlist_only).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "sms_region_config"
+        }
+      }
+    },
+    "client": {
+      "description": "Options related to how clients making requests on behalf of a project should be configured. Structure is [documented below](#nested_client).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "permissions": {
+          "description": "Configuration related to restricting a user's ability to affect their account. Structure is [documented below](#nested_client_permissions).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "client"
+        },
+        "api_key": {
+          "description": "(Output) API key that can be used when making requests for this project. **Note**: This property is sensitive and will not be displayed in the plan.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "client"
+        },
+        "firebase_subdomain": {
+          "description": "(Output) Firebase subdomain.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "client"
+        }
+      }
+    },
+    "mfa": {
+      "description": "Options related to how clients making requests on behalf of a project should be configured. Structure is [documented below](#nested_mfa).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "state": {
+          "description": "Whether MultiFactor Authentication has been enabled for this project. Possible values are: `DISABLED`, `ENABLED`, `MANDATORY`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "mfa"
+        },
+        "enabled_providers": {
+          "description": "A list of usable second factors for this project. Each value may be one of: `PHONE_SMS`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "mfa"
+        },
+        "provider_configs": {
+          "description": "A list of usable second factors for this project along with their configurations. This field does not support phone based MFA, for that use the 'enabledProviders' field. Structure is [documented below](#nested_mfa_provider_configs).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "mfa"
+        }
+      }
+    },
+    "multi_tenant": {
+      "description": "Configuration related to multi-tenant functionality. Structure is [documented below](#nested_multi_tenant).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "allow_tenants": {
+          "description": "Whether this project can have tenants or not.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "multi_tenant"
+        },
+        "default_tenant_location": {
+          "description": "The default cloud parent org or folder that the tenant project should be created under. The parent resource name should be in the format of \"/\", such as \"folders/123\" or \"organizations/456\". If the value is not set, the tenant will be created under the same organization or folder as the agent project.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "multi_tenant"
+        }
+      }
+    },
+    "monitoring": {
+      "description": "Configuration related to monitoring project activity. Structure is [documented below](#nested_monitoring).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "request_logging": {
+          "description": "Configuration for logging requests made to this project to Stackdriver Logging Structure is [documented below](#nested_monitoring_request_logging).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "monitoring"
+        }
+      }
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "email": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enabled": {
+          "description": "Whether email auth is enabled for the project or not.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "email"
+        },
+        "password_required": {
+          "description": "Whether a password is required for email auth or not. If true, both an email and password must be provided to sign in. If false, a user may sign in via either email/password or email link.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "email"
+        }
+      }
+    },
+    "phone_number": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enabled": {
+          "description": "Whether phone number auth is enabled for the project or not.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "phone_number"
+        },
+        "test_phone_numbers": {
+          "description": "A map of <test phone number, fake code> that can be used for phone auth testing.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "phone_number"
+        }
+      }
+    },
+    "anonymous": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enabled": {
+          "description": "Whether anonymous user auth is enabled for the project or not. The `hash_config` block contains:",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "anonymous"
+        },
+        "algorithm": {
+          "description": "(Output) Different password hash algorithms used in Identity Toolkit.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "anonymous"
+        },
+        "signer_key": {
+          "description": "(Output) Signer key in base64.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "anonymous"
+        },
+        "salt_separator": {
+          "description": "(Output) Non-printable character to be inserted between the salt and plain text password in base64.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "anonymous"
+        },
+        "rounds": {
+          "description": "(Output) How many rounds for hash calculation. Used by scrypt and other similar password derivation algorithms.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "anonymous"
+        },
+        "memory_cost": {
+          "description": "(Output) Memory cost for hash calculation. Used by scrypt and other similar password derivation algorithms. See https://tools.ietf.org/html/rfc7914 for explanation of field.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "anonymous"
+        }
+      }
+    },
+    "triggers": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "event_type": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "triggers"
+        },
+        "function_uri": {
+          "description": "HTTP URI trigger for the Cloud Function.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "triggers"
+        },
+        "update_time": {
+          "description": "(Output) When the trigger was changed.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "triggers"
+        }
+      }
+    },
+    "forward_inbound_credentials": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "id_token": {
+          "description": "Whether to pass the user's OIDC identity provider's ID token.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "forward_inbound_credentials"
+        },
+        "access_token": {
+          "description": "Whether to pass the user's OAuth identity provider's access token.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "forward_inbound_credentials"
+        },
+        "refresh_token": {
+          "description": "Whether to pass the user's OAuth identity provider's refresh token.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "forward_inbound_credentials"
+        }
+      }
+    },
+    "sign_up_quota_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "quota": {
+          "description": "A sign up APIs quota that customers can override temporarily. Value can be in between 1 and 1000.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "sign_up_quota_config"
+        },
+        "start_time": {
+          "description": "When this quota will take affect.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "sign_up_quota_config"
+        },
+        "quota_duration": {
+          "description": "How long this quota will be active for. It is measurred in seconds, e.g., Example: \"9.615s\".",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "sign_up_quota_config"
+        }
+      }
+    },
+    "allow_by_default": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "disallowed_regions": {
+          "description": "Two letter unicode region codes to disallow as defined by https://cldr.unicode.org/ The full list of these region codes is here: https://github.com/unicode-cldr/cldr-localenames-full/blob/master/main/en/territories.json",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "allow_by_default"
+        }
+      }
+    },
+    "allowlist_only": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "allowed_regions": {
+          "description": "Two letter unicode region codes to allow as defined by https://cldr.unicode.org/ The full list of these region codes is here: https://github.com/unicode-cldr/cldr-localenames-full/blob/master/main/en/territories.json",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "allowlist_only"
+        }
+      }
+    },
+    "permissions": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "disabled_user_signup": {
+          "description": "When true, end users cannot sign up for a new account on the associated project through any of our API methods",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "permissions"
+        },
+        "disabled_user_deletion": {
+          "description": "When true, end users cannot delete their account on the associated project through any of our API methods",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "permissions"
+        }
+      }
+    },
+    "provider_configs": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "state": {
+          "description": "Whether MultiFactor Authentication has been enabled for this project. Possible values are: `DISABLED`, `ENABLED`, `MANDATORY`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "provider_configs"
+        },
+        "totp_provider_config": {
+          "description": "TOTP MFA provider config for this project. Structure is [documented below](#nested_mfa_provider_configs_provider_configs_totp_provider_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "provider_configs"
+        }
+      }
+    },
+    "totp_provider_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "adjacent_intervals": {
+          "description": "The allowed number of adjacent intervals that will be used for verification to avoid clock skew.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "totp_provider_config"
+        }
+      }
+    },
+    "request_logging": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enabled": {
+          "description": "Whether logging is enabled for this project or not.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "request_logging"
+        }
+      }
+    }
+  }
+}
