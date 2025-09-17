@@ -32,12 +32,14 @@ conditions := [
         "Ensure 'topics', 'tasks.max', and 'cps.project' are set with non-empty values."
       ]
     },
+    
     {
-      "condition": "Must include required configuration keys",
-      "attribute_path": ["configs"],
-      "contains_keys": ["topics", "tasks.max", "cps.project"],
-      "policy_type": "require"
+    "condition": "configs must contain topics, tasks.max, and cps.project",
+    "attribute_path": ["configs"],
+    "values": ["topics", "tasks.max", "cps.project"],
+    "policy_type": "whitelist"
     }
+    
   ],
 
   # SCENARIO 3 — Enforce sensible task restart policy
@@ -50,14 +52,18 @@ conditions := [
       ]
     },
     {
-      "condition": "Backoff durations must be within defined limits",
-      "attribute_path": ["task_restart_policy"],
-      "constraints": {
-        "minimum_backoff": ">=30s",
-        "maximum_backoff": "<=3600s"
-      },
-      "policy_type": "range"
+      "condition": "minimum_backoff must be at least 30s",
+      "attribute_path": ["task_restart_policy", "minimum_backoff"],
+      "values": ["30s", "60s", "300s", "900s"],
+      "policy_type": "whitelist"
+    },
+    {
+      "condition": "maximum_backoff must be at most 3600s",
+      "attribute_path": ["task_restart_policy", "maximum_backoff"],
+      "values": ["30s", "60s", "300s", "900s", "1800s", "3600s"],
+      "policy_type": "whitelist"
     }
+
   ]
 
 ]
