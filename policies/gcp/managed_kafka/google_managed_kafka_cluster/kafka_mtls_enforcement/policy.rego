@@ -16,8 +16,8 @@ conditions := [
         }
     ],
 
-    
-   # SCENARIO 2 — TLS config must not be empty
+    # SCENARIO 2 — TLS config must not be empty
+
     [
         {"situation_description": "Clusters without tls_config are vulnerable to plain-text data transmission.",
          "remedies": ["Always define tls_config with CA pools and trust settings."]},
