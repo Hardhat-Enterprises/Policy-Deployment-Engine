@@ -13,7 +13,9 @@ conditions := [
         "attribute_path" :  ["acl_entries", 0, "principal"], 
         "values" : ["User:*"],
         "policy_type" : "blacklist" 
+
     }
+
     ]
 ]
 summary := {
