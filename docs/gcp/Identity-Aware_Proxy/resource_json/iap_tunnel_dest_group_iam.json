@@ -1,0 +1,98 @@
+{
+  "resource_name": "iap_tunnel_dest_group_iam",
+  "subcategory": "Identity-Aware Proxy",
+  "arguments": {
+    "region": {
+      "description": "Region of the IAP TCP destination group. If omitted, it is parsed from the parent identifier or taken from the provider configuration.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Ensures the binding is applied in the intended location; a mismatch can grant access in the wrong region.",
+      "compliant": "region = \"australia-southeast1\"",
+      "non-compliant": "region = \"\" or a region that does not match the parent resource",
+      "parent": null
+    },
+    "dest_group": {
+      "description": "Destination group identifier for IAP TCP forwarding (IAP Tunnel). Typically the dest group ID within the region.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Scopes the IAM binding to the exact tunnel destination group.",
+      "compliant": "dest_group = \"web-admin\"",
+      "non-compliant": "dest_group = \"\" or a non-existent destination group",
+      "parent": null
+    },
+    "project": {
+      "description": "If not provided, the project is parsed from the parent identifier; if missing there too, the provider project is used.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Optional override; a mismatch can apply changes to an unintended project.",
+      "compliant": "project = \"my-gcp-project\" (matches provider/parent context)",
+      "non-compliant": "project = \"other-project\" while parent points elsewhere",
+      "parent": null
+    },
+    "member/members": {
+      "description": "Principals to bind. Supported formats: allUsers, allAuthenticatedUsers, user:{email}, serviceAccount:{email}, group:{email}, domain:{domain}, projectOwner:projectid, projectEditor:projectid, projectViewer:projectid.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Defines who receives access to IAP TCP tunnels; public or malformed identities overexpose internal services.",
+      "compliant": "member = \"user:alice@example.com\" (for *_member) / members = [\"group:ops@example.com\"] (for *_binding)",
+      "non-compliant": "member = \"allUsers\" or \" domain:example.com \" (whitespace/malformed)",
+      "parent": null
+    },
+    "role": {
+      "description": "`google_iap_tunnel_dest_group_iam_binding`/`..._member` grant a specific role. Custom roles must be of the form `[projects|organizations]/{parent}/roles/{role-name}`.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Use least privilege for IAP TCP access. The typical accessor is roles/iap.tunnelResourceAccessor.",
+      "compliant": "role = \"roles/iap.tunnelResourceAccessor\"",
+      "non-compliant": "role = \"roles/owner\" / \"roles/editor\" / unrelated custom role",
+      "parent": null
+    },
+    "policy_data": {
+      "description": "A `google_iam_policy` data source (authoritative when used with the *_policy resource).",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Authoritative replacement of IAM is only applicable to `google_iap_tunnel_dest_group_iam_policy`; not used by *_member or *_binding.",
+      "compliant": "policy_data references data.google_iam_policy with intended bindings (for *_policy).",
+      "non-compliant": "policy_data missing required bindings or mis-scoped to the wrong resource.",
+      "parent": null
+    },
+    "condition": {
+      "description": "Optional IAM Condition block to scope the binding (for example, by source IP, time, or device attributes when evaluated by the proxy).",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Reduces blast radius by restricting when/where the binding applies.",
+      "compliant": "condition { title = \"OfficeHours\" expression = \"request.time.getHours() >= 8 && request.time.getHours() < 18\" description = \"Limit tunnel use to office hours\" }",
+      "non-compliant": "condition { } (missing required fields) or an empty expression",
+      "parent": null,
+      "arguments": {
+        "expression": {
+          "description": "CEL expression evaluated to determine if the binding applies.",
+          "required": true,
+          "security_impact": true,
+          "rationale": "A non-empty, precise expression is required for the condition to function.",
+          "compliant": "expression = \"request.client_ip.startsWith('10.0.')\"",
+          "non-compliant": "expression = \"\"",
+          "parent": "condition"
+        },
+        "title": {
+          "description": "Short descriptive title for the condition.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Improves reviewability and change tracking.",
+          "compliant": "title = \"OfficeHours\"",
+          "non-compliant": "title = \"\"",
+          "parent": "condition"
+        },
+        "description": {
+          "description": "~> Warning: Terraform treats `role` + condition (`title`+`description`+`expression`) as the resource identifier. Changing any part out-of-band looks like a different resource to Terraform.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Avoids drift surprises; clarifies scope and intent for reviewers.",
+          "compliant": "description = \"Restrict access during business hours only\"",
+          "non-compliant": "Omitting context when intent is not obvious",
+          "parent": "condition"
+        }
+      }
+    }
+  }
+}
