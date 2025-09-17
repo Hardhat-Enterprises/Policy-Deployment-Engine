@@ -12,8 +12,7 @@ conditions := [
         "condition":  "Ensure that the principal is NOT set to a wildcard value ('User:*').",
         "attribute_path" :  ["acl_entries", 0, "principal"], 
         "values" : ["User:*"],
-        "policy_type" : "blacklist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
-    }
+        "policy_type" : "blacklist" 
     ]
 ]
 summary := {
