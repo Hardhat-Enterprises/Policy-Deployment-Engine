@@ -1,0 +1,1021 @@
+{
+  "resource_name": "dataplex_datascan",
+  "subcategory": "Dataplex",
+  "arguments": {
+    "data": {
+      "description": "The data source for DataScan. Structure is [documented below](#nested_data).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "entity": {
+          "description": "The Dataplex entity that represents the data source(e.g. BigQuery table) for Datascan.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "data"
+        },
+        "resource": {
+          "description": "The service-qualified full resource name of the cloud resource for a DataScan job to scan against. The field could be: Cloud Storage bucket (//storage.googleapis.com/projects/PROJECT_ID/buckets/BUCKET_ID) for DataDiscoveryScan OR BigQuery table of type \"TABLE\" (/bigquery.googleapis.com/projects/PROJECT_ID/datasets/DATASET_ID/tables/TABLE_ID) for DataProfileScan/DataQualityScan.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "data"
+        }
+      }
+    },
+    "execution_spec": {
+      "description": "DataScan execution settings. Structure is [documented below](#nested_execution_spec).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "trigger": {
+          "description": "Spec related to how often and when a scan should be triggered. Structure is [documented below](#nested_execution_spec_trigger).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "execution_spec"
+        },
+        "field": {
+          "description": "The unnested field (of type Date or Timestamp) that contains values which monotonically increase over time. If not specified, a data scan will run for all data in the table.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "execution_spec"
+        }
+      }
+    },
+    "location": {
+      "description": "The location where the data scan should reside.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "data_scan_id": {
+      "description": "DataScan identifier. Must contain only lowercase letters, numbers and hyphens. Must start with a letter. Must end with a number or a letter.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "Description of the scan.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "display_name": {
+      "description": "User friendly display name.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "labels": {
+      "description": "User-defined labels for the scan. A list of key->value pairs. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "data_quality_spec": {
+      "description": "DataQualityScan related setting. Structure is [documented below](#nested_data_quality_spec).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "sampling_percent": {
+          "description": "The percentage of the records to be selected from the dataset for DataScan. Value can range between 0.0 and 100.0 with up to 3 significant decimal digits. Sampling is not applied if `sampling_percent` is not specified, 0 or 100.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "data_quality_spec"
+        },
+        "row_filter": {
+          "description": "A filter applied to all rows in a single DataScan job. The filter needs to be a valid SQL expression for a WHERE clause in BigQuery standard SQL syntax. Example: col1 >= 0 AND col2 < 10",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "data_quality_spec"
+        },
+        "post_scan_actions": {
+          "description": "Actions to take upon job completion. Structure is [documented below](#nested_data_quality_spec_post_scan_actions).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "data_quality_spec"
+        },
+        "rules": {
+          "description": "The list of rules to evaluate against a data source. At least one rule is required. Structure is [documented below](#nested_data_quality_spec_rules).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "data_quality_spec"
+        },
+        "catalog_publishing_enabled": {
+          "description": "If set, the latest DataScan job result will be published to Dataplex Catalog.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "data_quality_spec"
+        }
+      }
+    },
+    "data_profile_spec": {
+      "description": "DataProfileScan related setting. Structure is [documented below](#nested_data_profile_spec).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "sampling_percent": {
+          "description": "The percentage of the records to be selected from the dataset for DataScan. Value can range between 0.0 and 100.0 with up to 3 significant decimal digits. Sampling is not applied if `sampling_percent` is not specified, 0 or 100.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "data_profile_spec"
+        },
+        "row_filter": {
+          "description": "A filter applied to all rows in a single DataScan job. The filter needs to be a valid SQL expression for a WHERE clause in BigQuery standard SQL syntax. Example: col1 >= 0 AND col2 < 10",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "data_profile_spec"
+        },
+        "post_scan_actions": {
+          "description": "Actions to take upon job completion. Structure is [documented below](#nested_data_profile_spec_post_scan_actions).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "data_profile_spec"
+        },
+        "include_fields": {
+          "description": "The fields to include in data profile. If not specified, all fields at the time of profile scan job execution are included, except for ones listed in `exclude_fields`. Structure is [documented below](#nested_data_profile_spec_include_fields).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "data_profile_spec"
+        },
+        "exclude_fields": {
+          "description": "The fields to exclude from data profile. If specified, the fields will be excluded from data profile, regardless of `include_fields` value. Structure is [documented below](#nested_data_profile_spec_exclude_fields).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "data_profile_spec"
+        }
+      }
+    },
+    "data_discovery_spec": {
+      "description": "DataDiscoveryScan related setting. Structure is [documented below](#nested_data_discovery_spec).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "bigquery_publishing_config": {
+          "description": "Configuration for metadata publishing. Structure is [documented below](#nested_data_discovery_spec_bigquery_publishing_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "data_discovery_spec"
+        },
+        "storage_config": {
+          "description": "Configurations related to Cloud Storage as the data source. Structure is [documented below](#nested_data_discovery_spec_storage_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "data_discovery_spec"
+        }
+      }
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "trigger": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "on_demand": {
+          "description": "The scan runs once via dataScans.run API.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "trigger"
+        },
+        "schedule": {
+          "description": "The scan is scheduled to run periodically. Structure is [documented below](#nested_execution_spec_trigger_schedule).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "trigger"
+        }
+      }
+    },
+    "schedule": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "cron": {
+          "description": "Cron schedule for running scans periodically. This field is required for Schedule scans.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "schedule"
+        }
+      }
+    },
+    "post_scan_actions": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "bigquery_export": {
+          "description": "If set, results will be exported to the provided BigQuery table. Structure is [documented below](#nested_data_profile_spec_post_scan_actions_bigquery_export).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "post_scan_actions"
+        },
+        "notification_report": {
+          "description": "The configuration of notification report post scan action. Structure is [documented below](#nested_data_quality_spec_post_scan_actions_notification_report).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "post_scan_actions"
+        }
+      }
+    },
+    "bigquery_export": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "results_table": {
+          "description": "The BigQuery table to export DataProfileScan results to. Format://bigquery.googleapis.com/projects/PROJECT_ID/datasets/DATASET_ID/tables/TABLE_ID",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "bigquery_export"
+        }
+      }
+    },
+    "notification_report": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "recipients": {
+          "description": "The individuals or groups who are designated to receive notifications upon triggers. Structure is [documented below](#nested_data_quality_spec_post_scan_actions_notification_report_recipients).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "notification_report"
+        },
+        "score_threshold_trigger": {
+          "description": "This trigger is triggered when the DQ score in the job result is less than a specified input score. Structure is [documented below](#nested_data_quality_spec_post_scan_actions_notification_report_score_threshold_trigger).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "notification_report"
+        },
+        "job_failure_trigger": {
+          "description": "This trigger is triggered when the scan job itself fails, regardless of the result.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "notification_report"
+        },
+        "job_end_trigger": {
+          "description": "This trigger is triggered whenever a scan job run ends, regardless of the result.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "notification_report"
+        }
+      }
+    },
+    "recipients": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "emails": {
+          "description": "The email recipients who will receive the DataQualityScan results report.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "recipients"
+        }
+      }
+    },
+    "score_threshold_trigger": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "score_threshold": {
+          "description": "The score range is in [0,100].",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "score_threshold_trigger"
+        }
+      }
+    },
+    "rules": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "column": {
+          "description": "The unnested column which this rule is evaluated against.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        },
+        "ignore_null": {
+          "description": "Rows with null values will automatically fail a rule, unless ignoreNull is true. In that case, such null rows are trivially considered passing. Only applicable to ColumnMap rules.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        },
+        "dimension": {
+          "description": "The dimension name a rule belongs to. Custom dimension name is supported with all uppercase letters and maximum length of 30 characters.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        },
+        "threshold": {
+          "description": "The minimum ratio of passing_rows / total_rows required to pass this rule, with a range of [0.0, 1.0]. 0 indicates default value (i.e. 1.0).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        },
+        "name": {
+          "description": "A mutable name for the rule. The name must contain only letters (a-z, A-Z), numbers (0-9), or hyphens (-). The maximum length is 63 characters. Must start with a letter. Must end with a number or a letter.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        },
+        "suspended": {
+          "description": "Whether the Rule is active or suspended. Default = false.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        },
+        "description": {
+          "description": "Description of the rule. The maximum length is 1,024 characters.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        },
+        "range_expectation": {
+          "description": "ColumnMap rule which evaluates whether each column value lies between a specified range. Structure is [documented below](#nested_data_quality_spec_rules_rules_range_expectation).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        },
+        "non_null_expectation": {
+          "description": "ColumnMap rule which evaluates whether each column value is null.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        },
+        "set_expectation": {
+          "description": "ColumnMap rule which evaluates whether each column value is contained by a specified set. Structure is [documented below](#nested_data_quality_spec_rules_rules_set_expectation).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        },
+        "regex_expectation": {
+          "description": "ColumnMap rule which evaluates whether each column value matches a specified regex. Structure is [documented below](#nested_data_quality_spec_rules_rules_regex_expectation).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        },
+        "uniqueness_expectation": {
+          "description": "Row-level rule which evaluates whether each column value is unique.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        },
+        "statistic_range_expectation": {
+          "description": "ColumnAggregate rule which evaluates whether the column aggregate statistic lies between a specified range. Structure is [documented below](#nested_data_quality_spec_rules_rules_statistic_range_expectation).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        },
+        "row_condition_expectation": {
+          "description": "Table rule which evaluates whether each row passes the specified condition. Structure is [documented below](#nested_data_quality_spec_rules_rules_row_condition_expectation).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        },
+        "table_condition_expectation": {
+          "description": "Table rule which evaluates whether the provided expression is true. Structure is [documented below](#nested_data_quality_spec_rules_rules_table_condition_expectation).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        },
+        "sql_assertion": {
+          "description": "Table rule which evaluates whether any row matches invalid state. Structure is [documented below](#nested_data_quality_spec_rules_rules_sql_assertion).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        }
+      }
+    },
+    "range_expectation": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "min_value": {
+          "description": "The minimum column value allowed for a row to pass this validation. At least one of minValue and maxValue need to be provided.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "range_expectation"
+        },
+        "max_value": {
+          "description": "The maximum column value allowed for a row to pass this validation. At least one of minValue and maxValue need to be provided.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "range_expectation"
+        },
+        "strict_min_enabled": {
+          "description": "Whether each value needs to be strictly greater than ('>') the minimum, or if equality is allowed. Only relevant if a minValue has been defined. Default = false.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "range_expectation"
+        },
+        "strict_max_enabled": {
+          "description": "Whether each value needs to be strictly lesser than ('<') the maximum, or if equality is allowed. Only relevant if a maxValue has been defined. Default = false.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "range_expectation"
+        }
+      }
+    },
+    "set_expectation": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "values": {
+          "description": "Expected values for the column value.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "set_expectation"
+        }
+      }
+    },
+    "regex_expectation": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "regex": {
+          "description": "A regular expression the column value is expected to match.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "regex_expectation"
+        }
+      }
+    },
+    "statistic_range_expectation": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "statistic": {
+          "description": "column statistics. Possible values are: `STATISTIC_UNDEFINED`, `MEAN`, `MIN`, `MAX`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "statistic_range_expectation"
+        },
+        "min_value": {
+          "description": "The minimum column statistic value allowed for a row to pass this validation. At least one of minValue and maxValue need to be provided.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "statistic_range_expectation"
+        },
+        "max_value": {
+          "description": "The maximum column statistic value allowed for a row to pass this validation. At least one of minValue and maxValue need to be provided.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "statistic_range_expectation"
+        },
+        "strict_min_enabled": {
+          "description": "Whether column statistic needs to be strictly greater than ('>') the minimum, or if equality is allowed. Only relevant if a minValue has been defined. Default = false.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "statistic_range_expectation"
+        },
+        "strict_max_enabled": {
+          "description": "Whether column statistic needs to be strictly lesser than ('<') the maximum, or if equality is allowed. Only relevant if a maxValue has been defined. Default = false.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "statistic_range_expectation"
+        }
+      }
+    },
+    "row_condition_expectation": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "sql_expression": {
+          "description": "The SQL expression.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "row_condition_expectation"
+        }
+      }
+    },
+    "table_condition_expectation": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "sql_expression": {
+          "description": "The SQL expression.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "table_condition_expectation"
+        }
+      }
+    },
+    "sql_assertion": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "sql_statement": {
+          "description": "The SQL statement.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "sql_assertion"
+        }
+      }
+    },
+    "include_fields": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "field_names": {
+          "description": "Expected input is a list of fully qualified names of fields as in the schema. Only top-level field names for nested fields are supported. For instance, if 'x' is of nested field type, listing 'x' is supported but 'x.y.z' is not supported. Here 'y' and 'y.z' are nested fields of 'x'.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "include_fields"
+        }
+      }
+    },
+    "exclude_fields": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "field_names": {
+          "description": "Expected input is a list of fully qualified names of fields as in the schema. Only top-level field names for nested fields are supported. For instance, if 'x' is of nested field type, listing 'x' is supported but 'x.y.z' is not supported. Here 'y' and 'y.z' are nested fields of 'x'.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "exclude_fields"
+        }
+      }
+    },
+    "bigquery_publishing_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "table_type": {
+          "description": "Determines whether to publish discovered tables as BigLake external tables or non-BigLake external tables. Possible values are: `TABLE_TYPE_UNSPECIFIED`, `EXTERNAL`, `BIGLAKE`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "bigquery_publishing_config"
+        },
+        "connection": {
+          "description": "The BigQuery connection used to create BigLake tables. Must be in the form `projects/{projectId}/locations/{locationId}/connections/{connection_id}`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "bigquery_publishing_config"
+        },
+        "location": {
+          "description": "The location of the BigQuery dataset to publish BigLake external or non-BigLake external tables to.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "bigquery_publishing_config"
+        },
+        "project": {
+          "description": "The project of the BigQuery dataset to publish BigLake external or non-BigLake external tables to. If not specified, the project of the Cloud Storage bucket will be used. The format is \"projects/{project_id_or_number}\".",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "bigquery_publishing_config"
+        }
+      }
+    },
+    "storage_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "include_patterns": {
+          "description": "Defines the data to include during discovery when only a subset of the data should be considered. Provide a list of patterns that identify the data to include. For Cloud Storage bucket assets, these patterns are interpreted as glob patterns used to match object names. For BigQuery dataset assets, these patterns are interpreted as patterns to match table names.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "storage_config"
+        },
+        "exclude_patterns": {
+          "description": "Defines the data to exclude during discovery. Provide a list of patterns that identify the data to exclude. For Cloud Storage bucket assets, these patterns are interpreted as glob patterns used to match object names. For BigQuery dataset assets, these patterns are interpreted as patterns to match table names.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "storage_config"
+        },
+        "csv_options": {
+          "description": "Configuration for CSV data. Structure is [documented below](#nested_data_discovery_spec_storage_config_csv_options).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "storage_config"
+        },
+        "json_options": {
+          "description": "Configuration for JSON data. Structure is [documented below](#nested_data_discovery_spec_storage_config_json_options).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "storage_config"
+        }
+      }
+    },
+    "csv_options": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "header_rows": {
+          "description": "The number of rows to interpret as header rows that should be skipped when reading data rows.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "csv_options"
+        },
+        "delimiter": {
+          "description": "The delimiter that is used to separate values. The default is `,` (comma).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "csv_options"
+        },
+        "encoding": {
+          "description": "The character encoding of the data. The default is UTF-8.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "csv_options"
+        },
+        "type_inference_disabled": {
+          "description": "Whether to disable the inference of data types for CSV data. If true, all columns are registered as strings.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "csv_options"
+        },
+        "quote": {
+          "description": "The character used to quote column values. Accepts `\"` (double quotation mark) or `'` (single quotation mark). If unspecified, defaults to `\"` (double quotation mark).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "csv_options"
+        }
+      }
+    },
+    "json_options": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "encoding": {
+          "description": "The character encoding of the data. The default is UTF-8.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "json_options"
+        },
+        "type_inference_disabled": {
+          "description": "Whether to disable the inference of data types for JSON data. If true, all columns are registered as their primitive types (strings, number, or boolean).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "json_options"
+        }
+      }
+    }
+  }
+}

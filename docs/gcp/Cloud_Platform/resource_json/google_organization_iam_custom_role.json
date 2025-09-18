@@ -1,0 +1,60 @@
+{
+  "resource_name": "google_organization_iam_custom_role",
+  "subcategory": "Cloud Platform",
+  "arguments": {
+    "role_id": {
+      "description": "The role id to use for this role.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Identifier only and does not grant permissions by itself",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "org_id": {
+      "description": "The numeric ID of the organization in which you want to create a custom role.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Identifier only and does not affect access by itself",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "title": {
+      "description": " A human-readable title for the role.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Label only and has no direct security effect",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "A human-readable description for the role.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Documentation only and has no direct security effect",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "permissions": {
+      "description": " The names of the permissions this role grants when bound in an IAM policy. At least one permission must be specified.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Defines proper capabilities. Privilege escalation may result from risky or administrator-level permissions.",
+      "compliant": "permissions = [\"iam.roles.list\", \"resourcemanager.projects.get\"]",
+      "non-compliant": "permissions = [\"iam.roles.delete\", \"resourcemanager.*\"]",
+      "parent": null
+    },
+    "stage": {
+      "description": "Defaults to `GA`. List of possible stages is [here](https://cloud.google.com/iam/reference/rest/v1/organizations.roles#Role.RoleLaunchStage).",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Unstable stages like ALPHA or BETA may cause unexpected behavior. Stable GA or DISABLED are safer",
+      "compliant": "stage = \"GA\"  or  stage = \"DISABLED\"",
+      "non-compliant": "stage = \"ALPHA\"",
+      "parent": null
+    }
+  }
+}
