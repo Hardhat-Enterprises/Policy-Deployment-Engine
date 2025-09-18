@@ -2,7 +2,7 @@ resource "google_bigquery_data_transfer_config" "nc" {
   project                = "CH-project"
   display_name           = "nc"
   data_source_id         = "scheduled_query"
-  destination_dataset_id = "my_dataset"
+  destination_dataset_id = "test"
   location               = "us-central1"
 
   params = {

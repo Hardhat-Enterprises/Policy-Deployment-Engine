@@ -1,6 +1,6 @@
 resource "google_bigquery_data_transfer_config" "c" {
   display_name           = "c"
-  location               = "australia-southeast1, australia-southeast2"
+  location               = "australia-southeast1"
   data_source_id         = "scheduled_query"
   schedule               = "first sunday of quarter 00:00"
   destination_dataset_id = "my_dataset"

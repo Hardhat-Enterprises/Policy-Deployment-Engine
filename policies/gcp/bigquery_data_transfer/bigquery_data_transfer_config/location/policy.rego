@@ -10,7 +10,7 @@ conditions := [[
   {
     "condition": "Location is not australia-southeast1",
     "attribute_path": ["location"],
-    "values": ["australia-southeast1", "australia-southeast2"],
+    "values": ["australia-southeast1"],
     "policy_type": "whitelist"
   }
 ]]

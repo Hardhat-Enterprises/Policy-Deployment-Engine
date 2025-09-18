@@ -16,7 +16,7 @@ resource "google_bigquery_data_transfer_config" "c" {
   schedule               = "every 24 hours"
 
   params = {
-    destination_table_name_template = "secure_table"
+    destination_table_name_template = "table"
     file_format                     = "CSV"
     data_path                       = "s3://my-bucket/secure/"
     aws_access_key_id               = var.aws_access_key_id

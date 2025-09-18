@@ -7,11 +7,10 @@ resource "google_bigquery_data_transfer_config" "nc" {
   service_account_name   = "service-123456789012@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com"
 
   params = {
-    destination_table_name_template = "test_table"
+    destination_table_name_template = "table"
     file_format                     = "CSV"
     data_path                       = "s3://test-bucket/tmp/"
-
-    aws_access_key_id     = "EXAMPLEKEY"
-    aws_secret_access_key = "hardcoded-secret" 
+    aws_access_key_id               = "EXAMPLEKEY"
+    aws_secret_access_key           = "hardcoded-secretkey" 
   }
 }
