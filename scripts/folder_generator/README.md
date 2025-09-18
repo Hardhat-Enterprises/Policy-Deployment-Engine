@@ -23,14 +23,14 @@ pip install -r requirements.txt
 ```
 
 
-`### Running the Application
+### Running the Application
 
 Navigate to the `/scripts/folder-generator/` directory and run:`
 
 python main.py
 
 
-`### Using the GUI
+### Using the GUI
 
 1. Select a cloud provider (e.g., GCP).
 2. Select a service from the list (populated from local JSON files).
