@@ -1,6 +1,6 @@
 resource "google_firestore_database" "nc" {
   project                           = "abcd_1234"
-  name                              = "c"
+  name                              = "nc"
   location_id                       = "nam5"
   type                              = "FIRESTORE_NATIVE"
   //concurrency_mode                  = "OPTIMISTIC"
