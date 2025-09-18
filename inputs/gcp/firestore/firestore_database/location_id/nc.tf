@@ -1,7 +1,8 @@
 resource "google_firestore_database" "nc" {
   project                           = "abcd_1234"
   name                              = "nc"
-  //location_id                       = "nam5"
+  # location_id                       = "nam5"
+  location_id                       = ""
   type                              = "FIRESTORE_NATIVE"
   concurrency_mode                  = "OPTIMISTIC"
   app_engine_integration_mode       = "DISABLED"
