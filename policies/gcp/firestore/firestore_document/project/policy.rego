@@ -1,7 +1,7 @@
-package terraform.gcp.security.firestore_document.project
+package terraform.gcp.security.firestore.firestore_document.project
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.firestore.vars
+import data.terraform.gcp.security.firestore.firestore_document.vars
 
 conditions := [
     [
@@ -19,6 +19,7 @@ conditions := [
         }
     ]
 ]
+summary := helpers.get_multi_summary(conditions, vars.variables)
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
 details := helpers.get_multi_summary(conditions, vars.variables).details

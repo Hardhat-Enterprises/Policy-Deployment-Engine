@@ -1,7 +1,7 @@
-package terraform.gcp.firestore.backup_schedule.daily_recurrence
+package terraform.gcp.security.firestore.firestore_backup_schedule.daily_recurrence
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.firestore.vars
+import data.terraform.gcp.security.firestore.firestore_backup_schedule.vars
 
 conditions := [
     [
@@ -19,6 +19,8 @@ conditions := [
         }
     ]
 ]
+
+summary := helpers.get_multi_summary(conditions, vars.variables)
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
 details := helpers.get_multi_summary(conditions, vars.variables).details

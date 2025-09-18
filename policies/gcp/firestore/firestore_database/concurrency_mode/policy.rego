@@ -1,7 +1,7 @@
-package terraform.gcp.security.firestore_database.concurrency_mode
+package terraform.gcp.security.firestore.firestore_database.concurrency_mode
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.firestore.vars
+import data.terraform.gcp.security.firestore.firestore_database.vars
 
 conditions := [
     [
@@ -19,6 +19,8 @@ conditions := [
         }
     ]
 ]
+
+summary := helpers.get_multi_summary(conditions, vars.variables)
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
 details := helpers.get_multi_summary(conditions, vars.variables).details

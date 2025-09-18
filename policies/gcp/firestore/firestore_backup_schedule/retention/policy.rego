@@ -1,7 +1,7 @@
-package terraform.gcp.firestore.backup_schedule.retention
+package terraform.gcp.security.firestore.firestore_backup_schedule.retention
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.firestore.vars
+import data.terraform.gcp.security.firestore.firestore_backup_schedule.vars
 
 conditions := [
     [
