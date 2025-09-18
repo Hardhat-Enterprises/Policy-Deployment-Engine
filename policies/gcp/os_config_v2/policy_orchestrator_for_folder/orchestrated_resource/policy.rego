@@ -17,7 +17,7 @@ conditions := [
     {"situation_description" : "OS-Policies does not allow mode to be specific as VALIDATION",
     "remedies" : ["Only use of ENFORCEMENT is allowed to utilize the build feature before deployment"]},
     {
-        "condition": "Unspecified mode is not allowed to be used in orchestrated resource",
+        "condition": "Check if the mode is VALIDATION",
         "attribute_path" : ["orchestrated_resource",0,"os_policy_assignment_v1_payload",0,"os_policies",0,"mode"], 
         "values" : ["VALIDATION"],
         "policy_type" : "blacklist" 
