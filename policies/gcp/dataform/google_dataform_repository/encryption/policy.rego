@@ -45,7 +45,7 @@ conditions := [
     {
       "condition": "kms_key_name must match CMEK resource format",
       "attribute_path": ["kms_key_name"],
-      "values": ["projects/*/locations/*/keyRings/*/cryptoKeys/*", ["projects", "*", "locations", "*", "keyRings", "*", "cryptoKeys", "*"]],
+      "values": ["projects/*/locations/*/keyRings/*/cryptoKeys/*", [["*"], ["*"], ["*"], ["*"]]],
       "policy_type": "pattern whitelist"
     }
   ]

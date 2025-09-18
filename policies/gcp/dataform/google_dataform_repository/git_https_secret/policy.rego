@@ -45,7 +45,7 @@ conditions := [
     {
       "condition": "Secret version must match Secret Manager format",
       "attribute_path": ["git_remote_settings", 0, "authentication_token_secret_version"],
-      "values": ["projects/*/secrets/*/versions/*", ["projects", "*", "secrets", "*", "versions", "*"]],
+      "values": ["projects/*/secrets/*/versions/*", [["*"], ["*"], ["*"]]],
       "policy_type": "pattern whitelist"
     }
   ]

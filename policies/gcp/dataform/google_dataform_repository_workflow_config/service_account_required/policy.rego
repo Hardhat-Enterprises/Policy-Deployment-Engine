@@ -13,9 +13,24 @@ conditions := [
             ]
         },
         {
+            "condition": "invocation_config.service_account must not be null",
+            "attribute_path": ["invocation_config", 0, "service_account"],
+            "values": [null],
+            "policy_type": "blacklist"
+        }
+    ],
+    [
+        {
+            "situation_description": "Workflow configs must define an invocation_config.service_account",
+            "remedies": [
+                "Set invocation_config.service_account to a valid service account email",
+                "Ensure the service account has appropriate permissions for workflow execution"
+            ]
+        },
+        {
             "condition": "invocation_config.service_account must not be empty",
             "attribute_path": ["invocation_config", 0, "service_account"],
-            "values": [null, ""],
+            "values": [""],
             "policy_type": "blacklist"
         }
     ]

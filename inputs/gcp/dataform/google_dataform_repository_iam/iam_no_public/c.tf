@@ -17,6 +17,7 @@ resource "google_dataform_repository_iam_binding" "c" {
   members    = [
     "user:alice@example.com"
   ]
+  name       = "c"
 }
 
 
