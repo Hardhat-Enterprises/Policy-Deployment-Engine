@@ -1,9 +1,7 @@
 import os
 import json
 import shutil
-import time
 import re
-from collections import defaultdict
 
 import customtkinter as ctk
 from tkinter import messagebox
@@ -17,8 +15,10 @@ from config import (
     TEMPLATE_FILES_TF,
     TEMPLATE_POLICY,
     TEMPLATE_VARS,
-    CACHE_DIR,
 )
+
+# ---------- Runtime Cache ----------
+runtime_cache = {}
 
 # ---------- Utility Functions ----------
 def get_cloud_paths(cloud):
@@ -29,8 +29,8 @@ def get_cloud_paths(cloud):
         "policy_dir": os.path.join(POLICY_BASE_DIR, base_cloud),
     }
 
-# Saves current app state
 def save_state(state):
+    os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
     try:
         with open(STATE_FILE, "w", encoding="utf-8") as f:
             json.dump(state, f, indent=2)
@@ -46,7 +46,7 @@ def load_state():
             return {}
     return {}
 
-# ---------- Local Docs Logic ----------
+# ---------- Docs Directory Reading ----------
 def scan_provider_services(cloud):
     docs_folder = CLOUD_CONFIGS[cloud]["docs_folder"]
     service_resources = {}
@@ -59,45 +59,21 @@ def scan_provider_services(cloud):
             resources = []
             for fname in sorted(os.listdir(service_path)):
                 if fname.endswith(".json"):
-                    resource_name = fname[:-5]  # Remove .json
+                    resource_name = fname[:-5]  # strip .json
                     resources.append(resource_name)
             service_resources[service_name] = resources
     return service_resources
 
-def cache_services(cloud, service_map):
-    cache_file = CLOUD_CONFIGS[cloud]["cache_file"]
-    with open(cache_file, "w", encoding="utf-8") as f:
-        json.dump(service_map, f, indent=2)
-
-def load_services_from_cache(cloud):
-    file = CLOUD_CONFIGS[cloud]["cache_file"]
-    if os.path.exists(file):
-        try:
-            with open(file, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception:
-            pass
-    return {}
-
 def load_all_cloud_services(force_refresh=False):
-    all_services = {}
-    for cloud in CLOUD_CONFIGS:
-        if force_refresh:
-            services = scan_provider_services(cloud)
-            cache_services(cloud, services)
-        else:
-            services = load_services_from_cache(cloud)
-            if not services:
-                services = scan_provider_services(cloud)
-                cache_services(cloud, services)
-        all_services[cloud] = services
-    return all_services
+    global runtime_cache
+    if force_refresh or not runtime_cache:
+        all_services = {}
+        for cloud in CLOUD_CONFIGS:
+            all_services[cloud] = scan_provider_services(cloud)
+        runtime_cache = all_services
+    return runtime_cache
 
-def resource_json_path(cloud, service, resource):
-    docs_folder = CLOUD_CONFIGS[cloud]["docs_folder"]
-    return os.path.join(docs_folder, service, "resource_json", f"{resource}.json")
-
-# ---------- File Management ----------
+# ---------- File Copy Helper ----------
 def copy_files(files, src_dir, dest_dir):
     os.makedirs(dest_dir, exist_ok=True)
     for file in files:
@@ -122,7 +98,7 @@ def create_policy_files(cloud, service, resource, policy_name):
         shutil.copyfile(os.path.join(paths["template_dir"], TEMPLATE_VARS), os.path.join(vars_dir, TEMPLATE_VARS))
     messagebox.showinfo("Success", f"Created structure for {cloud}/{service}/{resource}/{policy_name}")
 
-# ---------- UI ----------
+# ---------- UI Components ----------
 class SearchableDropdown(ctk.CTkFrame):
     def __init__(self, master, values=None, variable=None, placeholder="Select...", command=None, width=400):
         super().__init__(master)
@@ -198,7 +174,7 @@ class SearchableDropdown(ctk.CTkFrame):
         rebuild_list()
         search_entry.focus_set()
 
-# ---------- App ----------
+# ---------- Main App ----------
 class PolicyApp(ctk.CTk):
     def __init__(self, saved_state, all_service_maps):
         super().__init__()
@@ -240,7 +216,7 @@ class PolicyApp(ctk.CTk):
         btn_row = ctk.CTkFrame(container, fg_color="transparent")
         btn_row.grid(row=row, column=0, columnspan=2, sticky="ew", padx=10, pady=16)
         create_btn = ctk.CTkButton(btn_row, text="Create Policy", command=self.on_create)
-        create_btn.pack(side="left", padx=(0, 10))
+        create_btn.pack(side="left",  padx=(0, 10))
         refresh_btn = ctk.CTkButton(btn_row, text="Refresh Services", command=self.refresh_services)
         refresh_btn.pack(side="left")
         self.service_map = {}
@@ -276,7 +252,8 @@ class PolicyApp(ctk.CTk):
         if not service_map:
             messagebox.showerror("Error", f"Failed to refresh {cloud} services.")
             return
-        cache_services(cloud, service_map)
+        global runtime_cache
+        runtime_cache[cloud] = service_map
         self.all_service_maps[cloud] = service_map
         self.service_map = service_map
         self.service_field.set_values(sorted(service_map.keys()))
@@ -329,8 +306,7 @@ class PolicyApp(ctk.CTk):
         if not re.match(r'^[A-Za-z][A-Za-z_]*$', policy_name):
             messagebox.showerror(
                 "Invalid Policy Name",
-                "Policy name must only contain alphabets with underscores between words. "
-                "Examples: MyPolicy, My_Policy, Another_Policy_Test"
+                "Policy name must only contain alphabets with underscores between words. Examples: MyPolicy, My_Policy, Another_Policy_Test"
             )
             return
         create_policy_files(cloud, service, resource, policy_name)
@@ -350,15 +326,15 @@ class PolicyApp(ctk.CTk):
         self.save_current_state()
         self.destroy()
 
-# ---------- Main ----------
+# ---------- Main Entry ----------
 if __name__ == "__main__":
-    print("Docs path for GCP:", CLOUD_CONFIGS["GCP"]["docs_folder"])
-    print("Directory exists:", os.path.isdir(CLOUD_CONFIGS["GCP"]["docs_folder"]))
-
-    os.makedirs(CACHE_DIR, exist_ok=True)
+    os.makedirs(CLOUD_CONFIGS["GCP"]["docs_folder"], exist_ok=True)  # Ensure docs folder exists
+    os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)  # Ensure state folder exists
     ctk.set_appearance_mode("system")
     ctk.set_default_color_theme("blue")
+
     saved_state = load_state()
     all_service_maps = load_all_cloud_services(force_refresh=False)
+
     app = PolicyApp(saved_state, all_service_maps)
     app.mainloop()

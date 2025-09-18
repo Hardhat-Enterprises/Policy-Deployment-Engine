@@ -1,32 +1,28 @@
 import os
 
-# Always resolve BASE_DIR to scripts/folder-generator
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Set PROJECT_ROOT to your repo's top directory
+# Set project root to two levels up from this file (scripts/folder-generator)
 PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, "..", ".."))
 
-# Docs directory now points to ../docs from root, as required
 DOCS_DIR = os.path.join(PROJECT_ROOT, "docs")
 
-# Cache directory (if needed) inside scripts/folder-generator/cache
-CACHE_DIR = os.path.join(BASE_DIR, "cache")
+CACHE_DIR = os.path.join(BASE_DIR, "cache")  # Cache dir still exists for other files like user state
 
 CLOUD_CONFIGS = {
     "GCP": {
         "docs_folder": os.path.join(DOCS_DIR, "gcp"),
-        "cache_file": os.path.join(CACHE_DIR, "gcp_service_cache.json"),
+        "cache_file": None,  # Not used now
     },
-    # Uncomment and modify as you add more providers:
+    # Uncomment when ready
     # "Azure": {
-    #     "docs_folder": os.path.join(DOCS_DIR, "azure"),
-    #     "cache_file": os.path.join(CACHE_DIR, "azure_service_cache.json"),
+    #    "docs_folder": os.path.join(DOCS_DIR, "azure"),
+    #    "cache_file": None,
     # },
 }
 
 STATE_FILE = os.path.join(CACHE_DIR, "user_state.json")
 
-# These should be root-level directories, not relative to BASE_DIR
 TEMPLATE_BASE_DIR = os.path.join(PROJECT_ROOT, "templates")
 INPUT_BASE_DIR = os.path.join(PROJECT_ROOT, "inputs")
 POLICY_BASE_DIR = os.path.join(PROJECT_ROOT, "policies")
