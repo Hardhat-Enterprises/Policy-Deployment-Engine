@@ -1,7 +1,7 @@
-package terraform.gcp.security.memorystore.instance.authorization_mode
+package terraform.gcp.security.memorystore.memorystore_instance.authorization_mode
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.memorystore.redis.vars
+import data.terraform.gcp.security.memorystore.memorystore_instance.vars
 
 conditions := [
     [
@@ -19,6 +19,7 @@ conditions := [
         }
     ]
 ]
+summary := helpers.get_multi_summary(conditions, vars.variables)
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
 details := helpers.get_multi_summary(conditions, vars.variables).details
