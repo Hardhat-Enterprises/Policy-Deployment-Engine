@@ -4,20 +4,24 @@ import data.terraform.gcp.security.gdce.cluster.vars
 
 conditions := [
 
-    # Maintenance Policy - Fixed check
     [
         {
             "situation_description": "Cluster maintenance policy window is not configured.",
-            "remedies": ["Configure maintenance window to avoid production disruptions", "Set recurring window for maintenance"]
+            "remedies": [
+                "Configure maintenance window to avoid production disruptions",
+                "Set recurring window for maintenance"
+            ]
         },
         {
             "condition": "Maintenance policy must be present",
             "attribute_path": ["maintenance_policy"],
-            "values": [{}],  # Empty dict means missing policy triggers non-compliance
+            "values": [null],
             "policy_type": "blacklist"
         }
     ],
+
 ]
+
 
 # ------------------------------------------------------------
 # Compliance messages

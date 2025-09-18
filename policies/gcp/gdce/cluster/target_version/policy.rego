@@ -4,20 +4,21 @@ import data.terraform.gcp.security.gdce.cluster.vars
 
 conditions := [
 
-    # Minimum Target Version Check
     [
         {
             "situation_description": "Cluster is running a target version lower than the minimum secure version.",
-            "remedies": ["Upgrade cluster target_version to 1.5.0 or higher to mitigate known vulnerabilities"]
+            "remedies": [
+                "Upgrade cluster target_version to 1.5.0 or higher to mitigate known vulnerabilities"
+            ]
         },
         {
-            "condition": "Target version must be at least 1.5.0",
+            "condition": "Target version must be one of the approved secure versions",
             "attribute_path": ["target_version"],
-            "values": ["1.5.0"],  # Minimum acceptable version
-            "policy_type": "range", # ✅ Use range to check minimum version
-            "comparison": "gte"     # greater than or equal
+            "values": ["1.5.0", "1.5.1", "1.6.0"], # extend list as new versions are approved
+            "policy_type": "whitelist"
         }
     ],
+
 ]
 
 # ------------------------------------------------------------

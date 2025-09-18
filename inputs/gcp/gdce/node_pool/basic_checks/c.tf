@@ -3,6 +3,6 @@ resource "google_edgecontainer_node_pool" "c" {
   name          = "c"  #  #Required
   location      = "australia-southeast1" #Required
   cluster       = "gdceclusterlabels-c"    # Valid cluster #Required
-  node_location = "us-central1-edge-customer-a"  # Approved location #Required
+  node_location = "australia-southeast1-edge-customer-a"  # Approved location #Required
   node_count    = 3                        # Within 1-5 range #Required #Required
 }

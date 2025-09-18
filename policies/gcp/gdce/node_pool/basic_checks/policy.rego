@@ -8,12 +8,12 @@ conditions := [
 	[
 		{
 			"situation_description": "Node pool is in an invalid location.",
-			"remedies": ["Use approved edge locations: us-central1-edge-customer-a, europe-west1-edge-customer-b"],
+			"remedies": ["Use approved edge locations: australia-southeast1-edge-customer-a, australia-southeast1-edge-customer-b"],
 		},
 		{
 			"condition": "Node location must be in approved list",
 			"attribute_path": ["node_location"],
-			"values": ["australia-southeast1", "australia-southeast2"],
+			"values": ["australia-southeast1-edge-customer-a", "australia-southeast1-edge-customer-b"],
 			"policy_type": "whitelist",
 		},
 	],

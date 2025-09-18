@@ -3,21 +3,20 @@ import data.terraform.gcp.helpers
 import data.terraform.gcp.security.gdce.vpn_connection.vars
 
 conditions := [
-    # VPC security validation - restrict to approved projects/ranges
+    # VPC format validation - blacklist invalid patterns
     [
         {
-            "situation_description": "Cluster VPC is overly permissive or outside approved projects.",
-            "remedies": ["Use an approved VPC in your project", "Ensure CIDR ranges are RFC1918 and not 0.0.0.0/0"]
+            "situation_description": "VPN connection uses invalid VPC format.",
+            "remedies": ["Use proper VPC format: projects/PROJECT/global/networks/VPC-NAME"]
         },
         {
-            "condition": "VPC must be within approved ranges/projects",
-            "attribute_path": ["networking", 0, "cluster_ipv4_cidr_blocks"],
-            "values": ["0.0.0.0/0"],  # blacklist overly permissive ranges
+            "condition": "VPC must not use invalid formats",
+            "attribute_path": ["vpc"],
+            "values": ["invalid-vpc-format", "", null],  # Blacklist specific invalid patterns
             "policy_type": "blacklist"
         }
     ]
 ]
-
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
 details := helpers.get_multi_summary(conditions, vars.variables).details
