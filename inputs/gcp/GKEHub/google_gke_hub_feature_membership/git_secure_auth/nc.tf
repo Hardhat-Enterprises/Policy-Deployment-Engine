@@ -1,7 +1,7 @@
 resource "google_gke_hub_feature_membership" "nc" {
   location   = "global"
   feature    = "configmanagement"
-  membership = "my-membership-nc"
+  membership = "nc"
 
   configmanagement {
     config_sync {

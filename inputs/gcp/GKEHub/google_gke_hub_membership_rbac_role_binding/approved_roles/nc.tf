@@ -4,7 +4,7 @@ resource "google_gke_hub_membership_rbac_role_binding" "nc" {
   membership_rbac_role_binding_id = "nc"
   membership_id = "basic"
   location      = "global"
-  user          = "allUsers"
+  user          = "devops@example.com"
 
   role {
     predefined_role = "ADMIN"

@@ -2,23 +2,21 @@ package terraform.gcp.security.gke_hub.google_gke_hub_feature_iam_binding.no_pub
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.gke_hub.google_gke_hub_feature_iam_binding.vars
 
-
 conditions := [[
   {
     "situation_description": "IAM member grant uses a public principal",
-    "remedies": [
-      "Remove allUsers/allAuthenticatedUsers, use an account from your org domain"]
+    "remedies": ["Remove any public principals,use org service accounts"]
   },
   {
-    "condition": "c1 members must NOT be allUser",
+    "condition": "members[0] must NOT be public",
     "attribute_path": ["members", 0],
-    "values": ["allUsers"],
+    "values": ["allUsers","allAuthenticatedUsers"],
     "policy_type": "blacklist"
   },
   {
-    "condition": "c2 members must NOT be allAuthenticatedUsers",
+    "condition": "members[1] must NOT be public",
     "attribute_path": ["members", 1],
-    "values": ["allAuthenticatedUsers"],
+    "values": ["allUsers","allAuthenticatedUsers"],
     "policy_type": "blacklist"
   }
 ]]

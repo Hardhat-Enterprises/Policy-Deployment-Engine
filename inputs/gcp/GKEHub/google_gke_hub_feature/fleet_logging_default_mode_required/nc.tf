@@ -1,5 +1,5 @@
 resource "google_gke_hub_feature" "nc" {
-  name     = "fleetobservability"
+  name = "nc"
   location = "global"
   project  = "1234"
   spec {

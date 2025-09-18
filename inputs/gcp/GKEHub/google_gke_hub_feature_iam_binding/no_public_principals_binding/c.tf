@@ -1,7 +1,7 @@
 resource "google_gke_hub_feature_iam_binding" "c" {
   project  = "example-project-123"
   location = "global"
-  name     = "policycontroller-c"
+  name     = "c"
   role     = "roles/gkehub.viewer"
   
   members = [

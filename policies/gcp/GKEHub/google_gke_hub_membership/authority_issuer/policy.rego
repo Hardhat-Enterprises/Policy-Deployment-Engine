@@ -6,7 +6,7 @@ conditions := [
   [ 
     {
       "situation_description": "Membership has no Workload Identity issuer configured",
-      "remedies": ["Set authority.issuer to your cluster's issuer URL"]
+      "remedies": ["authority.issuer MUST not be empty"]
     },
     {
       "condition": "authority.issuer must NOT be empty",

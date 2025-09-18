@@ -14,18 +14,6 @@ conditions := [
       "values": ["VIEW","EDIT","ANTHOS_SUPPORT"],
       "policy_type": "whitelist"
     }
-  ],
-  [
-    {
-      "situation_description": "Public principals are not allowed",
-      "remedies": ["ONLY use org service accounts"]
-    },
-    {
-      "condition": "user must NOT be public",
-      "attribute_path": ["user"],
-      "values": ["allUsers","allAuthenticatedUsers"],
-      "policy_type": "blacklist"
-    }
   ]
 ]
 

@@ -1,4 +1,3 @@
-
 package terraform.gcp.security.gke_hub.google_gke_hub_feature_iam_binding.vars
 
 variables := {
