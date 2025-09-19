@@ -1,4 +1,4 @@
-resource "google_memorystore_instance" "instance-full" {
+resource "google_memorystore_instance" "c" {
   instance_id                  = "full-instance"
   shard_count                  = 1
   desired_auto_created_endpoints {

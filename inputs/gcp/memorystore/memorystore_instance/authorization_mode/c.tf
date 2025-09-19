@@ -1,4 +1,4 @@
-resource "google_memorystore_instance" "instance-full_c" {
+resource "google_memorystore_instance" "c" {
   instance_id                  = "full-instance-c"
   shard_count                  = 1
   desired_auto_created_endpoints {
@@ -9,7 +9,8 @@ resource "google_memorystore_instance" "instance-full_c" {
   replica_count                = 1
   node_type                    = "SHARED_CORE_NANO"
   transit_encryption_mode      = "TRANSIT_ENCRYPTION_DISABLED"
-  authorization_mode           = "AUTH_DISABLED"
+  # authorization_mode           = "AUTH_DISABLED"
+  authorization_mode           = "AUTH_MODE_IAM_AUTH"
   kms_key                      = "my-key"
   engine_configs = {     
     maxmemory-policy           = "volatile-ttl"
