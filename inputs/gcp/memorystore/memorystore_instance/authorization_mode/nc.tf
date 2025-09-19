@@ -75,5 +75,5 @@ resource "google_compute_network" "producer_net_nc" {
 }
 
 data "google_project" "project_nc" {
-  project_id = "abcd_1234"
+  # project_id = "abcd_1234"
 }
