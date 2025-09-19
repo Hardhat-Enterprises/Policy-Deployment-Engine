@@ -9,4 +9,7 @@ terraform {
    required_version = ">= 1.3.0"
 }
 
-provider "google" {}
+provider "google" {
+  project = "your-gcp-project-id"
+  region  = "us-central1"
+}
