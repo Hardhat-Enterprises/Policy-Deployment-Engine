@@ -13,7 +13,7 @@ conditions := [
       {
         "condition": "allow_cross_region is mis-configured",
         "attribute_path": ["chat_engine_config", 0, "allow_cross_region"],
-        "values": ["GENERIC"],
+        "values": [false],
         "policy_type": "whitelist"
       }
     ]
