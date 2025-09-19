@@ -1,4 +1,5 @@
 resource "google_firestore_document" "nc" {
+  name        = "nc"
   project      = "abcd_1234"
   database     = "(default)"
   # collection   = ""
