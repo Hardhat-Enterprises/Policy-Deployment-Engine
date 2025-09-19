@@ -142,7 +142,7 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
         # ("terraform show -json plan > plan.json"),
     ]
     for cmd in tf_commands:
-        result = subprocess.run(cmd, shell=True, cwd=str(input_dir), capture_output=True, text=True, env=env)
+        # result = subprocess.run(cmd, shell=True, cwd=str(input_dir), capture_output=True, text=True, env=env)
         result = subprocess.run("terraform show -json plan", shell=True, cwd=str(input_dir), capture_output=True,
                                 text=True, env=env)
         if result.returncode != 0:
