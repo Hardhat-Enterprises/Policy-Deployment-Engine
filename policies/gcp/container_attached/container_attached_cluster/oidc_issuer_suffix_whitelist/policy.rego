@@ -13,7 +13,7 @@ conditions := [
       "condition": "OIDC issuer must end with approved suffix",
       "attribute_path": ["oidc_config", 0 , "issuer_url"],
       "values": [".oidc.corp.example.com"],
-      "policy_type": "suffix_whitelist"
+      "policy_type": "whitelist"
     }
   ]
 ]
