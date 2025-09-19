@@ -1,11 +1,3 @@
-# Create VPC network named "my-network1"
-resource "google_compute_network" "lustre-network1" {
-  name                    = "my-network1"
-  auto_create_subnetworks = true
-  project                 = "fake-project"
-}
-
-# Create Google Lustre instance
 resource "google_lustre_instance" "c" {
   project                     = "fake-project"
   instance_id                 = "my-instance"
@@ -13,7 +5,7 @@ resource "google_lustre_instance" "c" {
   description                 = "c"
   filesystem                  = "fs2"
   capacity_gib                = 18000
-  network                     = google_compute_network.lustre-network1.id
+  network                     = "projects/fs1/global/networks/nw1"
   per_unit_storage_throughput = 1000
   labels = {
     test = "value"
