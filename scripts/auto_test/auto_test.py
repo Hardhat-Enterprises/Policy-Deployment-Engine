@@ -139,16 +139,13 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
     tf_commands = [
         ("terraform init -backend=false -reconfigure"),
         ("terraform plan -refresh=false -input=false -out=plan"),
-        # ("terraform show -json plan > plan.json"),
+        ("terraform show -json plan > plan.json"),
     ]
     for cmd in tf_commands:
-        # result = subprocess.run(cmd, shell=True, cwd=str(input_dir), capture_output=True, text=True, env=env)
-        result = subprocess.run("terraform show -json plan", shell=True, cwd=str(input_dir), capture_output=True,
-                                text=True, env=env)
+        result = subprocess.run(cmd, shell=True, cwd=str(input_dir), capture_output=True, text=True, env=env)
         if result.returncode != 0:
             if verbose:
-                # print(f" Command failed: {cmd}")
-                print(f" Command failed: terraform show")
+                print(f" Command failed: {cmd}")
                 print(result.stdout)
                 print(result.stderr)
             return None
