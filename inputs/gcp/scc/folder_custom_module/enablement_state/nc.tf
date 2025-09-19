@@ -3,13 +3,13 @@
 
 resource "google_folder" "folder_nc" {
   parent       = "organizations/123456789"
-  display_name = "folder-name"
+  display_name = "nc"
   deletion_protection = false
 }
 
 resource "google_scc_folder_custom_module" "nc" {
   folder = google_folder.folder_nc.folder_id
-  display_name = "enablement_state"
+  display_name = "nc"
   enablement_state = "DISABLED"
   custom_config {
     predicate {
