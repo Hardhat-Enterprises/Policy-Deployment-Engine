@@ -13,7 +13,7 @@ conditions := [[
         ]
     },
         {
-            "condition": "event_based_hold must not be false",
+            "condition": "event_based_hold must not be UNSET",
             "attribute_path": ["put_object_hold", 0, "event_based_hold"],
             "policy_type": "blacklist",
             "values": ["UNSET"]

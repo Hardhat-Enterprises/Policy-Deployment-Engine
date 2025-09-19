@@ -1,7 +1,7 @@
 resource "google_storage_batch_operations_job" "nc" {
   provider = google-beta
   project  = "test-project"
-  job_id   = "nc"
+  job_id   = "nc1"
   bucket_list {
     buckets {
       bucket = "my-bucket"

@@ -12,10 +12,10 @@ conditions := [[
         ]
     },
     {
-        "condition": "kms_key must match CMEK pattern",
+        "condition": "kms_key must be a valid CMEK path",
         "attribute_path": ["rewrite_object", 0, "kms_key"],
         "policy_type": "pattern whitelist",
-        "values": ["projects/*/locations/*/keyRings/*/cryptoKeys/*", [["*"]]]
+        "values": ["^projects/[^/]+/locations/[^/]+/keyRings/[^/]+/cryptoKeys/[^/]+$"]
     }
 ]]
 
