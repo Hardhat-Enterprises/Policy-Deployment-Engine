@@ -1,4 +1,15 @@
-resource "google_firestore_database" "c" {
+resource "google_firestore_backup_schedule" "c" {
+  project  = "abcd_1234"
+  database = google_firestore_database.d-c.name
+
+  retention = "8467200s" // 14 weeks (maximum possible retention)
+
+  weekly_recurrence {
+    day = "SUNDAY"
+  }
+}
+
+resource "google_firestore_database" "d-c" {
   project     = "abcd_1234"
   name        = "c"
   location_id = "nam5"
@@ -8,13 +19,3 @@ resource "google_firestore_database" "c" {
   deletion_policy         = "DELETE"
 }
 
-resource "google_firestore_backup_schedule" "weekly-backup-c" {
-  project  = "abcd_1234"
-  database = google_firestore_database.c.name
-
-  retention = "8467200s" // 14 weeks (maximum possible retention)
-
-  weekly_recurrence {
-    day = "SUNDAY"
-  }
-}
