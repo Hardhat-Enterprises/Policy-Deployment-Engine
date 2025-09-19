@@ -3,7 +3,6 @@ package terraform.gcp.security.oslogin.google_compute_instance.disallow_legacy_m
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.oslogin.google_compute_instance.vars
 
-# Scenario: Instances with OS Login must not use legacy ssh-keys metadata
 conditions := [
     [
         {

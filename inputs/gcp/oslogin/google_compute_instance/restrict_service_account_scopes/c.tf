@@ -19,7 +19,7 @@ resource "google_compute_instance" "c" {
   }
 
   service_account {
-    email  = "good-sa@dummy-project.iam.gserviceaccount.com"
+    email  = "oslogin-sa@my-project.iam.gserviceaccount.com"
     scopes = ["https://www.googleapis.com/auth/logging.write"]
   }
 }

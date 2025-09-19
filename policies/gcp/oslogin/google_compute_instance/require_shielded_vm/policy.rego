@@ -3,7 +3,6 @@ package terraform.gcp.security.oslogin.google_compute_instance.require_shielded_
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.oslogin.google_compute_instance.vars
 
-# Scenario: Instances must use Shielded VM Secure Boot
 conditions := [
     [
         {

@@ -9,15 +9,14 @@ conditions := [
         {
             "situation_description": "Instances with OS Login must not use overly broad service account scopes",
             "remedies": [
-                "Remove cloud-platform scope",
-                "Use minimal scopes such as logging.write or monitoring.write"
+                "Replace \"cloud-platform\" scope with more restrictive scopes like \"logging.write\" or \"monitoring.write\"
             ]
         },
         {
             "condition": "Service account scopes must not include cloud-platform",
-            "attribute_path": ["service_account", 0, "scopes", 0],
-            "values": ["https://www.googleapis.com/auth/cloud-platform"],
-            "policy_type": "blacklist"
+            "attribute_path": ["service_account", 0, "scopes"],
+            "values": ["*cloud-platform*"],
+            "policy_type": "pattern blacklist"
         }
     ]
 ]

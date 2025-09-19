@@ -12,7 +12,9 @@ resource "google_compute_instance" "c" {
 
   network_interface {
     network = "default"
-    # no access_config = private only
+    access_config {
+      nat_ip = "127.0.0.1" # Whitelisted IP
+    }
   }
 
   metadata = {
