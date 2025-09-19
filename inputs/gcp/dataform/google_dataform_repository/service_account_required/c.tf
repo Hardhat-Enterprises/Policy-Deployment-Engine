@@ -8,7 +8,4 @@ resource "google_dataform_repository" "c" {
   service_account = "dataform-service@my-test-project.iam.gserviceaccount.com"
 }
 
-variable "project" {
-  type = string
-}
 

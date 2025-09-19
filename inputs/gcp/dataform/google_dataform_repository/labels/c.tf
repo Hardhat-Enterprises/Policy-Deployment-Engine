@@ -14,7 +14,4 @@ resource "google_dataform_repository" "c" {
   }
 }
 
-variable "project" {
-  type = string
-}
 

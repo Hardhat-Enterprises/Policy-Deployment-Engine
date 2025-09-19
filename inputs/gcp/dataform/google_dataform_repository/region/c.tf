@@ -8,6 +8,3 @@ resource "google_dataform_repository" "c" {
   display_name = "dataform-repository-compliant-region"
 }
 
-variable "project" {
-  type = string
-}

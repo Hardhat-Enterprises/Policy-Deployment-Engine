@@ -18,6 +18,3 @@ resource "google_dataform_repository_release_config" "c" {
   cron_schedule   = "0 2 * * *"
 }
 
-variable "project" {
-  type = string
-}

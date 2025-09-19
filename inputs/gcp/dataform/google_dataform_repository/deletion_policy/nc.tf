@@ -5,7 +5,6 @@ resource "google_dataform_repository" "nc" {
   project        = var.project
   region         = "australia-southeast1"
   name           = "nc"
-  deletion_policy = "FORCE"
 }
 
 

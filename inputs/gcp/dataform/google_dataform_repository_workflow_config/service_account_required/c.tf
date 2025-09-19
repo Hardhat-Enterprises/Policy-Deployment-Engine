@@ -30,6 +30,3 @@ resource "google_dataform_repository_workflow_config" "c" {
   }
 }
 
-variable "project" {
-  type = string
-}

@@ -41,10 +41,14 @@ def generate_top_level_table(args_dict, resource_name=None):
     for arg, details in args_dict.items():
         validate_argument(details)
 
+        rationale = details.get('rationale') if details.get('rationale') is not None else 'None'
+        compliant = details.get('compliant') if details.get('compliant') is not None else 'None'
+        non_compliant = details.get('non_compliant') if details.get('non_compliant') is not None else 'None'
+        
         md += (
             f"| `{arg}` | {details['description']} | {str(details['required']).lower()} "
-            f"| {str(details['security_impact']).lower()} | {details.get('rationale','')} "
-            f"| {details['compliant']} | {details['non-compliant']} |\n"
+            f"| {str(details['security_impact']).lower()} | {rationale} "
+            f"| {compliant} | {non_compliant} |\n"
         )
 
     return md
@@ -71,10 +75,14 @@ def generate_nested_blocks(args_dict, level=0, resource_name=None):
             for sub_arg, sub_details in details["arguments"].items():
                 validate_argument(sub_details)
 
+                sub_rationale = sub_details.get('rationale') if sub_details.get('rationale') is not None else 'None'
+                sub_compliant = sub_details.get('compliant') if sub_details.get('compliant') is not None else 'None'
+                sub_non_compliant = sub_details.get('non_compliant') if sub_details.get('non_compliant') is not None else 'None'
+                
                 md += (
                     f"{indent}| `{sub_arg}` | {sub_details['description']} | {str(sub_details['required']).lower()} "
-                    f"| {str(sub_details['security_impact']).lower()} | {sub_details.get('rationale','')} "
-                    f"| {sub_details['compliant']} | {sub_details['non-compliant']} |\n"
+                    f"| {str(sub_details['security_impact']).lower()} | {sub_rationale} "
+                    f"| {sub_compliant} | {sub_non_compliant} |\n"
                 )
 
             # Recurse into deeper nested blocks

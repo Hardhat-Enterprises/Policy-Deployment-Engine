@@ -9,6 +9,3 @@ resource "google_dataform_repository" "c" {
   kms_key_name   = "projects/my-project/locations/australia-southeast1/keyRings/dataform-kr/cryptoKeys/dataform-key"
 }
 
-variable "project" {
-  type = string
-}
