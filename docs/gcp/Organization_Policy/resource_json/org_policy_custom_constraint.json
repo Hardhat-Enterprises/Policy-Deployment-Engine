@@ -5,74 +5,108 @@
     "name": {
       "description": "Immutable. The name of the custom constraint. This is unique within the organization.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Identifies the custom constraint for enforcement and auditing.",
+      "rationale": "Unique names prevent overlap or accidental override of constraints.",
+      "compliant": "custom.restrictExternalBuckets",
+      "non-compliant": "constraint1",
       "parent": null
     },
     "condition": {
       "description": "A CEL condition that refers to a supported service resource, for example `resource.management.autoUpgrade == false`. For details about CEL usage, see [Common Expression Language](https://cloud.google.com/resource-manager/docs/organization-policy/creating-managing-custom-constraints#common_expression_language).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Defines the enforcement logic to prevent insecure configurations.",
+      "rationale": "Improper conditions may weaken or break enforcement.",
+      "compliant": "resource.name.startsWith(\"projects/secure-\")",
+      "non-compliant": "resource.name == \"*\"",
       "parent": null
     },
     "action_type": {
       "description": "The action to take if the condition is met. Possible values are: `ALLOW`, `DENY`.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Determines how violations are handled (deny insecure behavior).",
+      "rationale": "Correctly setting this ensures insecure actions are blocked instead of allowed.",
+      "compliant": "DENY",
+      "non-compliant": "ALLOW for sensitive constraints",
       "parent": null
     },
     "method_types": {
       "description": "A list of RESTful methods for which to enforce the constraint. Can be `CREATE`, `UPDATE`, or both. Not all Google Cloud services support both methods. To see supported methods for each service, find the service in [Supported services](https://cloud.google.com/resource-manager/docs/organization-policy/custom-constraint-supported-services).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Ensures enforcement during resource creation and modification.",
+      "rationale": "Without restricting both methods, insecure updates may bypass enforcement.",
+      "compliant": "[\"CREATE\", \"UPDATE\"]",
+      "non-compliant": "[\"CREATE\"] only",
       "parent": null
     },
     "resource_types": {
       "description": "Immutable. The fully qualified name of the Google Cloud REST resource containing the object and field you want to restrict. For example, `container.googleapis.com/NodePool`.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Defines which resources are affected by the policy.",
+      "rationale": "Misconfigured resource types may lead to policies not being applied at all.",
+      "compliant": "[\"storage.googleapis.com/Bucket\"]",
+      "non-compliant": "[]",
       "parent": null
     },
     "parent": {
       "description": "The parent of the resource, an organization. Format should be `organizations/{organization_id}`.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Ensures enforcement applies across the correct org.",
+      "rationale": "Incorrect parent scope could leave projects without enforcement.",
+      "compliant": "organizations/123456789",
+      "non-compliant": "folders/123 without intent",
       "parent": null
     },
     "display_name": {
       "description": "A human-friendly name for the constraint.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Improves readability and auditability.",
+      "rationale": "Descriptive display names improve clarity during reviews.",
+      "compliant": "Restrict External Buckets",
+      "non-compliant": "Constraint1",
       "parent": null
     },
     "description": {
       "description": "A human-friendly description of the constraint to display as an error message when the policy is violated.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Provides clarity for admins when violations occur.",
+      "rationale": "Clear error messages make violations easier to resolve securely.",
+      "compliant": "Buckets outside org are denied.",
+      "non-compliant": "None",
       "parent": null
     }
-  }
+  },
+  "security_policies": [
+    {
+      "id": 7,
+      "title": "Restrict External Buckets",
+      "constraint": "custom.restrictExternalBuckets",
+      "rationale": "Prevents buckets outside the org from being attached to Dataplex or BigQuery.",
+      "compliant": "resource.project == \"secure-project\"",
+      "non_compliant": "resource.project == \"*\""
+    },
+    {
+      "id": 8,
+      "title": "Restrict Service Account Impersonation",
+      "constraint": "custom.restrictServiceAccountImpersonation",
+      "rationale": "Prevents users from impersonating high-privilege service accounts.",
+      "compliant": "principal.email.endsWith(\"@secure-org.com\")",
+      "non_compliant": "principal.email == \"*\""
+    },
+    {
+      "id": 9,
+      "title": "Restrict Cross-Project Networking",
+      "constraint": "custom.restrictCrossProjectNetworking",
+      "rationale": "Prevents attaching VPCs across projects unless explicitly whitelisted.",
+      "compliant": "resource.vpcProject in [\"secure-project-1\", \"secure-project-2\"]",
+      "non_compliant": "resource.vpcProject == \"*\""
+    },
+    {
+      "id": 10,
+      "title": "Restrict VM Images",
+      "constraint": "custom.restrictVmImages",
+      "rationale": "Ensures only approved VM images can be deployed (prevents shadow IT).",
+      "compliant": "resource.image in [\"projects/secure-org/global/images/base-secure-v1\"]",
+      "non_compliant": "resource.image == \"*\""
+    }
+  ]
 }
