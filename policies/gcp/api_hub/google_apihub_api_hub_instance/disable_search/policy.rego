@@ -10,7 +10,7 @@ conditions := [
     {
         "condition": "Check if disable_search is set to TRUE",
         "attribute_path" : ["config",0,"disable_search"], 
-        "values" : ["true"], 
+        "values" : [true], 
         "policy_type" : "whitelist" 
     }
     ]

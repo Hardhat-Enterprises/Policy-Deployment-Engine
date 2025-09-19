@@ -1,6 +1,6 @@
 resource "google_apihub_curation" "nc1" { 
   location = "us-central1"
-  curation_id = "testnc1"
+  curation_id = "nc1"
   project = "PDE"
   display_name = "API Hub Curation Endpoint Compliant Test NC1"
   endpoint {
@@ -14,7 +14,7 @@ resource "google_apihub_curation" "nc1" {
 
 resource "google_apihub_curation" "nc2" { 
   location = "us-central1nc2"
-  curation_id = "testnc2"
+  curation_id = "nc2"
   project = "PDE"
   display_name = "API Hub Curation Endpoint Compliant Test NC2"
   endpoint {
@@ -28,7 +28,7 @@ resource "google_apihub_curation" "nc2" {
 
 resource "google_apihub_curation" "nc3" { 
   location = "us-central1nc3"
-  curation_id = "testnc3"
+  curation_id = "nc3"
   project = "PDE"
   display_name = "API Hub Curation Endpoint Compliant Test NC3"
   endpoint {
