@@ -3,7 +3,7 @@ data "google_project" "project" {
 }
 
 resource "google_container_attached_cluster" "c" {
-  name         = "c"
+  name         = "ac-oidc-ok"
   project      = data.google_project.project.project_id
   location     = "australia-southeast1"
   distribution = "aks"

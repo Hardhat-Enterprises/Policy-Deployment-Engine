@@ -1,7 +1,7 @@
 package terraform.gcp.security.container_attached.container_attached_cluster.location_whitelist
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.container_attached.container_attached_cluster.vars
+import data.terraform.gcp.security.container_attached.container_attached_cluster.location_whitelist.vars
 
 conditions := [
   [
