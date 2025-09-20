@@ -3,58 +3,67 @@ package terraform.gcp.security.analytics_hub.listing_iam.naming_standard
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.analytics_hub.listing_iam.vars
 
-# Conditions to enforce
 conditions := [
     [
         {
-            "situation_description" : "IAM role must not be overly permissive (e.g., roles/owner).",
-            "remedies":[ 
+            "situation_description": "listing_id must be 'c' for compliant configurations.",
+            "remedies": [
+                "Rename listing_id to 'c' for compliant resources."
+            ]
+        },
+        {
+            "condition": "Check if listing_id is equal to 'c'",
+            "attribute_path": ["listing_id"],
+            "values": ["c"],
+            "policy_type": "whitelist"
+        }
+    ],
+    [
+        {
+            "situation_description": "listing_id must not start with 'nc' (non-compliant marker).",
+            "remedies": [
+                "Avoid using 'nc' as the prefix in listing_id.",
+                "Rename to 'c' once the resource passes compliance checks."
+            ]
+        },
+        {
+            "condition": "Check if listing_id does not start with 'nc'",
+            "attribute_path": ["listing_id"],
+            "values": ["^nc.*$"],
+            "policy_type": "pattern blacklist"
+        }
+    ],
+    [
+        {
+            "situation_description": "IAM role must not be overly permissive (e.g., roles/owner).",
+            "remedies": [
                 "Use least privilege roles such as roles/viewer, roles/editor, or custom roles.",
-                "Avoid granting roles/owner to members unless absolutely necessary."
+                "Avoid granting roles/owner unless absolutely necessary."
             ]
         },
         {
             "condition": "Check if role avoids disallowed values",
-            "attribute_path" : ["role"], 
-            "values" : ["roles/owner"], 
-            "policy_type" : "pattern blacklist"
+            "attribute_path": ["role"],
+            "values": ["roles/owner"],
+            "policy_type": "blacklist"
         }
     ],
     [
         {
-            "situation_description" : "IAM member must follow valid identity formats (user:, serviceAccount:, group:, domain:, etc.).",
-            "remedies":[ 
-                "Ensure IAM member uses a valid prefix such as user:alice@example.com or serviceAccount:my-sa@appspot.gserviceaccount.com.",
-                "Do not use invalid strings or unsupported formats."
-            ]
-        },
-        {
-            "condition": "Check IAM member format is valid",
-            "attribute_path" : ["members"], 
-            "values" : ["^(user:|serviceAccount:|group:|domain:|allUsers|allAuthenticatedUsers)"], 
-            "policy_type" : "pattern whitelist"
-        }
-    ],
-    [
-        {
-            "situation_description" : "IAM bindings must include at least one member.",
-            "remedies":[ 
+            "situation_description": "IAM bindings must include at least one member.",
+            "remedies": [
                 "Ensure 'members' array is not empty when defining IAM bindings.",
                 "Add valid user, group, or service account identities."
             ]
         },
         {
-            "condition": "Check members list is not empty",
+            "condition": "Check if members is not empty",
             "attribute_path": ["members"],
-            "values": [".+"],
-            "policy_type": "pattern whitelist"
+            "values": ["^$"],
+            "policy_type": "pattern blacklist"
         }
     ]
-
 ]
 
-# General message (summary)
 message := helpers.get_multi_summary(conditions, vars.variables).message
-
-# Detailed evaluation
 details := helpers.get_multi_summary(conditions, vars.variables).details

@@ -1,3 +1,4 @@
+# ✅ Compliant BigQuery Analytics Hub Data Exchange Subscription
 resource "google_bigquery_analytics_hub_data_exchange_subscription" "c" {
   provider              = google-beta
   project               = "valid-project"
@@ -6,8 +7,8 @@ resource "google_bigquery_analytics_hub_data_exchange_subscription" "c" {
   data_exchange_location= "us"
   data_exchange_id      = "valid_exchange"
 
-  subscription_id    = "valid_subscription_1"
-  subscriber_contact = "validuser@example.com"
+  subscription_id    = "c"                        # ✅ short, compliant
+  subscriber_contact = "validuser@example.com"    # ✅ valid email
 
   destination_dataset {
     location = "us"

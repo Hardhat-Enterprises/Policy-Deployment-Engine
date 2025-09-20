@@ -4,7 +4,8 @@ resource "google_bigquery_analytics_hub_data_exchange_iam_binding" "c" {
   location         = "US"
   data_exchange_id = "compliant_exchange"
   role             = "roles/viewer"
+
   members = [
-    "user:jane@example.com",
+    "user:jane@example.com",  # ✅ valid user
   ]
 }

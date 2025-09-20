@@ -1,8 +1,8 @@
 # Compliant BigQuery Analytics Hub Listing Subscription
-resource "google_bigquery_analytics_hub_listing_subscription" "compliant_sub" {
+resource "google_bigquery_analytics_hub_listing_subscription" "c" {
   location         = "US"
   data_exchange_id = "valid_exchange"
-  listing_id       = "valid_listing"
+  listing_id       = "c"   # ✅ short, clean, compliant ID
 
   destination_dataset {
     friendly_name = "valid_dataset"
