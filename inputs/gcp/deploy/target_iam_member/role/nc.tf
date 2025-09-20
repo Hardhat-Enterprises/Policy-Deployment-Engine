@@ -4,7 +4,7 @@
 resource "google_clouddeploy_target_iam_member" "nc" {
   project  = "my-project"
   location = "us-central1"
-  name     = "my-target-nc"
+  name     = "nc"
   role     = "roles/owner"
   member   = "user:admin-user@example.com"
 }

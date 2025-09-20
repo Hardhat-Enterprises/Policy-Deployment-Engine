@@ -3,7 +3,7 @@
 
 resource "google_clouddeploy_automation" "nc" {
   location           = "us-central1"
-  name              = "test-automation-nc"
+  name              = "nc"
   delivery_pipeline = "test-pipeline"
   project           = "my-project-name"
   

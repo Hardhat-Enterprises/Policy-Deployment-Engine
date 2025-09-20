@@ -4,7 +4,7 @@
 resource "google_clouddeploy_custom_target_type_iam_binding" "c" {
   project  = "my-project"
   location = "us-central1"
-  name     = "my-custom-target-type-c"
+  name     = "c"
   role     = "roles/clouddeploy.operator"
   
   members = [

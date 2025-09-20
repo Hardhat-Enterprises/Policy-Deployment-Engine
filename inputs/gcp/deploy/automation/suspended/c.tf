@@ -1,6 +1,6 @@
 resource "google_clouddeploy_automation" "c" {
   location           = "us-central1"
-  name              = "test-automation-c"
+  name              = "c"
   delivery_pipeline = "test-pipeline"
   project           = "my-project-name"
   

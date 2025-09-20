@@ -4,7 +4,7 @@
 resource "google_clouddeploy_target_iam_binding" "nc" {
   project  = "my-project"
   location = "us-central1"
-  name     = "my-target-nc"
+  name     = "nc"
   role     = "roles/editor"
   
   members = [

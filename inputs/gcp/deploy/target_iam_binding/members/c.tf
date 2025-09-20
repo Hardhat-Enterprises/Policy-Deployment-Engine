@@ -1,5 +1,5 @@
 resource "google_clouddeploy_target_iam_binding" "c" {
-  name     = "target-iam-binding-c"
+  name     = "c"
   project  = "my-project-id"
   location = "us-central1"
   role     = "roles/clouddeploy.developer"

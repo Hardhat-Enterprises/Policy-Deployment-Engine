@@ -3,7 +3,7 @@
 
 resource "google_clouddeploy_target" "c" {
   location = "us-central1"
-  name     = "gcptarget-c"
+  name     = "c"
   project  = "my-project-name"
   
   run {

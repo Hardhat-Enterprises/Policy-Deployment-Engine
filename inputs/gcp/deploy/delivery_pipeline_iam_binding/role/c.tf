@@ -4,7 +4,7 @@
 resource "google_clouddeploy_delivery_pipeline_iam_binding" "c" {
   project  = "my-project"
   location = "us-central1"
-  name     = "my-delivery-pipeline-nc"
+  name     = "c"
   role     = "roles/clouddeploy.operator"
   
   members = [

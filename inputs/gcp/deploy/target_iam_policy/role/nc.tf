@@ -13,6 +13,6 @@ data "google_iam_policy" "nc" {
 resource "google_clouddeploy_target_iam_policy" "nc" {
   project     = "my-project"
   location    = "us-central1"
-  name        = "my-target-nc"
+  name        = "nc"
   policy_data = data.google_iam_policy.nc.policy_data
 }

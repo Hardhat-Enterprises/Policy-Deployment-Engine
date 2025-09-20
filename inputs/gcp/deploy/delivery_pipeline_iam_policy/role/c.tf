@@ -13,6 +13,6 @@ data "google_iam_policy" "delivery_pipeline_c" {
 resource "google_clouddeploy_delivery_pipeline_iam_policy" "c" {
   project     = "my-project"
   location    = "us-central1"
-  name        = "my-delivery-pipeline-c"
+  name        = "c"
   policy_data = data.google_iam_policy.delivery_pipeline_c.policy_data
 }

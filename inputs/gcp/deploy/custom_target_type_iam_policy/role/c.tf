@@ -13,7 +13,7 @@ data "google_iam_policy" "c" {
 resource "google_clouddeploy_custom_target_type_iam_policy" "c" {
   project     = "my-project"
   location    = "us-central1"
-  name        = "my-custom-target-type-c"
+  name        = "c"
   policy_data = data.google_iam_policy.c.policy_data
 }
  

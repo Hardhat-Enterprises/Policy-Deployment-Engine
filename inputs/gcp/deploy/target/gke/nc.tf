@@ -3,7 +3,7 @@
 
 resource "google_clouddeploy_target" "nc" {
   location = "us-central1"
-  name     = "testgcptarget-nc"
+  name     = "nc"
   project  = "my-project-name"
   
   gke {
