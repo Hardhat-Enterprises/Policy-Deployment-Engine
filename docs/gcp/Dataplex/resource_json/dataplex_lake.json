@@ -1,0 +1,80 @@
+{
+  "resource_name": "dataplex_lake",
+  "subcategory": "Dataplex",
+  "arguments": {
+    "location": {
+      "description": "The location for the resource",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "name": {
+      "description": "The name of the lake. - - -",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "Optional. Description of the lake.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "display_name": {
+      "description": "Optional. User friendly display name.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "labels": {
+      "description": "Optional. User-defined labels for the lake. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Labels like 'owner' are required for accountability and governance.",
+      "compliant": "{\"owner\": \"data-team\"}",
+      "non-compliant": "{} or missing 'owner' label",
+      "parent": null
+    },
+    "metastore": {
+      "description": "Optional. Settings to manage lake and Dataproc Metastore service instance association.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "A metastore ensures schema management and governance. Lakes should reference an approved metastore.",
+      "compliant": "projects/123456/locations/us-central1/services/metastore-1",
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "service": {
+          "description": "Optional. A relative reference to the Dataproc Metastore service associated with the lake.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Metastore service is needed for consistent schema governance.",
+          "compliant": "projects/123456/locations/us-central1/services/metastore-1",
+          "non-compliant": "Not set",
+          "parent": "metastore"
+        }
+      }
+    },
+    "project": {
+      "description": "The project for the resource",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    }
+  }
+}

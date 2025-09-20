@@ -1,0 +1,239 @@
+{
+  "resource_name": "dataplex_zone",
+  "subcategory": "Dataplex",
+  "arguments": {
+    "discovery_spec": {
+      "description": "Required. Specification of the discovery feature applied to data in this zone.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "csv_options": {
+          "description": "Optional. Configuration for CSV data.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "discovery_spec"
+        },
+        "enabled": {
+          "description": "Required. Whether discovery is enabled.",
+          "required": true,
+          "security_impact": true,
+          "rationale": "Discovery must be enabled to ensure visibility and schema detection.",
+          "compliant": true,
+          "non-compliant": false,
+          "parent": "discovery_spec"
+        },
+        "exclude_patterns": {
+          "description": "Optional. The list of patterns to apply for selecting data to exclude during discovery.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "discovery_spec"
+        },
+        "include_patterns": {
+          "description": "Optional. The list of patterns to apply for selecting data to include during discovery.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "discovery_spec"
+        },
+        "json_options": {
+          "description": "Optional. Configuration for Json data.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "discovery_spec"
+        },
+        "schedule": {
+          "description": "Optional. Cron schedule for running discovery periodically.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "discovery_spec"
+        }
+      }
+    },
+    "lake": {
+      "description": "The lake for the resource",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "location": {
+      "description": "The location for the resource",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "name": {
+      "description": "The name of the zone.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "resource_spec": {
+      "description": "Required. Immutable. Specification of the resources that are referenced by the assets within this zone.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "location_type": {
+          "description": "Required. Immutable. The location type of the resources that are allowed.",
+          "required": true,
+          "security_impact": true,
+          "rationale": "Restricting to SINGLE_REGION enforces data residency and compliance.",
+          "compliant": "SINGLE_REGION",
+          "non-compliant": "MULTI_REGION",
+          "parent": "resource_spec"
+        },
+        "description": {
+          "description": "Optional. Description of the zone.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "resource_spec"
+        },
+        "display_name": {
+          "description": "Optional. User friendly display name.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "resource_spec"
+        },
+        "labels": {
+          "description": "Optional. User defined labels for the zone.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Zones must have an 'owner' label for accountability.",
+          "compliant": "{\"owner\": \"platform-team\"}",
+          "non-compliant": "{} or missing 'owner'",
+          "parent": "resource_spec"
+        },
+        "project": {
+          "description": "The project for the resource",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "resource_spec"
+        }
+      }
+    },
+    "type": {
+      "description": "Required. Immutable. The type of the zone.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Zones must only be RAW or CURATED to ensure proper governance classification.",
+      "compliant": "RAW or CURATED",
+      "non-compliant": "TYPE_UNSPECIFIED or custom values",
+      "parent": null
+    },
+    "csv_options": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "delimiter": {
+          "description": "Optional. The delimiter being used to separate values.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "csv_options"
+        },
+        "disable_type_inference": {
+          "description": "Optional. Whether to disable the inference of data type.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "csv_options"
+        },
+        "encoding": {
+          "description": "Optional. The character encoding of the data.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "csv_options"
+        },
+        "header_rows": {
+          "description": "Optional. The number of rows to interpret as header rows.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "csv_options"
+        }
+      }
+    },
+    "json_options": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "disable_type_inference": {
+          "description": "Optional. Whether to disable the inference of data type for Json data.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "json_options"
+        },
+        "encoding": {
+          "description": "Optional. The character encoding of the data.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "json_options"
+        }
+      }
+    }
+  }
+}
