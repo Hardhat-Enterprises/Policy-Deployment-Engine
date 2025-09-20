@@ -1,7 +1,7 @@
 package terraform.gcp.security.beyondcorp.google_beyondcorp_security_gateway.security_gateway_id_pattern
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.beyondcorp.google_beyondcorp_security_gateway.security_gateway_id_pattern.vars
+import data.terraform.gcp.security.beyondcorp.google_beyondcorp_security_gateway.vars
 
 conditions := [
   [
