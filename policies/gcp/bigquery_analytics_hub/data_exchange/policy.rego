@@ -9,32 +9,32 @@ import data.terraform.gcp.security.analytics_hub.data_exchange.vars
 conditions := [
     [
         {
-            "situation_description" : "Data Exchange display_name must start with the prefix 'de-'",
-            "remedies":[ 
-                "Rename the Data Exchange so that its display_name starts with 'de-'", 
+            "situation_description": "Data Exchange display_name must start with the prefix 'de-'",
+            "remedies": [
+                "Rename the Data Exchange so that its display_name starts with 'de-'",
                 "Update your Terraform resource to include the correct prefix"
             ]
         },
         {
             "condition": "Check if display_name starts with the allowed prefix",
-            "attribute_path" : ["display_name"], 
-            "values" : ["de-"], 
-            "policy_type" : "pattern whitelist"
+            "attribute_path": ["display_name"],
+            "values": ["de-"],                # prefix check works with pattern whitelist
+            "policy_type": "pattern whitelist"
         }
     ],
     [
         {
-            "situation_description" : "Data Exchange ID must only contain lowercase letters, numbers, or underscores",
-            "remedies":[ 
+            "situation_description": "Data Exchange ID must only contain lowercase letters, numbers, or underscores",
+            "remedies": [
                 "Update the data_exchange_id to use only lowercase letters, numbers, and underscores",
                 "Avoid uppercase letters, spaces, or special characters"
             ]
         },
         {
-            "condition": "Check if data_exchange_id follows allowed character pattern",
-            "attribute_path" : ["data_exchange_id"], 
-            "values" : ["^[a-z0-9_]+$"], 
-            "policy_type" : "pattern whitelist"
+            "condition": "Check if data_exchange_id follows allowed naming convention",
+            "attribute_path": ["data_exchange_id"],
+            "values": ["^[a-z0-9_]+$"],       # full regex
+            "policy_type": "regex whitelist"  # ✅ changed from pattern whitelist → regex whitelist
         }
     ]
 ]

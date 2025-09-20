@@ -17,7 +17,7 @@ conditions := [
             "condition": "Check subscription_id follows allowed naming pattern",
             "attribute_path": ["subscription_id"],
             "values": ["^[a-z0-9_]+$"],
-            "policy_type": "pattern whitelist"
+            "policy_type": "regex whitelist"       # ✅ fixed
         }
     ],
     [
@@ -32,7 +32,7 @@ conditions := [
             "condition": "Check if subscriber_contact is valid email",
             "attribute_path": ["subscriber_contact"],
             "values": ["^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"],
-            "policy_type": "pattern whitelist"
+            "policy_type": "regex whitelist"       # ✅ fixed
         }
     ],
     [
@@ -46,8 +46,8 @@ conditions := [
         {
             "condition": "Check if destination_dataset.labels contains required keys",
             "attribute_path": ["destination_dataset", "labels"],
-            "values": ["environment","owner"],
-            "policy_type": "whitelist"
+            "values": ["environment", "owner"],
+            "policy_type": "enum whitelist"        # ✅ fixed
         }
     ]
 ]
