@@ -45,11 +45,12 @@ conditions := [
         },
         {
             "condition": "Check members list is not empty",
-            "attribute_path" : ["members"], 
-            "values" : [], 
-            "policy_type" : "not empty"
+            "attribute_path": ["members"],
+            "values": [".+"],
+            "policy_type": "pattern whitelist"
         }
     ]
+
 ]
 
 # General message (summary)
