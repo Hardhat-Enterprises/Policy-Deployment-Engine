@@ -10,7 +10,7 @@ conditions := [
   {
     "condition": "Password must come from Secret Manager",
     "attribute_path": ["password","0","secret_version"],
-    "values": ["google_secret_manager_secret_version"],
+    "values": ["google_secret_manager_secret_version.sercret-version.name"],
     "policy_type": "whitelist",
   }
 ]

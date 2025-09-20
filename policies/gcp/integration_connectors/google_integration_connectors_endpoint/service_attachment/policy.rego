@@ -10,8 +10,9 @@ conditions := [[
 	{
 		"condition": "Test if service attachment comes from approved projects",
 		"attribute_path": ["service_attachment"],
-		"values": ["projects/connectors-example/regions/us-central1/serviceAttachments/test"],
-		"policy_type": "whitelist",
+		"values": ["project/*/regions/us-cebtral1/serviceAttachments/*",
+			       [["connectors-example1","connectors-example2","connectors-example3"]]	],
+		"policy_type": "pattern whitelist",
 	},
 ]]
 
