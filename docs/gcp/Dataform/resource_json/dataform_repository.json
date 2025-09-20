@@ -14,46 +14,46 @@
     "git_remote_settings": {
       "description": "Optional. If set, configures this repository to be linked to a Git remote. Structure is [documented below](#nested_git_remote_settings).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Git remote configuration affects source code security, authentication methods, and access controls for repository content.",
+      "compliant": "Properly configured with authentication tokens or SSH keys",
+      "non-compliant": "Missing authentication or insecure configuration",
       "parent": null,
       "arguments": {
         "url": {
           "description": "The Git remote's URL.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Git URL determines the remote repository location and protocol (HTTPS vs SSH) which affects authentication security.",
+          "compliant": "https://github.com/company/repo.git",
+          "non-compliant": "Empty or invalid URL",
           "parent": "git_remote_settings"
         },
         "default_branch": {
           "description": "The Git remote's default branch name.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Default branch configuration affects source code management and security controls for repository access.",
+          "compliant": "main",
+          "non-compliant": "Empty or null default branch",
           "parent": "git_remote_settings"
         },
         "authentication_token_secret_version": {
           "description": "The name of the Secret Manager secret version to use as an authentication token for Git operations. This secret is for assigning with HTTPS only(for SSH use `ssh_authentication_config`). Must be in the format projects/*/secrets/*/versions/*.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "HTTPS authentication tokens stored in Secret Manager provide secure access to Git repositories without exposing credentials.",
+          "compliant": "projects/my-project/secrets/git-token/versions/1",
+          "non-compliant": "null or empty when using HTTPS authentication",
           "parent": "git_remote_settings"
         },
         "ssh_authentication_config": {
           "description": "Authentication fields for remote uris using SSH protocol. Structure is [documented below](#nested_git_remote_settings_ssh_authentication_config).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "SSH authentication configuration provides secure access to Git repositories using key-based authentication.",
+          "compliant": "Properly configured with private key and host public key",
+          "non-compliant": "Missing private key or host public key when using SSH",
           "parent": "git_remote_settings"
         },
         "token_status": {
@@ -135,28 +135,28 @@
     "kms_key_name": {
       "description": "Optional. The reference to a KMS encryption key. If provided, it will be used to encrypt user data in the repository and all child resources. It is not possible to add or update the encryption key after the repository is created. Example projects/[kms_project_id]/locations/[region]/keyRings/[key_region]/cryptoKeys/[key]",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Customer-managed encryption keys (CMEK) provide enhanced security by allowing organizations to control encryption keys for sensitive data repositories.",
+      "compliant": "projects/my-project/locations/us-central1/keyRings/my-keyring/cryptoKeys/my-key",
+      "non-compliant": "null or empty string",
       "parent": null
     },
     "labels": {
       "description": "Optional. Repository user labels. An object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Security-oriented labels help with compliance, incident response, and data classification for proper handling of sensitive repositories.",
+      "compliant": "{\"security_contact\": \"sec-team@company.com\", \"data_classification\": \"confidential\", \"business_criticality\": \"high\", \"compliance_regime\": \"hipaa\"}",
+      "non-compliant": "Missing security labels or invalid values like {\"security_contact\": \"\", \"data_classification\": \"top-secret\"}",
       "parent": null
     },
     "region": {
       "description": "A reference to the region",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Regional placement affects data residency, compliance requirements, and access controls for sensitive data repositories.",
+      "compliant": "australia-southeast1",
+      "non-compliant": "europe-west1 or other non-approved regions",
       "parent": null
     },
     "project": {
@@ -169,12 +169,12 @@
       "parent": null
     },
     "deletion_policy": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "The deletion policy for the repository. Can be 'DELETE' or 'FORCE'.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "FORCE deletion policy can cause cascading deletion of child resources, potentially leading to data loss and security risks.",
+      "compliant": "DELETE",
+      "non-compliant": "FORCE",
       "parent": null
     },
     "ssh_authentication_config": {
@@ -189,19 +189,19 @@
         "user_private_key_secret_version": {
           "description": "The name of the Secret Manager secret version to use as a ssh private key for Git operations. Must be in the format projects/*/secrets/*/versions/*.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "SSH private keys stored in Secret Manager provide secure authentication for Git repository access.",
+          "compliant": "projects/my-project/secrets/ssh-private-key/versions/1",
+          "non-compliant": "null or empty when using SSH authentication",
           "parent": "ssh_authentication_config"
         },
         "host_public_key": {
           "description": "Content of a public SSH key to verify an identity of a remote Git host.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Host public key verification prevents man-in-the-middle attacks by ensuring connection to the correct Git server.",
+          "compliant": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC...",
+          "non-compliant": "null or empty when using SSH authentication",
           "parent": "ssh_authentication_config"
         }
       }
