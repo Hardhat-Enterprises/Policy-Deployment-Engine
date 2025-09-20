@@ -2,7 +2,7 @@ data "google_project" "project_nc" {
   project_id        = "smooth-verve-467716-v1"
 }
 resource "google_container_attached_cluster" "nc" {
-  name         = "nc-us-01"
+  name         = "nc"
   project      = data.google_project.project_nc.project_id
   location     = "us-west1"
   distribution    = "nc_distro"
@@ -12,6 +12,6 @@ resource "google_container_attached_cluster" "nc" {
   }
 
   fleet { 
-    project = "projects/${data.google_project.project.number}"
+    project = "projects/${data.google_project.project_nc.number}"
   }
 }
