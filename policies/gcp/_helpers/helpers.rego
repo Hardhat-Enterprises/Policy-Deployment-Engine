@@ -35,7 +35,7 @@ array_contains(arr, elem, pol) if {
     #print(sprintf("%s", ["ww"]))
     arr_to_set = {x | x := arr[_]}
     elem_to_set = {x | x := elem[_]}
-    object.subset(arr_to_set, elem_to_set)
+    object.subset(arr_to_set, elem_to_set) # Check if elem_to_set is a subset of arr_to_set (all elements in elem must exist in arr)
 }
 
 # Generic helper functions:
