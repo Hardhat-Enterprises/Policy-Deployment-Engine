@@ -1,15 +1,19 @@
-resource "google_service_account" "c" {
+data "google_project" "project" {
+  project_id = "smooth-verve-467716-v1"
+}
+
+resource "google_service_account" "accnt_c" {
   account_id = "c-connector-sa"
-  display_name = "AppConnector Security Account"
+  project    = data.google_project.project.id
 }
 
 resource "google_beyondcorp_app_connector" "c" {
-  name = "c-region-ok"
+  name = "c"
+  project = data.google_project.project.id
   region = "australia-southeast1"
-  display_name = "Connector in approved region"
   principal_info {
     service_account { 
-      email = google_service_account.c.email 
+      email = google_service_account.accnt_c.email 
     }
   }
 }

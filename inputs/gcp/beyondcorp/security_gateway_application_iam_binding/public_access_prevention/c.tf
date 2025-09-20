@@ -1,6 +1,10 @@
+data "google_project" "project" {
+  project_id = "smooth-verve-467716-v1"
+}
+
 resource "google_beyondcorp_security_gateway" "sg" {
   security_gateway_id = "c"
-  display_name = "c-My Security Gateway resource"
+  project = data.google_project.project.project_id
   hubs { 
     region = "australia-southeast1" 
   }
@@ -8,6 +12,7 @@ resource "google_beyondcorp_security_gateway" "sg" {
 
 resource "google_beyondcorp_security_gateway_application" "sga" {
   security_gateway_id = google_beyondcorp_security_gateway.sg.security_gateway_id
+  project            = data.google_project.project.project_id
   application_id = "c"
   endpoint_matchers {
     hostname = "google.com"
@@ -16,6 +21,7 @@ resource "google_beyondcorp_security_gateway_application" "sga" {
 
 resource "google_beyondcorp_security_gateway_application_iam_binding" "c" {
   security_gateway_id = google_beyondcorp_security_gateway_application.sga.security_gateway_id
+  project = data.google_project.project.project_id
   application_id = google_beyondcorp_security_gateway_application.sga.application_id
   role = "roles/beyondcorp.securityGatewayUser"
   members = [

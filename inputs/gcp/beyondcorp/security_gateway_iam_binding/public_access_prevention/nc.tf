@@ -1,6 +1,11 @@
+data "google_project" "project_nc" {
+  project_id = "smooth-verve-467716-v1"
+}
+
 resource "google_beyondcorp_security_gateway" "sg_nc" {
   security_gateway_id = "nc"
-  display_name = "My Security Gateway resource"
+  project = data.google_project.project_nc.project_id
+
   hubs { 
     region = "australia-southeast1" 
   }

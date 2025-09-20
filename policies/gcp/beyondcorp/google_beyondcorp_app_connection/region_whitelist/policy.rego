@@ -8,12 +8,12 @@ conditions := [
   [
     {
       "situation_description": "AppConnection is created in a region outside the approved Australia region.",
-      "remedies": ["Use region 'australia-southeast1' only."]
+      "remedies": ["Use region 'australia-southeast1' or 'australia-southeast2' only."]
     },
     {
       "condition": "Region must be inside the approved one",
       "attribute_path": ["region"],
-      "values": ["australia-southeast1"],
+      "values": ["australia-southeast1", "australia-southeast2"],
       "policy_type": "whitelist"
     }
   ]

@@ -1,18 +1,18 @@
 package terraform.gcp.security.beyondcorp.google_beyondcorp_security_gateway_application.upstreams_whitelist
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.beyondcorp.google_beyondcorp_security_gateway_application.upstreams_whitelist.vars
+import data.terraform.gcp.security.beyondcorp.google_beyondcorp_security_gateway_application.vars
 
 conditions := [
   [
     {
       "situation_description": "Upstream egress policy uses unapproved regions.",
-      "remedies": ["Use 'australia-southeast1' only."]
+      "remedies": ["Use 'australia-southeast1' or 'australia-southeast2' only."]
     },
     {
       "condition": "Upstreams egress regions must be in the approved list.",
       "attribute_path": ["upstreams", 0 , "egress_policy", 0 , "regions"],
-      "values": ["australia-southeast1"],
+      "values": ["australia-southeast1", "australia-southeast2"],
       "policy_type": "whitelist"
     }
   ],
@@ -28,7 +28,7 @@ conditions := [
         "projects/my-proj/global/networks/prod-vpc",
         "projects/my-proj/global/networks/shared-services-vpc"
       ],
-      "policy_type": "whitelist"
+      "policy_type": "pattern whitelist"
     }
   ]
 ]

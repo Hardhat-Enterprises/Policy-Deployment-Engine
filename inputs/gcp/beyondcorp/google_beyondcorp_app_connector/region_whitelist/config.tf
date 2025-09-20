@@ -9,7 +9,5 @@ terraform {
   }
 }
 
-provider "google" {
-  project = "smooth-verve-467716-v1"
-  region  = "australia-southeast1"  
+provider "google" {  
 }

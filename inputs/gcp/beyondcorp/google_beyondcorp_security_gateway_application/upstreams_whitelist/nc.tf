@@ -1,9 +1,12 @@
-data "google_project" "nc" {}
+data "google_project" "project_nc" {
+  project_id = "smooth-verve-467716-v1"
+}
 
 resource "google_beyondcorp_security_gateway_application" "nc" {
-  security_gateway_id = "nc-default-sg"
-  application_id      = "nc-app-upstream-01"
-  endpoint_matchers { 
+  security_gateway_id = "nc"
+  project            = data.google_project.project_nc.project_id
+  application_id      = "nc"
+  endpoint_matchers {
     hostname = "svc.corp.example.com"
   }
   upstreams {
@@ -11,7 +14,7 @@ resource "google_beyondcorp_security_gateway_application" "nc" {
       regions = ["us-central1"]
     }
     network {
-      name = "projects/${data.google_project.nc.project_id}/global/networks/dev-scratch"
+      name = "projects/${data.google_project.project_nc.project_id}/global/networks/dev-scratch"
     }
   }
 }

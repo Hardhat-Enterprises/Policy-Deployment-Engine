@@ -1,15 +1,19 @@
-resource "google_service_account" "nc" {
+data "google_project" "project_nc" {
+  project_id = "smooth-verve-467716-v1"
+}
+
+resource "google_service_account" "accnt_nc" {
   account_id = "nc-connector-sa-bad"
-  display_name = "AppConnector Security Account Bad"
+  project    = data.google_project.project_nc.id
 }
 
 resource "google_beyondcorp_app_connector" "nc" {
-  name = "nc-region-bad"
+  name = "nc"
+  project = data.google_project.project_nc.id
   region = "us-central1"
-  display_name = "Connector in unapproved region"
   principal_info {
     service_account { 
-      email = google_service_account.nc.email 
+      email = google_service_account.accnt_nc.email 
     }
   }
 }

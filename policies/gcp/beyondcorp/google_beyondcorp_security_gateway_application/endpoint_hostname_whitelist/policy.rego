@@ -1,21 +1,9 @@
 package terraform.gcp.security.beyondcorp.google_beyondcorp_security_gateway_application.endpoint_hostname_whitelist
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.beyondcorp.google_beyondcorp_security_gateway_application.endpoint_hostname_whitelist.vars
+import data.terraform.gcp.security.beyondcorp.google_beyondcorp_security_gateway_application.vars
 
 conditions := [
-  # [
-  #   {
-  #     "situation_description": "Endpoint hostname is outside approved domains.",
-  #     "remedies": ["Use hostnames ending with '.com' only."]
-  #   },
-  #   {
-  #     "condition": "Endpoint hostname must end with approved suffix",
-  #     "attribute_path": ["endpoint_matchers", 0 , "hostname"],
-  #     "values": [".com"],
-  #     "policy_type": "whitelist"
-  #   }
-  # ],
   [
     {
       "situation_description": "Endpoint ports are outside approved list.",

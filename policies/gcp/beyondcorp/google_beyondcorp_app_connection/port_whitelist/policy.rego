@@ -15,7 +15,20 @@ conditions := [
       "values": [443, 8443, 9443],
       "policy_type": "whitelist"
     }
-  ]
+  ],
+
+  [
+  {
+    "situation_description": "Application endpoint host is not an approved IP address.",
+    "remedies": ["Use one of the approved IPs only."]
+  },
+  {
+    "condition": "Endpoint host must match an approved IP address.",
+    "attribute_path": ["application_endpoint", 0, "host"],
+    "values": ["svc.internal"],
+    "policy_type": "whitelist"
+  }
+]
 ]
 
 summary := helpers.get_multi_summary(conditions, vars.variables)
