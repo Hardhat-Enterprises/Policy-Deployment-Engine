@@ -3,7 +3,7 @@
 
 resource "google_scc_organization_custom_module" "c" {
   organization = "123456789"
-  display_name = "enablement_state"
+  display_name = "c"
   enablement_state = "ENABLED"
   custom_config {
     predicate {

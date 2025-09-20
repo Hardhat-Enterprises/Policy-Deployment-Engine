@@ -1,0 +1,24 @@
+{
+  "resource_name": "iap_client",
+  "subcategory": "Identity-Aware Proxy",
+  "arguments": {
+    "display_name": {
+      "description": "Human-friendly name shown for the OAuth client.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Clear, production-ready names reduce user confusion on the consent screen and avoid test/generic labels.",
+      "compliant": "display_name = \"Customer Portal OAuth Client\"",
+      "non-compliant": "display_name = \"Test\" / \"Demo\" / \"App\" / \"Customer Portal OAuth Client \" (trailing space)",
+      "parent": null
+    },
+    "brand": {
+      "description": "Identifier of the brand this client attaches to. Format: \"projects/{project_number}/brands/{brand_id}\".",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Ensures the client is tied to the intended brand/project; a wrong or malformed brand can point consent to the wrong tenant.",
+      "compliant": "brand = \"projects/123456789012/brands/12345\"",
+      "non-compliant": "brand = \"projects/my-project/brands/12345\" (uses project ID, not number) / \"12345\" (missing prefix) / \"projects/123456789012/brands/\" (empty brand_id)",
+      "parent": null
+    }
+  }
+}

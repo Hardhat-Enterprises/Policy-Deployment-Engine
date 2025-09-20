@@ -1,0 +1,257 @@
+{
+  "resource_name": "colab_schedule",
+  "subcategory": "Colab Enterprise",
+  "arguments": {
+    "display_name": {
+      "description": "Required. The display name of the Schedule.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "cron": {
+      "description": "Cron schedule (https://en.wikipedia.org/wiki/Cron) to launch scheduled runs.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "max_concurrent_run_count": {
+      "description": "Maximum number of runs that can be started concurrently for this Schedule. This is the limit for starting the scheduled requests and not the execution of the notebook execution jobs created by the requests.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "create_notebook_execution_job_request": {
+      "description": "Request for google_colab_notebook_execution. Structure is [documented below](#nested_create_notebook_execution_job_request).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "notebook_execution_job": {
+          "description": "The NotebookExecutionJob to create. Structure is [documented below](#nested_create_notebook_execution_job_request_notebook_execution_job).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "create_notebook_execution_job_request"
+        }
+      }
+    },
+    "location": {
+      "description": "The location for the resource: https://cloud.google.com/colab/docs/locations",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "start_time": {
+      "description": "The timestamp after which the first run can be scheduled. Defaults to the schedule creation time. Must be in the RFC 3339 (https://www.ietf.org/rfc/rfc3339.txt) format.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "end_time": {
+      "description": "Timestamp after which no new runs can be scheduled. If specified, the schedule will be completed when either end_time is reached or when scheduled_run_count >= max_run_count. Must be in the RFC 3339 (https://www.ietf.org/rfc/rfc3339.txt) format.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "max_run_count": {
+      "description": "Maximum run count of the schedule. If specified, The schedule will be completed when either startedRunCount >= maxRunCount or when endTime is reached. If not specified, new runs will keep getting scheduled until this Schedule is paused or deleted. Already scheduled runs will be allowed to complete. Unset if not specified.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "allow_queueing": {
+      "description": "Whether new scheduled runs can be queued when max_concurrent_runs limit is reached. If set to true, new runs will be queued instead of skipped. Default to false.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "desired_state": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "notebook_execution_job": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "display_name": {
+          "description": "Required. The display name of the Notebook Execution.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "notebook_execution_job"
+        },
+        "dataform_repository_source": {
+          "description": "The Dataform Repository containing the input notebook. Structure is [documented below](#nested_create_notebook_execution_job_request_notebook_execution_job_dataform_repository_source).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "notebook_execution_job"
+        },
+        "gcs_notebook_source": {
+          "description": "The Cloud Storage uri for the input notebook. Structure is [documented below](#nested_create_notebook_execution_job_request_notebook_execution_job_gcs_notebook_source).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "notebook_execution_job"
+        },
+        "execution_timeout": {
+          "description": "Max running time of the execution job in seconds (default 86400s / 24 hrs). A duration in seconds with up to nine fractional digits, ending with \"s\". Example: \"3.5s\".",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "notebook_execution_job"
+        },
+        "notebook_runtime_template_resource_name": {
+          "description": "The NotebookRuntimeTemplate to source compute configuration from.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "notebook_execution_job"
+        },
+        "gcs_output_uri": {
+          "description": "The Cloud Storage location to upload the result to. Format:`gs://bucket-name`",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "notebook_execution_job"
+        },
+        "execution_user": {
+          "description": "The user email to run the execution as.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "notebook_execution_job"
+        },
+        "service_account": {
+          "description": "The service account to run the execution as.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "notebook_execution_job"
+        }
+      }
+    },
+    "dataform_repository_source": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "dataform_repository_resource_name": {
+          "description": "The resource name of the Dataform Repository.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "dataform_repository_source"
+        },
+        "commit_sha": {
+          "description": "The commit SHA to read repository with. If unset, the file will be read at HEAD.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "dataform_repository_source"
+        }
+      }
+    },
+    "gcs_notebook_source": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "uri": {
+          "description": "The Cloud Storage uri pointing to the ipynb file. Format: gs://bucket/notebook_file.ipynb",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "gcs_notebook_source"
+        },
+        "generation": {
+          "description": "The version of the Cloud Storage object to read. If unset, the current version of the object is read. See https://cloud.google.com/storage/docs/metadata#generation-number.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "gcs_notebook_source"
+        }
+      }
+    }
+  }
+}

@@ -9,7 +9,7 @@ resource "google_vmwareengine_network" "network-peering-peer-nw" {
    type              = "STANDARD"
 }
 resource "google_vmwareengine_network_peering" "c" {
-    name = "sample-network-peering-c"
+    name = "c"
 
     vmware_engine_network = google_vmwareengine_network.network-peering-nw.id
     peer_network = google_vmwareengine_network.network-peering-peer-nw.id
