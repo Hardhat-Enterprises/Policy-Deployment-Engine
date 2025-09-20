@@ -1,6 +1,6 @@
 resource "google_vmwareengine_network" "c" {
   project     = google_project_service.acceptance.project
-  name        = "australia-southeast2-c-default" 
+  name        = "c" 
   location    = "australia-southeast2"
   type        = "STANDARD"
   description = "VMwareEngine legacy network sample"

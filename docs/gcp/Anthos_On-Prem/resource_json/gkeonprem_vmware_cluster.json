@@ -1,0 +1,945 @@
+{
+  "resource_name": "gkeonprem_vmware_cluster",
+  "subcategory": "Anthos On-Prem",
+  "arguments": {
+    "admin_cluster_membership": {
+      "description": "The admin cluster this VMware User Cluster belongs to. This is the full resource name of the admin cluster's hub membership. In the future, references to other resource types might be allowed if admin clusters are modeled as their own resources.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "on_prem_version": {
+      "description": "The Anthos clusters on the VMware version for your user cluster.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "control_plane_node": {
+      "description": "VMware User Cluster control plane nodes must have either 1 or 3 replicas. Structure is [documented below](#nested_control_plane_node).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "cpus": {
+          "description": "The number of CPUs for each admin cluster node that serve as control planes for this VMware User Cluster. (default: 4 CPUs)",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "control_plane_node"
+        },
+        "memory": {
+          "description": "The megabytes of memory for each admin cluster node that serves as a control plane for this VMware User Cluster (default: 8192 MB memory).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "control_plane_node"
+        },
+        "replicas": {
+          "description": "The number of control plane nodes for this VMware User Cluster. (default: 1 replica).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "control_plane_node"
+        },
+        "auto_resize_config": {
+          "description": "AutoResizeConfig provides auto resizing configurations. Structure is [documented below](#nested_control_plane_node_auto_resize_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "control_plane_node"
+        },
+        "vsphere_config": {
+          "description": "(Output) Vsphere-specific config. Structure is [documented below](#nested_control_plane_node_vsphere_config).",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "control_plane_node"
+        }
+      }
+    },
+    "name": {
+      "description": "The VMware cluster name.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "location": {
+      "description": "The location of the resource.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "A human readable description of this VMware User Cluster.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "annotations": {
+      "description": "Annotations on the VMware User Cluster. This field has the same restrictions as Kubernetes annotations. The total size of all keys and values combined is limited to 256k. Key can have 2 segments: prefix (optional) and name (required), separated by a slash (/). Prefix must be a DNS subdomain. Name must be 63 characters or less, begin and end with alphanumerics, with dashes (-), underscores (_), dots (.), and alphanumerics between. **Note**: This field is non-authoritative, and will only manage the annotations present in your configuration. Please refer to the field `effective_annotations` for all of the annotations present on the resource.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "anti_affinity_groups": {
+      "description": "AAGConfig specifies whether to spread VMware User Cluster nodes across at least three physical hosts in the datacenter. Structure is [documented below](#nested_anti_affinity_groups).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "aag_config_disabled": {
+          "description": "Spread nodes across at least three physical hosts (requires at least three hosts). Enabled by default.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "anti_affinity_groups"
+        }
+      }
+    },
+    "storage": {
+      "description": "Storage configuration. Structure is [documented below](#nested_storage).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "vsphere_csi_disabled": {
+          "description": "Whether or not to deploy vSphere CSI components in the VMware User Cluster. Enabled by default.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "storage"
+        }
+      }
+    },
+    "network_config": {
+      "description": "The VMware User Cluster network configuration. Structure is [documented below](#nested_network_config).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "service_address_cidr_blocks": {
+          "description": "All services in the cluster are assigned an RFC1918 IPv4 address from these ranges. Only a single range is supported.. This field cannot be changed after creation.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "network_config"
+        },
+        "pod_address_cidr_blocks": {
+          "description": "All pods in the cluster are assigned an RFC1918 IPv4 address from these ranges. Only a single range is supported. This field cannot be changed after creation.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "network_config"
+        },
+        "static_ip_config": {
+          "description": "Configuration settings for a static IP configuration. Structure is [documented below](#nested_network_config_static_ip_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "network_config"
+        },
+        "dhcp_ip_config": {
+          "description": "Configuration settings for a DHCP IP configuration. Structure is [documented below](#nested_network_config_dhcp_ip_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "network_config"
+        },
+        "vcenter_network": {
+          "description": "vcenter_network specifies vCenter network name. Inherited from the admin cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "network_config"
+        },
+        "host_config": {
+          "description": "Represents common network settings irrespective of the host's IP address. Structure is [documented below](#nested_network_config_host_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "network_config"
+        },
+        "control_plane_v2_config": {
+          "description": "Configuration for control plane V2 mode. Structure is [documented below](#nested_network_config_control_plane_v2_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "network_config"
+        }
+      }
+    },
+    "load_balancer": {
+      "description": "Load Balancer configuration. Structure is [documented below](#nested_load_balancer).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "vip_config": {
+          "description": "The VIPs used by the load balancer. Structure is [documented below](#nested_load_balancer_vip_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "load_balancer"
+        },
+        "f5_config": {
+          "description": "Configuration for F5 Big IP typed load balancers. Structure is [documented below](#nested_load_balancer_f5_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "load_balancer"
+        },
+        "manual_lb_config": {
+          "description": "Manually configured load balancers. Structure is [documented below](#nested_load_balancer_manual_lb_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "load_balancer"
+        },
+        "metal_lb_config": {
+          "description": "Configuration for MetalLB typed load balancers. Structure is [documented below](#nested_load_balancer_metal_lb_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "load_balancer"
+        }
+      }
+    },
+    "dataplane_v2": {
+      "description": "VmwareDataplaneV2Config specifies configuration for Dataplane V2. Structure is [documented below](#nested_dataplane_v2).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "dataplane_v2_enabled": {
+          "description": "Enables Dataplane V2.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "dataplane_v2"
+        },
+        "windows_dataplane_v2_enabled": {
+          "description": "Enable Dataplane V2 for clusters with Windows nodes.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "dataplane_v2"
+        },
+        "advanced_networking": {
+          "description": "Enable advanced networking which requires dataplane_v2_enabled to be set true.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "dataplane_v2"
+        }
+      }
+    },
+    "vm_tracking_enabled": {
+      "description": "Enable VM tracking.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "auto_repair_config": {
+      "description": "Configuration for auto repairing. Structure is [documented below](#nested_auto_repair_config).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enabled": {
+          "description": "Whether auto repair is enabled.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "auto_repair_config"
+        }
+      }
+    },
+    "authorization": {
+      "description": "RBAC policy that will be applied and managed by GKE On-Prem. Structure is [documented below](#nested_authorization).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "admin_users": {
+          "description": "Users that will be granted the cluster-admin role on the cluster, providing full access to the cluster. Structure is [documented below](#nested_authorization_admin_users).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "authorization"
+        }
+      }
+    },
+    "enable_control_plane_v2": {
+      "description": "Enable control plane V2. Default to false.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "enable_advanced_cluster": {
+      "description": "Enable advanced cluster. Default to false.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "disable_bundled_ingress": {
+      "description": "Disable bundled ingress.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "upgrade_policy": {
+      "description": "Specifies upgrade policy for the cluster. Structure is [documented below](#nested_upgrade_policy).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "control_plane_only": {
+          "description": "Controls whether the upgrade applies to the control plane only.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "upgrade_policy"
+        }
+      }
+    },
+    "vcenter": {
+      "description": "VmwareVCenterConfig specifies vCenter config for the user cluster. Inherited from the admin cluster. Structure is [documented below](#nested_vcenter).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "resource_pool": {
+          "description": "The name of the vCenter resource pool for the user cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "vcenter"
+        },
+        "datastore": {
+          "description": "The name of the vCenter datastore for the user cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "vcenter"
+        },
+        "datacenter": {
+          "description": "The name of the vCenter datacenter for the user cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "vcenter"
+        },
+        "cluster": {
+          "description": "The name of the vCenter cluster for the user cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "vcenter"
+        },
+        "folder": {
+          "description": "The name of the vCenter folder for the user cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "vcenter"
+        },
+        "ca_cert_data": {
+          "description": "Contains the vCenter CA certificate public key for SSL verification.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "vcenter"
+        },
+        "address": {
+          "description": "(Output) The vCenter IP address.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "vcenter"
+        },
+        "storage_policy_name": {
+          "description": "The name of the vCenter storage policy for the user cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "vcenter"
+        }
+      }
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "auto_resize_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enabled": {
+          "description": "Whether to enable control plane node auto resizing. The `vsphere_config` block contains:",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "auto_resize_config"
+        },
+        "datastore": {
+          "description": "(Output) The Vsphere datastore used by the Control Plane Node.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "auto_resize_config"
+        },
+        "storage_policy_name": {
+          "description": "(Output) The Vsphere storage policy used by the control plane Node.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "auto_resize_config"
+        }
+      }
+    },
+    "static_ip_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "ip_blocks": {
+          "description": "Represents the configuration values for static IP allocation to nodes. Structure is [documented below](#nested_network_config_static_ip_config_ip_blocks).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "static_ip_config"
+        }
+      }
+    },
+    "ip_blocks": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "netmask": {
+          "description": "The netmask used by the VMware User Cluster.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "ip_blocks"
+        },
+        "gateway": {
+          "description": "The network gateway used by the VMware User Cluster.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "ip_blocks"
+        },
+        "ips": {
+          "description": "The node's network configurations used by the VMware User Cluster. Structure is [documented below](#nested_network_config_static_ip_config_ip_blocks_ip_blocks_ips).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "ip_blocks"
+        }
+      }
+    },
+    "ips": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "ip": {
+          "description": "IP could be an IP address (like 1.2.3.4) or a CIDR (like 1.2.3.0/24).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "ips"
+        },
+        "hostname": {
+          "description": "Hostname of the machine. VM's name will be used if this field is empty.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "ips"
+        }
+      }
+    },
+    "dhcp_ip_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enabled": {
+          "description": "enabled is a flag to mark if DHCP IP allocation is used for VMware user clusters.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "dhcp_ip_config"
+        }
+      }
+    },
+    "host_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "dns_servers": {
+          "description": "DNS servers.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "host_config"
+        },
+        "ntp_servers": {
+          "description": "NTP servers.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "host_config"
+        },
+        "dns_search_domains": {
+          "description": "DNS search domains.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "host_config"
+        }
+      }
+    },
+    "control_plane_v2_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "control_plane_ip_block": {
+          "description": "Static IP addresses for the control plane nodes. Structure is [documented below](#nested_network_config_control_plane_v2_config_control_plane_ip_block).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "control_plane_v2_config"
+        }
+      }
+    },
+    "control_plane_ip_block": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "netmask": {
+          "description": "The netmask used by the VMware User Cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "control_plane_ip_block"
+        },
+        "gateway": {
+          "description": "The network gateway used by the VMware User Cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "control_plane_ip_block"
+        },
+        "ips": {
+          "description": "The node's network configurations used by the VMware User Cluster. Structure is [documented below](#nested_network_config_control_plane_v2_config_control_plane_ip_block_ips).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "control_plane_ip_block"
+        }
+      }
+    },
+    "vip_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "control_plane_vip": {
+          "description": "The VIP which you previously set aside for the Kubernetes API of this cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "vip_config"
+        },
+        "ingress_vip": {
+          "description": "The VIP which you previously set aside for ingress traffic into this cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "vip_config"
+        }
+      }
+    },
+    "f5_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "address": {
+          "description": "The load balancer's IP address.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "f5_config"
+        },
+        "partition": {
+          "description": "he preexisting partition to be used by the load balancer. T his partition is usually created for the admin cluster for example: 'my-f5-admin-partition'.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "f5_config"
+        },
+        "snat_pool": {
+          "description": "The pool name. Only necessary, if using SNAT.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "f5_config"
+        }
+      }
+    },
+    "manual_lb_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "ingress_http_node_port": {
+          "description": "NodePort for ingress service's http. The ingress service in the admin cluster is implemented as a Service of type NodePort (ex. 32527).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "manual_lb_config"
+        },
+        "ingress_https_node_port": {
+          "description": "NodePort for ingress service's https. The ingress service in the admin cluster is implemented as a Service of type NodePort (ex. 30139).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "manual_lb_config"
+        },
+        "control_plane_node_port": {
+          "description": "NodePort for control plane service. The Kubernetes API server in the admin cluster is implemented as a Service of type NodePort (ex. 30968).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "manual_lb_config"
+        },
+        "konnectivity_server_node_port": {
+          "description": "NodePort for konnectivity server service running as a sidecar in each kube-apiserver pod (ex. 30564).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "manual_lb_config"
+        }
+      }
+    },
+    "metal_lb_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "address_pools": {
+          "description": "AddressPools is a list of non-overlapping IP pools used by load balancer typed services. All addresses must be routable to load balancer nodes. IngressVIP must be included in the pools. Structure is [documented below](#nested_load_balancer_metal_lb_config_address_pools).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "metal_lb_config"
+        }
+      }
+    },
+    "address_pools": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "pool": {
+          "description": "The name of the address pool.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "address_pools"
+        },
+        "addresses": {
+          "description": "The addresses that are part of this pool. Each address must be either in the CIDR form (1.2.3.0/24) or range form (1.2.3.1-1.2.3.5).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "address_pools"
+        },
+        "avoid_buggy_ips": {
+          "description": "If true, avoid using IPs ending in .0 or .255. This avoids buggy consumer devices mistakenly dropping IPv4 traffic for those special IP addresses.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "address_pools"
+        },
+        "manual_assign": {
+          "description": "If true, prevent IP addresses from being automatically assigned.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "address_pools"
+        }
+      }
+    },
+    "admin_users": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "username": {
+          "description": "The name of the user, e.g. `my-gcp-id@gmail.com`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "admin_users"
+        }
+      }
+    }
+  }
+}
