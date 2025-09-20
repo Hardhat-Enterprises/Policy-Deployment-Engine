@@ -13,10 +13,10 @@ conditions := [
             ]
         },
         {
-            "condition": "Require reasonable threshold (blacklist: >100)",
+            "condition": "Require reasonable threshold (range: ≤100)",
             "attribute_path": ["conditions", 0, "condition_threshold", 0, "threshold_value"],
-            "values": [500, 1000, 5000, 10000],
-            "policy_type": "blacklist"
+            "range": {"max": 100},
+            "policy_type": "range"
         }
     ]
 ]

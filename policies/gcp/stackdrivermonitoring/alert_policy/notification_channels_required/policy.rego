@@ -15,7 +15,7 @@ conditions := [
         {
             "condition": "Require notification channels (blacklist: empty array)",
             "attribute_path": ["notification_channels"],
-            "values": [[]],
+            "values": [[], null],
             "policy_type": "blacklist"
         }
     ]
