@@ -4,56 +4,56 @@
   "arguments": {
     "location": {
       "description": "the value will be parsed from the identifier of the parent resource. If no location is provided in the parent identifier and no location is specified, it is taken from the provider configuration.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "Geographic/regional identifier only. Used for resource location but has no direct access control implications.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "name": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "Used to find the parent resource to bind the IAM policy to",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Simple resource identifier used for binding context. The security impact comes from the IAM permissions being granted, not the resource name itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "project": {
       "description": "If it is not provided, the project will be parsed from the identifier of the parent resource. If no project is provided in the parent identifier and no project is specified, the provider project is used.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "Specifies resource ownership/billing scope. Access is already controlled by Google Cloud IAM at the project level.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "member/members": {
       "description": "Each entry can have one of the following values: * **allUsers**: A special identifier that represents anyone who is on the internet; with or without a Google account. * **allAuthenticatedUsers**: A special identifier that represents anyone who is authenticated with a Google account or a service account. * **user:{emailid}**: An email address that represents a specific Google account. For example, alice@gmail.com or joe@example.com. * **serviceAccount:{emailid}**: An email address that represents a service account. For example, my-other-app@appspot.gserviceaccount.com. * **group:{emailid}**: An email address that represents a Google group. For example, admins@example.com. * **domain:{domain}**: A G Suite domain (primary, instead of alias) name that represents all the users of that domain. For example, google.com or example.com. * **projectOwner:projectid**: Owners of the given project. For example, \"projectOwner:my-example-project\" * **projectEditor:projectid**: Editors of the given project. For example, \"projectEditor:my-example-project\" * **projectViewer:projectid**: Viewers of the given project. For example, \"projectViewer:my-example-project\"",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "required": true,
+      "security_impact": true,
+      "rationale": "This defines *who* is granted the permissions. Granting access to a broad identity like `allUsers` or `allAuthenticatedUsers` would expose the pipeline to the entire internet or any Google-authenticated user, representing a critical security risk.",
+      "compliant": "user:dev-team@company.com, serviceAccount:deploy-sa@my-project-id.iam.gserviceaccount.com, group:deploy-team@company.com",
+      "non-compliant": "allUsers, allAuthenticatedUsers",
       "parent": null
     },
     "role": {
       "description": "`google_clouddeploy_delivery_pipeline_iam_binding` can be used per role. Note that custom roles must be of the format `[projects|organizations]/{parent-name}/roles/{role-name}`.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "required": true,
+      "security_impact": true,
+      "rationale": "This defines *what* permissions are being granted. Predefined roles (e.g., `roles/clouddeploy.admin`) are bundles of permissions. Assigning a more privileged role than necessary is a direct security violation of the principle of least privilege.",
+      "compliant": "clouddeploy.operator ,clouddeploy.developer, clouddeploy.releaser, clouddeploy.viewer, clouddeploy.jobRunner",
+      "non-compliant": "roles/editor, roles/owner",
       "parent": null
     },
     "policy_data": {
       "description": "a `google_iam_policy` data source.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "required": true,
+      "security_impact": true,
+      "rationale": "This the entire IAM policy for the resource. It specifies *all* bindings (role/member pairs) at once. An incorrect policy can accidentally revoke necessary access, grant overly broad access, or expose the resource publicly. It is the authoritative security configuration for the pipeline.",
+      "compliant": "policy with roles/clouddeploy.* roles and specific user/serviceAccount members",
+      "non-compliant": "policy containing allUsers/allAuthenticatedUsers or roles/owner/editor",
       "parent": null
     }
   }
