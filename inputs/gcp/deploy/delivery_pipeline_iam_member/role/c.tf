@@ -4,7 +4,7 @@
 resource "google_clouddeploy_delivery_pipeline_iam_member" "c" {
   project  = "my-project"
   location = "us-central1"
-  name     = "my-delivery-pipeline-c"
+  name     = "c"
   role     = "roles/clouddeploy.developer"
   member   = "user:dev-user@example.com"
 }
