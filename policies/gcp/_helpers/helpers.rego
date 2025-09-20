@@ -478,6 +478,23 @@ format_range_input(lower, upper) := range_values if {
 	range_values := {"lower_bound": lower, "upper_bound": upper}
 }
 
+format_range_validation_message(
+    friendly_resource_name,
+    resource_value_name,
+    attribute_path_string,
+    nc_value,
+    empty,
+    range_values
+) = msg if {
+    lower := get_lower_bound(range_values)
+    upper := get_upper_bound(range_values)
+
+    msg := sprintf(
+        "%s '%s' has '%s' set to '%v'%s. It must be between %v and %v",
+        [friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, lower, upper]
+    )
+}
+
 ############### REGEX
 
 # HELPER: gets the target * pattern
