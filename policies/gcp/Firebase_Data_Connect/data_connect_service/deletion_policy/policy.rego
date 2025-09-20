@@ -4,10 +4,10 @@ import data.terraform.gcp.security.Firebase_Data_Connect.data_connect_service.va
 
 conditions := [
     [
-    {"situation_description" : "The deletion_policy is set to FORCE, which may cause unintended or irreversible data loss.",
-    "remedies":[  "Avoid using FORCE deletion unless strictly required.",
-                "Use a safer deletion policy such as ABANDON to retain resources.",
-                "Implement change review before applying destructive operations."
+    {"situation_description" : "The resource is configured with deletion_policy set to DEFAULT, which does not guarantee forced removal and may leave residual data or resources unmanaged, leading to compliance and security risks.",
+    "remedies":[ "Update the deletion_policy attribute from DEFAULT to FORCE to ensure complete and compliant deletion of resources.",
+                "Review all resources using DEFAULT deletion policy and migrate them to FORCE where applicable.",
+                "Establish monitoring to prevent future use of DEFAULT deletion policy."
 ]},
     {
         "condition": "deletion_policy set to FORCE",
