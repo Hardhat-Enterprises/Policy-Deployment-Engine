@@ -2,7 +2,7 @@
 # This resource is compliant because platform_edition is not a trial SKU
 
 resource "google_looker_instance" "c" {
-  name = "c"
+  name = "cc"
   platform_edition  = "LOOKER_CORE_STANDARD_ANNUAL"
   region            = "us-central1"
   public_ip_enabled = false
@@ -14,5 +14,8 @@ resource "google_looker_instance" "c" {
     client_secret = "test-client-secret"
   }
 }
+
+
+
 
 

@@ -2,7 +2,7 @@
 # This resource is compliant because public_ip_enabled is set to false
 
 resource "google_looker_instance" "c" {
-  name = "c"
+  name = "cc"
   platform_edition  = "LOOKER_CORE_STANDARD_ANNUAL"
   region            = "us-central1"
   public_ip_enabled = false
@@ -14,5 +14,8 @@ resource "google_looker_instance" "c" {
     client_secret = "test-client-secret"
   }
 }
+
+
+
 
 

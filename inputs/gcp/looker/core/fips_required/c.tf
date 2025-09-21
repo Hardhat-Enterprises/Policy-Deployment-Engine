@@ -2,7 +2,7 @@
 # This resource is compliant because fips_enabled is set to true
 
 resource "google_looker_instance" "c" {
-  name = "c"
+  name = "cc"
   platform_edition  = "LOOKER_CORE_STANDARD_ANNUAL"
   region            = "us-central1"
   public_ip_enabled = false
@@ -15,5 +15,8 @@ resource "google_looker_instance" "c" {
     client_secret = "test-client-secret"
   }
 }
+
+
+
 
 
