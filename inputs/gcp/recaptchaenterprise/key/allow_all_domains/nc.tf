@@ -3,8 +3,7 @@
 
 resource "google_recaptcha_enterprise_key" "nc" {
   project      = var.project
-  display_name = "recaptcha-web-noncompliant"
-
+  display_name = "nc1"
   web_settings {
     allow_all_domains = true
     # Intentionally no allow-list when wildcarding
@@ -12,3 +11,5 @@ resource "google_recaptcha_enterprise_key" "nc" {
     challenge_security_preference = "BALANCE"
   }
 }
+
+

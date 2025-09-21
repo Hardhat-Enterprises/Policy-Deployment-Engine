@@ -3,8 +3,7 @@
 
 resource "google_recaptcha_enterprise_key" "nc" {
   project      = var.project
-  display_name = "recaptcha-web-noncompliant-allow-amp"
-
+  display_name = "nc1"
   web_settings {
     # Keep wildcarding off so the failure is only about AMP
     allow_all_domains = false
@@ -16,3 +15,5 @@ resource "google_recaptcha_enterprise_key" "nc" {
     allow_amp_traffic = true
   }
 }
+
+

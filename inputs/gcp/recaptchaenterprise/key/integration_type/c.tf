@@ -1,8 +1,7 @@
 # Google reCAPTCHA Enterprise Key (Web) — compliant (integration_type = "SCORE")
 resource "google_recaptcha_enterprise_key" "c" {
   project      = var.project
-  display_name = "recaptcha-web-compliant-integration-type"
-
+  display_name = "c1"
   web_settings {
     allow_all_domains = false
     allowed_domains   = ["example.com", "shop.example.com"]
@@ -17,3 +16,5 @@ resource "google_recaptcha_enterprise_key" "c" {
 
 # declare once per inputs folder so you can pass -var="project=..."
 variable "project" { type = string }
+
+

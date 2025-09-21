@@ -3,8 +3,7 @@
 
 resource "google_recaptcha_enterprise_key" "c" {
   project      = var.project
-  display_name = "recaptcha-web-compliant-allow-amp"
-
+  display_name = "c1"
   web_settings {
     allow_all_domains = false
     allowed_domains   = ["example.com", "shop.example.com"]
@@ -18,3 +17,5 @@ resource "google_recaptcha_enterprise_key" "c" {
 
 # Inline declaration so you can pass -var on the CLI (no new files needed)
 variable "project" { type = string }
+
+
