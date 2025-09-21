@@ -1,5 +1,5 @@
-﻿resource "google_looker_instance" "nc" {
-  name              = "bad"
+resource "google_looker_instance" "nc" {
+  name = "nc"
   project           = var.project
   public_ip_enabled = false
   # custom_domain block intentionally omitted to trigger failure
@@ -8,4 +8,5 @@
     client_secret = "test-client-secret"
   }
 }
+
 
