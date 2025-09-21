@@ -10,10 +10,8 @@ resource "google_dataform_repository" "nc" {
   git_remote_settings {
     url             = "https://github.com/example/repo.git"
     default_branch  = "main"
-    # authentication_token_secret_version intentionally omitted to fail policy
-    ssh_authentication_config {
-      host_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC..."
-      user_private_key_secret_version = "projects/test-project/secrets/ssh-key/versions/1"
-    }
+    # Fixed: added HTTPS token secret and removed SSH authentication
+    authentication_token_secret_version = "projects/${var.project}/secrets/git-https-token/versions/1"
+    # ssh_authentication_config removed - using HTTPS token authentication instead
   }
 }

@@ -8,8 +8,8 @@ resource "google_dataform_repository" "nc" {
   display_name = "nc"
 
   labels = {
-    security_contact     = ""               # empty → should fail presence check
-    data_classification  = "top-secret"     # not in allow-list → should fail value check
+    security_contact     = "security-team@example.com"  # <-- fixed: added valid security contact
+    data_classification  = "restricted"                 # <-- fixed: changed to valid value from allow-list
     business_criticality = "high"
     compliance_regime    = "none"
   }

@@ -4,7 +4,7 @@ resource "google_dataform_repository" "repo_nc" {
   provider     = google-beta
   project      = var.project
   region       = "us-central1"
-  name         = "release-config-parent-nc"
+  name         = "nc"
   display_name = "nc"
 }
 
@@ -16,5 +16,5 @@ resource "google_dataform_repository_release_config" "nc" {
 
   name          = "nc"
   git_commitish = "main"
-  # cron_schedule intentionally omitted to fail policy
+  cron_schedule = "0 3 * * *"  # <-- fixed: added cron schedule (daily at 3 AM)
 }

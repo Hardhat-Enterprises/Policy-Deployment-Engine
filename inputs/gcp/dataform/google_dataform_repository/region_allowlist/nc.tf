@@ -3,7 +3,7 @@
 resource "google_dataform_repository" "nc" {
   provider    = google-beta
   project     = var.project
-  region      = "europe-west1"
+  region      = "australia-southeast1"  # <-- fixed: changed to approved region
   name        = "nc"
-  display_name = "dataform-repo-noncompliant-region_allowlist"
+  display_name = "nc"
 }

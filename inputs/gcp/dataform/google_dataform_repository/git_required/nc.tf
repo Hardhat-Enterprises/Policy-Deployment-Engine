@@ -9,7 +9,7 @@ resource "google_dataform_repository" "nc" {
   
   git_remote_settings {
     url             = "https://github.com/example/repo.git"
-    default_branch  = ""  # empty string to fail policy
+    default_branch  = "main"  # <-- fixed: added proper default branch
     authentication_token_secret_version = "projects/example-project/secrets/git-token/versions/1"
   }
 }

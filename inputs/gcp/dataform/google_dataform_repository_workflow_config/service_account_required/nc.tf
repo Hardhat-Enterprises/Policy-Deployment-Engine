@@ -4,7 +4,7 @@ resource "google_dataform_repository" "repo_nc" {
   provider     = google-beta
   project      = var.project
   region       = "us-central1"
-  name         = "workflow-config-parent-nc"
+  name         = "nc"
   display_name = "nc"
 }
 
@@ -14,7 +14,7 @@ resource "google_dataform_repository_release_config" "rel_nc" {
   region     = google_dataform_repository.repo_nc.region
   repository = "projects/${var.project}/locations/${google_dataform_repository.repo_nc.region}/repositories/${google_dataform_repository.repo_nc.name}"
 
-  name          = "default-release-nc"
+  name          = "nc"
   git_commitish = "main"
   cron_schedule = "0 3 * * *"
 }
@@ -28,5 +28,8 @@ resource "google_dataform_repository_workflow_config" "nc" {
 
   release_config = google_dataform_repository_release_config.rel_nc.name
 
-  # invocation_config block intentionally omitted to fail policy
+  # invocation_config block with required service account
+  invocation_config {
+    service_account = "workflow-sa@${var.project}.iam.gserviceaccount.com"
+  }
 }

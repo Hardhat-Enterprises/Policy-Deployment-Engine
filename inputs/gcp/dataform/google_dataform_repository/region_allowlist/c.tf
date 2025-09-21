@@ -5,5 +5,5 @@ resource "google_dataform_repository" "c" {
   project     = var.project
   region      = "australia-southeast1"
   name        = "c"
-  display_name = "dataform-repo-compliant-region_allowlist"
+  display_name = "c"
 }

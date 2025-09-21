@@ -577,3 +577,10 @@ format_pattern_whitelist_message(friendly_resource_name, resource_value_name, at
         [friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, allowed_values]
     ) 
 }
+
+format_range_validation_message(friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, range_values) = msg if {
+    msg := sprintf(
+        "%s '%s' has '%s' set to '%s'%s. Value must be within range: %s",
+        [friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, range_values]
+    )
+}

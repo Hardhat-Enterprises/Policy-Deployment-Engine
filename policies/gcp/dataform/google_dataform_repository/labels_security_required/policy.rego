@@ -56,3 +56,4 @@ conditions := array.concat(presence_conditions, value_conditions)
 
 message := helpers.get_multi_summary(conditions, repo.variables).message
 details := helpers.get_multi_summary(conditions, repo.variables).details
+

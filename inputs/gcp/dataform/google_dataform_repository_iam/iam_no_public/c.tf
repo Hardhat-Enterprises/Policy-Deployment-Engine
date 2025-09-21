@@ -4,7 +4,7 @@ resource "google_dataform_repository" "repo_c" {
   provider     = google-beta
   project      = var.project
   region       = "australia-southeast1"
-  name         = "iam-policy-parent"
+  name         = "c"
   display_name = "c"
 }
 

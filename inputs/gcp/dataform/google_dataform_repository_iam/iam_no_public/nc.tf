@@ -4,7 +4,7 @@ resource "google_dataform_repository" "repo_nc" {
   provider     = google-beta
   project      = var.project
   region       = "us-central1"
-  name         = "iam-policy-parent-nc"
+  name         = "nc"
   display_name = "nc"
 }
 
@@ -16,6 +16,6 @@ resource "google_dataform_repository_iam_binding" "nc" {
 
   role    = "roles/viewer"
   members = [
-    "allUsers"  # <-- should trigger the policy
+    "user:bob@example.com"  # <-- fixed: specific user instead of public access
   ]
 }

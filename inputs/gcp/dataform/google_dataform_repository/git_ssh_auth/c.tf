@@ -5,7 +5,7 @@ resource "google_dataform_repository" "c" {
   project      = var.project
   region       = "australia-southeast1"
   name         = "c"
-  display_name = "git-ssh-compliant"
+  display_name = "c"
   
   git_remote_settings {
     url             = "ssh://git@github.com/example/repo.git"
