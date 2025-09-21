@@ -15,7 +15,8 @@ conditions := [
             "condition": "Checks if retention duration is >= 604800 seconds",
             "attribute_path": ["retention"],
             "values": ["604800s"],
-            "policy_type": "min_duration"
+#            "policy_type": "min_duration"
+            "policy_type": "whitelist"
         }
     ]
 ]

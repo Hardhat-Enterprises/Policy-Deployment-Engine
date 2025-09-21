@@ -15,8 +15,8 @@ conditions := [
             "condition": "Checks if weekly_recurrence block is present",
             "attribute_path": ["weekly_recurrence"],
             "values": [{}],
-#            "policy_type": "whitelist"
-            "policy_type": "existence"
+            "policy_type": "whitelist"
+#            "policy_type": "existence"
         }
     ]
 ]

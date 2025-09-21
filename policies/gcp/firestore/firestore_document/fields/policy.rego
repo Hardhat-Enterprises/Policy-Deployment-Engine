@@ -15,7 +15,8 @@ conditions := [
             "condition": "Checks if fields array contains both field1 and field2",
             "attribute_path": ["fields"],
             "values": [["field1", "field2"]],
-            "policy_type": "contains_all"
+#            "policy_type": "contains_all"
+            "policy_type": "whitelist"
         }
     ]
 ]
