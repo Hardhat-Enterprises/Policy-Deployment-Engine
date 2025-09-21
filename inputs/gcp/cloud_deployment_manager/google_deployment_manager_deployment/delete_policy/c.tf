@@ -1,8 +1,5 @@
-# Describe your resource type here
-# Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
-
-resource "google_deployment_manager_deployment" "nc" {
-    name = "deployment-nc"
+resource "google_deployment_manager_deployment" "c" {
+  name = "c"
 
   target {
     config {
@@ -22,5 +19,5 @@ EOF
     }
   }
 
-  create_policy = "CREATE_OR_ACQUIRE"
+  delete_policy = "DELETE"
 }

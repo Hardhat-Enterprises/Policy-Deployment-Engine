@@ -1,5 +1,5 @@
 resource "google_deployment_manager_deployment" "c" {
-  name = "deployment-c"
+  name = "c"
 
   target {
     config {
@@ -19,5 +19,5 @@ EOF
     }
   }
 
-  preview = false
+  create_policy = "ACQUIRE"
 }

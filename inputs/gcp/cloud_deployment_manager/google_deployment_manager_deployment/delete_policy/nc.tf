@@ -1,5 +1,5 @@
-resource "google_deployment_manager_deployment" "c" {
-  name = "deployment-c"
+resource "google_deployment_manager_deployment" "nc" {
+  name = "nc"
 
   target {
     config {
@@ -19,5 +19,5 @@ EOF
     }
   }
 
-  delete_policy = "DELETE"
+  delete_policy = "ABANDON"
 }
