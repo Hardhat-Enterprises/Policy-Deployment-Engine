@@ -6,64 +6,50 @@ import data.terraform.gcp.security.dataform.google_dataform_repository as repo
 # This policy enforces: if a repo configures git_remote_settings,
 # then BOTH `url` and `default_branch` must be set (non-empty).
 #
-# We implement this with two situations that use "guards":
-#  - If URL is set  -> default_branch must be set
-#  - If default_branch is set -> URL must be set
-#
-# (This avoids false positives when git_remote_settings = [] in the plan.)
+# We implement this with two separate situations:
+#  - Situation 1: If git_remote_settings exists, URL must be set
+#  - Situation 2: If git_remote_settings exists, default_branch must be set
 
 conditions := [
-  # ── Situation 1: URL present ⇒ default_branch required
+  # ── Situation 1: Git remote URL is required
   [
     {
-      "situation_description": "Git remote URL is configured but default_branch is missing",
-      "remedies": [
-        "Set git_remote_settings.default_branch to the repo's default branch (e.g., 'main')."
-      ]
-    },
-    {
-      "condition": "git_remote_settings must exist",
-      "attribute_path": ["git_remote_settings"],
-      "policy_type": "blacklist",
-      "values": [null, []]
-    },
-    {
-      "condition": "Guard: URL is set",
-      "attribute_path": ["git_remote_settings", 0, "url"],
-      "policy_type": "whitelist",
-      "values": [null, ""]
-    },
-    {
-      "condition": "default_branch must be set",
-      "attribute_path": ["git_remote_settings", 0, "default_branch"],
-      "policy_type": "blacklist",
-      "values": [null, ""]
-    }
-  ],
-
-  # ── Situation 2: default_branch present ⇒ URL required
-  [
-    {
-      "situation_description": "Git remote default_branch is configured but URL is missing",
+      "situation_description": "Git remote URL is missing",
       "remedies": [
         "Set git_remote_settings.url to the HTTPS remote (e.g., 'https://github.com/org/repo.git')."
       ]
     },
     {
-      "condition": "git_remote_settings must exist",
+      "condition": "Git remote is configured",
       "attribute_path": ["git_remote_settings"],
-      "policy_type": "blacklist",
+      "policy_type": "whitelist",
       "values": [null, []]
     },
     {
-      "condition": "Guard: default_branch is set",
-      "attribute_path": ["git_remote_settings", 0, "default_branch"],
-      "policy_type": "whitelist",
+      "condition": "Git remote URL must be set",
+      "attribute_path": ["git_remote_settings", 0, "url"],
+      "policy_type": "blacklist",
       "values": [null, ""]
+    }
+  ],
+
+  # ── Situation 2: Git remote default_branch is required
+  [
+    {
+      "situation_description": "Git remote default_branch is missing",
+      "remedies": [
+        "Set git_remote_settings.default_branch to the repo's default branch (e.g., 'main')."
+      ]
     },
     {
-      "condition": "url must be set",
-      "attribute_path": ["git_remote_settings", 0, "url"],
+      "condition": "Git remote is configured",
+      "attribute_path": ["git_remote_settings"],
+      "policy_type": "whitelist",
+      "values": [null, []]
+    },
+    {
+      "condition": "Git remote default_branch must be set",
+      "attribute_path": ["git_remote_settings", 0, "default_branch"],
       "policy_type": "blacklist",
       "values": [null, ""]
     }

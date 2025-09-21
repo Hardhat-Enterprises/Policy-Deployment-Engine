@@ -6,6 +6,7 @@ import data.terraform.gcp.security.dataform.google_dataform_repository_workflow_
 # Require a service account in invocation_config
 # NOTE: Terraform encodes nested blocks as single-element arrays in plan JSON.
 # Path uses index 0 to reach service_account.
+
 conditions := [
   [
     {
@@ -16,9 +17,9 @@ conditions := [
       ]
     },
     {
-      "condition": "invocation_config block must exist",
+      "condition": "invocation_config is configured",
       "attribute_path": ["invocation_config"],
-      "policy_type": "blacklist",
+      "policy_type": "whitelist",
       "values": [null, []]
     },
     {

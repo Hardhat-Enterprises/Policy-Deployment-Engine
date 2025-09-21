@@ -28,8 +28,8 @@ resource "google_dataform_repository_workflow_config" "nc" {
 
   release_config = google_dataform_repository_release_config.rel_nc.name
 
-  # invocation_config block with required service account
+  # invocation_config block with missing service account - non-compliant for testing policy enforcement
   invocation_config {
-    service_account = "workflow-sa@${var.project}.iam.gserviceaccount.com"
+    # service_account not set - non-compliant for testing policy enforcement
   }
 }

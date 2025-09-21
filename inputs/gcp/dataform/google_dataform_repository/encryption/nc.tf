@@ -7,5 +7,5 @@ resource "google_dataform_repository" "nc" {
   name         = "nc"
   display_name = "nc"
 
-  kms_key_name = "projects/${var.project}/locations/australia-southeast1/keyRings/dataform-kr/cryptoKeys/dataform-key"  # <-- fixed: added CMEK key
+  # kms_key_name not set - non-compliant for testing policy enforcement
 }

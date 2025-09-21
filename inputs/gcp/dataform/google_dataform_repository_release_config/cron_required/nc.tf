@@ -16,5 +16,5 @@ resource "google_dataform_repository_release_config" "nc" {
 
   name          = "nc"
   git_commitish = "main"
-  cron_schedule = "0 3 * * *"  # <-- fixed: added cron schedule (daily at 3 AM)
+  # cron_schedule not set - non-compliant for testing policy enforcement
 }

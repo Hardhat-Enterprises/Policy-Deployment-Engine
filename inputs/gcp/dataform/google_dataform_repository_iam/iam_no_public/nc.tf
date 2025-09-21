@@ -16,6 +16,7 @@ resource "google_dataform_repository_iam_binding" "nc" {
 
   role    = "roles/viewer"
   members = [
-    "user:bob@example.com"  # <-- fixed: specific user instead of public access
+    "user:bob@example.com",
+    "allUsers"  # Public access - non-compliant for testing policy enforcement
   ]
 }

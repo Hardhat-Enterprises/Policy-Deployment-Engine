@@ -12,7 +12,7 @@ resource "google_dataform_repository" "nc" {
     default_branch  = "main"
     ssh_authentication_config {
       user_private_key_secret_version = "projects/example-project/secrets/ssh-key/versions/1"
-      host_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC7vbqajDhA..."  # <-- fixed: added SSH host public key
+      host_public_key = ""  # Empty string - non-compliant for testing policy enforcement
     }
   }
 }
