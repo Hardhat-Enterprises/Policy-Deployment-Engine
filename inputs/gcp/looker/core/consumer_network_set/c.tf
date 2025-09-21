@@ -1,5 +1,5 @@
 resource "google_looker_instance" "c" {
-  name = "cc"
+  name = "c1"
   project          = var.project
   consumer_network = "projects/test-project-123/global/networks/test-vpc"
   oauth_config {
@@ -7,6 +7,7 @@ resource "google_looker_instance" "c" {
     client_secret = "test-client-secret"
   }
 }
+
 
 
 
