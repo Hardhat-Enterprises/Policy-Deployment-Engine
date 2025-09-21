@@ -5,16 +5,16 @@
     "location": {
       "description": "The location of the resource. This is the geographical region where the Chronicle instance resides, such as \"us\" or \"europe-west2\".",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Restricting to allowed locations ensures compliance with regional data residency, privacy regulations, and service availability.",
+      "compliant": "australia-southeast1",
+      "non-compliant": "Any location not in the approved list, e.g., europe-west3, us-central1, asia-northeast1",
       "parent": null
     },
     "instance": {
       "description": "The unique identifier for the Chronicle instance, which is the same as the customer ID.",
       "required": true,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -23,7 +23,7 @@
     "data_access_scope_id": {
       "description": "Required. The user provided scope id which will become the last part of the name of the scope resource. Needs to be compliant with https://google.aip.dev/122",
       "required": true,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -31,17 +31,17 @@
     },
     "allowed_data_access_labels": {
       "description": "The allowed labels for the scope. There has to be at least one label allowed for the scope to be valid. The logical operator for evaluation of the allowed labels is OR. Either allow_all or allowed_data_access_labels needs to be provided. E.g.: A customer with scope with allowed labels A and B will be able to see data with labeled with A or B or (A and B). Structure is [documented below](#nested_allowed_data_access_labels).",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "required": true,
+      "security_impact": true,
+      "rationale": "Without any allowed labels or allow_all set to true, the scope becomes ineffective and may lead to incorrect or overly permissive data visibility.",
+      "compliant": ["Automatic entries", "APIs", "Integrations"],
+      "non-compliant": ["Manual entries", "Empty or missing labels"],
       "parent": null,
       "arguments": {
         "data_access_label": {
           "description": "The name of the data access label.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -86,12 +86,12 @@
       }
     },
     "allow_all": {
-      "description": "Optional. Whether or not the scope allows all labels, allow_all and allowed_data_access_labels are mutually exclusive and one of them must be present. denied_data_access_labels can still be used along with allow_all. When combined with denied_data_access_labels, access will be granted to all data that doesn't have labels mentioned in denied_data_access_labels. E.g.: A customer with scope with denied labels A and B and allow_all will be able to see all data except data labeled with A and data labeled with B and data with labels A and B.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "Whether or not the scope allows all labels, allow_all and allowed_data_access_labels are mutually exclusive and one of them must be present. denied_data_access_labels can still be used along with allow_all. When combined with denied_data_access_labels, access will be granted to all data that doesn't have labels mentioned in denied_data_access_labels. E.g.: A customer with scope with denied labels A and B and allow_all will be able to see all data except data labeled with A and data labeled with B and data with labels A and B.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Improper use of `allow_all = true` may result in overly permissive access to sensitive datasets. It should be used only when necessary and accompanied by denied labels to restrict risky access.",
+      "compliant": false,
+      "non-compliant": true,
       "parent": null
     },
     "denied_data_access_labels": {

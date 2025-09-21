@@ -3,7 +3,7 @@
 
 resource "google_scc_project_custom_module" "nc" {
   project = "cefwed"
-  display_name = "enablement_state"
+  display_name = "nc"
   enablement_state = "DISABLED"
   custom_config {
     predicate {

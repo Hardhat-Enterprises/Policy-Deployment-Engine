@@ -5,8 +5,8 @@
     "name": {
       "description": "Name of the `DeployPolicy`.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Just a resource identifier. No security implications.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,8 +14,8 @@
     "selectors": {
       "description": "Required. Selected resources to which the policy will be applied. At least one selector is required. If one selector matches the resource the policy applies. For example, if there are two selectors and the action being attempted matches one of them, the policy will apply to that action. Structure is [documented below](#nested_selectors).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Defines the scope of targets the deployment applies to (e.g., specific targets or all targets). The security of actions on those targets is governed by the service_account's permissions, not the selection itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -23,7 +23,7 @@
         "target": {
           "description": "Contains attributes about a target. Structure is [documented below](#nested_selectors_selectors_target).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -32,7 +32,7 @@
         "delivery_pipeline": {
           "description": "Contains attributes about a delivery pipeline. Structure is [documented below](#nested_selectors_selectors_delivery_pipeline).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -43,8 +43,8 @@
     "rules": {
       "description": "Required. Rules to apply. At least one rule must be present. Structure is [documented below](#nested_rules).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Terraform schema validation requires this block and throws error if missing: At least 1 block(s) are expected for 'rules'. The main security risk (missing rules) is already prevented by Terraform itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -63,8 +63,8 @@
     "location": {
       "description": "The location for the resource",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Geographic placement preference. No security impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -72,8 +72,8 @@
     "description": {
       "description": "Optional. Description of the `DeployPolicy`. Max length is 255 characters.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Human-readable documentation field only. No security implications.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -81,8 +81,8 @@
     "annotations": {
       "description": "Optional. User annotations. These attributes can only be set and used by the user, and not by Cloud Deploy. Annotations must meet the following constraints: * Annotations are key/value pairs. * Valid annotation keys have two segments: an optional prefix and name, separated by a slash (`/`). * The name segment is required and must be 63 characters or less, beginning and ending with an alphanumeric character (`[a-z0-9A-Z]`) with dashes (`-`), underscores (`_`), dots (`.`), and alphanumerics between. * The prefix is optional. If specified, the prefix must be a DNS subdomain: a series of DNS labels separated by dots(`.`), not longer than 253 characters in total, followed by a slash (`/`). See https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/#syntax-and-character-set for more details. **Note**: This field is non-authoritative, and will only manage the annotations present in your configuration. Please refer to the field `effective_annotations` for all of the annotations present on the resource.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Just metadata for resource organization. Doesn't affect policy enforcement behaviour.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -90,8 +90,8 @@
     "labels": {
       "description": "Optional. Labels are attributes that can be set and used by both the user and by Cloud Deploy. Labels must meet the following constraints: * Keys and values can contain only lowercase letters, numeric characters, underscores, and dashes. * All characters must use UTF-8 encoding, and international characters are allowed. * Keys must start with a lowercase letter or international character. * Each resource is limited to a maximum of 64 labels. Both keys and values are additionally constrained to be <= 63 characters. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Used for billing and resource organization only. Doesn't control security enforcement.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -99,17 +99,17 @@
     "suspended": {
       "description": "Optional. When suspended, the policy will not prevent actions from occurring, even if the action violates the policy.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Controls whether the deploy policy actively enforces security controls. When suspended = true, ALL deployment rules are bypassed, creating a complete security control bypass. Unauthorized suspension allows deployments without any security enforcement.",
+      "compliant": false,
+      "non-compliant": true,
       "parent": null
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "Specifies which GCP project. Controlled by provider configuration and IAM. No security implications.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -173,10 +173,10 @@
       }
     },
     "rollout_restriction": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "Optional. What invoked the action. If left empty, all invoker types will be restricted.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Defines whether the policy applies to human users (`USER`), automation systems (`DEPLOY_AUTOMATION`), or both. Leaving this empty (default) restricts all invokers, which is the most secure but potentially overly broad setting. Misconfiguration could allow unauthorized automation or bypass human approval requirements.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
