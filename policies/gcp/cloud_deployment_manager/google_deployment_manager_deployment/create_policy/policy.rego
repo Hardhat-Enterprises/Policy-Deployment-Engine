@@ -1,6 +1,6 @@
-package terraform.gcp.security.deployment_manager.deployment.create_policy
+package terraform.gcp.security.cloud_deployment_manager.google_deployment_manager_deployment.create_policy
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.deployment_manager.deployment.vars
+import data.terraform.gcp.security.cloud_deployment_manager.google_deployment_manager_deployment.vars
 
 conditions := [
     [
