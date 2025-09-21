@@ -1,0 +1,784 @@
+{
+  "resource_name": "network_security_authz_policy",
+  "subcategory": "Network Security",
+  "arguments": {
+    "target": {
+      "description": "Specifies the set of resources to which this policy should be applied to. Structure is [documented below](#nested_target).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "load_balancing_scheme": {
+          "description": "All gateways and forwarding rules referenced by this policy and extensions must share the same load balancing scheme. For more information, refer to [Backend services overview](https://cloud.google.com/load-balancing/docs/backend-service). Possible values are: `INTERNAL_MANAGED`, `EXTERNAL_MANAGED`, `INTERNAL_SELF_MANAGED`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "target"
+        },
+        "resources": {
+          "description": "A list of references to the Forwarding Rules on which this policy will be applied.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "target"
+        }
+      }
+    },
+    "action": {
+      "description": "When the action is CUSTOM, customProvider must be specified. When the action is ALLOW, only requests matching the policy will be allowed. When the action is DENY, only requests matching the policy will be denied. When a request arrives, the policies are evaluated in the following order: 1. If there is a CUSTOM policy that matches the request, the CUSTOM policy is evaluated using the custom authorization providers and the request is denied if the provider rejects the request. 2. If there are any DENY policies that match the request, the request is denied. 3. If there are no ALLOW policies for the resource or if any of the ALLOW policies match the request, the request is allowed. 4. Else the request is denied by default if none of the configured AuthzPolicies with ALLOW action match the request. Possible values are: `ALLOW`, `DENY`, `CUSTOM`.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "name": {
+      "description": "Identifier. Name of the AuthzPolicy resource.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "location": {
+      "description": "The location of the resource.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "A human-readable description of the resource.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "labels": {
+      "description": "Set of labels associated with the AuthzExtension resource. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "http_rules": {
+      "description": "A list of authorization HTTP rules to match against the incoming request.A policy match occurs when at least one HTTP rule matches the request or when no HTTP rules are specified in the policy. At least one HTTP Rule is required for Allow or Deny Action. Limited to 5 rules. Structure is [documented below](#nested_http_rules).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "from": {
+          "description": "Describes properties of one or more sources of a request. Structure is [documented below](#nested_http_rules_http_rules_from).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "http_rules"
+        },
+        "to": {
+          "description": "Describes properties of one or more targets of a request Structure is [documented below](#nested_http_rules_http_rules_to).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "http_rules"
+        },
+        "when": {
+          "description": "CEL expression that describes the conditions to be satisfied for the action. The result of the CEL expression is ANDed with the from and to. Refer to the CEL language reference for a list of available attributes.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "http_rules"
+        }
+      }
+    },
+    "custom_provider": {
+      "description": "Required if the action is CUSTOM. Allows delegating authorization decisions to Cloud IAP or to Service Extensions. One of cloudIap or authzExtension must be specified. Structure is [documented below](#nested_custom_provider).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "cloud_iap": {
+          "description": "Delegates authorization decisions to Cloud IAP. Applicable only for managed load balancers. Enabling Cloud IAP at the AuthzPolicy level is not compatible with Cloud IAP settings in the BackendService. Enabling IAP in both places will result in request failure. Ensure that IAP is enabled in either the AuthzPolicy or the BackendService but not in both places. Structure is [documented below](#nested_custom_provider_cloud_iap).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "custom_provider"
+        },
+        "authz_extension": {
+          "description": "Delegate authorization decision to user authored Service Extension. Only one of cloudIap or authzExtension can be specified. Structure is [documented below](#nested_custom_provider_authz_extension).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "custom_provider"
+        }
+      }
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "from": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "sources": {
+          "description": "Describes the properties of a request's sources. At least one of sources or notSources must be specified. Limited to 5 sources. A match occurs when ANY source (in sources or notSources) matches the request. Within a single source, the match follows AND semantics across fields and OR semantics within a single field, i.e. a match occurs when ANY principal matches AND ANY ipBlocks match. Structure is [documented below](#nested_http_rules_http_rules_from_sources).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "from"
+        },
+        "not_sources": {
+          "description": "Describes the properties of a request's sources. At least one of sources or notSources must be specified. Limited to 5 sources. A match occurs when ANY source (in sources or notSources) matches the request. Within a single source, the match follows AND semantics across fields and OR semantics within a single field, i.e. a match occurs when ANY principal matches AND ANY ipBlocks match. Structure is [documented below](#nested_http_rules_http_rules_from_not_sources).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "from"
+        }
+      }
+    },
+    "sources": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "principals": {
+          "description": "A list of identities derived from the client's certificate. This field will not match on a request unless mutual TLS is enabled for the Forwarding rule or Gateway. Each identity is a string whose value is matched against the URI SAN, or DNS SAN or the subject field in the client's certificate. The match can be exact, prefix, suffix or a substring match. One of exact, prefix, suffix or contains must be specified. Limited to 5 principals. Structure is [documented below](#nested_http_rules_http_rules_from_sources_sources_principals).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "sources"
+        },
+        "resources": {
+          "description": "A list of resources to match against the resource of the source VM of a request. Limited to 5 resources. Structure is [documented below](#nested_http_rules_http_rules_from_sources_sources_resources).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "sources"
+        }
+      }
+    },
+    "principals": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "ignore_case": {
+          "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "principals"
+        },
+        "exact": {
+          "description": "The input string must match exactly the string specified here. Examples: * abc only matches the value abc.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "principals"
+        },
+        "prefix": {
+          "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead. Examples: * abc matches the value abc.xyz",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "principals"
+        },
+        "suffix": {
+          "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead. Examples: * abc matches the value xyz.abc",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "principals"
+        },
+        "contains": {
+          "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead. Examples: * abc matches the value xyz.abc.def",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "principals"
+        }
+      }
+    },
+    "resources": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "tag_value_id_set": {
+          "description": "A list of resource tag value permanent IDs to match against the resource manager tags value associated with the source VM of a request. Structure is [documented below](#nested_http_rules_http_rules_from_not_sources_not_sources_resources_resources_tag_value_id_set).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "resources"
+        },
+        "iam_service_account": {
+          "description": "An IAM service account to match against the source service account of the VM sending the request. Structure is [documented below](#nested_http_rules_http_rules_from_not_sources_not_sources_resources_resources_iam_service_account).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "resources"
+        }
+      }
+    },
+    "tag_value_id_set": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "ids": {
+          "description": "A list of resource tag value permanent IDs to match against the resource manager tags value associated with the source VM of a request. The match follows AND semantics which means all the ids must match. Limited to 5 matches.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "tag_value_id_set"
+        }
+      }
+    },
+    "iam_service_account": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "ignore_case": {
+          "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "iam_service_account"
+        },
+        "exact": {
+          "description": "The input string must match exactly the string specified here. Examples: * abc only matches the value abc.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "iam_service_account"
+        },
+        "prefix": {
+          "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead. Examples: * abc matches the value abc.xyz",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "iam_service_account"
+        },
+        "suffix": {
+          "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead. Examples: * abc matches the value xyz.abc",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "iam_service_account"
+        },
+        "contains": {
+          "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead. Examples: * abc matches the value xyz.abc.def",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "iam_service_account"
+        }
+      }
+    },
+    "not_sources": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "principals": {
+          "description": "A list of identities derived from the client's certificate. This field will not match on a request unless mutual TLS is enabled for the Forwarding rule or Gateway. Each identity is a string whose value is matched against the URI SAN, or DNS SAN or the subject field in the client's certificate. The match can be exact, prefix, suffix or a substring match. One of exact, prefix, suffix or contains must be specified. Limited to 5 principals. Structure is [documented below](#nested_http_rules_http_rules_from_not_sources_not_sources_principals).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "not_sources"
+        },
+        "resources": {
+          "description": "A list of resources to match against the resource of the source VM of a request. Limited to 5 resources. Structure is [documented below](#nested_http_rules_http_rules_from_not_sources_not_sources_resources).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "not_sources"
+        }
+      }
+    },
+    "to": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "operations": {
+          "description": "Describes properties of one or more targets of a request. At least one of operations or notOperations must be specified. Limited to 5 operations. A match occurs when ANY operation (in operations or notOperations) matches. Within an operation, the match follows AND semantics across fields and OR semantics within a field, i.e. a match occurs when ANY path matches AND ANY header matches and ANY method matches. Structure is [documented below](#nested_http_rules_http_rules_to_operations).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "to"
+        },
+        "not_operations": {
+          "description": "Describes the negated properties of the targets of a request. Matches requests for operations that do not match the criteria specified in this field. At least one of operations or notOperations must be specified. Structure is [documented below](#nested_http_rules_http_rules_to_not_operations).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "to"
+        }
+      }
+    },
+    "operations": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "header_set": {
+          "description": "A list of headers to match against in http header. Structure is [documented below](#nested_http_rules_http_rules_to_operations_operations_header_set).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "operations"
+        },
+        "hosts": {
+          "description": "A list of HTTP Hosts to match against. The match can be one of exact, prefix, suffix, or contains (substring match). Matches are always case sensitive unless the ignoreCase is set. Limited to 5 matches. Structure is [documented below](#nested_http_rules_http_rules_to_operations_operations_hosts).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "operations"
+        },
+        "paths": {
+          "description": "A list of paths to match against. The match can be one of exact, prefix, suffix, or contains (substring match). Matches are always case sensitive unless the ignoreCase is set. Limited to 5 matches. Note that this path match includes the query parameters. For gRPC services, this should be a fully-qualified name of the form /package.service/method. Structure is [documented below](#nested_http_rules_http_rules_to_operations_operations_paths).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "operations"
+        },
+        "methods": {
+          "description": "A list of HTTP methods to match against. Each entry must be a valid HTTP method name (GET, PUT, POST, HEAD, PATCH, DELETE, OPTIONS). It only allows exact match and is always case sensitive.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "operations"
+        }
+      }
+    },
+    "header_set": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "headers": {
+          "description": "A list of headers to match against in http header. The match can be one of exact, prefix, suffix, or contains (substring match). The match follows AND semantics which means all the headers must match. Matches are always case sensitive unless the ignoreCase is set. Limited to 5 matches. Structure is [documented below](#nested_http_rules_http_rules_to_not_operations_not_operations_header_set_headers).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "header_set"
+        }
+      }
+    },
+    "headers": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "name": {
+          "description": "Specifies the name of the header in the request.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "headers"
+        },
+        "value": {
+          "description": "Specifies how the header match will be performed. Structure is [documented below](#nested_http_rules_http_rules_to_not_operations_not_operations_header_set_headers_headers_value).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "headers"
+        }
+      }
+    },
+    "value": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "ignore_case": {
+          "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "value"
+        },
+        "exact": {
+          "description": "The input string must match exactly the string specified here. Examples: * abc only matches the value abc.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "value"
+        },
+        "prefix": {
+          "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead. Examples: * abc matches the value abc.xyz",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "value"
+        },
+        "suffix": {
+          "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead. Examples: * abc matches the value xyz.abc",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "value"
+        },
+        "contains": {
+          "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead. Examples: * abc matches the value xyz.abc.def",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "value"
+        }
+      }
+    },
+    "hosts": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "ignore_case": {
+          "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "hosts"
+        },
+        "exact": {
+          "description": "The input string must match exactly the string specified here. Examples: * abc only matches the value abc.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "hosts"
+        },
+        "prefix": {
+          "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead. Examples: * abc matches the value abc.xyz",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "hosts"
+        },
+        "suffix": {
+          "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead. Examples: * abc matches the value xyz.abc",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "hosts"
+        },
+        "contains": {
+          "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead. Examples: * abc matches the value xyz.abc.def",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "hosts"
+        }
+      }
+    },
+    "paths": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "ignore_case": {
+          "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "paths"
+        },
+        "exact": {
+          "description": "The input string must match exactly the string specified here. Examples: * abc only matches the value abc.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "paths"
+        },
+        "prefix": {
+          "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead. Examples: * abc matches the value abc.xyz",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "paths"
+        },
+        "suffix": {
+          "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead. Examples: * abc matches the value xyz.abc",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "paths"
+        },
+        "contains": {
+          "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead. Examples: * abc matches the value xyz.abc.def",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "paths"
+        }
+      }
+    },
+    "not_operations": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "header_set": {
+          "description": "A list of headers to match against in http header. Structure is [documented below](#nested_http_rules_http_rules_to_not_operations_not_operations_header_set).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "not_operations"
+        },
+        "hosts": {
+          "description": "A list of HTTP Hosts to match against. The match can be one of exact, prefix, suffix, or contains (substring match). Matches are always case sensitive unless the ignoreCase is set. Limited to 5 matches. Structure is [documented below](#nested_http_rules_http_rules_to_not_operations_not_operations_hosts).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "not_operations"
+        },
+        "paths": {
+          "description": "A list of paths to match against. The match can be one of exact, prefix, suffix, or contains (substring match). Matches are always case sensitive unless the ignoreCase is set. Limited to 5 matches. Note that this path match includes the query parameters. For gRPC services, this should be a fully-qualified name of the form /package.service/method. Structure is [documented below](#nested_http_rules_http_rules_to_not_operations_not_operations_paths).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "not_operations"
+        },
+        "methods": {
+          "description": "A list of HTTP methods to match against. Each entry must be a valid HTTP method name (GET, PUT, POST, HEAD, PATCH, DELETE, OPTIONS). It only allows exact match and is always case sensitive.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "not_operations"
+        }
+      }
+    },
+    "cloud_iap": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enabled": {
+          "description": "Enable Cloud IAP at the AuthzPolicy level.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_iap"
+        }
+      }
+    },
+    "authz_extension": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "resources": {
+          "description": "A list of references to authorization extensions that will be invoked for requests matching this policy. Limited to 1 custom provider.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "authz_extension"
+        }
+      }
+    }
+  }
+}

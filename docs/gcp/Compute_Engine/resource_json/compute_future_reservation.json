@@ -1,0 +1,572 @@
+{
+  "resource_name": "compute_future_reservation",
+  "subcategory": "Compute Engine",
+  "arguments": {
+    "time_window": {
+      "description": "Time window for this Future Reservation. Structure is [documented below](#nested_time_window).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "start_time": {
+          "description": "Start time of the future reservation in RFC3339 format.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "time_window"
+        },
+        "end_time": {
+          "description": "End time of the future reservation in RFC3339 format.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "time_window"
+        },
+        "duration": {
+          "description": "Duration of the future reservation Structure is [documented below](#nested_time_window_duration).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "time_window"
+        }
+      }
+    },
+    "name": {
+      "description": "Name of the resource. Provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the las character, which cannot be a dash.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "An optional description of this resource.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "share_settings": {
+      "description": "Settings for sharing the future reservation Structure is [documented below](#nested_share_settings).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "share_type": {
+          "description": "Type of sharing for this future reservation. Possible values are: `LOCAL`, `SPECIFIC_PROJECTS`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "share_settings"
+        },
+        "projects": {
+          "description": "list of Project names to specify consumer projects for this shared-reservation. This is only valid when shareType's value is SPECIFIC_PROJECTS.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "share_settings"
+        },
+        "project_map": {
+          "description": "A map of project id and project config. This is only valid when shareType's value is SPECIFIC_PROJECTS. Structure is [documented below](#nested_share_settings_project_map).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "share_settings"
+        }
+      }
+    },
+    "name_prefix": {
+      "description": "Name prefix for the reservations to be created at the time of delivery. The name prefix must comply with RFC1035. Maximum allowed length for name prefix is 20. Automatically created reservations name format will be -date-####.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "planning_status": {
+      "description": "Planning state before being submitted for evaluation Possible values are: `DRAFT`, `SUBMITTED`.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "auto_delete_auto_created_reservations": {
+      "description": "Setting for enabling or disabling automatic deletion for auto-created reservation. If set to true, auto-created reservations will be deleted at Future Reservation's end time (default) or at user's defined timestamp if any of the [autoCreatedReservationsDeleteTime, autoCreatedReservationsDuration] values is specified. For keeping auto-created reservation indefinitely, this value should be set to false.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "specific_reservation_required": {
+      "description": "Indicates whether the auto-created reservation can be consumed by VMs with affinity for \"any\" reservation. If the field is set, then only VMs that target the reservation by name can consume from the delivered reservation.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "reservation_name": {
+      "description": "Name of reservations where the capacity is provisioned at the time of delivery of future reservations. If the reservation with the given name does not exist already, it is created automatically at the time of Approval with INACTIVE state till specified start-time. Either provide the reservationName or a namePrefix.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "deployment_type": {
+      "description": "Type of the deployment requested as part of future reservation. Possible values are: `DENSE`, `FLEXIBLE`.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "reservation_mode": {
+      "description": "The reservation mode which determines reservation-termination behavior and expected pricing. Possible values are: `CALENDAR`, `DEFAULT`.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "commitment_info": {
+      "description": "If not present, then FR will not deliver a new commitment or update an existing commitment. Structure is [documented below](#nested_commitment_info).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "commitment_plan": {
+          "description": "Indicates if a Commitment needs to be created as part of FR delivery. If this field is not present, then no commitment needs to be created. Possible values are: `INVALID`, `THIRTY_SIX_MONTH`, `TWELVE_MONTH`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "commitment_info"
+        },
+        "commitment_name": {
+          "description": "name of the commitment where capacity is being delivered to.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "commitment_info"
+        },
+        "previous_commitment_terms": {
+          "description": "Only applicable if FR is delivering to the same reservation. If set, all parent commitments will be extended to match the end date of the plan for this commitment. Possible values are: `EXTEND`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "commitment_info"
+        }
+      }
+    },
+    "scheduling_type": {
+      "description": "Maintenance information for this reservation Possible values are: `GROUPED`, `INDEPENDENT`.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "specific_sku_properties": {
+      "description": "Future Reservation configuration to indicate instance properties and total count. Structure is [documented below](#nested_specific_sku_properties).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "instance_properties": {
+          "description": "Properties of the SKU instances being reserved. Structure is [documented below](#nested_specific_sku_properties_instance_properties).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "specific_sku_properties"
+        },
+        "total_count": {
+          "description": "Total number of instances for which capacity assurance is requested at a future time period.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "specific_sku_properties"
+        },
+        "source_instance_template": {
+          "description": "The instance template that will be used to populate the ReservedInstanceProperties of the future reservation",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "specific_sku_properties"
+        }
+      }
+    },
+    "auto_created_reservations_delete_time": {
+      "description": "Future timestamp when the FR auto-created reservations will be deleted by Compute Engine.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "auto_created_reservations_duration": {
+      "description": "Specifies the duration of auto-created reservations. It represents relative time to future reservation startTime when auto-created reservations will be automatically deleted by Compute Engine. Duration time unit is represented as a count of seconds and fractions of seconds at nanosecond resolution. Structure is [documented below](#nested_auto_created_reservations_duration).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "seconds": {
+          "description": "Span of time at a resolution of a second. Must be from 0 to 315,576,000,000 inclusive.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "auto_created_reservations_duration"
+        },
+        "nanos": {
+          "description": "Span of time that's a fraction of a second at nanosecond resolution. Durations less than one second are represented with a 0 seconds field and a positive nanos field. Must be from 0 to 999,999,999 inclusive.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "auto_created_reservations_duration"
+        }
+      }
+    },
+    "aggregate_reservation": {
+      "description": "Aggregate reservation details for the future reservation. Structure is [documented below](#nested_aggregate_reservation).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "vm_family": {
+          "description": "The VM family that all instances scheduled against this reservation must belong to. Possible values are: `VM_FAMILY_CLOUD_TPU_DEVICE_CT3`, `VM_FAMILY_CLOUD_TPU_LITE_DEVICE_CT5L`, `VM_FAMILY_CLOUD_TPU_LITE_POD_SLICE_CT5LP`, `VM_FAMILY_CLOUD_TPU_LITE_POD_SLICE_CT6E`, `VM_FAMILY_CLOUD_TPU_POD_SLICE_CT3P`, `VM_FAMILY_CLOUD_TPU_POD_SLICE_CT4P`, `VM_FAMILY_CLOUD_TPU_POD_SLICE_CT5P`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "aggregate_reservation"
+        },
+        "reserved_resources": {
+          "description": "futureReservations.list of reserved resources (CPUs, memory, accelerators). Structure is [documented below](#nested_aggregate_reservation_reserved_resources).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "aggregate_reservation"
+        },
+        "workload_type": {
+          "description": "The workload type of the instances that will target this reservation. Possible values are: `BATCH`, `SERVING`, `UNSPECIFIED`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "aggregate_reservation"
+        }
+      }
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "duration": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "seconds": {
+          "description": "Span of time at a resolution of a second. Must be from 0 to 315,576,000,000 inclusive.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "duration"
+        },
+        "nanos": {
+          "description": "Span of time that's a fraction of a second at nanosecond resolution.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "duration"
+        }
+      }
+    },
+    "project_map": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "id": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "project_map"
+        },
+        "project_id": {
+          "description": "The project ID, should be same as the key of this project config in the parent map.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "project_map"
+        }
+      }
+    },
+    "instance_properties": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "machine_type": {
+          "description": "Specifies type of machine (name only) which has fixed number of vCPUs and fixed amount of memory. This also includes specifying custom machine type following custom-NUMBER_OF_CPUS-AMOUNT_OF_MEMORY pattern.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "instance_properties"
+        },
+        "guest_accelerators": {
+          "description": "Specifies accelerator type and count. Structure is [documented below](#nested_specific_sku_properties_instance_properties_guest_accelerators).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "instance_properties"
+        },
+        "min_cpu_platform": {
+          "description": "Minimum cpu platform the reservation.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "instance_properties"
+        },
+        "local_ssds": {
+          "description": "Specifies amount of local ssd to reserve with each instance. The type of disk is local-ssd. Structure is [documented below](#nested_specific_sku_properties_instance_properties_local_ssds).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "instance_properties"
+        },
+        "maintenance_freeze_duration_hours": {
+          "description": "Specifies the number of hours after reservation creation where instances using the reservation won't be scheduled for maintenance.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "instance_properties"
+        },
+        "location_hint": {
+          "description": "An opaque location hint used to place the allocation close to other resources. This field is for use by internal tools that use the public API.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "instance_properties"
+        },
+        "maintenance_interval": {
+          "description": "Specifies the frequency of planned maintenance events. The accepted values are: PERIODIC Possible values are: `PERIODIC`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "instance_properties"
+        }
+      }
+    },
+    "guest_accelerators": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "accelerator_type": {
+          "description": "Full or partial URL of the accelerator type resource to attach to this instance.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "guest_accelerators"
+        },
+        "accelerator_count": {
+          "description": "The number of the guest accelerator cards exposed to this instance.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "guest_accelerators"
+        }
+      }
+    },
+    "local_ssds": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "disk_size_gb": {
+          "description": "Specifies the size of the disk in base-2 GB.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "local_ssds"
+        },
+        "interface": {
+          "description": "Specifies the disk interface to use for attaching this disk, which is either SCSI or NVME. The default is SCSI. Possible values are: `SCSI`, `NVME`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "local_ssds"
+        }
+      }
+    },
+    "reserved_resources": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "accelerator": {
+          "description": "Properties of accelerator resources in this reservation. Structure is [documented below](#nested_aggregate_reservation_reserved_resources_reserved_resources_accelerator).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "reserved_resources"
+        }
+      }
+    },
+    "accelerator": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "accelerator_count": {
+          "description": "Number of accelerators of specified type.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "accelerator"
+        },
+        "accelerator_type": {
+          "description": "Full or partial URL to accelerator type. e.g. \"projects/{PROJECT}/zones/{ZONE}/acceleratorTypes/ct4l\"",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "accelerator"
+        }
+      }
+    }
+  }
+}

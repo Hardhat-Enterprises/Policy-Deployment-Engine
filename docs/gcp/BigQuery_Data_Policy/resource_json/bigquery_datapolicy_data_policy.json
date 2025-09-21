@@ -1,0 +1,80 @@
+{
+  "resource_name": "bigquery_datapolicy_data_policy",
+  "subcategory": "BigQuery Data Policy",
+  "arguments": {
+    "data_policy_id": {
+      "description": "User-assigned (human readable) ID of the data policy that needs to be unique within a project. Used as {dataPolicyId} in part of the resource name.",
+      "required": false,
+      "security_impact": null,
+      "rationale": "Display policy id has no impact on the security of the resource.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "location": {
+      "description": "The name of the location of the data policy.",
+      "required": true,
+      "security_impact": null,
+      "rationale": "Ensure the location must be configured to correct location",
+      "compliant": "Set location to Australia.",
+      "non-compliant": "Other locations are not valid.",
+      "parent": null
+    },
+    "policy_tag": {
+      "description": "Policy tag resource name, in the format of projects/{project_number}/locations/{locationId}/taxonomies/{taxonomyId}/policyTags/{policyTag_id}.",
+      "required": false,
+      "security_impact": null,
+      "rationale": "Display policy id has no impact on the security of the resource.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "data_policy_type": {
+      "description": "The enrollment level of the service. Possible values are: `COLUMN_LEVEL_SECURITY_POLICY`, `DATA_MASKING_POLICY`.",
+      "required": true,
+      "security_impact": null,
+      "rationale": "Ensure data policy type is setting to COLUMN_LEVEL_SECURITY_POLICY because it consists of role-based security.",
+      "compliant": "Set data_policy_type to COLUMN_LEVEL_SECURITY_POLICY.",
+      "non-compliant": "Other data policy types are invalidated.",
+      "parent": null
+    },
+    "data_masking_policy": {
+      "description": "The data masking policy that specifies the data masking rule to use. Structure is [documented below](#nested_data_masking_policy).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "predefined_expression": {
+          "description": "The available masking rules. Learn more here: https://cloud.google.com/bigquery/docs/column-data-masking-intro#masking_options. Possible values are: `SHA256`, `ALWAYS_NULL`, `DEFAULT_MASKING_VALUE`, `LAST_FOUR_CHARACTERS`, `FIRST_FOUR_CHARACTERS`, `EMAIL_MASK`, `DATE_YEAR_MASK`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": "Ensure predefined expression is setting to SHA256 because it will be ",
+          "compliant": "Set predefined_expression to SHA256",
+          "non-compliant": "Other predefined expressions are invalidated",
+          "parent": "data_masking_policy"
+        },
+        "routine": {
+          "description": "The name of the BigQuery routine that contains the custom masking routine, in the format of projects/{projectNumber}/datasets/{dataset_id}/routines/{routine_id}.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "data_masking_policy"
+        }
+      }
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": false,
+      "security_impact": null,
+      "rationale": "Display policy id has no impact on the security of the resource.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    }
+  }
+}

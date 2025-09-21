@@ -1,0 +1,261 @@
+{
+  "resource_name": "vmwareengine_cluster",
+  "subcategory": "Cloud VMware Engine",
+  "arguments": {
+    "parent": {
+      "description": "The resource name of the private cloud to create a new cluster in. Resource names are schemeless URIs that follow the conventions in https://cloud.google.com/apis/design/resource_names. For example: projects/my-project/locations/us-west1-a/privateClouds/my-cloud",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "name": {
+      "description": "The ID of the Cluster.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "node_type_configs": {
+      "description": "The map of cluster node types in this cluster, where the key is canonical identifier of the node type (corresponds to the NodeType). Structure is [documented below](#nested_node_type_configs).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "node_type_id": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_type_configs"
+        },
+        "node_count": {
+          "description": "The number of nodes of this type in the cluster.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_type_configs"
+        },
+        "custom_core_count": {
+          "description": "Customized number of cores available to each node of the type. This number must always be one of `nodeType.availableCustomCoreCounts`. If zero is provided max value from `nodeType.availableCustomCoreCounts` will be used. Once the customer is created then corecount cannot be changed.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_type_configs"
+        }
+      }
+    },
+    "autoscaling_settings": {
+      "description": "Configuration of the autoscaling applied to this cluster Structure is [documented below](#nested_autoscaling_settings).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "autoscaling_policies": {
+          "description": "The map with autoscaling policies applied to the cluster. The key is the identifier of the policy. It must meet the following requirements: * Only contains 1-63 alphanumeric characters and hyphens * Begins with an alphabetical character * Ends with a non-hyphen character * Not formatted as a UUID * Complies with [RFC 1034](https://datatracker.ietf.org/doc/html/rfc1034) (section 3.5) Currently the map must contain only one element that describes the autoscaling policy for compute nodes. Structure is [documented below](#nested_autoscaling_settings_autoscaling_policies).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_settings"
+        },
+        "min_cluster_node_count": {
+          "description": "Minimum number of nodes of any type in a cluster. Mandatory for successful addition of autoscaling settings in cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_settings"
+        },
+        "max_cluster_node_count": {
+          "description": "Maximum number of nodes of any type in a cluster. Mandatory for successful addition of autoscaling settings in cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_settings"
+        },
+        "cool_down_period": {
+          "description": "The minimum duration between consecutive autoscale operations. It starts once addition or removal of nodes is fully completed. Minimum cool down period is 30m. Cool down period must be in whole minutes (for example, 30m, 31m, 50m). Mandatory for successful addition of autoscaling settings in cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_settings"
+        }
+      }
+    },
+    "autoscaling_policies": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "autoscale_policy_id": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_policies"
+        },
+        "node_type_id": {
+          "description": "The canonical identifier of the node type to add or remove.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_policies"
+        },
+        "scale_out_size": {
+          "description": "Number of nodes to add to a cluster during a scale-out operation. Must be divisible by 2 for stretched clusters.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_policies"
+        },
+        "cpu_thresholds": {
+          "description": "Utilization thresholds pertaining to CPU utilization. Structure is [documented below](#nested_autoscaling_settings_autoscaling_policies_autoscaling_policy_cpu_thresholds).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_policies"
+        },
+        "consumed_memory_thresholds": {
+          "description": "Utilization thresholds pertaining to amount of consumed memory. Structure is [documented below](#nested_autoscaling_settings_autoscaling_policies_autoscaling_policy_consumed_memory_thresholds).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_policies"
+        },
+        "storage_thresholds": {
+          "description": "Utilization thresholds pertaining to amount of consumed storage. Structure is [documented below](#nested_autoscaling_settings_autoscaling_policies_autoscaling_policy_storage_thresholds).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_policies"
+        }
+      }
+    },
+    "cpu_thresholds": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "scale_out": {
+          "description": "The utilization triggering the scale-out operation in percent.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cpu_thresholds"
+        },
+        "scale_in": {
+          "description": "The utilization triggering the scale-in operation in percent.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cpu_thresholds"
+        }
+      }
+    },
+    "consumed_memory_thresholds": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "scale_out": {
+          "description": "The utilization triggering the scale-out operation in percent.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "consumed_memory_thresholds"
+        },
+        "scale_in": {
+          "description": "The utilization triggering the scale-in operation in percent.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "consumed_memory_thresholds"
+        }
+      }
+    },
+    "storage_thresholds": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "scale_out": {
+          "description": "The utilization triggering the scale-out operation in percent.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "storage_thresholds"
+        },
+        "scale_in": {
+          "description": "The utilization triggering the scale-in operation in percent.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "storage_thresholds"
+        }
+      }
+    }
+  }
+}

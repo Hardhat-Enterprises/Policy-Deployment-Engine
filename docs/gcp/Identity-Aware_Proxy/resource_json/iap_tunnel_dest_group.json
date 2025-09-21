@@ -1,0 +1,51 @@
+{
+  "resource_name": "iap_tunnel_dest_group",
+  "subcategory": "Identity-Aware Proxy",
+  "arguments": {
+    "group_name": {
+      "description": "Unique tunnel destination group name.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Clear, unique names avoid misrouting and make reviews/audits easier.",
+      "compliant": "group_name = \"corp-admin-tcp\"",
+      "non-compliant": "group_name = \"test\" / \"\" / \"corp-admin-tcp \" (trailing space)",
+      "parent": null
+    },
+    "cidrs": {
+      "description": "List of CIDRs that this group applies to.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "CIDRs define reachable networks over IAP TCP; overly broad ranges expand blast radius.",
+      "compliant": "cidrs = [\"10.0.0.0/24\", \"192.168.10.0/24\"]",
+      "non-compliant": "cidrs = [\"0.0.0.0/0\"] or unnecessarily broad private ranges without justification",
+      "parent": null
+    },
+    "fqdns": {
+      "description": "List of FQDNs that this group applies to.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Restrict to specific internal hostnames; wildcards or public sites dilute access control.",
+      "compliant": "fqdns = [\"db.internal.example.com\", \"bastion.internal.example.com\"]",
+      "non-compliant": "fqdns = [\"*.example.com\", \"public-site.com\"]",
+      "parent": null
+    },
+    "region": {
+      "description": "The region of the tunnel group. Must be the same as the network resources in the group.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Region must match target resources; mismatches can route to the wrong place or fail closed.",
+      "compliant": "region = \"australia-southeast1\"",
+      "non-compliant": "region = \"\" or a region that doesn’t match the resources (e.g., \"us-east1\" while backends are in \"australia-southeast1\")",
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Ensures the destination group is created in the intended project; mismatches affect the wrong tenant.",
+      "compliant": "project = \"my-gcp-project\" (matches provider context)",
+      "non-compliant": "project = \"other-project\" while provider points elsewhere",
+      "parent": null
+    }
+  }
+}

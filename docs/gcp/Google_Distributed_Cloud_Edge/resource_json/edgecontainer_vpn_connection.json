@@ -1,0 +1,107 @@
+{
+  "resource_name": "edgecontainer_vpn_connection",
+  "subcategory": "Google Distributed Cloud Edge",
+  "arguments": {
+    "cluster": {
+      "description": "The canonical Cluster name to connect to. It is in the form of projects/{project}/locations/{location}/clusters/{cluster}.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Proper cluster reference ensures the VPN connection is established with the correct, authorized cluster with appropriate security controls.",
+      "compliant": "projects/my-project/locations/us-central1/clusters/my-cluster",
+      "non-compliant": "Incorrect or unauthorized cluster reference",
+      "parent": null
+    },
+    "name": {
+      "description": "The resource name of VPN connection.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "VPN connection name is an identifier and doesn't directly impact security.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "location": {
+      "description": "Google Cloud Platform location.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Location selection impacts data residency, compliance with regional regulations, and network latency for VPN connections.",
+      "compliant": "us-central1",
+      "non-compliant": "Unapproved or restricted regions",
+      "parent": null
+    },
+    "labels": {
+      "description": "Labels associated with this resource. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Proper labeling ensures VPN connections can be properly identified, tracked, and managed according to organizational policies and security requirements.",
+      "compliant": "Contains required labels: environment, purpose, network-tier",
+      "non-compliant": "Missing required labels or using non-standard label names",
+      "parent": null
+    },
+    "nat_gateway_ip": {
+      "description": "NAT gateway IP, or WAN IP address. If a customer has multiple NAT IPs, the customer needs to configure NAT such that only one external IP maps to the GMEC Anthos cluster. This is empty if NAT is not used.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "NAT gateway IP configuration impacts network security, traffic routing, and exposure of internal resources to external networks.",
+      "compliant": "Properly configured NAT IP with appropriate firewall rules",
+      "non-compliant": "Misconfigured NAT or overly permissive NAT settings",
+      "parent": null
+    },
+    "vpc": {
+      "description": "The network ID of VPC to connect to.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "VPC selection determines which network resources the VPN can access and impacts network segmentation and security boundaries.",
+      "compliant": "Proper VPC network reference with appropriate security controls",
+      "non-compliant": "Unauthorized or improperly secured VPC network",
+      "parent": null
+    },
+    "vpc_project": {
+      "description": "Project detail of the VPC network. Required if VPC is in a different project than the cluster project.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Cross-project VPC connections require proper authorization and security controls to prevent unauthorized access between projects.",
+      "compliant": "Properly authorized cross-project VPC configuration",
+      "non-compliant": "Unauthorized cross-project VPC connections",
+      "parent": null,
+      "arguments": {
+        "project_id": {
+          "description": "The project of the VPC to connect to. If not specified, it is the same as the cluster project.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Project ID must reference an authorized project with proper security controls and network policies.",
+          "compliant": "authorized-vpc-project",
+          "non-compliant": "Unauthorized or incorrect project reference",
+          "parent": "vpc_project"
+        }
+      }
+    },
+    "enable_high_availability": {
+      "description": "Whether this VPN connection has HA enabled on cluster side. If enabled, when creating VPN connection we will attempt to use 2 ANG floating IPs.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "High availability ensures VPN connection resilience and continuous connectivity, which is critical for production environments.",
+      "compliant": "true (for production environments)",
+      "non-compliant": "false (for production environments where HA is required)",
+      "parent": null
+    },
+    "router": {
+      "description": "The VPN connection Cloud Router name.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Cloud Router configuration impacts routing policies, BGP peering, and network traffic control between VPN endpoints.",
+      "compliant": "Properly configured Cloud Router with secure routing policies",
+      "non-compliant": "Misconfigured or insecure router settings",
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": true,
+      "rationale": "Project selection impacts resource isolation, billing accountability, and access control boundaries for the VPN connection.",
+      "compliant": "Proper project reference",
+      "non-compliant": "Incorrect or unauthorized project",
+      "parent": null
+    }
+  }
+}
