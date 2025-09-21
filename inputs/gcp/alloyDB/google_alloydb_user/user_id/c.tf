@@ -1,7 +1,6 @@
+# Compliant example for user_id policy
 resource "google_alloydb_user" "c" {
-  cluster        = "alloydb-secure-cluster"
-  user_id        = "secure_user"
-  user_type      = "ALLOYDB_BUILT_IN"   # required
-  password       = "StrongP@ssw0rd!"    # example only
-  database_roles = ["reader"]
+  cluster   = "projects/p/locations/us-central1/clusters/cluster-c"
+  user_id   = "pde_allowed_user" # passes reserved-name check
+  user_type = "ALLOYDB_BUILT_IN" # valid enum
 }

@@ -2,8 +2,8 @@
 # Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
 
 resource "google_scc_project_custom_module" "nc" {
-  project = "cefwed"
-  display_name = "enablement_state"
+  project          = "cefwed"
+  display_name     = "enablement_state"
   enablement_state = "DISABLED"
   custom_config {
     predicate {
@@ -14,7 +14,7 @@ resource "google_scc_project_custom_module" "nc" {
         "cloudkms.googleapis.com/CryptoKey",
       ]
     }
-    severity = "LOW"
+    severity       = "LOW"
     recommendation = "Steps to resolve violation"
   }
 }

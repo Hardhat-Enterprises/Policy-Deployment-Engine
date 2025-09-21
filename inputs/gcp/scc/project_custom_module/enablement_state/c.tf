@@ -2,8 +2,8 @@
 # Keep "c" as the name to indicate that this resource and its attributes are compliant
 
 resource "google_scc_project_custom_module" "c" {
-  project = "cefwed"
-  display_name = "enablement_state"
+  project          = "cefwed"
+  display_name     = "enablement_state"
   enablement_state = "ENABLED"
   custom_config {
     predicate {
@@ -14,7 +14,7 @@ resource "google_scc_project_custom_module" "c" {
         "cloudkms.googleapis.com/CryptoKey",
       ]
     }
-    severity = "LOW"
+    severity       = "LOW"
     recommendation = "Steps to resolve violation"
   }
 }
