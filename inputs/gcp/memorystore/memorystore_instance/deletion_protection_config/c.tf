@@ -75,4 +75,5 @@ resource "google_compute_network" "producer_net" {
 }
 
 data "google_project" "project" {
+    # project_id = "abcd1234"
 }

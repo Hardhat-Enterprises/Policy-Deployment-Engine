@@ -3,7 +3,7 @@ resource "google_memorystore_instance" "nc" {
   shard_count                  = 1
   desired_auto_created_endpoints {
     network                    = google_compute_network.producer_net_nc.id
-    project_id                 = data.google_project.project.project_id
+    project_id                 = data.google_project.project_nc.project_id
   }     
   location                     = "us-central1"
   replica_count                = 1

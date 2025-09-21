@@ -2,8 +2,8 @@ resource "google_memorystore_instance" "nc" {
   instance_id                  = "full-instance"
   shard_count                  = 1
   desired_auto_created_endpoints {
-    network                    = google_compute_network.producer_net.id
-    project_id                 = data.google_project.project.project_id
+    network                    = google_compute_network.producer_net_nc.id
+    project_id                 = data.google_project.project_nc.project_id
   }     
   location                     = "us-central1"
   replica_count                = 1
@@ -43,7 +43,7 @@ resource "google_memorystore_instance" "nc" {
     "abc" : "xyz"
   }
   depends_on = [
-    google_network_connectivity_service_connection_policy.default
+    google_network_connectivity_service_connection_policy.default_nc
   ]
 
   lifecycle {
@@ -58,7 +58,7 @@ resource "google_network_connectivity_service_connection_policy" "default_nc" {
   description   = "my basic service connection policy"
   network       = google_compute_network.producer_net.id
   psc_config {
-    subnetworks = [google_compute_subnetwork.producer_subnet.id]
+    subnetworks = [google_compute_subnetwork.producer_subnet_nc.id]
   }
 }
 
@@ -66,7 +66,7 @@ resource "google_compute_subnetwork" "producer_subnet_nc" {
   name          = "my-subnet"
   ip_cidr_range = "10.0.0.248/29"
   region        = "us-central1"
-  network       = google_compute_network.producer_net.id
+  network       = google_compute_network.producer_net_nc.id
 }
 
 resource "google_compute_network" "producer_net_nc" {
