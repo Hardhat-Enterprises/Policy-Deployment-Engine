@@ -19,8 +19,8 @@ conditions := [
     {
         "condition": "check whether default Dataproc version is supported",
         "attribute_path" : ["spark_application_environment_config", 0, "default_version"], 
-        "values" : ["1.3.95", "1.4.77", "1.5.53", "2.0.27", "0.x", "1.0.x", "1.1.x", "1.2.x"],
-        "policy_type" : "blacklist" 
+        "values" : ["2.3.*", "2.2.64","2.1.96", "2.0.*",[["11,", "10", "9", "8", "7"],["149", "147", "146", "145", "144"]]],
+        "policy_type" : "pattern_whitelist" 
     }
     ]
 ]

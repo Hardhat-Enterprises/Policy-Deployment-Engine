@@ -24,7 +24,7 @@ conditions := [
     {
       "condition": "Checks that scheduled backups are disabled.",
       "attribute_path": ["scheduled_backup", 0, "backup_location"],
-      "values": ["gs://*/folder_name/",[["a-z", "0-9", "-", "_", "."]]],
+      "values": ["gs://*/folder_name/",[["compliant-project"]]],
       "policy_type": "pattern_whitelist"
     }
   ],

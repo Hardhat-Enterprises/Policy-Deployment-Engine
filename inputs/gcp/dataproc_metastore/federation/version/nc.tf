@@ -1,7 +1,6 @@
 resource "google_dataproc_metastore_federation" "nc" {
   version             = "3.0.0"  
   federation_id       = "_metastore-fed"
-  deletion_protection = true
   project = 1 
 
   backend_metastores {
