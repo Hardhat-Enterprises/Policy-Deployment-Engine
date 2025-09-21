@@ -11,6 +11,6 @@ resource "google_storage_batch_operations_job" "c" {
     }
   }
   rewrite_object {
-    kms_key = "projects/example/locations/us-central1/keyRings/kr/cryptoKeys/key"
+    kms_key = "projects/test-project/locations/us-central1/keyRings/test-keyring/cryptoKeys/test-key"
   }
 }

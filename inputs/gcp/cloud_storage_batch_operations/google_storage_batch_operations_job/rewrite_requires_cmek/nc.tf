@@ -11,6 +11,6 @@ resource "google_storage_batch_operations_job" "nc" {
     }
   }
   rewrite_object {
-    kms_key = ""
+    kms_key = "invalid-key-path"
   }
 }
