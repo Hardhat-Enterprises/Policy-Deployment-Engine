@@ -2,7 +2,7 @@
 # Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
 
 resource "google_scc_event_threat_detection_custom_module" "nc" {
-    display_name= "enablement_state"
+    display_name= "nc"
     type = "CONFIGURABLE_BAD_IP"
     organization = "123456789"
     config = jsonencode({

@@ -13,7 +13,7 @@ resource "google_vmwareengine_network_policy" "external-access-rule-np_nc" {
 }
 
 resource "google_vmwareengine_external_access_rule" "nc" {
-  name = "sample-external-access-rule-nc"
+  name = "nc"
   parent =  google_vmwareengine_network_policy.external-access-rule-np_nc.id
   priority = 101
   action = "ALLOW"

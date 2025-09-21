@@ -4,26 +4,26 @@
   "arguments": {
     "udm_query": {
       "description": "A UDM query over event data.",
-      "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "required": false,
+      "security_impact": true,
+      "rationale": "Improper UDM queries may include disallowed or malicious values, potentially leading to incorrect data access labeling or security misinterpretations.",
+      "compliant": "principal.hostname=\"example.com\"",
+      "non-compliant": "principal.hostname=\"malicious.com\"",
       "parent": null
     },
     "location": {
-      "description": "The location of the resource. This is the geographical region where the Chronicle instance resides, such as \"us\" or \"europe-west2\".",
+      "description": "The location of the resource. This is the geographical region where the Chronicle instance resides, such as \"australia-southeast1\".",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Restricting to allowed locations ensures compliance with regional data residency and service availability.",
+      "compliant": "australia-southeast1",
+      "non-compliant": "europe-west3",
       "parent": null
     },
     "instance": {
       "description": "The unique identifier for the Chronicle instance, which is the same as the customer ID.",
       "required": true,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -32,8 +32,8 @@
     "data_access_label_id": {
       "description": "Required. The ID to use for the data access label, which will become the label's display name and the final component of the label's resource name. The maximum number of characters should be 63. Regex pattern is as per AIP: https://google.aip.dev/122#resource-id-segments",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "Improper label IDs can violate naming standards and break automation workflows or policy mappings that rely on predictable resource names.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -49,8 +49,8 @@
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
+      "required": false,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
