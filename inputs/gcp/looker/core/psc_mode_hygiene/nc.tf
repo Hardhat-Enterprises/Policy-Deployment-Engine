@@ -1,5 +1,5 @@
 resource "google_looker_instance" "nc" {
-  name = "nc"
+  name = "nc1"
   project            = var.project
   psc_enabled        = true
   public_ip_enabled  = true      # ← triggers Situation A
@@ -9,6 +9,7 @@ resource "google_looker_instance" "nc" {
     client_secret = "test-client-secret"
   }
 }
+
 
 
 
