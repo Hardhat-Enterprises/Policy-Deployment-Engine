@@ -1,498 +1,376 @@
 {
-  "resource_name": "gke_backup_backup_plan",
-  "subcategory": "Backup for GKE",
-  "arguments": {
-    "name": {
-      "description": "The full name of the BackupPlan Resource.",
-      "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "cluster": {
-      "description": "The source cluster from which Backups will be created via this BackupPlan.",
-      "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "location": {
-      "description": "The region of the Backup Plan.",
-      "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "description": {
-      "description": "User specified descriptive string for this BackupPlan.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "retention_policy": {
-      "description": "RetentionPolicy governs lifecycle of Backups created under this plan. Structure is [documented below](#nested_retention_policy).",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+  "resource_name": "individual_retrospective",
+  "subcategory": "Individual Assessment - 10.1P",
+  "student_details": {
+    "name": "Tanmay Shete",
+    "student_id": "s224335078",
+    "course": "SIT378/SIT782",
+    "unit": "School of IT Capstone",
+    "trimester": "T3 2024",
+    "project": "Policy Deployment Engine - Cloud Security Governance"
+  },
+  "achievements": {
+    "1": {
+      "title": "Implemented Comprehensive Security Policy Framework",
+      "description": "Developed and deployed 18 security policies across GKE Backup (8 policies) and VPC Access Connector (10 policies) services, establishing enterprise-grade governance for Google Cloud Platform infrastructure",
+      "security_impact": "High - Provides automated compliance enforcement for critical cloud resources",
+      "rationale": "Security policies prevent misconfigurations that could lead to data breaches, compliance violations, or operational failures",
+      "compliant": "Policies correctly identify and enforce security requirements",
+      "non_compliant": "Resources violating security standards are flagged for remediation",
       "parent": null,
-      "arguments": {
-        "backup_delete_lock_days": {
-          "description": "Minimum age for a Backup created via this BackupPlan (in days). Must be an integer value between 0-90 (inclusive). A Backup created under this BackupPlan will not be deletable until it reaches Backup's (create time + backup_delete_lock_days). Updating this field of a BackupPlan does not affect existing Backups. Backups created after a successful update will inherit this new value.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "retention_policy"
-        },
-        "backup_retain_days": {
-          "description": "The default maximum age of a Backup created via this BackupPlan. This field MUST be an integer value >= 0 and <= 365. If specified, a Backup created under this BackupPlan will be automatically deleted after its age reaches (createTime + backupRetainDays). If not specified, Backups created under this BackupPlan will NOT be subject to automatic deletion. Updating this field does NOT affect existing Backups under it. Backups created AFTER a successful update will automatically pick up the new value. NOTE: backupRetainDays must be >= backupDeleteLockDays. If cronSchedule is defined, then this must be <= 360 * the creation interval. If rpo_config is defined, then this must be <= 360 * targetRpoMinutes/(1440minutes/day)",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "retention_policy"
-        },
-        "locked": {
-          "description": "This flag denotes whether the retention policy of this BackupPlan is locked. If set to True, no further update is allowed on this policy, including the locked field itself.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "retention_policy"
-        }
-      }
+      "evidence_refs": [1, 2, 3, 4]
     },
-    "labels": {
-      "description": "Description: A set of custom labels supplied by the user. A list of key->value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "backup_schedule": {
-      "description": "Defines a schedule for automatic Backup creation via this BackupPlan. Structure is [documented below](#nested_backup_schedule).",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+    "2": {
+      "title": "Mastered Policy-as-Code Implementation",
+      "description": "Successfully implemented complex security validation using Open Policy Agent (OPA) and Rego language with advanced features including pattern matching, conditional logic, and multi-attribute validation",
+      "security_impact": "Medium - Enables scalable security governance through code",
+      "rationale": "Policy-as-code approach ensures consistent security enforcement and reduces human error",
+      "compliant": "Policies execute correctly and provide accurate compliance validation",
+      "non_compliant": "Manual security reviews prone to inconsistency and missed violations",
       "parent": null,
-      "arguments": {
-        "cron_schedule": {
-          "description": "A standard cron string that defines a repeating schedule for creating Backups via this BackupPlan. This is mutually exclusive with the rpoConfig field since at most one schedule can be defined for a BackupPlan. If this is defined, then backupRetainDays must also be defined.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "backup_schedule"
-        },
-        "paused": {
-          "description": "This flag denotes whether automatic Backup creation is paused for this BackupPlan.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "backup_schedule"
-        },
-        "rpo_config": {
-          "description": "Defines the RPO schedule configuration for this BackupPlan. This is mutually exclusive with the cronSchedule field since at most one schedule can be defined for a BackupPLan. If this is defined, then backupRetainDays must also be defined. Structure is [documented below](#nested_backup_schedule_rpo_config).",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "backup_schedule"
-        }
-      }
+      "evidence_refs": [5, 6, 7]
     },
-    "deactivated": {
-      "description": "This flag indicates whether this BackupPlan has been deactivated. Setting this field to True locks the BackupPlan such that no further updates will be allowed (except deletes), including the deactivated field itself. It also prevents any new Backups from being created via this BackupPlan (including scheduled Backups).",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "backup_config": {
-      "description": "Defines the configuration of Backups created via this BackupPlan. Structure is [documented below](#nested_backup_config).",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+    "3": {
+      "title": "Resolved Complex Technical Integration Challenges",
+      "description": "Independently diagnosed and resolved multiple technical issues including Terraform provider compatibility, API enablement requirements, resource schema validation, and Git workflow complications",
+      "security_impact": "Low - Indirect impact through improved development practices",
+      "rationale": "Strong problem-solving skills essential for maintaining secure development workflows",
+      "compliant": "Technical issues resolved with proper documentation and testing",
+      "non_compliant": "Unresolved technical debt could impact security implementation reliability",
       "parent": null,
-      "arguments": {
-        "include_volume_data": {
-          "description": "This flag specifies whether volume data should be backed up when PVCs are included in the scope of a Backup.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "backup_config"
-        },
-        "include_secrets": {
-          "description": "This flag specifies whether Kubernetes Secret resources should be included when they fall into the scope of Backups.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "backup_config"
-        },
-        "encryption_key": {
-          "description": "This defines a customer managed encryption key that will be used to encrypt the \"config\" portion (the Kubernetes resources) of Backups created via this plan. Structure is [documented below](#nested_backup_config_encryption_key).",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "backup_config"
-        },
-        "all_namespaces": {
-          "description": "If True, include all namespaced resources.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "backup_config"
-        },
-        "selected_namespaces": {
-          "description": "If set, include just the resources in the listed namespaces. Structure is [documented below](#nested_backup_config_selected_namespaces).",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "backup_config"
-        },
-        "selected_applications": {
-          "description": "A list of namespaced Kubernetes Resources. Structure is [documented below](#nested_backup_config_selected_applications).",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "backup_config"
-        },
-        "permissive_mode": {
-          "description": "This flag specifies whether Backups will not fail when Backup for GKE detects Kubernetes configuration that is non-standard or requires additional setup to restore.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "backup_config"
-        }
-      }
+      "evidence_refs": [8, 9, 10]
     },
-    "project": {
-      "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "rpo_config": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+    "4": {
+      "title": "Established Professional Development Workflow",
+      "description": "Implemented industry-standard Git workflows with feature branching, comprehensive testing, pull request processes, and code review integration following enterprise development practices",
+      "security_impact": "Medium - Secure development practices prevent vulnerable code deployment",
+      "rationale": "Proper version control and code review processes are essential security controls",
+      "compliant": "All code changes reviewed and tested before deployment",
+      "non_compliant": "Direct commits to main branch without review increase security risks",
       "parent": null,
-      "arguments": {
-        "target_rpo_minutes": {
-          "description": "Defines the target RPO for the BackupPlan in minutes, which means the target maximum data loss in time that is acceptable for this BackupPlan. This must be at least 60, i.e., 1 hour, and at most 86400, i.e., 60 days.",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "rpo_config"
-        },
-        "exclusion_windows": {
-          "description": "User specified time windows during which backup can NOT happen for this BackupPlan. Backups should start and finish outside of any given exclusion window. Note: backup jobs will be scheduled to start and finish outside the duration of the window as much as possible, but running jobs will not get canceled when it runs into the window. All the time and date values in exclusionWindows entry in the API are in UTC. We only allow <=1 recurrence (daily or weekly) exclusion window for a BackupPlan while no restriction on number of single occurrence windows. Structure is [documented below](#nested_backup_schedule_rpo_config_exclusion_windows).",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "rpo_config"
-        }
-      }
+      "evidence_refs": [11, 12, 13]
     },
-    "exclusion_windows": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+    "5": {
+      "title": "Created Comprehensive Testing and Validation Framework",
+      "description": "Developed systematic testing approach using Terraform planning, OPA policy evaluation, and automated validation with both compliant and non-compliant test scenarios",
+      "security_impact": "High - Ensures policy effectiveness and prevents false positives/negatives",
+      "rationale": "Thorough testing validates security controls work as intended",
+      "compliant": "Policies correctly identify compliant and non-compliant resources",
+      "non_compliant": "Untested policies may fail to enforce security requirements",
       "parent": null,
-      "arguments": {
-        "start_time": {
-          "description": "Specifies the start time of the window using time of the day in UTC. Structure is [documented below](#nested_backup_schedule_rpo_config_exclusion_windows_exclusion_windows_start_time).",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "exclusion_windows"
-        },
-        "duration": {
-          "description": "Specifies duration of the window in seconds with up to nine fractional digits, terminated by 's'. Example: \"3.5s\". Restrictions for duration based on the recurrence type to allow some time for backup to happen: - single_occurrence_date:  no restriction - daily window: duration < 24 hours - weekly window: - days of week includes all seven days of a week: duration < 24 hours - all other weekly window: duration < 168 hours (i.e., 24 * 7 hours)",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "exclusion_windows"
-        },
-        "single_occurrence_date": {
-          "description": "No recurrence. The exclusion window occurs only once and on this date in UTC. Only one of singleOccurrenceDate, daily and daysOfWeek may be set. Structure is [documented below](#nested_backup_schedule_rpo_config_exclusion_windows_exclusion_windows_single_occurrence_date).",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "exclusion_windows"
-        },
-        "daily": {
-          "description": "The exclusion window occurs every day if set to \"True\". Specifying this field to \"False\" is an error. Only one of singleOccurrenceDate, daily and daysOfWeek may be set.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "exclusion_windows"
-        },
-        "days_of_week": {
-          "description": "The exclusion window occurs on these days of each week in UTC. Only one of singleOccurrenceDate, daily and daysOfWeek may be set. Structure is [documented below](#nested_backup_schedule_rpo_config_exclusion_windows_exclusion_windows_days_of_week).",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "exclusion_windows"
-        }
-      }
-    },
-    "start_time": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "hours": {
-          "description": "Hours of day in 24 hour format.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "start_time"
-        },
-        "minutes": {
-          "description": "Minutes of hour of day.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "start_time"
-        },
-        "seconds": {
-          "description": "Seconds of minutes of the time.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "start_time"
-        },
-        "nanos": {
-          "description": "Fractions of seconds in nanoseconds.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "start_time"
-        }
-      }
-    },
-    "single_occurrence_date": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "year": {
-          "description": "Year of the date.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "single_occurrence_date"
-        },
-        "month": {
-          "description": "Month of a year.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "single_occurrence_date"
-        },
-        "day": {
-          "description": "Day of a month.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "single_occurrence_date"
-        }
-      }
-    },
-    "days_of_week": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "days_of_week": {
-          "description": "A list of days of week. Each value may be one of: `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`, `SUNDAY`.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "days_of_week"
-        }
-      }
-    },
-    "encryption_key": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "gcp_kms_encryption_key": {
-          "description": "Google Cloud KMS encryption key. Format: projects/*/locations/*/keyRings/*/cryptoKeys/*",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "encryption_key"
-        }
-      }
-    },
-    "selected_namespaces": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "namespaces": {
-          "description": "A list of Kubernetes Namespaces.",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "selected_namespaces"
-        }
-      }
-    },
-    "selected_applications": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "namespaced_names": {
-          "description": "A list of namespaced Kubernetes resources. Structure is [documented below](#nested_backup_config_selected_applications_namespaced_names).",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "selected_applications"
-        }
-      }
-    },
-    "namespaced_names": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "namespace": {
-          "description": "The namespace of a Kubernetes Resource.",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "namespaced_names"
-        },
-        "name": {
-          "description": "The name of a Kubernetes Resource.",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "namespaced_names"
-        }
-      }
+      "evidence_refs": [14, 15, 16]
     }
+  },
+  "clo_progress": {
+    "clo1": {
+      "description": "Apply advanced technical skills in software development and system implementation",
+      "progress": "Achieved",
+      "security_impact": "Enables implementation of complex security controls",
+      "rationale": "Advanced technical skills required for policy-as-code implementation",
+      "compliant": "Successfully implemented complex Rego policies and Infrastructure as Code",
+      "non_compliant": "Lack of technical skills would prevent effective security automation",
+      "examples": [
+        "Implemented advanced Rego policies with multi-condition validation logic",
+        "Created Infrastructure as Code configurations for Google Cloud Platform resources",
+        "Integrated multiple technologies: Terraform, OPA, Git, and GCP APIs"
+      ],
+      "evidence_refs": [1, 2, 5, 6]
+    },
+    "clo2": {
+      "description": "Demonstrate understanding of security principles and governance frameworks",
+      "progress": "Achieved",
+      "security_impact": "Direct impact on organizational security posture",
+      "rationale": "Security governance prevents data breaches and compliance violations",
+      "compliant": "Policies enforce data sovereignty, encryption, and access controls",
+      "non_compliant": "Missing security controls expose organization to risks",
+      "examples": [
+        "Implemented data sovereignty controls requiring Australian regions",
+        "Enforced customer-managed encryption key requirements",
+        "Created mandatory backup scheduling and retention policies"
+      ],
+      "evidence_refs": [3, 4, 7]
+    },
+    "clo3": {
+      "description": "Apply critical thinking and problem-solving skills to complex technical challenges",
+      "progress": "Achieved",
+      "security_impact": "Enables resolution of security-blocking technical issues",
+      "rationale": "Problem-solving skills essential for maintaining secure systems",
+      "compliant": "Technical challenges resolved systematically with documentation",
+      "non_compliant": "Unresolved technical issues could compromise security implementations",
+      "examples": [
+        "Diagnosed and resolved Terraform provider API enablement issues",
+        "Fixed policy evaluation framework import path conflicts",
+        "Resolved Git branching and merge conflicts during collaborative development"
+      ],
+      "evidence_refs": [8, 9, 10]
+    },
+    "clo4": {
+      "description": "Demonstrate professional practices in software development and project management",
+      "progress": "Achieved",
+      "security_impact": "Professional practices are essential security controls",
+      "rationale": "Proper development practices prevent security vulnerabilities",
+      "compliant": "Followed secure development lifecycle with code reviews and testing",
+      "non_compliant": "Poor development practices increase security vulnerability risks",
+      "examples": [
+        "Implemented feature branching strategy with proper pull request workflow",
+        "Created comprehensive documentation and testing procedures",
+        "Maintained professional communication through detailed commit messages"
+      ],
+      "evidence_refs": [11, 12, 13, 14]
+    }
+  },
+  "sfia_skills": {
+    "PROG": {
+      "skill_name": "Programming/Software Development",
+      "level": "Level 3 - Apply",
+      "description": "Created complex policy logic using Rego language with advanced programming concepts",
+      "security_impact": "Enables automated security validation and enforcement",
+      "rationale": "Programming skills required for implementing security-as-code",
+      "compliant": "Policies implemented with proper logic and error handling",
+      "non_compliant": "Poor programming practices could create security gaps",
+      "examples": [
+        "Implemented conditional logic for multi-attribute policy validation",
+        "Created reusable helper functions for policy evaluation",
+        "Organized code in modular structure with proper separation of concerns"
+      ],
+      "evidence_refs": [5, 6, 7]
+    },
+    "ARCH": {
+      "skill_name": "Solution Architecture",
+      "level": "Level 2 - Assist",
+      "description": "Designed scalable security policy architecture spanning multiple cloud services",
+      "security_impact": "Provides framework for comprehensive security governance",
+      "rationale": "Proper architecture ensures consistent security enforcement",
+      "compliant": "Architecture supports multiple services with consistent evaluation",
+      "non_compliant": "Poor architecture creates security coverage gaps",
+      "examples": [
+        "Created modular policy framework supporting multiple GCP services",
+        "Established clear separation between policy logic and test configurations",
+        "Designed extensible architecture for future service integration"
+      ],
+      "evidence_refs": [1, 2, 3]
+    },
+    "RLMT": {
+      "skill_name": "Risk Management",
+      "level": "Level 2 - Assist",
+      "description": "Identified and mitigated security risks through comprehensive policy implementation",
+      "security_impact": "Direct risk reduction through automated security controls",
+      "rationale": "Risk management prevents security incidents and compliance violations",
+      "compliant": "Policies address identified security risks with appropriate controls",
+      "non_compliant": "Unaddressed risks could result in security incidents",
+      "examples": [
+        "Implemented data sovereignty controls to mitigate regulatory compliance risks",
+        "Created encryption policies to address data security risks",
+        "Established backup and retention policies for operational continuity"
+      ],
+      "evidence_refs": [3, 4, 15]
+    },
+    "TEST": {
+      "skill_name": "Testing",
+      "level": "Level 2 - Assist",
+      "description": "Developed comprehensive testing strategies using automated policy evaluation",
+      "security_impact": "Ensures security controls function as intended",
+      "rationale": "Testing validates security policy effectiveness",
+      "compliant": "Comprehensive testing covers positive and negative scenarios",
+      "non_compliant": "Inadequate testing could allow security control failures",
+      "examples": [
+        "Created automated testing using Terraform planning and OPA evaluation",
+        "Developed test scenarios covering positive and negative test cases",
+        "Implemented validation processes proving policy effectiveness"
+      ],
+      "evidence_refs": [14, 15, 16]
+    }
+  },
+  "evidence": {
+    "1": {
+      "title": "GKE Backup Security Policies Implementation",
+      "description": "Complete implementation of 8 security policies for GKE Backup Plans including Australian region restriction, retention enforcement, and encryption requirements",
+      "type": "Pull Request",
+      "link": "https://github.com/Hardhat-Enterprises/Policy-Deployment-Engine/pull/94",
+      "security_impact": "High - Comprehensive backup security governance",
+      "rationale": "Backup security policies prevent data loss and ensure compliance",
+      "compliant": "All policies correctly validate GKE backup configurations",
+      "non_compliant": "Missing backup policies expose organization to data loss risks"
+    },
+    "2": {
+      "title": "VPC Access Connector Security Policies Implementation", 
+      "description": "Complete implementation of 10 security policies for VPC Access Connectors covering network security and configuration standards",
+      "type": "Pull Request",
+      "link": "https://github.com/Hardhat-Enterprises/Policy-Deployment-Engine/pull/153",
+      "security_impact": "High - Network access security controls",
+      "rationale": "Network security policies prevent unauthorized access and misconfigurations",
+      "compliant": "Policies enforce proper VPC connector configurations",
+      "non_compliant": "Misconfigured network access creates security vulnerabilities"
+    },
+    "3": {
+      "title": "Data Sovereignty and Compliance Policies",
+      "description": "Australian region restriction and customer-managed encryption policies for regulatory compliance",
+      "type": "Policy Implementation",
+      "link": "https://github.com/Hardhat-Enterprises/Policy-Deployment-Engine/tree/gcp/service/gke_backup/policies/gcp/gke_backup/backup_plan/australian_region_restriction",
+      "security_impact": "High - Regulatory compliance and data protection",
+      "rationale": "Data sovereignty prevents regulatory violations and protects sensitive data",
+      "compliant": "Resources deployed only in approved Australian regions with proper encryption",
+      "non_compliant": "Data stored in non-compliant regions exposes organization to regulatory penalties"
+    },
+    "4": {
+      "title": "Comprehensive Security Policy Portfolio",
+      "description": "Complete collection of 18 security policies covering data protection, encryption, backup, retention, and network controls",
+      "type": "Repository Branch",
+      "link": "https://github.com/Hardhat-Enterprises/Policy-Deployment-Engine/tree/gcp/service/gke_backup",
+      "security_impact": "High - Comprehensive security coverage",
+      "rationale": "Broad security policy coverage reduces organizational risk exposure",
+      "compliant": "Comprehensive security controls address multiple risk categories",
+      "non_compliant": "Security gaps in policy coverage create exploitable vulnerabilities"
+    },
+    "5": {
+      "title": "Advanced Rego Policy Logic Implementation",
+      "description": "Complex policy evaluation logic using pattern matching, conditional validation, and multi-attribute checking",
+      "type": "Code Implementation", 
+      "link": "Link to specific policy.rego files",
+      "security_impact": "Medium - Enables sophisticated security validation",
+      "rationale": "Advanced policy logic handles complex security requirements",
+      "compliant": "Policies accurately evaluate complex security conditions",
+      "non_compliant": "Simple validation logic might miss sophisticated security violations"
+    },
+    "6": {
+      "title": "Infrastructure as Code Security Configurations",
+      "description": "Terraform configurations demonstrating both compliant and non-compliant resource scenarios for comprehensive testing",
+      "type": "Code Implementation",
+      "link": "Link to terraform configurations",
+      "security_impact": "Medium - Validates security control effectiveness",
+      "rationale": "IaC testing ensures security policies work correctly",
+      "compliant": "Test configurations accurately represent compliant resources",
+      "non_compliant": "Inadequate testing could miss policy validation failures"
+    },
+    "7": {
+      "title": "Policy Framework Architecture Documentation",
+      "description": "Modular policy structure with reusable components supporting multiple cloud services",
+      "type": "Architecture Documentation",
+      "link": "Link to framework documentation",
+      "security_impact": "Medium - Enables scalable security governance",
+      "rationale": "Good architecture supports consistent security enforcement",
+      "compliant": "Framework supports extensible security policy implementation",
+      "non_compliant": "Poor architecture limits security policy scalability"
+    },
+    "8": {
+      "title": "Technical Problem Resolution Documentation",
+      "description": "Systematic resolution of complex integration issues including API enablement and schema compatibility",
+      "type": "Technical Documentation",
+      "link": "Link to problem resolution examples",
+      "security_impact": "Low - Enables reliable security implementation",
+      "rationale": "Technical reliability supports consistent security enforcement",
+      "compliant": "Technical issues resolved with proper documentation",
+      "non_compliant": "Unresolved technical issues could compromise security implementations"
+    },
+    "9": {
+      "title": "Professional Git Workflow Implementation",
+      "description": "Industry-standard version control practices including feature branching, code review, and collaborative development",
+      "type": "Version Control Documentation",
+      "link": "Link to git workflow examples",
+      "security_impact": "Medium - Secure development practices",
+      "rationale": "Proper version control is essential security control",
+      "compliant": "All changes follow secure development workflow",
+      "non_compliant": "Poor version control practices increase security risks"
+    },
+    "10": {
+      "title": "System Integration and API Management",
+      "description": "Successful integration with Google Cloud APIs and resolution of provider configuration issues",
+      "type": "Integration Documentation",
+      "link": "Link to integration solutions",
+      "security_impact": "Low - Enables secure cloud service integration",
+      "rationale": "Proper API integration prevents security misconfigurations",
+      "compliant": "APIs integrated following security best practices",
+      "non_compliant": "Poor API integration could create security vulnerabilities"
+    },
+    "11": {
+      "title": "Professional Pull Request Management",
+      "description": "Comprehensive PR documentation with detailed descriptions, proper commit messaging, and code review integration",
+      "type": "Pull Request Documentation",
+      "link": "Links to professional PRs",
+      "security_impact": "Medium - Secure code review process",
+      "rationale": "Code review prevents security vulnerabilities from deployment",
+      "compliant": "All code changes properly reviewed before deployment",
+      "non_compliant": "Unreviewed code changes could introduce security vulnerabilities"
+    },
+    "12": {
+      "title": "Code Review and Collaborative Development",
+      "description": "Active participation in security-focused code review with iterative improvement based on feedback",
+      "type": "Code Review History",
+      "link": "Link to code review conversations",
+      "security_impact": "High - Security-focused development practices",
+      "rationale": "Security code reviews prevent vulnerable implementations",
+      "compliant": "Code reviews address security concerns and best practices",
+      "non_compliant": "Missing security review could allow vulnerable code deployment"
+    },
+    "13": {
+      "title": "Security Documentation and Knowledge Sharing",
+      "description": "Comprehensive documentation of security policy implementation and usage guidelines",
+      "type": "Technical Documentation",
+      "link": "Link to security documentation",
+      "security_impact": "Medium - Enables secure policy adoption",
+      "rationale": "Good documentation supports secure implementation practices",
+      "compliant": "Documentation clearly explains security requirements and implementation",
+      "non_compliant": "Poor documentation could lead to insecure implementations"
+    },
+    "14": {
+      "title": "Automated Security Testing Framework",
+      "description": "Systematic testing using OPA evaluation and Terraform planning for security policy validation",
+      "type": "Testing Framework",
+      "link": "Link to testing procedures",
+      "security_impact": "High - Validates security control effectiveness",
+      "rationale": "Automated testing ensures security policies function correctly",
+      "compliant": "Testing framework validates all security policies",
+      "non_compliant": "Inadequate testing could miss security control failures"
+    },
+    "15": {
+      "title": "Security Policy Effectiveness Validation",
+      "description": "Proof of security policy functionality through automated evaluation demonstrating correct compliance validation",
+      "type": "Test Results",
+      "link": "Link to test execution results",
+      "security_impact": "High - Proves security control effectiveness",
+      "rationale": "Validation results demonstrate policies work as intended",
+      "compliant": "Policies correctly identify compliant and non-compliant resources",
+      "non_compliant": "Failed validation indicates security control weaknesses"
+    },
+    "16": {
+      "title": "Comprehensive Security Test Coverage",
+      "description": "Complete test suite covering positive and negative scenarios for all security policies",
+      "type": "Test Suite",
+      "link": "Link to complete test configurations",
+      "security_impact": "High - Comprehensive security validation",
+      "rationale": "Complete test coverage ensures no security gaps",
+      "compliant": "All security scenarios tested and validated",
+      "non_compliant": "Incomplete testing could miss critical security vulnerabilities"
+    }
+  },
+  "work_in_progress": {
+    "1": {
+      "item": "Pull Request Review and Integration",
+      "status": "Awaiting final review approval and integration into main branch",
+      "security_impact": "Deployment of security controls pending review completion",
+      "completion_plan": "Address final review feedback and coordinate integration",
+      "deadline": "End of T3 2024"
+    },
+    "2": {
+      "item": "Security Documentation Finalization",
+      "status": "Core implementation complete, final documentation review in progress", 
+      "security_impact": "Documentation gaps could impact secure adoption",
+      "completion_plan": "Complete final documentation updates and accessibility verification",
+      "deadline": "Before final submission"
+    }
+  },
+  "reflection": {
+    "key_learnings": [
+      "Policy-as-code enables scalable security governance",
+      "Complex technical integrations require systematic problem-solving",
+      "Security governance must balance comprehensive coverage with practical implementation",
+      "Professional development practices are essential security controls"
+    ],
+    "security_impact": "Developed comprehensive understanding of automated security governance",
+    "future_applications": [
+      "Extend policy framework to additional cloud services and compliance requirements",
+      "Contribute to open-source security policy libraries",
+      "Apply security governance principles in enterprise environments"
+    ]
   }
 }
