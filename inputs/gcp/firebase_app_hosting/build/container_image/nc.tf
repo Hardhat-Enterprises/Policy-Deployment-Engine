@@ -1,6 +1,6 @@
 resource "google_firebase_app_hosting_build" "nc" {
   project = "grounded-jetty-469512-j6"
-  build_id = "non-compliant-build"
+  build_id = "nc"
   backend = "my-backend"
   location = "australia-southeast2-a"
   

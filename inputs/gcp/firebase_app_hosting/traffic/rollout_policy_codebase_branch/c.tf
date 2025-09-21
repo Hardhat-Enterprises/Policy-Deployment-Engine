@@ -1,6 +1,6 @@
 resource "google_firebase_app_hosting_traffic" "c" {
   project = "grounded-jetty-469512-j6"
-  backend = "compliant-backend"
+  backend = "c"
   location = "australia-southeast2-a"
 
   rollout_policy {
