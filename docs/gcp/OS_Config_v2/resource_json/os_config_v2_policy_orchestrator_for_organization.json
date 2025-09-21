@@ -5,17 +5,17 @@
     "action": {
       "description": "Required. Action to be done by the orchestrator in `projects/{project_id}/zones/{zone_id}` locations defined by the `orchestration_scope`. Allowed values: - `UPSERT` - Orchestrator will create or update target resources. - `DELETE` - Orchestrator will delete target resources, if they exist",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Defines the operational intent of the orchestrator, which is crucial for maintaining the desired state of security configurations.",
+      "compliant": ["UPSERT"],
+      "non-compliant": ["DELETE"],
       "parent": null
     },
     "orchestrated_resource": {
       "description": "Represents a resource that is being orchestrated by the policy orchestrator. Structure is [documented below](#nested_orchestrated_resource).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "Creates the primary security perimeter for all managed cloud infrastructure resources.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -23,8 +23,8 @@
         "os_policy_assignment_v1_payload": {
           "description": "OS policy assignment is an API resource that is used to apply a set of OS policies to a dynamically targeted group of Compute Engine VM instances. An OS policy is used to define the desired state configuration for a Compute Engine VM instance through a set of configuration resources that provide capabilities such as installing or removing software packages, or executing a script. For more information about the OS policy resource definitions and examples, see [OS policy and OS policy assignment](https://cloud.google.com/compute/docs/os-configuration-management/working-with-os-policies). Structure is [documented below](#nested_orchestrated_resource_os_policy_assignment_v1_payload).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Maintains the structural integrity of security policy configurations.",
           "compliant": null,
           "non-compliant": null,
           "parent": "orchestrated_resource"
@@ -43,28 +43,28 @@
     "organization_id": {
       "description": "Part of `parent`. Required. The parent resource name in the form of: * `organizations/{organization_id}/locations/global` * `folders/{folder_id}/locations/global` * `projects/{project_id_or_number}/locations/global`",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Defines the organizational context in which the policy orchestrator operates, impacting its access to resources.",
+      "compliant": ["Hardhat-PDE-gcp-a1"],
+      "non-compliant": ["Anything_random"],
       "parent": null
     },
     "policy_orchestrator_id": {
       "description": "Required. The logical identifier of the policy orchestrator, with the following restrictions: * Must contain only lowercase letters, numbers, and hyphens. * Must start with a letter. * Must be between 1-63 characters. * Must end with a number or a letter. * Must be unique within the parent.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Ensures unique identification of the orchestrator within the organizational structure, preventing conflicts and misconfigurations.",
+      "compliant": ["google-gcp-production-a1"],
+      "non-compliant": ["aws-gcp-test-1"],
       "parent": null
     },
     "state": {
       "description": "Optional. State of the orchestrator. Can be updated to change orchestrator behaviour. Allowed values: - `ACTIVE` - orchestrator is actively looking for actions to be taken. - `STOPPED` - orchestrator won't make any changes. Note: There might be more states added in the future. We use string here instead of an enum, to avoid the need of propagating new states to all the client code.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Allows administrators to control the operational state of the orchestrator, enhancing security management.",
+      "compliant": ["STOPPED"],
+      "non-compliant": ["ACTIVE"],
       "parent": null
     },
     "orchestration_scope": {
@@ -171,8 +171,8 @@
         "os_policies": {
           "description": "Required. List of OS policies to be applied to the VMs. Structure is [documented below](#nested_orchestrated_resource_os_policy_assignment_v1_payload_os_policies).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": " Enforces consistent OS-level security configurations across all targeted virtual machines.",
           "compliant": null,
           "non-compliant": null,
           "parent": "os_policy_assignment_v1_payload"
@@ -263,17 +263,17 @@
         "mode": {
           "description": "Required. Policy mode Possible values: MODE_UNSPECIFIED VALIDATION ENFORCEMENT",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Specifying the policy mode ensures that the correct enforcement actions are applied, reducing the risk of misconfiguration.",
+          "compliant": ["ENFORCEMENT", "VALIDATION"],
+          "non-compliant": ["MODE_UNSPECIFIED"],
           "parent": "os_policies"
         },
         "resource_groups": {
           "description": "Required. List of resource groups for the policy. For a particular VM, resource groups are evaluated in the order specified and the first resource group that is applicable is selected and the rest are ignored. If none of the resource groups are applicable for a VM, the VM is considered to be non-compliant w.r.t this policy. This behavior can be toggled by the flag `allow_no_resource_group_match` Structure is [documented below](#nested_orchestrated_resource_os_policy_assignment_v1_payload_os_policies_os_policies_resource_groups).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Applies security controls to multiple related resources simultaneously, ensuring comprehensive protection.",
           "compliant": null,
           "non-compliant": null,
           "parent": "os_policies"
@@ -310,8 +310,8 @@
         "resources": {
           "description": "Required. List of resources configured for this resource group. The resources are executed in the exact order specified here. Structure is [documented below](#nested_orchestrated_resource_os_policy_assignment_v1_payload_os_policies_os_policies_resource_groups_resource_groups_resources).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Enables fine-grained security controls at the resource level, allowing for tailored configurations.",
           "compliant": null,
           "non-compliant": null,
           "parent": "resource_groups"
@@ -395,8 +395,8 @@
         "repository": {
           "description": "A resource that manages a package repository. Structure is [documented below](#nested_orchestrated_resource_os_policy_assignment_v1_payload_os_policies_os_policies_resource_groups_resource_groups_resources_resources_repository).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Enforces consistent package management policies across all targeted virtual machines.",
           "compliant": null,
           "non-compliant": null,
           "parent": "resources"
@@ -883,10 +883,10 @@
         "archive_type": {
           "description": "Required. Type of archive files in this repository. Possible values: ARCHIVE_TYPE_UNSPECIFIED DEB DEB_SRC",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Specifying the archive type helps in applying the correct security policies and validations.",
+          "compliant": ["DEB", "DEB_SRC"],
+          "non-compliant": ["ARCHIVE_TYPE_UNSPECIFIED"],
           "parent": "apt"
         },
         "uri": {
@@ -1156,8 +1156,8 @@
         "apt": {
           "description": "Represents a single apt package repository. These will be added to a repo file that will be managed at `/etc/apt/sources.list.d/google_osconfig.list`. Structure is [documented below](#nested_orchestrated_resource_os_policy_assignment_v1_payload_os_policies_os_policies_resource_groups_resource_groups_resources_resources_repository_apt).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Ensures that only approved package sources are used, reducing the risk of malicious software installation.",
           "compliant": null,
           "non-compliant": null,
           "parent": "repository"
@@ -1205,8 +1205,8 @@
         "all": {
           "description": "Target all VMs in the project. If true, no other criteria is permitted.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Ensures that all VMs are considered for policy application, preventing accidental exclusions.",
           "compliant": null,
           "non-compliant": null,
           "parent": "instance_filter"
@@ -1232,8 +1232,8 @@
         "inventories": {
           "description": "List of inventories to select VMs. A VM is selected if its inventory data matches at least one of the following inventories. Structure is [documented below](#nested_orchestrated_resource_os_policy_assignment_v1_payload_instance_filter_inventories).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Ensures that only VMs with the specified inventory are targeted, reducing the risk of misconfiguration.",
           "compliant": null,
           "non-compliant": null,
           "parent": "instance_filter"
@@ -1292,10 +1292,10 @@
         "os_short_name": {
           "description": "Required. The OS short name",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale":  "Specifying the OS short name ensures that policies are applied only to compatible operating systems, reducing the risk of misconfiguration.",
+          "compliant": ["debian"],
+          "non-compliant": ["windows"],
           "parent": "inventories"
         },
         "os_version": {
