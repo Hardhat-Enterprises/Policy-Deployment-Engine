@@ -34,5 +34,5 @@ resource "google_firestore_backup_schedule" "nc" {
 
   retention = "8467200s" // 14 weeks (maximum possible retention)
 
-  daily_recurrence {}
+  weekly_recurrence {}
 }

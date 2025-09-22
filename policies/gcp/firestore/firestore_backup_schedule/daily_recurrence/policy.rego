@@ -12,9 +12,9 @@ conditions := [
             ]
         },
         {
-            "condition": "Checks if daily_recurrence block is present",
+            "condition": "Checks if daily_recurrence block is present and exactly {}",
             "attribute_path": ["daily_recurrence"],
-            "values": [{}],
+            "values": [{}], # 只允许这个值
             "policy_type": "whitelist"
 #            "policy_type": "existence"
         }
