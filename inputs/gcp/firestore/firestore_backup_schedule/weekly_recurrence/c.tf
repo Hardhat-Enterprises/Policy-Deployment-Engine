@@ -1,5 +1,6 @@
-resource "google_firestore_backup_schedule" "c" {
-  project  = "abcd_1234"
+# resource "google_firestore_backup_schedule" "c" {
+resource "google_firestore_database" "c" {
+  project  = "abcd1234"
   # database = google_firestore_database.dc.name
 
   retention = "8467200s" // 14 weeks (maximum possible retention)

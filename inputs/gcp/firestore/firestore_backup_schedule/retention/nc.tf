@@ -1,5 +1,6 @@
-resource "google_firestore_backup_schedule" "nc" {
-  project  = "abcd_1234"
+# resource "google_firestore_backup_schedule" "nc" {
+resource "google_firestore_database" "c" {
+  project  = "abcd1234"
   # database = google_firestore_database.dnc.name
   retention = "3600s" // 1h,不合规
   daily_recurrence {}
