@@ -1,6 +1,3 @@
-# Describe your resource type here
-# Keep "c" as the name to indicate that this resource and its attributes are compliant
-
 resource "google_scc_event_threat_detection_custom_module" "c" {
     display_name= "c"
     type = "CONFIGURABLE_BAD_IP"

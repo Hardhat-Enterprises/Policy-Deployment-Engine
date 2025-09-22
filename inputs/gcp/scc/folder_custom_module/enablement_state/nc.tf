@@ -1,6 +1,3 @@
-# Describe your resource type here
-# Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
-
 resource "google_folder" "folder_nc" {
   parent       = "organizations/123456789"
   display_name = "nc"
