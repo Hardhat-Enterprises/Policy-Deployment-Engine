@@ -8,7 +8,7 @@ conditions := [
         {
             "situation_description": "Firestore backup schedules must use weekly_recurrence to guarantee weekly backups.",
             "remedies": [
-                "Set `weekly_recurrence = { ... }` in the google_firestore_backup_schedule resource block."
+                "Set `weekly_recurrence = {}` in the google_firestore_backup_schedule resource block."
             ]
         },
         {
