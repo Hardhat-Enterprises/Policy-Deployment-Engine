@@ -1,4 +1,4 @@
-package terraform.gcp.security.scc.google_scc_event_threat_detection_custom_module.config
+package terraform.gcp.security.scc.event_threat_detection_custom_module.config
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.scc.event_threat_detection_custom_module.vars
@@ -12,7 +12,7 @@ conditions := [
       ]
     },
     {
-      "condition": "Check config is in the approved whitelist",
+      "condition": "Check config.allowed_ips is in the approved whitelist",
       "attribute_path": ["config"],
       "values": [
         {"allowed_ips": ["192.168.1.1", "10.0.0.1"]}
