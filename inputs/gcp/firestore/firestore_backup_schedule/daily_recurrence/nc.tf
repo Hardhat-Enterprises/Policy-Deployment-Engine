@@ -3,7 +3,7 @@ resource "google_firestore_backup_schedule" "nc" {
   # database = google_firestore_database.database.name
   # database = google_firestore_database.dnc.name
   retention = "8467200s" // 14 weeks (maximum possible retention)
-  daily_recurrence {}
+  # daily_recurrence {}
 }
 
 # resource "google_firestore_database" "database2" {
