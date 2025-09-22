@@ -4,10 +4,10 @@ resource "google_firestore_document" "c" {
   database     = "(default)"
   collection   = "my_collection"
   document_id  = "example_doc"
-  fields = jsonencode({
-    field1 = "hello"
-    field2 = 42
-  })
+  fields      = jsonencode([
+    { name = "field1", value = "abc" },
+    { name = "field2", value = 123 }
+  ])
   # fields = [
   #   {
   #     name = "field1"

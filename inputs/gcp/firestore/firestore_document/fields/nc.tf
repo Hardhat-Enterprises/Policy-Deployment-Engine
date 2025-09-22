@@ -4,10 +4,10 @@ resource "google_firestore_document" "nc" {
   database     = "(default)"
   collection   = "my_collection"
   document_id  = "example_doc"
-  fields = jsonencode({
-    username = "admin"
-    password = "123456"   # 明文密码，不合规
-  })
+   fields      = jsonencode([
+    { name = "field1", value = "abc" }
+    # 缺 field2
+  ])
   # fields = [
   #
   # ]
