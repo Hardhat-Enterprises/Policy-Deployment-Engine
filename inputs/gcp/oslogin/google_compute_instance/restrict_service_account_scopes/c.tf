@@ -20,6 +20,6 @@ resource "google_compute_instance" "c" {
 
   service_account {
     email  = "oslogin-sa@my-project.iam.gserviceaccount.com"
-    scopes = ["https://www.googleapis.com/auth/logging.write"]
+    scopes = ["https://www.googleapis.com/auth/monitoring.write"]
   }
 }
