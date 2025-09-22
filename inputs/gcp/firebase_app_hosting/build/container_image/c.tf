@@ -6,7 +6,7 @@ resource "google_firebase_app_hosting_build" "c" {
  
   source {
     container {
-      image = "us-docker.pkg.dev/my-project/my-repo/my-app:latest"  # Compliant: Uses Artifact Registry
+      image = "au-docker.pkg.dev"  # Compliant: Uses Artifact Registry
     }
   }
   
