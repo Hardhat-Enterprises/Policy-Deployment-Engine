@@ -1,17 +1,8 @@
 resource "google_firestore_document" "nc" {
-  name        = "nc"
-  # project      = ""
+  # name        = "nc"
+  project      = "abc"
   database     = "(default)"
   collection   = "my_collection"
   document_id  = "example_doc"
-  fields = [
-    {
-      name = "field1"
-      type = "string"
-    },
-    {
-      name = "field2"
-      type = "integer"
-    }
-  ]
+  fields       = jsonencode({foo = "bar"})
 }
