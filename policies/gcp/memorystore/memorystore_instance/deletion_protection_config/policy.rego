@@ -9,12 +9,12 @@ conditions := [
         {
             "situation_description": "Redis instances must have deletion protection enabled to prevent accidental data loss.",
             "remedies": [
-                "Set `deletion_protection_config.enable_deletion_protection = true` in the google_redis_instance resource block."
+                "Set `enable_deletion_protection = true` in the google_redis_instance resource block."
             ]
         },
         {
-            "condition": "Checks if deletion_protection_config.enable_deletion_protection is true",
-            "attribute_path": ["deletion_protection_config", "enable_deletion_protection"],
+            "condition": "Checks if enable_deletion_protection is true",
+            "attribute_path": ["deletion_protection_config"], #, "enable_deletion_protection"],
             "values": [true],
             "policy_type": "whitelist"
         }
