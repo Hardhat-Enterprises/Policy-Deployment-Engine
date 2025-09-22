@@ -5,8 +5,8 @@
     "name": {
       "description": "Name of the `CustomTargetType`.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Simple string identifier with no security implications. Cannot be used to access resources or execute code.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,8 +14,8 @@
     "location": {
       "description": "The location of the source.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Geographic/regional identifier only. Determines where the resource is stored but has no access control implications.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -23,8 +23,8 @@
     "description": {
       "description": "Description of the `CustomTargetType`. Max length is 255 characters.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Fext field for documentation. Doesn't affect system behaviour or grant access.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -32,8 +32,8 @@
     "annotations": {
       "description": "User annotations. These attributes can only be set and used by the user, and not by Cloud Deploy. See https://google.aip.dev/128#annotations for more details such as format and size limitations. **Note**: This field is non-authoritative, and will only manage the annotations present in your configuration. Please refer to the field `effective_annotations` for all of the annotations present on the resource.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Key-value metadata for user documentation only. Explicitly stated as 'can only be set and used by the user, and not by Cloud Deploy' - no operational impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -41,8 +41,8 @@
     "labels": {
       "description": "Labels are attributes that can be set and used by both the user and by Cloud Deploy. Labels must meet the following constraints: * Keys and values can contain only lowercase letters, numeric characters, underscores, and dashes. * All characters must use UTF-8 encoding, and international characters are allowed. * Keys must start with a lowercase letter or international character. * Each resource is limited to a maximum of 64 labels. Both keys and values are additionally constrained to be <= 128 bytes. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Tags that could theoretically be used for resource selection, but in this context they're just organizational markers with no execution or access control",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -50,8 +50,8 @@
     "custom_actions": {
       "description": "Configures render and deploy for the `CustomTargetType` using Skaffold custom actions. Structure is [documented below](#nested_custom_actions).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "Executes arbitrary code through Skaffold actions and can pull code from external sources (Git repos, Cloud Storage, Cloud Build repos), creating supply chain attack vectors and code execution risks.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -59,26 +59,26 @@
         "render_action": {
           "description": "The Skaffold custom action responsible for render operations. If not provided then Cloud Deploy will perform the render operations via `skaffold render`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Can execute arbitrary code during render phase. Should be restricted to approved render actions only.",
+          "compliant": "render-action",
+          "non-compliant": "unauthorized-render",
           "parent": "custom_actions"
         },
         "deploy_action": {
           "description": "The Skaffold custom action responsible for deploy operations.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Can execute arbitrary code during deploy phase with potentially elevated privileges. Critical security boundary.",
+          "compliant": "deploy-action",
+          "non-compliant": "unauthorized-deploy",
           "parent": "custom_actions"
         },
         "include_skaffold_modules": {
           "description": "List of Skaffold modules Cloud Deploy will include in the Skaffold Config as required before performing diagnose. Structure is [documented below](#nested_custom_actions_include_skaffold_modules).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Can include external Skaffold configurations that may contain malicious code or reference untrusted sources.",
           "compliant": null,
           "non-compliant": null,
           "parent": "custom_actions"
@@ -87,27 +87,27 @@
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "Specifies resource ownership/billing scope. Access is already controlled by Google Cloud IAM at the project level.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "include_skaffold_modules": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "List of Skaffold modules Cloud Deploy will include in the Skaffold Config as required before performing diagnose.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Parent block for external module inclusion - inherits security concerns from child blocks.",
+      "compliant": "verified-sources-only",
+      "non-compliant": "unverified-external-sources",
       "parent": null,
       "arguments": {
         "configs": {
           "description": "The Skaffold Config modules to use from the specified source.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Simple list of configuration names - no direct security impact as it doesn't specify sources.",
           "compliant": null,
           "non-compliant": null,
           "parent": "include_skaffold_modules"
@@ -115,28 +115,28 @@
         "git": {
           "description": "Remote git repository containing the Skaffold Config modules. Structure is [documented below](#nested_custom_actions_include_skaffold_modules_include_skaffold_modules_git).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "References external Git repositories which could contain malicious Skaffold configurations or be compromised.",
+          "compliant": "approved-git-repos",
+          "non-compliant": "unauthorized-git-repos",
           "parent": "include_skaffold_modules"
         },
         "google_cloud_storage": {
           "description": "Cloud Storage bucket containing Skaffold Config modules. Structure is [documented below](#nested_custom_actions_include_skaffold_modules_include_skaffold_modules_google_cloud_storage).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "References external Cloud Storage buckets which could contain malicious configurations or be compromised.",
+          "compliant": "approved-gcs-buckets",
+          "non-compliant": "unauthorized-gcs-buckets",
           "parent": "include_skaffold_modules"
         },
         "google_cloud_build_repo": {
           "description": "Cloud Build 2nd gen repository containing the Skaffold Config modules. Structure is [documented below](#nested_custom_actions_include_skaffold_modules_include_skaffold_modules_google_cloud_build_repo).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "References external Cloud Build repositories which could contain malicious configurations or be compromised.",
+          "compliant": "approved-cloud-build-repos",
+          "non-compliant": "unauthorized-cloud-build-repos",
           "parent": "include_skaffold_modules"
         }
       }
