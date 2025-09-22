@@ -31,7 +31,7 @@ resource "google_firestore_backup_schedule" "nc" {
   project  = "my-project-name"
   database = google_firestore_database.database_nc.name
 
-  retention = "8467200s" // 1h 不合规
+  retention = "8467200s"
 
   daily_recurrence {}
 }
