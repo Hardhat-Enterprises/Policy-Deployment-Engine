@@ -10,8 +10,13 @@ conditions := [
     {
         "condition": "Container image should be from trusted registry",
         "attribute_path" : ["source", 0, "container", 0, "image"],
-        "values" : ["gcr.io/*", "*.pkg.dev/*"],
-        "policy_type" : "pattern whitelist" 
+        "values": [
+                "gcr.io",
+                "us-docker.pkg.dev",
+                "europe-docker.pkg.dev",
+                "au-docker.pkg.dev"
+            ],
+        "policy_type" : "whitelist" 
     }
     ],
     [
@@ -20,8 +25,12 @@ conditions := [
     {
         "condition": "Container image should not use insecure public registries",
         "attribute_path" : ["source", 0, "container", 0, "image"],
-        "values" : ["docker.io*", "index.docker.io*", "registry-1.docker.io*", "quay.io*"],
-        "policy_type" : "pattern blacklist" 
+        "values": [
+                "docker.io/nginx:latest",
+                "nginx:latest",
+                "ubuntu:latest"
+            ],
+        "policy_type" : "blacklist" 
     }
     ]
 ]
