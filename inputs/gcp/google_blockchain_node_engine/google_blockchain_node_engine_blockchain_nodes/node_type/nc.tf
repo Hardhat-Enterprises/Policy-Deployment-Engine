@@ -1,4 +1,4 @@
-resource "google_blockchain_node_engine_blockchain_nodes" "bad_node" {
+resource "google_blockchain_node_engine_blockchain_nodes" "nc" {
   blockchain_node_id = "node-eth-testnet-1"
   blockchain_type    = "ETHEREUM"
   location           = "us-central1"
