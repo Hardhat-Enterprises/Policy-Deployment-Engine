@@ -1,20 +1,16 @@
-resource "google_dataplex_asset" "ok" {
-  name          = "asset-ok"
-  project       = "dummy-project"
-  lake          = "test-lake"
-  dataplex_zone = "zone-ok"
-  location      = "us-central1"
-
-  resource_spec {
-    name = "projects/dummy-project/buckets/compliant-bucket"
-    type = "STORAGE_BUCKET"
-  }
+resource "google_dataplex_asset" "c" {
+  name     = "asset-compliant"
+  project  = "my-project"
+  location = "us-central1"
+  lake     = "example-lake"
+  dataplex_zone = "zone-1"
 
   discovery_spec {
-    enabled = true  
+    enabled = true
   }
 
-  labels = {
-    owner = "pde"
+  resource_spec {
+    name = "projects/my-project/buckets/my-secure-bucket"
+    type = "STORAGE_BUCKET"
   }
 }

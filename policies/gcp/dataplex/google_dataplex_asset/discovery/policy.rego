@@ -1,24 +1,23 @@
 package terraform.gcp.security.dataplex.google_dataplex_asset.discovery
 
+import data.terraform.gcp.helpers
 import data.terraform.gcp.security.dataplex.google_dataplex_asset.vars
 
-default details := []
-default message := []
+# Condition: ensure discovery_spec is enabled
+conditions := [
+  [
+    {
+      "situation_description": "Dataplex Asset must have discovery_spec enabled for metadata visibility and security",
+      "remedies": ["Enable discovery_spec with enabled = true"]
+    },
+    {
+      "condition": "Check if discovery_spec.enabled is true",
+      "attribute_path": ["discovery_spec", 0, "enabled"],
+      "values": [true],
+      "policy_type": "whitelist"
+    }
+  ]
+]
 
-discovery_disabled[d] if {
-  rc := input.resource_changes[_]
-  rc.type == vars.variables.resource_type
-
-  after := rc.change.after
-  after.discovery_spec.enabled == false
-
-  d := {
-    "resource_address": rc.address,
-    "attribute": "discovery_spec.enabled",
-    "why": "Dataplex Asset must have discovery enabled"
-  }
-}
-
-details := [d | d := discovery_disabled[_]]
-
-message := ["Dataplex Asset must have discovery enabled"] if { count(details) > 0 }
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

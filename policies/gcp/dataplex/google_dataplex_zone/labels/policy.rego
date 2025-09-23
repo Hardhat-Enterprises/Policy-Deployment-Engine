@@ -1,26 +1,36 @@
 package terraform.gcp.security.dataplex.google_dataplex_zone.labels
 
+import data.terraform.gcp.helpers
 import data.terraform.gcp.security.dataplex.google_dataplex_zone.vars
 
-default details := []
-default message := []
+# Conditions for labels
+conditions := [
+  [
+    {
+      "situation_description": "Dataplex Zones must have an 'owner' label for accountability",
+      "remedies": ["Add a label key 'owner' with an appropriate team or contact"]
+    },
+    {
+      "condition": "Check if 'owner' label is present",
+      "attribute_path": ["labels", "owner"],
+      "values": ["security-team"], 
+      "policy_type": "whitelist"
+    }
+  ],
+  [
+    {
+      "situation_description": "Dataplex Zones must have an 'environment' label (e.g., dev, test, prod)",
+      "remedies": ["Add a label key 'environment' with values like dev/test/prod"]
+    },
+    {
+      "condition": "Check if 'environment' label is present",
+      "attribute_path": ["labels", "environment"],
+      "values": ["dev", "test", "prod"], 
+      "policy_type": "whitelist"
+    }
+  ]
+]
 
-missing_owner_label[d] if {
-  rc := input.resource_changes[_]
-  rc.type == vars.variables.resource_type
-  after := rc.change.after
-
-  not after.labels.owner
-
-  d := {
-    "resource_address": rc.address,
-    "attribute": "labels.owner",
-    "why": "Every Dataplex Zone must have an 'owner' label"
-  }
-}
-
-details := [d | d := missing_owner_label[_]]
-
-message := ["Missing required 'owner' label on one or more Dataplex Zones"] if {
-  count(details) > 0
-}
+# General summary
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

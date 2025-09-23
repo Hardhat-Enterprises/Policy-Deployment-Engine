@@ -1,24 +1,15 @@
-terraform {
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = "~> 5.0"
-    }
-  }
-}
-
-provider "google" {
-  project = "dummy-project"
-  region  = "us-central1"
-}
-
-resource "google_dataplex_zone" "ok" {
-  name     = "zone-ok"
-  lake     = "test-lake"
+resource "google_dataplex_zone" "c" {
+  name     = "zone-compliant"
+  project  = "my-project"
   location = "us-central1"
+  lake     = "example-lake"
   type     = "RAW"
 
-  discovery_spec {
+  labels = {
+    environment = "prod"
+    owner       = "security-team"
+  }
+    discovery_spec {
     enabled = true
   }
 
@@ -26,7 +17,6 @@ resource "google_dataplex_zone" "ok" {
     location_type = "SINGLE_REGION"
   }
 
-  labels = {
-    owner = "pde"
-  }
+
 }
+
