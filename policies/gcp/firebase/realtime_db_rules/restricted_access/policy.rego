@@ -5,16 +5,16 @@ import data.terraform.gcp.security.firebase.realtime_db_rules.vars
 
 conditions := [
     [
-    {
-        "situation_description" : "Realtime Database rules allow public access",
-        "remedies":[ "Update database rules to require authentication for read/write" ]
-    },
-    {
-        "condition": "Check if rules allow public read or write",
-        "attribute_path" : ["values", "triggers", "rules"],
-        "values" : ["read": "true", "write": "true"],
-        "policy_type" : "blacklist"
-    }
+        {
+            "situation_description": "Realtime Database rules allow public access",
+            "remedies": ["Update database rules to require authentication for read/write"]
+        },
+        {
+            "condition": "Check if rules allow public read or write",
+            "attribute_path": ["values", "triggers", "rules"],
+            "values": [{"read": "true", "write": "true"}],
+            "policy_type": "blacklist"
+        }
     ]
 ]
 

@@ -8,4 +8,7 @@ terraform {
   }
 }
 
-provider "google" {}
+provider "google" {
+  project = "ankita-firebase-web-app"
+  region  = "us-central1" 
+}

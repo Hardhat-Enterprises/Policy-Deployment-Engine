@@ -1,10 +1,12 @@
-# Non-compliant Firebase Authentication with anonymous sign-in enabled
+# Non-compliant Firebase Authentication: Anonymous sign-in enabled
 # Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
 
-resource "null_resource" "nc" {
-  triggers = {
-    allow_anonymous = "true"
-    name            = "mock-nc"
+resource "google_identity_platform_config" "nc" {
+  sign_in {
+    allow_duplicate_emails = false
+    
+    anonymous {
+      enabled = true
+    }
   }
 }
-

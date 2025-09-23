@@ -2,10 +2,7 @@
 # Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
 
 
-resource "null_resource" "nc" {
-  triggers = {
-    name        = "unapproved-site"
-    default_url = "malicious.com"
-    type        = "google_firebase_hosting_site"
-  }
+resource "google_firebase_hosting_site" "nc" {
+  site_id = "unapproved-site"
+  project = "mock-project"
 }

@@ -1,10 +1,12 @@
-# Compliant Firebase Authentication with anonymous sign-in disabled
+# Compliant Firebase Authentication: Anonymous sign-in disabled
 # Keep "c" as the name to indicate that this resource and its attributes are compliant
 
-resource "null_resource" "c" {
-  triggers = {
-    allow_anonymous = "false"
-    name            = "mock-c"
+resource "google_identity_platform_config" "c" {
+  sign_in {
+    allow_duplicate_emails = false
+    
+    anonymous {
+      enabled = false
+    }
   }
 }
-
