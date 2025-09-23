@@ -1,7 +1,7 @@
-resource "google_dataplex_lake" "bad" {
-  project  = "dummy-project"
-  name     = "lake-bad"
+resource "google_dataplex_lake" "nc" {
+  name     = "lake-noncompliant"
+  project  = var.project
   location = "us-central1"
 
-  labels = {}
+  
 }

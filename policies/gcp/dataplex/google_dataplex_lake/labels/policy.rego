@@ -1,24 +1,24 @@
 package terraform.gcp.security.dataplex.google_dataplex_lake.labels
 
+import data.terraform.gcp.helpers
 import data.terraform.gcp.security.dataplex.google_dataplex_lake.vars
 
-default details := []
-default message := []
+# Condition: ensure labels include ownership and environment
+conditions := [
+  [
+    {
+      "situation_description": "Dataplex Lakes must have labels for ownership and environment tracking",
+      "remedies": ["Add labels such as 'owner' and 'environment'"]
+    },
+    {
+      "condition": "Check if labels are present",
+      "attribute_path": ["labels"],
+      "values": [null], 
+      "policy_type": "whitelist"
+    }
+  ]
+]
 
-missing_owner[d] if {
-  rc := input.resource_changes[_]
-  rc.type == vars.variables.resource_type
-  after := rc.change.after
-
-  not after.labels.owner
-
-  d := {
-    "resource_address": rc.address,
-    "attribute": "labels.owner",
-    "why": "Dataplex Lake must have an owner label for accountability"
-  }
-}
-
-details := [d | d := missing_owner[_]]
-
-message := ["Dataplex Lake missing required owner label"] if { count(details) > 0 }
+# Summary messages
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

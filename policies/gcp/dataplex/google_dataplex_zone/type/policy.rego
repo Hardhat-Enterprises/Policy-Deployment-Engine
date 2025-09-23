@@ -1,25 +1,23 @@
 package terraform.gcp.security.dataplex.google_dataplex_zone.type
 
+import data.terraform.gcp.helpers
 import data.terraform.gcp.security.dataplex.google_dataplex_zone.vars
 
-default details := []
-default message := []
+# Ensure zone type is either RAW or CURATED
+conditions := [
+  [
+    {
+      "situation_description": "Dataplex Zones must have type set to RAW or CURATED",
+      "remedies": ["Set the zone type to RAW or CURATED"]
+    },
+    {
+      "condition": "Check if type is RAW or CURATED",
+      "attribute_path": ["type"],
+      "values": ["RAW", "CURATED"],
+      "policy_type": "whitelist"
+    }
+  ]
+]
 
-invalid_type[d] if {
-  rc := input.resource_changes[_]
-  rc.type == vars.variables.resource_type
-  after := rc.change.after
-
-  after.type != "RAW"
-  after.type != "CURATED"
-
-  d := {
-    "resource_address": rc.address,
-    "attribute": "type",
-    "why": "Dataplex Zone type must be RAW or CURATED"
-  }
-}
-
-details := [d | d := invalid_type[_]]
-
-message := ["Dataplex Zone must have type RAW or CURATED"] if { count(details) > 0 }
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

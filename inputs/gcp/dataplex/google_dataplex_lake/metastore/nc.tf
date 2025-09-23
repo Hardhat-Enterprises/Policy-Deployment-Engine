@@ -1,7 +1,12 @@
-resource "google_dataplex_lake" "bad" {
-  project  = "dummy-project"
-  name     = "lake-metastore-bad"
+resource "google_dataplex_lake" "nc" {
+  name     = "lake-without-metastore"
+  project  = var.project
   location = "us-central1"
 
-  labels = { owner = "pde" }
+  labels = {
+    environment = "test"
+    owner       = "dev-team"
+  }
+
+ 
 }

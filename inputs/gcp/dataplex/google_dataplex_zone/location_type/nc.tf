@@ -1,8 +1,8 @@
-resource "google_dataplex_zone" "bad" {
-  project  = "dummy-project"
-  name     = "zone-location-bad"
-  lake     = "test-lake"
+resource "google_dataplex_zone" "nc" {
+  name     = "zone-noncompliant"
+  project  = var.project
   location = "us-central1"
+  lake     = "example-lake"
   type     = "RAW"
 
   discovery_spec {
@@ -10,8 +10,6 @@ resource "google_dataplex_zone" "bad" {
   }
 
   resource_spec {
-    location_type = "MULTI_REGION" 
+    location_type = "INVALID" 
   }
-
-  labels = { owner = "pde" }
 }

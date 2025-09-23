@@ -1,11 +1,14 @@
-resource "google_dataplex_lake" "ok" {
-  project  = "dummy-project"
-  name     = "lake-metastore-ok"
+resource "google_dataplex_lake" "c" {
+  name     = "lake-with-metastore"
+  project  = var.project
   location = "us-central1"
 
-  metastore {
-    service = "projects/dummy-project/locations/us-central1/services/dummy-metastore"
+  labels = {
+    environment = "prod"
+    owner       = "security-team"
   }
 
-  labels = { owner = "pde" }
+  metastore {
+    service = "projects/my-project/locations/us-central1/services/my-metastore"
+  }
 }

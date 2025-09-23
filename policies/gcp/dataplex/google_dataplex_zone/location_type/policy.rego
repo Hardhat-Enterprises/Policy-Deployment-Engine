@@ -1,24 +1,23 @@
 package terraform.gcp.security.dataplex.google_dataplex_zone.location_type
 
+import data.terraform.gcp.helpers
 import data.terraform.gcp.security.dataplex.google_dataplex_zone.vars
 
-default details := []
-default message := []
+# Ensure resource_spec.location_type is SINGLE_REGION or MULTI_REGION
+conditions := [
+  [
+    {
+      "situation_description": "Dataplex Zones must use a valid location_type (SINGLE_REGION or MULTI_REGION)",
+      "remedies": ["Set resource_spec.location_type to SINGLE_REGION or MULTI_REGION"]
+    },
+    {
+      "condition": "Check if location_type is valid",
+      "attribute_path": ["resource_spec", 0, "location_type"],
+      "values": ["SINGLE_REGION", "MULTI_REGION"],
+      "policy_type": "whitelist"
+    }
+  ]
+]
 
-not_single_region[d] if {
-  rc := input.resource_changes[_]
-  rc.type == vars.variables.resource_type
-  after := rc.change.after
-
-  after.resource_spec.location_type != "SINGLE_REGION"
-
-  d := {
-    "resource_address": rc.address,
-    "attribute": "resource_spec.location_type",
-    "why": "Dataplex Zone must be SINGLE_REGION for data residency compliance"
-  }
-}
-
-details := [d | d := not_single_region[_]]
-
-message := ["Dataplex Zone must have resource_spec.location_type = SINGLE_REGION"] if { count(details) > 0 }
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

@@ -1,21 +1,20 @@
-resource "google_dataplex_asset" "bad" {
-  name          = "asset-bad"
-  project       = "dummy-project"
-  lake          = "test-lake"
-  dataplex_zone = "zone-ok"
-  location      = "us-central1"
-
-  resource_spec {
-    name = "projects/dummy-project/buckets/noncompliant-bucket"
-    type = "STORAGE_BUCKET"
-  }
+resource "google_dataplex_asset" "nc" {
+  name     = "asset-json-bad"
+  project  = var.project
+  location = "us-central1"
+  lake     = "example-lake"
+  dataplex_zone = "zone-compliant"
 
   discovery_spec {
     enabled = true
-    
+    json_options {
+      encoding      = "ASCII"
+      disable_type_inference = true
+    }
   }
 
-  labels = {
-    owner = "pde"
+  resource_spec {
+    type = "STORAGE_BUCKET"
+    name = "projects/my-project/buckets/json-bad"
   }
 }

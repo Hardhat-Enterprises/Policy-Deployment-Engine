@@ -1,20 +1,16 @@
-resource "google_dataplex_asset" "bad" {
-  name          = "asset-bad"
-  project       = "dummy-project"
-  lake          = "test-lake"
-  dataplex_zone = "zone-ok"
-  location      = "us-central1"
+resource "google_dataplex_asset" "nc" {
+  name     = "asset-noncompliant"
+  project  = var.project
+  location = "us-central1"
+  lake     = "example-lake"
+  dataplex_zone = "zone-compliant"
 
   resource_spec {
-    name = "projects/dummy-project/bigquery/noncompliant-table"
-    type = "BIGQUERY"   
+    type = "INVALID_TYPE" 
+    name = "projects/my-project/buckets/my-insecure-bucket"
   }
 
   discovery_spec {
     enabled = true
-  }
-
-  labels = {
-    owner = "pde"
   }
 }

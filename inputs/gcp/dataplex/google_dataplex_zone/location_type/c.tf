@@ -1,8 +1,8 @@
-resource "google_dataplex_zone" "ok" {
-  project  = "dummy-project"
-  name     = "zone-location-ok"
-  lake     = "test-lake"
+resource "google_dataplex_zone" "c" {
+  name     = "zone-compliant"
+  project  = var.project
   location = "us-central1"
+  lake     = "example-lake"
   type     = "RAW"
 
   discovery_spec {
@@ -12,6 +12,4 @@ resource "google_dataplex_zone" "ok" {
   resource_spec {
     location_type = "SINGLE_REGION" 
   }
-
-  labels = { owner = "pde" }
 }
