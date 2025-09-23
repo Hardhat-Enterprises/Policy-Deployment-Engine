@@ -2,7 +2,7 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = ">= 6.15.0"
+      # version = ">= 6.15.0"
     }
   }
 
@@ -10,6 +10,6 @@ terraform {
 }
 
 provider "google" {
-#   # project = "your-gcp-project-id"
-#   # region  = "us-central1"
+  # project = "your-gcp-project-id"
+  # region  = "us-central1"
 }

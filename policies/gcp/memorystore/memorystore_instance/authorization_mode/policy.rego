@@ -1,4 +1,4 @@
-package terraform.gcp.security.memorystore_instance.authorization_mode
+package terraform.gcp.security.memorystore.memorystore_instance.authorization_mode
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.memorystore.memorystore_instance.vars
@@ -12,7 +12,7 @@ conditions := [
             ]
         },
         {
-            "condition": "Checks if authorization_mode is AUTH_MODE_IAM_AUTH",
+            "condition": "Checks if authorization_mode is AUTH_MODE_IAM_AUTH when present",
             "attribute_path": ["authorization_mode"],
             "values": ["AUTH_MODE_IAM_AUTH"],
             "policy_type": "whitelist"
