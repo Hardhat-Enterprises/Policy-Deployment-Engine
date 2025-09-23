@@ -22,5 +22,16 @@ conditions := [
 ]
 summary := helpers.get_multi_summary(conditions, vars.variables)
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+#message := helpers.get_multi_summary(conditions, vars.variables).message
+#details := helpers.get_multi_summary(conditions, vars.variables).details
+
+# compute failing resource names (only root_module)
+resource_type := vars.variables.resource_type
+resources := [r | r := input.planned_values.root_module.resources[_]; r.type == resource_type]
+missing_weekly := { r.name | r := resources[_]; not r.values.weekly_recurrence }
+
+# overwrite message with only failing resources
+message := [ sprintf("Resource '%s' does not define `weekly_recurrence`", [name]) | name := missing_weekly[_] ]
+
+# keep original details if you want (or rebuild details similarly)
+details := summary.details
