@@ -1,4 +1,4 @@
-resource "google_binary_authorization_policy" "non_compliant_attestors" {
+resource "google_binary_authorization_policy" "nc" {
   project = "my-gcp-project"
 
   default_admission_rule {

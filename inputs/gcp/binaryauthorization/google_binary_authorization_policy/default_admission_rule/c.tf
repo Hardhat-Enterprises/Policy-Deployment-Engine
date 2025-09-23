@@ -1,4 +1,4 @@
-resource "google_binary_authorization_policy" "compliant_default_rule" {
+resource "google_binary_authorization_policy" "c" {
   project = "my-gcp-project"
 
   default_admission_rule {

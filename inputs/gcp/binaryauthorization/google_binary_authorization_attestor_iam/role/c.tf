@@ -1,4 +1,4 @@
-resource "google_binary_authorization_attestor" "good_attestor" {
+resource "google_binary_authorization_attestor" "c" {
   name        = "good-attestor"
   description = "Compliant attestor with correct IAM role binding"
   project     = "my-secure-project"
@@ -22,7 +22,7 @@ EOT
   }
 }
 
-resource "google_binary_authorization_attestor_iam_member" "good_binding" {
+resource "google_binary_authorization_attestor_iam_member" "c1" {
   attestor = "projects/my-secure-project/attestors/good-attestor"
   role     = "roles/containeranalysis.notes.attacher"
   member   = "serviceAccount:valid-sa@my-secure-project.iam.gserviceaccount.com"

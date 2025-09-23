@@ -1,4 +1,4 @@
-resource "google_binary_authorization_attestor" "good_attestor" {
+resource "google_binary_authorization_attestor" "c" {
   name        = "attestor-secure-sig-algo"
   description = "Compliant attestor with a secure signature algorithm"
   project     = "my-secure-project"
@@ -16,7 +16,7 @@ fL5/NfaOS4YEdhzjz5wRgOqR9LJ0eB0F9qu7D+S5V8nXcVdcwFvCpc6fFJIBay0M
 +VUlZTpjMpphDFFWlQIDAQAB
 -----END PUBLIC KEY-----
 EOT
-        signature_algorithm = "RSA_PSS_2048_SHA256" # ✅ allowed
+        signature_algorithm = "RSA_PSS_2048_SHA256"
       }
     }
   }

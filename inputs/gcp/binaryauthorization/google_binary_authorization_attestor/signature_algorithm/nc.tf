@@ -1,4 +1,4 @@
-resource "google_binary_authorization_attestor" "bad_attestor" {
+resource "google_binary_authorization_attestor" "nc" {
   name        = "attestor-insecure-sig-algo"
   description = "Non-compliant attestor with a weak signature algorithm"
   project     = "my-insecure-project"

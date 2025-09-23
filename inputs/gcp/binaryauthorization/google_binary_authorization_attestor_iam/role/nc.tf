@@ -1,4 +1,4 @@
-resource "google_binary_authorization_attestor" "bad_attestor" {
+resource "google_binary_authorization_attestor" "nc" {
   name        = "bad-attestor"
   description = "Non-compliant attestor with incorrect IAM role"
   project     = "my-insecure-project"
@@ -22,7 +22,7 @@ EOT
   }
 }
 
-resource "google_binary_authorization_attestor_iam_member" "bad_binding" {
+resource "google_binary_authorization_attestor_iam_member" "nc1" {
   attestor = "projects/my-insecure-project/attestors/bad-attestor"
   role     = "roles/viewer"
   member   = "serviceAccount:invalid-sa@my-insecure-project.iam.gserviceaccount.com"

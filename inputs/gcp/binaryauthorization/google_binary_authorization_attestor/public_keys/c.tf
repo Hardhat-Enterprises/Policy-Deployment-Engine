@@ -1,4 +1,4 @@
-resource "google_binary_authorization_attestor" "good_attestor" {
+resource "google_binary_authorization_attestor" "c" {
   name        = "attestor-with-keys"
   description = "Compliant attestor with valid public keys"
   project     = "my-secure-project"

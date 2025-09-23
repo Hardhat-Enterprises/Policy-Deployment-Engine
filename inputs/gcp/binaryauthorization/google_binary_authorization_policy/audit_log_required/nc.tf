@@ -1,4 +1,4 @@
-resource "google_binary_authorization_policy" "bad_policy" {
+resource "google_binary_authorization_policy" "nc" {
   project = "my-insecure-project"
 
   admission_whitelist_patterns {

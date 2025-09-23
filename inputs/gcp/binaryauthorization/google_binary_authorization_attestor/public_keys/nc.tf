@@ -1,4 +1,4 @@
-resource "google_binary_authorization_attestor" "bad_attestor" {
+resource "google_binary_authorization_attestor" "nc" {
   name        = "attestor-without-keys"
   description = "Non-compliant attestor missing key details"
   project     = "my-insecure-project"
