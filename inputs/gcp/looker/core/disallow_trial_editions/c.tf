@@ -1,8 +1,8 @@
-﻿# Compliant Looker Core instance with production platform edition
+# Compliant Looker Core instance with production platform edition
 # This resource is compliant because platform_edition is not a trial SKU
 
 resource "google_looker_instance" "c" {
-  name              = "looker-core-compliant-production-edition"
+  name = "c1"
   platform_edition  = "LOOKER_CORE_STANDARD_ANNUAL"
   region            = "us-central1"
   public_ip_enabled = false
@@ -14,4 +14,9 @@ resource "google_looker_instance" "c" {
     client_secret = "test-client-secret"
   }
 }
+
+
+
+
+
 

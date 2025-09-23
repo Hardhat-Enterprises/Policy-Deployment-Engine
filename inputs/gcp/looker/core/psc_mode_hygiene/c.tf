@@ -1,5 +1,5 @@
-﻿resource "google_looker_instance" "ok" {
-  name               = "ok"
+resource "google_looker_instance" "c" {
+  name = "c1"
   project            = var.project
   psc_enabled        = true
   public_ip_enabled  = false
@@ -9,3 +9,8 @@
     client_secret = "test-client-secret"
   }
 }
+
+
+
+
+

@@ -1,5 +1,5 @@
-resource "google_looker_instance" "ok" {
-  name    = "ok"
+resource "google_looker_instance" "c" {
+  name = "c1"
   project = var.project
   encryption_config {
     kms_key_name = "projects/test-project-123/locations/us-central1/keyRings/test-keyring/cryptoKeys/test-key"
@@ -9,3 +9,8 @@ resource "google_looker_instance" "ok" {
     client_secret = "test-client-secret"
   }
 }
+
+
+
+
+
