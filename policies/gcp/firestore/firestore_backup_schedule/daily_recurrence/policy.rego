@@ -1,4 +1,4 @@
-package terraform.gcp.security.firestore.firestore_backup_schedule.daily_recurrence
+package terraform.gcp.security.firestore_backup_schedule.daily_recurrence
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.firestore.firestore_backup_schedule.vars
@@ -12,17 +12,24 @@ conditions := [
             ]
         },
         {
-            "condition": "Checks if daily_recurrence block is present and exactly {}",
+            "condition": "Checks if daily_recurrence block is present (non-empty list)",
             "attribute_path": ["daily_recurrence"],
-            "values": [{}], # 只允许这个值
+            # whitelist 里给一个通配符 [{}] 来匹配任意对象列表
+            "values": [[{}]],
             "policy_type": "whitelist"
-#            "policy_type": "existence"
         }
     ]
 ]
 
 summary := helpers.get_multi_summary(conditions, vars.variables)
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
+#message := helpers.get_multi_summary(conditions, vars.variables).message
+message := [m] if {
+    m := summary.message
+}
+
+message := ["All resources are compliant"] if {
+    not summary.message
+}
 details := helpers.get_multi_summary(conditions, vars.variables).details
 

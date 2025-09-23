@@ -19,9 +19,12 @@
 # }
 
 resource "google_firestore_database" "database" {
-  project     = "abcd1234"
-  name        = "database-id"
-  location_id = "nam5"
+  # project     = "abcd1234"
+  project     = "my-project-name"
+  # name        = "database-id"
+  name        = "(default)"
+  # location_id = "nam5"
+  location_id = "us-central"
   type        = "FIRESTORE_NATIVE"
 
   # delete_protection_state = "DELETE_PROTECTION_ENABLED"
@@ -29,11 +32,13 @@ resource "google_firestore_database" "database" {
 }
 
 resource "google_firestore_backup_schedule" "c" {
-  project  = "abcd1234"
+  # project  = "abcd1234"
+  project  = "my-project-name"
   database = google_firestore_database.database.name
 
   retention = "8467200s" // 14 weeks (maximum possible retention)
 
-  daily_recurrence {}
+  # daily_recurrence {}
+  weekly_recurrence {}
 }
 
