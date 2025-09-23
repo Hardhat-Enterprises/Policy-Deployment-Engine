@@ -1,4 +1,4 @@
-package terraform.gcp.security.firestore.firestore_document.collection
+package terraform.gcp.security.firestore_document.collection
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.firestore.firestore_document.vars

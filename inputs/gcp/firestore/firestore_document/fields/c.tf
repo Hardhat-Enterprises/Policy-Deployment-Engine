@@ -6,6 +6,6 @@ resource "google_firestore_document" "c" {
   document_id  = "example_doc"
   fields      = jsonencode([
     { name = "field1", value = "abc" },
-    { name = "field2", value = "1234" }
+    # { name = "field2", value = "1234" }
   ])
 }

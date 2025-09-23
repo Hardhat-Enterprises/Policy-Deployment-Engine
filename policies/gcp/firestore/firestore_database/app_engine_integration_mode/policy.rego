@@ -1,4 +1,4 @@
-package terraform.gcp.security.firestore.firestore_database.app_engine_integration_mode
+package terraform.gcp.security.firestore_database.app_engine_integration_mode
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.firestore.firestore_database.vars
