@@ -28,7 +28,7 @@ conditions := [
         "projects/my-proj/global/networks/prod-vpc",
         "projects/my-proj/global/networks/shared-services-vpc"
       ],
-      "policy_type": "pattern whitelist"
+      "policy_type": "whitelist"
     }
   ]
 ]
@@ -36,3 +36,4 @@ conditions := [
 summary := helpers.get_multi_summary(conditions, vars.variables)
 message := summary.message
 details := summary.details
+
