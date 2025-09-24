@@ -18,23 +18,24 @@ conditions := [
     }
   ],
   
-  # Situation 2: If region is not in allowed list, check if KMS key is in the same region (pattern match)
+   # S2: Enforce CMEK region alignment using conditional trigger + pattern whitelist
   [
     {
-      "situation_description": "Kafka clusters using CMEK must use a KMS key in the same region.",
-      "remedies": ["Use a CMEK key that resides in the same region as the cluster."]
+      "situation_description": "Kafka clusters using CMEK must ensure that the CMEK key region matches the cluster's region.",
+      "remedies": ["Ensure CMEK keys are stored in the same region as the Kafka cluster."]
     },
     {
-      "condition": "location not in [\"us-central1\", \"europe-west1\", \"asia-southeast1\"]",
+      "condition": "Cluster region is not in approved list → triggers CMEK check",
       "attribute_path": ["location"],
-      "values": ["us-central1", "europe-west1", "asia-southeast1"],
+      "values": ["us-central1", "australia-southeast1"],
       "policy_type": "blacklist"
     },
     {
-      "condition": "kms_key must match pattern projects/*/locations/LOCATION/keyRings/*/cryptoKeys/*",
-      "attribute_path": ["encryption_config", "kms_key"],
-      "values": ["projects/*/locations/*/keyRings/*/cryptoKeys/*"],
-      "policy_type": "whitelist"
+      "condition": "CMEK key must follow location pattern",
+      "attribute_path": ["encryption_config", "kms_key_name"],
+      "values": ["projects/*/locations/us-central1/keyRings/*/cryptoKeys/*",
+                 "projects/*/locations/australia-southeast1/keyRings/*/cryptoKeys/*"],
+      "policy_type": "pattern whitelist"
     }
   ]
 ]
