@@ -15,7 +15,7 @@ conditions := [
         {
             "condition": "Require reasonable threshold (range: ≤100)",
             "attribute_path": ["conditions", 0, "condition_threshold", 0, "threshold_value"],
-            "range": {"max": 100},
+            "values": [null, 100],
             "policy_type": "range"
         }
     ]
