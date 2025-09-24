@@ -5,8 +5,8 @@
     "security_gateway_id": {
       "description": "Optional. User-settable SecurityGateway resource ID. * Must start with a letter. * Must contain between 4-63 characters from `/a-z-/`. * Must end with a number or letter.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "This value is used to uniquely identify the SecurityGateway. Since it is user-settable, it may be chosen to follow a specific naming convention relevant to the user's organization.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,26 +14,26 @@
     "hubs": {
       "description": "Optional. Map of Hubs that represents regional data path deployment with GCP region as a key. Structure is [documented below](#nested_hubs).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "This mapping allows for tailored configurations and optimizations based on regional characteristics.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
       "arguments": {
         "region": {
-          "description": "",
-          "required": null,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "description": "This refers to the GCP region where the Hub is located. Example: `australia-southeast1`.",
+          "required": true,
+          "security_impact": true,
+          "rationale": "Specifying the region allows for optimized routing and compliance with data residency requirements.",
+          "compliant": "australia-southeast1, australia-southeast2",
+          "non-compliant": "us-central1, europe-west1",
           "parent": "hubs"
         },
         "internet_gateway": {
           "description": "Internet Gateway configuration. Structure is [documented below](#nested_hubs_hub_internet_gateway).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "This configuration allows for internet access and management of IP addresses.",
           "compliant": null,
           "non-compliant": null,
           "parent": "hubs"
@@ -43,8 +43,8 @@
     "display_name": {
       "description": "Optional. An arbitrary user-provided name for the SecurityGateway. Cannot exceed 64 characters.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "This is for user convenience and does not impact security.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -52,35 +52,35 @@
     "location": {
       "description": ", Deprecated) Resource ID segment making up resource `name`. It identifies the resource within its parent collection as described in https://google.aip.dev/122. Must be omitted or set to `global`. ~> **Warning:** `location` is deprecated and will be removed in a future major release.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The location is fixed to `global` for this resource type, ensuring consistency in resource identification.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "The project context is essential for resource management and billing, but does not directly impact security.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "internet_gateway": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "This attribute is read-only and reflects the configuration of the internet gateway associated with the SecurityGateway. Structure is [documented below](#nested_internet_gateway).",
+      "required": false,
+      "security_impact": false,
+      "rationale": "This configuration allows for internet access and management of IP addresses.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
       "arguments": {
         "assigned_ips": {
           "description": "(Output) Output only. List of IP addresses assigned to the Cloud NAT.",
-          "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "required": false,
+          "security_impact": false,
+          "rationale": "This argument provides visibility into the IP addresses assigned to the Cloud NAT, which is important for network management and security monitoring.",
           "compliant": null,
           "non-compliant": null,
           "parent": "internet_gateway"
