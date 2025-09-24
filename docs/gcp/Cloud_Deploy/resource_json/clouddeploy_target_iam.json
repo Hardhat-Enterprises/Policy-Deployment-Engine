@@ -4,56 +4,56 @@
   "arguments": {
     "location": {
       "description": "the value will be parsed from the identifier of the parent resource. If no location is provided in the parent identifier and no location is specified, it is taken from the provider configuration.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "A geographic identifier used to locate the specific Target resource. It is part of the resource's address but does not confer any permissions or define access rules itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "name": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": true,
+      "security_impact": false,
+      "rationale": "The name of the Target resource. This is an identifier used to select *which* target (e.g., 'prod', 'staging') the IAM policy applies to. The security impact is determined by the policy being applied (`role`, `member`, `policy_data`), not by the name of the target.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "project": {
       "description": "If it is not provided, the project will be parsed from the identifier of the parent resource. If no project is provided in the parent identifier and no project is specified, the provider project is used.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "Specifies the project containing the Target. Like `location` and `name`, this is part of the resource's address for lookup purposes. Project-level access is governed by its own IAM policies, not this argument.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "member/members": {
       "description": "Each entry can have one of the following values: * **allUsers**: A special identifier that represents anyone who is on the internet; with or without a Google account. * **allAuthenticatedUsers**: A special identifier that represents anyone who is authenticated with a Google account or a service account. * **user:{emailid}**: An email address that represents a specific Google account. For example, alice@gmail.com or joe@example.com. * **serviceAccount:{emailid}**: An email address that represents a service account. For example, my-other-app@appspot.gserviceaccount.com. * **group:{emailid}**: An email address that represents a Google group. For example, admins@example.com. * **domain:{domain}**: A G Suite domain (primary, instead of alias) name that represents all the users of that domain. For example, google.com or example.com. * **projectOwner:projectid**: Owners of the given project. For example, \"projectOwner:my-example-project\" * **projectEditor:projectid**: Editors of the given project. For example, \"projectEditor:my-example-project\" * **projectViewer:projectid**: Viewers of the given project. For example, \"projectViewer:my-example-project\"",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "required": true,
+      "security_impact": true,
+      "rationale": "This defines *who* is granted the permissions to deploy to this target. Granting access to a broad identity like `allUsers` or `allAuthenticatedUsers` would expose the deployment environment to the entire internet or any Google-authenticated user, representing a critical security risk.",
+      "compliant": "user:deploy-user@example.com, group:deploy-team@company.com, user:admin@example.com",
+      "non-compliant": "AllUsers, allAuthenticatedUsers",
       "parent": null
     },
     "role": {
       "description": "`google_clouddeploy_target_iam_binding` can be used per role. Note that custom roles must be of the format `[projects|organizations]/{parent-name}/roles/{role-name}`.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "required": true,
+      "security_impact": true,
+      "rationale": "This defines *what* permissions are being granted on the target. Granting broad roles like `roles/owner` or `roles/editor` on a production target violates the principle of least privilege, as these roles grant far more permissions than needed for deployment.",
+      "compliant": "roles/clouddeploy.developer, roles/clouddeploy.operator",
+      "non-compliant": "roles/owner, roles/editor",
       "parent": null
     },
     "policy_data": {
-      "description": "a `google_iam_policy` data source.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "(Required only by `google_clouddeploy_target_iam_policy`) a `google_iam_policy` data source.",
+      "required": true,
+      "security_impact": true,
+      "rationale": " It specifies *all* bindings (role/member pairs) at once. An incorrect policy can accidentally revoke necessary access, grant overly broad access (e.g., using `roles/editor`), or expose the target publicly (e.g., with `allUsers`). It is the authoritative security configuration for the target and must be rigorously controlled.",
+      "compliant": "The policy should be meticulously defined in code, granting only the necessary Cloud Deploy roles to the necessary principals, following the principle of least privilege.",
+      "non-compliant": "policy containing allUsers/allAuthenticatedUsers or roles/owner/editor",
       "parent": null
     }
   }

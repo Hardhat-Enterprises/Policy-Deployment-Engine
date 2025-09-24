@@ -5,8 +5,8 @@
     "location": {
       "description": "The location for the resource",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Geographic/regional identifier only. Determines where the resource is stored but has no access control implications.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,8 +14,8 @@
     "name": {
       "description": "Name of the `DeliveryPipeline`. Format is `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`. - - -",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Simple string identifier with no security implications. Cannot be used to access resources or execute code.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -23,8 +23,8 @@
     "annotations": {
       "description": "User annotations. These attributes can only be set and used by the user, and not by Google Cloud Deploy. See https://google.aip.dev/128#annotations for more details such as format and size limitations. **Note**: This field is non-authoritative, and will only manage the annotations present in your configuration. Please refer to the field `effective_annotations` for all of the annotations present on the resource.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Key-value metadata for user documentation only. Explicitly stated as 'can only be set and used by the user, and not by Cloud Deploy' - no operational impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -32,8 +32,8 @@
     "description": {
       "description": "Description of the `DeliveryPipeline`. Max length is 255 characters.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Key-value metadata for user documentation only. Explicitly stated as 'can only be set and used by the user, and not by Cloud Deploy' - no operational impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -41,8 +41,8 @@
     "labels": {
       "description": "Labels are attributes that can be set and used by both the user and by Google Cloud Deploy. Labels must meet the following constraints: * Keys and values can contain only lowercase letters, numeric characters, underscores, and dashes. * All characters must use UTF-8 encoding, and international characters are allowed. * Keys must start with a lowercase letter or international character. * Each resource is limited to a maximum of 64 labels. Both keys and values are additionally constrained to be <= 128 bytes. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Metadata tags that could theoretically be used for resource selection, but in this context they're organizational markers with no execution or access control implications.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -50,8 +50,8 @@
     "project": {
       "description": "The project for the resource",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Specifies resource ownership/billing scope. Access is already controlled by Google Cloud IAM at the project level.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -59,8 +59,8 @@
     "serial_pipeline": {
       "description": "SerialPipeline defines a sequential set of stages for a `DeliveryPipeline`.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Pipeline structure configuration - defines stages but doesn't control execution permissions or access external resources.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -68,8 +68,8 @@
         "stages": {
           "description": "Each stage specifies configuration for a `Target`. The ordering of this list defines the promotion flow.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Defines deployment stage sequence - organizational configuration with no direct security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "serial_pipeline"
@@ -79,17 +79,17 @@
     "suspended": {
       "description": "When suspended, no new releases or rollouts can be created, but in-progress ones will complete.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Controls whether the pipeline can execute deployments. Can be used to disable deployments in security incidents, but also could be maliciously set to cause denial of service.",
+      "compliant": false,
+      "non-compliant": true,
       "parent": null
     },
     "stages": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "Configuration for deployment stages.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Stage configuration container - security impact comes from nested arguments, not the container itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -97,35 +97,35 @@
         "deploy_parameters": {
           "description": "Optional. The deploy parameters to use for the target in this stage.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Can pass arbitrary parameters to deployment processes. Could be used to inject malicious configuration or override security settings.",
+          "compliant": "validated-parameters-only",
+          "non-compliant": "arbitrary-parameters, security-override-parameters",
           "parent": "stages"
         },
         "profiles": {
           "description": "Skaffold profiles to use when rendering the manifest for this stage's `Target`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Skaffold profiles can alter deployment behavior and reference external configurations. Malicious profiles could change security settings or deployment targets.",
+          "compliant": "approved-skaffold-profiles",
+          "non-compliant": "unvalidated-profiles, malicious-profiles",
           "parent": "stages"
         },
         "strategy": {
           "description": "Optional. The strategy to use for a `Rollout` to this stage.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Deployment strategy configuration (canary vs standard) - affects rollout behavior but not security permissions or external access.",
           "compliant": null,
           "non-compliant": null,
           "parent": "stages"
         },
         "target_id": {
-          "description": "The target_id to which this stage points. This field refers exclusively to the last segment of a target name. For example, this field would just be `my-target` (rather than `projects/project/locations/location/targets/my-target`). The location of the `Target` is inferred to be the same as the location of the `DeliveryPipeline` that contains this `Stage`.",
+          "description": "The target_id to which this stage points. This field refers exclusively to the last segment of a target name.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "References existing targets within the same location - doesn't create new access paths or execute code.",
           "compliant": null,
           "non-compliant": null,
           "parent": "stages"
@@ -133,10 +133,10 @@
       }
     },
     "deploy_parameters": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "Deploy parameters configuration block",
+      "required": false,
+      "security_impact": false,
+      "rationale": ": Environment-specific deployment parameters are typically configuration values, not security controls. Validation should be handled at the application level",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -144,8 +144,8 @@
         "match_target_labels": {
           "description": "Optional. Deploy parameters are applied to targets with match labels. If unspecified, deploy parameters are applied to all targets (including child targets of a multi-target).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Label matching for parameter application - organizational feature with no direct security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "deploy_parameters"
@@ -153,8 +153,8 @@
         "values": {
           "description": "Required. Values are deploy parameters in key-value pairs.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Arbitrary key-value pairs passed to deployment processes",
           "compliant": null,
           "non-compliant": null,
           "parent": "deploy_parameters"
@@ -162,10 +162,10 @@
       }
     },
     "strategy": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "Deployment strategy configuration.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Container for deployment strategy options - security impact comes from nested custom actions, not strategy type.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -173,8 +173,8 @@
         "canary": {
           "description": "Canary deployment strategy provides progressive percentage based deployments to a Target.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Canary strategy configuration - affects rollout behavior but inherits security concerns from nested actions.",
           "compliant": null,
           "non-compliant": null,
           "parent": "strategy"
@@ -182,8 +182,8 @@
         "standard": {
           "description": "Standard deployment strategy executes a single deploy and allows verifying the deployment.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Standard strategy configuration - affects rollout behavior but inherits security concerns from nested actions.",
           "compliant": null,
           "non-compliant": null,
           "parent": "strategy"

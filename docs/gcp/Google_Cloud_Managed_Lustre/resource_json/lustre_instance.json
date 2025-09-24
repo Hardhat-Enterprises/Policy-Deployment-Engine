@@ -4,8 +4,8 @@
   "arguments": {
     "capacity_gib": {
       "description": "The storage capacity of the instance in gibibytes (GiB). Allowed values are from `18000` to `954000`, in increments of 9000.",
-      "required": true,
-      "security_impact": null,
+      "required": false,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -13,8 +13,8 @@
     },
     "filesystem": {
       "description": "The filesystem name for this instance. This name is used by client-side tools, including when mounting the instance. Must be eight characters or less and can only contain letters and numbers.",
-      "required": true,
-      "security_impact": null,
+      "required": false,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -23,28 +23,28 @@
     "network": {
       "description": "The full name of the VPC network to which the instance is connected. Must be in the format `projects/{project_id}/global/networks/{network_name}`.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "The full VPC format ensures the instance is bound to a valid and secure GCP network.",
+      "compliant": "`projects/my-project/global/networks/vpc-1`",
+      "non-compliant": "`vpc-1`, `networks/vpc-1` — missing full path format.",
       "parent": null
     },
     "per_unit_storage_throughput": {
       "description": "The throughput of the instance in MB/s/TiB. Valid values are 125, 250, 500, 1000.",
       "required": true,
       "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "rationale": "GCP supports specific throughput tiers for predictable performance and resource allocation.",
+      "compliant": "`250`, `500` — valid throughput levels.",
+      "non-compliant": "`300`, `600` — not among supported values.",
       "parent": null
     },
     "location": {
-      "description": "Resource ID segment making up resource `name`. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
+      "description": "The location should be a valid location",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Restricting to allowed locations ensures compliance with regional data residency and service availability.",
+      "compliant": "australia-southeast-1-a, australia-southeast-1-b",
+      "non-compliant": "europe-west3",
       "parent": null
     },
     "instance_id": {
@@ -58,11 +58,11 @@
     },
     "gke_support_enabled": {
       "description": "Indicates whether you want to enable support for GKE clients. By default, GKE clients are not supported.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "required": true,
+      "security_impact": true,
+      "rationale": "GKE integration must be explicitly enabled for Lustre to be discoverable and mountable by Kubernetes workloads.",
+      "compliant": "`true` — GKE support enabled.",
+      "non-compliant": "`false` or not set — GKE clients will not be supported.",
       "parent": null
     },
     "description": {
