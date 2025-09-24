@@ -5,66 +5,66 @@
     "domain_name": {
       "description": "Relative name of the domain serving the application. Example: example.com.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Controls which domain the App Engine app is exposed on. Misconfigured domains may expose internal services or unused endpoints to the internet.",
+      "rationale": "Restricting domain mappings to known, approved domains reduces the risk of subdomain hijacking and data exposure.",
+      "compliant": "domain_name = \"secure-service.example.com\" (points only to an approved production domain).",
+      "non-compliant": "domain_name = \"*.example.com\" (wildcard domain unintentionally exposes all subdomains).",
       "parent": null
     },
     "ssl_settings": {
-      "description": "SSL configuration for this domain. If unconfigured, this domain will not serve with SSL. Structure is [documented below](#nested_ssl_settings).",
+      "description": "SSL configuration for this domain. If unconfigured, this domain will not serve with SSL. Structure is documented below.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Improper SSL configuration may allow plaintext (HTTP) traffic, exposing data in transit.",
+      "rationale": "Enforcing SSL ensures that all connections to the mapped domain are encrypted with TLS.",
+      "compliant": "ssl_settings { ssl_management_type = \"AUTOMATIC\" } (Google-managed certificate provisioned automatically).",
+      "non-compliant": "ssl_settings { ssl_management_type = \"MANUAL\" } without certificate_id (domain will not serve with SSL).",
       "parent": null,
       "arguments": {
         "certificate_id": {
-          "description": "ID of the AuthorizedCertificate resource configuring SSL for the application. Clearing this field will remove SSL support. By default, a managed certificate is automatically created for every domain mapping. To omit SSL support or to configure SSL manually, specify `SslManagementType.MANUAL` on a `CREATE` or `UPDATE` request. You must be authorized to administer the `AuthorizedCertificate` resource to manually map it to a DomainMapping resource. Example: 12345.",
+          "description": "ID of the AuthorizedCertificate resource configuring SSL for the application.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "Manual certificates may expire or be misconfigured, breaking TLS coverage.",
+          "rationale": "Where manual management is used, certificate rotation must be automated.",
+          "compliant": "certificate_id = \"12345\" with ssl_management_type = \"MANUAL\" and automated renewal in place.",
+          "non-compliant": "ssl_management_type = \"MANUAL\" without certificate_id specified.",
           "parent": "ssl_settings"
         },
         "ssl_management_type": {
-          "description": "SSL management type for this domain. If `AUTOMATIC`, a managed certificate is automatically provisioned. If `MANUAL`, `certificateId` must be manually specified in order to configure SSL for this domain. Possible values are: `AUTOMATIC`, `MANUAL`.",
+          "description": "SSL management type for this domain. AUTOMATIC provisions a managed cert, MANUAL requires certificate_id.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "Determines how TLS certs are provisioned. AUTOMATIC is more secure and lower-maintenance.",
+          "rationale": "Prefer AUTOMATIC to reduce operational risk and ensure continuous TLS coverage.",
+          "compliant": "ssl_management_type = \"AUTOMATIC\".",
+          "non-compliant": "ssl_management_type = \"MANUAL\" without a valid certificate_id.",
           "parent": "ssl_settings"
         },
         "pending_managed_certificate_id": {
-          "description": "(Output) ID of the managed `AuthorizedCertificate` resource currently being provisioned, if applicable. Until the new managed certificate has been successfully provisioned, the previous SSL state will be preserved. Once the provisioning process completes, the `certificateId` field will reflect the new managed certificate and this field will be left empty. To remove SSL support while there is still a pending managed certificate, clear the `certificateId` field with an update request.",
+          "description": "(Output only) ID of the managed AuthorizedCertificate resource currently being provisioned.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "Read-only status attribute; no direct security impact.",
+          "rationale": "Helps track certificate provisioning status.",
+          "compliant": "Not applicable (system-managed).",
+          "non-compliant": "Not applicable.",
           "parent": "ssl_settings"
         }
       }
     },
-    "override_strategy": {
-      "description": "Whether the domain creation should override any existing mappings for this domain. By default, overrides are rejected. Default value is `STRICT`. Possible values are: `STRICT`, `OVERRIDE`.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
+     "override_strategy": {
+     "description": "Whether the domain creation should override any existing mappings for this domain. By default, overrides are rejected. Default value is `STRICT`. Possible values are: `STRICT`, `OVERRIDE`.",
+     "required": false,
+     "security_impact": "Not applicable — this attribute cannot be validated using current helpers.",
+     "rationale": "While override_strategy controls replacement behavior, it is not possible to enforce via policy helpers.",
+     "compliant": "Documented only, no enforcement possible.",
+     "non-compliant": "Documented only, no enforcement possible.",
+     "parent": null
+},
     "project": {
       "description": "If it is not provided, the provider project is used.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Relying on implicit project configuration can result in deploying to the wrong environment.",
+      "rationale": "Always specify project explicitly for clarity and to prevent drift.",
+      "compliant": "project = \"secure-production-project\".",
+      "non-compliant": "Project omitted, relying on provider default.",
       "parent": null
     }
   }

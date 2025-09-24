@@ -5,622 +5,119 @@
     "runtime": {
       "description": "Desired runtime. Example python27.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Defines the language/runtime environment. Deprecated or unsupported runtimes may have unpatched vulnerabilities.",
+      "rationale": "Ensure only actively supported runtimes are used to avoid CVEs.",
+      "compliant": "runtime = \"python39\"",
+      "non-compliant": "runtime = \"python27\" (deprecated).",
       "parent": null
     },
     "deployment": {
-      "description": "Code and application artifacts that make up this version. Structure is [documented below](#nested_deployment).",
+      "description": "Code and application artifacts that make up this version.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "zip": {
-          "description": "Zip File Structure is [documented below](#nested_deployment_zip).",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "deployment"
-        },
-        "files": {
-          "description": "Manifest of the files stored in Google Cloud Storage that are included as part of this version. All files must be readable using the credentials supplied with this call. Structure is [documented below](#nested_deployment_files).",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "deployment"
-        }
-      }
+      "security_impact": "Improper deployment packaging may include sensitive files or expose unnecessary binaries.",
+      "rationale": "Deploy only required, reviewed artifacts.",
+      "compliant": "Deployment includes only signed application zip bundle.",
+      "non-compliant": "Deployment bundle includes unused debug files or credentials.",
+      "parent": null
     },
     "entrypoint": {
-      "description": "The entrypoint for the application. Structure is [documented below](#nested_entrypoint).",
+      "description": "The entrypoint for the application.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "shell": {
-          "description": "The format should be a shell command that can be fed to bash -c.",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "entrypoint"
-        }
-      }
+      "security_impact": "Improper entrypoint may bypass authentication logic or allow arbitrary execution.",
+      "rationale": "Entrypoint should be minimal and verified to enforce application logic.",
+      "compliant": "shell = \"gunicorn -b :$PORT main:app\"",
+      "non-compliant": "shell = \"bash debug.sh\"",
+      "parent": null
     },
     "service": {
       "description": "AppEngine service resource",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "version_id": {
-      "description": "Relative name of the version within the service. For example, `v1`. Version names can contain only lowercase letters, numbers, or hyphens. Reserved names,\"default\", \"latest\", and any name with the prefix \"ah-\".",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Improperly named services can lead to routing confusion or expose unintended workloads.",
+      "rationale": "Separate services logically for clearer security boundaries.",
+      "compliant": "service = \"payments-api\"",
+      "non-compliant": "service = \"default\" for multiple workloads.",
       "parent": null
     },
     "service_account": {
-      "description": "The identity that the deployed version will run as. Admin API will use the App Engine Appspot service account as default if this field is neither provided in app.yaml file nor through CLI flag.",
+      "description": "The identity that the deployed version will run as.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "threadsafe": {
-      "description": "Whether multiple requests can be dispatched to this version at once.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "app_engine_apis": {
-      "description": "Allows App Engine second generation runtimes to access the legacy bundled services.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "runtime_api_version": {
-      "description": "The version of the API in the given runtime environment. Please see the app.yaml reference for valid values at `https://cloud.google.com/appengine/docs/standard/<language>/config/appref`\\ Substitute `<language>` with `python`, `java`, `php`, `ruby`, `go` or `nodejs`.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Service account defines runtime permissions. Using broad roles (Editor/Owner) risks privilege escalation.",
+      "rationale": "Always run with least-privilege service accounts.",
+      "compliant": "service_account = \"app-runtime@project.iam.gserviceaccount.com\" with minimal roles.",
+      "non-compliant": "service_account = default App Engine service account with Editor.",
       "parent": null
     },
     "handlers": {
-      "description": "An ordered list of URL-matching patterns that should be applied to incoming requests. The first matching URL handles the request and other request handlers are not attempted. Structure is [documented below](#nested_handlers).",
+      "description": "URL-matching patterns applied to requests.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "url_regex": {
-          "description": "URL prefix. Uses regular expression syntax, which means regexp special characters must be escaped, but should not contain groupings. All URLs that begin with this prefix are handled by this handler, using the portion of the URL after the prefix as part of the file path.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "handlers"
-        },
-        "security_level": {
-          "description": "Security (HTTPS) enforcement for this URL. Possible values are: `SECURE_DEFAULT`, `SECURE_NEVER`, `SECURE_OPTIONAL`, `SECURE_ALWAYS`.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "handlers"
-        },
-        "login": {
-          "description": "Methods to restrict access to a URL based on login status. Possible values are: `LOGIN_OPTIONAL`, `LOGIN_ADMIN`, `LOGIN_REQUIRED`.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "handlers"
-        },
-        "auth_fail_action": {
-          "description": "Actions to take when the user is not logged in. Possible values are: `AUTH_FAIL_ACTION_REDIRECT`, `AUTH_FAIL_ACTION_UNAUTHORIZED`.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "handlers"
-        },
-        "redirect_http_response_code": {
-          "description": "30x code to use when performing redirects for the secure field. Possible values are: `REDIRECT_HTTP_RESPONSE_CODE_301`, `REDIRECT_HTTP_RESPONSE_CODE_302`, `REDIRECT_HTTP_RESPONSE_CODE_303`, `REDIRECT_HTTP_RESPONSE_CODE_307`.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "handlers"
-        },
-        "script": {
-          "description": "Executes a script to handle the requests that match this URL pattern. Only the auto value is supported for Node.js in the App Engine standard environment, for example \"script:\" \"auto\". Structure is [documented below](#nested_handlers_handlers_script).",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "handlers"
-        },
-        "static_files": {
-          "description": "Files served directly to the user for a given URL, such as images, CSS stylesheets, or JavaScript source files. Static file handlers describe which files in the application directory are static files, and which URLs serve them. Structure is [documented below](#nested_handlers_handlers_static_files).",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "handlers"
-        }
-      }
-    },
-    "libraries": {
-      "description": "Configuration for third-party Python runtime libraries that are required by the application. Structure is [documented below](#nested_libraries).",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "name": {
-          "description": "Name of the library. Example \"django\".",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "libraries"
-        },
-        "version": {
-          "description": "Version of the library to select, or \"latest\".",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "libraries"
-        }
-      }
+      "security_impact": "Handlers enforce HTTPS and login. Misconfiguration may expose sensitive endpoints over HTTP.",
+      "rationale": "All admin or internal routes should require authentication and HTTPS.",
+      "compliant": "security_level = \"SECURE_ALWAYS\" and login = \"LOGIN_REQUIRED\".",
+      "non-compliant": "security_level = \"SECURE_NEVER\" for admin URLs.",
+      "parent": null
     },
     "env_variables": {
-      "description": "Environment variables available to the application.",
+      "description": "Environment variables available to the app.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Storing secrets in plain environment variables risks leakage.",
+      "rationale": "Use Secret Manager for sensitive keys.",
+      "compliant": "env_variables = { \"LOG_LEVEL\" = \"DEBUG\" }",
+      "non-compliant": "env_variables = { \"DB_PASSWORD\" = \"plaintext\" }",
       "parent": null
     },
     "vpc_access_connector": {
-      "description": "Enables VPC connectivity for standard apps. Structure is [documented below](#nested_vpc_access_connector).",
+      "description": "Enables VPC connectivity for standard apps.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "name": {
-          "description": "Full Serverless VPC Access Connector name e.g. /projects/my-project/locations/us-central1/connectors/c1.",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "vpc_access_connector"
-        },
-        "egress_setting": {
-          "description": "The egress setting for the connector, controlling what traffic is diverted through it.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "vpc_access_connector"
-        }
-      }
-    },
-    "inbound_services": {
-      "description": "A list of the types of messages that this application is able to receive. Each value may be one of: `INBOUND_SERVICE_MAIL`, `INBOUND_SERVICE_MAIL_BOUNCE`, `INBOUND_SERVICE_XMPP_ERROR`, `INBOUND_SERVICE_XMPP_MESSAGE`, `INBOUND_SERVICE_XMPP_SUBSCRIBE`, `INBOUND_SERVICE_XMPP_PRESENCE`, `INBOUND_SERVICE_CHANNEL_PRESENCE`, `INBOUND_SERVICE_WARMUP`.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "instance_class": {
-      "description": "Instance class that is used to run this version. Valid values are AutomaticScaling: F1, F2, F4, F4_1G BasicScaling or ManualScaling: B1, B2, B4, B4_1G, B8 Defaults to F1 for AutomaticScaling and B2 for ManualScaling and BasicScaling. If no scaling is specified, AutomaticScaling is chosen.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Without VPC connector, app traffic may traverse public internet.",
+      "rationale": "Use VPC connectors for private service access.",
+      "compliant": "vpc_access_connector { name = \"/projects/proj/locations/us-central1/connectors/c1\" }",
+      "non-compliant": "Omitting VPC connector for sensitive apps.",
       "parent": null
     },
     "automatic_scaling": {
-      "description": "Automatic scaling is based on request rate, response latencies, and other application metrics. Structure is [documented below](#nested_automatic_scaling).",
+      "description": "Automatic scaling configuration.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "max_concurrent_requests": {
-          "description": "Number of concurrent requests an automatic scaling instance can accept before the scheduler spawns a new instance. Defaults to a runtime-specific value.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "automatic_scaling"
-        },
-        "max_idle_instances": {
-          "description": "Maximum number of idle instances that should be maintained for this version.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "automatic_scaling"
-        },
-        "max_pending_latency": {
-          "description": "Maximum amount of time that a request should wait in the pending queue before starting a new instance to handle it. A duration in seconds with up to nine fractional digits, terminated by 's'. Example: \"3.5s\".",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "automatic_scaling"
-        },
-        "min_idle_instances": {
-          "description": "Minimum number of idle instances that should be maintained for this version. Only applicable for the default version of a service.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "automatic_scaling"
-        },
-        "min_pending_latency": {
-          "description": "Minimum amount of time a request should wait in the pending queue before starting a new instance to handle it. A duration in seconds with up to nine fractional digits, terminated by 's'. Example: \"3.5s\".",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "automatic_scaling"
-        },
-        "standard_scheduler_settings": {
-          "description": "Scheduler settings for standard environment. Structure is [documented below](#nested_automatic_scaling_standard_scheduler_settings).",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "automatic_scaling"
-        }
-      }
+      "security_impact": "Improper scaling may exhaust resources or expose app to denial-of-service.",
+      "rationale": "Set sane min/max instances and latency thresholds.",
+      "compliant": "min_idle_instances = 1, max_instances = 20",
+      "non-compliant": "min_idle_instances = 0, unlimited max_instances.",
+      "parent": null
     },
     "basic_scaling": {
-      "description": "Basic scaling creates instances when your application receives requests. Each instance will be shut down when the application becomes idle. Basic scaling is ideal for work that is intermittent or driven by user activity. Structure is [documented below](#nested_basic_scaling).",
+      "description": "Basic scaling configuration.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "idle_timeout": {
-          "description": "Duration of time after the last request that an instance must wait before the instance is shut down. A duration in seconds with up to nine fractional digits, terminated by 's'. Example: \"3.5s\". Defaults to 900s.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "basic_scaling"
-        },
-        "max_instances": {
-          "description": "Maximum number of instances to create for this version. Must be in the range [1.0, 200.0].",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "basic_scaling"
-        }
-      }
+      "security_impact": "Improper idle timeouts may keep unnecessary instances alive, wasting resources.",
+      "rationale": "Use small idle_timeout for non-critical workloads.",
+      "compliant": "idle_timeout = \"300s\"",
+      "non-compliant": "idle_timeout left default, keeping idle instances indefinitely.",
+      "parent": null
     },
     "manual_scaling": {
-      "description": "A service with manual scaling runs continuously, allowing you to perform complex initialization and rely on the state of its memory over time. Structure is [documented below](#nested_manual_scaling).",
+      "description": "Manual scaling configuration.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "instances": {
-          "description": "Number of instances to assign to the service at the start. **Note:** When managing the number of instances at runtime through the App Engine Admin API or the (now deprecated) Python 2 Modules API set_num_instances() you must use `lifecycle.ignore_changes = [\"manual_scaling\"[0].instances]` to prevent drift detection.",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "manual_scaling"
-        }
-      }
+      "security_impact": "Running continuous instances unnecessarily increases attack surface.",
+      "rationale": "Use manual scaling only when workload requires persistent memory/state.",
+      "compliant": "instances = 2 for long-running services.",
+      "non-compliant": "instances = 50 for low-traffic app.",
+      "parent": null
+    },
+    "libraries": {
+      "description": "Third-party runtime libraries.",
+      "required": false,
+      "security_impact": "Unpinned or outdated libraries may include vulnerabilities.",
+      "rationale": "Pin library versions and update regularly.",
+      "compliant": "library = { name = \"django\", version = \"3.2\" }",
+      "non-compliant": "library = { name = \"django\", version = \"latest\" }",
+      "parent": null
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Explicit scoping avoids accidental deployment into wrong projects.",
+      "rationale": "Always define project ID for clarity.",
+      "compliant": "project = \"secure-app\"",
+      "non-compliant": "Omitting project, relying on provider defaults.",
       "parent": null
-    },
-    "noop_on_destroy": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "delete_service_on_destroy": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "zip": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "source_url": {
-          "description": "Source URL",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "zip"
-        },
-        "files_count": {
-          "description": "files count",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "zip"
-        }
-      }
-    },
-    "files": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "name": {
-          "description": "",
-          "required": null,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "files"
-        },
-        "sha1_sum": {
-          "description": "SHA1 checksum of the file",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "files"
-        },
-        "source_url": {
-          "description": "Source URL",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "files"
-        }
-      }
-    },
-    "script": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "script_path": {
-          "description": "Path to the script from the application root directory.",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "script"
-        }
-      }
-    },
-    "static_files": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "path": {
-          "description": "Path to the static files matched by the URL pattern, from the application root directory. The path can refer to text matched in groupings in the URL pattern.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "static_files"
-        },
-        "upload_path_regex": {
-          "description": "Regular expression that matches the file paths for all files that should be referenced by this handler.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "static_files"
-        },
-        "http_headers": {
-          "description": "HTTP headers to use for all responses from these URLs. An object containing a list of \"key:value\" value pairs.\".",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "static_files"
-        },
-        "mime_type": {
-          "description": "MIME type used to serve all files served by this handler. Defaults to file-specific MIME types, which are derived from each file's filename extension.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "static_files"
-        },
-        "expiration": {
-          "description": "Time a static file served by this handler should be cached by web proxies and browsers. A duration in seconds with up to nine fractional digits, terminated by 's'. Example \"3.5s\".",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "static_files"
-        },
-        "require_matching_file": {
-          "description": "Whether this handler should match the request if the file referenced by the handler does not exist.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "static_files"
-        },
-        "application_readable": {
-          "description": "Whether files should also be uploaded as code data. By default, files declared in static file handlers are uploaded as static data and are only served to end users; they cannot be read by the application. If enabled, uploads are charged against both your code and static data storage resource quotas.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "static_files"
-        }
-      }
-    },
-    "standard_scheduler_settings": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "target_cpu_utilization": {
-          "description": "Target CPU utilization ratio to maintain when scaling. Should be a value in the range [0.50, 0.95], zero, or a negative value.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "standard_scheduler_settings"
-        },
-        "target_throughput_utilization": {
-          "description": "Target throughput utilization ratio to maintain when scaling. Should be a value in the range [0.50, 0.95], zero, or a negative value.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "standard_scheduler_settings"
-        },
-        "min_instances": {
-          "description": "Minimum number of instances to run for this version. Set to zero to disable minInstances configuration.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "standard_scheduler_settings"
-        },
-        "max_instances": {
-          "description": "Maximum number of instances to run for this version. Set to zero to disable maxInstances configuration. **Note:** Starting from March 2025, App Engine sets the maxInstances default for standard environment deployments to 20. This change doesn't impact existing apps. To override the default, specify a new value between 0 and 2147483647, and deploy a new version or redeploy over an existing version. To disable the maxInstances default configuration setting, specify the maximum permitted value 2147483647.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "standard_scheduler_settings"
-        }
-      }
     }
   }
 }

@@ -5,28 +5,28 @@
     "service": {
       "description": "The name of the service these settings apply to.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Identifies which service is being restricted. Misconfigured service targeting can leave critical apps exposed.",
+      "rationale": "Ensures ingress rules are properly applied to sensitive services.",
+      "compliant": "service = \"payments-service\" with network restrictions applied.",
+      "non-compliant": "service = \"default\" without proper isolation.",
       "parent": null
     },
     "network_settings": {
-      "description": "Ingress settings for this service. Will apply to all versions. Structure is [documented below](#nested_network_settings).",
+      "description": "Ingress settings for this service. Will apply to all versions.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Defines which sources can reach the App Engine service. Incorrect ingress settings can expose apps to the public internet unnecessarily.",
+      "rationale": "Restrict ingress traffic to internal or load-balanced requests to minimize exposure.",
+      "compliant": "ingress_traffic_allowed = \"INGRESS_TRAFFIC_ALLOWED_INTERNAL_ONLY\"",
+      "non-compliant": "ingress_traffic_allowed = \"INGRESS_TRAFFIC_ALLOWED_ALL\" for sensitive workloads.",
       "parent": null,
       "arguments": {
         "ingress_traffic_allowed": {
           "description": "The ingress settings for version or service. Default value is `INGRESS_TRAFFIC_ALLOWED_UNSPECIFIED`. Possible values are: `INGRESS_TRAFFIC_ALLOWED_UNSPECIFIED`, `INGRESS_TRAFFIC_ALLOWED_ALL`, `INGRESS_TRAFFIC_ALLOWED_INTERNAL_ONLY`, `INGRESS_TRAFFIC_ALLOWED_INTERNAL_AND_LB`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "Controls whether external/public traffic is allowed. Allowing all traffic creates unnecessary risk.",
+          "rationale": "Ingress should be restricted to internal or load balancer traffic for production systems.",
+          "compliant": "INGRESS_TRAFFIC_ALLOWED_INTERNAL_ONLY or INGRESS_TRAFFIC_ALLOWED_INTERNAL_AND_LB.",
+          "non-compliant": "INGRESS_TRAFFIC_ALLOWED_ALL for sensitive applications.",
           "parent": "network_settings"
         }
       }
@@ -34,10 +34,10 @@
     "project": {
       "description": "If it is not provided, the provider project is used.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Ensures network restrictions are tied to the correct project context. Mis-targeting may leave services unprotected.",
+      "rationale": "Explicitly define the project to avoid accidental inheritance or misapplication of rules.",
+      "compliant": "project = \"secure-project\"",
+      "non-compliant": "Relying on implicit provider project without validation.",
       "parent": null
     }
   }

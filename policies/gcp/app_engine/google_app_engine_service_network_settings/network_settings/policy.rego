@@ -1,0 +1,29 @@
+package terraform.gcp.security.app_engine.google_app_engine_service_network_settings.network_settings
+
+import data.terraform.gcp.helpers
+import data.terraform.gcp.security.app_engine.google_app_engine_service_network_settings.vars
+
+conditions := [
+  [
+    {
+      "situation_description": "App Engine service must restrict ingress traffic to internal only",
+      "remedies": [
+        "Set ingress_traffic_allowed to INGRESS_TRAFFIC_ALLOWED_INTERNAL_ONLY",
+        "Do not leave ingress_traffic_allowed unset",
+        "Review network requirements for this service"
+      ]
+    },
+    {
+      "condition": "Check if ingress_traffic_allowed is set and compliant",
+      "attribute_path": ["ingress_traffic_allowed"],
+      "resource_value_name": "service",
+      "values": ["INGRESS_TRAFFIC_ALLOWED_INTERNAL_ONLY"],
+      "policy_type": "whitelist"
+    }
+  ]
+]
+
+summary := helpers.get_multi_summary(conditions, vars.variables)
+
+message := summary.message
+details := summary.details

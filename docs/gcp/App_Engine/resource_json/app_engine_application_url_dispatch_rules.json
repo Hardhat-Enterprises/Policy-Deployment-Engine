@@ -3,51 +3,52 @@
   "subcategory": "App Engine",
   "arguments": {
     "dispatch_rules": {
-      "description": "Rules to match an HTTP request and dispatch that request to a service. Structure is [documented below](#nested_dispatch_rules).",
+      "description": "Rules to match an HTTP request and dispatch that request to a service.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Improperly configured dispatch rules can allow unintended routes or services to be exposed, potentially leading to unauthorized access.",
+      "rationale": "Dispatch rules should restrict access to approved domains and paths, ensuring sensitive endpoints are not left open.",
+      "compliant": "Dispatch rules explicitly define secure domains and service mappings (e.g., domain = example.com, path = /secure/*, service = secure-service).",
+      "non-compliant": "Dispatch rules allow wildcard domains without restrictions (e.g., domain = *, path = /*, service = default).",
       "parent": null,
       "arguments": {
         "domain": {
-          "description": "Domain name to match against. The wildcard \"*\" is supported if specified before a period: \"*.\". Defaults to matching all domains: \"*\".",
+          "description": "Domain name to match against. Wildcard `*` is supported if specified before a period: `*.`. Defaults to matching all domains: `*`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "Unrestricted domain rules (e.g., `*`) can allow unintended external access.",
+          "rationale": "Limit routing to trusted domains only.",
+          "compliant": "domain = secure.example.com or domain = *.trusted.org",
+          "non-compliant": "domain = * or overly broad wildcards.",
           "parent": "dispatch_rules"
         },
         "path": {
-          "description": "Pathname within the host. Must start with a \"/\". A single \"*\" can be included at the end of the path. The sum of the lengths of the domain and path may not exceed 100 characters.",
+          "description": "Pathname within the host. Must start with `/`. A single `*` can be included at the end of the path.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "Overly broad paths (like `/*`) may unintentionally route sensitive traffic.",
+          "rationale": "Paths should be restricted to only the required application routes.",
+          "compliant": "path = /api/* or path = /admin/*",
+          "non-compliant": "path = /* for all requests.",
           "parent": "dispatch_rules"
         },
         "service": {
-          "description": "Pathname within the host. Must start with a \"/\". A single \"*\" can be included at the end of the path. The sum of the lengths of the domain and path may not exceed 100 characters.",
+          "description": "The service that traffic should be dispatched to.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "Routing sensitive paths to the wrong service could lead to privilege escalation or exposure of internal services.",
+          "rationale": "Services should be explicitly mapped to only the paths they are intended to handle.",
+          "compliant": "service = secure-service for /admin/*",
+          "non-compliant": "service = default for sensitive paths without access controls.",
           "parent": "dispatch_rules"
         }
       }
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "required": false,
+      "security_impact": "Using the wrong project could cause configs to apply in the wrong environment, exposing apps unintentionally.",
+      "rationale": "Always enforce correct project scoping for dispatch rules.",
+      "compliant": "Project ID explicitly set to the intended environment.",
+      "non-compliant": "Project left unset or referencing unintended project.",
       "parent": null
     }
-  }
+  },
+  "notes": "Full enforcement of App Engine dispatch rules was not possible with the current OPA helpers. Path + domain validation logic requires extended pattern matching support."
 }
