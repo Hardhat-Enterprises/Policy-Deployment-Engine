@@ -1,7 +1,7 @@
 package terraform.gcp.security.bigquery_connection.google_bigquery_connection.cloud_sql.database
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.bigquery_connection.google_bigquery_connection.vars
-
+#
 conditions := [
   [
     {

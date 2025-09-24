@@ -1,7 +1,7 @@
 package terraform.gcp.security.bigquery_connection.google_bigquery_connection.spark.dataproc_cluster
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.bigquery_connection.google_bigquery_connection.vars
-
+#
 conditions := [[
   {
     "situation_description": "Require Spark History Server cluster to be approved",
