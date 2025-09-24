@@ -126,42 +126,44 @@ empty_message(value) := msg if {
 	msg = ""
 }
 
-#Checks a value sits between a given range of a passed object with keys upper_bound and lower_bound
+# ---------------------------------------------------
+# #Checks a value sits between a given range of a passed object with keys upper_bound and lower_bound
+# ---------------------------------------------------
 
-test_value_range(range_values, value) if {
-	test_lower_range(range_values, value)
-	test_upper_range(range_values, value)
-}
+# test_value_range(range_values, value) if {
+#     test_lower_range(range_values, value)
+#     test_upper_range(range_values, value)
+# }
 
-test_lower_range(range_values, value) if {
-	# Check value exists
-	not is_null(range_values.lower_bound)
-	value >= range_values.lower_bound
-}
+# test_lower_range(range_values, value) if {
+#     # Check value exists
+#     not is_null(range_values.lower_bound)
+#     value >= range_values.lower_bound
+# }
 
-# Null indicates no lower bound
-test_lower_range(range_values, value) if {
-	is_null(range_values.lower_bound)
-}
+# # Null indicates no lower bound
+# test_lower_range(range_values, value) if {
+#     is_null(range_values.lower_bound)
+# }
 
-test_upper_range(range_values, value) if {
-	# Check value exists
-	not is_null(range_values.upper_bound)
-	value <= range_values.upper_bound
-}
+# test_upper_range(range_values, value) if {
+#     # Check value exists
+#     not is_null(range_values.upper_bound)
+#     value <= range_values.upper_bound
+# }
 
-# Null indicates no higher bound
-test_upper_range(range_values, value) if {
-	is_null(range_values.upper_bound)
-}
+# # Null indicates no higher bound
+# test_upper_range(range_values, value) if {
+#     is_null(range_values.upper_bound)
+# }
 
-is_null_or_number(value) if {
-	is_null(value) # true if value is null
-}
+# is_null_or_number(value) if {
+#     is_null(value) # true if value is null
+# }
 
-is_null_or_number(value) if {
-	type_name(value) == "number" # true if value is a number
-}
+# is_null_or_number(value) if {
+#     type_name(value) == "number" # true if value is a number
+# }
 
 # Search an array of objects for a specific key, return the value
 get_value_from_array(arr, key) := value if {
@@ -345,7 +347,20 @@ intersection_all(sets) := result if {
 # 1. A method that formats the error message to be displayed for a non-compliant value
 # 2. A method that obtains non-complaint resources
 # 3. A method that calls method to obtain nc resources and for each calls the format method
-
+# ---------------------------------------------------
+# Format a human-friendly range validation message
+# Called with:
+#   format_range_validation_message(friendly_name, resource_name, path, nc_value, empty_msg, range_values)
+# where range_values is {"lower_bound": <num|null>, "upper_bound": <num|null>}
+# ---------------------------------------------------
+format_range_validation_message(friendly_name, resource_name, path, nc_value, empty_msg, range_values) = msg if {
+    lower := get_lower_bound(range_values)
+    upper := get_upper_bound(range_values)
+    msg := sprintf(
+        "%s '%s' has '%s' set to '%v'%s. Allowed range: [%v - %v]",
+        [friendly_name, resource_name, path, nc_value, empty_msg, lower, upper]
+    )
+}
 # Blacklist methods
 
 get_blacklisted_resources(resource_type, attribute_path, blacklisted_values) = resources if {
@@ -454,7 +469,7 @@ get_nc_range_resources(resource_type, attribute_path, range_values) := resources
 		resource_type_match(resource, resource_type)
 
 		# Test array of array and deeply nested values
-		not test_value_range(range_values, to_number(object.get(resource.values, attribute_path, null)))
+		#not test_value_range(range_values, to_number(object.get(resource.values, attribute_path, null)))
 	]
 }
 
@@ -473,8 +488,8 @@ get_range_violations(resource_type, attribute_path, range_values, friendly_resou
 }
 
 format_range_input(lower, upper) := range_values if {
-	is_null_or_number(lower)
-	is_null_or_number(upper)
+	#is_null_or_number(lower)
+	#is_null_or_number(upper)
 	range_values := {"lower_bound": lower, "upper_bound": upper}
 }
 
@@ -577,3 +592,6 @@ format_pattern_whitelist_message(friendly_resource_name, resource_value_name, at
         [friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, allowed_values]
     ) 
 }
+
+
+
