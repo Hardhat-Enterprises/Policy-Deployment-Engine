@@ -1,8 +1,8 @@
 resource "google_memorystore_instance" "c" {
   project = "test-project"
-  instance_id = "full-instance"
+  instance_id = "basic-instance"
   shard_count = 1
-  location = "us-centrail1"
+  location = "us-central1"
   authorization_mode = "AUTH_MODE_IAM_AUTH"
 }
 # resource "google_memorystore_instance" "c" {
