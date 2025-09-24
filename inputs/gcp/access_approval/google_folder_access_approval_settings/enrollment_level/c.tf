@@ -4,11 +4,11 @@ resource "google_folder" "c" {
   deletion_protection = false
 }
 
-resource "google_folder_access_approval_settings" "c_folder_access_approval" {
-  folder_id = google_folder.c.folder_id
+resource "google_folder_access_approval_settings" "c" {
+  folder_id = "c"
 
   enrolled_services {
     cloud_product    = "none"
-    enrollment_level = ""
+    enrollment_level = "BLOCK_ALL"
   }
 }

@@ -1,4 +1,6 @@
 package terraform.gcp.helpers
+import future.keywords.in
+import future.keywords.every
 # tested on OPA Version: 1.2.0, Rego Version: v1
 
 # Defines the types of policies capable of being processed
@@ -10,12 +12,22 @@ policy_types := ["blacklist", "whitelist", "range", "pattern blacklist", "patter
 
 # Get resource's name; if not in values, take default "name". Checked!
 get_resource_name(this_nc_resource, value_name) = resource_name if {
-    this_nc_resource.values[value_name] 
+    this_nc_resource.values[value_name]
     resource_name := this_nc_resource.values[value_name]
 } else = resource_name if {
     resource_name := this_nc_resource[value_name]
 } else = null if {
-    print(sprintf("Resource name for '%s' was not found! Your 'resource_value_name' in vars is wrong. Try 'resource_value_name': 'name'.", [this_nc_resource.type]))
+    true
+}
+
+# Handle empty array blacklisting specifically
+array_contains(arr, elem, pol) if {
+    pol == "blacklist"
+    is_array(elem)
+    count(elem) == 0
+    some i
+    is_array(arr[i])
+    count(arr[i]) == 0
 }
 
 # if elem is an array; checks if elem contains any blacklisted items. e.g., elem=[w, r, a], arr=[a] -> true
