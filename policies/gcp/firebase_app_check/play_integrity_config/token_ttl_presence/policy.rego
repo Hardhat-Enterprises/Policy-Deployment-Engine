@@ -1,7 +1,7 @@
 package terraform.gcp.security.firebase_app_check.play_integrity_config.token_ttl_presence
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.firebase_app_check.play_integrity_config.vars
+import data.terraform.gcp.security.firebase_app_check.vars
 
 conditions := [
     [
