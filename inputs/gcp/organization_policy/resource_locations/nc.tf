@@ -1,11 +1,11 @@
-resource "google_org_policy_policy" "bad" {
-  name   = "projects/123456789/policies/gcp.resourceLocations"
-  parent = "projects/123456789"
+resource "google_org_policy_policy" "nc" {
+  name   = "projects/123/policies/gcp.resourceLocations"
+  parent = var.parent
 
   spec {
     rules {
       values {
-        allowed_values = ["in:asia-southeast1"] # 🚨 not allowed
+        allowed_values = ["europe-west1"]
       }
     }
   }

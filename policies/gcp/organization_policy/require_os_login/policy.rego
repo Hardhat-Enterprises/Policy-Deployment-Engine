@@ -1,26 +1,22 @@
 package terraform.gcp.security.organization_policy.require_os_login
 
+import data.terraform.gcp.helpers
 import data.terraform.gcp.security.organization_policy.vars
 
-default details := []
-default message := []
+conditions := [
+  [
+    {
+      "situation_description": "OS Login must be enforced to use IAM for SSH access",
+      "remedies": ["Set enforce = true for compute.requireOsLogin"]
+    },
+    {
+      "condition": "Check if enforce is true",
+      "attribute_path": ["spec", 0, "rules", 0, "enforce"],
+      "values": [true],
+      "policy_type": "whitelist"
+    }
+  ]
+]
 
-oslogin_disabled[d] if {
-  rc := input.resource_changes[_]
-  rc.type == vars.variables.resource_type
-  endswith(rc.change.after.name, "compute.requireOsLogin")
-
-  some i
-  rule := rc.change.after.spec.rules[i]
-  not rule.enforce
-
-  d := {
-    "resource_address": rc.address,
-    "attribute": "spec.rules.enforce",
-    "why": "OS Login must be enforced for secure IAM-based SSH"
-  }
-}
-
-details := [d | d := oslogin_disabled[_]]
-
-message := ["OS Login org policy must enforce true"] if { count(details) > 0 }
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

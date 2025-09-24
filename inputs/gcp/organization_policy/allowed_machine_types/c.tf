@@ -1,11 +1,11 @@
-resource "google_org_policy_policy" "ok" {
-  name   = "projects/123456789/policies/compute.allowedMachineTypes"
-  parent = "projects/123456789"
+resource "google_org_policy_policy" "c" {
+  name   = "projects/123/policies/compute.allowedMachineTypes"
+  parent = var.parent
 
   spec {
     rules {
       values {
-        allowed_values = ["n1-standard-1", "n1-standard-2"]
+        allowed_values = ["n1-standard-4", "e2-medium"] 
       }
     }
   }

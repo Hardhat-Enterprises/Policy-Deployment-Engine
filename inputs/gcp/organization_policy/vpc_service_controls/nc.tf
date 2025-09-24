@@ -1,13 +1,10 @@
-resource "google_org_policy_policy" "bad" {
-  name   = "organizations/123456789/policies/gcp.vpcServiceControls"
-  parent = "organizations/123456789"
+resource "google_org_policy_policy" "nc" {
+  name   = "projects/123/policies/accessPolicies.restrictVpcServiceControls"
+  parent = var.parent
 
-  # not restricting to VPC-SC
   spec {
     rules {
-      values {
-        allowed_values = ["anyLocation"]
-      }
+      enforce = false
     }
   }
 }

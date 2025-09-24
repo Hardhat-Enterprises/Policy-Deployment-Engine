@@ -1,6 +1,6 @@
-resource "google_org_policy_policy" "ok" {
-  name   = "projects/123456789/policies/compute.requireShieldedVm"
-  parent = "projects/123456789"
+resource "google_org_policy_policy" "c" {
+  name   = "projects/123/policies/compute.requireShieldedVm"
+  parent = var.parent
 
   spec {
     rules {

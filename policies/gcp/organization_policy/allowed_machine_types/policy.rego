@@ -1,29 +1,23 @@
 package terraform.gcp.security.organization_policy.allowed_machine_types
 
-import data.terraform.gcp.security.organization_policy.vars
+import data.terraform.gcp.helpers
+import data.terraform.gcp.security.organization_policy.allowed_machine_types.vars
 
-default details := []
-default message := []
+# Policy: only allow approved machine types
+conditions := [
+  [
+    {
+      "situation_description": "Only approved machine types should be allowed by organization policy",
+      "remedies": ["Restrict allowed_values to approved list, e.g., n1-standard-4, e2-medium"]
+    },
+    {
+      "condition": "Check if allowed_values are restricted to approved types",
+      "attribute_path": ["spec", 0, "rules", 0, "values", 0, "allowed_values"],
+      "values": ["n1-standard-4", "e2-medium"],
+      "policy_type": "whitelist"
+    }
+  ]
+]
 
-too_large_instance[d] if {
-  rc := input.resource_changes[_]
-  rc.type == vars.variables.resource_type
-  endswith(rc.change.after.name, "compute.allowedMachineTypes")
-
-  some i
-  rule := rc.change.after.spec.rules[i]
-
-  some j
-  val := rule.values.allowed_values[j]
-  startswith(val, "n1-ultramem")
-
-  d := {
-    "resource_address": rc.address,
-    "attribute": "spec.rules.values.allowed_values",
-    "why": sprintf("Machine type '%s' is not allowed (too large/expensive)", [val])
-  }
-}
-
-details := [d | d := too_large_instance[_]]
-
-message := ["Org policy must restrict large machine types"] if { count(details) > 0 }
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

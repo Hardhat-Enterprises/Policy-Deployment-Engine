@@ -1,6 +1,8 @@
-resource "google_org_policy_policy" "bad" {
-  name   = "organizations/123456789/policies/compute.disableNestedVirtualization"
-  parent = "organizations/123456789"
+
+
+resource "google_org_policy_policy" "nc" {
+  name   = "projects/123/policies/compute.disableNestedVirtualization"
+  parent = var.parent
 
   spec {
     rules {

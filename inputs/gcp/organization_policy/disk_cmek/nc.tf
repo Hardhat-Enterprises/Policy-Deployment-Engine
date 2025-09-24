@@ -1,8 +1,10 @@
-resource "google_org_policy_policy" "bad" {
-  name   = "organizations/123456789/policies/compute.requireCmekForDiskCreation"
-  parent = "organizations/123456789"
+resource "google_org_policy_policy" "nc" {
+  name   = "projects/123/policies/compute.requireCmekForDisk"
+  parent = var.parent
 
-  boolean_policy {
-    enforced = false
+  spec {
+    rules {
+      enforce = false
+    }
   }
 }

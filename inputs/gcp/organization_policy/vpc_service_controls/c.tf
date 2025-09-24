@@ -1,13 +1,10 @@
-resource "google_org_policy_policy" "ok" {
-  name   = "organizations/123456789/policies/gcp.vpcServiceControls"
-  parent = "organizations/123456789"
+resource "google_org_policy_policy" "c" {
+  name   = "projects/123/policies/accessPolicies.restrictVpcServiceControls"
+  parent = var.parent
 
-  # representation may vary by provider version; using spec.rules here
   spec {
     rules {
-      values {
-        allowed_values = ["inVpcServiceControls"]
-      }
+      enforce = true
     }
   }
 }

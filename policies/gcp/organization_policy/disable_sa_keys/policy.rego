@@ -1,27 +1,22 @@
 package terraform.gcp.security.organization_policy.disable_sa_keys
 
+import data.terraform.gcp.helpers
 import data.terraform.gcp.security.organization_policy.vars
 
-default details := []
-default message := []
+conditions := [
+  [
+    {
+      "situation_description": "Service Account key creation must be disabled",
+      "remedies": ["Set enforce = true for iam.disableServiceAccountKeyCreation"]
+    },
+    {
+      "condition": "Check if enforce is true",
+      "attribute_path": ["spec", 0, "rules", 0, "enforce"],
+      "values": [true],
+      "policy_type": "whitelist"
+    }
+  ]
+]
 
-sa_keys_enabled[d] if {
-  rc := input.resource_changes[_]
-  rc.type == vars.variables.resource_type
-  endswith(rc.change.after.name, "iam.disableServiceAccountKeyCreation")
-
-  some i
-  rule := rc.change.after.spec.rules[i]
-  not rule.enforce
-
-  d := {
-    "resource_address": rc.address,
-    "attribute": "spec.rules.enforce",
-    "why": "Service account key creation must be disabled to prevent unmanaged keys"
-  }
-}
-
-details := [d | d := sa_keys_enabled[_]]
-
-message := ["Org policy must disable service account key creation"] if { count(details) > 0 }
-
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

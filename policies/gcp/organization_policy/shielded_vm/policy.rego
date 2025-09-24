@@ -1,26 +1,22 @@
-package terraform.gcp.security.orgpolicy.shielded_vm
+package terraform.gcp.security.organization_policy.shielded_vm
 
-import data.terraform.gcp.security.orgpolicy.vars
+import data.terraform.gcp.helpers
+import data.terraform.gcp.security.organization_policy.vars
 
-default details := []
-default message := []
+conditions := [
+  [
+    {
+      "situation_description": "Shielded VM must be enabled for stronger security",
+      "remedies": ["Set enforce = true for compute.requireShieldedVm"]
+    },
+    {
+      "condition": "Check if enforce is true",
+      "attribute_path": ["spec", 0, "rules", 0, "enforce"],
+      "values": [true],
+      "policy_type": "whitelist"
+    }
+  ]
+]
 
-not_enforced[d] if {
-  rc := input.resource_changes[_]
-  rc.type == vars.variables.resource_type
-  endswith(rc.change.after.name, "compute.requireShieldedVm")
-
-  some i
-  rule := rc.change.after.spec.rules[i]
-  not rule.enforce
-
-  d := {
-    "resource_address": rc.address,
-    "attribute": "spec.rules.enforce",
-    "why": "Shielded VM must be enforced"
-  }
-}
-
-details := [d | d := not_enforced[_]]
-
-message := ["Shielded VM org policy must enforce true"] if { count(details) > 0 }
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details
