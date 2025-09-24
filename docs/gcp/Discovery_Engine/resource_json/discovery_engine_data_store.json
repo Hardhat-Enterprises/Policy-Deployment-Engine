@@ -5,8 +5,8 @@
     "display_name": {
       "description": "The display name of the data store. This field must be a UTF-8 encoded string with a length limit of 128 characters.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Just the name",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,35 +14,35 @@
     "industry_vertical": {
       "description": "The industry vertical that the data store registers. Possible values are: `GENERIC`, `MEDIA`, `HEALTHCARE_FHIR`.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Should be set to Generic or whatever is required, Generic is default though",
+      "compliant": "GENERIC",
+      "non-compliant": "HEALTHCARE_FHIR",
       "parent": null
     },
     "content_config": {
       "description": "The content config of the data store. Possible values are: `NO_CONTENT`, `CONTENT_REQUIRED`, `PUBLIC_WEBSITE`.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Needed to make sure private info isnt getting leaked",
+      "compliant": "CONTENT_REQUIRED",
+      "non-compliant": "PUBLIC_WEBSITE",
       "parent": null
     },
     "location": {
       "description": "The geographic location where the data store should reside. The value can only be one of \"global\", \"us\" and \"eu\".",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Data store and processing laws affect location",
+      "compliant": "eu",
+      "non-compliant": "us",
       "parent": null
     },
     "data_store_id": {
       "description": "The unique id of the data store.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "ID",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -50,8 +50,8 @@
     "solution_types": {
       "description": "The solutions that the data store enrolls. Each value may be one of: `SOLUTION_TYPE_RECOMMENDATION`, `SOLUTION_TYPE_SEARCH`, `SOLUTION_TYPE_CHAT`, `SOLUTION_TYPE_GENERATIVE_CHAT`.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Logistics",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -59,8 +59,8 @@
     "advanced_site_search_config": {
       "description": "Configuration data for advance site search. Structure is [documented below](#nested_advanced_site_search_config).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Logistic issue",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -88,17 +88,17 @@
     "kms_key_name": {
       "description": "KMS key resource name which will be used to encrypt resources: `/{project}/locations/{location}/keyRings/{keyRing}/cryptoKeys/{keyId}` The KMS key to be used to protect this DataStore at creation time. Must be set for requests that need to comply with CMEK Org Policy protections. If this field is set and processed successfully, the DataStore will be protected by the KMS key, as indicated in the cmek_config field.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Encryption",
+      "compliant": "ValidKey",
+      "non-compliant": "InvalidKey",
       "parent": null
     },
     "document_processing_config": {
       "description": "Configuration for Document understanding and enrichment. Structure is [documented below](#nested_document_processing_config).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "Use Native Text can make private info public if not set up correctly",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -144,7 +144,7 @@
     "create_advanced_site_search": {
       "description": "If true, an advanced data store for site search will be created. If the data store is not configured as site search (GENERIC vertical and PUBLIC_WEBSITE contentConfig), this flag will be ignored.",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -153,7 +153,7 @@
     "skip_default_schema_creation": {
       "description": "A boolean flag indicating whether to skip the default schema creation for the data store. Only enable this flag if you are certain that the default schema is incompatible with your use case. If set to true, you must manually create a schema for the data store before any documents can be ingested. This flag cannot be specified if `data_store.starting_schema` is specified.",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -161,8 +161,8 @@
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
+      "required": true,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -267,10 +267,10 @@
         "use_native_text": {
           "description": "If true, will use native text instead of OCR text on pages containing native text.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "can make private info public if set to false",
+          "compliant": true,
+          "non-compliant": false,
           "parent": "ocr_parsing_config"
         }
       }
