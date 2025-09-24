@@ -15,7 +15,7 @@ conditions := [[
         "condition": "kms_key must be a valid CMEK path",
         "attribute_path": ["rewrite_object", 0, "kms_key"],
         "policy_type": "pattern whitelist",
-        "values": ["^projects/[^/]+/locations/[^/]+/keyRings/[^/]+/cryptoKeys/[^/]+$"]
+        "values": ["projects/*/locations/*/keyRings/*/cryptoKeys/*", [["test-project", "my-project", "example"], ["us-central1", "us-east1", "europe-west1"], ["test-keyring", "my-keyring", "example-keyring"], ["test-key", "my-key", "example-key"]]]
     }
 ]]
 
