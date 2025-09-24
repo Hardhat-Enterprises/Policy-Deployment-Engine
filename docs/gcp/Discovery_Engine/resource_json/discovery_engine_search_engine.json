@@ -1,0 +1,118 @@
+{
+  "resource_name": "discovery_engine_search_engine",
+  "subcategory": "Discovery Engine",
+  "arguments": {
+    "display_name": {
+      "description": "Required. The display name of the engine. Should be human readable. UTF-8 encoded string with limit of 1024 characters.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Name",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "data_store_ids": {
+      "description": "The data stores associated with this engine. For SOLUTION_TYPE_SEARCH type of engines, they can only associate with at most one data store.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "ID",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "search_engine_config": {
+      "description": "Configurations for a Search Engine. Structure is [documented below](#nested_search_engine_config).",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Logistics",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "search_tier": {
+          "description": "The search feature tier of this engine. Defaults to SearchTier.SEARCH_TIER_STANDARD if not specified. Default value is `SEARCH_TIER_STANDARD`. Possible values are: `SEARCH_TIER_STANDARD`, `SEARCH_TIER_ENTERPRISE`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "search_engine_config"
+        },
+        "search_add_ons": {
+          "description": "The add-on that this search engine enables. Each value may be one of: `SEARCH_ADD_ON_LLM`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "search_engine_config"
+        }
+      }
+    },
+    "engine_id": {
+      "description": "Unique ID to use for Search Engine App.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "IDs",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "collection_id": {
+      "description": "The collection ID.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "IDs",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "location": {
+      "description": "Location.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Location affects data laws and regulations",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "industry_vertical": {
+      "description": "The industry vertical that the engine registers. The restriction of the Engine industry vertical is based on DataStore: If unspecified, default to GENERIC. Vertical on Engine has to match vertical of the DataStore liniked to the engine. Default value is `GENERIC`. Possible values are: `GENERIC`, `MEDIA`, `HEALTHCARE_FHIR`.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Needs to be set to the correct type",
+      "compliant": "GENERIC",
+      "non-compliant": "HEALTHCARE_FHIR",
+      "parent": null
+    },
+    "common_config": {
+      "description": "Common config spec that specifies the metadata of the engine. Structure is [documented below](#nested_common_config).",
+      "required": false,
+      "security_impact": false,
+      "rationale": "logistics",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "company_name": {
+          "description": "The name of the company, business or entity that is associated with the engine. Setting this may help improve LLM related features.cd",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "common_config"
+        }
+      }
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Needed to work",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    }
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "resource_name": "discovery_engine_chat_engine",
+  "subcategory": "Discovery Engine",
+  "arguments": {
+    "display_name": {
+      "description": "The display name of the engine. Should be human readable. UTF-8 encoded string with limit of 1024 characters.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Just the displayed name",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "data_store_ids": {
+      "description": "The data stores associated with this engine. Multiple DataStores in the same Collection can be associated here. All listed DataStores must be `SOLUTION_TYPE_CHAT`.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Where the chat engine gets its data",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "chat_engine_config": {
+        "description": "Configurations for a chat Engine. Structure is [documented below](#nested_chat_engine_config).",
+        "required": true,
+        "security_impact": true,
+        "rationale": "The internal configurations of this block can change, though some are security related",
+        "compliant": null,
+        "non-compliant": null,
+        "parent": null,
+        "arguments": {
+            "agent_creation_config": {
+                "description": "The configuration to generate the Dialogflow agent that is associated to this Engine. Exactly one of `agent_creation_config` or `dialogflow_agent_to_link` must be set. Structure is [documented below](#nested_chat_engine_config_agent_creation_config).",
+                "required": false,
+                "security_impact": true,
+                "rationale": "linking to other agents can be a risk",
+                "compliant": false,
+                "non-compliant":true,
+                "parent": "chat_engine_config"
+            },
+            "dialogflow_agent_to_link": {
+                "description": "The resource name of an existing Dialogflow agent to link to this Chat Engine. Format: `projects/<Project_ID>/locations/<Location_ID>/agents/<Agent_ID>`. Exactly one of `agent_creation_config` or `dialogflow_agent_to_link` must be set.",
+                "required": false,
+                "security_impact": false,
+                "rationale": null,
+                "compliant": null,
+                "non-compliant": null,
+                "parent": "chat_engine_config"
+            },
+            "allow_cross_region": {
+                "description": "If the flag set to true, we allow the agent and engine are in different locations, otherwise the agent and engine are required to be in the same location. The flag is set to false by default. Note that the `allow_cross_region` are one-time consumed by and passed to EngineService.CreateEngine. It means they cannot be retrieved using EngineService.GetEngine or EngineService.ListEngines API after engine creation.",
+                "required": false,
+                "security_impact": true,
+                "rationale": "data residency laws",
+                "compliant": "false",
+                "non-compliant": "true",
+                "parent": "chat_engine_config"
+            }
+        }
+    },
+    "engine_id": {
+      "description": "The ID to use for chat engine.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "the ID is just the ID",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "collection_id": {
+      "description": "The collection ID.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "the ID is just the ID",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "location": {
+      "description": "Location.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Data residency laws exist, eu has strongest avaliable for the service.",
+      "compliant": "eu",
+      "non-compliant": "us",
+      "parent": null
+    },
+    "industry_vertical": {
+      "description": "The industry vertical that the chat engine registers. Vertical on Engine has to match vertical of the DataStore linked to the engine. Default value is `GENERIC`. Possible values are: `GENERIC`.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "generic is the only option",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "common_config": {
+      "description": "Common config spec that specifies the metadata of the engine. Structure is [documented below](#nested_common_config).",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Basic additional support for LLM that is optional and not that important",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "company_name": {
+          "description": "The name of the company, business or entity that is associated with the engine. Setting this may help improve LLM related features.",
+          "required": false,
+          "security_impact": false,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "common_config"
+        }
+      }
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Is just the project ID",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "agent_creation_config": {
+      "description": "",
+      "required": false,
+      "security_impact": false,
+      "rationale": "This happens in the backgroud",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "business": {
+          "description": "Name of the company, organization or other entity that the agent represents. Used for knowledge connector LLM prompt and for knowledge search.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "agent_creation_config"
+        },
+        "default_language_code": {
+          "description": "The default language of the agent as a language tag. See [Language Support](https://cloud.google.com/dialogflow/docs/reference/language) for a list of the currently supported language codes.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "agent_creation_config"
+        },
+        "time_zone": {
+          "description": "The time zone of the agent from the [time zone database](https://www.iana.org/time-zones), e.g., America/New_York, Europe/Paris.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "agent_creation_config"
+        },
+        "location": {
+          "description": "Agent location for Agent creation, currently supported values: global/us/eu, it needs to be the same region as the Chat Engine.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "agent_creation_config"
+        }
+      }
+    }
+  }
+}
