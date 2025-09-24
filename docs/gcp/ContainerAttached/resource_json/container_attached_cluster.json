@@ -3,19 +3,19 @@
   "subcategory": "ContainerAttached",
   "arguments": {
     "location": {
-      "description": "The location for the resource",
+      "description": "The location of the cluster. This field is required and it must be either a zone or a region. For example, `us-central1-a`.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "The location is required to identify where the cluster is deployed. But for some use cases, the location may not have a direct security impact.",
+      "compliant": "australia-southeast1, australia-southeast2",
+      "non-compliant": "us-central1, europe-west1",
       "parent": null
     },
     "name": {
-      "description": "The name of this resource.",
+      "description": "The name of this resource which cannot be changed after creation. The name must be unique within the project and location. The name must be 1-63 characters long, and match the regular expression `[a-z0-9]([-a-z0-9]*[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The name is required to uniquely identify the cluster resource.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -23,8 +23,8 @@
     "oidc_config": {
       "description": "OIDC discovery information of the target cluster. Kubernetes Service Account (KSA) tokens are JWT tokens signed by the cluster API server. This fields indicates how GCP services validate KSA tokens in order to allow system workloads (such as GKE Connect and telemetry agents) to authenticate back to GCP. Both clusters with public and private issuer URLs are supported. Clusters with public issuers only need to specify the `issuer_url` field while clusters with private issuers need to provide both `issuer_url` and `jwks`. Structure is [documented below](#nested_oidc_config).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "The OIDC configuration is critical for ensuring that Kubernetes Service Account tokens are properly validated, which is essential for securing access to GCP resources.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -32,17 +32,17 @@
         "issuer_url": {
           "description": "A JSON Web Token (JWT) issuer URI. `issuer` must start with `https://`",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "The issuer URL is essential for validating the authenticity of Kubernetes Service Account tokens.",
+          "compliant": "https://oidc.issuer.url",
+          "non-compliant": "jdkfhgjsdf, example.com/issuer",
           "parent": "oidc_config"
         },
         "jwks": {
           "description": "OIDC verification keys in JWKS format (RFC 7517).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The jwks field is optional and is only required for clusters with private issuers. It provides the necessary keys for validating tokens but does not directly impact security if not provided.",
           "compliant": null,
           "non-compliant": null,
           "parent": "oidc_config"
@@ -52,8 +52,8 @@
     "platform_version": {
       "description": "The platform version for the cluster (e.g. `1.23.0-gke.1`).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The platform version is required to ensure compatibility and support for the cluster, but it may not have a direct security impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -61,26 +61,26 @@
     "distribution": {
       "description": "The Kubernetes distribution of the underlying attached cluster. Supported values: \"eks\", \"aks\", \"generic\". The generic distribution provides the ability to register or migrate any CNCF conformant cluster.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "The distribution field is important for understanding the underlying architecture of the cluster and ensuring compatibility with GCP services.",
+      "compliant": "aks, eks, generic",
+      "non-compliant": "gke, gkeonprem",
       "parent": null
     },
     "fleet": {
       "description": "Fleet configuration. Structure is [documented below](#nested_fleet).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "This fleet configuration is necessary for registering the cluster with the Fleet service, but it does not have a direct security impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
       "arguments": {
         "membership": {
           "description": "(Output) The name of the managed Hub Membership resource associated to this cluster. Membership names are formatted as projects/<project-number>/locations/global/membership/<cluster-id>.",
-          "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "required": false,
+          "security_impact": false,
+          "rationale": "This field is optional and is only required for clusters with private issuers. It provides the necessary keys for validating tokens but does not directly impact security if not provided.",
           "compliant": null,
           "non-compliant": null,
           "parent": "fleet"
@@ -88,8 +88,8 @@
         "project": {
           "description": "The number of the Fleet host project where this cluster will be registered.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The project field is required to specify the project under which the cluster will be managed.",
           "compliant": null,
           "non-compliant": null,
           "parent": "fleet"
@@ -99,8 +99,8 @@
     "description": {
       "description": "A human readable description of this attached cluster. Cannot be longer than 255 UTF-8 encoded bytes.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The description is optional and is primarily for user convenience. It does not have a direct security impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -108,8 +108,8 @@
     "annotations": {
       "description": "Optional. Annotations on the cluster. This field has the same restrictions as Kubernetes annotations. The total size of all keys and values combined is limited to 256k. Key can have 2 segments: prefix (optional) and name (required), separated by a slash (/). Prefix must be a DNS subdomain. Name must be 63 characters or less, begin and end with alphanumerics, with dashes (-), underscores (_), dots (.), and alphanumerics between. **Note**: This field is non-authoritative, and will only manage the annotations present in your configuration. Please refer to the field `effective_annotations` for all of the annotations present on the resource.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The annotation is simply a key-value pair for storing arbitrary metadata about the cluster. It does not have a direct security impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -117,8 +117,8 @@
     "logging_config": {
       "description": "Logging configuration. Structure is [documented below](#nested_logging_config).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The logging configuration of this is used to manage the logging behavior of the cluster.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -126,8 +126,8 @@
         "component_config": {
           "description": "The configuration of the logging components Structure is [documented below](#nested_logging_config_component_config).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The component configuration is optional and is used to specify which logging components should be enabled. It does not have a direct security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "logging_config"
@@ -137,8 +137,8 @@
     "authorization": {
       "description": "Configuration related to the cluster RBAC settings. Structure is [documented below](#nested_authorization).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The authorization settings are important for managing access to the cluster, but the fields within this block are optional and do not have a direct security impact unless configured.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -146,8 +146,8 @@
         "admin_users": {
           "description": "Users that can perform operations as a cluster admin. A managed ClusterRoleBinding will be created to grant the `cluster-admin` ClusterRole to the users. Up to ten admin users can be provided. For more info on RBAC, see https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The admin users field is optional and does not have a direct security impact unless configured.",
           "compliant": null,
           "non-compliant": null,
           "parent": "authorization"
@@ -155,8 +155,8 @@
         "admin_groups": {
           "description": "Groups that can perform operations as a cluster admin. A managed ClusterRoleBinding will be created to grant the `cluster-admin` ClusterRole to the groups. Up to ten admin groups can be provided. For more info on RBAC, see https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The admin groups field is used to specify which groups should have cluster admin access. It does not have a direct security impact unless configured.",
           "compliant": null,
           "non-compliant": null,
           "parent": "authorization"
@@ -166,8 +166,8 @@
     "monitoring_config": {
       "description": "Monitoring configuration. Structure is [documented below](#nested_monitoring_config).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The monitoring configuration is used to manage the monitoring behavior of the cluster.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -175,8 +175,8 @@
         "managed_prometheus_config": {
           "description": "Enable Google Cloud Managed Service for Prometheus in the cluster. Structure is [documented below](#nested_monitoring_config_managed_prometheus_config).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The managed Prometheus configuration is used to enable Google Cloud's managed Prometheus service for the cluster.",
           "compliant": null,
           "non-compliant": null,
           "parent": "monitoring_config"
@@ -186,8 +186,8 @@
     "binary_authorization": {
       "description": "Binary Authorization configuration. Structure is [documented below](#nested_binary_authorization).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The Binary Authorization configuration is used to manage the deployment of container images in the cluster.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -195,8 +195,8 @@
         "evaluation_mode": {
           "description": "Configure Binary Authorization evaluation mode. Possible values are: `DISABLED`, `PROJECT_SINGLETON_POLICY_ENFORCE`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The evaluation mode determines how Binary Authorization policies are enforced in the cluster.",
           "compliant": null,
           "non-compliant": null,
           "parent": "binary_authorization"
@@ -206,8 +206,8 @@
     "proxy_config": {
       "description": "Support for proxy configuration. Structure is [documented below](#nested_proxy_config).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The proxy configuration is optional and is used to specify a proxy for the cluster to use when communicating with GCP services. It does not have a direct security impact unless configured.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -215,8 +215,8 @@
         "kubernetes_secret": {
           "description": "The Kubernetes Secret resource that contains the HTTP(S) proxy configuration. Structure is [documented below](#nested_proxy_config_kubernetes_secret).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The Kubernetes Secret is used to store sensitive information, such as the proxy credentials, securely.",
           "compliant": null,
           "non-compliant": null,
           "parent": "proxy_config"
@@ -226,8 +226,8 @@
     "security_posture_config": {
       "description": ", Deprecated) Enable/Disable Security Posture API features for the cluster. Structure is [documented below](#nested_security_posture_config). ~> **Warning:** `security_posture_config` is deprecated and will be removed in a future major release.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "The Security Posture API features are used to enhance the security posture of the cluster.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -235,8 +235,8 @@
         "vulnerability_mode": {
           "description": "Sets the mode of the Kubernetes security posture API's workload vulnerability scanning. Possible values are: `VULNERABILITY_DISABLED`, `VULNERABILITY_ENTERPRISE`.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "The vulnerability mode determines how workload vulnerability scanning is performed in the cluster.",
           "compliant": null,
           "non-compliant": null,
           "parent": "security_posture_config"
@@ -245,27 +245,27 @@
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "The project of this resource. If not specified, the provider project is used by default.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "deletion_policy": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "The deletion policy of the cluster. Possible values are: `ABANDON`, `DELETE`. If `ABANDON` is chosen, the cluster will not be deleted and will continue to exist as an unmanaged resource in the GKE Hub. If `DELETE` is chosen, the cluster resource will be deleted together with the GKE Hub membership. Default value: `DELETE`.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "The deletion policy determines what happens to the cluster when it is deleted.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "component_config": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "The components configuration for the cluster logging. Structure is [documented below](#nested_logging_config_component_config).",
+      "required": false,
+      "security_impact": false,
+      "rationale": "The components configuration is used to specify which components should be logged.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -273,8 +273,8 @@
         "enable_components": {
           "description": "The components to be enabled. Each value may be one of: `SYSTEM_COMPONENTS`, `WORKLOADS`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The components to be enabled for logging. This field is optional and does not have a direct security impact unless configured.",
           "compliant": null,
           "non-compliant": null,
           "parent": "component_config"
@@ -282,10 +282,10 @@
       }
     },
     "managed_prometheus_config": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "The managed prometheus configuration for the cluster monitoring. Structure is [documented below](#nested_monitoring_config_managed_prometheus_config).",
+      "required": false,
+      "security_impact": false,
+      "rationale": "The managed prometheus configuration is used to specify how prometheus is managed for the cluster.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -293,8 +293,8 @@
         "enabled": {
           "description": "Enable Managed Collection.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Enabling managed collection allows the cluster to use Google Cloud's managed Prometheus service.",
           "compliant": null,
           "non-compliant": null,
           "parent": "managed_prometheus_config"
@@ -302,10 +302,10 @@
       }
     },
     "kubernetes_secret": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "The kubernetes secret configuration for the proxy config. Structure is [documented below](#nested_proxy_config_kubernetes_secret).",
+      "required": false,
+      "security_impact": false,
+      "rationale": "The kubernetes secret configuration is used to specify the secret containing the proxy config.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -313,8 +313,8 @@
         "name": {
           "description": "Name of the kubernetes secret containing the proxy config.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The name of the kubernetes secret is used to identify the secret containing the proxy config.",
           "compliant": null,
           "non-compliant": null,
           "parent": "kubernetes_secret"
@@ -322,8 +322,8 @@
         "namespace": {
           "description": "Namespace of the kubernetes secret containing the proxy config.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The namespace of the kubernetes secret is used to identify the location of the secret containing the proxy config.",
           "compliant": null,
           "non-compliant": null,
           "parent": "kubernetes_secret"
