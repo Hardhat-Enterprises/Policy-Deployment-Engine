@@ -7,16 +7,14 @@ conditions := [
 
   # Situation 1 – Whitelist subnets using pattern-based path
   [
-    {
-      "situation_description": "Kafka clusters should use private subnets for better security.",
-      "remedies": ["Ensure the subnet follows project/region/subnetwork/* pattern for private networking."]
+    { "situation_description": "Kafka clusters should not use public IPs; private networking must be enabled for better security.", 
+    "remedies": ["Set subnet inside network_configs to a private subnet."] 
     },
-    {
-      "condition": "network_configs.subnet must match private path",
-      "attribute_path": ["gcp_config", "access_config", "network_configs", 0, "subnet"],
-      "values": ["regex:^projects/.*/regions/.*/subnetworks/.*$"],
-      "policy_type": "whitelist"
-    }
+    { "condition": "network_configs.subnet must be defined", 
+    "attribute_path": ["gcp_config", "access_config", "network_configs", 0, "subnet"],
+     "values": [""], 
+     "policy_type": "whitelist"
+    } 
   ],
 
   # Situation 2 – Whitelist for vCPU minimum
@@ -28,8 +26,9 @@ conditions := [
     {
       "condition": "vcpu_count >= 2",
       "attribute_path": ["capacity_config", "vcpu_count"],
-      "values": ["range:2:*"],
-      "policy_type": "whitelist"
+      "values": [2, null],
+      "policy_type": "range"
+
     }
   ],
 
@@ -42,8 +41,9 @@ conditions := [
     {
       "condition": "memory_bytes >= 2147483648",
       "attribute_path": ["capacity_config", "memory_bytes"],
-      "values": ["range:2147483648:*"],
-      "policy_type": "whitelist"
+      "values": [2147483648, null],
+      "policy_type": "range"
+
     }
   ]
 ]
