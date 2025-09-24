@@ -35,7 +35,7 @@ conditions := [
             "projects/*/regions/*/subnetworks/private-*",
             "projects/*/regions/*/subnetworks/subnet-*"
         ],
-        "policy_type": "pattern_whitelist"
+        "policy_type": "whitelist" 
         }
     ]
 ]
