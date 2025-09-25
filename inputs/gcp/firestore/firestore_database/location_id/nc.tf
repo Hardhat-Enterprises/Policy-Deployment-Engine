@@ -1,5 +1,5 @@
 resource "google_firestore_database" "nc" {
-  project                           = "abcd_1234"
+  project                           = "nc"
   name                              = "nc"
   location_id                       = ""
   type                              = "FIRESTORE_NATIVE"

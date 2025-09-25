@@ -1,6 +1,5 @@
 resource "google_firestore_document" "c" {
-  project      = "abcd1234"
-  database     = "(default)"
+  project      = "c"
   collection   = "my_collection"
   document_id  = "example_doc"
   fields      = jsonencode([

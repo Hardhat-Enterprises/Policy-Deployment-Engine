@@ -6,15 +6,15 @@ import data.terraform.gcp.security.firestore.firestore_document.vars
 conditions := [
     [
         {
-            "situation_description": "Firestore documents must reside in project 'abcd_1234' to comply with organizational project governance.",
+            "situation_description": "Firestore documents must reside in project 'c' to comply with organizational project governance.",
             "remedies": [
-                "Set `project = 'abcd_1234'` in the google_firestore_document resource block."
+                "Set `project = 'c'` in the google_firestore_document resource block."
             ]
         },
         {
-            "condition": "Checks if project is abcd_1234",
+            "condition": "Checks if project is c",
             "attribute_path": ["project"],
-            "values": ["abcd_1234"],
+            "values": ["c"],
             "policy_type": "whitelist"
         }
     ]
