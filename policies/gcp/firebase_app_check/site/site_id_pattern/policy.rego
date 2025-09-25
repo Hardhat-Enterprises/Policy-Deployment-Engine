@@ -8,13 +8,14 @@ conditions := [
         {
             "situation_description": "Firebase Hosting Site ID does not follow the required pattern (lowercase alphanumeric and hyphens only).",
             "remedies": [
-                "Ensure the site_id consists of only lowercase letters, numbers, and hyphens."
+                "Ensure the site_id is in the format: app-env-region (e.g., myapp-prod-us).",
+                "Allowed apps: myapp, webapp. Environments: prod, dev, test. Regions: us, eu, asia."
             ]
         },
         {
-            "condition": "Check if site_id matches the pattern",
+            "condition": "Check if site_id matches allowed pattern",
             "attribute_path": ["site_id"],
-            "values": ["*", [["^[a-z0-9-]+$"]]],
+            "values": ["*-*-*", [["myapp", "webapp"]], [["prod", "dev", "test"]], [["us", "eu", "asia"]]],
             "policy_type": "pattern whitelist"
         }
     ]
