@@ -1,0 +1,467 @@
+{
+  "resource_name": "clouddeploy_automation",
+  "subcategory": "Cloud Deploy",
+  "arguments": {
+    "name": {
+      "description": "Name of the `Automation`.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Display name has no impact on the security of the resource or data contained.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "service_account": {
+      "description": "Required. Email address of the user-managed IAM service account that creates Cloud Deploy release and rollout resources.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Controls the identity that executes automation. Improper service accounts can lead to privilege escalation or excessive permissions. ",
+      "compliant": "dedicated-automation-sa@my-project.iam.gserviceaccount.com",
+      "non-compliant": "generic-sa@my-project.iam.gserviceaccount.com",
+      "parent": null
+    },
+    "selector": {
+      "description": "Required. Selected resources to which the automation will be applied. Structure is [documented below](#nested_selector).",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Defines the scope of targets the automation applies to (e.g., specific targets or all targets). The security of actions on those targets is governed by the service_account's permissions, not the selection itself.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "targets": {
+          "description": "Contains attributes about a target. Structure is [documented below](#nested_selector_targets).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "selector"
+        }
+      }
+    },
+    "rules": {
+      "description": "Required. List of Automation rules associated with the Automation resource. Must have at least one rule and limited to 250 rules per Delivery Pipeline. Note: the order of the rules here is not the same as the order of execution. Structure is [documented below](#nested_rules).",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Rules define the automation's behavior and logic but do not, by themselves, grant permissions or change access controls. The security of the actions they trigger is governed by the service account's IAM permissions and the 'suspended' state.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "promote_release_rule": {
+          "description": "Optional. `PromoteReleaseRule` will automatically promote a release from the current target to a specified target. Structure is [documented below](#nested_rules_rules_promote_release_rule).",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Defines the conditions for a promotion but cannot execute it without the permissions granted to the service_account. The security impact is contingent on that principal's rights.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        },
+        "advance_rollout_rule": {
+          "description": "Optional. The `AdvanceRolloutRule` will automatically advance a successful Rollout. Structure is [documented below](#nested_rules_rules_advance_rollout_rule).",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Defines the conditions for advancing a rollout but cannot execute it without the permissions granted to the service_account. The security impact is contingent on that principal's rights",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        },
+        "repair_rollout_rule": {
+          "description": "Optional. The RepairRolloutRule will automatically repair a failed rollout. Structure is [documented below](#nested_rules_rules_repair_rollout_rule).",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Defines the conditions and actions for repairing a rollout but cannot execute them without the permissions granted to the service_account. The security impact is contingent on that principal's rights.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        },
+        "timed_promote_release_rule": {
+          "description": "Optional. The `TimedPromoteReleaseRule` will automatically promote a release from the current target(s) to the specified target(s) on a configured schedule. Structure is [documented below](#nested_rules_rules_timed_promote_release_rule).",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Defines a schedule for automatic promotions but cannot execute them without the permissions granted to the service_account. The security impact is contingent on that principal's rights.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        }
+      }
+    },
+    "location": {
+      "description": "The location for the resource",
+      "required": true,
+      "security_impact": false,
+      "rationale": "A geographical identifier (e.g., 'us-central1') for data residency. It does not confer any access rights or security capabilities.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "delivery_pipeline": {
+      "description": "The delivery_pipeline for the resource",
+      "required": true,
+      "security_impact": false,
+      "rationale": "A reference to an existing pipeline resource. This is an identifier and does not alter the security posture; access to the pipeline is controlled by its own IAM policies.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "Optional. Description of the `Automation`. Max length is 255 characters.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Purely descriptive metadata for human readability. Has no functional impact on the automation's execution or permissions.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "annotations": {
+      "description": "Optional. User annotations. These attributes can only be set and used by the user, and not by Cloud Deploy. Annotations must meet the following constraints: * Annotations are key/value pairs. * Valid annotation keys have two segments: an optional prefix and name, separated by a slash (`/`). * The name segment is required and must be 63 characters or less, beginning and ending with an alphanumeric character (`[a-z0-9A-Z]`) with dashes (`-`), underscores (`_`), dots (`.`), and alphanumerics between. * The prefix is optional. If specified, the prefix must be a DNS subdomain: a series of DNS labels separated by dots(`.`), not longer than 253 characters in total, followed by a slash (`/`). See https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/#syntax-and-character-set for more details. **Note**: This field is non-authoritative, and will only manage the annotations present in your configuration. Please refer to the field `effective_annotations` for all of the annotations present on the resource.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Key-value pairs for user-defined metadata. While they could be misused to store sensitive data (which is a bad practice), the annotations themselves do not affect the permissions or execution logic of the Cloud Deploy service.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "labels": {
+      "description": "Optional. Labels are attributes that can be set and used by both the user and by Cloud Deploy. Labels must meet the following constraints: * Keys and values can contain only lowercase letters, numeric characters, underscores, and dashes. * All characters must use UTF-8 encoding, and international characters are allowed. * Keys must start with a lowercase letter or international character. * Each resource is limited to a maximum of 64 labels. Both keys and values are additionally constrained to be <= 63 characters. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Used for organizing and filtering resources. Like annotations, they should not contain secrets but are not used for authorization decisions and have no security impact on the automation's function.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "suspended": {
+      "description": "Optional. When Suspended, automation is deactivated from execution.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "This is a master on/off switch for the automation. If set to 'false' or not set, the automation will run according to its rules. If set to 'true' incorrectly, it can disrupt deployment processes. If left 'false' when it should be disabled, it can cause unintended automatic deployments.",
+      "compliant": false,
+      "non-compliant": true,
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "An identifier for resource placement and billing. The project itself has security boundaries (IAM policies, etc.), but this argument simply points to it and does not alter those boundaries.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "targets": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "id": {
+          "description": "ID of the `Target`. The value of this field could be one of the following: * The last segment of a target name. It only needs the ID to determine which target is being referred to * \"*\", all targets in a location.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Specifies which target(s) to act upon. Using \"*\" broadens scope but does not grant new permissions; the service_account must already have access to all targets for any action to succeed.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "targets"
+        },
+        "labels": {
+          "description": "Target labels.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Used to select targets based on metadata labels. This is a filtering operation and does not bypass IAM checks performed against the service_account when actions are executed on those targets.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "targets"
+        }
+      }
+    },
+    "promote_release_rule": {
+      "description": "Optional. PromoteReleaseRule will automatically promote a release from the current target to a specified target. Structure is documented below.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Defines the conditions for a promotion but cannot execute it without the permissions granted to the service_account. The security impact is contingent on that principal's rights.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "id": {
+          "description": "Required. ID of the rule. This id must be unique in the `Automation` resource to which this rule belongs. The format is `a-z{0,62}`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "promote_release_rule"
+        },
+        "wait": {
+          "description": "Optional. How long the release need to be paused until being promoted to the next target.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "promote_release_rule"
+        },
+        "destination_target_id": {
+          "description": "Optional. The ID of the stage in the pipeline to which this `Release` is deploying. If unspecified, default it to the next stage in the promotion flow. The value of this field could be one of the following: * The last segment of a target name. It only needs the ID to determine if the target is one of the stages in the promotion sequence defined in the pipeline. * \"@next\", the next target in the promotion sequence.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "promote_release_rule"
+        },
+        "destination_phase": {
+          "description": "Optional. The starting phase of the rollout created by this operation. Default to the first phase.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "promote_release_rule"
+        }
+      }
+    },
+    "advance_rollout_rule": {
+      "description": "Optional. The AdvanceRolloutRule will automatically advance a successful Rollout. ",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Defines the conditions for advancing a rollout but cannot execute it without the permissions granted to the service_account. The security impact is contingent on that principal's rights.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "id": {
+          "description": "Required. ID of the rule. This id must be unique in the `Automation` resource to which this rule belongs. The format is `a-z{0,62}`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "advance_rollout_rule"
+        },
+        "wait": {
+          "description": "Optional. How long to wait after a rollout is finished.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "advance_rollout_rule"
+        },
+        "source_phases": {
+          "description": "Optional. Proceeds only after phase name matched any one in the list. This value must consist of lower-case letters, numbers, and hyphens, start with a letter and end with a letter or a number, and have a max length of 63 characters. In other words, it must match the following regex: `^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "advance_rollout_rule"
+        }
+      }
+    },
+    "repair_rollout_rule": {
+      "description": "Optional. The `RepairRolloutRule` will automatically repair a failed rollout.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Defines the conditions and actions for repairing a rollout but cannot execute them without the permissions granted to the service_account. The security impact is contingent on that principal's rights.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "id": {
+          "description": "Required. ID of the rule. This id must be unique in the `Automation` resource to which this rule belongs. The format is `a-z{0,62}`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "repair_rollout_rule"
+        },
+        "phases": {
+          "description": "Optional. Phases within which jobs are subject to automatic repair actions on failure. Proceeds only after phase name matched any one in the list, or for all phases if unspecified. This value must consist of lower-case letters, numbers, and hyphens, start with a letter and end with a letter or a number, and have a max length of 63 characters. In other words, it must match the following regex: ^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "repair_rollout_rule"
+        },
+        "jobs": {
+          "description": "Optional. Jobs to repair. Proceeds only after job name matched any one in the list, or for all jobs if unspecified or empty. The phase that includes the job must match the phase ID specified in sourcePhase. This value must consist of lower-case letters, numbers, and hyphens, start with a letter and end with a letter or a number, and have a max length of 63 characters. In other words, it must match the following regex: ^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "repair_rollout_rule"
+        },
+        "repair_phases": {
+          "description": "Optional. Proceeds only after phase name matched any one in the list. This value must consist of lower-case letters, numbers, and hyphens, start with a letter and end with a letter or a number, and have a max length of 63 characters. In other words, it must match the following regex: `^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$`. Structure is [documented below](#nested_rules_rules_repair_rollout_rule_repair_phases).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "repair_rollout_rule"
+        }
+      }
+    },
+    "repair_phases": {
+      "description": "Proceeds only after phase name matched any one in the list. This value must consist of lower-case letters, numbers, and hyphens, start with a letter and end with a letter or a number, and have a max length of 63 characters. In other words, it must match the following regex: `^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$`. Structure is [documented below](#nested_rules_rules_repair_rollout_rule_repair_phases).",
+      "required": false,
+      "security_impact": false,
+      "rationale": "A container block that defines one or more repair strategies (e.g., retry, rollback). The choice of strategy is an operational decision on 'how' to fix a failure. The ability to actually perform the retry or rollback action is solely determined by the service_account's permissions.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "retry": {
+          "description": "Optional. Retries a failed job. Structure is [documented below](#nested_rules_rules_repair_rollout_rule_repair_phases_repair_phases_retry).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "repair_phases"
+        },
+        "rollback": {
+          "description": "Optional. Rolls back a Rollout. Structure is [documented below](#nested_rules_rules_repair_rollout_rule_repair_phases_repair_phases_rollback).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "repair_phases"
+        }
+      }
+    },
+    "retry": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "attempts": {
+          "description": "Required. Total number of retries. Retry is skipped if set to 0; The minimum value is 1, and the maximum value is 10.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "retry"
+        },
+        "wait": {
+          "description": "Optional. How long to wait for the first retry. Default is 0, and the maximum value is 14d. A duration in seconds with up to nine fractional digits, ending with 's'. Example: `3.5s`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "retry"
+        },
+        "backoff_mode": {
+          "description": "Optional. The pattern of how wait time will be increased. Default is linear. Backoff mode will be ignored if wait is 0. Possible values are: `BACKOFF_MODE_UNSPECIFIED`, `BACKOFF_MODE_LINEAR`, `BACKOFF_MODE_EXPONENTIAL`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "retry"
+        }
+      }
+    },
+    "rollback": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "destination_phase": {
+          "description": "Optional. The starting phase ID for the Rollout. If unspecified, the Rollout will start in the stable phase.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rollback"
+        },
+        "disable_rollback_if_rollout_pending": {
+          "description": "Optional. If pending rollout exists on the target, the rollback operation will be aborted.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rollback"
+        }
+      }
+    },
+    "timed_promote_release_rule": {
+      "description": "Optional. The `TimedPromoteReleaseRule` will automatically promote a release from the current target(s) to the specified target(s) on a configured schedule.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Defines a schedule for automatic promotions but cannot execute them without the permissions granted to the service_account. The security impact is contingent on that principal's rights.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "id": {
+          "description": "Required. ID of the rule. This id must be unique in the `Automation` resource to which this rule belongs. The format is `a-z{0,62}`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "timed_promote_release_rule"
+        },
+        "destination_target_id": {
+          "description": "Optional. The ID of the stage in the pipeline to which this Release is deploying. If unspecified, default it to the next stage in the promotion flow. The value of this field could be one of the following: - The last segment of a target name - \"@next\", the next target in the promotion sequence\"",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "timed_promote_release_rule"
+        },
+        "schedule": {
+          "description": "Required. Schedule in crontab format. e.g. `0 9 * * 1` for every Monday at 9am.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "timed_promote_release_rule"
+        },
+        "time_zone": {
+          "description": "Required. The time zone in IANA format IANA Time Zone Database (e.g. America/New_York).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "timed_promote_release_rule"
+        },
+        "destination_phase": {
+          "description": "Optional. The starting phase of the rollout created by this rule. Default to the first phase.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "timed_promote_release_rule"
+        }
+      }
+    }
+  }
+}

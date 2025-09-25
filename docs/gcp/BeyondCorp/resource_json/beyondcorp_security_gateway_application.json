@@ -1,0 +1,140 @@
+{
+  "resource_name": "beyondcorp_security_gateway_application",
+  "subcategory": "BeyondCorp",
+  "arguments": {
+    "endpoint_matchers": {
+      "description": "Required. Endpoint matchers associated with an application. A combination of hostname and ports as endpoint matcher is used to match the application. Match conditions for OR logic. An array of match conditions to allow for multiple matching criteria. The rule is considered a match if one the conditions are met. The conditions can be one of the following combination (Hostname), (Hostname & Ports) EXAMPLES: Hostname - (\"*.abc.com\"), (\"xyz.abc.com\") Hostname and Ports - (\"abc.com\" and \"22\"), (\"abc.com\" and \"22,33\") etc Structure is [documented below](#nested_endpoint_matchers).",
+      "required": true,
+      "security_impact": true,
+      "rationale": "This is to ensure that only authorized applications can be accessed through the Security Gateway.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "hostname": {
+          "description": "Required. Hostname of the application.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "This needs to be specified to ensure proper routing and access control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "endpoint_matchers"
+        },
+        "ports": {
+          "description": "Optional. Ports of the application.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Specifying the ports is crucial for ensuring that only the intended traffic is allowed through the Security Gateway.",
+          "compliant": "443, 8443",
+          "non-compliant": "80, 8080",
+          "parent": "endpoint_matchers"
+        }
+      }
+    },
+    "security_gateway_id": {
+      "description": "ID of the Security Gateway resource this belongs to.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Security through the Security Gateway is a core part of BeyondCorp, and associating applications with a specific gateway is essential for proper access control and routing.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "application_id": {
+      "description": "User-settable Application resource ID. * Must start with a letter. * Must contain between 4-63 characters from `/a-z-/`. * Must end with a number or letter.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "This id corresponds to the 'resource name' of the Application and is used to uniquely identify it within the Security Gateway.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "display_name": {
+      "description": "Optional. An arbitrary user-provided name for the Application resource. Cannot exceed 64 characters.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "This is the name that will be displayed in the UI and can help administrators easily identify and manage the application.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "upstreams": {
+      "description": "Optional. List of which upstream resource(s) to forward traffic to. Structure is [documented below](#nested_upstreams).",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Specifying upstream resources is crucial for ensuring that traffic is properly routed and managed.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "egress_policy": {
+          "description": "Optional. Routing policy information. Structure is [documented below](#nested_upstreams_upstreams_egress_policy).",
+          "required": false,
+          "security_impact": false,
+          "rationale": "This attribute will define the region of the egress. This will help to ensure that traffic is routed in a secure manner and complies with data residency requirements.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "upstreams"
+        },
+        "network": {
+          "description": "Network to forward traffic to. Structure is [documented below](#nested_upstreams_upstreams_network).",
+          "required": false,
+          "security_impact": false,
+          "rationale": "The network name needs to be specified to ensure that traffic is forwarded to the correct destination within the organization's infrastructure.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "upstreams"
+        }
+      }
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "This field allows for the specification of a project ID, which can be useful for organizing resources and managing access control.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "egress_policy": {
+      "description": "Defines the egress traffic policy for the application. Structure is [documented below](#nested_upstreams_upstreams_egress_policy).",
+      "required": false,
+      "security_impact": true,
+      "rationale": "This policy is crucial for controlling the flow of egress traffic and ensuring compliance with organizational security requirements.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "regions": {
+          "description": "Required. List of regions where the application sends traffic to.",
+          "required": true,
+          "security_impact": true,
+          "rationale": "This attribute will define the regions where the application is allowed to send egress traffic.",
+          "compliant": "australia-southeast1, australia-southeast2",
+          "non-compliant": "us-west1, us-west2",
+          "parent": "egress_policy"
+        }
+      }
+    },
+    "network": {
+      "description": "This network must be in the same project as the BeyondCorp Security Gateway. Structure is [documented below](#nested_upstreams_upstreams_network).",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Specifying the correct network is essential for ensuring that traffic is routed properly and complies with organizational policies.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "name": {
+          "description": "Required. Network name is of the format: `projects/{project}/global/networks/{network}`",
+          "required": true,
+          "security_impact": true,
+          "rationale": "The network name needs to be specified to ensure that traffic is forwarded to the correct destination within the organization's infrastructure.",
+          "compliant": "projects/my-proj/global/networks/prod-vpc,projects/my-proj/global/networks/shared-services-vpc",
+          "non-compliant": "projects/my-proj/global/networks/test-vpc,projects/my-proj/global/networks/dev-vpc",
+          "parent": "network"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,190 @@
+{
+  "resource_name": "netapp_volume_replication",
+  "subcategory": "Google Cloud NetApp Volumes",
+  "arguments": {
+    "replication_schedule": {
+      "description": "Replication interval.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Controls RPO to meet policy (e.g., ≥ hourly).",
+      "compliant": "EVERY_10_MINUTES",
+      "non-compliant": "DAILY",
+      "parent": null
+    },
+    "location": {
+      "description": "Region of the replication resource (destination volume’s region).",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Keeps replicas within approved regions.",
+      "compliant": "australia-southeast2",
+      "non-compliant": "us-central1",
+      "parent": null
+    },
+    "volume_name": {
+      "description": "The name of the existing source volume.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "name": {
+      "description": "The name of the replication. Needs to be unique per location.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "labels": {
+      "description": "Labels as key value pairs. Example: `{ \"owner\": \"Bob\", \"department\": \"finance\", \"purpose\": \"testing\" }` **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "destination_volume_parameters": {
+      "description": "Destination volume parameters. Structure is [documented below](#nested_destination_volume_parameters).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "storage_pool": {
+          "description": "Name of an existing storage pool for the destination volume with format: `projects/{{project}}/locations/{{location}}/storagePools/{{poolId}}`",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "destination_volume_parameters"
+        },
+        "volume_id": {
+          "description": "Name for the destination volume to be created. If not specified, the name of the source volume will be used.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "destination_volume_parameters"
+        },
+        "share_name": {
+          "description": "Share name for destination volume. If not specified, name of source volume's share name will be used.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "destination_volume_parameters"
+        },
+        "description": {
+          "description": "Description for the destination volume.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "destination_volume_parameters"
+        },
+        "tiering_policy": {
+          "description": "Tiering policy for the volume. Structure is [documented below](#nested_destination_volume_parameters_tiering_policy).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "destination_volume_parameters"
+        }
+      }
+    },
+    "description": {
+      "description": "An description of this resource.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "delete_destination_volume": {
+      "description": "under Terraform management unless you import it manually. If you delete the replication, this volume will remain. Setting this parameter to true will delete the *current* destination volume when destroying the replication. If you reversed the replication direction, this will be your former source volume! For production use, it is recommended to keep this parameter false to avoid accidental volume deletion. Handle with care. Default is false.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "replication_enabled": {
+      "description": "and act independently from the source volume. Set to true to enable/resume the mirror. WARNING: Resuming a mirror overwrites any changes done to the destination volume with the content of the source volume.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "force_stopping": {
+      "description": "currently receives an update and stopping the update might be undesirable. Set this parameter to true to stop anyway. All data transferred to the destination will be discarded and content of destination volume will remain at the state of the last successful update. Default is false.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "wait_for_mirror": {
+      "description": "for mirror_state to reach MIRRORED. If you want Terraform to wait for the mirror to finish on create/stop/resume operations, set this parameter to true. Default is false.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "tiering_policy": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "cooling_threshold_days": {
+          "description": "Optional. Time in days to mark the volume's data block as cold and make it eligible for tiering, can be range from 2-183. Default is 31.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "tiering_policy"
+        },
+        "tier_action": {
+          "description": "Optional. Flag indicating if the volume has tiering policy enable/pause. Default is PAUSED. Default value is `PAUSED`. Possible values are: `ENABLED`, `PAUSED`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "tiering_policy"
+        }
+      }
+    }
+  }
+}

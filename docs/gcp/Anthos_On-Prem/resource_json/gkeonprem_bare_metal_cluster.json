@@ -1,0 +1,1084 @@
+{
+  "resource_name": "gkeonprem_bare_metal_cluster",
+  "subcategory": "Anthos On-Prem",
+  "arguments": {
+    "admin_cluster_membership": {
+      "description": "The Admin Cluster this Bare Metal User Cluster belongs to. This is the full resource name of the Admin Cluster's hub membership.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "bare_metal_version": {
+      "description": "A human readable description of this Bare Metal User Cluster.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "network_config": {
+      "description": "Network configuration. Structure is [documented below](#nested_network_config).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "island_mode_cidr": {
+          "description": "A nested object resource. Structure is [documented below](#nested_network_config_island_mode_cidr).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "network_config"
+        },
+        "advanced_networking": {
+          "description": "Enables the use of advanced Anthos networking features, such as Bundled Load Balancing with BGP or the egress NAT gateway. Setting configuration for advanced networking features will automatically set this flag.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "network_config"
+        },
+        "multiple_network_interfaces_config": {
+          "description": "Configuration for multiple network interfaces. Structure is [documented below](#nested_network_config_multiple_network_interfaces_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "network_config"
+        },
+        "sr_iov_config": {
+          "description": "Configuration for SR-IOV. Structure is [documented below](#nested_network_config_sr_iov_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "network_config"
+        }
+      }
+    },
+    "control_plane": {
+      "description": "Specifies the control plane configuration. Structure is [documented below](#nested_control_plane).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "control_plane_node_pool_config": {
+          "description": "Configures the node pool running the control plane. If specified the corresponding NodePool will be created for the cluster's control plane. The NodePool will have the same name and namespace as the cluster. Structure is [documented below](#nested_control_plane_control_plane_node_pool_config).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "control_plane"
+        },
+        "api_server_args": {
+          "description": "Customizes the default API server args. Only a subset of customized flags are supported. Please refer to the API server documentation below to know the exact format: https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/ Structure is [documented below](#nested_control_plane_api_server_args).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "control_plane"
+        }
+      }
+    },
+    "load_balancer": {
+      "description": "Specifies the load balancer configuration. Structure is [documented below](#nested_load_balancer).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "vip_config": {
+          "description": "Specified the Bare Metal Load Balancer Config Structure is [documented below](#nested_load_balancer_vip_config).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "load_balancer"
+        },
+        "port_config": {
+          "description": "Specifies the load balancer ports. Structure is [documented below](#nested_load_balancer_port_config).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "load_balancer"
+        },
+        "metal_lb_config": {
+          "description": "A nested object resource. Structure is [documented below](#nested_load_balancer_metal_lb_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "load_balancer"
+        },
+        "manual_lb_config": {
+          "description": "A nested object resource. Structure is [documented below](#nested_load_balancer_manual_lb_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "load_balancer"
+        },
+        "bgp_lb_config": {
+          "description": "Configuration for BGP typed load balancers. Structure is [documented below](#nested_load_balancer_bgp_lb_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "load_balancer"
+        }
+      }
+    },
+    "storage": {
+      "description": "Specifies the cluster storage configuration. Structure is [documented below](#nested_storage).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "lvp_share_config": {
+          "description": "Specifies the config for local PersistentVolumes backed by subdirectories in a shared filesystem. These subdirectores are automatically created during cluster creation. Structure is [documented below](#nested_storage_lvp_share_config).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "storage"
+        },
+        "lvp_node_mounts_config": {
+          "description": "Specifies the config for local PersistentVolumes backed by mounted node disks. These disks need to be formatted and mounted by the user, which can be done before or after cluster creation. Structure is [documented below](#nested_storage_lvp_node_mounts_config).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "storage"
+        }
+      }
+    },
+    "name": {
+      "description": "The bare metal cluster name.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "location": {
+      "description": "The location of the resource.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "A human readable description of this Bare Metal User Cluster.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "annotations": {
+      "description": "Annotations on the Bare Metal User Cluster. This field has the same restrictions as Kubernetes annotations. The total size of all keys and values combined is limited to 256k. Key can have 2 segments: prefix (optional) and name (required), separated by a slash (/). Prefix must be a DNS subdomain. Name must be 63 characters or less, begin and end with alphanumerics, with dashes (-), underscores (_), dots (.), and alphanumerics between. **Note**: This field is non-authoritative, and will only manage the annotations present in your configuration. Please refer to the field `effective_annotations` for all of the annotations present on the resource.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "proxy": {
+      "description": "Specifies the cluster proxy configuration. Structure is [documented below](#nested_proxy).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "uri": {
+          "description": "Specifies the address of your proxy server. For example: http://domain WARNING: Do not provide credentials in the format of http://(username:password@)domain these will be rejected by the server.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "proxy"
+        },
+        "no_proxy": {
+          "description": "A list of IPs, hostnames, and domains that should skip the proxy. For example [\"127.0.0.1\", \"example.com\", \".corp\", \"localhost\"].",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "proxy"
+        }
+      }
+    },
+    "cluster_operations": {
+      "description": "Specifies the User Cluster's observability infrastructure. Structure is [documented below](#nested_cluster_operations).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enable_application_logs": {
+          "description": "Whether collection of application logs/metrics should be enabled (in addition to system logs/metrics).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cluster_operations"
+        }
+      }
+    },
+    "maintenance_config": {
+      "description": "Specifies the workload node configurations. Structure is [documented below](#nested_maintenance_config).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "maintenance_address_cidr_blocks": {
+          "description": "All IPv4 address from these ranges will be placed into maintenance mode. Nodes in maintenance mode will be cordoned and drained. When both of these are true, the \"baremetal.cluster.gke.io/maintenance\" annotation will be set on the node resource.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "maintenance_config"
+        }
+      }
+    },
+    "node_config": {
+      "description": "Specifies the workload node configurations. Structure is [documented below](#nested_node_config).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "max_pods_per_node": {
+          "description": "The maximum number of pods a node can run. The size of the CIDR range assigned to the node will be derived from this parameter.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        },
+        "container_runtime": {
+          "description": "The available runtimes that can be used to run containers in a Bare Metal User Cluster. Possible values are: `CONTAINER_RUNTIME_UNSPECIFIED`, `DOCKER`, `CONTAINERD`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_config"
+        }
+      }
+    },
+    "node_access_config": {
+      "description": "Specifies the node access related settings for the bare metal user cluster. Structure is [documented below](#nested_node_access_config).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "login_user": {
+          "description": "LoginUser is the user name used to access node machines. It defaults to \"root\" if not set.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_access_config"
+        }
+      }
+    },
+    "os_environment_config": {
+      "description": "OS environment related configurations. Structure is [documented below](#nested_os_environment_config).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "package_repo_excluded": {
+          "description": "Whether the package repo should not be included when initializing bare metal machines.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "os_environment_config"
+        }
+      }
+    },
+    "security_config": {
+      "description": "Specifies the security related settings for the Bare Metal User Cluster. Structure is [documented below](#nested_security_config).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "authorization": {
+          "description": "Configures user access to the Bare Metal User cluster. Structure is [documented below](#nested_security_config_authorization).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "security_config"
+        }
+      }
+    },
+    "binary_authorization": {
+      "description": "Binary Authorization related configurations. Structure is [documented below](#nested_binary_authorization).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "evaluation_mode": {
+          "description": "Mode of operation for binauthz policy evaluation. If unspecified, defaults to DISABLED. Possible values are: `DISABLED`, `PROJECT_SINGLETON_POLICY_ENFORCE`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "binary_authorization"
+        }
+      }
+    },
+    "upgrade_policy": {
+      "description": "The cluster upgrade policy. Structure is [documented below](#nested_upgrade_policy).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "policy": {
+          "description": "Specifies which upgrade policy to use. Possible values are: `SERIAL`, `CONCURRENT`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "upgrade_policy"
+        }
+      }
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "island_mode_cidr": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "service_address_cidr_blocks": {
+          "description": "All services in the cluster are assigned an RFC1918 IPv4 address from these ranges. This field cannot be changed after creation.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "island_mode_cidr"
+        },
+        "pod_address_cidr_blocks": {
+          "description": "All pods in the cluster are assigned an RFC1918 IPv4 address from these ranges. This field cannot be changed after creation.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "island_mode_cidr"
+        }
+      }
+    },
+    "multiple_network_interfaces_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enabled": {
+          "description": "Whether to enable multiple network interfaces for your pods. When set network_config.advanced_networking is automatically set to true.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "multiple_network_interfaces_config"
+        }
+      }
+    },
+    "sr_iov_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enabled": {
+          "description": "Whether to install the SR-IOV operator.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "sr_iov_config"
+        }
+      }
+    },
+    "control_plane_node_pool_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "node_pool_config": {
+          "description": "The generic configuration for a node pool running the control plane. Structure is [documented below](#nested_control_plane_control_plane_node_pool_config_node_pool_config).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "control_plane_node_pool_config"
+        }
+      }
+    },
+    "node_pool_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "node_configs": {
+          "description": "The list of machine addresses in the Bare Metal Node Pool. Structure is [documented below](#nested_load_balancer_bgp_lb_config_load_balancer_node_pool_config_node_pool_config_node_configs).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_pool_config"
+        },
+        "operating_system": {
+          "description": "Specifies the nodes operating system (default: LINUX).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_pool_config"
+        },
+        "taints": {
+          "description": "The initial taints assigned to nodes of this node pool. Structure is [documented below](#nested_load_balancer_bgp_lb_config_load_balancer_node_pool_config_node_pool_config_taints).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_pool_config"
+        },
+        "labels": {
+          "description": "The map of Kubernetes labels (key/value pairs) to be applied to each node. These will added in addition to any default label(s) that Kubernetes may apply to the node. In case of conflict in label keys, the applied set may differ depending on the Kubernetes version -- it's best to assume the behavior is undefined and conflicts should be avoided. For more information, including usage and the valid values, see: - http://kubernetes.io/v1.1/docs/user-guide/labels.html An object containing a list of \"key\": value pairs. For example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_pool_config"
+        },
+        "kubelet_config": {
+          "description": "The modifiable kubelet configurations for the baremetal machines. Structure is [documented below](#nested_load_balancer_bgp_lb_config_load_balancer_node_pool_config_node_pool_config_kubelet_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_pool_config"
+        }
+      }
+    },
+    "node_configs": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "node_ip": {
+          "description": "The default IPv4 address for SSH access and Kubernetes node. Example: 192.168.0.1",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_configs"
+        },
+        "labels": {
+          "description": "The map of Kubernetes labels (key/value pairs) to be applied to each node. These will added in addition to any default label(s) that Kubernetes may apply to the node. In case of conflict in label keys, the applied set may differ depending on the Kubernetes version -- it's best to assume the behavior is undefined and conflicts should be avoided. For more information, including usage and the valid values, see: - http://kubernetes.io/v1.1/docs/user-guide/labels.html An object containing a list of \"key\": value pairs. For example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_configs"
+        }
+      }
+    },
+    "taints": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "key": {
+          "description": "Key associated with the effect.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "taints"
+        },
+        "value": {
+          "description": "Value associated with the effect.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "taints"
+        },
+        "effect": {
+          "description": "Specifies the nodes operating system (default: LINUX). Possible values are: `EFFECT_UNSPECIFIED`, `PREFER_NO_SCHEDULE`, `NO_EXECUTE`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "taints"
+        }
+      }
+    },
+    "api_server_args": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "argument": {
+          "description": "The argument name as it appears on the API Server command line please make sure to remove the leading dashes.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "api_server_args"
+        },
+        "value": {
+          "description": "The value of the arg as it will be passed to the API Server command line.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "api_server_args"
+        }
+      }
+    },
+    "vip_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "control_plane_vip": {
+          "description": "The VIP which you previously set aside for the Kubernetes API of this Bare Metal User Cluster.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "vip_config"
+        },
+        "ingress_vip": {
+          "description": "The VIP which you previously set aside for ingress traffic into this Bare Metal User Cluster.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "vip_config"
+        }
+      }
+    },
+    "port_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "control_plane_load_balancer_port": {
+          "description": "The port that control plane hosted load balancers will listen on.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "port_config"
+        }
+      }
+    },
+    "metal_lb_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "address_pools": {
+          "description": "AddressPools is a list of non-overlapping IP pools used by load balancer typed services. All addresses must be routable to load balancer nodes. IngressVIP must be included in the pools. Structure is [documented below](#nested_load_balancer_metal_lb_config_address_pools).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "metal_lb_config"
+        },
+        "load_balancer_node_pool_config": {
+          "description": "Specifies the load balancer's node pool configuration. Structure is [documented below](#nested_load_balancer_metal_lb_config_load_balancer_node_pool_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "metal_lb_config"
+        }
+      }
+    },
+    "address_pools": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "pool": {
+          "description": "The name of the address pool.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "address_pools"
+        },
+        "addresses": {
+          "description": "The addresses that are part of this pool. Each address must be either in the CIDR form (1.2.3.0/24) or range form (1.2.3.1-1.2.3.5).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "address_pools"
+        },
+        "avoid_buggy_ips": {
+          "description": "If true, avoid using IPs ending in .0 or .255. This avoids buggy consumer devices mistakenly dropping IPv4 traffic for those special IP addresses.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "address_pools"
+        },
+        "manual_assign": {
+          "description": "If true, prevent IP addresses from being automatically assigned.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "address_pools"
+        }
+      }
+    },
+    "load_balancer_node_pool_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "node_pool_config": {
+          "description": "The generic configuration for a node pool running a load balancer. Structure is [documented below](#nested_load_balancer_bgp_lb_config_load_balancer_node_pool_config_node_pool_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "load_balancer_node_pool_config"
+        }
+      }
+    },
+    "manual_lb_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "enabled": {
+          "description": "Whether manual load balancing is enabled.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "manual_lb_config"
+        }
+      }
+    },
+    "bgp_lb_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "asn": {
+          "description": "BGP autonomous system number (ASN) of the cluster. This field can be updated after cluster creation.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "bgp_lb_config"
+        },
+        "bgp_peer_configs": {
+          "description": "The list of BGP peers that the cluster will connect to. At least one peer must be configured for each control plane node. Control plane nodes will connect to these peers to advertise the control plane VIP. The Services load balancer also uses these peers by default. This field can be updated after cluster creation. Structure is [documented below](#nested_load_balancer_bgp_lb_config_bgp_peer_configs).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "bgp_lb_config"
+        },
+        "address_pools": {
+          "description": "AddressPools is a list of non-overlapping IP pools used by load balancer typed services. All addresses must be routable to load balancer nodes. IngressVIP must be included in the pools. Structure is [documented below](#nested_load_balancer_bgp_lb_config_address_pools).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "bgp_lb_config"
+        },
+        "load_balancer_node_pool_config": {
+          "description": "Specifies the node pool running data plane load balancing. L2 connectivity is required among nodes in this pool. If missing, the control plane node pool is used for data plane load balancing. Structure is [documented below](#nested_load_balancer_bgp_lb_config_load_balancer_node_pool_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "bgp_lb_config"
+        }
+      }
+    },
+    "bgp_peer_configs": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "asn": {
+          "description": "BGP autonomous system number (ASN) for the network that contains the external peer device.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "bgp_peer_configs"
+        },
+        "ip_address": {
+          "description": "The IP address of the external peer device.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "bgp_peer_configs"
+        },
+        "control_plane_nodes": {
+          "description": "The IP address of the control plane node that connects to the external peer. If you don't specify any control plane nodes, all control plane nodes can connect to the external peer. If you specify one or more IP addresses, only the nodes specified participate in peering sessions.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "bgp_peer_configs"
+        }
+      }
+    },
+    "kubelet_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "registry_pull_qps": {
+          "description": "The limit of registry pulls per second. Setting this value to 0 means no limit. Updating this field may impact scalability by changing the amount of traffic produced by image pulls. Defaults to 5.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "kubelet_config"
+        },
+        "registry_burst": {
+          "description": "The maximum size of bursty pulls, temporarily allows pulls to burst to this number, while still not exceeding registry_pull_qps. The value must not be a negative number. Updating this field may impact scalability by changing the amount of traffic produced by image pulls. Defaults to 10.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "kubelet_config"
+        },
+        "serialize_image_pulls_disabled": {
+          "description": "Prevents the Kubelet from pulling multiple images at a time. We recommend *not* changing the default value on nodes that run docker daemon with version  < 1.9 or an Another Union File System (Aufs) storage backend. Issue https://github.com/kubernetes/kubernetes/issues/10959 has more details.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "kubelet_config"
+        }
+      }
+    },
+    "lvp_share_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "lvp_config": {
+          "description": "Defines the machine path and storage class for the LVP Share. Structure is [documented below](#nested_storage_lvp_share_config_lvp_config).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "lvp_share_config"
+        },
+        "shared_path_pv_count": {
+          "description": "The number of subdirectories to create under path.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "lvp_share_config"
+        }
+      }
+    },
+    "lvp_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "path": {
+          "description": "The host machine path.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "lvp_config"
+        },
+        "storage_class": {
+          "description": "The StorageClass name that PVs will be created with.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "lvp_config"
+        }
+      }
+    },
+    "lvp_node_mounts_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "path": {
+          "description": "The host machine path.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "lvp_node_mounts_config"
+        },
+        "storage_class": {
+          "description": "The StorageClass name that PVs will be created with.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "lvp_node_mounts_config"
+        }
+      }
+    },
+    "authorization": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "admin_users": {
+          "description": "Users that will be granted the cluster-admin role on the cluster, providing full access to the cluster. Structure is [documented below](#nested_security_config_authorization_admin_users).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "authorization"
+        }
+      }
+    },
+    "admin_users": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "username": {
+          "description": "The name of the user, e.g. `my-gcp-id@gmail.com`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "admin_users"
+        }
+      }
+    }
+  }
+}
