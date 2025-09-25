@@ -1,46 +1,36 @@
-package terraform.gcp.security.analytics_hub.data_exchange.naming_standard
+package terraform.gcp.security.cloud_vmware_engine.private_cloud.zonal_location
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.analytics_hub.data_exchange.vars
-
-# STEP 1: STUDY YOUR RESOURCE AND ITS ATTRIBUTES, THEN FILL IN THE VARS FILE
-# STEP 2: CREATE SCENARIOS (conditions to enforce naming standards)
+import data.terraform.gcp.security.cloud_vmware_engine.private_cloud.vars
 
 conditions := [
     [
         {
-            "situation_description": "Data Exchange display_name must start with the prefix 'de-'",
-            "remedies": [
-                "Rename the Data Exchange so that its display_name starts with 'de-'",
-                "Update your Terraform resource to include the correct prefix"
-            ]
+            "situation_description": "Cloud is within australia zone",
+            "remedies": ["Use Australian zones"]
         },
         {
-            "condition": "Check if display_name starts with the allowed prefix",
-            "attribute_path": ["display_name"],
-            "values": ["de-"],                # prefix check works with pattern whitelist
+            "condition": "c1 primary location is either between australia-southeast 1a,1b,1c or australia-southeast 2a,2b,2c",
+            "attribute_path": ["management_cluster", 0, "stretched_cluster_config", 0, "preferred_location"],
+            "values": ["projects/projectabc/locations/*".[["australia-southeast1-a", "australia-southeast1-b", "australia-southeast1-c",
+                                                        "australia-southeast2-a", "australia-southeast2-b", "australia-southeast2-c"]]],
             "policy_type": "pattern whitelist"
         }
     ],
     [
         {
-            "situation_description": "Data Exchange ID must only contain lowercase letters, numbers, or underscores",
-            "remedies": [
-                "Update the data_exchange_id to use only lowercase letters, numbers, and underscores",
-                "Avoid uppercase letters, spaces, or special characters"
-            ]
+            "situation_description": "c2 secondary location is either between australia-southeast 1a,1b,1c or australia-southeast 2a,2b,2c",
+            "remedies": ["Ensure secondary location is within Australian zones"]
         },
         {
-            "condition": "Check if data_exchange_id follows allowed naming convention",
-            "attribute_path": ["data_exchange_id"],
-            "values": ["^[a-z0-9_]+$"],       # full regex
-            "policy_type": "regex whitelist"  # ✅ changed from pattern whitelist → regex whitelist
+            "condition": "Check secondary location is in allowed Australian zones",
+            "attribute_path": ["management_cluster", 0, "stretched_cluster_config", 0, "secondary_location"],
+            "values": ["projects/projectabc/locations/*".[["australia-southeast1-a", "australia-southeast1-b", "australia-southeast1-c",
+                                                        "australia-southeast2-a", "australia-southeast2-b", "australia-southeast2-c"]]],
+            "policy_type": "pattern whitelist"
         }
     ]
 ]
 
-# Displays a general message about policy compliance
 message := helpers.get_multi_summary(conditions, vars.variables).message
-
-# Displays a detailed summary of each resource’s compliance to every condition
 details := helpers.get_multi_summary(conditions, vars.variables).details
