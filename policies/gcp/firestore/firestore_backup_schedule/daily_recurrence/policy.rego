@@ -14,7 +14,6 @@ conditions := [
         {
             "condition": "Checks if daily_recurrence block is present (non-empty list)",
             "attribute_path": ["daily_recurrence"],
-            # whitelist 里给一个通配符 [{}] 来匹配任意对象列表
             "values": [[{}]],
             "policy_type": "whitelist"
         }
@@ -23,7 +22,6 @@ conditions := [
 
 summary := helpers.get_multi_summary(conditions, vars.variables)
 
-#message := helpers.get_multi_summary(conditions, vars.variables).message
 message := [m] if {
     m := summary.message
 }

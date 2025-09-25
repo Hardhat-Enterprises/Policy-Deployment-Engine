@@ -1,5 +1,4 @@
 resource "google_firestore_document" "c" {
-  # name        = "c"
   project      = "abcd_1234"
   database     = "(default)"
   collection   = "my_collection"

@@ -3,7 +3,6 @@ package terraform.gcp.security.firestore_backup_schedule.retention
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.firestore.firestore_backup_schedule.vars
 
-# 只允许 retention >= 604800
 conditions := [
     [
         {
@@ -23,12 +22,5 @@ conditions := [
 
 summary := helpers.get_multi_summary(conditions, vars.variables)
 message := helpers.get_multi_summary(conditions, vars.variables).message
-#message := [m] if {
-#    m := summary.message
-#}
-#
-#message := ["All resources are compliant"] if {
-#    not summary.message
-#}
 details := helpers.get_multi_summary(conditions, vars.variables).details
 

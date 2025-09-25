@@ -1,13 +1,8 @@
 resource "google_firestore_database" "database_1" {
   project     = "my-project-name"
   name        = "database-id"
-  # location_id = "nam5"
-  # type        = "FIRESTORE_NATIVE"
   location_id = "us-central"
   type        = "FIRESTORE_NATIVE"
-
-  # delete_protection_state = "DELETE_PROTECTION_ENABLED"
-  # deletion_policy         = "DELETE"
 }
 
 resource "google_firestore_backup_schedule" "nc" {

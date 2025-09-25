@@ -12,18 +12,15 @@ conditions := [
             ]
         },
         {
-#            "condition": "Checks if weekly_recurrence block is present",
             "condition": "Checks if weekly_recurrence.day is MONDAY",
             "attribute_path": ["weekly_recurrence"],
-            "values": [ { "day": "MONDAY" } ], # 只接受 weekly_recurrence 块
+            "values": [ { "day": "MONDAY" } ],
             "policy_type": "whitelist"
-#            "policy_type": "existence"
         }
     ]
 ]
 summary := helpers.get_multi_summary(conditions, vars.variables)
 
-#message := helpers.get_multi_summary(conditions, vars.variables).message
 message := [m] if {
     m := summary.message
 }
