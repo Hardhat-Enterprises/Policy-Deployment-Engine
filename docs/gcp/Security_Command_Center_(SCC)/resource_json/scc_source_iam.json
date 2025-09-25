@@ -1,0 +1,42 @@
+{
+  "resource_name": "scc_source_iam_binding",
+  "subcategory": "Security Command Center (SCC)",
+  "arguments": {
+    "source": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "members": {
+      "description": "Identities that will be bound to the role. Supported formats include: allUsers, allAuthenticatedUsers, user:{emailid}, serviceAccount:{emailid}, group:{emailid}, domain:{domain}, projectOwner:{projectid}, projectEditor:{projectid}, projectViewer:{projectid}.",
+      "required": true,
+      "security_impact": "Overly permissive members (e.g., allUsers) can expose the SCC source to the public, leading to serious security risks.",
+      "rationale": "IAM bindings should be restricted to specific, trusted principals to avoid privilege escalation or data exposure.",
+      "compliant": "Members list contains only approved principals (e.g., specific users, groups, or service accounts).",
+      "non-compliant": "Members list includes public identities (e.g., allUsers, allAuthenticatedUsers) or unapproved principals.",
+      "parent": "source"
+    },
+    "role": {
+      "description": "The role assigned to members. Example: roles/viewer, roles/editor, roles/admin. Custom roles must follow the format [projects|organizations]/{parent-name}/roles/{role-name}.",
+      "required": true,
+      "security_impact": "Assigning overly privileged roles (e.g., owner, admin) can lead to unauthorized changes or data exposure.",
+      "rationale": "Restrict roles to the minimum required for SCC operations, following the principle of least privilege.",
+      "compliant": "Role is set to approved values such as Viewer, Editor, or Admin as per organizational policy.",
+      "non-compliant": "Role is set to Owner or other disallowed roles, granting excessive privileges.",
+      "parent": "source"
+    },
+    "policy_data": {
+      "description": "A `google_iam_policy` data source.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    }
+  }
+}

@@ -7,7 +7,7 @@ resource "google_vmwareengine_network" "network-policy-nw_nc" {
 
 resource "google_vmwareengine_network_policy" "nc" {
     location = "us-east1"
-    name = "sample-network-policy-nc"
+    name = "nc"
     edge_services_cidr = "192.168.30.0/26"
     vmware_engine_network = google_vmwareengine_network.network-policy-nw_nc.id
 }
