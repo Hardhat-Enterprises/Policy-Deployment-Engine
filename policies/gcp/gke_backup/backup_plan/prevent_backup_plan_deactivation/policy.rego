@@ -6,7 +6,7 @@ import data.terraform.gcp.security.gke_backup.backup_plan.vars
 conditions := [
     [
         {
-            "situation_description": "GKE Backup plan must remain active for continuous data protection",
+            "situation_description": "GKE Backup Plan must remain active for continuous data protection",
             "remedies": ["Set deactivated to false or remove the attribute"]
         },
         {

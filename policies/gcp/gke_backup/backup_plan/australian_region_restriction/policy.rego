@@ -6,7 +6,7 @@ import data.terraform.gcp.security.gke_backup.backup_plan.vars
 conditions := [
     [
         {
-            "situation_description": "GKE Backup plan must be located in approved Australian regions for data sovereignty",
+            "situation_description": "GKE Backup Plan must be located in approved Australian regions for data sovereignty",
             "remedies": ["Set location to australia-southeast1 or australia-southeast2"]
         },
         {

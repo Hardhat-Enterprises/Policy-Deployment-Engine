@@ -6,7 +6,7 @@ import data.terraform.gcp.security.gke_backup.backup_plan.vars
 conditions := [
     [
         {
-            "situation_description": "GKE Backup plan cluster must follow approved naming patterns for environment identification",
+            "situation_description": "GKE Backup Plan cluster must follow approved naming patterns for environment identification",
             "remedies": ["Use cluster names with prod- or staging- prefix"]
         },
         {

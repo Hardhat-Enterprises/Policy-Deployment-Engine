@@ -6,7 +6,7 @@ import data.terraform.gcp.security.gke_backup.backup_plan.vars
 conditions := [
     [
         {
-            "situation_description": "GKE Backup plan must use customer-managed encryption keys for enhanced security",
+            "situation_description": "GKE Backup Plan must use customer-managed encryption keys for enhanced security",
             "remedies": ["Specify gcp_kms_encryption_key in backup_config encryption_key block"]
         },
         {
