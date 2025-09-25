@@ -3,20 +3,18 @@ package terraform.gcp.security.gke_backup.backup_plan.customer_managed_encryptio
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.gke_backup.backup_plan.vars
 
-situations := [
-    [
-        {
-            "situation_description": "GKE Backup Plan must use customer-managed encryption keys for enhanced security",
-            "remedies": ["Specify gcp_kms_encryption_key in backup_config encryption_key block"]
-        },
-        {
-            "condition": "Checking customer-managed encryption key",
-            "attribute_path": ["backup_config", 0, "encryption_key", 0, "gcp_kms_encryption_key"],
-            "values": [null],
-            "policy_type": "blacklist"
-        }
-    ]
+conditions := [
+    {
+        "situation_description": "GKE Backup plan must use customer-managed encryption keys for enhanced security",
+        "remedies": ["Specify gcp_kms_encryption_key in backup_config encryption_key block"]
+    },
+    {
+        "condition": "Checking for encryption key presence",
+        "attribute_path": ["backup_config", 0, "encryption_key"],
+        "values": [[], null],
+        "policy_type": "blacklist"
+    }
 ]
 
-message := helpers.get_multi_summary(situations, vars.variables).message
-details := helpers.get_multi_summary(situations, vars.variables).details
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details
