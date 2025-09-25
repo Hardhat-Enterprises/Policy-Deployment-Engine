@@ -22,12 +22,10 @@ conditions := [
       "remedies": ["Use only approved networks: prod-vpc, shared-services-vpc."]
     },
     {
-      "condition": "Upstream network must be in the approved list.",
+      "condition": "Upstream network must be in the approved list [projects/{project}/global/networks/{network}].",
       "attribute_path": ["upstreams", 0 , "network", 0 , "name"],
-      "values": [
-        "projects/my-proj/global/networks/prod-vpc",
-        "projects/my-proj/global/networks/shared-services-vpc"
-      ],
+      "values": ["projects/smooth-verve-467716-v1/global/networks/prod-vpc", 
+      "projects/smooth-verve-467716-v1/global/networks/shared-services-vpc"],
       "policy_type": "whitelist"
     }
   ]
@@ -36,4 +34,3 @@ conditions := [
 summary := helpers.get_multi_summary(conditions, vars.variables)
 message := summary.message
 details := summary.details
-
