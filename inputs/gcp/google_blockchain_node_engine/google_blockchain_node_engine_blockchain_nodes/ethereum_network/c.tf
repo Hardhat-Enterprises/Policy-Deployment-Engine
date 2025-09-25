@@ -6,11 +6,14 @@ resource "google_blockchain_node_engine_blockchain_nodes" "c1" {
 
   ethereum_details {
     network = "MAINNET"
+
     geth_details {
-      node_type = "FULL_NODE"
+      # no unsupported fields
     }
   }
 
-  logging_enabled = true
-  disk_size_gb    = 1000
+  labels = {
+    environment = "prod"
+    owner       = "security-team"
+  }
 }
