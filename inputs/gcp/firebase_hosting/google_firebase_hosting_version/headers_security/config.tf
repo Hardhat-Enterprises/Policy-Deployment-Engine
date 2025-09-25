@@ -8,18 +8,6 @@ terraform {
 }
 
 provider "google-beta" {
-  project = var.project_id
+  project = "dummy-project"   
   region  = "us-central1"
-}
-
-variable "project_id" {
-  description = "Dummy GCP project ID for testing"
-  type        = string
-  default     = "test-project"
-}
-
-variable "site_id" {
-  description = "Firebase hosting site ID"
-  type        = string
-  default     = "headers-security-site"
 }

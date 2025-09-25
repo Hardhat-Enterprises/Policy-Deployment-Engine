@@ -8,12 +8,6 @@ terraform {
 }
 
 provider "google-beta" {
-  project = var.project_id
+  project = "dummy-project"
   region  = "us-central1"
-}
-
-variable "project_id" {
-  description = "Dummy GCP project ID for plan-only tests"
-  type        = string
-  default     = "dummy-project"
 }

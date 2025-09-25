@@ -1,12 +1,12 @@
-resource "google_firebase_hosting_version" "compliant_redirect_rules_secure" {
+resource "google_firebase_hosting_version" "https_redirect_c" {
   provider = google-beta
-  site_id  = "redirect-rules-secure-compliant-site"
+  site_id  = "c"
 
   config {
     redirects {
-      glob        = "/old-path/**"
-      status_code = 301
-      location    = "https://example.com/new-path"
+      glob     = "/old/*"
+      location = "https://example.com/new"
+      status   = 301
     }
   }
 }

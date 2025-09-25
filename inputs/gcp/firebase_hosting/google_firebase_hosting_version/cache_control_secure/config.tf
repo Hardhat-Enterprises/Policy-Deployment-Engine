@@ -1,6 +1,4 @@
 terraform {
-  required_version = ">= 1.5.0"
-
   required_providers {
     google-beta = {
       source  = "hashicorp/google-beta"
@@ -9,14 +7,7 @@ terraform {
   }
 }
 
-# Default avoids prompts during plan-only testing
-variable "project_id" {
-  type        = string
-  default     = "dummy-project"
-  description = "GCP project ID (dummy for plan-only tests)"
-}
-
 provider "google-beta" {
-  project = var.project_id
+  project = "dummy-project"   
   region  = "us-central1"
 }

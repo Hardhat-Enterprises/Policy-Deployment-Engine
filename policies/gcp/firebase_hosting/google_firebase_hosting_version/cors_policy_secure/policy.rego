@@ -3,6 +3,11 @@ package terraform.gcp.security.firebase_hosting.google_firebase_hosting_version.
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.firebase_hosting.google_firebase_hosting_version.vars
 
+# NOTE
+# - .values.config is an array -> index with 0
+# - .values.config[0].headers is an array -> index with 0
+# - The inner "headers" is a MAP (string->string)
+
 conditions := [
   [
     {
@@ -13,42 +18,27 @@ conditions := [
       ],
     },
     {
-      "condition": "Validating Access-Control-Allow-Origin is not '*'",
-      "attribute_path": ["config", "headers", 0, "headers", 0, "value"],
+      "condition": "Access-Control-Allow-Origin must not be '*'",
+      "attribute_path": ["config", 0, "headers", 0, "headers", "Access-Control-Allow-Origin"],
       "values": ["*"],
       "policy_type": "blacklist",
     },
   ],
   [
     {
-      "situation_description": "CORS must not allow credentials",
+      "situation_description": "CORS must not allow credentials broadly",
       "remedies": [
         "Avoid Access-Control-Allow-Credentials: true unless strictly required",
         "If credentials are necessary, restrict origins to an explicit allowlist (never '*')"
       ],
     },
     {
-      "condition": "Validating Access-Control-Allow-Credentials is not 'true'",
-      "attribute_path": ["config", "headers", 0, "headers", 0, "value"],
+      "condition": "Access-Control-Allow-Credentials must not be 'true'",
+      "attribute_path": ["config", 0, "headers", 0, "headers", "Access-Control-Allow-Credentials"],
       "values": ["true"],
       "policy_type": "blacklist",
     },
-  ],
-  [
-    {
-      "situation_description": "CORS headers must be explicitly set",
-      "remedies": [
-        "Define CORS headers in firebase.json or Terraform config",
-        "Ensure Access-Control-Allow-Origin is not omitted"
-      ],
-    },
-    {
-      "condition": "Check if headers are missing entirely",
-      "attribute_path": ["config", "headers"],
-      "values": [""],
-      "policy_type": "blacklist",
-    },
-  ],
+  ]
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message

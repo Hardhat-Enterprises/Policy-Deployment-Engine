@@ -11,26 +11,14 @@ conditions := [
         "Set appropriate cache headers for sensitive content",
         "Use no-cache for authentication pages",
         "Set short TTL for dynamic content"
-      ],
-    },
-    {
-      "condition": "Validating sensitive files have proper cache control (path match)",
-      "attribute_path": ["config", "headers", 0, "glob"],
-      "values": ["/login*", "/admin*", "/api/auth*", "*.json"],
-      "policy_type": "pattern whitelist",
-    },
-    {
-      "condition": "Validating header key is Cache-Control",
-      "attribute_path": ["config", "headers", 0, "headers", 0, "key"],
-      "values": ["Cache-Control"],
-      "policy_type": "whitelist",
+      ]
     },
     {
       "condition": "Validating cache control is restrictive for sensitive files",
-      "attribute_path": ["config", "headers", 0, "headers", 0, "value"],
+      "attribute_path": ["config", 0, "headers", 0, "headers", "Cache-Control"],
       "values": ["no-cache", "no-store", "max-age=0"],
-      "policy_type": "whitelist",
-    },
+      "policy_type": "whitelist"
+    }
   ],
   [
     {
@@ -38,27 +26,15 @@ conditions := [
       "remedies": [
         "Set appropriate max-age for static resources",
         "Use cache busting for updated assets"
-      ],
-    },
-    {
-      "condition": "Validating static assets cache duration (path match)",
-      "attribute_path": ["config", "headers", 0, "glob"],
-      "values": ["**/*.js", "**/*.css", "**/*.png", "**/*.jpg"],
-      "policy_type": "pattern whitelist",
-    },
-    {
-      "condition": "Validating header key is Cache-Control",
-      "attribute_path": ["config", "headers", 0, "headers", 0, "key"],
-      "values": ["Cache-Control"],
-      "policy_type": "whitelist",
+      ]
     },
     {
       "condition": "Validating cache duration is reasonable",
-      "attribute_path": ["config", "headers", 0, "headers", 0, "value"],
+      "attribute_path": ["config", 0, "headers", 1, "headers", "Cache-Control"],
       "values": ["max-age=31536000", "max-age=86400", "max-age=3600"],
-      "policy_type": "whitelist",
-    },
-  ],
+      "policy_type": "whitelist"
+    }
+  ]
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message

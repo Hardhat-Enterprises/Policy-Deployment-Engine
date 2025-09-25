@@ -1,12 +1,12 @@
-resource "google_firebase_hosting_version" "non_compliant_redirect_rules_secure" {
+resource "google_firebase_hosting_version" "https_redirect_nc" {
   provider = google-beta
-  site_id  = "redirect-rules-secure-noncompliant-site"
+  site_id  = "nc"
 
   config {
     redirects {
-      glob        = "/old-path/**"
-      status_code = 302
-      location    = "http://insecure.example.com/new-path"
+      glob     = "/old/*"
+      location = "http://example.com/new"
+      status   = 302
     }
   }
 }

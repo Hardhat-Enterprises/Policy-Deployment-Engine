@@ -1,4 +1,4 @@
-package terraform.gcp.security.firebase_hosting.google_firebase_hosting_version.redirect_rules_secure
+package terraform.gcp.security.firebase_hosting.google_firebase_hosting_version.rewrite_rules_secure
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.firebase_hosting.google_firebase_hosting_version.vars
@@ -6,17 +6,33 @@ import data.terraform.gcp.security.firebase_hosting.google_firebase_hosting_vers
 conditions := [
   [
     {
-      "situation_description": "Redirects must use HTTPS",
+      "situation_description": "Rewrite sources must not expose sensitive routes",
       "remedies": [
-        "Ensure all redirect targets start with https://"
-      ],
+        "Avoid rewrites that match admin/config/secret paths",
+        "Limit rewrites to public routes (e.g., /, /app/**)"
+      ]
     },
     {
-      "condition": "Validating redirect locations use HTTPS",
-      "attribute_path": ["config", "redirects", 0, "location"],
-      "values": ["https://"],
-      "policy_type": "pattern whitelist",
+      "condition": "Sensitive rewrite sources are forbidden",
+      "attribute_path": ["config", 0, "rewrites", 0, "glob"],
+      "values": ["/admin/**", "/config/**", "/secret/**"],
+      "policy_type": "blacklist"
+    }
+  ],
+  [
+    {
+      "situation_description": "Redirect locations must use HTTPS",
+      "remedies": [
+        "Ensure all redirect locations begin with https://",
+        "Update any http:// redirects to https://"
+      ]
     },
+    {
+      "condition": "Redirect location must start with https://",
+      "attribute_path": ["config", 0, "redirects", 0, "location"],
+      "values": ["*://", [["https"]]],
+      "policy_type": "pattern whitelist"
+    }
   ]
 ]
 
