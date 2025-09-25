@@ -1,3 +1,4 @@
+#package terraform.gcp.security.<service>.<resource_type>.vars
 package terraform.gcp.security.google_cloudfunction.google_cloudfunctions2_function.vars
 
 variables := {
