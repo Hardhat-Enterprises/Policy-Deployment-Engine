@@ -1,8 +1,9 @@
 resource "google_app_engine_standard_app_version" "c" {
-  service  = "default"
+  service    = "c"
   version_id = "v1"
-  runtime  = "nodejs18"
-  project = "my-project"
+  runtime    = "nodejs18"
+  project    = "my-project"
+
   vpc_access_connector {
     name = "my-vpc-connector"
   }

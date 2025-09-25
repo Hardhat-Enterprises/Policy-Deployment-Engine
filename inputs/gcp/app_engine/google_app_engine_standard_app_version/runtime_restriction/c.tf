@@ -1,14 +1,15 @@
 resource "google_app_engine_standard_app_version" "c" {
-  service  = "default"
-  version_id = "v1"
-  runtime  = "python39"
-  project = "my-project"
+  service     = "c"
+  version_id  = "v1"
+  runtime     = "python39"   
+  project     = "my-project"
+
   entrypoint {
     shell = "python main.py"
   }
 
   automatic_scaling {
-  //  max_total_instances = 10
+    # max_total_instances = 10
   }
 
   deployment {
