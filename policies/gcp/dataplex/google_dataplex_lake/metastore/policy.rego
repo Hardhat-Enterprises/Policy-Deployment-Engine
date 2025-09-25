@@ -3,22 +3,21 @@ package terraform.gcp.security.dataplex.google_dataplex_lake.metastore
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.dataplex.google_dataplex_lake.vars
 
-# Condition: ensure metastore is defined
+# Ensure metastore is defined
 conditions := [
   [
     {
-      "situation_description": "Dataplex Lakes should be linked to a metastore for cataloging",
-      "remedies": ["Attach a valid metastore to the Dataplex Lake"]
+      "situation_description": "Dataplex Lake must have a metastore configuration for metadata management",
+      "remedies": ["Add a metastore block with service set to Dataproc Metastore"]
     },
     {
-      "condition": "Check if metastore is set",
+      "condition": "Check if metastore.service is defined",
       "attribute_path": ["metastore", 0, "service"],
-      "values": [null],
+      "values": ["dataproc_metastore"], # or whatever valid value(s) your org allows
       "policy_type": "whitelist"
     }
   ]
 ]
 
-# Summary and details
 message := helpers.get_multi_summary(conditions, vars.variables).message
 details := helpers.get_multi_summary(conditions, vars.variables).details

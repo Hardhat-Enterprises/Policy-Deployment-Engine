@@ -3,21 +3,27 @@ package terraform.gcp.security.dataplex.google_dataplex_asset.json_options
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.dataplex.google_dataplex_asset.vars
 
+# Policy: Only non-compliant if BOTH conditions are true:
+#   - encoding is UTF-16
+#   - json_options.disable is true
 conditions := [
   [
     {
-      "situation_description": "Dataplex Asset must use secure JSON encoding (UTF-8) and allow type inference",
-      "remedies": ["Set encoding to UTF-8", "Ensure disable_type_inference = false"]
+      "situation_description": "Dataplex Asset must not use UTF-16 with JSON disable enabled",
+      "remedies": [
+        "Use UTF-8 encoding instead of UTF-16",
+        "Or disable must be set to false"
+      ]
     },
     {
-      "condition": "Check if json_options.encoding is UTF-8",
+      "condition": "Check if encoding is UTF-16",
       "attribute_path": ["discovery_spec", 0, "json_options", 0, "encoding"],
-      "values": ["UTF-8"],
+      "values": ["UTF-16"],
       "policy_type": "whitelist"
     },
     {
-      "condition": "Check if json_options.disable_type_inference is false",
-      "attribute_path": ["discovery_spec", 0, "json_options", 0, "disable_type_inference"],
+      "condition": "Check if json_options.disable is true",
+      "attribute_path": ["discovery_spec", 0, "json_options", 0, "disable"],
       "values": [false],
       "policy_type": "whitelist"
     }
