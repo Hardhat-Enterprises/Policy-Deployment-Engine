@@ -4,7 +4,7 @@ package terraform.gcp.security.gke_backup.backup_plan.mandatory_backup_schedulin
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.gke_backup.backup_plan.vars
 
-conditions := [
+situations := [
     [
         {
             "situation_description": "GKE Backup Plan must have scheduled backups configured for automated protection",
@@ -19,5 +19,5 @@ conditions := [
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+message := helpers.get_multi_summary(situations, vars.variables).message
+details := helpers.get_multi_summary(situations, vars.variables).details

@@ -1,10 +1,9 @@
-
 package terraform.gcp.security.gke_backup.backup_plan.kubernetes_secrets_backup_enforcement
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.gke_backup.backup_plan.vars
 
-conditions := [
+situations := [
     [
         {
             "situation_description": "GKE Backup Plan must include secrets for complete security coverage",
@@ -19,5 +18,5 @@ conditions := [
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+message := helpers.get_multi_summary(situations, vars.variables).message
+details := helpers.get_multi_summary(situations, vars.variables).details
