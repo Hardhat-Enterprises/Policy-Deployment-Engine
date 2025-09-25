@@ -1,0 +1,50 @@
+{
+    "format_version": "1.2",
+    "terraform_version": "1.11.4",
+    "planned_values": {
+      "root_module": {
+        "resources": [
+          {
+            "address": "google_app_engine_service_split_traffic.c",
+            "type": "google_app_engine_service_split_traffic",
+            "name": "c",
+            "values": {
+              "service": "web",
+              "migrate_traffic": true,
+              "split": [{ "shard_by": "COOKIE", "allocations": { "v1": 0.95, "v2": 0.05 } }]
+            }
+          },
+          {
+            "address": "google_app_engine_service_split_traffic.nc",
+            "type": "google_app_engine_service_split_traffic",
+            "name": "nc",
+            "values": {
+              "service": "payments",
+              "migrate_traffic": false,
+              "split": [{ "shard_by": "RANDOM", "allocations": { "v1": 0.6, "v2": 0.4 } }]
+            }
+          }
+        ]
+      }
+    },
+    "resource_changes": [
+      {
+        "address": "google_app_engine_service_split_traffic.c",
+        "type": "google_app_engine_service_split_traffic",
+        "change": { "actions": ["create"], "after": { "service": "web", "migrate_traffic": true } }
+      },
+      {
+        "address": "google_app_engine_service_split_traffic.nc",
+        "type": "google_app_engine_service_split_traffic",
+        "change": { "actions": ["create"], "after": { "service": "payments", "migrate_traffic": false } }
+      }
+    ],
+    "configuration": {
+      "provider_config": { "google": { "name": "google" } },
+      "root_module": { "resources": [] }
+    },
+    "applyable": true,
+    "complete": true,
+    "errored": false
+  }
+  
