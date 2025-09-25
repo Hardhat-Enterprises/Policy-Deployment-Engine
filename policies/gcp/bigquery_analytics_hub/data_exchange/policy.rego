@@ -1,36 +1,42 @@
-package terraform.gcp.security.cloud_vmware_engine.private_cloud.zonal_location
+package terraform.gcp.security.analytics_hub.data_exchange.policy
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.cloud_vmware_engine.private_cloud.vars
+import data.terraform.gcp.security.analytics_hub.data_exchange.vars
 
 conditions := [
     [
         {
-            "situation_description": "Cloud is within australia zone",
-            "remedies": ["Use Australian zones"]
+            "situation_description": "Data Exchange must be deployed in an approved region",
+            "remedies": [
+                "Select a region within australia-southeast1 or australia-southeast2",
+                "Update your Terraform resource to use an allowed region"
+            ]
         },
         {
-            "condition": "c1 primary location is either between australia-southeast 1a,1b,1c or australia-southeast 2a,2b,2c",
-            "attribute_path": ["management_cluster", 0, "stretched_cluster_config", 0, "preferred_location"],
-            "values": ["projects/projectabc/locations/*".[["australia-southeast1-a", "australia-southeast1-b", "australia-southeast1-c",
-                                                        "australia-southeast2-a", "australia-southeast2-b", "australia-southeast2-c"]]],
+            "condition": "Check if location is within allowed Australian regions",
+            "attribute_path": ["location"],
+            "values": ["australia-southeast1", "australia-southeast2"],
             "policy_type": "pattern whitelist"
         }
     ],
     [
         {
-            "situation_description": "c2 secondary location is either between australia-southeast 1a,1b,1c or australia-southeast 2a,2b,2c",
-            "remedies": ["Ensure secondary location is within Australian zones"]
+            "situation_description": "Data Exchange description should not be left empty",
+            "remedies": [
+                "Provide a meaningful description when creating the Data Exchange"
+            ]
         },
         {
-            "condition": "Check secondary location is in allowed Australian zones",
-            "attribute_path": ["management_cluster", 0, "stretched_cluster_config", 0, "secondary_location"],
-            "values": ["projects/projectabc/locations/*".[["australia-southeast1-a", "australia-southeast1-b", "australia-southeast1-c",
-                                                        "australia-southeast2-a", "australia-southeast2-b", "australia-southeast2-c"]]],
-            "policy_type": "pattern whitelist"
+            "condition": "Check if description is provided",
+            "attribute_path": ["description"],
+            "values": [".+"],        # regex ensures non-empty string
+            "policy_type": "regex whitelist"
         }
     ]
 ]
 
+# Displays a general message about policy compliance
 message := helpers.get_multi_summary(conditions, vars.variables).message
+
+# Displays a detailed summary of each resource’s compliance to every condition
 details := helpers.get_multi_summary(conditions, vars.variables).details
