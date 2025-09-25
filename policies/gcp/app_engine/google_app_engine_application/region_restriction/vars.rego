@@ -3,5 +3,5 @@ package terraform.gcp.security.app_engine.google_app_engine_application.region_r
 variables := {
   "friendly_resource_name": "App Engine Application",
   "resource_type": "google_app_engine_application",
-  "resource_value_name": "location_id"
+  "resource_value_name": "project"
 }

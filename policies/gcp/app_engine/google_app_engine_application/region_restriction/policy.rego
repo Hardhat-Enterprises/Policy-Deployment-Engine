@@ -3,15 +3,14 @@ package terraform.gcp.security.app_engine.google_app_engine_application.region_r
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.app_engine.google_app_engine_application.region_restriction.vars
 
-# Enforce use of only approved regions (e.g., us-central, europe-west, etc.)
-# Disallow deployment to unapproved or global/multi-region locations
-
 conditions := [
   [
-    {"situation_description" : "Deployment is using an unapproved region",
-     "remedies": [ 
-        "Update the region to an allowed one such as us-central or europe-west" 
-     ]},
+    {
+      "situation_description": "Deployment is using an unapproved region",
+      "remedies": [
+        "Update the region to an allowed one such as us-central or europe-west"
+      ]
+    },
     {
       "condition": "Region must be in allowed list",
       "attribute_path": ["location_id"],

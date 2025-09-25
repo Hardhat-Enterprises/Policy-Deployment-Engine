@@ -3,5 +3,5 @@ package terraform.gcp.security.app_engine.google_app_engine_firewall_rule.intern
 variables := {
   "friendly_resource_name": "App Engine Firewall Rule",
   "resource_type": "google_app_engine_firewall_rule",
-  "resource_value_name": "source_range"
+  "resource_value_name": "project"
 }
