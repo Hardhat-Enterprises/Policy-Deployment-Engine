@@ -1,0 +1,42 @@
+{
+  "resource_name": "storage_bucket_acl",
+  "subcategory": "Cloud Storage",
+  "arguments": {
+    "bucket": {
+      "description": "The name of the bucket.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Naming of bucket is not security related",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "predefined_acl": {
+      "description": "The canned GCS ACL to apply. Must be set if role_entity is not.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "By applying a predefined ACL to an existing bucket or object, you completely replace the existing bucket or object ACL with the predefined ACL. This change might cause you to lose access to the bucket",
+      "compliant": "null",
+      "non-compliant": "publicRead",
+      "parent": null
+    },
+    "role_entity": {
+      "description": "List of role/entity pairs in the form ROLE:entity",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Role/entity should be restricted to allowed users/domain/group/projects",
+      "compliant": "project-team-projectId",
+      "non-compliant": "READER:allUsers",
+      "parent": null
+    },
+    "default_acl": {
+      "description": "Configure this ACL to be the default ACL",
+      "required": false,
+      "security_impact": true,
+      "rationale": "role_entity is preferred to manage access instead because it gives fine-grained access controls",
+      "compliant": "null",
+      "non-compliant": "publicReadWrite",
+      "parent": null
+    }
+  }
+}
