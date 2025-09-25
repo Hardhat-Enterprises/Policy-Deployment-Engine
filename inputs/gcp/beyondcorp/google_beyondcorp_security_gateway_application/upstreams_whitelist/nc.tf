@@ -11,7 +11,7 @@ resource "google_beyondcorp_security_gateway_application" "nc" {
       regions = ["us-central1"]
     }
     network {
-      name = "projects/smooth-verve-467716-v1/global/networks/dev-scratch"
+      name = "projects/1d/location/project/dev-scratch"
     }
   }
 }
