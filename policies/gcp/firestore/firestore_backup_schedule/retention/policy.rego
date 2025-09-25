@@ -1,4 +1,4 @@
-package terraform.gcp.security.firestore_document.retention
+package terraform.gcp.security.firestore_backup_schedule.retention
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.firestore.firestore_backup_schedule.vars
