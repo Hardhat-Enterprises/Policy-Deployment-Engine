@@ -6,16 +6,21 @@ import json
 import re
 from pathlib import Path
 
+
 def extract_path_parts(path: Path):
     if len(path.parts) < 3:
         sys.exit(f"Invalid path: {path}")
     return path.parts[-3], path.parts[-2], path.parts[-1]  # service, resource, attribute
 
+
 def make_failure(attribute: str, reason: str, service: str, resource: str) -> dict:
-    return {"service": str(service), "resource": str(resource), "policy": str(attribute), "passed": False, "failure": {"reason": reason}}
+    return {"service": str(service), "resource": str(resource), "policy": str(attribute), "passed": False,
+            "failure": {"reason": reason}}
+
 
 def make_success(attribute: str, service: str, resource: str) -> dict:
     return {"service": str(service), "resource": str(resource), "policy": str(attribute), "passed": True}
+
 
 def opa_eval_value(policies_root: Path, plan_json_path: Path, query: str):
     """Evaluate an OPA query and return the expression value from JSON output or None."""
@@ -39,7 +44,8 @@ def opa_eval_value(policies_root: Path, plan_json_path: Path, query: str):
     except Exception as e:
         print(f"Failed to parse OPA JSON output: {e}")
         return None
-    
+
+
 def get_unique_resource_names(plan_json_path: Path, resource_type: str) -> set[str]:
     """Return unique Terraform resource names for a given type,
     considering only root_module resources.
@@ -60,6 +66,7 @@ def get_unique_resource_names(plan_json_path: Path, resource_type: str) -> set[s
                 names.add(name)
 
     return names
+
 
 def parse_rego_metadata(policy_dir: Path):
     """Parse policy.rego to extract (package_path, vars_import_data_path).
@@ -102,8 +109,10 @@ def match_names_in_messages(messages: list[str], candidate_names: set[str]) -> s
             matched.add(name)
     return matched
 
+
 def get_resource_type(policies_root: Path, plan_path: Path, vars_resource_type_query: str):
     return opa_eval_value(policies_root.resolve(), plan_path, vars_resource_type_query)
+
 
 def normalize_messages(messages_value) -> list[str]:
     if isinstance(messages_value, list):
@@ -114,9 +123,11 @@ def normalize_messages(messages_value) -> list[str]:
         return [str(messages_value)]
     return []
 
+
 def get_policy_messages(policies_root: Path, plan_path: Path, message_query: str) -> list[str]:
     val = opa_eval_value(policies_root.resolve(), plan_path, message_query)
     return normalize_messages(val)
+
 
 def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | None:
     env = os.environ.copy()
@@ -140,6 +151,7 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
             return None
     return input_dir / "plan.json"
 
+
 def get_policy_metadata(policy_dir: Path, service: str, resource: str, attribute: str) -> tuple[str, str]:
     """Return (message_query, vars_resource_type_query)."""
     pkg_path, vars_import = parse_rego_metadata(policy_dir)
@@ -152,6 +164,7 @@ def get_policy_metadata(policy_dir: Path, service: str, resource: str, attribute
         vars_resource_type_query = f"data.terraform.gcp.security.{service}.{resource}.vars.variables.resource_type"
     return message_query, vars_resource_type_query
 
+
 def log_messages(verbose: bool, message_query: str, messages: list[str]) -> None:
     if not verbose:
         return
@@ -159,7 +172,9 @@ def log_messages(verbose: bool, message_query: str, messages: list[str]) -> None
     for m in messages:
         print(m)
 
-def validate_policy_output(attribute: str, resource_type: str | None, plan_path: Path, messages: list[str], verbose: bool, service: str, resource: str) -> dict:
+
+def validate_policy_output(attribute: str, resource_type: str | None, plan_path: Path, messages: list[str],
+                           verbose: bool, service: str, resource: str) -> dict:
     unique_names = get_unique_resource_names(plan_path, str(resource_type))
     matched = match_names_in_messages(messages, unique_names)
 
@@ -168,7 +183,9 @@ def validate_policy_output(attribute: str, resource_type: str | None, plan_path:
     non_nc_in_output = {n.strip() for n in matched if not nc_pattern.fullmatch(n)}
     if non_nc_in_output:
         print(f"Check failed: Resources in output other than 'nc' found: {', '.join(sorted(non_nc_in_output))}\n")
-        return make_failure(attribute, f"Resources in output other than 'nc' found: {', '.join(sorted(non_nc_in_output))}", service, resource)
+        return make_failure(attribute,
+                            f"Resources in output other than 'nc' found: {', '.join(sorted(non_nc_in_output))}",
+                            service, resource)
 
     # Ensure all resources are mentioned, except 'c*' which can be omitted
     missing = unique_names - matched
@@ -185,13 +202,16 @@ def validate_policy_output(attribute: str, resource_type: str | None, plan_path:
     if missing_non_c:
         if verbose:
             print(f"Check failed: Unmentioned resources other than 'c' found: {', '.join(sorted(missing_non_c))}\n")
-        return make_failure(attribute, f"Unmentioned resources other than 'c' found: {', '.join(sorted(missing_non_c))}", service, resource)
+        return make_failure(attribute,
+                            f"Unmentioned resources other than 'c' found: {', '.join(sorted(missing_non_c))}", service,
+                            resource)
 
     if missing and missing == {"c"} and verbose:
         print("Only compliant resources are unmentioned; ignoring")
     if verbose:
         print("Check passed\n")
     return make_success(attribute, service, resource)
+
 
 def run_policy_check_pair(input_dir: Path, policy_dir: Path, policies_root: Path, verbose: bool = False):
     # Extract data about services and filesystem paths
@@ -202,22 +222,23 @@ def run_policy_check_pair(input_dir: Path, policy_dir: Path, policies_root: Path
     if plan_path is None:
         res = make_failure(attribute, "Terraform failed to compile!", service, resource)
         return res
-    
+
     message_query, vars_resource_type_query = get_policy_metadata(policy_dir, service, resource, attribute)
 
     resource_type = get_resource_type(policies_root, plan_path, vars_resource_type_query)
     if resource_type is None:
         res = make_failure(attribute, "Could not find any resources!", service, resource)
         return res
-    
+
     messages = get_policy_messages(policies_root, plan_path, message_query)
     if not messages:
         res = make_failure(attribute, "Could not run OPA query!", service, resource)
         return res
-    
+
     log_messages(verbose, message_query, messages)
     res = validate_policy_output(attribute, resource_type, plan_path, messages, verbose, service, resource)
     return res
+
 
 def find_matching_pairs(inputs_root: Path, policies_root: Path):
     def is_leaf_terraform_dir(directory: Path) -> bool:
@@ -243,8 +264,10 @@ def find_matching_pairs(inputs_root: Path, policies_root: Path):
 
     return pairs
 
+
 def main():
-    parser = argparse.ArgumentParser(description="Run Terraform + OPA policy checks for all matched input/policy pairs.")
+    parser = argparse.ArgumentParser(
+        description="Run Terraform + OPA policy checks for all matched input/policy pairs.")
     parser.add_argument("--inputs", default="inputs/gcp", help="Root directory for Terraform inputs")
     parser.add_argument("--policies", default="policies/gcp", help="Root directory for policy files")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
@@ -291,6 +314,7 @@ def main():
                         print(f"{res['failure']['reason']}")
                         print()
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
