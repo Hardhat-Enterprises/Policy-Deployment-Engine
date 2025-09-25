@@ -92,10 +92,10 @@
     "authorization_mode": {
       "description": "Optional. The authorization mode of the Redis cluster. If not provided, auth feature is disabled for the cluster. Default value is `AUTH_MODE_DISABLED`. Possible values are: `AUTH_MODE_UNSPECIFIED`, `AUTH_MODE_IAM_AUTH`, `AUTH_MODE_DISABLED`.",
       "required": false,
-      "security_impact": null,
+      "security_impact": true,
       "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "compliant": "AUTH_MODE_IAM_AUTH",
+      "non-compliant": ["AUTH_MODE_UNSPECIFIED", "AUTH_MODE_DISABLED"],
       "parent": null
     },
     "transit_encryption_mode": {
@@ -186,10 +186,10 @@
     "deletion_protection_enabled": {
       "description": "Optional. Indicates if the cluster is deletion protected or not. If the value if set to true, any delete cluster operation will fail. Default value is true.",
       "required": false,
-      "security_impact": null,
+      "security_impact": true,
       "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "compliant": true,
+      "non-compliant": false,
       "parent": null
     },
     "redis_configs": {
@@ -204,37 +204,37 @@
     "persistence_config": {
       "description": "Persistence config (RDB, AOF) for the cluster. Structure is [documented below](#nested_persistence_config).",
       "required": false,
-      "security_impact": null,
+      "security_impact": true,
       "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "compliant": ["RDB", "AOF"],
+      "non-compliant": ["DISABLED", "PERSISTENCE_MODE_UNSPECIFIED"],
       "parent": null,
       "arguments": {
         "mode": {
           "description": "Optional. Controls whether Persistence features are enabled. If not provided, the existing value will be used. - DISABLED: \tPersistence (both backup and restore) is disabled for the cluster. - RDB: RDB based Persistence is enabled. - AOF: AOF based Persistence is enabled. Possible values are: `PERSISTENCE_MODE_UNSPECIFIED`, `DISABLED`, `RDB`, `AOF`.",
           "required": false,
-          "security_impact": null,
+          "security_impact": true,
           "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "compliant": ["RDB", "AOF"],
+          "non-compliant": ["DISABLED", "PERSISTENCE_MODE_UNSPECIFIED"],
           "parent": "persistence_config"
         },
         "rdb_config": {
           "description": "RDB configuration. This field will be ignored if mode is not RDB. Structure is [documented below](#nested_persistence_config_rdb_config).",
           "required": false,
-          "security_impact": null,
+          "security_impact": true,
           "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "compliant": "ONE_HOUR",
+          "non-compliant": ["SIX_HOURS", "TWELVE_HOURS", "TWENTY_FOUR_HOURS"],
           "parent": "persistence_config"
         },
         "aof_config": {
           "description": "AOF configuration. This field will be ignored if mode is not AOF. Structure is [documented below](#nested_persistence_config_aof_config).",
           "required": false,
-          "security_impact": null,
+          "security_impact": true,
           "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "compliant": "EVERYSEC",
+          "non-compliant": ["ALWAYS", "NO"],
           "parent": "persistence_config"
         }
       }

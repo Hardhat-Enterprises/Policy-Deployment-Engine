@@ -1,9 +1,9 @@
 # Describe your resource type here
 # Keep "c" as the name to indicate that this resource and its attributes are compliant
 
-resource "google_redis_cluster" "c-1" {
+resource "google_redis_cluster" "c1" {
   project        = "abc-12345678"
-  name           = "compliant-redis-1" 
+  name           = "c1" 
   region         = "us-central1"
   shard_count = 3 
 
@@ -15,9 +15,9 @@ resource "google_redis_cluster" "c-1" {
   }
 }
 
-resource "google_redis_cluster" "c-2" {
+resource "google_redis_cluster" "c2" {
   project        = "abc-12345678"
-  name           = "compliant-redis-2" 
+  name           = "c2" 
   region         = "us-central1"
   shard_count = 3 
 
@@ -29,9 +29,9 @@ resource "google_redis_cluster" "c-2" {
   }
 }
 
-resource "google_redis_cluster" "c-3" {
+resource "google_redis_cluster" "c3" {
   project        = "abc-12345678"
-  name           = "compliant-redis-3" 
+  name           = "c3" 
   region         = "us-central1"
   shard_count = 3 
 
@@ -43,9 +43,9 @@ resource "google_redis_cluster" "c-3" {
   }
 }
 
-resource "google_redis_cluster" "c-4" {
+resource "google_redis_cluster" "c4" {
   project        = "abc-12345678"
-  name           = "compliant-redis-4" 
+  name           = "c4" 
   region         = "us-central1"
   shard_count = 3 
 

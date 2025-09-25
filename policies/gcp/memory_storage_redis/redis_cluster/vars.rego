@@ -1,4 +1,4 @@
-package terraform.gcp.security.memorystorage.redis.vars
+package terraform.gcp.security.memorystorage.redis.google_redis_cluster_vars
 
 # variables := {
 #     "friendly_resource_name": "Redis Database Instance",

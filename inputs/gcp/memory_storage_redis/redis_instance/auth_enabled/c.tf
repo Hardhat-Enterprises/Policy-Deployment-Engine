@@ -3,7 +3,7 @@
 
 resource "google_redis_instance" "c" {
   project        = "abc-12345678"
-  name           = "compliant-redis" 
+  name           = "c" 
   tier           = "STANDARD_HA"
   memory_size_gb = 1
   region         = "us-central1"

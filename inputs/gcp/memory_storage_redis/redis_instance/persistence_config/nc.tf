@@ -1,17 +1,17 @@
 # Describe your resource type here
 # Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
 
-resource "google_redis_instance" "nc-1" {
+resource "google_redis_instance" "nc1" {
     project        = "abc-12345678"
-    name           = "noncompliant-redis-1" 
+    name           = "nc1" 
     tier           = "STANDARD_HA"
     memory_size_gb = 1
     region         = "us-central1"
 }
 
-resource "google_redis_instance" "nc-2" {
+resource "google_redis_instance" "nc2" {
     project        = "abc-12345678"
-    name           = "noncompliant-redis-2" 
+    name           = "nc2" 
     tier           = "STANDARD_HA"
     memory_size_gb = 1
     region         = "us-central1"
@@ -21,9 +21,9 @@ resource "google_redis_instance" "nc-2" {
     }
 }
 
-resource "google_redis_instance" "nc-3" {
+resource "google_redis_instance" "nc3" {
     project        = "abc-12345678"
-    name           = "noncompliant-redis-3" 
+    name           = "nc3" 
     tier           = "STANDARD_HA"
     memory_size_gb = 1
     region         = "us-central1"

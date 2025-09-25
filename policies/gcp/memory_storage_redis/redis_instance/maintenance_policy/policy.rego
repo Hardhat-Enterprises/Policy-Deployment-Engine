@@ -1,7 +1,7 @@
 package terraform.gcp.security.memorystorage_redis.redis_instance.maintenance_policy
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.memorystorage.redis.vars
+import data.terraform.gcp.security.memorystorage.redis.google_redis_instance_vars
 
 conditions := [
     [

@@ -4,7 +4,7 @@
 
 resource "google_redis_instance" "nc" {
   project        = "abc-12345678"
-  name           = "noncompliant-redis"
+  name           = "nc"
   tier           = "STANDARD_HA"
   memory_size_gb = 1
   region         = "us-central1"

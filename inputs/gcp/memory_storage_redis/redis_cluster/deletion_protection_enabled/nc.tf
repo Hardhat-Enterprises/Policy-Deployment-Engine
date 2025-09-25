@@ -4,7 +4,7 @@
 
 resource "google_redis_cluster" "nc" {
   project        = "abc-12345678"
-  name           = "noncompliant-redis" 
+  name           = "nc" 
   region         = "us-central1"
   shard_count = 3 
 

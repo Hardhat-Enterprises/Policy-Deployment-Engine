@@ -3,7 +3,7 @@
 
 resource "google_redis_cluster" "c" {
   project        = "abc-12345678"
-  name           = "compliant-redis" 
+  name           = "c" 
   region         = "us-central1"
   shard_count = 3 
 

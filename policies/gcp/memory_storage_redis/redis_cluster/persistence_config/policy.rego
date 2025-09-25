@@ -1,7 +1,7 @@
 package terraform.gcp.security.memorystorage_redis.redis_cluster.persistence_config_policy
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.memorystorage.redis.vars
+import data.terraform.gcp.security.memorystorage.redis.google_redis_cluster_vars
 
 conditions := [
     [
