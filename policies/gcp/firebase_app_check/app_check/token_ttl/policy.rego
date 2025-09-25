@@ -1,22 +1,22 @@
-package terraform.gcp.security.firebase.app_check.app_attest.token_ttl
+package terraform.gcp.security.firebase_app_check.app_check.token_ttl
 
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.firebase.app_check.app_attest.vars
+import data.terraform.gcp.security.firebase_app_check.app_check.vars
 
-# Scenario: token_ttl must be between 30 minutes (1800s) and 7 days (604800s)
+# Scenario: token_ttl must be at least 30 minutes (1800s)
 conditions := [
     [
         {
-            "situation_description": "Firebase App Check App Attest token_ttl must be between 30 minutes and 7 days.",
+            "situation_description": "Firebase App Check token_ttl must be at least 30 minutes (1800s).",
             "remedies": [
-                "Set token_ttl within the allowed range (1800s - 604800s)."
+                "Set token_ttl to a compliant value, for example '1800s'."
             ]
         },
         {
-            "condition": "Check token_ttl range",
+            "condition": "Check for compliant token_ttl",
             "attribute_path": ["token_ttl"],
-            "values": [1800, 604800],
-            "policy_type": "range"
+            "values": ["1800s"],
+            "policy_type": "whitelist"
         }
     ]
 ]
