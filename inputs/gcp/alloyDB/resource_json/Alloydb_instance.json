@@ -1,0 +1,51 @@
+{
+  "resource_name": "google_alloydb_instance",
+  "subcategory": "AlloyDB",
+  "arguments": {
+    "instance_id": {
+      "description": "ID of the instance.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Identifier only.",
+      "compliant": "payments-rw-01",
+      "non-compliant": null,
+      "parent": null
+    },
+    "cluster": {
+      "description": "Cluster name this instance belongs to.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Binds to security configuration of the cluster.",
+      "compliant": "projects/p/locations/us-central1/clusters/cluster-a",
+      "non-compliant": "",
+      "parent": null
+    },
+    "instance_type": {
+      "description": "Instance role (PRIMARY or READ_POOL).",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Affects topology, not auth/crypto.",
+      "compliant": "PRIMARY",
+      "non-compliant": null,
+      "parent": null
+    },
+    "machine_config": {
+      "description": "vCPU/memory configuration.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Capacity; no direct security impact.",
+      "compliant": "cpu_count >= 2",
+      "non-compliant": "cpu_count = 0",
+      "parent": null
+    },
+    "database_flags": {
+      "description": "PostgreSQL flags.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Flags can weaken security (e.g., logging, ssl).",
+      "compliant": "log_min_error_statement=error",
+      "non-compliant": "ssl=off",
+      "parent": null
+    }
+  }
+}
