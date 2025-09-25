@@ -5,14 +5,12 @@ import data.terraform.gcp.security.gke_backup.backup_plan.vars
 
 conditions := [
     {
-        "situation_description": "GKE Backup plan must include volume data for complete data protection",
-        "remedies": ["Set include_volume_data to true in backup_config"]
-    },
-    {
-        "condition": "Checking volume data inclusion",
+        "situation_description": "GKE Backup plan must include persistent volume data",
+        "remedies": ["Set include_volume_data to true in backup_config"],
+        "condition": "c1",
         "attribute_path": ["backup_config", 0, "include_volume_data"],
-        "values": [false, null],
-        "policy_type": "blacklist"
+        "values": [true],
+        "policy_type": "whitelist"
     }
 ]
 

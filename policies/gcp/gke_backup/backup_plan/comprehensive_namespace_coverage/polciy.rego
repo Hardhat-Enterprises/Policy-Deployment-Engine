@@ -5,11 +5,9 @@ import data.terraform.gcp.security.gke_backup.backup_plan.vars
 
 conditions := [
     {
-        "situation_description": "GKE Backup plan must enable comprehensive namespace coverage to ensure all workloads are protected",
-        "remedies": ["Set all_namespaces to true in backup_config"]
-    },
-    {
-        "condition": "Checking namespace coverage",
+        "situation_description": "GKE Backup plan must include all namespaces for comprehensive coverage",
+        "remedies": ["Set all_namespaces to true in backup_config"],
+        "condition": "c1",
         "attribute_path": ["backup_config", 0, "all_namespaces"],
         "values": [true],
         "policy_type": "whitelist"

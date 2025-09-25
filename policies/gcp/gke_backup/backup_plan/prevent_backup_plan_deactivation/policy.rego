@@ -5,14 +5,12 @@ import data.terraform.gcp.security.gke_backup.backup_plan.vars
 
 conditions := [
     {
-        "situation_description": "GKE Backup plan must not be paused to ensure continuous protection",
-        "remedies": ["Set paused to false in backup_schedule or remove the paused attribute"]
-    },
-    {
-        "condition": "Checking if backup is paused",
-        "attribute_path": ["backup_schedule", 0, "paused"],
-        "values": [true],
-        "policy_type": "blacklist"
+        "situation_description": "GKE Backup plan is deactivated",
+        "remedies": ["Set deactivated to false or remove the deactivated attribute"],
+        "condition": "c1",
+        "attribute_path": ["deactivated"],
+        "values": [false, null],
+        "policy_type": "whitelist"
     }
 ]
 

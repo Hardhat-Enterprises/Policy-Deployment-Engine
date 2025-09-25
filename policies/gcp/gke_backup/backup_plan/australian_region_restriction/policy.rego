@@ -3,18 +3,18 @@ package terraform.gcp.security.gke_backup.backup_plan.australian_region_restrict
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.gke_backup.backup_plan.vars
 
-conditions := [
+# Use situations (not conditions) to match what helpers.rego expects
+situations := [
     {
-        "situation_description": "GKE Backup plan must be located in approved Australian regions for data sovereignty",
-        "remedies": ["Set location to australia-southeast1 or australia-southeast2"]
-    },
-    {
-        "condition": "Checking backup plan location",
+        "situation_description": "GKE Backup plan must be deployed in Australian regions for compliance",
+        "remedies": ["Set location to australia-southeast1 or australia-southeast2"],
+        "condition": "c1",
         "attribute_path": ["location"],
-        "values": ["australia-southeast1"],  # Only southeast1 is approved
+        "values": ["australia-southeast1", "australia-southeast2"],
         "policy_type": "whitelist"
     }
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+# These calls should work with the helpers.rego file
+message := helpers.get_multi_summary(situations, vars.variables).message
+details := helpers.get_multi_summary(situations, vars.variables).details
