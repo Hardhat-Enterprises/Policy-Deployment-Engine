@@ -5,8 +5,8 @@
     "connection_profile_id": {
       "description": "The ID of the connection profile.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Connection Profile ID has no impact on the security of the resource or data contained",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,8 +14,8 @@
     "display_name": {
       "description": "The connection profile display name.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Display name has no impact on the security of the resource or data contained",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -23,8 +23,8 @@
     "labels": {
       "description": "The resource labels for connection profile to use to annotate any related underlying resources such as Compute Engine VMs. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Labels have no impact on the security of the resource or data contained",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -32,8 +32,8 @@
     "mysql": {
       "description": "Specifies connection parameters required specifically for MySQL databases. Structure is [documented below](#nested_mysql).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "MySQL profiles may expose sensitive database connection details. Misconfigured host, ports, or missing SSL can lead to data breaches.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -41,8 +41,8 @@
         "host": {
           "description": "The IP or hostname of the source MySQL database.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "host value itself does not impact security since networking and SSL enforcement are controlled by other parameters such as private_network and require_ssl.",
           "compliant": null,
           "non-compliant": null,
           "parent": "mysql"
@@ -50,8 +50,8 @@
         "port": {
           "description": "The network port of the source MySQL database.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Port has no impact on the security since the host will be private",
           "compliant": null,
           "non-compliant": null,
           "parent": "mysql"
@@ -59,8 +59,8 @@
         "username": {
           "description": "The username that Database Migration Service will use to connect to the database. The value is encrypted when stored in Database Migration Service.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Username has no impact on the security of the resource or data contained",
           "compliant": null,
           "non-compliant": null,
           "parent": "mysql"
@@ -68,8 +68,8 @@
         "password": {
           "description": "Input only. The password for the user that Database Migration Service will be using to connect to the database. This field is not returned on request, and the value is encrypted when stored in Database Migration Service. **Note**: This property is sensitive and will not be displayed in the plan.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Password will be set with the username buy deafault and doesnot depend on a rego policy",
           "compliant": null,
           "non-compliant": null,
           "parent": "mysql"
@@ -77,8 +77,8 @@
         "password_set": {
           "description": "(Output) Output only. Indicates If this connection profile password is stored.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "This is the output",
           "compliant": null,
           "non-compliant": null,
           "parent": "mysql"
@@ -86,17 +86,17 @@
         "ssl": {
           "description": "SSL configuration for the destination to connect to the source database. Structure is [documented below](#nested_mysql_ssl).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "SSL ensures data in transit is encrypted, preventing eavesdropping or man-in-the-middle attacks.",
+          "compliant": "'SERVER_ONLY','SERVER_CLIENT','REQUIRED'",
+          "non-compliant": "NONE",
           "parent": "mysql"
         },
         "cloud_sql_id": {
           "description": "If the source is a Cloud SQL database, use this field to provide the Cloud SQL instance ID of the source.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "cloud_sql_id has no impact on the security of the resource or data contained",
           "compliant": null,
           "non-compliant": null,
           "parent": "mysql"
@@ -106,26 +106,26 @@
     "postgresql": {
       "description": "Specifies connection parameters required specifically for PostgreSQL databases. Structure is [documented below](#nested_postgresql).",
       "required": false,
-      "security_impact": null,
+      "security_impact": true,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
       "parent": null,
       "arguments": {
         "host": {
-          "description": "The IP or hostname of the source MySQL database.",
+          "description": "The IP or hostname of the source postgresql database.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "host value itself does not impact security since networking and SSL enforcement are controlled by other parameters such as private_network and require_ssl.",
           "compliant": null,
           "non-compliant": null,
           "parent": "postgresql"
         },
         "port": {
-          "description": "The network port of the source MySQL database.",
+          "description": "The network port of the source postgresql database.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Port number itself does not impact security if host is private.",
           "compliant": null,
           "non-compliant": null,
           "parent": "postgresql"
@@ -133,8 +133,8 @@
         "username": {
           "description": "The username that Database Migration Service will use to connect to the database. The value is encrypted when stored in Database Migration Service.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Username alone has no security effect unless paired with weak roles.",
           "compliant": null,
           "non-compliant": null,
           "parent": "postgresql"
@@ -142,8 +142,8 @@
         "password": {
           "description": "Input only. The password for the user that Database Migration Service will be using to connect to the database. This field is not returned on request, and the value is encrypted when stored in Database Migration Service. **Note**: This property is sensitive and will not be displayed in the plan.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Password is handled securely by GCP. Policy cannot enforce complexity.",
           "compliant": null,
           "non-compliant": null,
           "parent": "postgresql"
@@ -151,8 +151,8 @@
         "password_set": {
           "description": "(Output) Output only. Indicates If this connection profile password is stored.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "This is the output",
           "compliant": null,
           "non-compliant": null,
           "parent": "postgresql"
@@ -160,17 +160,17 @@
         "ssl": {
           "description": "SSL configuration for the destination to connect to the source database. Structure is [documented below](#nested_postgresql_ssl).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "SSL is required for encryption of data in transit.",
+          "compliant": "'SERVER_ONLY','SERVER_CLIENT','REQUIRED'",
+          "non-compliant": "NONE",
           "parent": "postgresql"
         },
         "cloud_sql_id": {
           "description": "If the source is a Cloud SQL database, use this field to provide the Cloud SQL instance ID of the source.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "cloud_sql_id has no impact on the security of the resource or data contained",
           "compliant": null,
           "non-compliant": null,
           "parent": "postgresql"
@@ -178,8 +178,8 @@
         "alloydb_cluster_id": {
           "description": "If the connected database is an AlloyDB instance, use this field to provide the AlloyDB cluster ID.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Alloydb cluster ID has no impact on the security of the resource or data contained",
           "compliant": null,
           "non-compliant": null,
           "parent": "postgresql"
@@ -187,8 +187,8 @@
         "network_architecture": {
           "description": "(Output) Output only. If the source is a Cloud SQL database, this field indicates the network architecture it's associated with.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "This is the output",
           "compliant": null,
           "non-compliant": null,
           "parent": "postgresql"
@@ -198,7 +198,7 @@
     "oracle": {
       "description": "Specifies connection parameters required specifically for Oracle databases. Structure is [documented below](#nested_oracle).",
       "required": false,
-      "security_impact": null,
+      "security_impact": true,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -207,8 +207,8 @@
         "host": {
           "description": "Required. The IP or hostname of the source Oracle database.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "host value itself does not impact security since networking and SSL enforcement are controlled by other parameters.",
           "compliant": null,
           "non-compliant": null,
           "parent": "oracle"
@@ -216,8 +216,8 @@
         "port": {
           "description": "Required. The network port of the source Oracle database.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Port has no impact on the security since the host will be private",
           "compliant": null,
           "non-compliant": null,
           "parent": "oracle"
@@ -225,8 +225,8 @@
         "username": {
           "description": "Required. The username that Database Migration Service will use to connect to the database. The value is encrypted when stored in Database Migration Service.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Username alone has no security effect unless paired with weak roles.",
           "compliant": null,
           "non-compliant": null,
           "parent": "oracle"
@@ -234,8 +234,8 @@
         "password": {
           "description": "Required. Input only. The password for the user that Database Migration Service will be using to connect to the database. This field is not returned on request, and the value is encrypted when stored in Database Migration Service. **Note**: This property is sensitive and will not be displayed in the plan.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Password is handled securely by GCP. Policy cannot enforce complexity.",
           "compliant": null,
           "non-compliant": null,
           "parent": "oracle"
@@ -243,8 +243,8 @@
         "password_set": {
           "description": "(Output) Output only. Indicates If this connection profile password is stored.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "This is the output",
           "compliant": null,
           "non-compliant": null,
           "parent": "oracle"
@@ -252,8 +252,8 @@
         "database_service": {
           "description": "Required. Database service for the Oracle connection.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Database service has no impact on the security of the resource or data contained",
           "compliant": null,
           "non-compliant": null,
           "parent": "oracle"
@@ -261,37 +261,37 @@
         "ssl": {
           "description": "SSL configuration for the destination to connect to the source database. Structure is [documented below](#nested_oracle_ssl).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "SSL protects sensitive Oracle traffic from interception.",
+          "compliant": "'SERVER_ONLY','SERVER_CLIENT','REQUIRED'",
+          "non-compliant": "NONE",
           "parent": "oracle"
         },
         "static_service_ip_connectivity": {
           "description": "This object has no nested fields. Static IP address connectivity configured on service project.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Static service IP connectivity exposes the Oracle database over a fixed public IP. Use private connectivity instead",
+          "compliant": "Not configured",
+          "non-compliant": "Configured",
           "parent": "oracle"
         },
         "forward_ssh_connectivity": {
           "description": "SSL configuration for the destination to connect to the source database. Structure is [documented below](#nested_oracle_forward_ssh_connectivity).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Forward SSH introduces risk of misconfigurations and exposure. Use private connectivity instead",
+          "compliant": "Not configured",
+          "non-compliant": "Configured",
           "parent": "oracle"
         },
         "private_connectivity": {
           "description": "Configuration for using a private network to communicate with the source database Structure is [documented below](#nested_oracle_private_connectivity).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Private connectivity prevents external access over public networks.",
+          "compliant": "Configured",
+          "non-compliant": "Not configured",
           "parent": "oracle"
         }
       }
@@ -299,8 +299,8 @@
     "cloudsql": {
       "description": "Specifies required connection parameters, and, optionally, the parameters required to create a Cloud SQL destination database instance. Structure is [documented below](#nested_cloudsql).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "Cloud SQL instances must enforce private networking and SSL to prevent exposure.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -308,8 +308,8 @@
         "cloud_sql_id": {
           "description": "(Output) Output only. The Cloud SQL instance ID that this connection profile is associated with.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "This is the output",
           "compliant": null,
           "non-compliant": null,
           "parent": "cloudsql"
@@ -317,8 +317,8 @@
         "settings": {
           "description": "Immutable. Metadata used to create the destination Cloud SQL database. Structure is [documented below](#nested_cloudsql_settings).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Configure SSL and private network",
           "compliant": null,
           "non-compliant": null,
           "parent": "cloudsql"
@@ -326,8 +326,8 @@
         "private_ip": {
           "description": "(Output) Output only. The Cloud SQL database instance's private IP.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "This is the output",
           "compliant": null,
           "non-compliant": null,
           "parent": "cloudsql"
@@ -335,8 +335,8 @@
         "public_ip": {
           "description": "(Output) Output only. The Cloud SQL database instance's public IP.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "This is the output",
           "compliant": null,
           "non-compliant": null,
           "parent": "cloudsql"
@@ -346,8 +346,8 @@
     "alloydb": {
       "description": "Specifies required connection parameters, and the parameters required to create an AlloyDB destination cluster. Structure is [documented below](#nested_alloydb).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Not Security Related",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -355,8 +355,8 @@
         "cluster_id": {
           "description": "Required. The AlloyDB cluster ID that this connection profile is associated with.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not Security Related",
           "compliant": null,
           "non-compliant": null,
           "parent": "alloydb"
@@ -364,8 +364,8 @@
         "settings": {
           "description": "Immutable. Metadata used to create the destination AlloyDB cluster. Structure is [documented below](#nested_alloydb_settings).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not Security Related",
           "compliant": null,
           "non-compliant": null,
           "parent": "alloydb"
@@ -375,44 +375,44 @@
     "location": {
       "description": "The location where the connection profile should reside.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Location determines the region where the connection profile is deployed.",
+      "compliant": "'australia-southeast1', 'australia-southeast2'",
+      "non-compliant": "us-east1",
       "parent": null
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Not Security Related",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "ssl": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "This field is used in attributes of MySql PostgreSql and Oracle databases",
+      "required": false,
+      "security_impact": true,
+      "rationale": "The type of SSL used must be described",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
       "arguments": {
         "type": {
           "description": "(Output) The current connection profile state.",
-          "required": null,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "required": false,
+          "security_impact": true,
+          "rationale": "The SSL type determines the level of encryption and whether client certificates are enforced.",
+          "compliant": "'SERVER_ONLY','SERVER_CLIENT','REQUIRED'",
+          "non-compliant": "NONE",
           "parent": "ssl"
         },
         "client_key": {
           "description": "Input only. The unencrypted PKCS#1 or PKCS#8 PEM-encoded private key associated with the Client Certificate. If this field is used then the 'clientCertificate' field is mandatory. **Note**: This property is sensitive and will not be displayed in the plan.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Depends on SSL Type",
           "compliant": null,
           "non-compliant": null,
           "parent": "ssl"
@@ -420,8 +420,8 @@
         "client_certificate": {
           "description": "Input only. The x509 PEM-encoded certificate that will be used by the replica to authenticate against the source database server. If this field is used then the 'clientKey' field is mandatory **Note**: This property is sensitive and will not be displayed in the plan.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Depends on SSL Type",
           "compliant": null,
           "non-compliant": null,
           "parent": "ssl"
@@ -429,8 +429,8 @@
         "ca_certificate": {
           "description": "Input only. The x509 PEM-encoded certificate of the CA that signed the source database server's certificate. The replica will use this certificate to verify it's connecting to the right host. **Note**: This property is sensitive and will not be displayed in the plan.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Depends on SSL Type",
           "compliant": null,
           "non-compliant": null,
           "parent": "ssl"
@@ -438,12 +438,12 @@
       }
     },
     "forward_ssh_connectivity": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "SSL configuration for the destination to connect to the source database.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Forward SSH introduces risk of misconfigurations and exposure. Configure private connectivity instead",
+      "compliant": "Not configured",
+      "non-compliant": "Configured",
       "parent": null,
       "arguments": {
         "hostname": {
@@ -494,10 +494,10 @@
       }
     },
     "private_connectivity": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "Use private network to connect to Oracle database.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Private connectivity prevents external access over public networks.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -505,19 +505,19 @@
         "private_connection": {
           "description": "Required. The resource name (URI) of the private connection.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Private connectivity prevents external access over public networks.",
+          "compliant": "Compliant URI",
+          "non-compliant": "Non-Compliant URI",
           "parent": "private_connectivity"
         }
       }
     },
     "settings": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "Immutable. Metadata used to create the destination Cloud SQL database.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Configure SSL and private network",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -525,8 +525,8 @@
         "database_version": {
           "description": "The database engine type and version. Currently supported values located at https://cloud.google.com/database-migration/docs/reference/rest/v1/projects.locations.connectionProfiles#sqldatabaseversion",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not Security Related",
           "compliant": null,
           "non-compliant": null,
           "parent": "settings"
@@ -534,8 +534,8 @@
         "user_labels": {
           "description": "The resource labels for a Cloud SQL instance to use to annotate any related underlying resources such as Compute Engine VMs.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not Security Related",
           "compliant": null,
           "non-compliant": null,
           "parent": "settings"
@@ -543,8 +543,8 @@
         "tier": {
           "description": "The tier (or machine type) for this instance, for example: db-n1-standard-1 (MySQL instances) or db-custom-1-3840 (PostgreSQL instances). For more information, see https://cloud.google.com/sql/docs/mysql/instance-settings",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not Security Related",
           "compliant": null,
           "non-compliant": null,
           "parent": "settings"
@@ -552,8 +552,8 @@
         "storage_auto_resize_limit": {
           "description": "The maximum size to which storage capacity can be automatically increased. The default value is 0, which specifies that there is no limit.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not Security Related",
           "compliant": null,
           "non-compliant": null,
           "parent": "settings"
@@ -561,8 +561,8 @@
         "activation_policy": {
           "description": "The activation policy specifies when the instance is activated; it is applicable only when the instance state is 'RUNNABLE'. Possible values are: `ALWAYS`, `NEVER`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not Security Related",
           "compliant": null,
           "non-compliant": null,
           "parent": "settings"
@@ -570,8 +570,8 @@
         "ip_config": {
           "description": "The settings for IP Management. This allows to enable or disable the instance IP and manage which external networks can connect to the instance. The IPv4 address cannot be disabled. Structure is [documented below](#nested_cloudsql_settings_ip_config).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Enable SSL and Private connection",
           "compliant": null,
           "non-compliant": null,
           "parent": "settings"
@@ -579,8 +579,8 @@
         "auto_storage_increase": {
           "description": "If you enable this setting, Cloud SQL checks your available storage every 30 seconds. If the available storage falls below a threshold size, Cloud SQL automatically adds additional storage capacity. If the available storage repeatedly falls below the threshold size, Cloud SQL continues to add storage until it reaches the maximum of 30 TB.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not Security Related",
           "compliant": null,
           "non-compliant": null,
           "parent": "settings"
@@ -588,8 +588,8 @@
         "database_flags": {
           "description": "The database flags passed to the Cloud SQL instance at startup.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not Security Related",
           "compliant": null,
           "non-compliant": null,
           "parent": "settings"
@@ -597,8 +597,8 @@
         "data_disk_type": {
           "description": "The type of storage. Possible values are: `PD_SSD`, `PD_HDD`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not Security Related",
           "compliant": null,
           "non-compliant": null,
           "parent": "settings"
@@ -606,8 +606,8 @@
         "data_disk_size_gb": {
           "description": "The storage capacity available to the database, in GB. The minimum (and default) size is 10GB.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not Security Related",
           "compliant": null,
           "non-compliant": null,
           "parent": "settings"
@@ -615,8 +615,8 @@
         "zone": {
           "description": "The Google Cloud Platform zone where your Cloud SQL datdabse instance is located.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not Security Related",
           "compliant": null,
           "non-compliant": null,
           "parent": "settings"
@@ -624,8 +624,8 @@
         "source_id": {
           "description": "The Database Migration Service source connection profile ID, in the format: projects/my_project_name/locations/us-central1/connectionProfiles/connection_profile_ID",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not Security Related",
           "compliant": null,
           "non-compliant": null,
           "parent": "settings"
@@ -633,8 +633,8 @@
         "root_password": {
           "description": "Input only. Initial root password. **Note**: This property is sensitive and will not be displayed in the plan.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not Security Related",
           "compliant": null,
           "non-compliant": null,
           "parent": "settings"
@@ -642,8 +642,8 @@
         "root_password_set": {
           "description": "(Output) Output only. Indicates If this connection profile root password is stored.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "This is the output",
           "compliant": null,
           "non-compliant": null,
           "parent": "settings"
@@ -651,8 +651,8 @@
         "collation": {
           "description": "The Cloud SQL default instance level collation.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not Security Related",
           "compliant": null,
           "non-compliant": null,
           "parent": "settings"
@@ -660,17 +660,17 @@
         "cmek_key_name": {
           "description": "The KMS key name used for the csql instance.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "CloudSQL connection profiles must use CMEK encryption.",
+          "compliant": "Compliant_Key",
+          "non-compliant": "Non_Compliant_Key",
           "parent": "settings"
         },
         "edition": {
           "description": "The edition of the given Cloud SQL instance. Possible values are: `ENTERPRISE`, `ENTERPRISE_PLUS`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not Security Related",
           "compliant": null,
           "non-compliant": null,
           "parent": "settings"
@@ -678,8 +678,8 @@
         "initial_user": {
           "description": "Required. Input only. Initial user to setup during cluster creation. Structure is [documented below](#nested_alloydb_settings_initial_user).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not Security Related",
           "compliant": null,
           "non-compliant": null,
           "parent": "settings"
@@ -687,8 +687,8 @@
         "vpc_network": {
           "description": "Required. The resource link for the VPC network in which cluster resources are created and from which they are accessible via Private IP. The network must belong to the same project as the cluster. It is specified in the form: 'projects/{project_number}/global/networks/{network_id}'. This is required to create a cluster.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "This is a required field already",
           "compliant": null,
           "non-compliant": null,
           "parent": "settings"
@@ -696,8 +696,8 @@
         "labels": {
           "description": "Labels for the AlloyDB cluster created by DMS.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not Security Related",
           "compliant": null,
           "non-compliant": null,
           "parent": "settings"
@@ -705,8 +705,8 @@
         "primary_instance_settings": {
           "description": "Settings for the cluster's primary instance Structure is [documented below](#nested_alloydb_settings_primary_instance_settings).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not Security Related",
           "compliant": null,
           "non-compliant": null,
           "parent": "settings"
@@ -714,10 +714,10 @@
       }
     },
     "ip_config": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "The settings for IP Management. ",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Enable SSL and Private connection",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -725,8 +725,8 @@
         "enable_ipv4": {
           "description": "Whether the instance should be assigned an IPv4 address or not.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not Security Related",
           "compliant": null,
           "non-compliant": null,
           "parent": "ip_config"
@@ -734,39 +734,39 @@
         "private_network": {
           "description": "The resource link for the VPC network from which the Cloud SQL instance is accessible for private IP. For example, projects/myProject/global/networks/default. This setting can be updated, but it cannot be removed after it is set.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Private networks restrict connectivity to internal VPCs, preventing exposure over the public internet.",
+          "compliant": "projects/myProject/global/networks/default",
+          "non-compliant": "Not configured",
           "parent": "ip_config"
         },
         "require_ssl": {
           "description": "Whether SSL connections over IP should be enforced or not.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Enforcing SSL ensures that all traffic between clients and the database is encrypted",
+          "compliant": true,
+          "non-compliant": false,
           "parent": "ip_config"
         },
         "authorized_networks": {
           "description": "The list of external networks that are allowed to connect to the instance using the IP. Structure is [documented below](#nested_cloudsql_settings_ip_config_authorized_networks).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Authorized networks define which external IPs can access the database. Better not configured",
+          "compliant": "Not configured",
+          "non-compliant": "Configured",
           "parent": "ip_config"
         }
       }
     },
     "authorized_networks": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "The list of external networks that are allowed to connect to the instance using the IP. Structure is [documented below](#nested_cloudsql_settings_ip_config_authorized_networks).",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Authorized networks define which external IPs can access the database. Better not configured",
+      "compliant": "Not configured",
+      "non-compliant": "Configured",
       "parent": null,
       "arguments": {
         "value": {
@@ -808,10 +808,10 @@
       }
     },
     "initial_user": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": " Initial user to setup during cluster creation.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Not Security Related",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -846,10 +846,10 @@
       }
     },
     "primary_instance_settings": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "Settings for the cluster's primary instance Structure ",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Not Security Related",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -902,10 +902,10 @@
       }
     },
     "machine_config": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "Configuration for the machines that host the underlying database engine. Structure is [documented below](#nested_alloydb_settings_primary_instance_settings_machine_config).",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Not Security Related",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
