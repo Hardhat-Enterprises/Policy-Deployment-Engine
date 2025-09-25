@@ -29,8 +29,8 @@ conditions := [
         {
             "condition": "Check if description is provided",
             "attribute_path": ["description"],
-            "values": [".+"],        # regex ensures non-empty string
-            "policy_type": "regex whitelist"
+            "values": ["*"],   # wildcard pattern → must have some value
+            "policy_type": "pattern whitelist"
         }
     ]
 ]
