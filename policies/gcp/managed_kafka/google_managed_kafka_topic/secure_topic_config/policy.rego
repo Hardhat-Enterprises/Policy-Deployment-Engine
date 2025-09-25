@@ -5,7 +5,9 @@ import data.terraform.gcp.security.managed_kafka.google_managed_kafka_topic.vars
 
 conditions := [
 
-  # SITUATION 1 – Enforce minimum replication factor
+
+  # SITUATION 1 – Minimum replication factor using range
+
   [
     {
       "situation_description": "Kafka topics should have a replication factor of at least 3 for high availability.",
@@ -14,8 +16,9 @@ conditions := [
     {
       "condition": "replication_factor must be at least 3",
       "attribute_path": ["replication_factor"],
-      "values": ["range:3:*"],
-      "policy_type": "whitelist"
+      "values": [3, null],
+      "policy_type": "range"
+
     }
   ],
 
