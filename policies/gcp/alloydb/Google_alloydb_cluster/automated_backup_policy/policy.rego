@@ -1,4 +1,4 @@
-package terraform.gcp.security.alloydb.google_alloydb_cluster_automated_backup_min_retention
+package terraform.gcp.security.alloydb.google_alloydb_cluster.automated_backup_policy
 
 import data.terraform.gcp.helpers as helpers
 import data.terraform.gcp.security.alloydb.google_alloydb_cluster.vars as vars
@@ -12,7 +12,7 @@ conditions := [
 		{
 			"condition": "Retention period must be at least 7 days (accepted durations).",
 			"attribute_path": ["automated_backup_policy", "time_based_retention", "retention_period"],
-			"values": vars.variables.accepted_retention_seconds,
+			"values": [604800, 1209600, 1814400, 2419200, 2592000],
 			"policy_type": "whitelist",
 		},
 	],
