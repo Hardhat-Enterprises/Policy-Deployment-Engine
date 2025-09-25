@@ -1,6 +1,3 @@
-# Describe your resource type here
-# Keep "c" as the name to indicate that this resource and its attributes are compliant
-
 resource "google_scc_organization_custom_module" "c" {
   organization = "123456789"
   display_name = "c"
