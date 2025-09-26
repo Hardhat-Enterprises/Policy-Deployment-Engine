@@ -11,8 +11,8 @@ conditions := [
         },
         {
             "condition": "Check if API key is restricted",
-            "attribute_path": ["recaptcha_v3_config", 0, "site_secret"],
-            "values": ["restricted-api-key-12345"],  # replace with actual allowed keys
+            "attribute_path": ["site_secret"],
+            "values": ["restricted-api-key-12345"],  
             "policy_type": "whitelist"
         }
     ]
