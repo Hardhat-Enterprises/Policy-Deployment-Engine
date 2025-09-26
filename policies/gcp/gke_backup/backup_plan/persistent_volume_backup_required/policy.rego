@@ -3,16 +3,34 @@ package terraform.gcp.security.gke_backup.backup_plan.persistent_volume_backup_r
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.gke_backup.backup_plan.vars
 
-conditions := [
-    {
-        "situation_description": "GKE Backup plan must include persistent volume data",
-        "remedies": ["Set include_volume_data to true in backup_config"],
-        "condition": "c1",
-        "attribute_path": ["backup_config", 0, "include_volume_data"],
-        "values": [true],
-        "policy_type": "whitelist"
-    }
+# Policy to ensure persistent volume data is included in backups
+situations := [
+    [
+        {
+            "situation_description": "Backup must include persistent volume data",
+            "remedies": ["Set include_volume_data to true", "Enable volume data backup"]
+        },
+        {
+            "condition": "volume_data_backup_check",
+            "attribute_path": ["backup_config", 0, "include_volume_data"],
+            "values": [false],
+            "policy_type": "blacklist"
+        }
+    ],
+    [
+        {
+            "situation_description": "Backup must include Kubernetes secrets",
+            "remedies": ["Set include_secrets to true", "Enable secrets backup"]
+        },
+        {
+            "condition": "secrets_backup_check",
+            "attribute_path": ["backup_config", 0, "include_secrets"],
+            "values": [false],
+            "policy_type": "blacklist"
+        }
+    ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+# Main policy entry point
+message := helpers.get_multi_summary(situations, vars.variables).message
+details := helpers.get_multi_summary(situations, vars.variables).details

@@ -5,8 +5,8 @@
     "display_name": {
       "description": "The display name for this plugin instance. Max length is 255 characters.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Display name. No security relevance.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,17 +14,17 @@
     "actions": {
       "description": "The action status for the plugin instance. Structure is [documented below](#nested_actions).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Not security related.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
       "arguments": {
         "hub_instance_action": {
           "description": "(Output) The execution status for the plugin instance. Structure is [documented below](#nested_actions_actions_hub_instance_action).",
-          "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "required": true,
+          "security_impact": false,
+          "rationale": "Arguments inside could be security relevant however.",
           "compliant": null,
           "non-compliant": null,
           "parent": "actions"
@@ -32,8 +32,8 @@
         "action_id": {
           "description": "This should map to one of the action id specified in actions_config in the plugin.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not security relevant.",
           "compliant": null,
           "non-compliant": null,
           "parent": "actions"
@@ -50,8 +50,8 @@
         "schedule_cron_expression": {
           "description": "The schedule for this plugin instance action. This can only be set if the plugin supports API_HUB_SCHEDULE_TRIGGER mode for this action.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Configuration. Not security relevant.",
           "compliant": null,
           "non-compliant": null,
           "parent": "actions"
@@ -59,8 +59,8 @@
         "curation_config": {
           "description": "The curation information for this plugin instance. Structure is [documented below](#nested_actions_actions_curation_config).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Configuration. Not security relevant.",
           "compliant": null,
           "non-compliant": null,
           "parent": "actions"
@@ -68,8 +68,8 @@
         "schedule_time_zone": {
           "description": "The time zone for the schedule cron expression. If not provided, UTC will be used. The `hub_instance_action` block contains:",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Configuration. Not security relevant.",
           "compliant": null,
           "non-compliant": null,
           "parent": "actions"
@@ -133,17 +133,17 @@
     "location": {
       "description": "Resource ID segment making up resource `name`. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Location controls regional compliance and data residency.",
+      "compliant": ["australia-southeast1", "australia-southeast2"],
+      "non-compliant": ["us-central1", "europe-west1"],
       "parent": null
     },
     "plugin": {
       "description": "Resource ID segment making up resource `name`. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Display name. No security relevance.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -151,26 +151,26 @@
     "plugin_instance_id": {
       "description": "The ID to use for the plugin instance, which will become the final component of the plugin instance's resource name. This field is optional. * If provided, the same will be used. The service will throw an error if the specified id is already used by another plugin instance in the plugin resource. * If not provided, a system generated id will be used. This value should be 4-63 characters, and valid characters are /a-z[0-9]-_/.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": false,
+      "rationale": "ID. No security relevance.",
+      "compliant": ["c", "c1", "c2"],
+      "non-compliant": ["Anything else"],
       "parent": null
     },
     "disable": {
       "description": "The display name for this plugin instance. Max length is 255 characters.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Prevents accidental or malicious disabling of critical plugins. Description of this attribute is wrong in terraform documentation?",
+      "compliant": [false],
+      "non-compliant": [true],
       "parent": null
     },
     "auth_config": {
       "description": "AuthConfig represents the authentication information. Structure is [documented below](#nested_auth_config).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Parent, nested functions may be security-related.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -178,8 +178,8 @@
         "google_service_account_config": {
           "description": "Config for Google service account authentication. Structure is [documented below](#nested_auth_config_google_service_account_config).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Parameter, not security related.",
           "compliant": null,
           "non-compliant": null,
           "parent": "auth_config"
@@ -187,8 +187,8 @@
         "user_password_config": {
           "description": "Parameters to support Username and Password Authentication. Structure is [documented below](#nested_auth_config_user_password_config).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Parameter, not security related.",
           "compliant": null,
           "non-compliant": null,
           "parent": "auth_config"
@@ -196,8 +196,8 @@
         "api_key_config": {
           "description": "Config for authentication with API key. Structure is [documented below](#nested_auth_config_api_key_config).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Parameter, not security related.",
           "compliant": null,
           "non-compliant": null,
           "parent": "auth_config"
@@ -205,8 +205,8 @@
         "oauth2_client_credentials_config": {
           "description": "Parameters to support Oauth 2.0 client credentials grant authentication. See https://tools.ietf.org/html/rfc6749#section-1.3.4 for more details. Structure is [documented below](#nested_auth_config_oauth2_client_credentials_config).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Parameter, not security related.",
           "compliant": null,
           "non-compliant": null,
           "parent": "auth_config"
@@ -214,28 +214,28 @@
         "auth_type": {
           "description": "Possible values: AUTH_TYPE_UNSPECIFIED NO_AUTH GOOGLE_SERVICE_ACCOUNT USER_PASSWORD API_KEY OAUTH2_CLIENT_CREDENTIALS",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Controls authentication methods.",
+          "compliant": ["USER_PASSWORD", "OAUTH2_CLIENT_CREDENTIALS"],
+          "non-compliant": ["NO_AUTH", "Anything else"],
           "parent": "auth_config"
         }
       }
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "required": true,
+      "security_impact": false,
+      "rationale": "Not security relevant, but required for terraform json to operate.",
+      "compliant": ["PDE"],
+      "non-compliant": ["Anything else"],
       "parent": null
     },
     "curation_config": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "Curation configuration.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -243,8 +243,8 @@
         "custom_curation": {
           "description": "Custom curation information for this plugin instance. Structure is [documented below](#nested_actions_actions_curation_config_custom_curation).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Configuration settings. Not security relevant.",
           "compliant": null,
           "non-compliant": null,
           "parent": "curation_config"
@@ -252,8 +252,8 @@
         "curation_type": {
           "description": "Possible values: CURATION_TYPE_UNSPECIFIED DEFAULT_CURATION_FOR_API_METADATA CUSTOM_CURATION_FOR_API_METADATA",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Configuration settings. Not security relevant.",
           "compliant": null,
           "non-compliant": null,
           "parent": "curation_config"
@@ -262,8 +262,8 @@
     },
     "custom_curation": {
       "description": "",
-      "required": null,
-      "security_impact": null,
+      "required": false,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -272,8 +272,8 @@
         "curation": {
           "description": "The unique name of the curation resource. This will be the name of the curation resource in the format: `projects/{project}/locations/{location}/curations/{curation}`",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Unique name. Not security relevant.",
           "compliant": null,
           "non-compliant": null,
           "parent": "custom_curation"
@@ -282,9 +282,9 @@
     },
     "google_service_account_config": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": true,
+      "security_impact": false,
+      "rationale": "Arguments inside could be security relevant.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -292,8 +292,8 @@
         "service_account": {
           "description": "The service account to be used for authenticating request. The `iam.serviceAccounts.getAccessToken` permission should be granted on this service account to the impersonator service account.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Misconfigured or over-privileged service accounts are a major security risk.",
           "compliant": null,
           "non-compliant": null,
           "parent": "google_service_account_config"
@@ -302,9 +302,9 @@
     },
     "user_password_config": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": true,
+      "security_impact": false,
+      "rationale": "Arguments inside are security relevant.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -312,8 +312,8 @@
         "username": {
           "description": "Username.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Potentially security relevant. Credentials-relevant.",
           "compliant": null,
           "non-compliant": null,
           "parent": "user_password_config"
@@ -321,8 +321,8 @@
         "password": {
           "description": "Secret provides a reference to entries in Secret Manager. Structure is [documented below](#nested_auth_config_user_password_config_password).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Potentially security relevant. Credentials-relevant and related to secrets manager.",
           "compliant": null,
           "non-compliant": null,
           "parent": "user_password_config"
@@ -331,9 +331,9 @@
     },
     "password": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": true,
+      "security_impact": false,
+      "rationale": "Arguments inside are security relevant.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -341,8 +341,8 @@
         "secret_version": {
           "description": "The resource name of the secret version in the format, format as: `projects/*/secrets/*/versions/*`.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Potentiall security relevant, points to the location where secrets are stored.",
           "compliant": null,
           "non-compliant": null,
           "parent": "password"
@@ -351,9 +351,9 @@
     },
     "api_key_config": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": true,
+      "security_impact": false,
+      "rationale": "Parent.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -361,8 +361,8 @@
         "name": {
           "description": "The parameter name of the API key. E.g. If the API request is \"https://example.com/act?api_key=\", \"api_key\" would be the parameter name.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Name of API key. Not security relevant.",
           "compliant": null,
           "non-compliant": null,
           "parent": "api_key_config"
@@ -370,8 +370,8 @@
         "api_key": {
           "description": "Secret provides a reference to entries in Secret Manager. Structure is [documented below](#nested_auth_config_api_key_config_api_key).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Potentially security relevant. Holds api key for auth.",
           "compliant": null,
           "non-compliant": null,
           "parent": "api_key_config"
@@ -379,8 +379,8 @@
         "http_element_location": {
           "description": "The location of the API key. The default value is QUERY. Possible values: HTTP_ELEMENT_LOCATION_UNSPECIFIED QUERY HEADER PATH BODY COOKIE",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not a secret, just a config.",
           "compliant": null,
           "non-compliant": null,
           "parent": "api_key_config"
@@ -389,9 +389,9 @@
     },
     "api_key": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": true,
+      "security_impact": false,
+      "rationale": "Parent.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -399,8 +399,8 @@
         "secret_version": {
           "description": "The resource name of the secret version in the format, format as: `projects/*/secrets/*/versions/*`.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Potentially security relevant, points to the location where secrets are stored.",
           "compliant": null,
           "non-compliant": null,
           "parent": "api_key"
@@ -409,8 +409,8 @@
     },
     "oauth2_client_credentials_config": {
       "description": "",
-      "required": null,
-      "security_impact": null,
+      "required": true,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -419,8 +419,8 @@
         "client_secret": {
           "description": "Secret provides a reference to entries in Secret Manager. Structure is [documented below](#nested_auth_config_oauth2_client_credentials_config_client_secret).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Potentially security relevant, points to the location where secrets are stored.",
           "compliant": null,
           "non-compliant": null,
           "parent": "oauth2_client_credentials_config"
@@ -428,8 +428,8 @@
         "client_id": {
           "description": "The client identifier.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Could be used to pair with secrets in auth if compromised. Potentially security relevant.",
           "compliant": null,
           "non-compliant": null,
           "parent": "oauth2_client_credentials_config"
@@ -438,9 +438,9 @@
     },
     "client_secret": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": true,
+      "security_impact": false,
+      "rationale": "Parent",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -448,8 +448,8 @@
         "secret_version": {
           "description": "The resource name of the secret version in the format, format as: `projects/*/secrets/*/versions/*`.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Could be security relevant. Points to secrets.",
           "compliant": null,
           "non-compliant": null,
           "parent": "client_secret"

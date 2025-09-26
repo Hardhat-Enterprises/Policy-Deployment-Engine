@@ -5,26 +5,26 @@
     "node_location": {
       "description": "Name of the Google Distributed Cloud Edge zone where this node pool will be created. For example: `us-central1-edge-customer-a`.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Node location determines the physical and geographical placement of nodes, impacting data residency, latency, and compliance with regional regulations.",
+      "compliant": "us-central1-edge-customer-a (approved zone)",
+      "non-compliant": "Unapproved or restricted edge zones",
       "parent": null
     },
     "node_count": {
       "description": "The number of nodes in the pool.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Proper node count ensures adequate capacity for workloads while avoiding resource overprovisioning that could increase attack surface.",
+      "compliant": "3 (appropriate for workload requirements)",
+      "non-compliant": "1 (single point of failure) or excessive nodes beyond requirements",
       "parent": null
     },
     "name": {
       "description": "The resource name of the node pool.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Node pool name is an identifier and doesn't directly impact security.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -32,62 +32,62 @@
     "location": {
       "description": "The location of the resource.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Location selection impacts data residency, compliance with regional regulations, and disaster recovery capabilities.",
+      "compliant": "australia-southeast1",
+      "non-compliant": "Unapproved or restricted regions",
       "parent": null
     },
     "cluster": {
       "description": "The name of the target Distributed Cloud Edge Cluster.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Cluster association ensures nodes are deployed to the correct, authorized cluster with proper security controls.",
+      "compliant": "proper-cluster-name",
+      "non-compliant": "Unauthorized or incorrect cluster reference",
       "parent": null
     },
     "labels": {
       "description": "Labels associated with this resource. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Proper labeling ensures node pools can be properly identified, tracked, and managed according to organizational policies and security requirements.",
+      "compliant": "Contains required labels: environment, team, cost-center",
+      "non-compliant": "Missing required labels or using non-standard label names",
       "parent": null
     },
     "machine_filter": {
       "description": "Only machines matching this filter will be allowed to join the node pool. The filtering language accepts strings like \"name=<name>\", and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Machine filters ensure nodes run only on approved, properly configured hardware with adequate security controls and compliance certifications.",
+      "compliant": "name=approved-machine-pattern*",
+      "non-compliant": "Overly permissive filters or missing filters allowing unapproved hardware",
       "parent": null
     },
     "local_disk_encryption": {
-      "description": "Local disk encryption options. This field is only used when enabling CMEK support. Structure is [documented below](#nested_local_disk_encryption).",
+      "description": "Local disk encryption options. This field is only used when enabling CMEK support.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Local disk encryption protects sensitive data at rest on node storage and should use customer-managed keys for enhanced security control.",
+      "compliant": "Properly configured customer-managed encryption",
+      "non-compliant": "Missing encryption or using default Google-managed keys when CMEK is required",
       "parent": null,
       "arguments": {
         "kms_key": {
           "description": "The Cloud KMS CryptoKey e.g. projects/{project}/locations/{location}/keyRings/{keyRing}/cryptoKeys/{cryptoKey} to use for protecting node local disks. If not specified, a Google-managed key will be used instead.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Customer-managed keys provide better control over encryption policies, access controls, and key rotation procedures.",
+          "compliant": "projects/my-project/locations/us-central1/keyRings/my-keyring/cryptoKeys/my-key",
+          "non-compliant": "Missing or improperly formatted KMS key reference",
           "parent": "local_disk_encryption"
         },
         "kms_key_active_version": {
           "description": "(Output) The Cloud KMS CryptoKeyVersion currently in use for protecting node local disks. Only applicable if kmsKey is set.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Output-only field indicating current key version, no security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "local_disk_encryption"
@@ -95,8 +95,8 @@
         "kms_key_state": {
           "description": "(Output) Availability of the Cloud KMS CryptoKey. If not KEY_AVAILABLE, then nodes may go offline as they cannot access their local data. This can be caused by a lack of permissions to use the key, or if the key is disabled or deleted.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Output-only field indicating key status, no security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "local_disk_encryption"
@@ -104,21 +104,21 @@
       }
     },
     "node_config": {
-      "description": "Configuration for each node in the NodePool Structure is [documented below](#nested_node_config).",
+      "description": "Configuration for each node in the NodePool.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Node configuration impacts security posture, resource allocation, and isolation between workloads.",
+      "compliant": "Properly configured node settings with security labels",
+      "non-compliant": "Misconfigured or insecure node settings",
       "parent": null,
       "arguments": {
         "labels": {
-          "description": "\"The Kubernetes node labels\"",
+          "description": "The Kubernetes node labels.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Node labels enable proper workload placement, security zoning, and resource management based on security requirements.",
+          "compliant": "security-zone=restricted, environment=production",
+          "non-compliant": "Missing security labels or incorrect labeling that could lead to improper workload placement",
           "parent": "node_config"
         }
       }
@@ -126,10 +126,10 @@
     "project": {
       "description": "If it is not provided, the provider project is used.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Project selection impacts resource isolation, billing accountability, and access control boundaries.",
+      "compliant": "Proper project reference",
+      "non-compliant": "Incorrect or unauthorized project",
       "parent": null
     }
   }

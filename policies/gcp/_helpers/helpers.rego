@@ -18,6 +18,14 @@ get_resource_name(this_nc_resource, value_name) = resource_name if {
     print(sprintf("Resource name for '%s' was not found! Your 'resource_value_name' in vars is wrong. Try 'resource_value_name': 'name'.", [this_nc_resource.type]))
 }
 
+# Handle empty array blacklisting specifically  
+array_contains(arr, elem, pol) if {
+    pol == "blacklist"
+    [] in arr  # Check if empty array is in blacklisted values
+    is_array(elem)
+    count(elem) == 0  # elem is empty
+}
+
 # if elem is an array; checks if elem contains any blacklisted items. e.g., elem=[w, r, a], arr=[a] -> true
 array_contains(arr, elem, pol) if {
     is_array(elem)
