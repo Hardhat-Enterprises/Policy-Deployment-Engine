@@ -1,12 +1,11 @@
-resource "google_firebase_hosting_version" "non_compliant_redirect_rules_secure" {
+resource "google_firebase_hosting_version" "nc" {
   provider = google-beta
-  site_id  = "redirect-rules-secure-noncompliant-site"
+  site_id  = "nc"
 
   config {
-    redirects {
-      glob        = "/admin/**"
-      location    = "/index.html"
-      status_code = 200
+    rewrites {
+      glob = "/admin/**"
+      path = "/admin.html"
     }
   }
 }

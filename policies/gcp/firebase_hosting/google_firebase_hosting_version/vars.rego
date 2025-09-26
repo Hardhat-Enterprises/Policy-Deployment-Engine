@@ -1,7 +1,9 @@
-package terraform.gcp.security.firebase_hosting.google_firebase_hosting_version.vars
+package terraform.gcp.security.firebase_hosting.google_firebase_hosting_version
 
-variables := {
-    "friendly_resource_name": "Firebase Hosting Version",
+vars := {
+  "variables": {
     "resource_type": "google_firebase_hosting_version",
-    "resource_value_name": "name"
+    "friendly_resource_name": "Firebase Hosting Version",
+    "resource_value_name": "site_id"
+  }
 }

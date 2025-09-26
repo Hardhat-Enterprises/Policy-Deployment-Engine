@@ -1,14 +1,13 @@
-resource "google_firebase_hosting_version" "non_compliant_cors_policy_secure" {
+resource "google_firebase_hosting_version" "nc" {
   provider = google-beta
-  site_id  = "nc"  # <- autotester-friendly
+  site_id  = "nc"
 
   config {
     headers {
-      glob    = "/api/**"
+      glob = "/api/**"
       headers = {
-        # Wildcard origin is the non-compliance we want caught
-        "Access-Control-Allow-Origin"      = "*"
-        # You can optionally make it “worse” to ensure it’s flagged:
+        "Access-Control-Allow-Origin" = "*"
+        # Optionally add this to ensure it fails on either check:
         # "Access-Control-Allow-Credentials" = "true"
       }
     }

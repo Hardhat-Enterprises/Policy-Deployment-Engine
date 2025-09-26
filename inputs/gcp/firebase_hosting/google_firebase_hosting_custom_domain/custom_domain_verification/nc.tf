@@ -1,6 +1,6 @@
-resource "google_firebase_hosting_custom_domain" "non_compliant_custom_domain" {
+resource "google_firebase_hosting_custom_domain" "nc" {
   provider        = google-beta
-  site_id         = "custom-domain-verification-site"
-  custom_domain   = "example.com"
-  cert_preference = ""                                  
+  site_id         = "nc"
+  custom_domain   = "nc.example.com"
+  cert_preference = ""  
 }

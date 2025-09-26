@@ -1,6 +1,6 @@
-resource "google_firebase_hosting_version" "compliant_cors_policy_secure" {
+resource "google_firebase_hosting_version" "c" {
   provider = google-beta
-  site_id  = "c"  # <- autotester-friendly
+  site_id  = "c"
 
   config {
     headers {

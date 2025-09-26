@@ -10,15 +10,15 @@ conditions := [
       "remedies": [
         "Set cert_preference to GROUPED or PROJECT_GROUPED to enable managed SSL certificates",
         "Avoid DEDICATED unless there is a strict operational requirement"
-      ],
+      ]
     },
     {
       "condition": "Validating cert_preference is automatic (managed)",
       "attribute_path": ["cert_preference"],
       "values": ["GROUPED", "PROJECT_GROUPED"],
-      "policy_type": "whitelist",
-    },
-  ],
+      "policy_type": "whitelist"
+    }
+  ]
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message

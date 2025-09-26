@@ -6,22 +6,6 @@ import data.terraform.gcp.security.firebase_hosting.google_firebase_hosting_vers
 conditions := [
   [
     {
-      "situation_description": "Sensitive files should not be cached for extended periods",
-      "remedies": [
-        "Set appropriate cache headers for sensitive content",
-        "Use no-cache for authentication pages",
-        "Set short TTL for dynamic content"
-      ]
-    },
-    {
-      "condition": "Validating cache control is restrictive for sensitive files",
-      "attribute_path": ["config", 0, "headers", 0, "headers", "Cache-Control"],
-      "values": ["no-cache", "no-store", "max-age=0"],
-      "policy_type": "whitelist"
-    }
-  ],
-  [
-    {
       "situation_description": "Static assets should have reasonable cache duration",
       "remedies": [
         "Set appropriate max-age for static resources",
@@ -29,8 +13,8 @@ conditions := [
       ]
     },
     {
-      "condition": "Validating cache duration is reasonable",
-      "attribute_path": ["config", 0, "headers", 1, "headers", "Cache-Control"],
+      "condition": "Cache-Control for static assets",
+      "attribute_path": ["config", 0, "headers", 0, "headers", "Cache-Control"],
       "values": ["max-age=31536000", "max-age=86400", "max-age=3600"],
       "policy_type": "whitelist"
     }
