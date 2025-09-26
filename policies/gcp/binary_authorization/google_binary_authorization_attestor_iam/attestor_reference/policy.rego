@@ -15,17 +15,17 @@ conditions := [
       "condition": "Only approved attestor references are allowed",
       "attribute_path": ["attestor"],
       "values": [
-        "projects/australia-southeast1/attestors/attestor1",
-        "projects/australia-southeast1/attestors/attestor2",
-        "projects/us-central1/attestors/attestor1",
-        "projects/us-central1/attestors/attestor2",
-        "projects/europe-west1/attestors/attestor1",
-        "projects/europe-west1/attestors/attestor2"
+        "projects/my-secure-project/attestors/australia-southeast1",
+        "projects/my-secure-project/attestors/us-central1-attestor1",
+        "projects/my-secure-project/attestors/us-central1-attestor2"
       ],
       "policy_type": "whitelist"
     }
   ]
 ]
 
+# Summary message for compliance
 message := helpers.get_multi_summary(conditions, vars.variables).message
+
+# Detailed compliance info for debugging
 details := helpers.get_multi_summary(conditions, vars.variables).details

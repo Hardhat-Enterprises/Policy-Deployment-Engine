@@ -1,4 +1,4 @@
-package terraform.gcp.security.binary_authorization.google_binary_authorization_attestor_iam.member
+package terraform.gcp.security.binary_authorization.google_binary_authorization_attestor_iam.required_member
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.binary_authorization.google_binary_authorization_attestor_iam.vars
@@ -6,16 +6,18 @@ import data.terraform.gcp.security.binary_authorization.google_binary_authorizat
 conditions := [
   [
     {
-      "situation_description": "IAM binding has an invalid or empty member",
+      "situation_description": "IAM member is not an approved service account for Binary Authorization",
       "remedies": [
-        "Add a valid `member` identity such as `serviceAccount:<sa>@<project>.iam.gserviceaccount.com` or `user:<user>@example.com`"
+        "Set the `member` field to an approved service account (e.g., `serviceAccount:valid-sa@my-secure-project.iam.gserviceaccount.com`)."
       ]
     },
     {
-      "condition": "`member` must not be empty",
+      "condition": "`member` must be set to an approved identity",
       "attribute_path": ["member"],
-      "values": [""],
-      "policy_type": "blacklist"
+      "values": [
+        "serviceAccount:valid-sa@my-secure-project.iam.gserviceaccount.com"
+      ],
+      "policy_type": "whitelist"
     }
   ]
 ]

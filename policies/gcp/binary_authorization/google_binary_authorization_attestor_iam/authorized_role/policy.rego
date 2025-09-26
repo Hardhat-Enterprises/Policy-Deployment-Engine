@@ -1,4 +1,4 @@
-package terraform.gcp.security.binary_authorization.google_binary_authorization_attestor_iam.role
+package terraform.gcp.security.binary_authorization.google_binary_authorization_attestor_iam.authorized_role
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.binary_authorization.google_binary_authorization_attestor_iam.vars

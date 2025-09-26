@@ -1,11 +1,11 @@
 resource "google_binary_authorization_attestor" "nc1" {
   name        = "nc1"
-  description = "Non-compliant attestor missing key details"
-  project     = "my-insecure-project"
+  description = "Non-compliant attestor with no public keys"
+  project     = "my-secure-project"
 
   attestation_authority_note {
-    note_reference = "projects/my-insecure-project/notes/invalid-note"
-    
-    public_keys {}
+    note_reference = "projects/my-secure-project/notes/valid-note"
+
+    # Missing public_keys block → triggers blacklist policy
   }
 }

@@ -1,5 +1,5 @@
 resource "google_binary_authorization_policy" "c1" {
-  project = "my-gcp-project"
+  project = "c1"
 
   default_admission_rule {
     evaluation_mode  = "REQUIRE_ATTESTATION"

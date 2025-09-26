@@ -1,12 +1,10 @@
 resource "google_binary_authorization_policy" "c1" {
-  project = "my-secure-project"
+  project = "c1"
 
-  admission_whitelist_patterns {
-    name_pattern = "gcr.io/google_containers/*"
-  }
+  global_policy_evaluation_mode = "ENABLE"
 
   default_admission_rule {
-    evaluation_mode  = "ALWAYS_ALLOW"
+    evaluation_mode  = "REQUIRE_ATTESTATION"
     enforcement_mode = "ENFORCED_BLOCK_AND_AUDIT_LOG"
   }
 }

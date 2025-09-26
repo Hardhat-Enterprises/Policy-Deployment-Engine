@@ -1,6 +1,6 @@
 resource "google_binary_authorization_attestor" "c1" {
   name        = "c1"
-  description = "Compliant attestor with a secure signature algorithm"
+  description = "Compliant attestor with secure signature algorithm"
   project     = "my-secure-project"
 
   attestation_authority_note {
@@ -11,9 +11,7 @@ resource "google_binary_authorization_attestor" "c1" {
       pkix_public_key {
         public_key_pem = <<EOT
 -----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwlQq+FHDujbB5YaqmS9m
-fL5/NfaOS4YEdhzjz5wRgOqR9LJ0eB0F9qu7D+S5V8nXcVdcwFvCpc6fFJIBay0M
-+VUlZTpjMpphDFFWlQIDAQAB
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr3y...
 -----END PUBLIC KEY-----
 EOT
         signature_algorithm = "RSA_PSS_2048_SHA256"

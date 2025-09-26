@@ -8,14 +8,14 @@ conditions := [
     {
       "situation_description": "Audit logging is not properly configured in Binary Authorization policy",
       "remedies": [
-        "Add `audit_log_config` with `log_type` set to `ALL`"
+        "Set `default_admission_rule.enforcement_mode` to `ENFORCED_BLOCK_AND_AUDIT_LOG`"
       ]
     },
     {
-      "condition": "`audit_log_config` must be defined",
-      "attribute_path": ["name_pattern"],
-      "values": [null, []],
-      "policy_type": "blacklist"
+      "condition": "Audit logging must be enabled in enforcement mode",
+      "attribute_path": ["default_admission_rule", 0, "enforcement_mode"],
+      "values": ["ENFORCED_BLOCK_AND_AUDIT_LOG"],
+      "policy_type": "whitelist"
     }
   ]
 ]

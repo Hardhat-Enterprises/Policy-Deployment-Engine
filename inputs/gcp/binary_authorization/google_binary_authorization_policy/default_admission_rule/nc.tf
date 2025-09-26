@@ -1,5 +1,5 @@
 resource "google_binary_authorization_policy" "nc1" {
-  project = "my-gcp-project"
+  project = "nc1"
 
   default_admission_rule {
     evaluation_mode  = "ALWAYS_ALLOW"

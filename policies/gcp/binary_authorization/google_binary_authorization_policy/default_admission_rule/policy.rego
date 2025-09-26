@@ -18,20 +18,6 @@ conditions := [
       "values": ["REQUIRE_ATTESTATION"],
       "policy_type": "whitelist"
     }
-  ],
-  [
-    {
-      "situation_description": "Default admission rule does not enforce blocking",
-      "remedies": [
-        "Set enforcement_mode to ENFORCED_BLOCK_AND_AUDIT_LOG"
-      ]
-    },
-    {
-      "condition": "Enforcement must block and log",
-      "attribute_path": ["default_admission_rule", "enforcement_mode"],
-      "values": ["ENFORCED_BLOCK_AND_AUDIT_LOG"],
-      "policy_type": "whitelist"
-    }
   ]
 ]
 

@@ -3,5 +3,5 @@ package terraform.gcp.security.binary_authorization.google_binary_authorization_
 variables := {
     "friendly_resource_name": "Binary Authorization Attestor IAM Binding",
     "resource_type": "google_binary_authorization_attestor_iam_member",
-    "resource_value_name": "attestor_iam"
+    "resource_value_name": "name"
 }
