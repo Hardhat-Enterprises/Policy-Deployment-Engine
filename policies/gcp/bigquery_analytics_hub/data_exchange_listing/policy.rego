@@ -1,52 +1,42 @@
-package terraform.gcp.security.analytics_hub.listing
+package terraform.gcp.security.analytics_hub.listing.policy
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.analytics_hub.listing.vars
 
-# Define conditions for compliance
 conditions := [
     [
         {
-            "situation_description": "Listing display_name must start with the prefix 'de-' and follow naming standards.",
+            "situation_description": "c1: Listing must not be shared publicly with allUsers or allAuthenticatedUsers",
             "remedies":[ 
-                "Rename the Listing so that its display_name starts with 'de-'",
-                "Use only lowercase letters, numbers, hyphens, or underscores after the prefix"
+                "Remove allUsers/allAuthenticatedUsers from the listing IAM policy",
+                "Restrict access to specific users, groups, or service accounts"
             ]
         },
         {
-            "condition": "Check if display_name starts with 'de-' and follows naming convention",
-            "attribute_path": ["display_name"], 
-            "values": ["^de-[a-z0-9_-]+$"], 
-            "policy_type": "regex whitelist"
+            "condition": "Check for risky IAM members on listing",
+            "attribute_path": ["iam_policy", "members"], 
+            "values": [
+                "allUsers",
+                "allAuthenticatedUsers"
+            ], 
+            "policy_type": "blacklist"
         }
     ],
     [
         {
-            "situation_description": "Listing ID must only contain lowercase letters, numbers, and underscores, with length 3–50.",
+            "situation_description": "c2: Listing must only use approved regions",
             "remedies":[ 
-                "Update the listing_id to only use lowercase letters, numbers, or underscores",
-                "Ensure the ID is at least 3 characters and no longer than 50 characters"
+                "Ensure listing region is australia-southeast1 or australia-southeast2",
+                "Update the Terraform configuration to an approved region"
             ]
         },
         {
-            "condition": "Check if listing_id follows allowed character pattern",
-            "attribute_path": ["listing_id"], 
-            "values": ["^[a-z0-9_]{3,50}$"], 
-            "policy_type": "regex whitelist"
-        }
-    ],
-    [
-        {
-            "situation_description": "Listing description must not be empty.",
-            "remedies":[ 
-                "Add a meaningful description for the listing",
-                "Ensure the description provides context about the dataset usage"
-            ]
-        },
-        {
-            "condition": "Check that description is not empty",
-            "attribute_path": ["description"], 
-            "values": ["*"], 
+            "condition": "Check if listing region is approved",
+            "attribute_path": ["location"], 
+            "values": [
+                "australia-southeast1",
+                "australia-southeast2"
+            ], 
             "policy_type": "pattern whitelist"
         }
     ]
