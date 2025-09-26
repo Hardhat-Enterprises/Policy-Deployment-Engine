@@ -2,7 +2,7 @@
 resource "google_dataproc_autoscaling_policy" "nc" {
   project   = "my-project-dataproc02" # 
   location  = "us-central1"
-  policy_id = "policy-non-compliant"
+  policy_id = "nc"
 
   worker_config {
     # VIOLATION: Exceeds the maximum limit of 100.

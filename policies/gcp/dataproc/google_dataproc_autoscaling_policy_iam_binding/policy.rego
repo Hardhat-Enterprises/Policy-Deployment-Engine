@@ -1,4 +1,4 @@
-package terraform.gcp.security.dataproc.autoscaling_policy_iam.iam_least_privilege
+package terraform.gcp.security.dataproc.autoscaling_policy_iam_binding
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.dataproc.autoscaling_policy_iam.vars

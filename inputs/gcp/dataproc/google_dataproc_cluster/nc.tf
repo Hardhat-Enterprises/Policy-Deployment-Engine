@@ -1,7 +1,7 @@
 resource "google_dataproc_cluster" "nc" {
   project = "my-project-dataproc02"
   region  = "us-central1"
-  name    = "cluster-nc-example"
+  name    = "nc"
 
   cluster_config {
     # VIOLATION: Missing encryption_config block for CMEK.

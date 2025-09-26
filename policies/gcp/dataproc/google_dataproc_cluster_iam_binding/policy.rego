@@ -1,9 +1,9 @@
-package terraform.gcp.security.dataproc.cluster_iam.iam_least_privilege
+package terraform.gcp.security.dataproc.cluster_iam
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.dataproc.cluster_iam.vars
 
-conditions := [
+conditions = [
     [
         {"situation_description" : "A primitive role (owner, editor, or viewer) is being assigned.",
          "remedies": [ "Replace the primitive role with a specific Dataproc role like 'roles/dataproc.editor'."]},

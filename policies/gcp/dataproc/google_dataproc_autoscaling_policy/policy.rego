@@ -1,4 +1,4 @@
-package terraform.gcp.security.dataproc.autoscaling_policy.cost_and_availability_checks
+package terraform.gcp.security.dataproc.autoscaling_policy
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.dataproc.autoscaling_policy.vars

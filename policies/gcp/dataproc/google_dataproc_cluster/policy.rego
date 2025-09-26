@@ -1,9 +1,9 @@
-package terraform.gcp.security.dataproc.cluster.comprehensive_cluster_security
+package terraform.gcp.security.dataproc.cluster
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.dataproc.cluster.vars
 
-conditions := [
+conditions = [
     [
         {"situation_description" : "Dataproc cluster has public IP addresses enabled.",
          "remedies": [ "Set 'internal_ip_only' to 'true'."]},

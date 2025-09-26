@@ -1,9 +1,9 @@
-package terraform.gcp.security.dataproc.batch.batch_security_checks
+package terraform.gcp.security.dataproc.batch
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.dataproc.batch.vars
 
-conditions := [
+conditions = [
     [
         {"situation_description" : "Dataproc batch job is using the default service account.",
          "remedies": [ "Specify a dedicated service account in 'runtime_config.properties'."]},

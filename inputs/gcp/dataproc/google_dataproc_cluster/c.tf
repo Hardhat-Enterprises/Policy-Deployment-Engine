@@ -1,7 +1,7 @@
 resource "google_dataproc_cluster" "c" {
   project = "my-project-dataproc02"
   region  = "us-central1"
-  name    = "cluster-c-example"
+  name    = "c"
 
   cluster_config {
     # Compliant: Specifies a Customer-Managed Encryption Key.

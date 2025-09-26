@@ -1,7 +1,7 @@
 resource "google_dataproc_batch" "c" {
   project  = "my-project-dataproc02"
   location = "us-central1"
-  batch_id = "batch-c-example"
+  batch_id = "c"
 
   pyspark_batch {
     main_python_file_uri = "gs://example-bucket-name/pi.py"
