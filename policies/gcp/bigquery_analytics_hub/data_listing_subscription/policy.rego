@@ -7,47 +7,47 @@ import data.terraform.gcp.security.analytics_hub.listing_subscription.vars
 conditions := [
     [
         {
-            "situation_description" : "Listing Subscription ID must only contain lowercase letters, numbers, and underscores.",
+            "situation_description" : "Listing Subscription ID must only contain lowercase letters, numbers, and underscores, with length 3–50.",
             "remedies":[ 
-                "Update the subscription_id to only use lowercase letters, numbers, or underscores",
-                "Avoid uppercase letters, spaces, or special characters"
+                "Update subscription_id to use only lowercase letters, numbers, or underscores",
+                "Ensure the ID length is between 3 and 50 characters"
             ]
         },
         {
-            "condition": "Check if subscription_id follows allowed character pattern",
+            "condition": "Check subscription_id follows allowed naming convention",
             "attribute_path" : ["subscription_id"], 
-            "values" : ["^[a-z0-9_]+$"], 
-            "policy_type" : "pattern whitelist"
+            "values" : ["^[a-z0-9_]{3,50}$"], 
+            "policy_type" : "regex whitelist"
         }
     ],
     [
         {
-            "situation_description" : "Destination dataset ID must only contain letters, numbers, or underscores.",
+            "situation_description" : "Destination dataset_id must comply with BigQuery standards (lowercase letters, numbers, underscores, 3–50 chars).",
             "remedies":[ 
-                "Ensure destination dataset_id complies with BigQuery naming standards",
-                "Avoid using special characters or spaces"
+                "Rename dataset_id using only lowercase letters, numbers, or underscores",
+                "Ensure dataset_id length is between 3 and 50 characters"
             ]
         },
         {
-            "condition": "Check if dataset_id follows allowed character pattern",
+            "condition": "Check dataset_id format",
             "attribute_path" : ["destination_dataset", "dataset_reference", "dataset_id"], 
-            "values" : ["^[a-zA-Z0-9_]+$"], 
-            "policy_type" : "pattern whitelist"
+            "values" : ["^[a-z0-9_]{3,50}$"], 
+            "policy_type" : "regex whitelist"
         }
     ],
     [
         {
-            "situation_description" : "Friendly name should not contain emojis or unsupported characters.",
+            "situation_description" : "Friendly name must only use letters, numbers, spaces, hyphens, or underscores (no emojis), with length 1–100.",
             "remedies":[ 
-                "Update friendly_name to plain text (letters, numbers, spaces, underscores)",
-                "Avoid emojis or special characters"
+                "Update friendly_name to plain text only",
+                "Avoid emojis, special Unicode characters, or excessive length"
             ]
         },
         {
             "condition": "Check friendly_name format",
             "attribute_path" : ["destination_dataset", "friendly_name"], 
-            "values" : ["^[a-zA-Z0-9_\\- ]+$"], 
-            "policy_type" : "pattern whitelist"
+            "values" : ["^[a-zA-Z0-9_\\- ]{1,100}$"], 
+            "policy_type" : "regex whitelist"
         }
     ]
 ]

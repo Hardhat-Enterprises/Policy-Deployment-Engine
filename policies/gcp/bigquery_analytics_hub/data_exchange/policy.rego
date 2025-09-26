@@ -6,30 +6,19 @@ import data.terraform.gcp.security.analytics_hub.data_exchange.vars
 conditions := [
     [
         {
-            "situation_description": "Data Exchange must be deployed in an approved region",
+            "situation_description": "c1: Data Exchange must be deployed in an approved Australian region",
             "remedies": [
-                "Select a region within australia-southeast1 or australia-southeast2",
-                "Update your Terraform resource to use an allowed region"
+                "Select australia-southeast1 or australia-southeast2 as the region",
+                "Update the Terraform configuration to use an approved region"
             ]
         },
         {
-            "condition": "Check if location is within allowed Australian regions",
+            "condition": "Check if location is within approved Australian regions",
             "attribute_path": ["location"],
-            "values": ["australia-southeast1", "australia-southeast2"],
-            "policy_type": "pattern whitelist"
-        }
-    ],
-    [
-        {
-            "situation_description": "Data Exchange description should not be left empty",
-            "remedies": [
-                "Provide a meaningful description when creating the Data Exchange"
-            ]
-        },
-        {
-            "condition": "Check if description is provided",
-            "attribute_path": ["description"],
-            "values": ["*"],   # wildcard pattern → must have some value
+            "values": [
+                "australia-southeast1",
+                "australia-southeast2"
+            ],
             "policy_type": "pattern whitelist"
         }
     ]

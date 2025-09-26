@@ -7,32 +7,47 @@ import data.terraform.gcp.security.analytics_hub.listing.vars
 conditions := [
     [
         {
-            "situation_description": "Listing display_name must start with the prefix 'de-'.",
+            "situation_description": "Listing display_name must start with the prefix 'de-' and follow naming standards.",
             "remedies":[ 
                 "Rename the Listing so that its display_name starts with 'de-'",
-                "Update your Terraform resource to include the correct prefix"
+                "Use only lowercase letters, numbers, hyphens, or underscores after the prefix"
             ]
         },
         {
-            "condition": "Check if display_name starts with the allowed prefix",
+            "condition": "Check if display_name starts with 'de-' and follows naming convention",
             "attribute_path": ["display_name"], 
-            "values": ["de-"], 
-            "policy_type": "pattern whitelist"   # ✅ correct usage (prefix check)
+            "values": ["^de-[a-z0-9_-]+$"], 
+            "policy_type": "regex whitelist"
         }
     ],
     [
         {
-            "situation_description": "Listing ID must only contain lowercase letters, numbers, and underscores.",
+            "situation_description": "Listing ID must only contain lowercase letters, numbers, and underscores, with length 3–50.",
             "remedies":[ 
                 "Update the listing_id to only use lowercase letters, numbers, or underscores",
-                "Avoid uppercase letters, spaces, or special characters"
+                "Ensure the ID is at least 3 characters and no longer than 50 characters"
             ]
         },
         {
             "condition": "Check if listing_id follows allowed character pattern",
             "attribute_path": ["listing_id"], 
-            "values": ["^[a-z0-9_]+$"], 
-            "policy_type": "regex whitelist"     # ✅ fixed: changed from 'pattern whitelist'
+            "values": ["^[a-z0-9_]{3,50}$"], 
+            "policy_type": "regex whitelist"
+        }
+    ],
+    [
+        {
+            "situation_description": "Listing description must not be empty.",
+            "remedies":[ 
+                "Add a meaningful description for the listing",
+                "Ensure the description provides context about the dataset usage"
+            ]
+        },
+        {
+            "condition": "Check that description is not empty",
+            "attribute_path": ["description"], 
+            "values": ["*"], 
+            "policy_type": "pattern whitelist"
         }
     ]
 ]

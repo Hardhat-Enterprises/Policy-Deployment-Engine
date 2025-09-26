@@ -6,64 +6,54 @@ import data.terraform.gcp.security.analytics_hub.listing_iam.vars
 conditions := [
     [
         {
-            "situation_description": "listing_id must be 'c' for compliant configurations.",
+            "situation_description": "Listing ID must follow standard naming convention (prefix 'de-', lowercase, 3–50 chars).",
             "remedies": [
-                "Rename listing_id to 'c' for compliant resources."
+                "Rename listing_id to start with 'de-'",
+                "Use only lowercase letters, numbers, underscores, or hyphens",
+                "Keep length between 3 and 50 characters"
             ]
         },
         {
-            "condition": "Check if listing_id is equal to 'c'",
+            "condition": "Check listing_id naming pattern",
             "attribute_path": ["listing_id"],
-            "values": ["c"],
-            "policy_type": "whitelist"
+            "values": ["^de-[a-z0-9_-]{3,50}$"],
+            "policy_type": "regex whitelist"
         }
     ],
     [
         {
-            "situation_description": "listing_id must not start with 'nc' (non-compliant marker).",
+            "situation_description": "IAM role must not be overly permissive (e.g., roles/owner, roles/editor, roles/admin).",
             "remedies": [
-                "Avoid using 'nc' as the prefix in listing_id.",
-                "Rename to 'c' once the resource passes compliance checks."
+                "Use least privilege roles such as roles/viewer",
+                "If broader access is required, define a custom role with only necessary permissions"
             ]
         },
         {
-            "condition": "Check if listing_id does not start with 'nc'",
-            "attribute_path": ["listing_id"],
-            "values": ["^nc.*$"],
-            "policy_type": "pattern blacklist"
-        }
-    ],
-    [
-        {
-            "situation_description": "IAM role must not be overly permissive (e.g., roles/owner).",
-            "remedies": [
-                "Use least privilege roles such as roles/viewer, roles/editor, or custom roles.",
-                "Avoid granting roles/owner unless absolutely necessary."
-            ]
-        },
-        {
-            "condition": "Check if role avoids disallowed values",
+            "condition": "Check that IAM role is not overly permissive",
             "attribute_path": ["role"],
-            "values": ["roles/owner"],
+            "values": ["roles/owner", "roles/editor", "roles/admin"],
             "policy_type": "blacklist"
         }
     ],
     [
         {
-            "situation_description": "IAM bindings must include at least one member.",
+            "situation_description": "IAM bindings must include valid members and must not contain risky principals like allUsers or allAuthenticatedUsers.",
             "remedies": [
-                "Ensure 'members' array is not empty when defining IAM bindings.",
-                "Add valid user, group, or service account identities."
+                "Ensure members array is not empty",
+                "Remove allUsers/allAuthenticatedUsers and replace with specific users, groups, or service accounts"
             ]
         },
         {
-            "condition": "Check if members is not empty",
+            "condition": "Check IAM members validity",
             "attribute_path": ["members"],
-            "values": ["^$"],
+            "values": ["^$", "allUsers", "allAuthenticatedUsers"],
             "policy_type": "pattern blacklist"
         }
     ]
 ]
 
+# General compliance summary
 message := helpers.get_multi_summary(conditions, vars.variables).message
+
+# Detailed compliance evaluation
 details := helpers.get_multi_summary(conditions, vars.variables).details
