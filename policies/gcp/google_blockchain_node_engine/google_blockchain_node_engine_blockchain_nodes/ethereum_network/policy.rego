@@ -13,7 +13,7 @@ conditions := [
     },
     {
       "condition": "ethereum_network must be MAINNET",
-      "attribute_path": ["ethereum_details", "network"],
+      "attribute_path": ["ethereum_details", 0, "network"],
       "values": ["MAINNET"],
       "policy_type": "whitelist"
     }

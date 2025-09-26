@@ -5,6 +5,13 @@ resource "google_blockchain_node_engine_blockchain_nodes" "nc1" {
   blockchain_type    = "ETHEREUM"
 
   ethereum_details {
-    network = "TESTNET_GOERLI_PRATER"
+    network = "MAINNET"
+
+    validator_config {
+      mev_relay_urls = [
+        "https://mev1.example.org/",
+        "https://untrusted-relay.io/"
+      ]
+    }
   }
 }

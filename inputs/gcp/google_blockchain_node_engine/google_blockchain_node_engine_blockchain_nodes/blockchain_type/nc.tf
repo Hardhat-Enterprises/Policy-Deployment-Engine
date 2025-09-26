@@ -1,6 +1,6 @@
 resource "google_blockchain_node_engine_blockchain_nodes" "nc1" {
-  location           = "us-central1"
+  location           = "india"
   project            = "my-insecure-project"
-  blockchain_node_id = "nc1"
-  blockchain_type    = ""
+  blockchain_type    = "bitcoin" 
+  labels             = "nc1"
 }

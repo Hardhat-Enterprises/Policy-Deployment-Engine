@@ -5,6 +5,14 @@ resource "google_blockchain_node_engine_blockchain_nodes" "nc1" {
   blockchain_type    = "ETHEREUM"
 
   ethereum_details {
-    network = "TESTNET_GOERLI_PRATER"
+    network = "MAINNET"
+    execution_client  = "EXECUTION_CLIENT_UNSPECIFIED"
+
+    validator_config {
+      mev_relay_urls = [
+        "https://relay.flashbots.net/",
+        "https://trusted.mev.org/"
+      ]
+    }
   }
 }

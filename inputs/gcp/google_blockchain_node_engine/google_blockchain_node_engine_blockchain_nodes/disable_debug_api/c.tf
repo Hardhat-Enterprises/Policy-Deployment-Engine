@@ -5,15 +5,8 @@ resource "google_blockchain_node_engine_blockchain_nodes" "c1" {
   blockchain_type    = "ETHEREUM"
 
   ethereum_details {
+    api_enable_debug = false
     network = "MAINNET"
-
-    geth_details {
-      # no unsupported fields
-    }
-  }
-
-  labels = {
-    environment = "prod"
-    owner       = "security-team"
-  }
+    
+}
 }

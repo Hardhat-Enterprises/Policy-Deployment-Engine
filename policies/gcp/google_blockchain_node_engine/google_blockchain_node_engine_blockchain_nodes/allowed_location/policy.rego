@@ -1,4 +1,4 @@
-package terraform.gcp.security.blockchain.blockchain_nodes.location
+package terraform.gcp.security.blockchain.blockchain_nodes.allowed_location
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.blockchain.blockchain_nodes.vars
@@ -6,15 +6,15 @@ import data.terraform.gcp.security.blockchain.blockchain_nodes.vars
 conditions := [
   [
     {
-      "situation_description": "Blockchain node deployed in unapproved location",
+      "situation_description": "Blockchain node is deployed in unsupported GCP locations",
       "remedies": [
-        "Deploy nodes only in approved regions: us-central1, europe-west1."
+        "Restrict deployment to approved locations, e.g., `us-central1` only."
       ]
     },
     {
-      "condition": "`location` must be an approved region",
+      "condition": "location must be `us-central1`",
       "attribute_path": ["location"],
-      "values": ["us-central1", "europe-west1"],
+      "values": ["us-central1"],
       "policy_type": "whitelist"
     }
   ]
