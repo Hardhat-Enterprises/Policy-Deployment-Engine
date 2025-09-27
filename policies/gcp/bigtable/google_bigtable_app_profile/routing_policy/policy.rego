@@ -13,13 +13,15 @@ conditions := [
       "Implement proper testing for failover scenarios if using multi-cluster routing.",
       "Monitor routing effectiveness and adjust based on performance metrics."]},
     {
-        "condition": "Google Cloud Bigtable app profile should have appropriate routing policy configured for optimal performance and availability.",
-        "attribute_path" : ["single_cluster_routing", "multi_cluster_routing_use_any"], 
-        "values" : [null], 
+        "condition": "Google Cloud Bigtable app profile should have transactional writes enabled for better performance and consistency.",
+        "attribute_path" : ["single_cluster_routing", 0, "allow_transactional_writes"], 
+        "values" : [false], 
         "policy_type" : "blacklist" 
     }
     ]
 ]
+
+summary := helpers.get_multi_summary(conditions, vars.variables)
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
 details := helpers.get_multi_summary(conditions, vars.variables).details

@@ -16,11 +16,13 @@ conditions := [
     {
         "condition": "Google Cloud Bigtable table should have deletion protection enabled when the attribute is explicitly set to false",
         "attribute_path" : ["deletion_protection"], 
-        "values" : [false], 
+        "values" : ["UNPROTECTED"], 
         "policy_type" : "blacklist" 
     }
     ]
 ]
+
+summary := helpers.get_multi_summary(conditions, vars.variables)
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
 details := helpers.get_multi_summary(conditions, vars.variables).details
