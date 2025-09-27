@@ -5,19 +5,19 @@
     "key_id": {
       "description": "The key identifier of a private key enabled with DeviceCheck, created in your Apple Developer account.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "The Key ID is a sensitive part of the DeviceCheck credential. It should be stored securely and not exposed.",
+      "compliant": "loaded from a secret manager",
+      "non-compliant": "hardcoded-key-id",
       "parent": null
     },
     "private_key": {
       "description": "The contents of the private key (.p8) file associated with the key specified by keyId. **Note**: This property is sensitive and will not be displayed in the plan.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "The DeviceCheck private key is a sensitive credential used to attest to the authenticity of your app and device. It must be kept confidential to prevent unauthorized use. Hardcoding secrets increases the risk of exposure.",
+      "compliant": "loaded from a secret manager, e.g., data.google_secret_manager_secret_version.device_check_private_key.secret_data",
+      "non-compliant": "hardcoded private key",
       "parent": null
     },
     "app_id": {
@@ -32,10 +32,10 @@
     "token_ttl": {
       "description": "Specifies the duration for which App Check tokens exchanged from DeviceCheck artifacts will be valid. If unset, a default value of 1 hour is assumed. Must be between 30 minutes and 7 days, inclusive. A duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.5s\".",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "A shorter token TTL (Time-To-Live) reduces the window of opportunity for an attacker to replay an intercepted token. While the App Check SDK handles token refreshes, a shorter TTL enhances security. However, it should be balanced with performance considerations to avoid excessive refresh requests.",
+      "compliant": "3600s",
+      "non-compliant": "604800s",
       "parent": null
     },
     "project": {
