@@ -1,6 +1,7 @@
 resource "google_alloydb_cluster" "nc" {
   cluster_id = "cluster-default-vpc"
   location   = "us-central1"
+  project = "123"
 
   network_config {
     network = "projects/pde-demo/global/networks/default"
