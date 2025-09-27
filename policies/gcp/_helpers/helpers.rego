@@ -18,7 +18,7 @@ get_resource_name(this_nc_resource, value_name) = resource_name if {
     print(sprintf("Resource name for '%s' was not found! Your 'resource_value_name' in vars is wrong. Try 'resource_value_name': 'name'.", [this_nc_resource.type]))
 }
 
-# Handle empty array blacklisting specifically  
+# Handle empty array blacklisting specifically
 array_contains(arr, elem, pol) if {
     pol == "blacklist"
     [] in arr  # Check if empty array is in blacklisted values
@@ -59,15 +59,15 @@ array_contains(arr, elem, pol) if {
 resource_type_match(resource, resource_type) if {
     resource.type == resource_type
 }
- 
+
 # Collect all relevant resources
 get_all_resources(resource_type) = resources if
-{    
+{
     resources := [
-        resource |        
-        resource := input.planned_values.root_module.resources[_]         
-        resource_type_match(resource, resource_type)     
-    ] 
+        resource |
+        resource := input.planned_values.root_module.resources[_]
+        resource_type_match(resource, resource_type)
+    ]
 }
 # Extract policy type
 get_policy_type(chosen_type) = policy_type if {
@@ -92,7 +92,7 @@ get_attribute_path(attribute_path) = result if {
         val := convert_value(x)
   ]
 }
-# Returns a formatted string of any given attribute path 
+# Returns a formatted string of any given attribute path
 format_attribute_path(attribute_path) = string_path if {
     is_array(attribute_path)
     string_path := concat(".", get_attribute_path(attribute_path))
@@ -186,7 +186,7 @@ check_empty_set(set,msg) = return if {
 
 ####################################################
 
-# Entry point for all policies 
+# Entry point for all policies
 get_multi_summary(situations, variables) = summary if { # Samira , Patrick
     # Unpack values from vars
     resource_type := variables.resource_type
@@ -278,12 +278,12 @@ process_violations(violations) = situation_summary if {
         some key, val in this_sit
         sit_desc := key
         this_condition := val.conds
-        resource_set := [nc | 
+        resource_set := [nc |
             some keyy, vall in this_condition[_]
             nc := {x | x := vall[_].name}]
     ]
 
-    overall_nc_resources :=[ {sit_desc : intersec} | 
+    overall_nc_resources :=[ {sit_desc : intersec} |
         this_set := resource_sets[_]
         some key, val in this_set
         sit_desc := key
@@ -314,15 +314,15 @@ process_violations(violations) = situation_summary if {
         }
     ]
 
-} 
+}
 
 format_violations(violations_object) = formatted_message if {
     formatted_message := [
         [ sd, nc, remedies] |
-        some i 
+        some i
         this_sit := violations_object[i]
         sd := sprintf("Situation %d: %s",[i+1, this_sit.situation])
-        resources_value := [value | 
+        resources_value := [value |
         value := this_sit.non_compliant_resources[_]
         ]
         nc := sprintf("Non-Compliant Resources: %s", [concat(", ", resources_value)])
@@ -360,7 +360,7 @@ get_blacklisted_resources(resource_type, attribute_path, blacklisted_values) = r
 
 get_blacklist_violations(resource_type, attribute_path, blacklisted_values, friendly_resource_name, value_name) = results if {
     string_path := format_attribute_path(attribute_path)
-    results := 
+    results :=
     [ { "name": get_resource_name(this_nc_resource, value_name),
         "message": msg
     } |
@@ -376,7 +376,7 @@ format_blacklist_message(friendly_resource_name, resource_value_name, string_pat
         #Change message however we want it displayed
         "%s '%s' has '%s' set to '%v'%s. This is blacklisted: %v",
         [friendly_resource_name, resource_value_name, string_path, nc_value, empty, nc_values]
-        ) 
+        )
 }
 ####################################################
 # Whitelist methods
@@ -385,7 +385,7 @@ format_whitelist_message(friendly_resource_name, resource_value_name, attribute_
     msg := sprintf(
         "%s '%s' has '%s' set to '%v'%s. It should be set to '%v'",
         [friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, compliant_values]
-    ) 
+    )
 }
 
 get_nc_whitelisted_resources(resource_type, attribute_path, compliant_values) = resources if {
@@ -400,7 +400,7 @@ get_nc_whitelisted_resources(resource_type, attribute_path, compliant_values) = 
 
 get_whitelist_violations(resource_type, attribute_path, compliant_values, friendly_resource_name, value_name) = results if {
     string_path := format_attribute_path(attribute_path)
-    results := 
+    results :=
     [ { "name": get_resource_name(this_nc_resource, value_name),
         "message": msg
     } |
@@ -436,7 +436,7 @@ format_range_validation_message(friendly_resource_name, resource_value_name, att
     msg := sprintf(
         "%s '%s' has '%s' set to '%s'%s. It should be set between '%s and %s'.",
         [friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, lower_bound, upper_bound]
-    ) 
+    )
 }
 
 get_nc_range_resources(resource_type, attribute_path, range_values) = resources if {
@@ -452,13 +452,13 @@ get_nc_range_resources(resource_type, attribute_path, range_values) = resources 
 get_range_violations(resource_type, attribute_path, range_values, friendly_resource_name, value_name) = results if {
     unpacked_range_values = range_values #[0] <===================================================================== removed [0] - Visal
     string_path := format_attribute_path(attribute_path)
-    results := 
+    results :=
     [ { "name": get_resource_name(this_nc_resource, value_name),
         "message": msg
     } |
     nc_resources := get_nc_range_resources(resource_type, attribute_path, unpacked_range_values)
     this_nc_resource = nc_resources[_]
-    this_nc_attribute = object.get(this_nc_resource.values, attribute_path, null) 
+    this_nc_attribute = object.get(this_nc_resource.values, attribute_path, null)
     msg := format_range_validation_message(friendly_resource_name, get_resource_name(this_nc_resource, value_name), string_path, this_nc_attribute, empty_message(this_nc_attribute), unpacked_range_values)
     ]
 }
@@ -469,13 +469,30 @@ format_range_input(lower,upper) = range_values if {
     range_values := {"lower_bound":lower,"upper_bound":upper}
 }
 
+format_range_validation_message(
+    friendly_resource_name,
+    resource_value_name,
+    attribute_path_string,
+    nc_value,
+    empty,
+    range_values
+) = msg if {
+    lower := get_lower_bound(range_values)
+    upper := get_upper_bound(range_values)
+
+    msg := sprintf(
+        "%s '%s' has '%s' set to '%v'%s. It must be between %v and %v",
+        [friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, lower, upper]
+    )
+}
+
 ############### REGEX
 
 # HELPER: gets the target * pattern
 get_target_list(resource, attribute_path, target) = target_list if {
     p := regex.replace(target, "\\*", "([^/]+)")
     #print(sprintf("SSSSSSSSSSSSSSSSSSSSound %s", [p]))
-    target_value := object.get(resource.values, attribute_path, null) 
+    target_value := object.get(resource.values, attribute_path, null)
     matches := regex.find_all_string_submatch_n(p, target_value, 1)[0] # all matches, including main string
     target_list := array.slice(matches, 1, count(matches)) # leaves every single * match except main string
     #print(sprintf("SSSSSSSSSSSSSSSSSSSSound %s", [target_list]))
@@ -489,7 +506,7 @@ final_formatter(target, sub_pattern) = final_format if {
 get_nc_pattern_blacklist(resource, attribute_path, target, patterns) = ncc if {
     target_list = get_target_list(resource, attribute_path, target) # list of targetted substrings
     ncc := [
-        {"value": target_list[i], "allowed": patterns[i]} | 
+        {"value": target_list[i], "allowed": patterns[i]} |
             some i
             array_contains(patterns[i], target_list[i], "blacklist") # direct mapping of positions of target * with its list of allowed patterns
     ]
@@ -508,7 +525,7 @@ get_nc_pattern_blacklist_resources(resource_type, attribute_path, values) = reso
 
 get_pattern_blacklist_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name) = results if {
     string_path := format_attribute_path(attribute_path)
-    results := # and their patterns 
+    results := # and their patterns
     [ { "name": get_resource_name(this_nc_resource, value_name),
         "message": msg
     } |
@@ -524,14 +541,14 @@ format_pattern_blacklist_message(friendly_resource_name, resource_value_name, at
     msg := sprintf(
         "%s '%s' has '%s' set to '%s'%s. This is blacklisted: %s",
         [friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, allowed_values]
-    ) 
+    )
 }
 
 # PATTERN WHITELIST (clone of blacklist, but not array_contains()
 get_nc_pattern_whitelist(resource, attribute_path, target, patterns) = ncc if {
     target_list = get_target_list(resource, attribute_path, target) # list of targetted substrings
     ncc := [
-        {"value": target_list[i], "allowed": patterns[i]} | 
+        {"value": target_list[i], "allowed": patterns[i]} |
             some i
             not array_contains(patterns[i], target_list[i], "whitelist") # direct mapping of positions of target * with its list of allowed patterns
     ]
