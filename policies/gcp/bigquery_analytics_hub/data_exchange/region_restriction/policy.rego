@@ -1,4 +1,4 @@
-package terraform.gcp.security.analytics_hub.data_exchange.policy
+package terraform.gcp.security.analytics_hub.data_exchange.region_restriction
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.analytics_hub.data_exchange.vars
@@ -24,8 +24,8 @@ conditions := [
     ]
 ]
 
-# Displays a general message about policy compliance
+# Compliance summary
 message := helpers.get_multi_summary(conditions, vars.variables).message
 
-# Displays a detailed summary of each resource’s compliance to every condition
+# Detailed evaluation
 details := helpers.get_multi_summary(conditions, vars.variables).details
