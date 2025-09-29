@@ -1,0 +1,238 @@
+{
+  "resource_name": "google_storage_batch_operations_job",
+  "subcategory": "Cloud Storage Batch Operations",
+  "arguments": {
+    "job_id": {
+      "description": "The ID of the job.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Job ID is an identifier and does not affect security; only identifies the operation.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Project ID is an organizational identifier and does not directly impact security.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "bucket_list": {
+      "description": "List of buckets and their objects to be transformed.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Bucket list configuration is required for batch operations but doesn't directly impact security.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "buckets": {
+          "description": "List of buckets and their objects to be transformed.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Bucket configuration is required for batch operations but doesn't directly impact security.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "bucket_list",
+          "arguments": {
+            "bucket": {
+              "description": "Bucket name for the objects to be transformed.",
+              "required": true,
+              "security_impact": false,
+              "rationale": "Bucket name is required for batch operations but doesn't directly impact security.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "buckets"
+            },
+            "prefix_list": {
+              "description": "Specifies objects matching a prefix set. Required for scoping operations to specific objects.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "Without proper prefix scoping, operations may affect unintended objects in the bucket.",
+              "compliant": "prefix_list = [{ included_object_prefixes = ['secure-data/'] }]",
+              "non-compliant": "prefix_list = [] or missing prefix_list entirely",
+              "parent": "buckets",
+              "arguments": {
+                "included_object_prefixes": {
+                  "description": "List of object name prefixes to include in the batch operation.",
+                  "required": true,
+                  "security_impact": true,
+                  "rationale": "Prefixes ensure operations are scoped to specific objects, preventing accidental mass operations.",
+                  "compliant": "included_object_prefixes = ['secure-data/', 'backup/']",
+                  "non-compliant": "included_object_prefixes = [] or included_object_prefixes = ['']",
+                  "parent": "prefix_list"
+                }
+              }
+            },
+            "manifest": {
+              "description": "Contains the manifest source file that is a CSV file in a Google Cloud Storage bucket.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "Manifest files provide explicit object lists, ensuring operations only affect intended objects.",
+              "compliant": "manifest = [{ manifest_location = 'gs://bucket/manifest.csv' }]",
+              "non-compliant": "manifest = [] or manifest_location = ''",
+              "parent": "buckets",
+              "arguments": {
+                "manifest_location": {
+                  "description": "Specifies objects in a manifest file stored in Cloud Storage.",
+                  "required": true,
+                  "security_impact": true,
+                  "rationale": "Valid manifest location ensures operations target only explicitly listed objects.",
+                  "compliant": "manifest_location = 'gs://secure-bucket/manifest.csv'",
+                  "non-compliant": "manifest_location = '' or manifest_location = null",
+                  "parent": "manifest"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "delete_object": {
+      "description": "Allows batch operations to delete objects in bucket.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Permanent deletion can cause data loss if misused. Policy ensures delete safety.",
+      "compliant": "permanent_object_deletion_enabled = false",
+      "non-compliant": "permanent_object_deletion_enabled = true",
+      "parent": null,
+      "arguments": {
+        "permanent_object_deletion_enabled": {
+          "description": "Enable flag to permanently delete object and all object versions if versioning is enabled on bucket.",
+          "required": true,
+          "security_impact": true,
+          "rationale": "Permanent deletion removes recovery options and poses a major security risk for data loss.",
+          "compliant": "permanent_object_deletion_enabled = false",
+          "non-compliant": "permanent_object_deletion_enabled = true",
+          "parent": "delete_object"
+        }
+      }
+    },
+    "rewrite_object": {
+      "description": "Allows update of encryption key for objects in bucket.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "All rewrites must use CMEK to ensure customer-controlled encryption.",
+      "compliant": "kms_key = 'projects/my-project/locations/us-central1/keyRings/kr/cryptoKeys/key'",
+      "non-compliant": "kms_key = '' or kms_key = null",
+      "parent": null,
+      "arguments": {
+        "kms_key": {
+          "description": "Valid KMS key for encryption during rewrite operations.",
+          "required": true,
+          "security_impact": true,
+          "rationale": "CMEK ensures encryption is customer-managed rather than default Google-managed keys.",
+          "compliant": "kms_key = 'projects/my-project/locations/us-central1/keyRings/kr/cryptoKeys/key'",
+          "non-compliant": "kms_key = null or kms_key = ''",
+          "parent": "rewrite_object"
+        }
+      }
+    },
+    "put_object_hold": {
+      "description": "Allows update of temporary hold or eventBased hold for objects.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Unsetting holds can weaken data retention and allow premature deletion.",
+      "compliant": "event_based_hold = 'SET', temporary_hold = 'SET'",
+      "non-compliant": "event_based_hold = 'UNSET'",
+      "parent": null,
+      "arguments": {
+        "event_based_hold": {
+          "description": "Set/unset to update event based hold for objects.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Unsetting event-based holds can allow premature deletion of objects that should be retained.",
+          "compliant": "event_based_hold = 'SET'",
+          "non-compliant": "event_based_hold = 'UNSET'",
+          "parent": "put_object_hold"
+        },
+        "temporary_hold": {
+          "description": "Set/unset to update temporary based hold for objects.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Unsetting temporary holds can allow premature deletion of objects that should be retained.",
+          "compliant": "temporary_hold = 'SET'",
+          "non-compliant": "temporary_hold = 'UNSET'",
+          "parent": "put_object_hold"
+        }
+      }
+    },
+    "put_metadata": {
+      "description": "Allows batch operations to update metadata for objects in bucket.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Metadata updates are generally safe operations that don't affect data integrity or security.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "custom_time": {
+          "description": "Updates the objects fixed custom time metadata.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Custom time metadata is informational and doesn't impact security.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "put_metadata"
+        },
+        "content_disposition": {
+          "description": "Content-Disposition of the object data.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Content disposition is a metadata field that doesn't affect security.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "put_metadata"
+        },
+        "content_encoding": {
+          "description": "Content Encoding of the object data.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Content encoding is a metadata field that doesn't affect security.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "put_metadata"
+        },
+        "content_type": {
+          "description": "Content-Type of the object data.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Content type is a metadata field that doesn't affect security.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "put_metadata"
+        },
+        "content_language": {
+          "description": "Content-Language of the object data.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Content language is a metadata field that doesn't affect security.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "put_metadata"
+        },
+        "cache_control": {
+          "description": "Cache-Control directive to specify caching behavior of object data. If omitted and object is accessible to all anonymous users, the default will be public, max-age=3600",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Cache control is a metadata field that doesn't affect security.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "put_metadata"
+        },
+        "custom_metadata": {
+          "description": "User-provided metadata, in key/value pairs.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Custom metadata is informational and doesn't impact security.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "put_metadata"
+        }
+      }
+    }
+  }
+}
