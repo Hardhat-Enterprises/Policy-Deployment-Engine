@@ -137,8 +137,8 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
         'GOOGLE_REGION': 'us-central1'
     })
     tf_commands = [
-        ("terraform init -backend=false -reconfigure"),
-        ("terraform plan -refresh=false -input=false -out=plan"),
+        ("terraform init"),
+        ("terraform plan -out=plan"),
         ("terraform show -json plan > plan.json"),
     ]
     for cmd in tf_commands:
