@@ -1,0 +1,144 @@
+{
+  "compute_ssh": {
+    "resource_changes": [
+      {
+        "address": "google_compute_firewall.allow-ssh",
+        "type": "google_compute_firewall",
+        "change": {
+          "after": {
+            "allow": [
+              { "protocol": "tcp", "ports": ["22"] }
+            ],
+            "source_ranges": ["0.0.0.0/0"]
+          }
+        }
+      }
+    ]
+  },
+  "compute_rdp": {
+    "resource_changes": [
+      {
+        "address": "google_compute_firewall.allow-rdp",
+        "type": "google_compute_firewall",
+        "change": {
+          "after": {
+            "allow": [
+              { "protocol": "tcp", "ports": ["3389"] }
+            ],
+            "source_ranges": ["0.0.0.0/0"]
+          }
+        }
+      }
+    ]
+  },
+  "compute_telnet": {
+    "resource_changes": [
+      {
+        "address": "google_compute_firewall.allow-telnet",
+        "type": "google_compute_firewall",
+        "change": {
+          "after": {
+            "allow": [
+              { "protocol": "tcp", "ports": ["23"] }
+            ],
+            "source_ranges": ["0.0.0.0/0"]
+          }
+        }
+      }
+    ]
+  },
+  "compute_ftp": {
+    "resource_changes": [
+      {
+        "address": "google_compute_instance.ftp-server",
+        "type": "google_compute_instance",
+        "change": {
+          "after": {
+            "anonymous_access": true
+          }
+        }
+      }
+    ]
+  },
+  "compute_smtp": {
+    "resource_changes": [
+      {
+        "address": "google_compute_instance.mail-server",
+        "type": "google_compute_instance",
+        "change": {
+          "after": {
+            "open_relay": true
+          }
+        }
+      }
+    ]
+  },
+  "sql_db": {
+    "resource_changes": [
+      {
+        "address": "google_sql_database_instance.mydb",
+        "type": "google_sql_database_instance",
+        "change": {
+          "after": {
+            "name": "mydb",
+            "settings": {
+              "ip_configuration": { "ipv4_enabled": true }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "dns": {
+    "resource_changes": [
+      {
+        "address": "google_dns_managed_zone.myzone",
+        "type": "google_dns_managed_zone",
+        "change": {
+          "after": {
+            "recursion_enabled": true
+          }
+        }
+      }
+    ]
+  },
+  "backend_service": {
+    "resource_changes": [
+      {
+        "address": "google_compute_backend_service.myservice",
+        "type": "google_compute_backend_service",
+        "change": {
+          "after": {
+            "redirect_disabled": true
+          }
+        }
+      }
+    ]
+  },
+  "firewall_egress": {
+    "resource_changes": [
+      {
+        "address": "google_compute_firewall.egress-rule",
+        "type": "google_compute_firewall",
+        "change": {
+          "after": {
+            "egress_allowlist": []
+          }
+        }
+      }
+    ]
+  },
+  "firewall_default": {
+    "resource_changes": [
+      {
+        "address": "google_compute_firewall.default-allow-all",
+        "type": "google_compute_firewall",
+        "change": {
+          "after": {
+            "default_deny": false
+          }
+        }
+      }
+    ]
+  }
+}
