@@ -145,7 +145,7 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
     })
 
     commands = [
-        ["terraform", "init", "-backend=false", "-reconfigure"],
+        ["terraform", "init", "-backend=false"],
         ["terraform", "plan", "-input=false", "-out=plan"],
     ]
 
