@@ -147,6 +147,7 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
     commands = [
         ["terraform", "init", "-backend=false"],
         ["terraform", "plan", "-input=false", "-out=plan"],
+        ["terraform", "show", "-json", "plan"]
     ]
 
     for cmd in commands:
@@ -168,18 +169,6 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
 
     # Export plan.json explicitly
     plan_json = input_dir / "plan.json"
-    with plan_json.open("w") as f:
-        result = subprocess.run(
-            ["terraform", "show", "-json", "plan"],
-            cwd=input_dir,
-            env=env,
-            stdout=f,
-            text=True
-        )
-    if result.returncode != 0:
-        if verbose:
-            print("❌ terraform show failed")
-        return None
     print(plan_json)
     return plan_json
 
