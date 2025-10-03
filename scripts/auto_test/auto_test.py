@@ -180,7 +180,7 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
         if verbose:
             print("❌ terraform show failed")
         return None
-
+    print(plan_json)
     return plan_json
 
 
