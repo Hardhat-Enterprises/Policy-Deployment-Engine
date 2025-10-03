@@ -14,7 +14,7 @@ conditions := [
         {
             "condition": "Sink name should follow standard naming conventions",
             "attribute_path": ["name"],
-            "values": ["bq-export-", "sink-", "export-", "logs-to-bq-"],
+            "values": ["c"],
             "policy_type": "whitelist"
         }
     ],

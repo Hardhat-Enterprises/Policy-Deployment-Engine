@@ -9,6 +9,6 @@ terraform {
 }
 
 provider "google" {
-  project = "gdce-dev"              
-  region  = "australia-southeast1"  
+  project = "gdce-dev"              # Project ID
+  region  = "australia-southeast1"  # GDCE region
 }
