@@ -131,25 +131,57 @@ def get_policy_messages(policies_root: Path, plan_path: Path, message_query: str
 
 def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | None:
     env = os.environ.copy()
+
+    # Write fake credentials file
+    creds_path = input_dir / "fake-creds.json"
+    creds_content = '{"type": "service_account", "project_id": "fake-project"}'
+    creds_path.write_text(creds_content)
+
+    # Correct env var for Google provider
     env.update({
-        'GOOGLE_CREDENTIALS': '{"type": "service_account", "project_id": "fake-project"}',
+        'GOOGLE_APPLICATION_CREDENTIALS': str(creds_path),
         'GOOGLE_PROJECT': 'fake-project',
-        'GOOGLE_REGION': 'us-central1'
+        'GOOGLE_REGION': 'us-central1',
     })
-    tf_commands = [
-        ("terraform init -reconfigure"),
-        ("terraform plan -input=false -out=plan"),
-        ("terraform show -json plan > plan.json"),
+
+    commands = [
+        ["terraform", "init", "-reconfigure"],
+        ["terraform", "plan", "-input=false", "-out=plan"],
     ]
-    for cmd in tf_commands:
-        result = subprocess.run(cmd, shell=True, cwd=str(input_dir), capture_output=True, text=True, env=env)
+
+    for cmd in commands:
+        result = subprocess.run(
+            cmd,
+            cwd=input_dir,
+            capture_output=True,
+            text=True,
+            env=env
+        )
         if result.returncode != 0:
             if verbose:
-                print(f" Command failed: {cmd}")
+                print(f"❌ Command failed: {' '.join(cmd)}")
+                print("--- stdout ---")
                 print(result.stdout)
+                print("--- stderr ---")
                 print(result.stderr)
             return None
-    return input_dir / "plan.json"
+
+    # Export plan.json explicitly
+    plan_json = input_dir / "plan.json"
+    with plan_json.open("w") as f:
+        result = subprocess.run(
+            ["terraform", "show", "-json", "plan"],
+            cwd=input_dir,
+            env=env,
+            stdout=f,
+            text=True
+        )
+    if result.returncode != 0:
+        if verbose:
+            print("❌ terraform show failed")
+        return None
+
+    return plan_json
 
 
 def get_policy_metadata(policy_dir: Path, service: str, resource: str, attribute: str) -> tuple[str, str]:
