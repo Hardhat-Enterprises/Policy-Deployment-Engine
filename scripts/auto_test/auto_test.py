@@ -131,7 +131,7 @@ def get_policy_messages(policies_root: Path, plan_path: Path, message_query: str
 
 def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | None:
     env = os.environ.copy()
-    
+
     creds_path = input_dir / "fake-creds.json"
     creds_content = '{"type": "service_account", "project_id": "fake-project"}'
     creds_path.write_text(creds_content)
@@ -151,6 +151,7 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
     for cmd in commands:
         result = subprocess.run(
             cmd,
+            shell=True,
             cwd=input_dir,
             capture_output=True,
             text=True,
