@@ -131,13 +131,11 @@ def get_policy_messages(policies_root: Path, plan_path: Path, message_query: str
 
 def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | None:
     env = os.environ.copy()
-
-    # Write fake credentials file
+    
     creds_path = input_dir / "fake-creds.json"
     creds_content = '{"type": "service_account", "project_id": "fake-project"}'
     creds_path.write_text(creds_content)
 
-    # Correct env var for Google provider
     env.update({
         'GOOGLE_APPLICATION_CREDENTIALS': str(creds_path),
         'GOOGLE_PROJECT': 'fake-project',
@@ -145,9 +143,9 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
     })
 
     commands = [
-        ["terraform", "init", "-backend=false"],
-        ["terraform", "plan", "-input=false", "-out=plan"],
-        ["terraform", "show", "-json", "plan > plan.json"]
+        ("terraform init -backend=false"),
+        ("terraform plan -input=false -out=plan"),
+        ("terraform show -json plan > plan.json")
     ]
 
     for cmd in commands:
