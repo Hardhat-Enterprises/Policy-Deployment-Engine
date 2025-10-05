@@ -140,6 +140,7 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
         'GOOGLE_APPLICATION_CREDENTIALS': str(creds_path),
         'GOOGLE_PROJECT': 'fake-project',
         'GOOGLE_REGION': 'us-central1',
+        'TF_PLUGIN_CACHE_DIR': '$HOME/.terraform.d/plugin-cache'
     })
 
     commands = [
