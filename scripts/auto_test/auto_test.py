@@ -143,7 +143,7 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
     })
 
     commands = [
-        ("terraform init -backend=false"),
+        ("terraform init"),
         ("terraform plan -input=false -out=plan"),
         ("terraform show -json plan > plan.json")
     ]
