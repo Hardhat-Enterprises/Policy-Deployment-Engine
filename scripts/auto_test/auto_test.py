@@ -256,6 +256,16 @@ def run_policy_check_pair(input_dir: Path, policy_dir: Path, policies_root: Path
     if not messages:
         res = make_failure(attribute, "Could not run OPA query!", service, resource)
         return res
+    
+    try:
+        (abs_input_dir / "plan").unlink(missing_ok=True)
+        (abs_input_dir / "fake-creds.json").unlink(missing_ok=True)
+        tf_dir = abs_input_dir / ".terraform"
+        if tf_dir.exists():
+            import shutil
+            shutil.rmtree(tf_dir, ignore_errors=True)
+    except Exception as e:
+        print(f"Warning: cleanup failed in {abs_input_dir}: {e}")
 
     log_messages(verbose, message_query, messages)
     res = validate_policy_output(attribute, resource_type, plan_path, messages, verbose, service, resource)
