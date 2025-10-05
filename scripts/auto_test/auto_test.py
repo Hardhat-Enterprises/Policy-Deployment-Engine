@@ -167,6 +167,15 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
                 print(result.stderr)
             return None
 
+    try:
+        (input_dir / "plan").unlink(missing_ok=True)
+        (input_dir / "fake-creds.json").unlink(missing_ok=True)
+        tf_dir = input_dir / ".terraform"
+        if tf_dir.exists():
+            import shutil
+            shutil.rmtree(tf_dir, ignore_errors=True)
+    except Exception as e:
+        print(f"Warning: cleanup failed in {input_dir}: {e}")
     # Export plan.json explicitly
     plan_json = input_dir / "plan.json"
     print(plan_json)
