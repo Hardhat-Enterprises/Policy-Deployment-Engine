@@ -149,8 +149,6 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
     ]
 
     for cmd in commands:
-        print(f"Running Terraform in: {input_dir}")
-        print(f"Commands: {commands}")
         result = subprocess.run(
             cmd,
             shell=True,
@@ -283,7 +281,7 @@ def find_matching_pairs(inputs_root: Path, policies_root: Path):
             pairs.append((input_dir, policy_dir))
         else:
             print(f" No matching policy dir for: {input_dir}")
-
+    print(pairs)
     return pairs
 
 
