@@ -236,6 +236,7 @@ def validate_policy_output(attribute: str, resource_type: str | None, plan_path:
 def run_policy_check_pair(input_dir: Path, policy_dir: Path, policies_root: Path, verbose: bool = False):
     # Extract data about services and filesystem paths
     abs_input_dir = input_dir.resolve()
+    print(abs_input_dir)
     service, resource, attribute = extract_path_parts(input_dir)
     # Runs TF commands and returns abs path to plan.json
     plan_path = run_terraform_commands(abs_input_dir, verbose)
@@ -281,7 +282,6 @@ def find_matching_pairs(inputs_root: Path, policies_root: Path):
             pairs.append((input_dir, policy_dir))
         else:
             print(f" No matching policy dir for: {input_dir}")
-    print(pairs)
     return pairs
 
 
