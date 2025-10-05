@@ -32,6 +32,14 @@ jobs:
       - name: Set up plugin cache config
         run: |
           bash scripts/auto_test/cache_setup.sh 
+      
+      - name: Cache terraform plugins
+        uses: actions/cache@v4
+        with:
+          path: ~/.terraform.d/plugin-cache
+          key: terraform-plugins-${{ runner.os }}-${{ hashFiles('**/.terraform.lock.hcl') }}
+          restore-keys: terraform-plugins-${{ runner.os }}-
+      - run: echo "TF_PLUGIN_CACHE_DIR=$HOME/.terraform.d/plugin-cache" >> $GITHUB_ENV
  
       - name: Run policy checks (Terraform + OPA)
         run: |
