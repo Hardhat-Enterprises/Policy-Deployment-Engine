@@ -137,16 +137,21 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
     creds_content = '{"type": "service_account", "project_id": "fake-project"}'
     creds_path.write_text(creds_content)
 
+    plugin_cache = Path.home() / ".terraform.d" / "plugin-cache"
+    global_data_dir = Path(".tfshared").resolve()
+    global_data_dir.mkdir(parents=True, exist_ok=True)
+    
     env.update({
         'GOOGLE_APPLICATION_CREDENTIALS': str(creds_path),
         'GOOGLE_PROJECT': 'fake-project',
         'GOOGLE_REGION': 'us-central1',
-        'TF_PLUGIN_CACHE_DIR': '$HOME/.terraform.d/plugin-cache'
+        'TF_PLUGIN_CACHE_DIR': str(plugin_cache),
+        'TF_DATA_DIR': str(global_data_dir),
     })
 
     commands = [
         ("terraform init -backend=false"),
-        ("terraform plan -input=false -out=plan"),
+        ("terraform plan -refresh=false -lock=false -input=false -out=plan"),
         ("terraform show -json plan > plan.json")
     ]
 
