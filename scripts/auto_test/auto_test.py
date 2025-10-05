@@ -274,7 +274,7 @@ def run_policy_check_pair(input_dir: Path, policy_dir: Path, policies_root: Path
     return res
 
 def cleanup_workspace(workdir: Path):
-
+    workdir = workdir.resolve()
     before_free, before_inodes, before_disk_str, before_inode_str = check_disk_and_inodes("/")
     print("Before cleanup →", before_disk_str, "|", before_inode_str)
 
