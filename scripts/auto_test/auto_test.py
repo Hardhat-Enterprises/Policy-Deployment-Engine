@@ -149,6 +149,8 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
     ]
 
     for cmd in commands:
+        print(f"Running Terraform in: {input_dir}")
+        print(f"Commands: {commands}")
         result = subprocess.run(
             cmd,
             shell=True,
@@ -159,7 +161,7 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
         )
         if result.returncode != 0:
             if verbose:
-                print(f"❌ Command failed: {' '.join(cmd)}")
+                print(f"❌ Command failed: {cmd}")
                 print("--- stdout ---")
                 print(result.stdout)
                 print("--- stderr ---")
