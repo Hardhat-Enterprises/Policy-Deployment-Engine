@@ -296,6 +296,8 @@ def cleanup_workspace(workdir: Path):
     after_free, after_inodes, after_disk_str, after_inode_str = check_disk_and_inodes("/")
     print("After cleanup  →", after_disk_str, "|", after_inode_str)
 
+    print(subprocess.run("du -ahx / | sort -rh | head -n 50", shell=True, text=True, capture_output=True).stdout)
+    
 def _human(n: int) -> str:
     """Convert bytes to human-readable string."""
     for unit in ["B", "KB", "MB", "GB", "TB"]:
