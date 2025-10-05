@@ -4,6 +4,7 @@ import subprocess
 import argparse
 import json
 import re
+import shutil
 from pathlib import Path
 
 
@@ -266,20 +267,56 @@ def run_policy_check_pair(input_dir: Path, policy_dir: Path, policies_root: Path
         res = make_failure(attribute, "Could not run OPA query!", service, resource)
         return res
     
-    try:
-        (abs_input_dir / "plan").unlink(missing_ok=True)
-        (abs_input_dir / "fake-creds.json").unlink(missing_ok=True)
-        tf_dir = abs_input_dir / ".terraform"
-        if tf_dir.exists():
-            import shutil
-            shutil.rmtree(tf_dir, ignore_errors=True)
-    except Exception as e:
-        print(f"Warning: cleanup failed in {abs_input_dir}: {e}")
+    cleanup_workspace(input_dir)
 
     log_messages(verbose, message_query, messages)
     res = validate_policy_output(attribute, resource_type, plan_path, messages, verbose, service, resource)
     return res
 
+def cleanup_workspace(workdir: Path):
+
+    before_free, before_inodes, before_disk_str, before_inode_str = check_disk_and_inodes("/")
+    print("Before cleanup →", before_disk_str, "|", before_inode_str)
+
+    # remove plan.json and plan binary
+    for fname in ["plan", "fake-creds.json"]:
+        f = workdir / fname
+        try:
+            f.unlink()
+            print(f"Deleted {f}")
+        except FileNotFoundError:
+            pass
+
+    # remove .terraform directory recursively
+    tfdir = workdir / ".terraform"
+    if tfdir.exists():
+        shutil.rmtree(tfdir, ignore_errors=True)
+        print(f"Deleted {tfdir}")
+
+    after_free, after_inodes, after_disk_str, after_inode_str = check_disk_and_inodes("/")
+    print("After cleanup  →", after_disk_str, "|", after_inode_str)
+
+def _human(n: int) -> str:
+    """Convert bytes to human-readable string."""
+    for unit in ["B", "KB", "MB", "GB", "TB"]:
+        if n < 1024:
+            return f"{n:.1f}{unit}"
+        n /= 1024
+    return f"{n:.1f}PB"
+
+def check_disk_and_inodes(path: str = "/"):
+    """Return (disk_free_bytes, inode_free, disk_usage_str, inode_usage_str)."""
+    usage = shutil.disk_usage(path)
+    stats = os.statvfs(path)
+    total_inodes = stats.f_files
+    free_inodes = stats.f_ffree
+    used_inodes = total_inodes - free_inodes
+    inode_percent = (used_inodes / total_inodes) * 100 if total_inodes > 0 else 0
+
+    disk_str = f"Disk free: {_human(usage.free)} / {_human(usage.total)}"
+    inode_str = f"Inodes used: {used_inodes}/{total_inodes} ({inode_percent:.2f}%)"
+
+    return usage.free, free_inodes, disk_str, inode_str
 
 def find_matching_pairs(inputs_root: Path, policies_root: Path):
     def is_leaf_terraform_dir(directory: Path) -> bool:
