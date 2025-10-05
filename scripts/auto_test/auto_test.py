@@ -168,16 +168,6 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
                 print(result.stderr)
             return None
 
-    try:
-        (input_dir / "plan").unlink(missing_ok=True)
-        (input_dir / "fake-creds.json").unlink(missing_ok=True)
-        tf_dir = input_dir / ".terraform"
-        if tf_dir.exists():
-            import shutil
-            shutil.rmtree(tf_dir, ignore_errors=True)
-    except Exception as e:
-        print(f"Warning: cleanup failed in {input_dir}: {e}")
-    # Export plan.json explicitly
     plan_json = input_dir / "plan.json"
     print(plan_json)
     return plan_json
@@ -251,6 +241,8 @@ def run_policy_check_pair(input_dir: Path, policy_dir: Path, policies_root: Path
     service, resource, attribute = extract_path_parts(input_dir)
     # Runs TF commands and returns abs path to plan.json
     plan_path = run_terraform_commands(abs_input_dir, verbose)
+    find_all_terraform_dirs(Path("."))
+    cleanup_workspace(abs_input_dir)
     if plan_path is None:
         res = make_failure(attribute, "Terraform failed to compile!", service, resource)
         return res
@@ -266,15 +258,12 @@ def run_policy_check_pair(input_dir: Path, policy_dir: Path, policies_root: Path
     if not messages:
         res = make_failure(attribute, "Could not run OPA query!", service, resource)
         return res
-    
-    cleanup_workspace(input_dir)
 
     log_messages(verbose, message_query, messages)
     res = validate_policy_output(attribute, resource_type, plan_path, messages, verbose, service, resource)
     return res
 
 def cleanup_workspace(workdir: Path):
-    workdir = workdir.resolve()
     before_free, before_inodes, before_disk_str, before_inode_str = check_disk_and_inodes("/")
     print("Before cleanup →", before_disk_str, "|", before_inode_str)
 
@@ -309,6 +298,18 @@ def _human(n: int) -> str:
             return f"{n:.1f}{unit}"
         n /= 1024
     return f"{n:.1f}PB"
+
+def find_all_terraform_dirs(root: Path):
+    print(f"Scanning for .terraform dirs under {root}")
+    result = subprocess.run(
+        f"find {root} -type d -name .terraform",
+        shell=True, text=True, capture_output=True
+    )
+    if result.stdout.strip():
+        print("Found these .terraform dirs:")
+        print(result.stdout)
+    else:
+        print("No .terraform dirs found")
 
 def check_disk_and_inodes(path: str = "/"):
     """Return (disk_free_bytes, inode_free, disk_usage_str, inode_usage_str)."""
