@@ -174,7 +174,6 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
             return None
 
     plan_json = input_dir / "plan.json"
-    print(plan_json)
     return plan_json
 
 
@@ -242,12 +241,11 @@ def validate_policy_output(attribute: str, resource_type: str | None, plan_path:
 def run_policy_check_pair(input_dir: Path, policy_dir: Path, policies_root: Path, verbose: bool = False):
     # Extract data about services and filesystem paths
     abs_input_dir = input_dir.resolve()
-    print(abs_input_dir)
     service, resource, attribute = extract_path_parts(input_dir)
     # Runs TF commands and returns abs path to plan.json
     plan_path = run_terraform_commands(abs_input_dir, verbose)
-    find_all_terraform_dirs(Path("."))
     cleanup_workspace(abs_input_dir)
+
     if plan_path is None:
         res = make_failure(attribute, "Terraform failed to compile!", service, resource)
         return res
@@ -269,17 +267,12 @@ def run_policy_check_pair(input_dir: Path, policy_dir: Path, policies_root: Path
     return res
 
 def cleanup_workspace(workdir: Path):
-    before_free, before_inodes, before_disk_str, before_inode_str = check_disk_and_inodes("/")
-    print("Before cleanup →", before_disk_str, "|", before_inode_str)
-
-    # remove plan.json and plan binary
+    # remove plan binary and other transient parts
     for fname in ["plan", "fake-creds.json"]:
         f = workdir / fname
         try:
             f.unlink()
-            print(f"Deleted {f}")
         except FileNotFoundError:
-            print(f"File not found {f}")
             pass
 
     # remove .terraform directory recursively
@@ -287,48 +280,8 @@ def cleanup_workspace(workdir: Path):
         if tfdir.is_dir():
             try:
                 shutil.rmtree(tfdir)
-                print(f"  Deleted {tfdir}")
             except Exception as e:
-                print(f"  Failed to delete {tfdir}: {e}")
-        else:
-            print(".Tf directory not found")
-
-    after_free, after_inodes, after_disk_str, after_inode_str = check_disk_and_inodes("/")
-    print("After cleanup  →", after_disk_str, "|", after_inode_str)
-
-def _human(n: int) -> str:
-    """Convert bytes to human-readable string."""
-    for unit in ["B", "KB", "MB", "GB", "TB"]:
-        if n < 1024:
-            return f"{n:.1f}{unit}"
-        n /= 1024
-    return f"{n:.1f}PB"
-
-def find_all_terraform_dirs(root: Path):
-    print(f"Scanning for .terraform dirs under {root}")
-    result = subprocess.run(
-        f"find {root} -type d -name .terraform",
-        shell=True, text=True, capture_output=True
-    )
-    if result.stdout.strip():
-        print("Found these .terraform dirs:")
-        print(result.stdout)
-    else:
-        print("No .terraform dirs found")
-
-def check_disk_and_inodes(path: str = "/"):
-    """Return (disk_free_bytes, inode_free, disk_usage_str, inode_usage_str)."""
-    usage = shutil.disk_usage(path)
-    stats = os.statvfs(path)
-    total_inodes = stats.f_files
-    free_inodes = stats.f_ffree
-    used_inodes = total_inodes - free_inodes
-    inode_percent = (used_inodes / total_inodes) * 100 if total_inodes > 0 else 0
-
-    disk_str = f"Disk free: {_human(usage.free)} / {_human(usage.total)}"
-    inode_str = f"Inodes used: {used_inodes}/{total_inodes} ({inode_percent:.2f}%)"
-
-    return usage.free, free_inodes, disk_str, inode_str
+                pass
 
 def find_matching_pairs(inputs_root: Path, policies_root: Path):
     def is_leaf_terraform_dir(directory: Path) -> bool:
