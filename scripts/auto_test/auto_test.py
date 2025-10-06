@@ -4,6 +4,7 @@ import subprocess
 import argparse
 import json
 import re
+import shutil
 from pathlib import Path
 
 
@@ -131,25 +132,49 @@ def get_policy_messages(policies_root: Path, plan_path: Path, message_query: str
 
 def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | None:
     env = os.environ.copy()
+
+    creds_path = input_dir / "fake-creds.json"
+    creds_content = '{"type": "service_account", "project_id": "fake-project"}'
+    creds_path.write_text(creds_content)
+
+    plugin_cache = Path.home() / ".terraform.d" / "plugin-cache"
+    global_data_dir = Path(".tfshared").resolve()
+    global_data_dir.mkdir(parents=True, exist_ok=True)
+    
     env.update({
-        'GOOGLE_CREDENTIALS': '{"type": "service_account", "project_id": "fake-project"}',
+        'GOOGLE_APPLICATION_CREDENTIALS': str(creds_path),
         'GOOGLE_PROJECT': 'fake-project',
-        'GOOGLE_REGION': 'us-central1'
+        'GOOGLE_REGION': 'us-central1',
+        'TF_PLUGIN_CACHE_DIR': str(plugin_cache),
+        'TF_DATA_DIR': str(global_data_dir),
     })
-    tf_commands = [
-        ("terraform init -backend=false -reconfigure"),
-        ("terraform plan -refresh=false -input=false -out=plan"),
-        ("terraform show -json plan > plan.json"),
+
+    commands = [
+        ("terraform init -backend=false"),
+        ("terraform plan -refresh=false -lock=false -input=false -out=plan"),
+        ("terraform show -json plan > plan.json")
     ]
-    for cmd in tf_commands:
-        result = subprocess.run(cmd, shell=True, cwd=str(input_dir), capture_output=True, text=True, env=env)
+
+    for cmd in commands:
+        result = subprocess.run(
+            cmd,
+            shell=True,
+            cwd=input_dir,
+            capture_output=True,
+            text=True,
+            env=env
+        )
         if result.returncode != 0:
             if verbose:
-                print(f" Command failed: {cmd}")
+                print(f"❌ Command failed: {cmd}")
+                print("--- stdout ---")
                 print(result.stdout)
+                print("--- stderr ---")
                 print(result.stderr)
             return None
-    return input_dir / "plan.json"
+
+    plan_json = input_dir / "plan.json"
+    return plan_json
 
 
 def get_policy_metadata(policy_dir: Path, service: str, resource: str, attribute: str) -> tuple[str, str]:
@@ -219,6 +244,8 @@ def run_policy_check_pair(input_dir: Path, policy_dir: Path, policies_root: Path
     service, resource, attribute = extract_path_parts(input_dir)
     # Runs TF commands and returns abs path to plan.json
     plan_path = run_terraform_commands(abs_input_dir, verbose)
+    cleanup_workspace(abs_input_dir)
+
     if plan_path is None:
         res = make_failure(attribute, "Terraform failed to compile!", service, resource)
         return res
@@ -239,6 +266,22 @@ def run_policy_check_pair(input_dir: Path, policy_dir: Path, policies_root: Path
     res = validate_policy_output(attribute, resource_type, plan_path, messages, verbose, service, resource)
     return res
 
+def cleanup_workspace(workdir: Path):
+    # remove plan binary and other transient parts
+    for fname in ["plan", "fake-creds.json"]:
+        f = workdir / fname
+        try:
+            f.unlink()
+        except FileNotFoundError:
+            pass
+
+    # remove .terraform directory recursively
+    for tfdir in workdir.rglob(".terraform"):
+        if tfdir.is_dir():
+            try:
+                shutil.rmtree(tfdir)
+            except Exception as e:
+                pass
 
 def find_matching_pairs(inputs_root: Path, policies_root: Path):
     def is_leaf_terraform_dir(directory: Path) -> bool:
@@ -261,7 +304,6 @@ def find_matching_pairs(inputs_root: Path, policies_root: Path):
             pairs.append((input_dir, policy_dir))
         else:
             print(f" No matching policy dir for: {input_dir}")
-
     return pairs
 
 
