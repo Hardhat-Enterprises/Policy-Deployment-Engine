@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Policy Deployment Engine Wiki</title>
@@ -79,13 +80,14 @@
     }
   </style>
 </head>
+
 <body>
   <h1>Policy Deployment Engine Wiki</h1>
   <p class="warning">
-    ⚠️ This wiki uses GitHub Pages and only allows for 60 API calls per hour per ID.  
+    ⚠️ This wiki uses GitHub Pages and only allows for 60 API calls per hour per ID.
     If you use this website often, you may need to try a different device or wait.
   </p>
-  
+
   <div class="search-container">
     <input type="text" id="searchBox" placeholder="Search files...">
   </div>
@@ -102,9 +104,11 @@
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
 
-        // Get only files inside docs/gcp/
-        const files = data.tree.filter(item => 
-          item.path.startsWith("docs/gcp/") && item.type === "blob"
+        // Get only md files inside docs/gcp/
+        const files = data.tree.filter(item =>
+          item.path.startsWith("docs/gcp/") &&
+          item.type === "blob" &&
+          item.path.endsWith(".md")
         );
 
         let htmlString = "";
@@ -170,4 +174,5 @@
     })()
   </script>
 </body>
+
 </html>
