@@ -4,19 +4,19 @@ package terraform.gcp.helpers
 # Defines the types of policies capable of being processed
 policy_types := ["blacklist", "whitelist", "range", "pattern blacklist", "pattern whitelist", "element blacklist"]
 
+import data.terraform.helpers.shared
+import data.terraform.gcp.helpers.policies.blacklist
+import data.terraform.gcp.helpers.policies.whitelist
+import data.terraform.gcp.helpers.policies.range
+import data.terraform.gcp.helpers.policies.pattern_blacklist
+import data.terraform.gcp.helpers.policies.pattern_whitelist
+import data.terraform.gcp.helpers.policies.element_blacklist
+
 ####################################################
 
 # NEW FUNCTIONS
 
-# Get resource's name; if not in values, take default "name". Checked!
-get_resource_name(this_nc_resource, value_name) = resource_name if {
-    this_nc_resource.values[value_name] 
-    resource_name := this_nc_resource.values[value_name]
-} else = resource_name if {
-    resource_name := this_nc_resource[value_name]
-} else = null if {
-    print(sprintf("Resource name for '%s' was not found! Your 'resource_value_name' in vars is wrong. Try 'resource_value_name': 'name'.", [this_nc_resource.type]))
-}
+
 
 # Handle empty array blacklisting specifically
 array_contains(arr, elem, pol) if {
@@ -56,9 +56,9 @@ array_contains(arr, elem, pol) if {
 }
 
 # For resource filtering
-resource_type_match(resource, resource_type) if {
-    resource.type == resource_type
-}
+# resource_type_match(resource, resource_type) if {
+#     resource.type == resource_type
+# }
 
 # Collect all relevant resources
 get_all_resources(resource_type) = resources if
@@ -66,7 +66,7 @@ get_all_resources(resource_type) = resources if
     resources := [
         resource |
         resource := input.planned_values.root_module.resources[_]
-        resource_type_match(resource, resource_type)
+        resource.type == resource_type
     ]
 }
 # Extract policy type
@@ -75,6 +75,10 @@ get_policy_type(chosen_type) = policy_type if {
     policy_type == chosen_type
 }
 
+
+################################################################################
+# This code is used by policies to convert error messages from:
+# ["status", 0, "restricted_services"] → "status.[0].restricted_services"all this code 
 # Converts values from an int to a string but leaves strings as is
 convert_value(x) = string if {
   type_name(x) == "number"
@@ -101,16 +105,34 @@ format_attribute_path(attribute_path) = string_path if {
     is_string(attribute_path)
     string_path := replace(attribute_path, "_", " ")
 }
-array_check(values) = result if {
-    type := type_name(values)
-    type != "array"
-    result := [values]
+################################################################################
+
+
+# This normalizes input values into an array it is only called once by 
+# check_conditions in the line
+# values_formatted = array_check(values)
+# much more direct change this line to 
+# array_values := ensure_array(values)
+
+# array_check(values) = result if {
+#     type := type_name(values)
+#     type != "array"
+#     result := [values]
+# }
+# array_check(values) = result if {
+#     type := type_name(values)
+#     type == "array"
+#     result := values
+# }
+
+ensure_array(values) = values if {
+    is_array(values)
 }
-array_check(values) = result if {
-    type := type_name(values)
-    type == "array"
-    result := values
+ensure_array(values) = [values] if {
+    not is_array(values)
 }
+
+################################################################################
 
 # Check if value is empty space
 is_empty(value) if {
@@ -129,42 +151,7 @@ empty_message(value) = msg if {
     msg = ""
 }
 
-#Checks a value sits between a given range of a passed object with keys upper_bound and lower_bound
-
-test_value_range(range_values, value) if {
-    test_lower_range(range_values, value)
-    test_upper_range(range_values, value)
-}
-
-test_lower_range(range_values,value) = true if {
-    # Check value exists
-    not is_null(range_values.lower_bound)
-    value >= range_values.lower_bound
-}
-
-# Null indicates no lower bound
-test_lower_range(range_values,value) = true if {
-    is_null(range_values.lower_bound)
-}
-
-test_upper_range(range_values,value) = true if {
-    # Check value exists
-    not is_null(range_values.upper_bound)
-    value <= range_values.upper_bound
-}
-
-# Null indicates no higher bound
-test_upper_range(range_values,value) = true if {
-    is_null(range_values.upper_bound)
-}
-
-is_null_or_number(value) if {
-    is_null(value)  # true if value is null
-}
-
-is_null_or_number(value) if {
-    type_name(value) == "number"  # true if value is a number
-}
+###############################################################################
 
 # Search an array of objects for a specific key, return the value
 get_value_from_array(arr, key) = value if {
@@ -207,33 +194,32 @@ get_multi_summary(situations, variables) = summary if { # Samira , Patrick
 
 select_policy_logic(resource_type, attribute_path, values_formatted, friendly_resource_name, chosen_type, value_name) = results if {
     chosen_type == policy_types[0] # Blacklist
-    results := get_blacklist_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name)
+    results := blacklist.get_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name)
 }
 
 select_policy_logic(resource_type, attribute_path, values_formatted, friendly_resource_name, chosen_type, value_name) = results if {
     chosen_type == policy_types[1] # Whitelist
-    results := get_whitelist_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name)
+    results := whitelist.get_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name)
 }
 
 select_policy_logic(resource_type, attribute_path, values_formatted, friendly_resource_name, chosen_type, value_name) = results if {
     chosen_type == policy_types[2] # Range (Upper and lower bounds)
-    values_formatted_range := format_range_input(values_formatted[0], values_formatted[1])
-    results := get_range_violations(resource_type, attribute_path, values_formatted_range, friendly_resource_name, value_name)
+    results := range.get_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name)
 }
 
 select_policy_logic(resource_type, attribute_path, values_formatted, friendly_resource_name, chosen_type, value_name) = results if {
     chosen_type == policy_types[3] # Patterns (B)
-    results := get_pattern_blacklist_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name)
+    results := pattern_blacklist.get_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name)
 }
 
 select_policy_logic(resource_type, attribute_path, values_formatted, friendly_resource_name, chosen_type, value_name) = results if {
     chosen_type == policy_types[4] # Patterns (W)
-    results := get_pattern_whitelist_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name)
+    results := pattern_whitelist.get_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name)
 }
 
 select_policy_logic(resource_type, attribute_path, values_formatted, friendly_resource_name, chosen_type, value_name) = results if {
     chosen_type == policy_types[5] # Element blacklist
-    results := get_element_blacklist_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name)
+    results := element_blacklist.get_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name)
 }
 
 check_violations(resource_type, situations, friendly_resource_name, value_name) = violations if {
@@ -253,8 +239,8 @@ check_conditions(resource_type, situation, friendly_resource_name, value_name) =
         values := condition.values
         pol := lower(condition.policy_type)
         pol == get_policy_type(pol) # checks, leads to else
-        values_formatted = array_check(values)
-        msg := {condition_name : select_policy_logic(resource_type, attribute_path, values_formatted, friendly_resource_name, pol, value_name)} # all in
+        array_values := ensure_array(values)
+        msg := {condition_name : select_policy_logic(resource_type, attribute_path, array_values, friendly_resource_name, pol, value_name)} # all in
     ]
     sd := get_value_from_array(situation,"situation_description")
     remedies := get_value_from_array(situation,"remedies")
@@ -342,154 +328,6 @@ intersection_all(sets) = result if {
         every s in all_other { x in s }
     }
 }
-####################################################
-
-# Policy type specific methods
-
-# Each policy type needs the following:
-# 1. A method that formats the error message to be displayed for a non-compliant value
-# 2. A method that obtains non-complaint resources
-# 3. A method that calls method to obtain nc resources and for each calls the format method
-
-# Blacklist methods
-
-get_blacklisted_resources(resource_type, attribute_path, blacklisted_values) = resources if {
-    resources := [
-        resource |
-        resource := input.planned_values.root_module.resources[_]
-        resource_type_match(resource, resource_type)
-        # Test array of array and deeply nested values
-        array_contains(blacklisted_values, object.get(resource.values, attribute_path, null), "blacklist")
-    ]
-}
-
-get_blacklist_violations(resource_type, attribute_path, blacklisted_values, friendly_resource_name, value_name) = results if {
-    string_path := format_attribute_path(attribute_path)
-    results :=
-    [ { "name": get_resource_name(this_nc_resource, value_name),
-        "message": msg
-    } |
-    nc_resources := get_blacklisted_resources(resource_type, attribute_path, blacklisted_values)
-    this_nc_resource = nc_resources[_]
-    this_nc_attribute = object.get(this_nc_resource.values, attribute_path, null)
-    msg := format_blacklist_message(friendly_resource_name, get_resource_name(this_nc_resource, value_name), string_path, this_nc_attribute, empty_message(this_nc_attribute), blacklisted_values)
-    ]
-}
-
-format_blacklist_message(friendly_resource_name, resource_value_name, string_path, nc_value, empty, nc_values) = msg if {
-        msg := sprintf(
-        #Change message however we want it displayed
-        "%s '%s' has '%s' set to '%v'%s. This is blacklisted: %v",
-        [friendly_resource_name, resource_value_name, string_path, nc_value, empty, nc_values]
-        )
-}
-####################################################
-# Whitelist methods
-
-format_whitelist_message(friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, compliant_values) = msg if {
-    msg := sprintf(
-        "%s '%s' has '%s' set to '%v'%s. It should be set to '%v'",
-        [friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, compliant_values]
-    )
-}
-
-get_nc_whitelisted_resources(resource_type, attribute_path, compliant_values) = resources if {
-    resources := [
-        resource |
-        resource := input.planned_values.root_module.resources[_]
-        resource_type_match(resource, resource_type)
-        # Test array of array and deeply nested values
-        not array_contains(compliant_values, object.get(resource.values, attribute_path, null), "whitelist")
-    ]
-}
-
-get_whitelist_violations(resource_type, attribute_path, compliant_values, friendly_resource_name, value_name) = results if {
-    string_path := format_attribute_path(attribute_path)
-    results :=
-    [ { "name": get_resource_name(this_nc_resource, value_name),
-        "message": msg
-    } |
-    nc_resources := get_nc_whitelisted_resources(resource_type, attribute_path, compliant_values)
-    this_nc_resource = nc_resources[_]
-    this_nc_attribute = object.get(this_nc_resource.values, attribute_path, null)
-    msg := format_whitelist_message(friendly_resource_name, get_resource_name(this_nc_resource, value_name), string_path, this_nc_attribute, empty_message(this_nc_attribute), compliant_values)
-    ]
-}
-
-####################################################
-# Range methods
-
-get_upper_bound(range_values) = bound if {
-    not is_null(range_values.upper_bound)
-    bound := sprintf("%v", [range_values.upper_bound])
-}
-get_upper_bound(range_values) = "Inf" if {
-    is_null(range_values.upper_bound)
-}
-
-get_lower_bound(range_values) = bound if {
-    not is_null(range_values.lower_bound)
-    bound := sprintf("%v", [range_values.lower_bound])
-}
-get_lower_bound(range_values) = "-Inf" if {
-    is_null(range_values.lower_bound)
-}
-
-format_range_validation_message(friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, range_values) = msg if {
-    upper_bound := get_upper_bound(range_values)
-    lower_bound := get_lower_bound(range_values)
-    msg := sprintf(
-        "%s '%s' has '%s' set to '%s'%s. It should be set between '%s and %s'.",
-        [friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, lower_bound, upper_bound]
-    )
-}
-
-get_nc_range_resources(resource_type, attribute_path, range_values) = resources if {
-    resources := [
-        resource |
-        resource := input.planned_values.root_module.resources[_]
-        resource_type_match(resource, resource_type)
-        # Test array of array and deeply nested values
-        not test_value_range(range_values, to_number(object.get(resource.values, attribute_path, null)))
-    ]
-}
-
-get_range_violations(resource_type, attribute_path, range_values, friendly_resource_name, value_name) = results if {
-    unpacked_range_values = range_values #[0] <===================================================================== removed [0] - Visal
-    string_path := format_attribute_path(attribute_path)
-    results :=
-    [ { "name": get_resource_name(this_nc_resource, value_name),
-        "message": msg
-    } |
-    nc_resources := get_nc_range_resources(resource_type, attribute_path, unpacked_range_values)
-    this_nc_resource = nc_resources[_]
-    this_nc_attribute = object.get(this_nc_resource.values, attribute_path, null)
-    msg := format_range_validation_message(friendly_resource_name, get_resource_name(this_nc_resource, value_name), string_path, this_nc_attribute, empty_message(this_nc_attribute), unpacked_range_values)
-    ]
-}
-
-format_range_input(lower,upper) = range_values if {
-    is_null_or_number(lower)
-    is_null_or_number(upper)
-    range_values := {"lower_bound":lower,"upper_bound":upper}
-}
-
-format_range_validation_message(
-    friendly_resource_name,
-    resource_value_name,
-    attribute_path_string,
-    nc_value,
-    empty,
-    range_values
-) = msg if {
-    lower := get_lower_bound(range_values)
-    upper := get_upper_bound(range_values)
-
-    msg := sprintf(
-        "%s '%s' has '%s' set to '%v'%s. It must be between %v and %v",
-        [friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, lower, upper]
-    )
-}
 
 ############### REGEX
 
@@ -507,199 +345,4 @@ final_formatter(target, sub_pattern) = final_format if {
     final_format := regex.replace(target, sub_pattern, sprintf("'%s'", [sub_pattern]))
 }
 
-# PATTERN BLACKLIST
-get_nc_pattern_blacklist(resource, attribute_path, target, patterns) = ncc if {
-    target_list = get_target_list(resource, attribute_path, target) # list of targetted substrings
-    ncc := [
-        {"value": target_list[i], "allowed": patterns[i]} |
-            some i
-            array_contains(patterns[i], target_list[i], "blacklist") # direct mapping of positions of target * with its list of allowed patterns
-    ]
-}
 
-get_nc_pattern_blacklist_resources(resource_type, attribute_path, values) = resources if {
-    resources := [
-        resource |
-        target := values[0] # target val string
-        patterns := values[1] # allowed patterns (list)
-        resource := input.planned_values.root_module.resources[_]
-        resource_type_match(resource, resource_type)
-        count(get_nc_pattern_blacklist(resource, attribute_path, target, patterns)) > 0 # ok, there is a resource with at least one non-compliant
-    ]
-}
-
-get_pattern_blacklist_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name) = results if {
-    string_path := format_attribute_path(attribute_path)
-    results := # and their patterns
-    [ { "name": get_resource_name(this_nc_resource, value_name),
-        "message": msg
-    } |
-    nc_resources := get_nc_pattern_blacklist_resources(resource_type, attribute_path, values_formatted)
-    this_nc_resource = nc_resources[_]
-    nc := get_nc_pattern_blacklist(this_nc_resource, attribute_path, values_formatted[0], values_formatted[1])
-    this_nc := nc[_]
-    msg := format_pattern_blacklist_message(friendly_resource_name, get_resource_name(this_nc_resource, value_name), string_path, final_formatter(object.get(this_nc_resource.values, attribute_path, null), this_nc.value), empty_message(this_nc.value), this_nc.allowed)
-    ]
-}
-
-format_pattern_blacklist_message(friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, allowed_values) = msg if {
-    msg := sprintf(
-        "%s '%s' has '%s' set to '%s'%s. This is blacklisted: %s",
-        [friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, allowed_values]
-    )
-}
-
-# PATTERN WHITELIST (clone of blacklist, but not array_contains()
-get_nc_pattern_whitelist(resource, attribute_path, target, patterns) = ncc if {
-    target_list = get_target_list(resource, attribute_path, target) # list of targetted substrings
-    ncc := [
-        {"value": target_list[i], "allowed": patterns[i]} |
-            some i
-            not array_contains(patterns[i], target_list[i], "whitelist") # direct mapping of positions of target * with its list of allowed patterns
-    ]
-}
-
-get_nc_pattern_whitelist_resources(resource_type, attribute_path, values) = resources if {
-    resources := [
-        resource |
-        target := values[0] # target val string
-        patterns := values[1] # allowed patterns (list)
-        resource := input.planned_values.root_module.resources[_]
-        resource_type_match(resource, resource_type)
-        count(get_nc_pattern_whitelist(resource, attribute_path, target, patterns)) > 0 # ok, there is a resource with at least one non-compliant
-    ]
-}
-
-get_pattern_whitelist_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name) = results if {
-    string_path := format_attribute_path(attribute_path)
-    results := # and their patterns 
-    [ { "name": get_resource_name(this_nc_resource, value_name),
-        "message": msg
-    } |
-    nc_resources := get_nc_pattern_whitelist_resources(resource_type, attribute_path, values_formatted)
-    this_nc_resource = nc_resources[_]
-    nc := get_nc_pattern_whitelist(this_nc_resource, attribute_path, values_formatted[0], values_formatted[1])
-    this_nc := nc[_]
-    msg := format_pattern_whitelist_message(friendly_resource_name, get_resource_name(this_nc_resource, value_name), string_path, final_formatter(object.get(this_nc_resource.values, attribute_path, null), this_nc.value), empty_message(this_nc.value), this_nc.allowed)
-    ]
-}
-
-format_pattern_whitelist_message(friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, allowed_values) = msg if {
-    msg := sprintf(
-        "%s '%s' has '%s' set to '%s'%s. It should be set to one of: %s",
-        [friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, allowed_values]
-    ) 
-}
-
-
-
-####################################################
-# Element blacklist methods
-
-
-# get_element_blacklist_violations() generates detailed violation reports for resources with blacklisted array elements.
-#
-# Parameters:
-#   resource_type   - Terraform resource type (e.g., "google_access_context_manager_service_perimeter")
-#   attribute_path  - Array path to target array attribute (e.g., ["status", 0, "restricted_services"])
-#   patterns        - Array of forbidden substrings (e.g., ["*", "0.0.0.0"])
-#   friendly_resource_name  - Human-readable resource type name for error messages (e.g., "Storage Bucket")
-#   value_name              - Resource attribute to use as identifier (typically "name" or "title")
-#
-# Returns:
-#   An array of violation objects, each containing:
-#     - "name": The resource identifier (extracted using value_name parameter)
-#     - "message": Formatted error message listing the blacklisted patterns and violating elements
-#   Returns empty array if no violations found.
-#
-# Example Output:
-#   [
-#     {
-#       "name": "my-service-perimeter",
-#       "message": "service_perimeter 'my-service-perimeter' has 'status.[0].restricted_services' containing blacklisted 
-#           patterns [\"*\"] in elements: [\"*.googleapis.com\"]"
-#     }
-#   ]
-get_element_blacklist_violations(resource_type, attribute_path, patterns, friendly_resource_name, value_name) = results if {
-    string_path := format_attribute_path(attribute_path)
-    results := [
-        {
-            "name": get_resource_name(this_nc_resource, value_name),
-            "message": msg
-        } |
-        nc_resources := _get_element_blacklist_resources(resource_type, attribute_path, patterns)
-        this_nc_resource = nc_resources[_]
-        array_value := object.get(this_nc_resource.values, attribute_path, null)
-        violating_elements := [elem | 
-            elem := array_value[_]
-            some pattern in patterns
-            contains(elem, pattern)
-        ]
-        msg := _format_element_blacklist_message(
-            friendly_resource_name, 
-            get_resource_name(this_nc_resource, value_name), 
-            string_path, 
-            violating_elements, 
-            patterns
-        )
-    ]
-}
-
-
-# get_element_blacklist_resources() filters Terraform resources based on array element content violations.
-#
-# Parameters:
-#   resource_type   - Terraform resource type (e.g., "google_access_context_manager_service_perimeter")
-#   attribute_path  - Array path to target array attribute (e.g., ["status", 0, "restricted_services"])
-#   patterns        - Array of forbidden substrings (e.g., ["*", "0.0.0.0"])
-#
-# Returns:
-#   An array of resources that violate the policy by having at least one array element
-#   containing at least one of the blacklisted patterns. Returns empty array if no violations found.
-#
-# Example:
-#   For a resource with restricted_services = ["*.googleapis.com", "storage.googleapis.com"]
-#   and patterns = ["*"], this function returns the resource because "*.googleapis.com" contains "*"
-_get_element_blacklist_resources(resource_type, attribute_path, patterns) = resources if {
-    resources := [
-        resource |
-        resource := input.planned_values.root_module.resources[_]
-        resource_type_match(resource, resource_type)
-        array_value := object.get(resource.values, attribute_path, null)
-        is_array(array_value)
-        # Check if ANY element contains ANY pattern - collect matches
-        matches := [1 | 
-            some element in array_value
-            some pattern in patterns
-            contains(element, pattern)
-        ]
-        count(matches) > 0
-    ]
-}
-
-
-# format_element_blacklist_message() generates a human-readable error message for element blacklist violations.
-#
-# Parameters:
-#   friendly_resource_name  - Human-readable resource type (e.g., "Service Perimeter", "Storage Bucket")
-#   resource_value_name     - Specific resource identifier (e.g., "my-service-perimeter")
-#   attribute_path_string   - Path to violating attribute (e.g., "status.[0].restricted_services")
-#   violating_elements      - Array containing blacklisted patterns (e.g., ["*.googleapis.com"])
-#   patterns                - Array of forbidden substrings (e.g., ["*", "0.0.0.0"])
-#
-# Returns:
-#   Formatted error message for and user feedback.
-#
-# Message Format:
-#   "{friendly_resource_name} '{resource_value_name}' has '{attribute_path_string}' containing blacklisted patterns 
-#    {patterns} in elements: {violating_elements}"
-#
-# Example Output:
-#   "Service Perimeter 'my-perimeter' has 'status.[0].restricted_services' containing blacklisted patterns [\"*\"] in 
-#   elements: [\"*.googleapis.com\"]"
-_format_element_blacklist_message(friendly_resource_name, resource_value_name, attribute_path_string, violating_elements, patterns) = msg if {
-    msg := sprintf(
-        "%s '%s' has '%s' containing blacklisted patterns %v in elements: %v",
-        [friendly_resource_name, resource_value_name, attribute_path_string, patterns, violating_elements]
-    )
-}
