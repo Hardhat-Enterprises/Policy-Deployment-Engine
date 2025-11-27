@@ -1,4 +1,4 @@
-package terraform.gcp.helpers.shared
+package terraform.helpers.shared
 
 # Shared utility functions used by all policy modules
 # No imports to avoid circular dependencies

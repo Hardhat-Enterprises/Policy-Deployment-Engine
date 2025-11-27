@@ -1,6 +1,6 @@
-package terraform.gcp.helpers.policies.element_blacklist
+package terraform.helpers.policies.element_blacklist
 
-import data.terraform.gcp.helpers.shared
+import data.terraform.helpers.shared
 
 # get_violations() generates detailed violation reports for resources with blacklisted array elements.
 #

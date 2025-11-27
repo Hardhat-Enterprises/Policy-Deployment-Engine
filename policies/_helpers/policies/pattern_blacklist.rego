@@ -1,6 +1,6 @@
-package terraform.gcp.helpers.policies.pattern_blacklist
+package terraform.helpers.policies.pattern_blacklist
 
-import data.terraform.gcp.helpers.shared
+import data.terraform.helpers.shared
 
 
 get_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name) = results if {

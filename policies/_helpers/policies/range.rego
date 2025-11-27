@@ -1,6 +1,6 @@
-package terraform.gcp.helpers.policies.range
+package terraform.helpers.policies.range
 
-import data.terraform.gcp.helpers.shared
+import data.terraform.helpers.shared
 
 # Helper function to check if a value is null or a number
 is_null_or_number(value) if {

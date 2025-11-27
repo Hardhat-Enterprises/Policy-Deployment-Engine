@@ -1,6 +1,6 @@
-package terraform.gcp.helpers.policies.whitelist
+package terraform.helpers.policies.whitelist
 
-import data.terraform.gcp.helpers.shared
+import data.terraform.helpers.shared
 
 get_violations(resource_type, attribute_path, compliant_values, friendly_resource_name, value_name) = results if {
     string_path := shared.format_attribute_path(attribute_path)
