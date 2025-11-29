@@ -123,20 +123,28 @@
 
           const subFiles = files.filter(f => f.path.split("/")[2] === folder);
           for (let subFile of subFiles) {
-            // let displayName = subFile.path.endsWith(".md")
-            //   ? subFile.path.split("/").pop().slice(0, -3)
-            //   : subFile.path.split("/").pop();
-            // let cleanPath = subFile.path.endsWith(".md")
-            //   ? subFile.path.slice(0, -3)
-            //   : subFile.path;
+            let displayName = subFile.path.endsWith(".md")
+              ? subFile.path.split("/").pop().slice(0, -3)
+              : subFile.path.split("/").pop();
+            let cleanPath = subFile.path.endsWith(".md")
+              ? subFile.path.slice(0, -3)
+              : subFile.path;
             
-              const displayName = subFile.path.split("/").pop().replace(".md", "");
+            // const subItem = `<li class="subfile"><a href="/Policy-Deployment-Engine/${cleanPath}" target="_blank">${displayName}</a></li>`;
+            const rawURL = `https://raw.githubusercontent.com/Hardhat-Enterprises/Policy-Deployment-Engine/${branch}/${subFile.path}`;
 
-            const rawUrl = `https://raw.githubusercontent.com/Hardhat-Enterprises/Policy-Deployment-Engine/dev/${subFile.path}`;
-            const subItem = `<li class="subfile"><a href="#" data-md="${rawUrl}" class="md-link">${displayName}</a></li>`;
+            htmlString += `
+              <li class="subfile">
+                <a href="${rawURL}" 
+                  class="md-link"
+                  data-path="${subFile.path}" 
+                  data-raw="${rawURL}">
+                  ${displayName}
+                </a>
+              </li>`;
 
-            folderMap[folder].push(subItem);
-            htmlString += subItem;
+            // folderMap[folder].push(subItem);
+            // htmlString += subItem;
           }
           htmlString += `</ul></li>`;
         }
