@@ -8,9 +8,10 @@ data "google_iam_policy" "nc" {
   }
 }
 
-resource "google_api_gateway_api_iam_policy" "nc" {
+resource "google_api_gateway_gateway_iam_policy" "nc" {
   provider = google-beta
   project = "reliable-alpha-478205-k9"
-  api = "my-api-id-nc"
+  region = "australia-southeast1"
+  gateway = "my-gateway-id-nc"
   policy_data = data.google_iam_policy.nc.policy_data
 }
