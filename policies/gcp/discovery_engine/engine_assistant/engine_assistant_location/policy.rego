@@ -1,8 +1,8 @@
-package terraform.gcp.security.discovery_engine.chat_engine.chat_engine_location
+package terraform.gcp.security.discovery_engine.engine_assistant.engine_assistant_location
 import data.terraform.gcp.helpers
-import data.terraform.gcp.security.discovery_engine.chat_engine.vars
+import data.terraform.gcp.security.discovery_engine.engine_assistant.vars
 
-#location check
+#engine_assistant_location
 
 conditions := [
     [
