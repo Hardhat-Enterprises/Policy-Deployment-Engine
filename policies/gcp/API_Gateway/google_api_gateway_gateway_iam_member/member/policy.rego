@@ -11,7 +11,7 @@ conditions := [
     {
       "condition": "member must NOT be public/broad",
       "attribute_path": ["member"],
-      "values":["allUsers"],
+      "values":["allUsers", "allAuthenticatedUsers"],
       "policy_type": "blacklist"
     }
   ]
