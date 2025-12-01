@@ -13,6 +13,7 @@ resource "google_beyondcorp_security_gateway_application" "sgp_nc" {
   project = google_beyondcorp_security_gateway.sg_nc.project
   endpoint_matchers {
     hostname = "google.com"
+    ports = [80, 443]
   }
 }
 
