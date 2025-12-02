@@ -1,12 +1,12 @@
 resource "google_api_gateway_api_config" "c" {
-  provider = google-beta
-  api = "my-api-id-c"
-  api_config_id = "my-api-config-id-c"
-  project = "reliable-alpha-478205-k9"
+  provider      = google-beta
+  api           = "c"
+  api_config_id = "c"
+  project       = "reliable-alpha-478205-k9"
 
   openapi_documents {
     document {
-      path = "spec.yaml"
+      path     = "spec.yaml"
       contents = filebase64("openapi.yml")
     }
   }

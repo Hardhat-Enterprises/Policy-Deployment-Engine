@@ -11,6 +11,6 @@ data "google_iam_policy" "c" {
 resource "google_api_gateway_api_iam_policy" "c" {
   provider    = google-beta
   project     = "reliable-alpha-478205-k9"
-  api         = "my-api-id-c"
+  api         = "c"
   policy_data = data.google_iam_policy.c.policy_data
 }
