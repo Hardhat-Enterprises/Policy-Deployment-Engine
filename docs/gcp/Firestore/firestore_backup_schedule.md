@@ -6,7 +6,8 @@ Reference: [Terraform Registry – firestore_backup_schedule](https://registry.t
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `retention` | Firestore backup schedules must retain backups for at least 7 days (604800 seconds). | true | false | None | None | None |
@@ -16,6 +17,7 @@ Reference: [Terraform Registry – firestore_backup_schedule](https://registry.t
 | `project` | If it is not provided, the provider project is used. | false | false | None | None | None |
 
 ### weekly_recurrence Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `day` | The day of week to run. Possible values are: `DAY_OF_WEEK_UNSPECIFIED`, `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`, `SUNDAY`. | false | false | None | None | None |

@@ -6,7 +6,8 @@ Reference: [Terraform Registry – storage_managed_folder](https://registry.terr
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `bucket` | The name of the bucket that contains the managed folder. | true | false | None | None | None |

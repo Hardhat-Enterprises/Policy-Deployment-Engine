@@ -6,7 +6,8 @@ Reference: [Terraform Registry – google_project](https://registry.terraform.io
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `name` | The display name of the project. | true | false | Label only and does not affect security | None | None |

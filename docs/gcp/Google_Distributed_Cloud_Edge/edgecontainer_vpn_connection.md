@@ -6,7 +6,8 @@ Reference: [Terraform Registry – edgecontainer_vpn_connection](https://registr
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `cluster` | The canonical Cluster name to connect to. It is in the form of projects/{project}/locations/{location}/clusters/{cluster}. | true | true | Proper cluster reference ensures the VPN connection is established with the correct, authorized cluster with appropriate security controls. | projects/my-project/locations/us-central1/clusters/my-cluster | Incorrect or unauthorized cluster reference |
@@ -21,6 +22,7 @@ Reference: [Terraform Registry – edgecontainer_vpn_connection](https://registr
 | `project` | If it is not provided, the provider project is used. | false | true | Project selection impacts resource isolation, billing accountability, and access control boundaries for the VPN connection. | Proper project reference | Incorrect or unauthorized project |
 
 ### vpc_project Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `project_id` | The project of the VPC to connect to. If not specified, it is the same as the cluster project. | false | true | Project ID must reference an authorized project with proper security controls and network policies. | authorized-vpc-project | Unauthorized or incorrect project reference |

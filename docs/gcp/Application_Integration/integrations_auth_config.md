@@ -6,7 +6,8 @@ Reference: [Terraform Registry – integrations_auth_config](https://registry.te
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `display_name` | The name of the auth config. | true | false | None | None | None |
@@ -32,6 +33,7 @@ Reference: [Terraform Registry – integrations_auth_config](https://registry.te
 | `oidc_token` |  | false | false | None | None | None |
 
 ### decrypted_credential Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `credential_type` | Credential type associated with auth configs. | true | true | Only approved credential types are allowed to ensure strong, secure, and supported authentication methods | oauth2_client_credentials | basic_auth |
@@ -44,6 +46,7 @@ Reference: [Terraform Registry – integrations_auth_config](https://registry.te
 | `oidc_token` | Google OIDC ID Token. Structure is [documented below](#nested_decrypted_credential_oidc_token). | false | false | None | None | None |
 
 ### client_certificate Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `ssl_certificate` | The ssl certificate encoded in PEM format. This string must include the begin header and end footer lines. | true | false | None | None | None |
@@ -51,12 +54,14 @@ Reference: [Terraform Registry – integrations_auth_config](https://registry.te
 | `passphrase` | 'passphrase' should be left unset if private key is not encrypted. Note that 'passphrase' is not the password for web server, but an extra layer of security to protected private key. | false | false | None | None | None |
 
 ### username_and_password Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `username` | Username to be used. | false | false | None | None | None |
 | `password` | Password to be used. | false | false | None | None | None |
 
 ### oauth2_authorization_code Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `client_id` | The client's id. | false | false | None | None | None |
@@ -66,6 +71,7 @@ Reference: [Terraform Registry – integrations_auth_config](https://registry.te
 | `token_endpoint` | The token url endpoint to send the token request to. | false | false | None | None | None |
 
 ### oauth2_client_credentials Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `client_id` | The client's ID. | false | false | None | None | None |
@@ -76,32 +82,38 @@ Reference: [Terraform Registry – integrations_auth_config](https://registry.te
 | `request_type` | Represent how to pass parameters to fetch access token Possible values are: `REQUEST_TYPE_UNSPECIFIED`, `REQUEST_BODY`, `QUERY_PARAMETERS`, `ENCODED_HEADER`. | false | true | Only secure request types should be used to transmit credentials. Types like 'ENCODED_HEADER' or 'REQUEST_BODY' ensures safer handling of credentials. | ENCODED_HEADER | QUERY_PARAMETERS |
 
 ### token_params Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `entries` | A list of parameter map entries. Structure is [documented below](#nested_decrypted_credential_oauth2_client_credentials_token_params_entries). | false | false | None | None | None |
 
 ### entries Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `key` | Key of the map entry. Structure is [documented below](#nested_decrypted_credential_oauth2_client_credentials_token_params_entries_entries_key). | false | false | None | None | None |
 | `value` | Value of the map entry. Structure is [documented below](#nested_decrypted_credential_oauth2_client_credentials_token_params_entries_entries_value). | false | false | None | None | None |
 
 ### key Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `literal_value` | Passing a literal value Structure is [documented below](#nested_decrypted_credential_oauth2_client_credentials_token_params_entries_entries_key_literal_value). | false | false | None | None | None |
 
 ### literal_value Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `string_value` | String. | false | false | None | None | None |
 
 ### value Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `literal_value` | Passing a literal value Structure is [documented below](#nested_decrypted_credential_oauth2_client_credentials_token_params_entries_entries_value_literal_value). | false | false | None | None | None |
 
 ### jwt Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `jwt_header` | Identifies which algorithm is used to generate the signature. | false | true | Using secure JWT headers ensures proper validation. The 'HS256' algorithm should be used to prevent weak or insecure cryptographic signing, and the type must be set to 'JWT' to maintain standardization and avoid parsing errors or misuse. | {"alg": "HS256", "typ": "JWT"} | {"alg": "RS256", "typ": "JWS"} |
@@ -110,18 +122,21 @@ Reference: [Terraform Registry – integrations_auth_config](https://registry.te
 | `jwt` | (Output) The token calculated by the header, payload and signature. | false | false | None | None | None |
 
 ### auth_token Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `type` | Authentication type must be set, e.g. "Basic", "Bearer", etc. | false | true | Using secure authentication token types ensures proper authorization standards are enforced. | Bearer | Basic |
 | `token` | The token for the auth type. | false | true | Providing a token value is critical for secure authentication. Empty tokens can result in unauthorized access, increasing the risk of security breaches. | secure-value-token |  |
 
 ### service_account_credentials Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `service_account` | Name of the service account that has the permission to make the request. | false | false | None | None | None |
 | `scope` | A space-delimited list of requested scope permissions. | false | false | None | None | None |
 
 ### oidc_token Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `service_account_email` | The service account email to be used as the identity for the token. | false | false | None | None | None |

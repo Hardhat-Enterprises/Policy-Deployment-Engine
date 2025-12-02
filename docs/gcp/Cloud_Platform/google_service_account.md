@@ -6,7 +6,8 @@ Reference: [Terraform Registry – google_service_account](https://registry.terr
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `account_id` | account email address and a stable unique id. It is unique within a project, must be 6-30 characters long, and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])` to comply with RFC1035. Changing this forces a new service account to be created. | true | true | Risky names like admin, root, or owner give false sense of privilege and can confuse audits | account_id = "payments-batcher-prod" | account_id = "admin" |
