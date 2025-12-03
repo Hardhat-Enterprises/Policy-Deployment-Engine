@@ -1,118 +1,88 @@
 package terraform.helpers.policies.range
 
+# Range Policy
+#
+# Detects resources with numeric attributes outside specified bounds.
+# Both lower and upper bounds are required.
+#
+# Example: [10, 100] requires value between 10 and 100 (inclusive)
+
 import data.terraform.helpers.shared
 
-# Helper function to check if a value is null or a number
-is_null_or_number(value) if {
-    is_null(value)  # true if value is null
+################################################################################
+# Range Validation Utilities
+################################################################################
+
+# Checks if a value is within the specified range (inclusive)
+_test_value_range(value, lower_bound, upper_bound) if {
+    value >= lower_bound
+    value <= upper_bound
 }
 
-is_null_or_number(value) if {
-    type_name(value) == "number"  # true if value is a number
-}
+################################################################################
+# Public API
+################################################################################
 
+# Identifies resources with numeric attributes outside specified range
+#
+# Parameters:
+#   tf_variables - Resource metadata
+#   attribute_path - Path to numeric attribute
+#   values_formatted - Two-element array [lower_bound, upper_bound]
+#
+# Returns:
+#   Set of violation objects with {name, message}
+get_violations(tf_variables, attribute_path, values_formatted) = results if {
+    count(values_formatted) == 2
+    lower_bound := values_formatted[0]
+    upper_bound := values_formatted[1]
     
-get_upper_bound(range_values) = bound if {
-    not is_null(range_values.upper_bound)
-    bound := sprintf("%v", [range_values.upper_bound])
-}
-get_upper_bound(range_values) = "Inf" if {
-    is_null(range_values.upper_bound)
-}
-
-get_lower_bound(range_values) = bound if {
-    not is_null(range_values.lower_bound)
-    bound := sprintf("%v", [range_values.lower_bound])
-}
-get_lower_bound(range_values) = "-Inf" if {
-    is_null(range_values.lower_bound)
+    nc_resources := _get_resources(tf_variables.resource_type, attribute_path, lower_bound, upper_bound)
+    results := {
+        _build_violation(tf_variables, attribute_path, lower_bound, upper_bound, resource) |
+        some resource in nc_resources
+    }
 }
 
-format_range_input(lower,upper) = range_values if {
-    is_null_or_number(lower)
-    is_null_or_number(upper)
-    range_values := {"lower_bound":lower,"upper_bound":upper}
+_build_violation(tf_variables, attribute_path, lower_bound, upper_bound, resource) = violation if {
+    attribute_path_string := shared.format_attribute_path(attribute_path)
+    attribute_value := shared.get_attribute_value(resource, attribute_path)
+    
+    violation := {
+        "name": shared.get_resource_attribute(resource, tf_variables.resource_value_name),
+        "message": _format_message(
+            tf_variables.friendly_resource_name,
+            shared.get_resource_attribute(resource, tf_variables.resource_value_name),
+            attribute_path_string,
+            attribute_value,
+            shared.empty_message(attribute_value),
+            lower_bound,
+            upper_bound
+        )
+    }
 }
 
-# Checks a value sits between a given range of a passed object with keys upper_bound and lower_bound
-test_value_range(range_values, value) if {
-    test_lower_range(range_values, value)
-    test_upper_range(range_values, value)
-}
-
-test_lower_range(range_values,value) = true if {
-    # Check value exists
-    not is_null(range_values.lower_bound)
-    value >= range_values.lower_bound
-}
-
-# Null indicates no lower bound
-test_lower_range(range_values,value) = true if {
-    is_null(range_values.lower_bound)
-}
-
-test_upper_range(range_values,value) = true if {
-    # Check value exists
-    not is_null(range_values.upper_bound)
-    value <= range_values.upper_bound
-}
-
-# Null indicates no higher bound
-test_upper_range(range_values,value) = true if {
-    is_null(range_values.upper_bound)
-}
-
-
-
-get_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name) = results if {
-    # Format the input values into range object
-    values_formatted_range := format_range_input(values_formatted[0], values_formatted[1])
-    string_path := shared.format_attribute_path(attribute_path)
-    results :=
-    [ { "name": shared.get_resource_name(this_nc_resource, value_name),
-        "message": msg
-    } |
-    nc_resources := _get_resources(resource_type, attribute_path, values_formatted_range)
-    this_nc_resource = nc_resources[_]
-    this_nc_attribute = object.get(this_nc_resource.values, attribute_path, null)
-    msg := _format_range_validation_message(friendly_resource_name, shared.get_resource_name(this_nc_resource, value_name), string_path, this_nc_attribute, shared.empty_message(this_nc_attribute), values_formatted_range)
-    ]
-}
-
-_get_resources(resource_type, attribute_path, range_values) = resources if {
-    resources := [
+_get_resources(resource_type, attribute_path, lower_bound, upper_bound) = resources if {
+    resources := {
         resource |
         resource := input.planned_values.root_module.resources[_]
         resource.type == resource_type
-        # Test array of array and deeply nested values
-        not test_value_range(range_values, to_number(object.get(resource.values, attribute_path, null)))
-    ]
+        attribute_value := to_number(shared.get_attribute_value(resource, attribute_path))
+        not _test_value_range(attribute_value, lower_bound, upper_bound)
+    }
 }
 
-
-_format_range_validation_message(
+_format_message(
     friendly_resource_name,
     resource_value_name,
     attribute_path_string,
     nc_value,
     empty,
-    range_values
+    lower_bound,
+    upper_bound
 ) = msg if {
-    lower := get_lower_bound(range_values)
-    upper := get_upper_bound(range_values)
-
     msg := sprintf(
         "%s '%s' has '%s' set to '%v'%s. It must be between %v and %v",
-        [friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, lower, upper]
+        [friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, lower_bound, upper_bound]
     )
 }
-
-
-# _format_range_validation_message(friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, range_values) = msg if {
-#     upper_bound := get_upper_bound(range_values)
-#     lower_bound := get_lower_bound(range_values)
-#     msg := sprintf(
-#         "%s '%s' has '%s' set to '%s'%s. It should be set between '%s and %s'.",
-#         [friendly_resource_name, resource_value_name, attribute_path_string, nc_value, empty, lower_bound, upper_bound]
-#     )
-# }

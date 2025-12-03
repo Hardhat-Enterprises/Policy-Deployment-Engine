@@ -1,53 +1,52 @@
 package terraform.helpers.policies.element_blacklist
 
+# Element Blacklist Policy
+#
+# Detects array attributes containing elements with blacklisted substrings.
+# Uses simple substring matching (contains) rather than regex patterns.
+#
+# Example:
+#   patterns: ["test", "staging"]
+#   Violates if any array element contains "test" or "staging"
+
 import data.terraform.helpers.shared
 
-# get_violations() generates detailed violation reports for resources with blacklisted array elements.
+# Identifies resources with array elements containing blacklisted substrings
 #
 # Parameters:
-#   resource_type   - Terraform resource type (e.g., "google_access_context_manager_service_perimeter")
-#   attribute_path  - Array path to target array attribute (e.g., ["status", 0, "restricted_services"])
-#   patterns        - Array of forbidden substrings (e.g., ["*", "0.0.0.0"])
-#   friendly_resource_name  - Human-readable resource type name for error messages (e.g., "Storage Bucket")
-#   value_name              - Resource attribute to use as identifier (typically "name" or "title")
+#   tf_variables - Resource metadata
+#   attribute_path - Path to array attribute
+#   patterns - Array of substring patterns to match against
 #
 # Returns:
-#   An array of violation objects, each containing:
-#     - "name": The resource identifier (extracted using value_name parameter)
-#     - "message": Formatted error message listing the blacklisted patterns and violating elements
-#   Returns empty array if no violations found.
-#
-# Example Output:
-#   [
-#     {
-#       "name": "my-service-perimeter",
-#       "message": "service_perimeter 'my-service-perimeter' has 'status.[0].restricted_services' containing blacklisted 
-#           patterns [\"*\"] in elements: [\"*.googleapis.com\"]"
-#     }
-#   ]
-get_violations(resource_type, attribute_path, patterns, friendly_resource_name, value_name) = results if {
-    string_path := shared.format_attribute_path(attribute_path)
-    results := [
-        {
-            "name": shared.get_resource_name(this_nc_resource, value_name),
-            "message": msg
-        } |
-        nc_resources := _get_resources(resource_type, attribute_path, patterns)
-        this_nc_resource = nc_resources[_]
-        array_value := object.get(this_nc_resource.values, attribute_path, null)
-        violating_elements := [elem | 
-            elem := array_value[_]
-            some pattern in patterns
-            contains(elem, pattern)
-        ]
-        msg := _format_message(
-            friendly_resource_name, 
-            shared.get_resource_name(this_nc_resource, value_name), 
-            string_path, 
+#   Set of violation objects with {name, message}
+get_violations(tf_variables, attribute_path, patterns) = results if {
+    nc_resources := _get_resources(tf_variables.resource_type, attribute_path, patterns)
+    results := {
+        _build_violation(tf_variables, attribute_path, patterns, resource) |
+        some resource in nc_resources
+    }
+}
+
+_build_violation(tf_variables, attribute_path, patterns, resource) = violation if {
+    attribute_path_string := shared.format_attribute_path(attribute_path)
+    array_value := shared.get_attribute_value(resource, attribute_path)
+    violating_elements := [elem | 
+        elem := array_value[_]
+        some pattern in patterns
+        contains(elem, pattern)
+    ]
+    
+    violation := {
+        "name": shared.get_resource_attribute(resource, tf_variables.resource_value_name),
+        "message": _format_message(
+            tf_variables.friendly_resource_name, 
+            shared.get_resource_attribute(resource, tf_variables.resource_value_name), 
+            attribute_path_string, 
             violating_elements, 
             patterns
         )
-    ]
+    }
 }
 
 
@@ -66,11 +65,11 @@ get_violations(resource_type, attribute_path, patterns, friendly_resource_name, 
 #   For a resource with restricted_services = ["*.googleapis.com", "storage.googleapis.com"]
 #   and patterns = ["*"], this function returns the resource because "*.googleapis.com" contains "*"
 _get_resources(resource_type, attribute_path, patterns) = resources if {
-    resources := [
+    resources := {
         resource |
         resource := input.planned_values.root_module.resources[_]
         resource.type == resource_type
-        array_value := object.get(resource.values, attribute_path, null)
+        array_value := shared.get_attribute_value(resource, attribute_path)
         is_array(array_value)
         # Check if ANY element contains ANY pattern - collect matches
         matches := [1 | 
@@ -79,7 +78,7 @@ _get_resources(resource_type, attribute_path, patterns) = resources if {
             contains(element, pattern)
         ]
         count(matches) > 0
-    ]
+    }
 }
 
 

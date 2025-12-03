@@ -1,8 +1,16 @@
 package terraform.helpers
-# tested on OPA Version: 1.2.0, Rego Version: v1
+# Tested on OPA Version: 1.2.0, Rego Version: v1
 
-# Defines the types of policies capable of being processed
-policy_types := ["blacklist", "whitelist", "range", "pattern blacklist", "pattern whitelist", "element blacklist"]
+# Policy Orchestration Layer
+# 
+# This module serves as the main entry point for all policy evaluation.
+# It coordinates policy execution across multiple situations and conditions,
+# aggregating results and formatting them for consumption.
+#
+# Architecture:
+#   - Delegates policy logic to specialized modules (blacklist, whitelist, range, etc.)
+#   - Uses set intersection for AND logic across conditions
+#   - Returns structured summaries with violation details
 
 import data.terraform.helpers.shared
 import data.terraform.helpers.policies.blacklist
@@ -12,337 +20,230 @@ import data.terraform.helpers.policies.pattern_blacklist
 import data.terraform.helpers.policies.pattern_whitelist
 import data.terraform.helpers.policies.element_blacklist
 
-####################################################
-
-# NEW FUNCTIONS
-
-
-
-# Handle empty array blacklisting specifically
-array_contains(arr, elem, pol) if {
-    pol == "blacklist"
-    [] in arr  # Check if empty array is in blacklisted values
-    is_array(elem)
-    count(elem) == 0  # elem is empty
-}
-
-# if elem is an array; checks if elem contains any blacklisted items. e.g., elem=[w, r, a], arr=[a] -> true
-array_contains(arr, elem, pol) if {
-    is_array(elem)
-    pol == "blacklist"
-    #print(sprintf("%s", ["bb"]))
-    arr_to_set = {x | x := arr[_]}
-    elem_to_set = {x | x := elem[_]}
-    count(arr_to_set & elem_to_set) > 0
-}
-
-# if elem is an array; checks if elem is at least a subset of arr. e.g., elem=[write, read], arr=[read, write, eat] -> true
-array_contains(arr, elem, pol) if {
-    is_array(elem)
-    pol == "whitelist"
-    #print(sprintf("%s", ["ww"]))
-    arr_to_set = {x | x := arr[_]}
-    elem_to_set = {x | x := elem[_]}
-    object.subset(arr_to_set, elem_to_set)
-}
-
-# Generic helper functions:
-
-# Helper: Check if value exists in array
-array_contains(arr, elem, pol) if {
-    not is_array(elem)
-    #print(sprintf("%s", ["a2"]))
-    arr[_] == elem
-}
-
-# For resource filtering
-# resource_type_match(resource, resource_type) if {
-#     resource.type == resource_type
-# }
-
-# Collect all relevant resources
-get_all_resources(resource_type) = resources if
-{
-    resources := [
-        resource |
-        resource := input.planned_values.root_module.resources[_]
-        resource.type == resource_type
-    ]
-}
-# Extract policy type
-get_policy_type(chosen_type) = policy_type if {
-    policy_type := policy_types[_]
-    policy_type == chosen_type
-}
-
-
 ################################################################################
-# This code is used by policies to convert error messages from:
-# ["status", 0, "restricted_services"] → "status.[0].restricted_services"all this code 
-# Converts values from an int to a string but leaves strings as is
-convert_value(x) = string if {
-  type_name(x) == "number"
-  string := sprintf("[%v]", [x])
-}
-
-convert_value(x) = x if {
-  type_name(x) == "string"
-}
-# Converts each entry in attribute path into a string
-get_attribute_path(attribute_path) = result if {
-    is_array(attribute_path)
-    result := [ val |
-        x := attribute_path[_]
-        val := convert_value(x)
-  ]
-}
-# Returns a formatted string of any given attribute path
-format_attribute_path(attribute_path) = string_path if {
-    is_array(attribute_path)
-    string_path := concat(".", get_attribute_path(attribute_path))
-}
-format_attribute_path(attribute_path) = string_path if {
-    is_string(attribute_path)
-    string_path := replace(attribute_path, "_", " ")
-}
+# Public API
 ################################################################################
 
-
-# This normalizes input values into an array it is only called once by 
-# check_conditions in the line
-# values_formatted = array_check(values)
-# much more direct change this line to 
-# array_values := ensure_array(values)
-
-# array_check(values) = result if {
-#     type := type_name(values)
-#     type != "array"
-#     result := [values]
-# }
-# array_check(values) = result if {
-#     type := type_name(values)
-#     type == "array"
-#     result := values
-# }
-
-ensure_array(values) = values if {
-    is_array(values)
-}
-ensure_array(values) = [values] if {
-    not is_array(values)
-}
-
-################################################################################
-
-# Check if value is empty space
-is_empty(value) if {
-    value == ""
-}
-
-# empty_message: if empty, return fomratted warning
-empty_message(value) = msg if {
-    is_empty(value)
-    msg = " (!!!EMPTY!!!)"
-}
-
-# empty_message: if present, return nothing (space)
-empty_message(value) = msg if {
-    not is_empty(value)
-    msg = ""
-}
-
-###############################################################################
-
-# Search an array of objects for a specific key, return the value
-get_value_from_array(arr, key) = value if {
-    some i
-    obj := arr[i]
-    obj[key] != null
-    value := obj[key]
-}
-
-# Checks if a set is empty and returns a message if it is
-check_empty_set(set,msg) = return if {
-    count(set) == 0
-    return := [msg]
-}
-check_empty_set(set,msg) = return if {
-    count(set) != 0
-    return := set
-}
-
-####################################################
-
-# Entry point for all policies
-get_multi_summary(situations, variables) = summary if { # Samira , Patrick
-    # Unpack values from vars
-    resource_type := variables.resource_type
-    friendly_resource_name := variables.friendly_resource_name
-    value_name := variables.resource_value_name
-    all_resources := get_all_resources(resource_type)
-    violations := check_violations(resource_type, situations, friendly_resource_name, value_name)
-    violations_object := process_violations(violations)
-    formatted_message := format_violations(violations_object)
+# Main entry point for policy evaluation
+#
+# Evaluates a set of policy conditions against Terraform plan resources and
+# returns a structured summary of compliant and non-compliant resources.
+#
+# Parameters:
+#   conditions - Array of condition groups, each containing:
+#                - situation_description: Human-readable scenario name
+#                - remedies: Array of suggested fixes
+#                - condition objects with policy_type, attribute_path, values
+#   tf_variables - Resource configuration containing:
+#                  - resource_type: Terraform resource type (e.g., "google_storage_bucket")
+#                  - friendly_resource_name: Display name for messages
+#                  - value_name: Attribute key for resource identification
+#
+# Returns:
+#   Object with:
+#     - message: Array of formatted summary strings
+#     - details: Array of situation results with non_compliant_resources
+#
+# Logic:
+#   Resources must fail ALL conditions within a situation to be non-compliant (AND logic)
+get_multi_summary(conditions, tf_variables) = summary if {
+    # Count resources without storing them
+    resource_count := count([r |
+        r := input.planned_values.root_module.resources[_]
+        r.type == tf_variables.resource_type
+    ])
+    
+    # Build situation results using declarative approach
+    situation_results := build_situation_results(tf_variables, conditions)
+    
     summary := {
-        "message": array.concat(
-            [sprintf("Total %s detected: %d ", [friendly_resource_name, count(all_resources)])],
-            formatted_message
+        "message": format_summary_messages(
+            tf_variables.friendly_resource_name,
+            resource_count,
+            situation_results
         ),
-        "details": violations_object
+        "details": situation_results
     }
 } else := "Policy type not supported."
 
-select_policy_logic(resource_type, attribute_path, values_formatted, friendly_resource_name, chosen_type, value_name) = results if {
-    chosen_type == policy_types[0] # Blacklist
-    results := blacklist.get_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name)
-}
+################################################################################
+# Situation Processing
+################################################################################
 
-select_policy_logic(resource_type, attribute_path, values_formatted, friendly_resource_name, chosen_type, value_name) = results if {
-    chosen_type == policy_types[1] # Whitelist
-    results := whitelist.get_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name)
-}
-
-select_policy_logic(resource_type, attribute_path, values_formatted, friendly_resource_name, chosen_type, value_name) = results if {
-    chosen_type == policy_types[2] # Range (Upper and lower bounds)
-    results := range.get_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name)
-}
-
-select_policy_logic(resource_type, attribute_path, values_formatted, friendly_resource_name, chosen_type, value_name) = results if {
-    chosen_type == policy_types[3] # Patterns (B)
-    results := pattern_blacklist.get_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name)
-}
-
-select_policy_logic(resource_type, attribute_path, values_formatted, friendly_resource_name, chosen_type, value_name) = results if {
-    chosen_type == policy_types[4] # Patterns (W)
-    results := pattern_whitelist.get_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name)
-}
-
-select_policy_logic(resource_type, attribute_path, values_formatted, friendly_resource_name, chosen_type, value_name) = results if {
-    chosen_type == policy_types[5] # Element blacklist
-    results := element_blacklist.get_violations(resource_type, attribute_path, values_formatted, friendly_resource_name, value_name)
-}
-
-check_violations(resource_type, situations, friendly_resource_name, value_name) = violations if {
-    some i
-    violations := [
-        msg |
-        msg := check_conditions(resource_type, situations[i], friendly_resource_name, value_name)
+# Build all situation results in one pass
+build_situation_results(tf_variables, conditions) = results if {
+    results := [
+        build_single_situation(tf_variables, condition_group) |
+        some condition_group in conditions
     ]
 }
 
-check_conditions(resource_type, situation, friendly_resource_name, value_name) = violations if {
-        messages := [
-        msg |
-        condition := situation[_] # per cond
-        condition_name := condition.condition
-        attribute_path := condition.attribute_path
-        values := condition.values
-        pol := lower(condition.policy_type)
-        pol == get_policy_type(pol) # checks, leads to else
-        array_values := ensure_array(values)
-        msg := {condition_name : select_policy_logic(resource_type, attribute_path, array_values, friendly_resource_name, pol, value_name)} # all in
-    ]
-    sd := get_value_from_array(situation,"situation_description")
-    remedies := get_value_from_array(situation,"remedies")
-    violations := {
-        "situation_description": sd,
-        "remedies": remedies,
-        "all_conditions": messages #[{c1 : [{msg, nc}, {msg, nc}, ...]}, {c2 :[{msg, nc}, ...]}, ... : [...], ...}]
+# Process a single situation (metadata + conditions)
+build_single_situation(tf_variables, condition_group) = situation_result if {
+    # Extract metadata
+    metadata := extract_situation_metadata(condition_group)
+    
+    # Evaluate all conditions for this situation
+    condition_results := evaluate_conditions(tf_variables, condition_group)
+    
+    # Find resources that fail ALL conditions (AND logic)
+    nc_resources := find_failing_resources(condition_results)
+    
+    situation_result := {
+        "situation": metadata.description,
+        "remedies": metadata.remedies,
+        "non_compliant_resources": nc_resources,
+        "conditions": condition_results
     }
 }
 
-process_violations(violations) = situation_summary if {
-    # In each set of rules, get each unique nc resource name and each violation message
-    situation := [
-        {sit_desc : {"remedies": remedies, "conds": conds}} |
-        this_sit := violations[_]
-        sit_desc := this_sit.situation_description
-        remedies := this_sit.remedies
-        conds := this_sit.all_conditions
+# Extract metadata from condition group
+extract_situation_metadata(condition_group) = metadata if {
+    # Find metadata entry
+    description := shared.get_value_from_array(condition_group, "situation_description")
+    remedies := shared.get_value_from_array(condition_group, "remedies")
+    
+    metadata := {
+        "description": description,
+        "remedies": remedies
+    }
+}
+
+################################################################################
+# Condition Evaluation
+################################################################################
+
+# Evaluate all conditions, returning structured results
+evaluate_conditions(tf_variables, condition_group) = results if {
+    results := [
+        {condition_obj.condition: violations} |
+        some condition_entry in condition_group
+        condition_obj := condition_entry
+        condition_obj.policy_type  # Skip metadata entries without policy_type
+        
+        # Get violations for this condition
+        values := shared.ensure_array(condition_obj.values)
+        policy_type := lower(condition_obj.policy_type)
+        violations := select_policy_logic(
+            tf_variables,
+            condition_obj.attribute_path,
+            values,
+            policy_type
+        )
     ]
+}
 
-    # There is an issue here if you use the same situation description however that shouldn't happen
-
-    # Create a set containing only the nc resource for each situation
-    resource_sets :=  [ {sit_desc : resource_set} |
-        this_sit := situation[_]
-        some key, val in this_sit
-        sit_desc := key
-        this_condition := val.conds
-        resource_set := [nc |
-            some keyy, vall in this_condition[_]
-            nc := {x | x := vall[_].name}]
-    ]
-
-    overall_nc_resources :=[ {sit_desc : intersec} |
-        this_set := resource_sets[_]
-        some key, val in this_set
-        sit_desc := key
-        intersec := intersection_all(val)
-    ]
-
-    resource_message := [ {sit : msg} | # USE THIS
-        some key, val in overall_nc_resources[_]
-        sit := key
-        msg := check_empty_set(val, "All passed")
-    ]
-    # PER SITUATION
-
-    situation_summary := [ summary |
-        this_sit := situation[_]
-        some key, val in this_sit
-        sit_name := key
-        details := val.conds
-        remedies := val.remedies
-        nc_all := object.get(resource_message[_], sit_name, null)
-        nc_all != null
-
-        summary := {
-            "situation" : sit_name,
-            "remedies" : remedies,
-            "non_compliant_resources" : nc_all,
-            "details" : details
+# Find resources failing ALL conditions using set intersection
+find_failing_resources(condition_results) = failing_resources if {
+    # Extract resource names from each condition into sets
+    resource_sets := [
+        {resource.name |
+            some _, violations in condition_results[_]
+            some resource in violations
         }
     ]
+    
+    # Apply intersection across all sets
+    count(resource_sets) > 0
+    failing_resources := set_intersection_all(resource_sets)
+} else = set()
 
+################################################################################
+# Policy Type Dispatch
+################################################################################
+# Routes evaluation to appropriate policy module based on policy_type string
+# Each policy type implements its own violation detection logic
+
+select_policy_logic(tf_variables, attribute_path, values_formatted, "blacklist") = results if {
+    results := blacklist.get_violations(tf_variables, attribute_path, values_formatted)
 }
 
-format_violations(violations_object) = formatted_message if {
-    formatted_message := [
-        [ sd, nc, remedies] |
-        some i
-        this_sit := violations_object[i]
-        sd := sprintf("Situation %d: %s",[i+1, this_sit.situation])
-        resources_value := [value |
-        value := this_sit.non_compliant_resources[_]
-        ]
-        nc := sprintf("Non-Compliant Resources: %s", [concat(", ", resources_value)])
-        remedies := sprintf("Potential Remedies: %s", [concat(", ", this_sit.remedies)])
-    ]
+select_policy_logic(tf_variables, attribute_path, values_formatted, "whitelist") = results if {
+    results := whitelist.get_violations(tf_variables, attribute_path, values_formatted)
 }
 
-intersection_all(sets) = result if {
-    result = {x |
-        x = sets[0][_]
-        all_other := [s | s := sets[_]]
-        every s in all_other { x in s }
+select_policy_logic(tf_variables, attribute_path, values_formatted, "range") = results if {
+    results := range.get_violations(tf_variables, attribute_path, values_formatted)
+}
+
+select_policy_logic(tf_variables, attribute_path, values_formatted, "pattern blacklist") = results if {
+    results := pattern_blacklist.get_violations(tf_variables, attribute_path, values_formatted)
+}
+
+select_policy_logic(tf_variables, attribute_path, values_formatted, "pattern whitelist") = results if {
+    results := pattern_whitelist.get_violations(tf_variables, attribute_path, values_formatted)
+}
+
+select_policy_logic(tf_variables, attribute_path, values_formatted, "element blacklist") = results if {
+    results := element_blacklist.get_violations(tf_variables, attribute_path, values_formatted)
+}
+
+# Fallback for unknown policy types
+select_policy_logic(_, _, _, policy_type) = results if {
+    not policy_type in ["blacklist", "whitelist", "range", "pattern blacklist", "pattern whitelist", "element blacklist"]
+    results := {
+        {"error": sprintf("Unknown policy type: '%s'. Valid types: blacklist, whitelist, range, pattern blacklist, pattern whitelist, element blacklist", [policy_type])}
     }
 }
 
-############### REGEX
+################################################################################
+# Output Formatting
+################################################################################
 
-# HELPER: gets the target * pattern
-get_target_list(resource, attribute_path, target) = target_list if {
-    p := regex.replace(target, "\\*", "([^/]+)")
-    #print(sprintf("SSSSSSSSSSSSSSSSSSSSound %s", [p]))
-    target_value := object.get(resource.values, attribute_path, null)
-    matches := regex.find_all_string_submatch_n(p, target_value, 1)[0] # all matches, including main string
-    target_list := array.slice(matches, 1, count(matches)) # leaves every single * match except main string
-    #print(sprintf("SSSSSSSSSSSSSSSSSSSSound %s", [target_list]))
-} else := "Wrong pattern"
-
-final_formatter(target, sub_pattern) = final_format if {
-    final_format := regex.replace(target, sub_pattern, sprintf("'%s'", [sub_pattern]))
+# Format messages using array comprehension
+format_summary_messages(resource_name, total_count, situations) = messages if {
+    header := sprintf("Total %s detected: %d ", [resource_name, total_count])
+    
+    situation_messages := [msg |
+        some i
+        sit := situations[i]
+        
+        # Convert set to array for formatting
+        nc_list := [r | some r in sit.non_compliant_resources]
+        
+        # Handle empty case: display "All passed" if no violations
+        display_list := _get_display_list(nc_list)
+        
+        msg := array.concat(
+            [
+                sprintf("Situation %d: %s", [i+1, sit.situation]),
+                sprintf("Non-Compliant Resources: %s", [concat(", ", display_list)])
+            ],
+            [sprintf("Potential Remedies: %s", [concat(", ", sit.remedies)]) | count(nc_list) > 0]
+        )
+    ]
+    
+    messages := array.concat([header], situation_messages)
 }
 
+# Helper to format non-compliant resources list
+_get_display_list(nc_list) = ["None - All passed"] if {
+    count(nc_list) == 0
+}
+_get_display_list(nc_list) = nc_list if {
+    count(nc_list) > 0
+}
 
+################################################################################
+# Set Utilities
+################################################################################
+
+# Improved set intersection using native Rego idioms
+set_intersection_all(sets) = result if {
+    count(sets) == 0
+    result := set()
+} else = result if {
+    count(sets) == 1
+    result := sets[0]
+} else = result if {
+    # Find intersection of all sets using 'every' keyword
+    first_set := sets[0]
+    # Set comprehension: for each resource in first_set, include it in result
+    # only if it exists in every remaining set (intersection logic)
+    result := {resource |
+        some resource in first_set
+        every remaining_set in sets {
+            resource in remaining_set
+        }
+    }
+}

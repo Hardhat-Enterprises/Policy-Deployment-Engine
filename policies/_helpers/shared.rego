@@ -4,25 +4,44 @@ package terraform.helpers.shared
 # No imports to avoid circular dependencies
 
 ################################################################################
-# Resource Name Extraction
+# Resource Attribute Extraction
 ################################################################################
 
-# Extract resource identifier with fallback lookup: .values[key] → root[key] → null
-# Used by all policy types to identify non-compliant resources in violation reports
-# Tries: 1) resource.values[value_name], 2) resource[value_name], 3) returns null with error
-# Example: get_resource_name(resource, "name") → "my-bucket-name"
-get_resource_name(this_nc_resource, value_name) = resource_name if {
-    this_nc_resource.values[value_name] 
-    resource_name := this_nc_resource.values[value_name]
-} else = resource_name if {
-    resource_name := this_nc_resource[value_name]
+# Retrieves a resource's attribute value with defensive fallback logic
+# 
+# This function handles variations in Terraform resource structure by attempting
+# multiple lookup paths. Different resource types and states (planned vs existing)
+# may store attributes in different locations within the resource object.
+#
+# Lookup sequence:
+#   1. resource.values[attribute_key] - Primary path for planned resource values
+#   2. resource[attribute_key] - Fallback for direct attribute access
+#   3. null - Returns null and prints diagnostic error if both paths fail
+#
+# Parameters:
+#   tf_resource_object - A Terraform resource object from the plan
+#   attribute_key - The attribute name to extract (e.g., "name", "id", "bucket")
+#
+# Returns:
+#   Value of the specified attribute, or null if attribute doesn't exist
+#
+# Example: get_resource_attribute(s3_resource, "bucket") → "my-app-logs"
+get_resource_attribute(tf_resource_object, attribute_key) = attribute_value if {
+    tf_resource_object.values[attribute_key] 
+    attribute_value := tf_resource_object.values[attribute_key]
+} else = attribute_value if {
+    attribute_value := tf_resource_object[attribute_key]
 } else = null if {
-    print(sprintf("Resource name for '%s' was not found! Your 'resource_value_name' in vars is wrong. Try 'resource_value_name': 'name'.", [this_nc_resource.type]))
+    print(sprintf("Resource attribute '%s' for resource type '%s' was not found! Your 'resource_value_name' in vars is wrong. Try 'resource_value_name': 'name'.", [attribute_key, tf_resource_object.type]))
 }
 
 ################################################################################
 # Attribute Path Formatting
 ################################################################################
+# This code is used by policies to convert error messages from:
+# ["status", 0, "restricted_services"] → "status.[0].restricted_services"all this code 
+# Converts values from an int to a string but leaves strings as is
+
 
 # Converts values from an int to a string but leaves strings as is
 convert_value(x) = string if {
@@ -56,59 +75,55 @@ format_attribute_path(attribute_path) = string_path if {
 }
 
 ################################################################################
+# Data Normalization
+################################################################################
+
+# Normalizes input values into an array format
+# Accepts either a single value or an array and ensures array output
+# Used to handle flexible policy definition formats
+ensure_array(values) = values if {
+    is_array(values)
+}
+ensure_array(values) = [values] if {
+    not is_array(values)
+}
+
+# Get attribute value from a resource with null fallback
+# Simplifies the common pattern of accessing nested resource attributes
+get_attribute_value(resource, attribute_path) := object.get(resource.values, attribute_path, null)
+
+# Searches an array of objects for a specific key and returns its value
+# Used to extract metadata from condition groups
+get_value_from_array(arr, key) = value if {
+    some i
+    obj := arr[i]
+    obj[key] != null
+    value := obj[key]
+}
+
+################################################################################
 # Empty Value Handling
 ################################################################################
 
-# Check if value is empty string
-is_empty(value) if {
+# Returns warning string for empty values, empty string otherwise
+# Handles empty strings and null values gracefully
+empty_message(value) = " (EMPTY!)" if {
     value == ""
 }
 
-# Returns warning string if value is empty, empty string otherwise
-empty_message(value) = msg if {
-    is_empty(value)
-    msg = " (!!!EMPTY!!!)"
-}
-
-empty_message(value) = msg if {
-    not is_empty(value)
-    msg = ""
+empty_message(value) = "" if {
+    value != ""
 }
 
 ################################################################################
 # Array Membership Checking
 ################################################################################
 
-# Handle empty array blacklisting specifically
-array_contains(arr, elem, pol) if {
-    pol == "blacklist"
-    [] in arr  # Check if empty array is in blacklisted values
-    is_array(elem)
-    count(elem) == 0  # elem is empty
-}
-
-# if elem is an array; checks if elem contains any blacklisted items. e.g., elem=[w, r, a], arr=[a] -> true
-array_contains(arr, elem, pol) if {
-    is_array(elem)
-    pol == "blacklist"
-    arr_to_set = {x | x := arr[_]}
-    elem_to_set = {x | x := elem[_]}
-    count(arr_to_set & elem_to_set) > 0
-}
-
-# if elem is an array; checks if elem is at least a subset of arr. e.g., elem=[write, read], arr=[read, write, eat] -> true
-array_contains(arr, elem, pol) if {
-    is_array(elem)
-    pol == "whitelist"
-    arr_to_set = {x | x := arr[_]}
-    elem_to_set = {x | x := elem[_]}
-    object.subset(arr_to_set, elem_to_set)
-}
-
-# Generic helper: Check if value exists in array
-array_contains(arr, elem, pol) if {
-    not is_array(elem)
-    arr[_] == elem
+# Generic helper: Check if a scalar value exists in an array
+# Used by policy modules for simple membership testing
+value_in_array(arr, value) if {
+    not is_array(value)
+    arr[_] == value
 }
 
 ################################################################################
