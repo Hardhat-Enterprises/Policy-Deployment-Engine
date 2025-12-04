@@ -6,20 +6,14 @@ import data.terraform.gcp.security.access_context_manager_vpc_service_controls.g
 conditions := [
     [
     {
-      "situation_description": "Ensure restricted services is not empty (no protection) or to general.",
-      "remedies": ["Update status/restricted_services to explicitly include only required service calls."]
+      "situation_description": "Whether or not screenlock is required for the DevicePolicy to be true.",
+      "remedies": ["Update screen lock requirement in device policy."]
     },
     {
-      "condition": "restricted_services is not an empty list",
-      "attribute_path": ["status", 0, "restricted_services"],
-      "values": null,
+      "condition": "screen_lock is true",
+      "attribute_path": ["basic", "conditions", "device_policy", "require_screen_lock"],
+      "values": false,
       "policy_type": "blacklist"
-    },
-    {
-      "condition": "restricted_services is too permissive",
-      "attribute_path": ["status", 0, "restricted_services"],
-      "values": ["*"],
-      "policy_type": "element blacklist"
     }
   ]
 ]
