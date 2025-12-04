@@ -1,5 +1,5 @@
 resource "google_access_context_manager_service_perimeter" "c" {
-  parent = "accessPolicies/${access_context_manager_access_policy.access-policy.name}"
+  parent = "accessPolicies/${google_access_context_manager_access_policy.access-policy.name}"
   name   = "c"
   title  = "restrict_storage"
   status {

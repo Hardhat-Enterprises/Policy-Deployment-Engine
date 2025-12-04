@@ -1,7 +1,7 @@
-package terraform.gcp.security.access_context_manager_vpc_service_controls.google_access_context_manager_access_level.os_type
+package terraform.gcp.security.access_context_manager_vpc_service_controls.google_access_context_manager_access_levels.os_type
 
 import data.terraform.helpers
-import data.terraform.gcp.security.access_context_manager_vpc_service_controls.google_access_context_manager_access_level.vars
+import data.terraform.gcp.security.access_context_manager_vpc_service_controls.google_access_context_manager_access_levels.vars
 
 conditions := [
     [
@@ -11,7 +11,7 @@ conditions := [
     },
     {
       "condition": "os_type is not in blacklist",
-      "attribute_path": ["basic", 0, "conditions", 0, "device_policy", 0, "os_constraints", "os_type"],
+      "attribute_path": ["access_levels", 0, "basic", 0, "conditions", 0, "device_policy", 0, "os_constraints", 0, "os_type"],
       "values": ["OS_UNSPECIFIED","ANDROID","IOS"],
       "policy_type": "blacklist"
     }

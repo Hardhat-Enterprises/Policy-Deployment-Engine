@@ -11,9 +11,9 @@ conditions := [
     },
     {
       "condition": "screen_lock is true",
-      "attribute_path": ["basic", "conditions", "device_policy", "require_screen_lock"],
-      "values": false,
-      "policy_type": "blacklist"
+      "attribute_path": ["basic", 0, "conditions", 0, "device_policy", 0, "require_screen_lock"],
+      "values": true,
+      "policy_type": "whitelist"
     }
   ]
 ]

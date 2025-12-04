@@ -5,7 +5,7 @@ resource "google_access_context_manager_access_level" "c" {
   basic {
     conditions {
       device_policy {
-        allowed_device_management_levels = ["COMPLETE"]
+        require_corp_owned = true
       }
     }
   }

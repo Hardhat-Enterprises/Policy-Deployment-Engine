@@ -1,11 +1,14 @@
 resource "google_access_context_manager_access_level" "c" {
   parent = "accessPolicies/${google_access_context_manager_access_policy.access-policy.name}"
-  name   = "accessPolicies/${google_access_context_manager_access_policy.access-policy.name}/accessLevels/chromeos_no_lock"
-  title  = "chromeos_no_lock"
+  name   = "c"
+  title  = "c-os_type"
   basic {
+    combining_function = "AND"
     conditions {
       device_policy {
-        allowed_device_management_levels = ["COMPLETE"]
+        os_constraints {
+          os_type = "DESKTOP_CHROME_OS"
+        }
       }
     }
   }
