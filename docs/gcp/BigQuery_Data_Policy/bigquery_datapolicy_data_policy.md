@@ -6,7 +6,8 @@ Reference: [Terraform Registry – bigquery_datapolicy_data_policy](https://regi
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `data_policy_id` | User-assigned (human readable) ID of the data policy that needs to be unique within a project. Used as {dataPolicyId} in part of the resource name. | false | false | Display policy id has no impact on the security of the resource. | None | None |
@@ -17,6 +18,7 @@ Reference: [Terraform Registry – bigquery_datapolicy_data_policy](https://regi
 | `project` | If it is not provided, the provider project is used. | false | false | Display policy id has no impact on the security of the resource. | None | None |
 
 ### data_masking_policy Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `predefined_expression` | The available masking rules. Learn more here: https://cloud.google.com/bigquery/docs/column-data-masking-intro#masking_options. Possible values are: `SHA256`, `ALWAYS_NULL`, `DEFAULT_MASKING_VALUE`, `LAST_FOUR_CHARACTERS`, `FIRST_FOUR_CHARACTERS`, `EMAIL_MASK`, `DATE_YEAR_MASK`. | true | false | Ensure predefined expression is setting to SHA256 because it will be  | Set predefined_expression to SHA256 | Other predefined expressions are invalidated |

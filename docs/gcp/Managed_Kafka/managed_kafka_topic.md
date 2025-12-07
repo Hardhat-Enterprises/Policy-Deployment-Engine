@@ -6,7 +6,8 @@ Reference: [Terraform Registry – managed_kafka_topic](https://registry.terrafo
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `replication_factor` | The number of replicas of each partition. A replication factor of 3 is recommended for high availability. | true | true | Ensures data availability and fault tolerance. Lower replication factors increase the risk of data loss during failures. | ['replication_factor: 3 or more'] | ['replication_factor: 1'] |

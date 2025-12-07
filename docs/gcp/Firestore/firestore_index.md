@@ -6,7 +6,8 @@ Reference: [Terraform Registry – firestore_index](https://registry.terraform.i
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `collection` | The collection being indexed. | true | false | None | None | None |
@@ -20,6 +21,7 @@ Reference: [Terraform Registry – firestore_index](https://registry.terraform.i
 | `vector_config` |  | false | false | None | None | None |
 
 ### fields Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `field_path` | Name of the field. | false | false | None | None | None |
@@ -28,6 +30,7 @@ Reference: [Terraform Registry – firestore_index](https://registry.terraform.i
 | `vector_config` | Indicates that this field supports vector search operations. Only one of `order`, `arrayConfig`, and `vectorConfig` can be specified. Vector Fields should come after the field path `__name__`. Structure is [documented below](#nested_fields_fields_vector_config). | false | false | None | None | None |
 
 ### vector_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `dimension` | The resulting index will only include vectors of this dimension, and can be used for vector search with the same dimension. | false | false | None | None | None |

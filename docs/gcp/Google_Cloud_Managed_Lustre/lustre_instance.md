@@ -6,7 +6,8 @@ Reference: [Terraform Registry – lustre_instance](https://registry.terraform.i
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `capacity_gib` | The storage capacity of the instance in gibibytes (GiB). Allowed values are from `18000` to `954000`, in increments of 9000. | false | false | None | None | None |
