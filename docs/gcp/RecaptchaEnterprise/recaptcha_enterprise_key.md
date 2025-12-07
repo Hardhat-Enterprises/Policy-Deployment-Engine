@@ -6,7 +6,8 @@ Reference: [Terraform Registry – recaptcha_enterprise_key](https://registry.te
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `display_name` | Human-readable display name of this key. Modifiable by user. - - - | true | false | None | None | None |
@@ -19,30 +20,35 @@ Reference: [Terraform Registry – recaptcha_enterprise_key](https://registry.te
 | `web_settings` | Settings for keys that can be used by websites. | false | false | None | None | None |
 
 ### android_settings Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `allow_all_package_names` | If set to true, it means allowed_package_names will not be enforced. | false | false | None | None | None |
 | `allowed_package_names` | Android package names of apps allowed to use the key. Example: 'com.companyname.appname' | false | false | None | None | None |
 
 ### ios_settings Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `allow_all_bundle_ids` | If set to true, it means allowed_bundle_ids will not be enforced. | false | false | None | None | None |
 | `allowed_bundle_ids` | iOS bundle ids of apps allowed to use the key. Example: 'com.companyname.productname.appname' | false | false | None | None | None |
 
 ### testing_options Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `testing_challenge` | For challenge-based keys only (CHECKBOX, INVISIBLE), all challenge requests for this site will return nocaptcha if NOCAPTCHA, or an unsolvable challenge if UNSOLVABLE_CHALLENGE. Possible values: TESTING_CHALLENGE_UNSPECIFIED, NOCAPTCHA, UNSOLVABLE_CHALLENGE | false | false | None | None | None |
 | `testing_score` | All assessments for this Key will return this score. Must be between 0 (likely not legitimate) and 1 (likely legitimate) inclusive. | false | false | None | None | None |
 
 ### waf_settings Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `waf_feature` | Supported WAF features. For more information, see https://cloud.google.com/recaptcha-enterprise/docs/usecase#comparison_of_features. Possible values: CHALLENGE_PAGE, SESSION_TOKEN, ACTION_TOKEN, EXPRESS | true | false | None | None | None |
 | `waf_service` | The WAF service that uses this key. Possible values: CA, FASTLY | true | false | None | None | None |
 
 ### web_settings Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `allow_all_domains` | If set to true, it means allowed_domains will not be enforced. | false | true | Allowing all domains bypasses origin allowlisting and can expose the key to abuse. Restrict usage to trusted domains via allowed_domains. | false | true |

@@ -6,7 +6,8 @@ Reference: [Terraform Registry – storage_bucket_object](https://registry.terra
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `bucket` |  | false | false | None | None | None |
@@ -31,12 +32,14 @@ Reference: [Terraform Registry – storage_bucket_object](https://registry.terra
 | `deletion_policy` | --- | false | false | None | None | None |
 
 ### customer_encryption Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `encryption_algorithm` |  | false | false | None | None | None |
 | `encryption_key` |  | false | false | None | None | None |
 
 ### retention Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `mode` |  | false | false | None | None | None |

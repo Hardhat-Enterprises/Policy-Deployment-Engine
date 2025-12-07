@@ -6,7 +6,8 @@ Reference: [Terraform Registry – iap_web_cloud_run_service_iam](https://regist
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `location` | Region of the Cloud Run service. If omitted, it is parsed from the parent identifier; otherwise taken from the provider configuration. | false | true | Must match the Cloud Run service’s region so the binding targets the correct resource. | location = "australia-southeast1" | location = "us-east1" while the service is deployed in "australia-southeast1" |
@@ -18,6 +19,7 @@ Reference: [Terraform Registry – iap_web_cloud_run_service_iam](https://regist
 | `condition` | Optional IAM Condition to scope the binding (e.g., by request host/path, time, or device context). | false | true | Reduces blast radius by restricting when/where the binding applies. | condition { title = "OfficeHours" description = "Limit access to business hours" expression = "request.time.getHours() >= 8 && request.time.getHours() < 18" } | Empty condition block or empty expression |
 
 ### condition Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `expression` | CEL expression that decides when the binding applies. | true | true | Must be specific and non-empty to be effective. | expression = "request.host == 'app.example.com'" | expression = "" |

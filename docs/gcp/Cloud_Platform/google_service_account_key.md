@@ -6,7 +6,8 @@ Reference: [Terraform Registry – google_service_account_key](https://registry.
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `service_account_id` | The service account ID for the key. Can be in the form {ACCOUNT} or projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}. | true | false | This only identifies which service account the key belongs to. It does not affect the security of the key itself. | None | None |

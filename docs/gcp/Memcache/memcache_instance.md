@@ -6,7 +6,8 @@ Reference: [Terraform Registry – memcache_instance](https://registry.terraform
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `name` | The resource name of the instance. | true | false | None | None | None |
@@ -24,18 +25,21 @@ Reference: [Terraform Registry – memcache_instance](https://registry.terraform
 | `project` | If it is not provided, the provider project is used. | false | false | None | None | None |
 
 ### node_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `cpu_count` | Number of CPUs per node. | true | false | None | None | None |
 | `memory_size_mb` | Memory size in Mebibytes for each memcache node. | true | false | None | None | None |
 
 ### memcache_parameters Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `id` | (Output) This is a unique ID associated with this set of parameters. | false | false | None | None | None |
 | `params` | User-defined set of parameters to use in the memcache process. | false | false | None | None | None |
 
 ### maintenance_policy Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `create_time` | (Output) Output only. The time when the policy was created. A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits | false | false | None | None | None |
@@ -44,6 +48,7 @@ Reference: [Terraform Registry – memcache_instance](https://registry.terraform
 | `weekly_maintenance_window` | Required. Maintenance window that is applied to resources covered by this policy. Minimum 1. For the current version, the maximum number of weekly_maintenance_windows is expected to be one. Structure is [documented below](#nested_maintenance_policy_weekly_maintenance_window). | true | true | Setting a weekly maintenance window allows administrators to align system updates with low-traffic periods, minimizing operational impact and ensuring service stability. | None | None |
 
 ###   weekly_maintenance_window Block
+
   | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
   |----------|-------------|----------|-----------------|-----------|-----------|---------------|
   | `day` | Day of the week when the maintenance window starts (e.g., MONDAY, SUNDAY). | true | false | Selecting an appropriate day ensures maintenance does not disrupt peak traffic periods. | ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'] | [None, '', 'DAY_OF_WEEK_UNSPECIFIED', 3] |
@@ -51,9 +56,10 @@ Reference: [Terraform Registry – memcache_instance](https://registry.terraform
   | `duration` | Duration of the maintenance window in seconds. | true | false | Specifying the duration ensures that updates are completed within a controlled timeframe. | 10800s to 28800s | None |
 
 ###     start_time Block
-  | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
-  |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-  | `hours` | Hour of the day (0-23). | false | false | Correct hour selection ensures updates align with expected downtime periods. | Integer between 0 - 23 | [-1, 24, 'non-integer values'] |
-  | `minutes` | Minute of the hour (0-59). | true | false | Precise minute specification helps align maintenance with exact scheduling needs. | Integer between 0 - 59 | [-1, 60, 'non-integer values'] |
-  | `seconds` | Second of the minute (0-59). | false | false | Seconds allow fine-grained control of the start time, but usually default to 0. | Integer between 0 - 59 | [-1, 60, 'non-integer values'] |
-  | `nanos` | Fractions of a second in nanoseconds (0-999,999,999). | false | false | Nanosecond precision is rarely required for maintenance windows but ensures full compatibility with GCP TimeOfDay format. | 0 | 999999999 |
+
+    | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+    |----------|-------------|----------|-----------------|-----------|-----------|---------------|
+    | `hours` | Hour of the day (0-23). | false | false | Correct hour selection ensures updates align with expected downtime periods. | Integer between 0 - 23 | [-1, 24, 'non-integer values'] |
+    | `minutes` | Minute of the hour (0-59). | true | false | Precise minute specification helps align maintenance with exact scheduling needs. | Integer between 0 - 59 | [-1, 60, 'non-integer values'] |
+    | `seconds` | Second of the minute (0-59). | false | false | Seconds allow fine-grained control of the start time, but usually default to 0. | Integer between 0 - 59 | [-1, 60, 'non-integer values'] |
+    | `nanos` | Fractions of a second in nanoseconds (0-999,999,999). | false | false | Nanosecond precision is rarely required for maintenance windows but ensures full compatibility with GCP TimeOfDay format. | 0 | 999999999 |

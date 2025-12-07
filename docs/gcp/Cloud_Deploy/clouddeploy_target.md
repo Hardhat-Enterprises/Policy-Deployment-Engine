@@ -6,7 +6,8 @@ Reference: [Terraform Registry – clouddeploy_target](https://registry.terrafor
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `location` | The location for the resource | true | false | A geographic identifier for resource placement. It does not affect the security of the target or its connectivity. | None | None |
@@ -28,11 +29,13 @@ Reference: [Terraform Registry – clouddeploy_target](https://registry.terrafor
 | `gke_clusters` |  | false | false | None | None | None |
 
 ### anthos_cluster Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `membership` | Membership of the GKE Hub-registered cluster to which to apply the Skaffold configuration. Format is `projects/{project}/locations/{location}/memberships/{membership_name}`. | false | false | None | None | None |
 
 ### associated_entities Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `anthos_clusters` | Optional. Information specifying Anthos clusters as associated entities. | false | false | None | None | None |
@@ -40,11 +43,13 @@ Reference: [Terraform Registry – clouddeploy_target](https://registry.terrafor
 | `gke_clusters` | Optional. Information specifying GKE clusters as associated entities. | false | false | None | None | None |
 
 ### custom_target Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `custom_target_type` | Required. The name of the CustomTargetType. Format must be `projects/{project}/locations/{location}/customTargetTypes/{custom_target_type}`. | true | false | None | None | None |
 
 ### execution_configs Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `artifact_storage` | Optional. Cloud Storage location in which to store execution outputs. This can either be a bucket ("gs://my-bucket") or a path within a bucket ("gs://my-bucket/my-dir"). If unspecified, a default bucket located in the same region will be used. | false | false | None | None | None |
@@ -55,6 +60,7 @@ Reference: [Terraform Registry – clouddeploy_target](https://registry.terrafor
 | `worker_pool` | Optional. The resource name of the `WorkerPool`, with the format `projects/{project}/locations/{location}/workerPools/{worker_pool}`. If this optional field is unspecified, the default Cloud Build pool will be used. | false | false | None | None | None |
 
 ### gke Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `cluster` | Information specifying a GKE Cluster. Format is `projects/{project_id}/locations/{location_id}/clusters/{cluster_id}. | false | false | None | None | None |
@@ -63,21 +69,25 @@ Reference: [Terraform Registry – clouddeploy_target](https://registry.terrafor
 | `proxy_url` | Optional. If set, used to configure a [proxy](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#proxy) to the Kubernetes server. | false | false | None | None | None |
 
 ### multi_target Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `target_ids` | Required. The target_ids of this multiTarget. | true | false | None | None | None |
 
 ### run Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `location` | Required. The location where the Cloud Run Service should be located. Format is `projects/{project}/locations/{location}`. | true | true | The physical location of the Cloud Run service has implications for data sovereignty, compliance, and latency. Deploying to unapproved regions may violate organizational policy or regulatory requirements. | Must be set to an approved region - projects/my-project-name/locations/us-central1, us-east1, europe-west1, asia-southeast1 | Deploying to a region that is not on the approved list - projects/my-project-name/locations/us-west2 |
 
 ### anthos_clusters Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `membership` | Optional. Membership of the GKE Hub-registered cluster to which to apply the Skaffold configuration. Format is `projects/{project}/locations/{location}/memberships/{membership_name}`. | false | false | None | None | None |
 
 ### gke_clusters Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `cluster` | Optional. Information specifying a GKE Cluster. Format is `projects/{project_id}/locations/{location_id}/clusters/{cluster_id}`. | false | false | None | None | None |
