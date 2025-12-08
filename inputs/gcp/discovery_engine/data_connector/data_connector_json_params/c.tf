@@ -1,18 +1,14 @@
 # Describe your resource type here
 # Data connector
-# Data source
-
-# Maybe change the data source to one of the valid formats, whatever that might be.
-
+# Json prams
 
 resource "google_discovery_engine_data_connector" "c" {
   project                      = "735927692082"
   location                     = "eu"
   collection_id                = "c"
   collection_display_name      = "tf-c-dataconnector"
-  data_source                  = "c-datasource"
-  params = {
-  }
+  data_source                  = "servicenow"
+  json_params				   = "valid-string"
   refresh_interval             = "86400s"
   incremental_refresh_interval = "21600s"
 }
