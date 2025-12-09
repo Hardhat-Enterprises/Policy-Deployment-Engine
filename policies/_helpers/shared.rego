@@ -90,7 +90,28 @@ ensure_array(values) = [values] if {
 
 # Get attribute value from a resource with null fallback
 # Simplifies the common pattern of accessing nested resource attributes
-get_attribute_value(resource, attribute_path) := object.get(resource.values, attribute_path, null)
+#
+# Enhanced: Array-of-Objects Field Extraction (Added 2025-12-04)
+# When the attribute path ends with a string field name and leads to an array of objects,
+# this function automatically extracts that field from each object in the array.
+get_attribute_value(resource, attribute_path) := extracted_values if {
+    # Check if this might be an array-of-objects extraction pattern
+    count(attribute_path) > 1
+    last_element := attribute_path[count(attribute_path) - 1]
+    is_string(last_element)
+    
+    # Get the path to the array (everything except the last element)
+    array_path := array.slice(attribute_path, 0, count(attribute_path) - 1)
+    array_value := object.get(resource.values, array_path, null)
+    
+    # If it's an array of objects, extract the field from each
+    is_array(array_value)
+    count(array_value) > 0
+    is_object(array_value[0])
+    
+    # Extract the field from each object in the array
+    extracted_values := [obj[last_element] | obj := array_value[_]; obj[last_element] != null]
+} else := object.get(resource.values, attribute_path, null)
 
 # Searches an array of objects for a specific key and returns its value
 # Used to extract metadata from condition groups
