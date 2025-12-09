@@ -18,6 +18,18 @@ conditions := [
   ],
 
   [
+    {
+      "situation_description": "Insecure protocol detected.",
+      "remedies": ["Use HTTPS protocol only."]
+    },
+    {
+      "condition": "Only HTTPS protocol is allowed.",
+      "attribute_path": ["application_endpoint", 0, "protocol"],
+      "values": ["https"],
+      "policy_type": "whitelist"
+    }
+  ], 
+  [
   {
     "situation_description": "Application endpoint host is not an approved IP address.",
     "remedies": ["Use one of the approved IPs only."]
