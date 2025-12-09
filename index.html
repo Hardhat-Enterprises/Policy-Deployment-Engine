@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Policy Deployment Engine Wiki</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     body {
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -99,7 +100,7 @@
       try {
         const branch = "dev"; // 👈 change this
         const url = `https://api.github.com/repos/Hardhat-Enterprises/Policy-Deployment-Engine/git/trees/${branch}?recursive=1`;
-
+        
         const response = await fetch(url);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
@@ -128,8 +129,9 @@
             let cleanPath = subFile.path.endsWith(".md")
               ? subFile.path.slice(0, -3)
               : subFile.path;
-
+            
             const subItem = `<li class="subfile"><a href="/Policy-Deployment-Engine/${cleanPath}" target="_blank">${displayName}</a></li>`;
+            
             folderMap[folder].push(subItem);
             htmlString += subItem;
           }

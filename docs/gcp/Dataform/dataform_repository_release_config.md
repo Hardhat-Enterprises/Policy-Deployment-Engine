@@ -6,7 +6,8 @@ Reference: [Terraform Registry – dataform_repository_release_config](https://r
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `name` | The release's name. | true | false | None | None | None |
@@ -19,6 +20,7 @@ Reference: [Terraform Registry – dataform_repository_release_config](https://r
 | `project` | If it is not provided, the provider project is used. | false | false | None | None | None |
 
 ### code_compilation_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `default_database` | Optional. The default database (Google Cloud project ID). | false | false | None | None | None |

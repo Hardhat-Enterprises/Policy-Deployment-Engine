@@ -6,7 +6,8 @@ Reference: [Terraform Registry – storage_bucket](https://registry.terraform.io
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `name` |  | false | false | None | None | None |
@@ -40,18 +41,21 @@ Reference: [Terraform Registry – storage_bucket](https://registry.terraform.io
 | `vpc_network_sources` |  | false | false | None | None | None |
 
 ### autoclass Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `enabled` |  | false | false | None | None | None |
 | `terminal_storage_class` |  | false | false | None | None | None |
 
 ### lifecycle_rule Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `action` |  | false | false | None | None | None |
 | `condition` |  | false | false | None | None | None |
 
 ### versioning Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `enabled` | The `website` block supports the following elements, and requires at least one to be defined: | false | false | None | None | None |
@@ -59,6 +63,7 @@ Reference: [Terraform Registry – storage_bucket](https://registry.terraform.io
 | `not_found_page` | resource is not found. | false | false | None | None | None |
 
 ### cors Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `origin` |  | false | false | None | None | None |
@@ -67,34 +72,40 @@ Reference: [Terraform Registry – storage_bucket](https://registry.terraform.io
 | `max_age_seconds` |  | false | false | None | None | None |
 
 ### retention_policy Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `is_locked` |  | false | true | Should not be used because locking is irreversible ation | false/null | true |
 | `retention_period` |  | false | true | Rentention period should be within specified timeline for compliance | 604800/7 days | 2692000 / > 30 days |
 
 ### logging Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `log_bucket` |  | false | false | None | None | None |
 | `log_object_prefix` | by default GCS sets this to this bucket's name. | false | false | None | None | None |
 
 ### custom_placement_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `data_locations` |  | false | false | None | None | None |
 
 ### soft_delete_policy Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `retention_duration_seconds` |  | false | false | None | None | None |
 | `effective_time` |  | false | false | None | None | None |
 
 ### hierarchical_namespace Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `enabled` |  | false | false | None | None | None |
 
 ### ip_filter Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `mode` |  | false | false | None | None | None |
@@ -103,6 +114,7 @@ Reference: [Terraform Registry – storage_bucket](https://registry.terraform.io
 | `vpc_network_sources` |  | false | false | None | None | None |
 
 ### action Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `type` |  | false | false | None | None | None |
@@ -124,11 +136,13 @@ Reference: [Terraform Registry – storage_bucket](https://registry.terraform.io
 | `noncurrent_time_before` |  | false | false | None | None | None |
 
 ### public_network_source Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `allowed_ip_cidr_ranges` |  | false | false | None | None | None |
 
 ### vpc_network_sources Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `network` |  | false | false | None | None | None |

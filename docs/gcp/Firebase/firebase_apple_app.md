@@ -6,7 +6,8 @@ Reference: [Terraform Registry – firebase_apple_app](https://registry.terrafor
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `display_name` | The user-assigned display name of the App. | true | false | Display name is only a user-friendly identifier and does not expose sensitive data or impact the security of the application or its resources. | None | None |
