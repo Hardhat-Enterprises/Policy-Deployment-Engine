@@ -154,10 +154,95 @@ test_shared_utilities_with_deep_nesting if {
 }
 
 # ==============================================================================
+# ARRAY-OF-OBJECTS FIELD EXTRACTION (1): Test new enhancement
+# ==============================================================================
+
+# Test 12: Array-of-objects field extraction (new enhancement)
+test_get_attribute_value_array_of_objects_extraction if {
+	# Mock resource with array of objects (realistic os_constraints pattern)
+	mock_resource := {
+		"type": "google_access_context_manager_access_level",
+		"values": {
+			"basic": [{
+				"conditions": [{
+					"device_policy": [{
+						"os_constraints": [
+							{"os_type": "ANDROID", "minimum_version": "10"},
+							{"os_type": "IOS", "minimum_version": "14"},
+							{"os_type": "OS_UNSPECIFIED", "minimum_version": null},
+						],
+					}],
+				}],
+			}],
+		},
+	}
+
+	# Test: Extract os_type field from array of objects
+	os_types := shared.get_attribute_value(
+		mock_resource,
+		["basic", 0, "conditions", 0, "device_policy", 0, "os_constraints", "os_type"],
+	)
+	
+	# Should return array of extracted field values
+	trace(sprintf("Extracted os_types: %v", [os_types]))
+	is_array(os_types)
+	count(os_types) == 3
+	os_types == ["ANDROID", "IOS", "OS_UNSPECIFIED"]
+
+	# Test: Also works with other fields in the same array
+	versions := shared.get_attribute_value(
+		mock_resource,
+		["basic", 0, "conditions", 0, "device_policy", 0, "os_constraints", "minimum_version"],
+	)
+	trace(sprintf("Extracted versions: %v", [versions]))
+	is_array(versions)
+	count(versions) == 2  # null values are filtered out
+	versions == ["10", "14"]
+}
+
+# Test 13: Array-of-objects extraction edge cases
+test_get_attribute_value_array_of_objects_edge_cases if {
+	mock_resource := {
+		"type": "test_resource",
+		"values": {
+			"empty_array": [],
+			"scalar_value": "not-an-array",
+			"array_of_scalars": ["a", "b", "c"],
+			"nested": [{
+				"items": [
+					{"field": "value1"},
+					{"field": "value2"},
+					{"different": "ignored"},  # Missing 'field' key
+				],
+			}],
+		},
+	}
+
+	# Empty array should return null (fallback to object.get)
+	empty_result := shared.get_attribute_value(mock_resource, ["empty_array", "field"])
+	empty_result == null
+
+	# Scalar value with field access should return null
+	scalar_result := shared.get_attribute_value(mock_resource, ["scalar_value", "field"])
+	scalar_result == null
+
+	# Array of scalars (not objects) should return null
+	scalar_array_result := shared.get_attribute_value(mock_resource, ["array_of_scalars", "field"])
+	scalar_array_result == null
+
+	# Extraction from nested array with missing field in some objects
+	nested_result := shared.get_attribute_value(mock_resource, ["nested", 0, "items", "field"])
+	trace(sprintf("Nested extraction: %v", [nested_result]))
+	is_array(nested_result)
+	count(nested_result) == 2  # Only objects with 'field' key
+	nested_result == ["value1", "value2"]
+}
+
+# ==============================================================================
 # REALITY CHECK (1): Test with real Terraform plan structure
 # ==============================================================================
 
-# Test 12: Reality check with actual fixture data
+# Test 14: Reality check with actual fixture data
 test_shared_utilities_with_real_structure if {
 	# Access real Terraform plan loaded by OPA from fixtures/gcp_access_level/
 	# The wrapped file loads as data.gcp_access_level_plan (wrapper key becomes the path)
