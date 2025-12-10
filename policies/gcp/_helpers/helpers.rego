@@ -1,4 +1,4 @@
-package terraform.gcp.helpers
+package data.terraform.helpers
 # tested on OPA Version: 1.2.0, Rego Version: v1
 
 # Defines the types of policies capable of being processed

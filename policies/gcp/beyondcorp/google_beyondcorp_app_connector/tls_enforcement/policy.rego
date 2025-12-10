@@ -1,5 +1,4 @@
 package terraform.gcp.security.beyondcorp.google_beyondcorp_app_connector.tls_enforcement
-
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.beyondcorp.google_beyondcorp_app_connector.vars
 
