@@ -19,13 +19,25 @@ conditions := [
     ],
     [
     {
-        "situation_description": "Is the data prams set correctly",
-        "remedies": ["Ensure that it is set to the correct paramiters"]
+        "situation_description": "Is the client_id set correctly",
+        "remedies": ["Ensure that it is set to the correct client_id"]
+        },
+      {
+        "condition": "client_id is misconfigured",
+        "attribute_path": ["params", 0, "client_id"],
+        "values": ["VALID-ID"],
+        "policy_type": "whitelist"
+      }
+    ],
+    [
+    {
+        "situation_description": "Is the user_account set correctly",
+        "remedies": ["Ensure that it is set to the correct user_account"]
         },
       {
         "condition": "parms is misconfigured",
-        "attribute_path": ["params", 0, "client_id"],
-        "values": ["VALID-ID"],
+        "attribute_path": ["params", 0, "user_account"],
+        "values": ["Validuser@google.com"],
         "policy_type": "whitelist"
       }
     ]
