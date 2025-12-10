@@ -6,8 +6,7 @@ Reference: [Terraform Registry – storage_managed_folder_iam](https://registry.
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `bucket` |  | false | false | None | None | None |
@@ -18,7 +17,6 @@ Reference: [Terraform Registry – storage_managed_folder_iam](https://registry.
 | `condition` | Structure is documented below. --- | false | false | None | None | None |
 
 ### condition Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `expression` |  | false | false | None | None | None |

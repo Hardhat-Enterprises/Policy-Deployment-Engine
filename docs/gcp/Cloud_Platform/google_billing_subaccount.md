@@ -6,7 +6,6 @@ Reference: [Terraform Registry – google_billing_subaccount](https://registry.t
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|

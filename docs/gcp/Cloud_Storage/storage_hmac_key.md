@@ -6,8 +6,7 @@ Reference: [Terraform Registry – storage_hmac_key](https://registry.terraform.
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `service_account_email` | The email address of the key's associated service account. | true | false | None | None | None |

@@ -6,8 +6,7 @@ Reference: [Terraform Registry – firebase_web_app](https://registry.terraform.
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `display_name` | The user-assigned display name of the App. | true | false | The display name is only a user-friendly label to help identify the web application. It does not affect authentication, access control, or security posture. | None | None |

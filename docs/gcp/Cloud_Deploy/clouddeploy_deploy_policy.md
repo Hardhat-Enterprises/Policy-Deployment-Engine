@@ -6,8 +6,7 @@ Reference: [Terraform Registry – clouddeploy_deploy_policy](https://registry.t
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `name` | Name of the `DeployPolicy`. | true | false | Just a resource identifier. No security implications. | None | None |
@@ -31,34 +30,29 @@ Reference: [Terraform Registry – clouddeploy_deploy_policy](https://registry.t
 | `weekly_windows` |  | false | false | None | None | None |
 
 ### selectors Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `target` | Contains attributes about a target. Structure is [documented below](#nested_selectors_selectors_target). | false | false | None | None | None |
 | `delivery_pipeline` | Contains attributes about a delivery pipeline. Structure is [documented below](#nested_selectors_selectors_delivery_pipeline). | false | false | None | None | None |
 
 ### rules Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `rollout_restriction` | Optional. Rollout restrictions. Structure is [documented below](#nested_rules_rules_rollout_restriction). | false | false | None | None | None |
 
 ### target Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `id` | ID of the `Target`. The value of this field could be one of the following: * The last segment of a target name. It only needs the ID to determine which target is being referred to * "*", all targets in a location. | false | false | None | None | None |
 | `labels` | Target labels. | false | false | None | None | None |
 
 ### delivery_pipeline Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `id` | Optional. ID of the DeliveryPipeline. The value of this field could be one of the following: - The last segment of a pipeline name - "*", all delivery pipelines in a location | false | false | None | None | None |
 | `labels` | DeliveryPipeline labels. | false | false | None | None | None |
 
 ### rollout_restriction Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `id` | Required. ID of the rule. This id must be unique in the `DeployPolicy` resource to which this rule belongs. The format is `a-z{0,62}`. | true | false | None | None | None |
@@ -67,7 +61,6 @@ Reference: [Terraform Registry – clouddeploy_deploy_policy](https://registry.t
 | `time_windows` | Required. Time window within which actions are restricted. Structure is [documented below](#nested_rules_rules_rollout_restriction_time_windows). | false | false | None | None | None |
 
 ### time_windows Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `time_zone` | Required. The time zone in IANA format IANA Time Zone Database (e.g. America/New_York). | true | false | None | None | None |
@@ -75,7 +68,6 @@ Reference: [Terraform Registry – clouddeploy_deploy_policy](https://registry.t
 | `weekly_windows` | Optional. Recurring weekly windows within which actions are restricted. Structure is [documented below](#nested_rules_rules_rollout_restriction_time_windows_weekly_windows). | false | false | None | None | None |
 
 ### one_time_windows Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `start_date` | Required. Start date. Structure is [documented below](#nested_rules_rules_rollout_restriction_time_windows_one_time_windows_one_time_windows_start_date). | true | false | None | None | None |
@@ -84,7 +76,6 @@ Reference: [Terraform Registry – clouddeploy_deploy_policy](https://registry.t
 | `end_time` | Required. End time (exclusive). You may use 24:00 for the end of the day. Structure is [documented below](#nested_rules_rules_rollout_restriction_time_windows_one_time_windows_one_time_windows_end_time). | true | false | None | None | None |
 
 ### start_date Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `year` | Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year. | false | false | None | None | None |
@@ -92,7 +83,6 @@ Reference: [Terraform Registry – clouddeploy_deploy_policy](https://registry.t
 | `day` | Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn't significant. | false | false | None | None | None |
 
 ### end_date Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `year` | Year of the date. Must be from 1 to 9999. | false | false | None | None | None |
@@ -100,7 +90,6 @@ Reference: [Terraform Registry – clouddeploy_deploy_policy](https://registry.t
 | `day` | Day of a month. Must be from 1 to 31 and valid for the year and month. | false | false | None | None | None |
 
 ### start_time Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `hours` | Hours of a day in 24 hour format. Must be greater than or equal to 0 and typically must be less than or equal to 23. An API may choose to allow the value "24:00:00" for scenarios like business closing time. | false | false | None | None | None |
@@ -109,7 +98,6 @@ Reference: [Terraform Registry – clouddeploy_deploy_policy](https://registry.t
 | `nanos` | Fractions of seconds, in nanoseconds. Must be greater than or equal to 0 and less than or equal to 999,999,999. | false | false | None | None | None |
 
 ### end_time Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `hours` | Hours of a day in 24 hour format. Must be greater than or equal to 0 and typically must be less than or equal to 23. An API may choose to allow the value "24:00:00" for scenarios like business closing time. | false | false | None | None | None |
@@ -118,7 +106,6 @@ Reference: [Terraform Registry – clouddeploy_deploy_policy](https://registry.t
 | `nanos` | Fractions of seconds, in nanoseconds. Must be greater than or equal to 0 and less than or equal to 999,999,999. | false | false | None | None | None |
 
 ### weekly_windows Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `days_of_week` | Optional. Days of week. If left empty, all days of the week will be included. Each value may be one of: `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`, `SUNDAY`. | false | false | None | None | None |

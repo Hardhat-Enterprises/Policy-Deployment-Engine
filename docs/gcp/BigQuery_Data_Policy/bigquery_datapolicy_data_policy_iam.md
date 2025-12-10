@@ -6,8 +6,7 @@ Reference: [Terraform Registry – bigquery_datapolicy_data_policy_iam](https://
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `location` | Used to find the parent resource to bind the IAM policy to. If not specified, the value will be parsed from the identifier of the parent resource. If no location is provided in the parent identifier and no location is specified, it is taken from the provider configuration. | true | false | Ensure the location must be configured to correct location | Set location to Australia. | Other locations are not valid. |

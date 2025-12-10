@@ -6,8 +6,7 @@ Reference: [Terraform Registry – discovery_engine_chat_engine](https://registr
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `display_name` | The display name of the engine. Should be human readable. UTF-8 encoded string with limit of 1024 characters. | true | false | Just the displayed name | None | None |
@@ -22,7 +21,6 @@ Reference: [Terraform Registry – discovery_engine_chat_engine](https://registr
 | `agent_creation_config` |  | false | false | This happens in the backgroud | None | None |
 
 ### chat_engine_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `agent_creation_config` | The configuration to generate the Dialogflow agent that is associated to this Engine. Exactly one of `agent_creation_config` or `dialogflow_agent_to_link` must be set. Structure is [documented below](#nested_chat_engine_config_agent_creation_config). | false | true | linking to other agents can be a risk | False | True |
@@ -30,13 +28,11 @@ Reference: [Terraform Registry – discovery_engine_chat_engine](https://registr
 | `allow_cross_region` | If the flag set to true, we allow the agent and engine are in different locations, otherwise the agent and engine are required to be in the same location. The flag is set to false by default. Note that the `allow_cross_region` are one-time consumed by and passed to EngineService.CreateEngine. It means they cannot be retrieved using EngineService.GetEngine or EngineService.ListEngines API after engine creation. | false | true | data residency laws | false | true |
 
 ### common_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `company_name` | The name of the company, business or entity that is associated with the engine. Setting this may help improve LLM related features. | false | false | None | None | None |
 
 ### agent_creation_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `business` | Name of the company, organization or other entity that the agent represents. Used for knowledge connector LLM prompt and for knowledge search. | false | false | None | None | None |

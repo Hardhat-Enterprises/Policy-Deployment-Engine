@@ -6,8 +6,7 @@ Reference: [Terraform Registry – discovery_engine_recommendation_engine](https
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `display_name` | Required. The display name of the engine. Should be human readable. UTF-8 encoded string with limit of 1024 characters. | true | false | naming | None | None |
@@ -24,7 +23,6 @@ Reference: [Terraform Registry – discovery_engine_recommendation_engine](https
 | `most_popular_config` |  | false | false | None | None | None |
 
 ### media_recommendation_engine_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `type` | The type of engine. e.g., `recommended-for-you`. This field together with MediaRecommendationEngineConfig.optimizationObjective describes engine metadata to use to control engine training and serving. Currently supported values: `recommended-for-you`, `others-you-may-like`, `more-like-this`, `most-popular-items`. | false | false | None | None | None |
@@ -34,33 +32,28 @@ Reference: [Terraform Registry – discovery_engine_recommendation_engine](https
 | `engine_features_config` | More feature configs of the selected engine type. Structure is [documented below](#nested_media_recommendation_engine_config_engine_features_config). | false | false | None | None | None |
 
 ### common_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `company_name` | The name of the company, business or entity that is associated with the engine. Setting this may help improve LLM related features.cd | false | false | None | None | None |
 
 ### optimization_objective_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `target_field` | The name of the field to target. Currently supported values: `watch-percentage`, `watch-time`. | false | false | None | None | None |
 | `target_field_value_float` | The threshold to be applied to the target (e.g., 0.5). | false | false | None | None | None |
 
 ### engine_features_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `recommended_for_you_config` | Additional feature configurations for creating a `recommended-for-you` engine. Structure is [documented below](#nested_media_recommendation_engine_config_engine_features_config_recommended_for_you_config). | false | false | None | None | None |
 | `most_popular_config` | Feature configurations that are required for creating a Most Popular engine. Structure is [documented below](#nested_media_recommendation_engine_config_engine_features_config_most_popular_config). | false | false | None | None | None |
 
 ### recommended_for_you_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `context_event_type` | The type of event with which the engine is queried at prediction time. If set to `generic`, only `view-item`, `media-play`,and `media-complete` will be used as `context-event` in engine training. If set to `view-home-page`, `view-home-page` will also be used as `context-events` in addition to `view-item`, `media-play`, and `media-complete`. Currently supported for the `recommended-for-you` engine. Currently supported values: `view-home-page`, `generic`. | false | false | None | None | None |
 
 ### most_popular_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `time_window_days` | The time window of which the engine is queried at training and prediction time. Positive integers only. The value translates to the last X days of events. Currently required for the `most-popular-items` engine. | false | false | None | None | None |

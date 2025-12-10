@@ -6,8 +6,7 @@ Reference: [Terraform Registry – deployment_manager_deployment](https://regist
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `name` | Unique name for the deployment | true | false | Identifier only; does not change security posture. | Name is set and follows org/project naming standard. | Missing name or violates naming standard. |
@@ -22,27 +21,23 @@ Reference: [Terraform Registry – deployment_manager_deployment](https://regist
 | `imports` |  | false | false | None | None | None |
 
 ### target Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `config` | The root configuration file to use for this deployment. Structure is [documented below](#nested_target_config). | true | false | None | None | None |
 | `imports` | Specifies import files for this configuration. This can be used to import templates or other files. For example, you might import a text file in order to use the file in a template. Structure is [documented below](#nested_target_imports). | false | false | None | None | None |
 
 ### labels Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `key` | Key for label. | false | false | None | None | None |
 | `value` | Value of label. | false | false | None | None | None |
 
 ### config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `content` | The full YAML contents of your configuration file. | true | false | None | None | None |
 
 ### imports Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `content` | The full contents of the template that you want to import. | false | false | None | None | None |

@@ -6,8 +6,7 @@ Reference: [Terraform Registry – google_project_iam](https://registry.terrafor
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `member/members` | Each entry can have one of the following values: * **user:{emailid}**: An email address that represents a specific Google account. For example, alice@gmail.com or joe@example.com. * **serviceAccount:{emailid}**: An email address that represents a service account. For example, my-other-app@appspot.gserviceaccount.com. * **group:{emailid}**: An email address that represents a Google group. For example, admins@example.com. * **domain:{domain}**: A G Suite domain (primary, instead of alias) name that represents all the users of that domain. For example, google.com or example.com. | false | false | None | None | None |
@@ -19,14 +18,12 @@ Reference: [Terraform Registry – google_project_iam](https://registry.terrafor
 | `condition` | Structure is [documented below](#nested_condition). --- | false | false | None | None | None |
 
 ### audit_log_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `log_type` |  | false | false | None | None | None |
 | `exempted_members` |  | false | false | None | None | None |
 
 ### condition Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `expression` |  | false | false | None | None | None |

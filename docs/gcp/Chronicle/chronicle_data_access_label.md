@@ -6,8 +6,7 @@ Reference: [Terraform Registry – chronicle_data_access_label](https://registry
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `udm_query` | A UDM query over event data. | false | true | Improper UDM queries may include disallowed or malicious values, potentially leading to incorrect data access labeling or security misinterpretations. | principal.hostname="example.com" | principal.hostname="malicious.com" |

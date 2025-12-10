@@ -6,8 +6,7 @@ Reference: [Terraform Registry – iap_tunnel_dest_group_iam](https://registry.t
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `region` | Region of the IAP TCP destination group. If omitted, it is parsed from the parent identifier or taken from the provider configuration. | false | true | Ensures the binding is applied in the intended location; a mismatch can grant access in the wrong region. | region = "australia-southeast1" | region = "" or a region that does not match the parent resource |
@@ -19,7 +18,6 @@ Reference: [Terraform Registry – iap_tunnel_dest_group_iam](https://registry.t
 | `condition` | Optional IAM Condition block to scope the binding (for example, by source IP, time, or device attributes when evaluated by the proxy). | false | true | Reduces blast radius by restricting when/where the binding applies. | condition { title = "OfficeHours" expression = "request.time.getHours() >= 8 && request.time.getHours() < 18" description = "Limit tunnel use to office hours" } | condition { } (missing required fields) or an empty expression |
 
 ### condition Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `expression` | CEL expression evaluated to determine if the binding applies. | true | true | A non-empty, precise expression is required for the condition to function. | expression = "request.client_ip.startsWith('10.0.')" | expression = "" |

@@ -6,8 +6,7 @@ Reference: [Terraform Registry – discovery_engine_cmek_config](https://registr
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `kms_key` | KMS key resource name which will be used to encrypt resources `projects/{project}/locations/{location}/keyRings/{keyRing}/cryptoKeys/{keyId}`. | true | true | Encryption key related | my-crypto-key | nc-crypto-key |
@@ -18,7 +17,6 @@ Reference: [Terraform Registry – discovery_engine_cmek_config](https://registr
 | `project` | If it is not provided, the provider project is used. | true | false | project ID | None | None |
 
 ### single_region_keys Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `kms_key` | Single-regional kms key resource name which will be used to encrypt resources `projects/{project}/locations/{location}/keyRings/{keyRing}/cryptoKeys/{keyId}`. | true | true | encryption | projects/735927692082/locations/europe-west1/keyRings/my-ring/cryptoKeys/my-eu1-key |   |

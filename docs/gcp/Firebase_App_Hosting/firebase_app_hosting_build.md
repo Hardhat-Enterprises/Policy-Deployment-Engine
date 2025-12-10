@@ -6,8 +6,7 @@ Reference: [Terraform Registry – firebase_app_hosting_build](https://registry.
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `source` | The source for the build. Structure is [documented below](#nested_source). | true | true | Build source must use approved container registries to ensure secure and trusted container images. | Refer to child arguments | Refer to child arguments |
@@ -22,20 +21,17 @@ Reference: [Terraform Registry – firebase_app_hosting_build](https://registry.
 | `codebase` |  | false | false | Codebase fields are output-only or have no specific security policies. | None | None |
 
 ### source Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `container` | The URI of an Artifact Registry [container image](https://cloud.google.com/artifact-registry/docs/reference/rest/v1/projects.locations.repositories.dockerImages) to use as the build source. Structure is [documented below](#nested_source_container). | false | true | Container images must be sourced from approved registries to ensure security and compliance. | Refer to child arguments | Refer to child arguments |
 | `codebase` | A codebase source, representing the state of the codebase that the build will be created at. Structure is [documented below](#nested_source_codebase). | false | false | Codebase source has no specific security policy in place. | None | None |
 
 ### container Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `image` | A URI representing a container for the backend to use. | true | true | Container image must be sourced from approved Australian Artifact Registry to ensure security, compliance, and data residency requirements. | au-docker.pkg.dev | docker.io/nginx:latest |
 
 ### codebase Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `display_name` | (Output) The 'name' field in a Git user's git.config. Required by Git. | false | false | Output field with no security policy. | None | None |

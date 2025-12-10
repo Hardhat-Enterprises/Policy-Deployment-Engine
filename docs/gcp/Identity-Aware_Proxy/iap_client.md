@@ -6,8 +6,7 @@ Reference: [Terraform Registry – iap_client](https://registry.terraform.io/pro
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `display_name` | Human-friendly name shown for the OAuth client. | true | true | Clear, production-ready names reduce user confusion on the consent screen and avoid test/generic labels. | display_name = "Customer Portal OAuth Client" | display_name = "Test" / "Demo" / "App" / "Customer Portal OAuth Client " (trailing space) |

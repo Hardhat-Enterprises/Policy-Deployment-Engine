@@ -6,8 +6,7 @@ Reference: [Terraform Registry – iap_tunnel_dest_group](https://registry.terra
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `group_name` | Unique tunnel destination group name. | true | true | Clear, unique names avoid misrouting and make reviews/audits easier. | group_name = "corp-admin-tcp" | group_name = "test" / "" / "corp-admin-tcp " (trailing space) |

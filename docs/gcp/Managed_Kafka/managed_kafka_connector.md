@@ -6,8 +6,7 @@ Reference: [Terraform Registry – managed_kafka_connector](https://registry.ter
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `location` | ID of the location of the Kafka Connect resource. | true | false | Defines geographic location; does not affect access or data protection. | none | none |
@@ -18,7 +17,6 @@ Reference: [Terraform Registry – managed_kafka_connector](https://registry.ter
 | `project` | If it is not provided, the provider project is used. | false | false | Resource scoping identifier; does not influence security directly. | none | none |
 
 ### task_restart_policy Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `minimum_backoff` | Minimum time to wait before retrying a failed task. Example: "3.5s". | false | false | Availability-related; does not directly influence security posture. | [] | [] |

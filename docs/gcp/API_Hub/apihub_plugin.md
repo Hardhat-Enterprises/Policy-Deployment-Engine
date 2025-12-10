@@ -6,8 +6,7 @@ Reference: [Terraform Registry – apihub_plugin](https://registry.terraform.io/
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `display_name` | The display name of the plugin. Max length is 50 characters (Unicode code points). | true | false | Display name. No security relevance. | None | None |
@@ -27,7 +26,6 @@ Reference: [Terraform Registry – apihub_plugin](https://registry.terraform.io/
 | `multi_select_options` |  | false | false | Option metadata only. Not security relevant. | None | None |
 
 ### actions_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `id` | The id of the action. | true | false | Identifier only. Not sensitive. | None | None |
@@ -36,39 +34,33 @@ Reference: [Terraform Registry – apihub_plugin](https://registry.terraform.io/
 | `trigger_mode` | The trigger mode supported by the action. Possible values: TRIGGER_MODE_UNSPECIFIED API_HUB_ON_DEMAND_TRIGGER API_HUB_SCHEDULE_TRIGGER NON_API_HUB_MANAGED | true | false | Configuration setting. Not a secret. | None | None |
 
 ### documentation Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `external_uri` | The uri of the externally hosted documentation. | false | false | Points to external docs. No secret values. | None | None |
 
 ### config_template Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `auth_config_template` | AuthConfigTemplate represents the authentication template for a plugin. Structure is [documented below](#nested_config_template_auth_config_template). | false | false | Container for auth config. Not directly sensitive. | None | None |
 | `additional_config_template` | The list of additional configuration variables for the plugin's configuration. Structure is [documented below](#nested_config_template_additional_config_template). | false | false | Additional metadata. Security depends on nested values. | None | None |
 
 ### hosting_service Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `service_uri` | The URI of the service implemented by the plugin developer, used to invoke the plugin's functionality. This information is only required for user defined plugins. | false | false | Public endpoint reference. Not secret. | None | None |
 
 ### auth_config_template Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `supported_auth_types` | The list of authentication types supported by the plugin. | true | false | Lists allowed auth mechanisms. Not a secret but security-relevant in configuration enforcement. | None | None |
 | `service_account` | Config for Google service account authentication. Structure is [documented below](#nested_config_template_auth_config_template_service_account). | false | false | Container for service account settings. Secret risk exists at child level. | None | None |
 
 ### service_account Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `service_account` | The service account to be used for authenticating request. The `iam.serviceAccounts.getAccessToken` permission should be granted on this service account to the impersonator service account. | true | true | Directly references a service account used for authentication. Exposure could compromise system access. | None | None |
 
 ### additional_config_template Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `required` | Flag represents that this `ConfigVariable` must be provided for a PluginInstance. | false | false | Boolean flag. Not sensitive. | None | None |
@@ -80,7 +72,6 @@ Reference: [Terraform Registry – apihub_plugin](https://registry.terraform.io/
 | `validation_regex` | Regular expression in RE2 syntax used for validating the `value` of a `ConfigVariable`. | false | false | Validation expression. Not sensitive. | None | None |
 
 ### enum_options Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `id` | Id of the option. | true | false | Identifier only. Not sensitive. | None | None |
@@ -88,7 +79,6 @@ Reference: [Terraform Registry – apihub_plugin](https://registry.terraform.io/
 | `description` | Description of the option. | false | false | Metadata only. Not sensitive. | None | None |
 
 ### multi_select_options Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `id` | Id of the option. | true | false | Identifier only. Not sensitive. | None | None |

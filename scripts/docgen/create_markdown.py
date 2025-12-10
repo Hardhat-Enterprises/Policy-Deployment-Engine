@@ -59,7 +59,7 @@ def generate_nested_blocks(args_dict, level=0, resource_name=None):
     for arg, details in args_dict.items():
         if "arguments" in details and details["arguments"]:
             # Create a block header
-            md += f"\n### {indent}{arg} Block\n\n"
+            md += f"\n### {indent}{arg} Block\n"
             # Table header
             md += (
                 f"{indent}| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |\n"
@@ -94,8 +94,7 @@ Reference: [Terraform Registry – {resource_name}]({registry_url})
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 """
 
     # 1️⃣ Top-level table

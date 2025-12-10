@@ -6,8 +6,7 @@ Reference: [Terraform Registry – google_project_default_service_accounts](http
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `project` | The project ID where service accounts are created. | true | false | Identifier only and does not affect security directly | None | None |

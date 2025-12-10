@@ -6,8 +6,7 @@ Reference: [Terraform Registry – firebase_app_hosting_backend](https://registr
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `serving_locality` | Immutable. Specifies how App Hosting will serve the content for this backend. It will either be contained to a single region (REGIONAL_STRICT) or allowed to use App Hosting's global-replicated serving infrastructure (GLOBAL_ACCESS). Possible values are: `REGIONAL_STRICT`, `GLOBAL_ACCESS`. | true | true | Serving locality must be set to REGIONAL_STRICT to ensure data residency compliance and maintain regional data sovereignty requirements. | REGIONAL_STRICT | GLOBAL_ACCESS |
@@ -23,7 +22,6 @@ Reference: [Terraform Registry – firebase_app_hosting_backend](https://registr
 | `project` | If it is not provided, the provider project is used. | false | false | Project specification uses default provider project when not specified. | None | None |
 
 ### codebase Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `repository` | The resource name for the Developer Connect [`gitRepositoryLink`](https://cloud.google.com/developer-connect/docs/api/reference/rest/v1/projects.locations.connections.gitRepositoryLinks) connected to this backend, in the format: projects/{project}/locations/{location}/connections/{connection}/gitRepositoryLinks/{repositoryLink} | true | true | Repository must use the GCP Developer Connect format to ensure secure authentication and authorization through GCP's managed connections. | projects/my-project/locations/australia-southeast2/connections/github-connection/gitRepositoryLinks/my-repo-link | github.com/user/repo |

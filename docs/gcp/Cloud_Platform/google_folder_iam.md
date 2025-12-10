@@ -6,8 +6,7 @@ Reference: [Terraform Registry – google_folder_iam](https://registry.terraform
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `member/members` | Each entry can have one of the following values: * **user:{emailid}**: An email address that represents a specific Google account. For example, alice@gmail.com or joe@example.com. * **serviceAccount:{emailid}**: An email address that represents a service account. For example, my-other-app@appspot.gserviceaccount.com. * **group:{emailid}**: An email address that represents a Google group. For example, admins@example.com. * **domain:{domain}**: A G Suite domain (primary, instead of alias) name that represents all the users of that domain. For example, google.com or example.com. | true | true | Improperly assigned members can cause unauthorised access or privilege escalation. | members = ["user:alice@example.com"] | members = ["domain:example.com"]  # grants access to entire domain |
@@ -19,14 +18,12 @@ Reference: [Terraform Registry – google_folder_iam](https://registry.terraform
 | `condition` | Structure is [documented below](#nested_condition). --- | false | true | To reduce risk by applying time- or context-based constraints to access. Misconfiguration can unintentionally allow or block access. | None | None |
 
 ### audit_log_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `log_type` | Permission type for which logging is to be configured. Must be one of DATA_READ, DATA_WRITE, or ADMIN_READ. | true | true | Ensures important access events are captured in logs. | log_type = "ADMIN_READ" | log_type = "" |
 | `exempted_members` | Identities that do not cause logging for this type of permission. The format is the same as that for members. | false | true | Members being excluded from records weakens control and creates blind spots. | exempted_members not set | exempted_members = ["user:admin@example.com"] |
 
 ### condition Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `expression` | Textual representation of an expression in Common Expression Language syntax. | true | true | Defines when the role is valid. Incorrect expressions may lead to overly permissive or broken access control. | expression = "request.time < timestamp('2025-12-31T00:00:00Z')" | expression = "" |

@@ -6,8 +6,7 @@ Reference: [Terraform Registry – firebase_app_hosting_domain](https://registry
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `location` | The location of the Backend that this Domain is associated with | true | false | Location inherits from backend configuration and has no independent security policy. | australia-southeast2-a | us-east1 |
@@ -18,13 +17,11 @@ Reference: [Terraform Registry – firebase_app_hosting_domain](https://registry
 | `redirect` |  | false | false | Redirect configuration has no specific security policy. | None | None |
 
 ### serve Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `redirect` | Specifies redirect behavior for a domain. Structure is [documented below](#nested_serve_redirect). | false | false | Domain redirect configuration has no specific security policy. | None | None |
 
 ### redirect Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `uri` | The URI of the redirect's intended destination. This URI will be prepended to the original request path. URI without a scheme are assumed to be HTTPS. | true | false | Redirect URI has no specific security policy. | None | None |

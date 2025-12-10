@@ -6,8 +6,7 @@ Reference: [Terraform Registry – storage_object_access_control](https://regist
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `bucket` | The name of the bucket. | true | false | None | None | None |

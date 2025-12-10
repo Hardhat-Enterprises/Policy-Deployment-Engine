@@ -6,8 +6,7 @@ Reference: [Terraform Registry – clouddeploy_delivery_pipeline](https://regist
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `location` | The location for the resource | true | false | Geographic/regional identifier only. Determines where the resource is stored but has no access control implications. | None | None |
@@ -36,13 +35,11 @@ Reference: [Terraform Registry – clouddeploy_delivery_pipeline](https://regist
 | `standard` |  | false | false | None | None | None |
 
 ### serial_pipeline Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `stages` | Each stage specifies configuration for a `Target`. The ordering of this list defines the promotion flow. | false | false | Defines deployment stage sequence - organizational configuration with no direct security impact. | None | None |
 
 ### stages Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `deploy_parameters` | Optional. The deploy parameters to use for the target in this stage. | false | true | Can pass arbitrary parameters to deployment processes. Could be used to inject malicious configuration or override security settings. | validated-parameters-only | arbitrary-parameters, security-override-parameters |
@@ -51,21 +48,18 @@ Reference: [Terraform Registry – clouddeploy_delivery_pipeline](https://regist
 | `target_id` | The target_id to which this stage points. This field refers exclusively to the last segment of a target name. | false | false | References existing targets within the same location - doesn't create new access paths or execute code. | None | None |
 
 ### deploy_parameters Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `match_target_labels` | Optional. Deploy parameters are applied to targets with match labels. If unspecified, deploy parameters are applied to all targets (including child targets of a multi-target). | false | false | Label matching for parameter application - organizational feature with no direct security impact. | None | None |
 | `values` | Required. Values are deploy parameters in key-value pairs. | true | false | Arbitrary key-value pairs passed to deployment processes | None | None |
 
 ### strategy Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `canary` | Canary deployment strategy provides progressive percentage based deployments to a Target. | false | false | Canary strategy configuration - affects rollout behavior but inherits security concerns from nested actions. | None | None |
 | `standard` | Standard deployment strategy executes a single deploy and allows verifying the deployment. | false | false | Standard strategy configuration - affects rollout behavior but inherits security concerns from nested actions. | None | None |
 
 ### canary Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `canary_deployment` | Configures the progressive based deployment for a Target. | false | false | None | None | None |
@@ -73,7 +67,6 @@ Reference: [Terraform Registry – clouddeploy_delivery_pipeline](https://regist
 | `runtime_config` | Optional. Runtime specific configurations for the deployment strategy. The runtime configuration is used to determine how Cloud Deploy will split traffic to enable a progressive deployment. | false | false | None | None | None |
 
 ### canary_deployment Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `percentages` | Required. The percentage based deployments that will occur as a part of a `Rollout`. List is expected in ascending order and each integer n is 0 <= n < 100. | true | false | None | None | None |
@@ -82,25 +75,21 @@ Reference: [Terraform Registry – clouddeploy_delivery_pipeline](https://regist
 | `verify` | Whether to run verify tests after each percentage deployment. | false | false | None | None | None |
 
 ### postdeploy Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `actions` | Optional. A sequence of skaffold custom actions to invoke during execution of the postdeploy job. | false | false | None | None | None |
 
 ### predeploy Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `actions` | Optional. A sequence of skaffold custom actions to invoke during execution of the predeploy job. | false | false | None | None | None |
 
 ### custom_canary_deployment Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `phase_configs` | Required. Configuration for each phase in the canary deployment in the order executed. | true | false | None | None | None |
 
 ### phase_configs Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `percentage` | Required. Percentage deployment for the phase. | true | false | None | None | None |
@@ -111,14 +100,12 @@ Reference: [Terraform Registry – clouddeploy_delivery_pipeline](https://regist
 | `verify` | Whether to run verify tests after the deployment. | false | false | None | None | None |
 
 ### runtime_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `cloud_run` | Cloud Run runtime configuration. | false | false | None | None | None |
 | `kubernetes` | Kubernetes runtime configuration. | false | false | None | None | None |
 
 ### cloud_run Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `automatic_traffic_control` | Whether Cloud Deploy should update the traffic stanza in a Cloud Run Service on the user's behalf to facilitate traffic splitting. This is required to be true for CanaryDeployments, but optional for CustomCanaryDeployments. | false | false | None | None | None |
@@ -127,14 +114,12 @@ Reference: [Terraform Registry – clouddeploy_delivery_pipeline](https://regist
 | `stable_revision_tags` | Optional. A list of tags that are added to the final stable revision when the stable phase is applied. | false | false | None | None | None |
 
 ### kubernetes Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `gateway_service_mesh` | Kubernetes Gateway API service mesh configuration. | false | false | None | None | None |
 | `service_networking` | Kubernetes Service networking configuration. | false | false | None | None | None |
 
 ### gateway_service_mesh Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `deployment` | Required. Name of the Kubernetes Deployment whose traffic is managed by the specified HTTPRoute and Service. | true | false | None | None | None |
@@ -146,14 +131,12 @@ Reference: [Terraform Registry – clouddeploy_delivery_pipeline](https://regist
 | `stable_cutback_duration` | Optional. The amount of time to migrate traffic back from the canary Service to the original Service during the stable phase deployment. If specified, must be between 15s and 3600s. If unspecified, there is no cutback time. | false | false | None | None | None |
 
 ### route_destinations Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `destination_ids` | Required. The clusters where the Gateway API HTTPRoute resource will be deployed to. Valid entries include the associated entities IDs configured in the Target resource and "@self" to include the Target cluster. | true | false | None | None | None |
 | `propagate_service` | Optional. Whether to propagate the Kubernetes Service to the route destination clusters. The Service will always be deployed to the Target cluster even if the HTTPRoute is not. This option may be used to facilitiate successful DNS lookup in the route destination clusters. Can only be set to true if destinations are specified. | false | false | None | None | None |
 
 ### service_networking Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `deployment` | Required. Name of the Kubernetes Deployment whose traffic is managed by the specified Service. | true | false | None | None | None |
@@ -162,7 +145,6 @@ Reference: [Terraform Registry – clouddeploy_delivery_pipeline](https://regist
 | `service` | Required. Name of the Kubernetes Service. | true | false | None | None | None |
 
 ### standard Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `postdeploy` | Optional. Configuration for the postdeploy job. If this is not configured, postdeploy job will not be present. | false | false | None | None | None |

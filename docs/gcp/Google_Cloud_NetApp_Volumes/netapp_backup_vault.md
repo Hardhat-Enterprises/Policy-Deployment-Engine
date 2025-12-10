@@ -6,8 +6,7 @@ Reference: [Terraform Registry – netapp_backup_vault](https://registry.terrafo
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `location` | Region where the backup vault is created. | true | true | Controls data residency and compliance for where backups are stored. | australia-southeast2 | us-central1 |
@@ -20,7 +19,6 @@ Reference: [Terraform Registry – netapp_backup_vault](https://registry.terrafo
 | `project` | If it is not provided, the provider project is used. | false | false | None | None | None |
 
 ### backup_retention_policy Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `backup_minimum_enforced_retention_days` | Minimum retention duration in days for backups in the backup vault. | true | false | None | None | None |

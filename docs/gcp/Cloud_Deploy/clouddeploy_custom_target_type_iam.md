@@ -6,8 +6,7 @@ Reference: [Terraform Registry – clouddeploy_custom_target_type_iam](https://r
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `location` | the value will be parsed from the identifier of the parent resource. If no location is provided in the parent identifier and no location is specified, it is taken from the provider configuration. | false | false | Geographic/regional identifier only. Used for resource location but has no direct access control implications. | None | None |

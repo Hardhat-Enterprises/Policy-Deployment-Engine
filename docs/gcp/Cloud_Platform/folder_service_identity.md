@@ -6,8 +6,7 @@ Reference: [Terraform Registry – folder_service_identity](https://registry.ter
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `service` | The service to generate identity for. - - - | true | false | None | None | None |

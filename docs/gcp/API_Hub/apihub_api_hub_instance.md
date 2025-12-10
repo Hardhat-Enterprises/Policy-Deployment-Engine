@@ -6,8 +6,7 @@ Reference: [Terraform Registry – apihub_api_hub_instance](https://registry.ter
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `config` | Available configurations to provision an ApiHub Instance. Structure is [documented below](#nested_config). | true | false | Config block is required but security impact depends on its nested arguments. | None | None |
@@ -18,7 +17,6 @@ Reference: [Terraform Registry – apihub_api_hub_instance](https://registry.ter
 | `project` | If it is not provided, the provider project is used. | true | false | Required for terraform files to operate correctly | ['PDE'] | ['anything else'] |
 
 ### config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `encryption_type` | Optional. Encryption type for the region. If the encryption type is CMEK, the cmek_key_name must be provided. If no encryption type is provided, GMEK will be used. Possible values: ENCRYPTION_TYPE_UNSPECIFIED GMEK CMEK | false | true | Encryption type directly impacts data confidentiality. CMEK should be enforced to ensure org-controlled keys are used. | ['CMEK'] | ['GMEK', 'ENCRYPTION_TYPE_UNSPECIFIED'] |

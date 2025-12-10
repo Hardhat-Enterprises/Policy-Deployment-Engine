@@ -6,8 +6,7 @@ Reference: [Terraform Registry – netapp_kmsconfig](https://registry.terraform.
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `crypto_key_name` | Resource name of the regional CMEK key. | true | true | Encrypts data with an approved customer-managed key. | projects/deakin-lab-123/locations/australia-southeast2/keyRings/netapp-kr/cryptoKeys/netapp-cmek | projects/other-proj/locations/us-central1/keyRings/kr/cryptoKeys/key |

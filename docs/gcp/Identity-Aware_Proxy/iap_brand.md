@@ -6,8 +6,7 @@ Reference: [Terraform Registry – iap_brand](https://registry.terraform.io/prov
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `support_email` | Support email displayed on the OAuth consent screen. Can be a user or group email. If a user email is specified, the caller must be that user. If a group email is specified, the caller can be a user or a service account that owns the group in Cloud Identity. | true | true | A corporate mailbox helps users reach the right owner and prevents phishing/confusion from public/vendor addresses. | support_email = "support@example.com" | support_email = "support@gmail.com" / "help@vendor.io" / "support@example.com " |

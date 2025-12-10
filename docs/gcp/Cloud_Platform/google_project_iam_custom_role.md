@@ -6,8 +6,7 @@ Reference: [Terraform Registry – google_project_iam_custom_role](https://regis
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `role_id` |  | false | false | None | None | None |

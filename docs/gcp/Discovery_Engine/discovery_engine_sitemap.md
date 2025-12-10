@@ -6,8 +6,7 @@ Reference: [Terraform Registry – discovery_engine_sitemap](https://registry.te
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `location` | The geographic location where the data store should reside. The value can only be one of "global", "us" and "eu". | true | false | None | None | None |

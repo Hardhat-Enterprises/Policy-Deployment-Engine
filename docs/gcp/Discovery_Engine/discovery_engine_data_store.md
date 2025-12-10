@@ -6,8 +6,7 @@ Reference: [Terraform Registry – discovery_engine_data_store](https://registry
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `display_name` | The display name of the data store. This field must be a UTF-8 encoded string with a length limit of 128 characters. | true | false | Just the name | None | None |
@@ -30,14 +29,12 @@ Reference: [Terraform Registry – discovery_engine_data_store](https://registry
 | `parsing_config_overrides` |  | false | false | None | None | None |
 
 ### advanced_site_search_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `disable_initial_index` | If set true, initial indexing is disabled for the DataStore. | false | false | None | None | None |
 | `disable_automatic_refresh` | If set true, automatic refresh is disabled for the DataStore. | false | false | None | None | None |
 
 ### document_processing_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `name` | (Output) The full resource name of the Document Processing Config. Format: `projects/{project}/locations/{location}/collections/{collection_id}/dataStores/{data_store_id}/documentProcessingConfig`. | false | false | None | None | None |
@@ -46,20 +43,17 @@ Reference: [Terraform Registry – discovery_engine_data_store](https://registry
 | `parsing_config_overrides` | Map from file type to override the default parsing configuration based on the file type. Supported keys: * `pdf`: Override parsing config for PDF files, either digital parsing, ocr parsing or layout parsing is supported. * `html`: Override parsing config for HTML files, only digital parsing and or layout parsing are supported. * `docx`: Override parsing config for DOCX files, only digital parsing and or layout parsing are supported. Structure is [documented below](#nested_document_processing_config_parsing_config_overrides). | false | false | None | None | None |
 
 ### chunking_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `layout_based_chunking_config` | Configuration for the layout based chunking. Structure is [documented below](#nested_document_processing_config_chunking_config_layout_based_chunking_config). | false | false | None | None | None |
 
 ### layout_based_chunking_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `chunk_size` | The token size limit for each chunk. Supported values: 100-500 (inclusive). Default value: 500. | false | false | None | None | None |
 | `include_ancestor_headings` | Whether to include appending different levels of headings to chunks from the middle of the document to prevent context loss. Default value: False. | false | false | None | None | None |
 
 ### default_parsing_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `digital_parsing_config` | Configurations applied to digital parser. | false | false | None | None | None |
@@ -67,13 +61,11 @@ Reference: [Terraform Registry – discovery_engine_data_store](https://registry
 | `layout_parsing_config` | Configurations applied to layout parser. Structure is [documented below](#nested_document_processing_config_default_parsing_config_layout_parsing_config). | false | false | None | None | None |
 
 ### ocr_parsing_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `use_native_text` | If true, will use native text instead of OCR text on pages containing native text. | false | true | can make private info public if set to false | True | False |
 
 ### layout_parsing_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `enable_table_annotation` | If true, the LLM based annotation is added to the table during parsing. | false | false | None | None | None |
@@ -84,7 +76,6 @@ Reference: [Terraform Registry – discovery_engine_data_store](https://registry
 | `exclude_html_ids` | List of HTML ids to exclude from the parsed content. | false | false | None | None | None |
 
 ### parsing_config_overrides Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `file_type` |  | false | false | None | None | None |

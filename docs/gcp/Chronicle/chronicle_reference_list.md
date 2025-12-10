@@ -6,8 +6,7 @@ Reference: [Terraform Registry – chronicle_reference_list](https://registry.te
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `description` | Required. A user-provided description of the reference list. | true | false | None | None | None |
@@ -19,7 +18,6 @@ Reference: [Terraform Registry – chronicle_reference_list](https://registry.te
 | `project` | If it is not provided, the provider project is used. | false | false | None | None | None |
 
 ### entries Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `value` | Required. The value of the entry. Maximum length is 512 characters. | true | false | None | None | None |

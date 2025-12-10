@@ -6,8 +6,7 @@ Reference: [Terraform Registry – google_project_service](https://registry.terr
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `service` | The service to enable. | true | true | Enabling some APIs, like IAM, is necessary for safely managing access and credentials.  Security measures are weakened when essential APIs are missed. | service = "iam.googleapis.com" | service = "storage.googleapis.com" # IAM missing |

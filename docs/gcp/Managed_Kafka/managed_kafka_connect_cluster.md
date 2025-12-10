@@ -6,8 +6,7 @@ Reference: [Terraform Registry – managed_kafka_connect_cluster](https://regist
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `kafka_cluster` | The name of the Kafka cluster this Kafka Connect cluster is attached to. Structured like: `projects/PROJECT_ID/locations/LOCATION/clusters/CLUSTER_ID`. | true | false | Used for attachment reference; does not directly impact access or data protection. | [] | [] |
@@ -21,26 +20,22 @@ Reference: [Terraform Registry – managed_kafka_connect_cluster](https://regist
 | `network_configs` |  | false | true | Defines networking for PSC interfaces, which affect secure access. | ['Primary and additional subnets from approved VPC'] | ['No subnet or misconfigured region/VPC'] |
 
 ### capacity_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `vcpu_count` | The number of vCPUs to provision for the cluster. The minimum is 3. | true | false | Affects performance but not confidentiality or integrity. | ['3 or more vCPUs'] | ['Less than 3 vCPUs'] |
 | `memory_bytes` | The memory to provision for the cluster. CPU:Memory ratio must be between 1:1 and 1:8. | true | false | Availability concern rather than access/security. | ['Ratio within 1:1 to 1:8'] | ['Outside defined ratio'] |
 
 ### gcp_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `access_config` | Access configuration for the Kafka Connect cluster. | true | true | Controls how the Connect cluster is accessed. Improper setup risks exposure. | ['Subnets from secure VPC only'] | ['Public or overly permissive settings'] |
 
 ### access_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `network_configs` | VPC subnets used for Kafka Connect cluster. | true | true | Defines network isolation. Insecure subnet increases exposure. | ['Private subnets with PSC'] | ['Public subnets'] |
 
 ### network_configs Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `primary_subnet` | Primary VPC subnet used for PSC interface. | true | true | Defines where traffic is routed from/to. Impacts exposure level. | ['Private RFC1918 subnet with /22 or larger'] | ['Shared or public subnets', 'CIDR < /22'] |

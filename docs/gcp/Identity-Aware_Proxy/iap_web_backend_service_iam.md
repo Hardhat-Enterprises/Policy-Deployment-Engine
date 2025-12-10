@@ -6,8 +6,7 @@ Reference: [Terraform Registry – iap_web_backend_service_iam](https://registry
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `web_backend_service` | Name of the backend service to bind with IAP Web IAM. | true | true | Scopes the IAM binding to a specific HTTPS backend. Pointing at the wrong service can expose an unintended or sensitive admin surface. | web_backend_service = "orders-edge-iap" | web_backend_service = "grafana" / "kibana" (admin consoles) or empty/typo value |
@@ -18,7 +17,6 @@ Reference: [Terraform Registry – iap_web_backend_service_iam](https://registry
 | `condition` | Structure is documented below. --- | false | true | IAM Conditions reduce blast radius by scoping access (time, path/host, device context). | condition { title = "OfficeHours" description = "Limit access to business hours" expression = "request.time.getHours() >= 8 && request.time.getHours() < 18" } | Empty condition block or empty expression |
 
 ### condition Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `expression` | CEL expression that decides when the binding applies. | true | true | Must be specific and non-empty to be effective. | expression = "request.host == 'app.example.com'" | expression = "" |

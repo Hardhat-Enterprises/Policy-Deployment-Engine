@@ -6,8 +6,7 @@ Reference: [Terraform Registry – chronicle_retrohunt](https://registry.terrafo
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `process_interval` | Represents a time interval, encoded as a Timestamp start (inclusive) and a Timestamp end (exclusive). The start must be less than or equal to the end. When the start equals the end, the interval is empty (matches no time). When both start and end are unspecified, the interval matches any time. Structure is [documented below](#nested_process_interval). | true | false | None | None | None |
@@ -18,7 +17,6 @@ Reference: [Terraform Registry – chronicle_retrohunt](https://registry.terrafo
 | `project` | If it is not provided, the provider project is used. | false | false | None | None | None |
 
 ### process_interval Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `start_time` | Inclusive start of the interval. | true | false | None | None | None |

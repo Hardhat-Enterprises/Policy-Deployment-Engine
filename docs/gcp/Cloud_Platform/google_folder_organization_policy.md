@@ -6,8 +6,7 @@ Reference: [Terraform Registry – google_folder_organization_policy](https://re
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `folder` | The resource name of the folder to set the policy for. Its format is folders/{folder_id}. | true | false | identifier only, no security impact | None | None |
@@ -18,13 +17,11 @@ Reference: [Terraform Registry – google_folder_organization_policy](https://re
 | `restore_policy` | ~> **Note:** If none of [`boolean_policy`, `list_policy`, `restore_policy`] are defined the policy for a given constraint will effectively be unset. This is represented in the UI as the constraint being 'Inherited'. - - - | false | true | Restoring defaults can weaken protections. | None | None |
 
 ### boolean_policy Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `enforced` | If true, then the Policy is enforced. If false, then any configuration is acceptable. | true | true | Enforcement ensures mandatory restrictions are applied. | enforced = true | enforced = false |
 
 ### list_policy Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `suggested_value` | The Google Cloud Console will try to default to a configuration that matches the value specified in this field. | false | false | Console-only suggestion, it does not enforce or weaken security. | None | None |
@@ -33,7 +30,6 @@ Reference: [Terraform Registry – google_folder_organization_policy](https://re
 | `values` | The policy can define specific values that are allowed or denied. | false | true | Improper values may allow risky APIs or services. | deny.values = ["cloudresourcemanager.googleapis.com"] | allow.values = ["cloudresourcemanager.googleapis.com"] |
 
 ### restore_policy Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `default` | May only be set to true. If set, then the default Policy is restored. | true | false | Restoring default removes explicit protections. | default = false | default = true |

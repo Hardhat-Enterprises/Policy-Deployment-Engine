@@ -6,8 +6,7 @@ Reference: [Terraform Registry – iap_tunnel_iam](https://registry.terraform.io
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `project` | If not provided, the project is parsed from the parent identifier; if missing there too, the provider project is used. | false | true | Ensures the binding is applied to the intended tenant; mismatches can grant access in the wrong project. | project = "my-gcp-project" (matches provider/parent context) | project = "other-project" while parent/provider point elsewhere |
@@ -17,7 +16,6 @@ Reference: [Terraform Registry – iap_tunnel_iam](https://registry.terraform.io
 | `condition` | Optional IAM Condition to scope the binding (e.g., by source IP, time, or device attributes when evaluated). | false | true | Reduces blast radius by restricting when/where the binding applies. | condition { title = "OfficeHours" expression = "request.time.getHours() >= 8 && request.time.getHours() < 18" description = "Restrict tunnel use to office hours" } | condition { } (missing required fields) or an empty expression |
 
 ### condition Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `expression` | CEL expression evaluated to determine if the binding applies. | true | true | A non-empty, precise expression is required for the condition to function. | expression = "request.client_ip.startsWith('10.0.')" | expression = "" |

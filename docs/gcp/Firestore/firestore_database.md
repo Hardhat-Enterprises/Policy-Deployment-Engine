@@ -6,8 +6,7 @@ Reference: [Terraform Registry – firestore_database](https://registry.terrafor
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `name` | The ID to use for the database, which will become the final component of the database's resource name. This value should be 4-63 characters. Valid characters are /[a-z][0-9]-/ with first character a letter and the last a letter or a number. Must not be UUID-like /[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}/. "(default)" database id is also valid. | true | false | None | None | None |
@@ -24,7 +23,6 @@ Reference: [Terraform Registry – firestore_database](https://registry.terrafor
 | `deletion_policy` | If the deletion policy is `ABANDON`, the database will be removed from Terraform state but not deleted from Google Cloud upon destruction. If the deletion policy is `DELETE`, the database will both be removed from Terraform state and deleted from Google Cloud upon destruction. The default value is `ABANDON`. See also `delete_protection`. | false | false | None | None | None |
 
 ### cmek_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `kms_key_name` | The resource ID of a Cloud KMS key. If set, the database created will be a Customer-managed Encryption Key (CMEK) database encrypted with this key. This feature is allowlist only in initial launch. Only keys in the same location as this database are allowed to be used for encryption. For Firestore's nam5 multi-region, this corresponds to Cloud KMS multi-region us. For Firestore's eur3 multi-region, this corresponds to Cloud KMS multi-region europe. See https://cloud.google.com/kms/docs/locations. This value should be the KMS key resource ID in the format of `projects/{project_id}/locations/{kms_location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}`. How to retrieve this resource ID is listed at https://cloud.google.com/kms/docs/getting-resource-ids#getting_the_id_for_a_key_and_version. | true | false | None | None | None |

@@ -6,8 +6,7 @@ Reference: [Terraform Registry – database_migration_service_migration_job](htt
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `type` | The type of the migration job. Possible values are: `ONE_TIME`, `CONTINUOUS`. | true | true | Migration type impacts how long source databases are exposed. Continuous migrations may carry higher security and cost implications than one-time jobs. | ONE_TIME | CONTINUOUS |
@@ -27,7 +26,6 @@ Reference: [Terraform Registry – database_migration_service_migration_job](htt
 | `project` | If it is not provided, the provider project is used. | false | false | Not Security Related | None | None |
 
 ### dump_flags Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `dump_flags` | A list of dump flags Structure is [documented below](#nested_dump_flags_dump_flags). | false | false | None | None | None |
@@ -35,13 +33,11 @@ Reference: [Terraform Registry – database_migration_service_migration_job](htt
 | `value` | The vale of the flag | false | false | None | None | None |
 
 ### performance_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `dump_parallel_level` | Initial dump parallelism level. Possible values are: `MIN`, `OPTIMAL`, `MAX`. | false | false | None | None | None |
 
 ### reverse_ssh_connectivity Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `vm_ip` | The IP of the virtual machine (Compute Engine) used as the bastion server for the SSH tunnel. | false | false | Must be setup anyway when reverse_ssh_connectivity is chosen | None | None |
@@ -50,7 +46,6 @@ Reference: [Terraform Registry – database_migration_service_migration_job](htt
 | `vpc` | The name of the VPC to peer with the Cloud SQL private network. | false | false | Must be setup anyway when reverse_ssh_connectivity is chosen | None | None |
 
 ### vpc_peering_connectivity Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `vpc` | The name of the VPC network to peer with the Cloud SQL private network. | false | true | VPC peering is the preferred secure method to connect source and destination over private networks, avoiding public exposure. | Valid VPC | Not Configured |

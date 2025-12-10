@@ -6,8 +6,7 @@ Reference: [Terraform Registry – iap_tunnel_instance_iam](https://registry.ter
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `zone` | Zone of the Compute Engine instance. If omitted, parsed from the parent identifier; otherwise taken from the provider configuration. | false | true | Must match the instance’s actual zone so the binding targets the correct resource. | zone = "australia-southeast1-b" | zone = "us-central1-a" while the instance is in "australia-southeast1-b" |
@@ -19,7 +18,6 @@ Reference: [Terraform Registry – iap_tunnel_instance_iam](https://registry.ter
 | `condition` | Optional IAM Condition to scope the binding (e.g., by source IP, time, or device attributes when evaluated). | false | true | Reduces blast radius by restricting when/where the binding applies. | condition { title = "OfficeHours" expression = "request.time.getHours() >= 8 && request.time.getHours() < 18" description = "Restrict tunnel use to office hours" } | condition { } (missing required fields) or an empty expression |
 
 ### condition Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `expression` | CEL expression evaluated to determine if the binding applies. | true | true | A non-empty, precise expression is required for the condition to function. | expression = "request.client_ip.startsWith('10.0.')" | expression = "" |

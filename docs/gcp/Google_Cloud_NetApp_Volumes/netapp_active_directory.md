@@ -6,8 +6,7 @@ Reference: [Terraform Registry – netapp_active_directory](https://registry.ter
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `domain` | Fully qualified domain name for the Active Directory domain. | true | true | Ensures join operations target the trusted domain. | deakin.internal | ad.internal |

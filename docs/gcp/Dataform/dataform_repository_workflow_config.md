@@ -6,8 +6,7 @@ Reference: [Terraform Registry – dataform_repository_workflow_config](https://
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `name` | The workflow's name. | true | false | None | None | None |
@@ -21,7 +20,6 @@ Reference: [Terraform Registry – dataform_repository_workflow_config](https://
 | `included_targets` |  | false | false | None | None | None |
 
 ### invocation_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `included_targets` | Optional. The set of action identifiers to include. Structure is [documented below](#nested_invocation_config_included_targets). | false | false | None | None | None |
@@ -32,7 +30,6 @@ Reference: [Terraform Registry – dataform_repository_workflow_config](https://
 | `service_account` | Optional. The service account to run workflow invocations under. | false | false | None | None | None |
 
 ### included_targets Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `database` | The action's database (Google Cloud project ID). | false | false | None | None | None |

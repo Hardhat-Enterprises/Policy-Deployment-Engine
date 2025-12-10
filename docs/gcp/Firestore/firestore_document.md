@@ -6,8 +6,7 @@ Reference: [Terraform Registry – firestore_document](https://registry.terrafor
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `fields` | The document's [fields](https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents) formated as a json string.Firestore documents must include both 'field1' and 'field2' to satisfy mandatory data schema. | true | false | None | None | None |

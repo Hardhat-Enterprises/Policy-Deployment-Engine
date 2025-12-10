@@ -6,8 +6,7 @@ Reference: [Terraform Registry – google_service_account_iam](https://registry.
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `service_account_id` |  | false | false | None | None | None |
@@ -17,7 +16,6 @@ Reference: [Terraform Registry – google_service_account_iam](https://registry.
 | `condition` | Structure is [documented below](#nested_condition). | false | false | None | None | None |
 
 ### condition Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `expression` |  | false | false | None | None | None |

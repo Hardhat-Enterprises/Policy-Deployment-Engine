@@ -6,8 +6,7 @@ Reference: [Terraform Registry – iap_web_type_app_engine_iam](https://registry
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `app_id` | App Engine application ID used in the IAP resource path (projects/{project}/iap_web/appengine-{app_id}). | true | true | Targets the correct App Engine application for the IAP Web IAM binding; a wrong ID can expose or fail to protect the intended app. | app_id = "my-app" | app_id = "" or an ID that does not exist in the project |
@@ -18,7 +17,6 @@ Reference: [Terraform Registry – iap_web_type_app_engine_iam](https://registry
 | `condition` | Optional IAM Condition to scope the binding (e.g., by request host/path, time, or device context). | false | true | Reduces blast radius by restricting when/where the binding applies. | condition { title = "OfficeHours" description = "Limit access to business hours" expression = "request.time.getHours() >= 8 && request.time.getHours() < 18" } | Empty condition block or empty expression |
 
 ### condition Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `expression` | CEL expression that decides when the binding applies. | true | true | Must be specific and non-empty to be effective. | expression = "request.host == 'app.example.com'" | expression = "" |

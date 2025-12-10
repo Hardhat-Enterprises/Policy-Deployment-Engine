@@ -6,8 +6,7 @@ Reference: [Terraform Registry – database_migration_service_connection_profile
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `connection_profile_id` | The ID of the connection profile. | true | false | Connection Profile ID has no impact on the security of the resource or data contained | None | None |
@@ -31,7 +30,6 @@ Reference: [Terraform Registry – database_migration_service_connection_profile
 | `machine_config` | Configuration for the machines that host the underlying database engine. Structure is [documented below](#nested_alloydb_settings_primary_instance_settings_machine_config). | true | false | Not Security Related | None | None |
 
 ### mysql Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `host` | The IP or hostname of the source MySQL database. | false | false | host value itself does not impact security since networking and SSL enforcement are controlled by other parameters such as private_network and require_ssl. | None | None |
@@ -43,7 +41,6 @@ Reference: [Terraform Registry – database_migration_service_connection_profile
 | `cloud_sql_id` | If the source is a Cloud SQL database, use this field to provide the Cloud SQL instance ID of the source. | false | false | cloud_sql_id has no impact on the security of the resource or data contained | None | None |
 
 ### postgresql Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `host` | The IP or hostname of the source postgresql database. | false | false | host value itself does not impact security since networking and SSL enforcement are controlled by other parameters such as private_network and require_ssl. | None | None |
@@ -57,7 +54,6 @@ Reference: [Terraform Registry – database_migration_service_connection_profile
 | `network_architecture` | (Output) Output only. If the source is a Cloud SQL database, this field indicates the network architecture it's associated with. | false | false | This is the output | None | None |
 
 ### oracle Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `host` | Required. The IP or hostname of the source Oracle database. | true | false | host value itself does not impact security since networking and SSL enforcement are controlled by other parameters. | None | None |
@@ -72,7 +68,6 @@ Reference: [Terraform Registry – database_migration_service_connection_profile
 | `private_connectivity` | Configuration for using a private network to communicate with the source database Structure is [documented below](#nested_oracle_private_connectivity). | false | true | Private connectivity prevents external access over public networks. | Configured | Not configured |
 
 ### cloudsql Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `cloud_sql_id` | (Output) Output only. The Cloud SQL instance ID that this connection profile is associated with. | false | false | This is the output | None | None |
@@ -81,14 +76,12 @@ Reference: [Terraform Registry – database_migration_service_connection_profile
 | `public_ip` | (Output) Output only. The Cloud SQL database instance's public IP. | false | false | This is the output | None | None |
 
 ### alloydb Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `cluster_id` | Required. The AlloyDB cluster ID that this connection profile is associated with. | true | false | Not Security Related | None | None |
 | `settings` | Immutable. Metadata used to create the destination AlloyDB cluster. Structure is [documented below](#nested_alloydb_settings). | false | false | Not Security Related | None | None |
 
 ### ssl Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `type` | (Output) The current connection profile state. | false | true | The SSL type determines the level of encryption and whether client certificates are enforced. | 'SERVER_ONLY','SERVER_CLIENT','REQUIRED' | NONE |
@@ -97,7 +90,6 @@ Reference: [Terraform Registry – database_migration_service_connection_profile
 | `ca_certificate` | Input only. The x509 PEM-encoded certificate of the CA that signed the source database server's certificate. The replica will use this certificate to verify it's connecting to the right host. **Note**: This property is sensitive and will not be displayed in the plan. | false | false | Depends on SSL Type | None | None |
 
 ### forward_ssh_connectivity Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `hostname` | Required. Hostname for the SSH tunnel. | true | false | None | None | None |
@@ -107,13 +99,11 @@ Reference: [Terraform Registry – database_migration_service_connection_profile
 | `private_key` | Input only. SSH private key. Only one of `password` and `private_key` can be configured. **Note**: This property is sensitive and will not be displayed in the plan. | false | false | None | None | None |
 
 ### private_connectivity Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `private_connection` | Required. The resource name (URI) of the private connection. | true | true | Private connectivity prevents external access over public networks. | Compliant URI | Non-Compliant URI |
 
 ### settings Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `database_version` | The database engine type and version. Currently supported values located at https://cloud.google.com/database-migration/docs/reference/rest/v1/projects.locations.connectionProfiles#sqldatabaseversion | false | false | Not Security Related | None | None |
@@ -139,7 +129,6 @@ Reference: [Terraform Registry – database_migration_service_connection_profile
 | `primary_instance_settings` | Settings for the cluster's primary instance Structure is [documented below](#nested_alloydb_settings_primary_instance_settings). | false | false | Not Security Related | None | None |
 
 ### ip_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `enable_ipv4` | Whether the instance should be assigned an IPv4 address or not. | false | false | Not Security Related | None | None |
@@ -148,7 +137,6 @@ Reference: [Terraform Registry – database_migration_service_connection_profile
 | `authorized_networks` | The list of external networks that are allowed to connect to the instance using the IP. Structure is [documented below](#nested_cloudsql_settings_ip_config_authorized_networks). | false | true | Authorized networks define which external IPs can access the database. Better not configured | Not configured | Configured |
 
 ### authorized_networks Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `value` | The allowlisted value for the access control list. | true | false | None | None | None |
@@ -157,7 +145,6 @@ Reference: [Terraform Registry – database_migration_service_connection_profile
 | `ttl` | Input only. The time-to-leave of this access control entry. | false | false | None | None | None |
 
 ### initial_user Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `user` | The database username. | true | false | None | None | None |
@@ -165,7 +152,6 @@ Reference: [Terraform Registry – database_migration_service_connection_profile
 | `password_set` | (Output) Output only. Indicates if the initialUser.password field has been set. | false | false | None | None | None |
 
 ### primary_instance_settings Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `id` | The database username. | true | false | None | None | None |
@@ -175,7 +161,6 @@ Reference: [Terraform Registry – database_migration_service_connection_profile
 | `private_ip` | (Output) Output only. The private IP address for the Instance. This is the connection endpoint for an end-user application. | false | false | None | None | None |
 
 ### machine_config Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `cpu_count` | The number of CPU's in the VM instance. | true | false | None | None | None |

@@ -6,8 +6,7 @@ Reference: [Terraform Registry – google_project_organization_policy](https://r
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `project` |  | false | false | None | None | None |
@@ -18,13 +17,11 @@ Reference: [Terraform Registry – google_project_organization_policy](https://r
 | `restore_policy` | ~> **Note:** If none of [`boolean_policy`, `list_policy`, `restore_policy`] are defined the policy for a given constraint will effectively be unset. This is represented in the UI as the constraint being 'Inherited'. - - - | false | false | None | None | None |
 
 ### boolean_policy Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `enforced` |  | false | false | None | None | None |
 
 ### list_policy Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `suggested_value` |  | false | false | None | None | None |
@@ -33,7 +30,6 @@ Reference: [Terraform Registry – google_project_organization_policy](https://r
 | `values` |  | false | false | None | None | None |
 
 ### restore_policy Block
-
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `default` |  | false | false | None | None | None |

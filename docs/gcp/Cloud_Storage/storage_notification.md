@@ -6,8 +6,7 @@ Reference: [Terraform Registry – storage_notification](https://registry.terraf
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `bucket` |  | false | false | None | None | None |

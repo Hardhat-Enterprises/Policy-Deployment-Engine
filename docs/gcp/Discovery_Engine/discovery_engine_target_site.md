@@ -6,8 +6,7 @@ Reference: [Terraform Registry – discovery_engine_target_site](https://registr
 
 ---
 
-## Argument Reference  
-
+## Argument Reference
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `provided_uri_pattern` | The user provided URI pattern from which the `generated_uri_pattern` is generated. | true | false | None | None | None |
