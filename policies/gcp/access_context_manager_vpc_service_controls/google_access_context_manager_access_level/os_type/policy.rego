@@ -11,7 +11,7 @@ conditions := [
     },
     {
       "condition": "os_type is not in blacklist",
-      "attribute_path": ["basic", 0, "conditions", 0, "device_policy", 0, "os_constraints", "os_type"],
+      "attribute_path": ["basic", 0, "conditions", 0, "device_policy", 0, "os_constraints", 0, "os_type"],
       "values": ["OS_UNSPECIFIED","ANDROID","IOS"],
       "policy_type": "blacklist"
     }
