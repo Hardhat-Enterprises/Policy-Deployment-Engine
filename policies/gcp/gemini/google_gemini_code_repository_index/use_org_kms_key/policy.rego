@@ -10,8 +10,8 @@ conditions := [
         {
             "condition": "Check if kms_key is compliant",
             "attribute_path" : ["kms_key"], 
-            "values" : ["projects/projectExample/locations/locationExample/keyRings/keyRingExample/cryptoKeys/cryptoKeyExample"], 
-            "policy_type" : "whitelist" 
+            "values" : ["", "null", "Anything Else"], 
+            "policy_type" : "blacklist" 
         }
     ]
 ]
