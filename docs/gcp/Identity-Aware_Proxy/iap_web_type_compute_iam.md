@@ -6,7 +6,8 @@ Reference: [Terraform Registry – iap_web_type_compute_iam](https://registry.te
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `project` | If not provided, the project is parsed from the parent identifier; if missing there too, the provider project is used. | false | true | Ensures the binding lands in the intended tenant; a mismatch can grant access in the wrong project. | project = "my-gcp-project" (aligned with provider/parent) | project = "other-project" while parent/provider point elsewhere |
@@ -16,6 +17,7 @@ Reference: [Terraform Registry – iap_web_type_compute_iam](https://registry.te
 | `condition` | Optional IAM Condition to scope the binding (e.g., request host/path, time, or device context). | false | true | Reduces blast radius by restricting when/where the binding applies. | condition { title = "OfficeHours" description = "Limit access to business hours" expression = "request.time.getHours() >= 8 && request.time.getHours() < 18" } | Empty condition block or empty expression |
 
 ### condition Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `expression` | CEL expression that decides when the binding applies. | true | true | Must be specific and non-empty to be effective. | expression = "request.host == 'app.example.com'" | expression = "" |

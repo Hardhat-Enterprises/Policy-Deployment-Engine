@@ -6,7 +6,8 @@ Reference: [Terraform Registry – database_migration_service_private_connection
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `vpc_peering_config` | The VPC Peering configuration is used to create VPC peering between databasemigrationservice and the consumer's VPC. Structure is [documented below](#nested_vpc_peering_config). | true | false | This is a required field and doesnot need a Rego policy | None | None |
@@ -18,6 +19,7 @@ Reference: [Terraform Registry – database_migration_service_private_connection
 | `project` | If it is not provided, the provider project is used. | false | false | Not Security Related | None | None |
 
 ### vpc_peering_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `vpc_name` | Fully qualified name of the VPC that Database Migration Service will peer to. Format: projects/{project}/global/{networks}/{name} | true | false | None | None | None |

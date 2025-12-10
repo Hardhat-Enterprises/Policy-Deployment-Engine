@@ -6,7 +6,8 @@ Reference: [Terraform Registry – storage_default_object_acl](https://registry.
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `bucket` | --- | false | false | None | None | None |

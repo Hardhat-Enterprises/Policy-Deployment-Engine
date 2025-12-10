@@ -6,7 +6,8 @@ Reference: [Terraform Registry – netapp_storage_pool](https://registry.terrafo
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `service_level` | Service level of the storage pool. Possible values are: `PREMIUM`, `EXTREME`, `STANDARD`, `FLEX`. | true | false | None | None | None |

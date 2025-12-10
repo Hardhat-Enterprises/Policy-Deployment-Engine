@@ -6,7 +6,8 @@ Reference: [Terraform Registry – dataform_repository](https://registry.terrafo
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `name` | The repository's name. | true | false | None | None | None |
@@ -23,6 +24,7 @@ Reference: [Terraform Registry – dataform_repository](https://registry.terrafo
 | `ssh_authentication_config` |  | false | false | None | None | None |
 
 ### git_remote_settings Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `url` | The Git remote's URL. | true | false | None | None | None |
@@ -32,6 +34,7 @@ Reference: [Terraform Registry – dataform_repository](https://registry.terrafo
 | `token_status` | (Output) Indicates the status of the Git access token. https://cloud.google.com/dataform/reference/rest/v1beta1/projects.locations.repositories#TokenStatus | false | false | None | None | None |
 
 ### workspace_compilation_overrides Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `default_database` | The default database (Google Cloud project ID). | false | false | None | None | None |
@@ -39,6 +42,7 @@ Reference: [Terraform Registry – dataform_repository](https://registry.terrafo
 | `table_prefix` | The prefix that should be prepended to all table names. | false | false | None | None | None |
 
 ### ssh_authentication_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `user_private_key_secret_version` | The name of the Secret Manager secret version to use as a ssh private key for Git operations. Must be in the format projects/*/secrets/*/versions/*. | true | false | None | None | None |

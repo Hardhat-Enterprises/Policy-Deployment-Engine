@@ -6,7 +6,8 @@ Reference: [Terraform Registry – edgecontainer_node_pool](https://registry.ter
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `node_location` | Name of the Google Distributed Cloud Edge zone where this node pool will be created. For example: `us-central1-edge-customer-a`. | true | true | Node location determines the physical and geographical placement of nodes, impacting data residency, latency, and compliance with regional regulations. | us-central1-edge-customer-a (approved zone) | Unapproved or restricted edge zones |
@@ -21,6 +22,7 @@ Reference: [Terraform Registry – edgecontainer_node_pool](https://registry.ter
 | `project` | If it is not provided, the provider project is used. | false | true | Project selection impacts resource isolation, billing accountability, and access control boundaries. | Proper project reference | Incorrect or unauthorized project |
 
 ### local_disk_encryption Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `kms_key` | The Cloud KMS CryptoKey e.g. projects/{project}/locations/{location}/keyRings/{keyRing}/cryptoKeys/{cryptoKey} to use for protecting node local disks. If not specified, a Google-managed key will be used instead. | false | true | Customer-managed keys provide better control over encryption policies, access controls, and key rotation procedures. | projects/my-project/locations/us-central1/keyRings/my-keyring/cryptoKeys/my-key | Missing or improperly formatted KMS key reference |
@@ -28,6 +30,7 @@ Reference: [Terraform Registry – edgecontainer_node_pool](https://registry.ter
 | `kms_key_state` | (Output) Availability of the Cloud KMS CryptoKey. If not KEY_AVAILABLE, then nodes may go offline as they cannot access their local data. This can be caused by a lack of permissions to use the key, or if the key is disabled or deleted. | false | false | Output-only field indicating key status, no security impact. | None | None |
 
 ### node_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `labels` | The Kubernetes node labels. | false | true | Node labels enable proper workload placement, security zoning, and resource management based on security requirements. | security-zone=restricted, environment=production | Missing security labels or incorrect labeling that could lead to improper workload placement |
