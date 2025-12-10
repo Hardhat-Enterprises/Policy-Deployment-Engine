@@ -3,9 +3,9 @@
 # Prams
 
 resource "google_discovery_engine_data_connector" "nc" {
+  collection_id                = "nc"
   project                      = "735927692082"
   location                     = "eu"
-  collection_id                = "nc"
   collection_display_name      = "tf-c-dataconnector"
   data_source                  = "nc-datasource"
   params = {

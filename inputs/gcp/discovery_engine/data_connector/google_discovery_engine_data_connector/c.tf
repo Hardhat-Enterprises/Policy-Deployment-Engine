@@ -3,9 +3,9 @@
 # Data source
 
 resource "google_discovery_engine_data_connector" "c" {
+  collection_id                = "c"
   project                      = "735927692082"
   location                     = "eu"
-  collection_id                = "c"
   collection_display_name      = "tf-c-dataconnector"
   data_source                  = "servicenow"
   params = {
