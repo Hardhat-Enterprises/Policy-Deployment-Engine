@@ -1,5 +1,5 @@
 package terraform.gcp.security.integration_connectors.google_integration_connectors_managed_zone.managed_zone
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.integration_connectors.google_integration_connectors_managed_zone.vars
 
 conditions := [[

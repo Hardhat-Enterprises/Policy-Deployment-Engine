@@ -1,6 +1,6 @@
 package terraform.gcp.security.cloud_storage.google_storage_default_object_acl.public_access_prevention
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.cloud_storage.google_storage_default_object_acl.vars
 
 conditions := [

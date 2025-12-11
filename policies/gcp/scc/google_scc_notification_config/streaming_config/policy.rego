@@ -1,6 +1,6 @@
 package terraform.gcp.security.scc.google_scc_notification_config.streaming_config
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.scc.google_scc_notification_config.vars
 
 conditions := [

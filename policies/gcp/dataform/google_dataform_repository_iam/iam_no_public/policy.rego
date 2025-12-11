@@ -1,6 +1,6 @@
 package terraform.gcp.security.dataform.google_dataform_repository_iam.iam_no_public
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.dataform.google_dataform_repository_iam as repo
 
 # Disallow public principals on repository IAM bindings

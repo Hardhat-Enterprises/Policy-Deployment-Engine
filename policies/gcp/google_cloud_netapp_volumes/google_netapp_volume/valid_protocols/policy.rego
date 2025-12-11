@@ -1,5 +1,5 @@
 package terraform.gcp.security.google_cloud_netapp_volumes.google_netapp_volume.valid_protocols  
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.google_cloud_netapp_volumes.google_netapp_volume.vars
 
 

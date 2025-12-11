@@ -1,6 +1,6 @@
 package terraform.gcp.security.firestore_database.location_id
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.firestore.firestore_database.vars
 
 conditions := [

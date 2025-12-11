@@ -1,6 +1,6 @@
 package terraform.gcp.security.lustre.lustre_instance.allowed_vpc_network
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.lustre.lustre_instance.vars
 
 conditions := [
