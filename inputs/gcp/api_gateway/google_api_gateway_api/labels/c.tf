@@ -6,6 +6,6 @@ resource "google_api_gateway_api" "c" {
     environment = "production"
     owner       = "team-a"
     sensitivity = "restricted"
-    cost_center = "cc-1234"
+    cost_center = "ENG-001"
   }
 }

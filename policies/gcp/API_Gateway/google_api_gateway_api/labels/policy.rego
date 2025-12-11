@@ -1,5 +1,5 @@
 package terraform.gcp.security.api_gateway.google_api_gateway_api.labels
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.api_gateway.google_api_gateway_api.vars
 
 # Security-oriented required labels
@@ -14,6 +14,7 @@ required_label_keys := [
 allowed_values := {
   "environment" : ["production", "staging", "qa", "development"],
   "sensitivity": ["public", "internal", "confidential", "restricted"],
+  "cost_center": ["FIN-001", "ENG-001", "SEC-001", "MKT-001", "HR-001", "IT-001"]
 }
 
 # Build the presence checks (non-empty)
@@ -47,10 +48,12 @@ value_conditions := [
       "values": allowed_values[k]
     }
   ] |
-    k := {"environment", "sensitivity"}[_]
+    k := {"environment", "sensitivity", "cost_center"}[_]
 ]
 
 conditions := array.concat(presence_conditions, value_conditions)
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details

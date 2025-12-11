@@ -1,5 +1,5 @@
 package terraform.gcp.security.api_gateway.google_api_gateway_api_config_iam_member.member
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.api_gateway.google_api_gateway_api_config_iam_member.vars
 
 conditions := [
@@ -11,7 +11,21 @@ conditions := [
     {
       "condition": "member must NOT be public/broad",
       "attribute_path": ["member"],
-      "values":["allUsers", "allAuthenticatedUsers"],
+      "values":["allUsers"],
+      "policy_type": "blacklist"
+    }
+  ],
+  [
+    {
+      "situation_description": "Domain-wide grants are not allowed",
+      "remedies": [
+        "Replace domain: principals with explicit user:/group: members"
+      ]
+    },
+    {
+      "condition": "member must not be domain-scoped",
+      "attribute_path": ["member"],
+      "values": ["domain:example.com"],
       "policy_type": "blacklist"
     }
   ]

@@ -11,7 +11,21 @@ conditions := [
     {
       "condition": "member must NOT be public/broad",
       "attribute_path": ["members"],
-      "values":["allUsers", "allAuthenticatedUsers"],
+      "values":["allUsers"],
+      "policy_type": "blacklist"
+    }
+  ],
+  [
+    {
+      "situation_description": "Domain-wide grants are not allowed",
+      "remedies": [
+        "Replace domain: principals with explicit user:/group: members"
+      ]
+    },
+    {
+      "condition": "member must not be domain-scoped",
+      "attribute_path": ["member"],
+      "values": ["domain:example.com"],
       "policy_type": "blacklist"
     }
   ]

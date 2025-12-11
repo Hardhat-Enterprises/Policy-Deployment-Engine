@@ -1,5 +1,5 @@
 package terraform.gcp.security.api_gateway.google_api_gateway_api_config_iam_policy.member
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.api_gateway.google_api_gateway_api_config_iam_policy.vars
 
 conditions := [
@@ -12,6 +12,18 @@ conditions := [
       "condition": "policy_data must NOT include allUsers",
       "attribute_path": ["policy_data"],
       "values": ["{\"bindings\":[{\"members\":[\"allUsers\"],\"role\":\"roles/apigateway.viewer\"}]}"],
+      "policy_type": "blacklist"
+    }
+  ],
+  [
+    {
+      "situation_description": "IAM policy contains public or overly-broad principals",
+      "remedies": ["Remove granting high privilege roles for allAuthenticatedUsers" ]
+    },
+    {
+      "condition": "policy_data must NOT grant high privilege roles for allAuthenticatedUsers",
+      "attribute_path": ["policy_data"],
+      "values": ["{\"bindings\":[{\"members\":[\"allAuthenticatedUsers\"],\"role\":\"roles/owner\"}]}"],
       "policy_type": "blacklist"
     }
   ]
