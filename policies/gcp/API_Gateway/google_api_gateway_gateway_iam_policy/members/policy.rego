@@ -17,14 +17,14 @@ conditions := [
   ],
   [
     {
-      "situation_description": "IAM policy contains public or overly-broad principals",
+      "situation_description": "IAM policy contains public or overly-broad roles for allAuthenticatedUsers",
       "remedies": ["Remove granting high privilege roles for allAuthenticatedUsers" ]
     },
     {
       "condition": "policy_data must NOT include allUsers",
       "attribute_path": ["policy_data"],
-      "values": ["{\"bindings\":[{\"members\":[\"allAuthenticatedUsers\"], \"role\":\"roles/*\"", [["apigateway.admin", "owner", "editor"]]], 
-      "policy_type": "pattern blacklist"
+      "values": ["{\"bindings\":[{\"members\":[\"allAuthenticatedUsers\"],\"role\":\"roles/owner\"}]}"],
+      "policy_type": "blacklist"
     }
   ]
 ]

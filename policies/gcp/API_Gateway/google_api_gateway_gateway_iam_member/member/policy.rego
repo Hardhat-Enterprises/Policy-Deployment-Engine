@@ -1,5 +1,5 @@
 package terraform.gcp.security.api_gateway.google_api_gateway_gateway_iam_member.member
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.api_gateway.google_api_gateway_gateway_iam_member.vars
 
 conditions := [

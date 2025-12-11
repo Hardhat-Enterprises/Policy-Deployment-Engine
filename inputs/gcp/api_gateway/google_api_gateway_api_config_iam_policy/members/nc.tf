@@ -1,4 +1,4 @@
-data "google_iam_policy" "nc" {
+data "google_iam_policy" "nc1" {
   provider = google-beta
   binding {
     role = "roles/apigateway.viewer"
@@ -8,9 +8,26 @@ data "google_iam_policy" "nc" {
   }
 }
 
-resource "google_api_gateway_api_config_iam_policy" "nc" {
+data "google_iam_policy" "nc2" {
+  provider = google-beta
+  binding {
+    role = "roles/apigateway.admin"
+    members = [
+      "allAuthenticatedUsers",
+    ]
+  }
+}
+
+resource "google_api_gateway_api_config_iam_policy" "nc1" {
   provider    = google-beta
-  api         = "nc"
-  api_config  = "nc"
-  policy_data = data.google_iam_policy.nc.policy_data
+  api         = "nc1"
+  api_config  = "nc1"
+  policy_data = data.google_iam_policy.nc1.policy_data
+}
+
+resource "google_api_gateway_api_config_iam_policy" "nc2" {
+  provider    = google-beta
+  api         = "nc2"
+  api_config  = "nc2"
+  policy_data = data.google_iam_policy.nc2.policy_data
 }
