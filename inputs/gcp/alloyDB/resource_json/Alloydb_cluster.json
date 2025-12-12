@@ -1,0 +1,93 @@
+{
+  "resource_name": "google_alloydb_cluster",
+  "subcategory": "AlloyDB",
+  "arguments": {
+    "cluster_id": {
+      "description": "The ID of the cluster to create.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Identifier only; no direct security impact.",
+      "compliant": "team-payments-cluster-a",
+      "non-compliant": null,
+      "parent": null
+    },
+    "network": {
+      "description": "VPC self_link hosting the cluster.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Controls reachable network plane.",
+      "compliant": "projects/proj/global/networks/prod-vpc",
+      "non-compliant": "default",
+      "parent": null
+    },
+    "continuous_backup_config": {
+      "description": "Controls PITR and backup retention.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Backups are critical for recovery and ransomware resilience.",
+      "compliant": "enabled with retention ≥ 7 days",
+      "non-compliant": "disabled or retention 0",
+      "parent": null,
+      "arguments": {
+        "enabled": {
+          "description": "Enables continuous backup.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Enables PITR.",
+          "compliant": true,
+          "non-compliant": false,
+          "parent": "continuous_backup_config"
+        },
+        "recovery_window_seconds": {
+          "description": "Retention window for PITR in seconds.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Longer window improves recovery options.",
+          "compliant": 604800,
+          "non-compliant": 0,
+          "parent": "continuous_backup_config"
+        },
+        "encryption_config": {
+          "description": "CMEK for continuous backup.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Ensures backups use customer-managed keys.",
+          "compliant": "See kms_key_name child.",
+          "non-compliant": "Not set when policy requires CMEK.",
+          "parent": "continuous_backup_config",
+          "arguments": {
+            "kms_key_name": {
+              "description": "KMS key resource for backup encryption.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "CMEK aligns with enterprise key governance.",
+              "compliant": "projects/p/locations/us-central1/keyRings/kr/cryptoKeys/key",
+              "non-compliant": "",
+              "parent": "encryption_config"
+            }
+          }
+        }
+      }
+    },
+    "encryption_config": {
+      "description": "CMEK for cluster storage.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Encrypts data at rest with customer keys.",
+      "compliant": "Refer to kms_key_name child.",
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "kms_key_name": {
+          "description": "KMS key resource for cluster encryption.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "CMEK under enterprise control.",
+          "compliant": "projects/p/locations/us-central1/keyRings/kr/cryptoKeys/key",
+          "non-compliant": "",
+          "parent": "encryption_config"
+        }
+      }
+    }
+  }
+}
