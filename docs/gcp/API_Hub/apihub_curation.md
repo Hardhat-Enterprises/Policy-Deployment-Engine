@@ -6,7 +6,8 @@ Reference: [Terraform Registry – apihub_curation](https://registry.terraform.i
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `display_name` | The display name of the curation. | true | false | None | None | None |
@@ -18,11 +19,13 @@ Reference: [Terraform Registry – apihub_curation](https://registry.terraform.i
 | `application_integration_endpoint_details` |  | true | false | Arguments inside may impact security | None | None |
 
 ### endpoint Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `application_integration_endpoint_details` | The details of the Application Integration endpoint to be triggered for curation. Structure is [documented below](#nested_endpoint_application_integration_endpoint_details). | true | false | Controls workflow routing for API metadata. | None | None |
 
 ### application_integration_endpoint_details Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `trigger_id` | The API trigger ID of the Application Integration workflow. | true | true | Trigger IDs must follow strict naming conventions to prevent routing to unauthorized workflows. | ['api_trigger/curation_API_PDE_1', 'api_trigger/curation_API_PDE_2', 'api_trigger/curation_API_PDE_3'] | ['RANDOM_9999', 'api_trigger/aaaa', ''] |

@@ -6,7 +6,8 @@ Reference: [Terraform Registry – model_armor_template](https://registry.terraf
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `filter_config` | Filters configuration. Structure is [documented below](#nested_filter_config). | true | true | Controls which filters (malicious URI, Responsible AI, sensitive data, prompt-injection) are active. Misconfiguration could allow harmful or sensitive data to pass unchecked. | Properly configured filters covering all required categories. | Filters disabled or missing critical protections. |
@@ -25,6 +26,7 @@ Reference: [Terraform Registry – model_armor_template](https://registry.terraf
 | `multi_language_detection` |  | false | false | None | None | None |
 
 ### filter_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `malicious_uri_filter_settings` | Malicious URI filter settings. Structure is [documented below](#nested_filter_config_malicious_uri_filter_settings). | false | true | Prevents injection of malicious URLs. Disabling increases phishing or malware risk. | filter_enforcement set to ENABLED. | filter_enforcement set to DISABLED. |
@@ -33,6 +35,7 @@ Reference: [Terraform Registry – model_armor_template](https://registry.terraf
 | `pi_and_jailbreak_filter_settings` | Prompt injection and Jailbreak Filter settings. Structure is [documented below](#nested_filter_config_pi_and_jailbreak_filter_settings). | false | true | Blocks attempts to override safeguards or exfiltrate data via prompt injection. | filter_enforcement set to ENABLED. | filter_enforcement set to DISABLED. |
 
 ### template_metadata Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `log_template_operations` | If true, log template crud operations. | false | false | None | None | None |
@@ -46,45 +49,53 @@ Reference: [Terraform Registry – model_armor_template](https://registry.terraf
 | `enforcement_type` | Possible values: INSPECT_ONLY INSPECT_AND_BLOCK | false | false | None | None | None |
 
 ### malicious_uri_filter_settings Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `filter_enforcement` | Tells whether the Malicious URI filter is enabled or disabled. Possible values: ENABLED DISABLED | false | false | None | None | None |
 
 ### rai_settings Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `rai_filters` | List of Responsible AI filters enabled for template. Structure is [documented below](#nested_filter_config_rai_settings_rai_filters). | true | false | None | None | None |
 
 ### rai_filters Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `filter_type` | Possible values: SEXUALLY_EXPLICIT HATE_SPEECH HARASSMENT DANGEROUS | true | true | Specifies which harmful content categories to filter. Omitting critical categories can allow unsafe output. | Includes all required categories (e.g., SEXUALLY_EXPLICIT, HATE_SPEECH, HARASSMENT, DANGEROUS). | Missing any mandated category or set incorrectly. |
 | `confidence_level` | Possible values: LOW_AND_ABOVE MEDIUM_AND_ABOVE HIGH | false | true | Determines sensitivity of detection. Too low can allow harmful content through; too high can overblock legitimate content. | Configured to MEDIUM_AND_ABOVE or higher per policy. | LOW_ONLY |
 
 ### sdp_settings Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `advanced_config` | Sensitive Data Protection Advanced configuration. Structure is [documented below](#nested_filter_config_sdp_settings_advanced_config). | false | false | None | None | None |
 | `basic_config` | Sensitive Data Protection basic configuration. Structure is [documented below](#nested_filter_config_sdp_settings_basic_config). | false | false | None | None | None |
 
 ### advanced_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `inspect_template` | Sensitive Data Protection inspect template resource name If only inspect template is provided (de-identify template not provided), then Sensitive Data Protection InspectContent action is performed during Sanitization. All Sensitive Data Protection findings identified during inspection will be returned as SdpFinding in SdpInsepctionResult. e.g:- `projects/{project}/locations/{location}/inspectTemplates/{inspect_template}` | false | false | None | None | None |
 | `deidentify_template` | Optional Sensitive Data Protection Deidentify template resource name. If provided then DeidentifyContent action is performed during Sanitization using this template and inspect template. The De-identified data will be returned in SdpDeidentifyResult. Note that all info-types present in the deidentify template must be present in inspect template. e.g. `projects/{project}/locations/{location}/deidentifyTemplates/{deidentify_template}` | false | false | None | None | None |
 
 ### basic_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `filter_enforcement` | Tells whether the Sensitive Data Protection basic config is enabled or disabled. Possible values: ENABLED DISABLED | false | false | None | None | None |
 
 ### pi_and_jailbreak_filter_settings Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `filter_enforcement` | Tells whether Prompt injection and Jailbreak filter is enabled or disabled. Possible values: ENABLED DISABLED | false | false | None | None | None |
 | `confidence_level` | Possible values: LOW_AND_ABOVE MEDIUM_AND_ABOVE HIGH | false | false | None | None | None |
 
 ### multi_language_detection Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `enable_multi_language_detection` | If true, multi language detection will be enabled. | true | false | None | None | None |

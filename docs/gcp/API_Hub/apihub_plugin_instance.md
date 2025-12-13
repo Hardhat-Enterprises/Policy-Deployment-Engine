@@ -6,7 +6,8 @@ Reference: [Terraform Registry – apihub_plugin_instance](https://registry.terr
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `display_name` | The display name for this plugin instance. Max length is 255 characters. | true | false | Display name. No security relevance. | None | None |
@@ -28,6 +29,7 @@ Reference: [Terraform Registry – apihub_plugin_instance](https://registry.terr
 | `client_secret` |  | true | false | Parent | None | None |
 
 ### actions Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `hub_instance_action` | (Output) The execution status for the plugin instance. Structure is [documented below](#nested_actions_actions_hub_instance_action). | true | false | Arguments inside could be security relevant however. | None | None |
@@ -44,6 +46,7 @@ Reference: [Terraform Registry – apihub_plugin_instance](https://registry.terr
 | `end_time` | (Output) The last execution end time of the plugin instance. | false | false | None | None | None |
 
 ### auth_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `google_service_account_config` | Config for Google service account authentication. Structure is [documented below](#nested_auth_config_google_service_account_config). | false | false | Parameter, not security related. | None | None |
@@ -53,33 +56,39 @@ Reference: [Terraform Registry – apihub_plugin_instance](https://registry.terr
 | `auth_type` | Possible values: AUTH_TYPE_UNSPECIFIED NO_AUTH GOOGLE_SERVICE_ACCOUNT USER_PASSWORD API_KEY OAUTH2_CLIENT_CREDENTIALS | true | true | Controls authentication methods. | ['USER_PASSWORD', 'OAUTH2_CLIENT_CREDENTIALS'] | ['NO_AUTH', 'Anything else'] |
 
 ### curation_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `custom_curation` | Custom curation information for this plugin instance. Structure is [documented below](#nested_actions_actions_curation_config_custom_curation). | false | false | Configuration settings. Not security relevant. | None | None |
 | `curation_type` | Possible values: CURATION_TYPE_UNSPECIFIED DEFAULT_CURATION_FOR_API_METADATA CUSTOM_CURATION_FOR_API_METADATA | true | false | Configuration settings. Not security relevant. | None | None |
 
 ### custom_curation Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `curation` | The unique name of the curation resource. This will be the name of the curation resource in the format: `projects/{project}/locations/{location}/curations/{curation}` | true | false | Unique name. Not security relevant. | None | None |
 
 ### google_service_account_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `service_account` | The service account to be used for authenticating request. The `iam.serviceAccounts.getAccessToken` permission should be granted on this service account to the impersonator service account. | true | true | Misconfigured or over-privileged service accounts are a major security risk. | None | None |
 
 ### user_password_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `username` | Username. | true | true | Potentially security relevant. Credentials-relevant. | None | None |
 | `password` | Secret provides a reference to entries in Secret Manager. Structure is [documented below](#nested_auth_config_user_password_config_password). | true | true | Potentially security relevant. Credentials-relevant and related to secrets manager. | None | None |
 
 ### password Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `secret_version` | The resource name of the secret version in the format, format as: `projects/*/secrets/*/versions/*`. | true | true | Potentiall security relevant, points to the location where secrets are stored. | None | None |
 
 ### api_key_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `name` | The parameter name of the API key. E.g. If the API request is "https://example.com/act?api_key=", "api_key" would be the parameter name. | true | false | Name of API key. Not security relevant. | None | None |
@@ -87,17 +96,20 @@ Reference: [Terraform Registry – apihub_plugin_instance](https://registry.terr
 | `http_element_location` | The location of the API key. The default value is QUERY. Possible values: HTTP_ELEMENT_LOCATION_UNSPECIFIED QUERY HEADER PATH BODY COOKIE | true | false | Not a secret, just a config. | None | None |
 
 ### api_key Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `secret_version` | The resource name of the secret version in the format, format as: `projects/*/secrets/*/versions/*`. | true | true | Potentially security relevant, points to the location where secrets are stored. | None | None |
 
 ### oauth2_client_credentials_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `client_secret` | Secret provides a reference to entries in Secret Manager. Structure is [documented below](#nested_auth_config_oauth2_client_credentials_config_client_secret). | true | true | Potentially security relevant, points to the location where secrets are stored. | None | None |
 | `client_id` | The client identifier. | true | true | Could be used to pair with secrets in auth if compromised. Potentially security relevant. | None | None |
 
 ### client_secret Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `secret_version` | The resource name of the secret version in the format, format as: `projects/*/secrets/*/versions/*`. | true | true | Could be security relevant. Points to secrets. | None | None |

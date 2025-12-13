@@ -6,7 +6,8 @@ Reference: [Terraform Registry – netapp_volume_snapshot](https://registry.terr
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `location` | Region where the snapshot is created. | true | true | Residency/compliance. | australia-southeast2 | us-central1 |
