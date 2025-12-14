@@ -16,6 +16,42 @@ conditions := [
         "values": ["OAUTH_PASSWORD_GRANT"],
         "policy_type": "whitelist"
       }
+    ],
+    [
+    {
+        "situation_description": "Is the static_ip_enabled set correctly",
+        "remedies": ["Ensure that it is set to the correct static_ip_enabled"]
+        },
+      {
+        "condition": "static_ip_enabled is misconfigured",
+        "attribute_path": ["params", 0, "static_ip_enabled"],
+        "values": ["false"],
+        "policy_type": "whitelist"
+      }
+    ],
+    [
+    {
+        "situation_description": "Is the client_id set correctly",
+        "remedies": ["Ensure that it is set to the correct client_id"]
+        },
+      {
+        "condition": "client_id is misconfigured",
+        "attribute_path": ["params", 0, "client_id"],
+        "values": ["VALID-ID"],
+        "policy_type": "whitelist"
+      }
+    ],
+    [
+    {
+        "situation_description": "Is the user_account set correctly",
+        "remedies": ["Ensure that it is set to the correct user_account"]
+        },
+      {
+        "condition": "parms is misconfigured",
+        "attribute_path": ["params", 0, "user_account"],
+        "values": ["Validuser@google.com"],
+        "policy_type": "whitelist"
+      }
     ]
 
 ]
