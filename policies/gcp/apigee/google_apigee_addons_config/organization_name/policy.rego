@@ -18,7 +18,7 @@ conditions := [
             "attribute_path": ["org"],
 
             # Allow only org names that match this pattern
-            "values": ["PDE-*"],
+            "values": ["PDE-*",["a-z"]],
 
             "policy_type": "pattern whitelist"
         }
