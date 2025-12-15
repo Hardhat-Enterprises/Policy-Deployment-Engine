@@ -1,6 +1,6 @@
 package terraform.gcp.security.apigee.google_apigee_addons_config.organization_name
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.apigee.google_apigee_addons_config.vars
 
 conditions := [
