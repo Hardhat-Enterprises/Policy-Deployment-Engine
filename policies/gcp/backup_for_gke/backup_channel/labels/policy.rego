@@ -1,0 +1,17 @@
+package terraform.gcp.security.backup_for_gke.backup_channel.labels
+
+import rego.v1
+import data.terraform.gcp.security.backup_for_gke.backup_channel.vars
+import data.terraform.helpers.policies.whitelist
+
+# Required labels must be present
+violations := whitelist.get_violations(
+    vars.variables,
+    ["labels", "environment"],
+    ["prod", "staging", "dev"]
+)
+
+message := [m | 
+    some violation in violations
+    m := violation.message
+]
