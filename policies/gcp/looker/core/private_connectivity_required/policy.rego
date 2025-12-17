@@ -1,7 +1,7 @@
 # policies/gcp/looker/core/private_connectivity_required/policy.rego
 package terraform.gcp.security.looker.core.private_connectivity_required
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.looker.core.vars
 
 # Policy intent:

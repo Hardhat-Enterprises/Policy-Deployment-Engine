@@ -1,6 +1,6 @@
 package terraform.gcp.security.identity_aware_proxy.google_iap_web_cloud_run_service_iam.cloud_run_service_name
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.identity_aware_proxy.google_iap_web_cloud_run_service_iam as vars
 
 # 1) Block sensitive admin consoles

@@ -1,6 +1,6 @@
 package terraform.gcp.security.cloud_storage.google_storage_bucket_acl.role_entity_required
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.cloud_storage.google_storage_bucket_acl.vars
 
 conditions := [

@@ -1,5 +1,5 @@
 package terraform.gcp.security.deploy.delivery_pipeline_iam_member.prohibited_member
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.deploy.delivery_pipeline_iam_member.vars
 
 conditions := [

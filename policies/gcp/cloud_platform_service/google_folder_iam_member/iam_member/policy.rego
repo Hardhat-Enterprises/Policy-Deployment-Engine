@@ -1,5 +1,5 @@
 package terraform.gcp.security.cloud_platform_service.google_folder_iam_member.iam_member
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.cloud_platform_service.google_folder_iam_member.vars
 
 conditions := [

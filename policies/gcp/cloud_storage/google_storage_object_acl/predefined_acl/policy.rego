@@ -1,6 +1,6 @@
 package terraform.gcp.security.cloud_storage.google_storage_object_acl.predefined_acl
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.cloud_storage.google_storage_object_acl.vars
 
 conditions := [

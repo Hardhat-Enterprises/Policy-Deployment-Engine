@@ -1,5 +1,5 @@
 package terraform.gcp.security.gke_hub.google_gke_hub_feature.fleet_logging_default_mode_required
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.gke_hub.google_gke_hub_feature.vars
 
 conditions := [[
