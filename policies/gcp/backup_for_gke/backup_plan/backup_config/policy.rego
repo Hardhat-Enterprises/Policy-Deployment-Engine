@@ -4,7 +4,7 @@ import rego.v1
 import data.terraform.gcp.security.backup_for_gke.backup_plan.vars
 import data.terraform.helpers.policies.blacklist
 
-# Backup config must not be empty
+# Backup config must not be empty or null
 violations := blacklist.get_violations(
     vars.variables,
     ["backup_config"],
