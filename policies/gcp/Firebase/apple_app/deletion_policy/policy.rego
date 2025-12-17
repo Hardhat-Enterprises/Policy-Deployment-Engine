@@ -1,5 +1,5 @@
 package terraform.gcp.security.Firebase.apple_app.deletion_policy
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.Firebase.apple_app.vars
 
 conditions := [

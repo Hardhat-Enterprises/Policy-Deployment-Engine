@@ -1,6 +1,6 @@
 package terraform.gcp.security.google_cloud_netapp_volumes.google_netapp_backup.approved_vault_name
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.google_cloud_netapp_volumes.google_netapp_backup.vars
 
 conditions := [

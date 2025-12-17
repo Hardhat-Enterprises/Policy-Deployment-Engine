@@ -1,5 +1,5 @@
 package terraform.gcp.security.deploy.deploy_policy.suspended_check
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.deploy.deploy_policy.vars
 
 conditions := [

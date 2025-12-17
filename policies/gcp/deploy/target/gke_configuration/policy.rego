@@ -1,5 +1,5 @@
 package terraform.gcp.security.deploy.target.gke_configuration
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.deploy.target.vars
 
 conditions := [
