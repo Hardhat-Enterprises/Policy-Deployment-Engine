@@ -6,7 +6,8 @@ Reference: [Terraform Registry – managed_kafka_acl](https://registry.terraform
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `acl_entries` | The acl entries that apply to the resource pattern. The maximum number of allowed entries is 100. Structure is [documented below](#nested_acl_entries). | true | true | ACLs are used to control access to Kafka resources, ensuring that only authorized users can perform specific operations. Properly configured ACLs help maintain the security and integrity of the Kafka environment by preventing unauthorized access and potential data breaches. | ['User:specific-user@project.iam.gserviceaccount.com', 'permission_type: ALLOW', 'operation: READ or WRITE'] | ['User:*', 'permission_type: ALLOW', 'operation: ALL'] |
@@ -16,6 +17,7 @@ Reference: [Terraform Registry – managed_kafka_acl](https://registry.terraform
 | `project` | If it is not provided, the provider project is used. | false | false | Project identifier used for resource scoping; does not define security posture of the resource. | none | none |
 
 ### acl_entries Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `principal` | The principal. Specified as Google Cloud account, with the Kafka StandardAuthorizer prefix User:". For example: "User:test-kafka-client@test-project.iam.gserviceaccount.com". Can be the wildcard "User:*" to refer to all users. | true | true | Specifying the principal is crucial for defining who has access to Kafka resources. Using specific user accounts enhances security by limiting access to authorized individuals, while using wildcards can expose resources to unauthorized access. | ['User:app-client@project.iam.gserviceaccount.com'] | ['User:*'] |

@@ -1,6 +1,6 @@
 package terraform.gcp.security.service_networking.network
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.service_networking.network.vars
 
 allowed_networks := vars.variables["allowed_networks"]

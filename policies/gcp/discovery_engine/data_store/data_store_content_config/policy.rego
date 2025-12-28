@@ -1,5 +1,5 @@
 package terraform.gcp.security.discovery_engine.data_store.data_store_content_config 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.discovery_engine.data_store.vars
 
 #Data_store_config

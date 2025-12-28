@@ -6,7 +6,8 @@ Reference: [Terraform Registry – netapp_backup](https://registry.terraform.io/
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `location` | Region of the backup resource. | true | true | Data residency and compliance. | australia-southeast2 | us-central1 |

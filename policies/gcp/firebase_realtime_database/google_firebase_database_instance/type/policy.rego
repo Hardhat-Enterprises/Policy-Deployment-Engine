@@ -1,5 +1,5 @@
 package terraform.gcp.security.firebase_realtime_database.google_firebase_database_instance.type 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.firebase_realtime_database.google_firebase_database_instance.vars
 
 conditions := [

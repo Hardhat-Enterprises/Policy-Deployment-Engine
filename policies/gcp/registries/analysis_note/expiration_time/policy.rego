@@ -1,6 +1,6 @@
 package terraform.gcp.security.analysis_note.expiration_time
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.analysis_note.expiration_time.vars
 
 conditions := [
