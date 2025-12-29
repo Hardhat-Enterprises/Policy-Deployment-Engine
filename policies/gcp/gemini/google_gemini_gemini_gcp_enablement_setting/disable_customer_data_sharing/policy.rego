@@ -1,6 +1,6 @@
 package terraform.gcp.security.gemini.google_gemini_gemini_gcp_enablement_setting.disable_customer_data_sharing
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.gemini.google_gemini_gemini_gcp_enablement_setting.vars
 
 conditions := [

@@ -1,6 +1,5 @@
 package terraform.gcp.security.gemini.google_gemini_code_repository_index.use_org_kms_key
-
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.gemini.google_gemini_code_repository_index.vars
 
 conditions := [
