@@ -6,7 +6,8 @@ Reference: [Terraform Registry – netapp_volume](https://registry.terraform.io/
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `share_name` | Share name (SMB) or export path (NFS) of the volume. Needs to be unique per location. | true | false | None | None | None |
@@ -40,17 +41,20 @@ Reference: [Terraform Registry – netapp_volume](https://registry.terraform.io/
 | `monthly_schedule` |  | false | false | None | None | None |
 
 ### export_policy Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `rules` | Export rules (up to 5) control NFS volume access. Structure is [documented below](#nested_export_policy_rules). | true | false | None | None | None |
 
 ### restore_parameters Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `source_snapshot` | Full name of the snapshot to use for creating this volume. `source_snapshot` and `source_backup` cannot be used simultaneously. Format: `projects/{{project}}/locations/{{location}}/volumes/{{volume}}/snapshots/{{snapshot}}`. | false | false | None | None | None |
 | `source_backup` | Full name of the backup to use for creating this volume. `source_snapshot` and `source_backup` cannot be used simultaneously. Format: `projects/{{project}}/locations/{{location}}/backupVaults/{{backupVaultId}}/backups/{{backup}}`. | false | false | None | None | None |
 
 ### snapshot_policy Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `enabled` | Enables automated snapshot creation according to defined schedule. Default is false. To disable automatic snapshot creation you have to remove the whole snapshot_policy block. | false | false | None | None | None |
@@ -60,6 +64,7 @@ Reference: [Terraform Registry – netapp_volume](https://registry.terraform.io/
 | `monthly_schedule` | Monthly schedule policy. Structure is [documented below](#nested_snapshot_policy_monthly_schedule). | false | false | None | None | None |
 
 ### backup_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `backup_policies` | Specify a single backup policy ID for scheduled backups. Format: `projects/{{projectId}}/locations/{{location}}/backupPolicies/{{backupPolicyName}}` | false | false | None | None | None |
@@ -67,6 +72,7 @@ Reference: [Terraform Registry – netapp_volume](https://registry.terraform.io/
 | `scheduled_backup_enabled` | When set to true, scheduled backup is enabled on the volume. Omit if no backup_policy is specified. | false | false | None | None | None |
 
 ### tiering_policy Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `cooling_threshold_days` | Optional. Time in days to mark the volume's data block as cold and make it eligible for tiering, can be range from 2-183. Default is 31. | false | false | None | None | None |
@@ -74,6 +80,7 @@ Reference: [Terraform Registry – netapp_volume](https://registry.terraform.io/
 | `hot_tier_bypass_mode_enabled` | , [Beta](https://terraform.io/docs/providers/google/guides/provider_versions.html)) Optional. Flag indicating that the hot tier bypass mode is enabled. Default is false. Only applicable to Flex service level. | false | false | None | None | None |
 
 ### hybrid_replication_parameters Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `replication` | Required. Desired name for the replication of this volume. | false | false | None | None | None |
@@ -86,6 +93,7 @@ Reference: [Terraform Registry – netapp_volume](https://registry.terraform.io/
 | `labels` | Optional. Labels to be added to the replication as the key value pairs. An object containing a list of "key": value pairs. Example: { "name": "wrench", "mass": "1.3kg", "count": "3" }. | false | false | None | None | None |
 
 ### rules Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `allowed_clients` | Defines the client ingress specification (allowed clients) as a comma separated list with IPv4 CIDRs or IPv4 host addresses. | false | false | None | None | None |
@@ -101,12 +109,14 @@ Reference: [Terraform Registry – netapp_volume](https://registry.terraform.io/
 | `kerberos5p_read_write` | If enabled (true) the rule defines read and write access for clients matching the 'allowedClients' specification. It enables nfs clients to mount using 'privacy' kerberos security mode. The 'kerberos5pReadOnly' value is ignored if this is enabled. | false | false | None | None | None |
 
 ### hourly_schedule Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `snapshots_to_keep` | The maximum number of snapshots to keep for the hourly schedule. | true | false | None | None | None |
 | `minute` | Set the minute of the hour to create the snapshot (0-59), defaults to the top of the hour (0). | false | false | None | None | None |
 
 ### daily_schedule Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `snapshots_to_keep` | The maximum number of snapshots to keep for the daily schedule. | true | false | None | None | None |
@@ -114,6 +124,7 @@ Reference: [Terraform Registry – netapp_volume](https://registry.terraform.io/
 | `hour` | Set the hour to create the snapshot (0-23), defaults to midnight (0). | false | false | None | None | None |
 
 ### weekly_schedule Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `snapshots_to_keep` | The maximum number of snapshots to keep for the weekly schedule. | true | false | None | None | None |
@@ -122,6 +133,7 @@ Reference: [Terraform Registry – netapp_volume](https://registry.terraform.io/
 | `day` | Set the day or days of the week to make a snapshot. Accepts a comma separated days of the week. Defaults to 'Sunday'. | false | false | None | None | None |
 
 ### monthly_schedule Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `snapshots_to_keep` | The maximum number of snapshots to keep for the monthly schedule | true | false | None | None | None |

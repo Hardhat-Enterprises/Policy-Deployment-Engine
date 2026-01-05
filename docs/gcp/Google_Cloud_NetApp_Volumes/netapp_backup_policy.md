@@ -6,7 +6,8 @@ Reference: [Terraform Registry – netapp_backup_policy](https://registry.terraf
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `daily_backup_limit` | Number of daily backups to retain (minimum 2). | true | true | Defines baseline retention to support recovery objectives. | 7 | 1 |

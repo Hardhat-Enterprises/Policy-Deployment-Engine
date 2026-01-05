@@ -6,7 +6,8 @@ Reference: [Terraform Registry – firebase_data_connect_service](https://regist
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `location` | The region in which the service resides, e.g. "us-central1" or "asia-east1". | true | false | The location attribute determines the physical region where the service is deployed. It does not directly affect security, but it may have compliance or data residency implications depending on organizational and regulatory requirements. | None | None |

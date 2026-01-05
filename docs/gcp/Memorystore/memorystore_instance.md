@@ -6,7 +6,8 @@ Reference: [Terraform Registry – memorystore_instance](https://registry.terraf
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `shard_count` | Required. Number of shards for the instance. | true | false | None | None | None |
@@ -42,12 +43,14 @@ Reference: [Terraform Registry – memorystore_instance](https://registry.terraf
 | `secondary_instances` |  | false | false | None | None | None |
 
 ### automated_backup_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `fixed_frequency_schedule` | Trigger automated backups at a fixed frequency. Structure is [documented below](#nested_automated_backup_config_fixed_frequency_schedule). | true | false | None | None | None |
 | `retention` | How long to keep automated backups before the backups are deleted. The value should be between 1 day and 365 days. If not specified, the default value is 35 days. A duration in seconds with up to nine fractional digits, ending with 's'. Example: "3.5s". The default_value is "3024000s" | true | false | None | None | None |
 
 ### persistence_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `mode` | Optional. Current persistence mode. Possible values: DISABLED RDB AOF Possible values are: `DISABLED`, `RDB`, `AOF`. | false | false | None | None | None |
@@ -55,6 +58,7 @@ Reference: [Terraform Registry – memorystore_instance](https://registry.terraf
 | `aof_config` | Configuration for AOF based persistence. Structure is [documented below](#nested_persistence_config_aof_config). | false | false | None | None | None |
 
 ### maintenance_policy Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `create_time` | (Output) The time when the policy was created. A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits. | false | false | None | None | None |
@@ -62,12 +66,14 @@ Reference: [Terraform Registry – memorystore_instance](https://registry.terraf
 | `weekly_maintenance_window` | Optional. Maintenance window that is applied to resources covered by this policy. Minimum 1. For the current version, the maximum number of weekly_window is expected to be one. Structure is [documented below](#nested_maintenance_policy_weekly_maintenance_window). | false | false | None | None | None |
 
 ### zone_distribution_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `zone` | Optional. Defines zone where all resources will be allocated with SINGLE_ZONE mode. Ignored for MULTI_ZONE mode. | false | false | None | None | None |
 | `mode` | Optional. Current zone distribution mode. Defaults to MULTI_ZONE. Possible values: MULTI_ZONE SINGLE_ZONE Possible values are: `MULTI_ZONE`, `SINGLE_ZONE`. | false | false | None | None | None |
 
 ### cross_instance_replication_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `instance_role` | The instance role supports the following values: 1. `INSTANCE_ROLE_UNSPECIFIED`: This is an independent instance that has never participated in cross instance replication. It allows both reads and writes. 2. `NONE`: This is an independent instance that previously participated in cross instance replication(either as a `PRIMARY` or `SECONDARY` cluster). It allows both reads and writes. 3. `PRIMARY`: This instance serves as the replication source for secondary instance that are replicating from it. Any data written to it is automatically replicated to its secondary clusters. It allows both reads and writes. 4. `SECONDARY`: This instance replicates data from the primary instance. It allows only reads. Possible values are: `INSTANCE_ROLE_UNSPECIFIED`, `NONE`, `PRIMARY`, `SECONDARY`. | false | false | None | None | None |
@@ -77,21 +83,25 @@ Reference: [Terraform Registry – memorystore_instance](https://registry.terraf
 | `update_time` | (Output) The last time cross instance replication config was updated. | false | false | None | None | None |
 
 ### gcs_source Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `uris` | URIs of the GCS objects to import. Example: gs://bucket1/object1, gs://bucket2/folder2/object2 | true | false | None | None | None |
 
 ### managed_backup_source Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `backup` | Example: `projects/{project}/locations/{location}/backupCollections/{collection}/backups/{backup}`. | true | false | None | None | None |
 
 ### fixed_frequency_schedule Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `start_time` | The start time of every automated backup in UTC. It must be set to the start of an hour. This field is required. Structure is [documented below](#nested_automated_backup_config_fixed_frequency_schedule_start_time). | true | false | None | None | None |
 
 ### start_time Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `hours` | Hours of day in 24 hour format. Should be from 0 to 23. An API may choose to allow the value "24:00:00" for scenarios like business closing time. | false | false | None | None | None |
@@ -100,17 +110,20 @@ Reference: [Terraform Registry – memorystore_instance](https://registry.terraf
 | `nanos` | Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999. | false | false | None | None | None |
 
 ### rdb_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `rdb_snapshot_period` | Optional. Period between RDB snapshots. Possible values: ONE_HOUR SIX_HOURS TWELVE_HOURS TWENTY_FOUR_HOURS | false | false | None | None | None |
 | `rdb_snapshot_start_time` | Optional. Time that the first snapshot was/will be attempted, and to which future snapshots will be aligned. If not provided, the current time will be used. | false | false | None | None | None |
 
 ### aof_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `append_fsync` | Optional. The fsync mode. Possible values: NEVER EVERY_SEC ALWAYS | false | false | None | None | None |
 
 ### weekly_maintenance_window Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `day` | The day of week that maintenance updates occur. - DAY_OF_WEEK_UNSPECIFIED: The day of the week is unspecified. - MONDAY: Monday - TUESDAY: Tuesday - WEDNESDAY: Wednesday - THURSDAY: Thursday - FRIDAY: Friday - SATURDAY: Saturday - SUNDAY: Sunday Possible values are: `DAY_OF_WEEK_UNSPECIFIED`, `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`, `SUNDAY`. | true | false | None | None | None |
@@ -118,12 +131,14 @@ Reference: [Terraform Registry – memorystore_instance](https://registry.terraf
 | `start_time` | Start time of the window in UTC time. Structure is [documented below](#nested_maintenance_policy_weekly_maintenance_window_weekly_maintenance_window_start_time). | true | false | None | None | None |
 
 ### primary_instance Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `instance` | The full resource path of the primary instance in the format: projects/{project}/locations/{region}/instances/{instance-id} | false | false | None | None | None |
 | `uid` | (Output) The unique id of the primary instance. | false | false | None | None | None |
 
 ### secondary_instances Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `instance` | (Output) The full resource path of the secondary instance in the format: projects/{project}/locations/{region}/instance/{instance-id} | false | false | None | None | None |

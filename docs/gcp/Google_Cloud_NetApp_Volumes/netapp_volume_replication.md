@@ -6,7 +6,8 @@ Reference: [Terraform Registry – netapp_volume_replication](https://registry.t
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `replication_schedule` | Replication interval. | true | true | Controls RPO to meet policy (e.g., ≥ hourly). | EVERY_10_MINUTES | DAILY |
@@ -24,6 +25,7 @@ Reference: [Terraform Registry – netapp_volume_replication](https://registry.t
 | `tiering_policy` |  | false | false | None | None | None |
 
 ### destination_volume_parameters Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `storage_pool` | Name of an existing storage pool for the destination volume with format: `projects/{{project}}/locations/{{location}}/storagePools/{{poolId}}` | true | false | None | None | None |
@@ -33,6 +35,7 @@ Reference: [Terraform Registry – netapp_volume_replication](https://registry.t
 | `tiering_policy` | Tiering policy for the volume. Structure is [documented below](#nested_destination_volume_parameters_tiering_policy). | false | false | None | None | None |
 
 ### tiering_policy Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `cooling_threshold_days` | Optional. Time in days to mark the volume's data block as cold and make it eligible for tiering, can be range from 2-183. Default is 31. | false | false | None | None | None |

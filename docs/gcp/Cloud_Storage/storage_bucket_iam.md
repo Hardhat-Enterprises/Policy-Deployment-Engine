@@ -6,7 +6,8 @@ Reference: [Terraform Registry – storage_bucket_iam](https://registry.terrafor
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `bucket` | The storage bucket in GCP | true | false | References to the existing bucket | None | None |
