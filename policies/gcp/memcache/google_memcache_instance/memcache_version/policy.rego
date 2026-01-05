@@ -1,5 +1,5 @@
 package terraform.gcp.security.memcache.google_memcache_instance.memcache_version
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.memcache.google_memcache_instance.vars
 
 conditions := [

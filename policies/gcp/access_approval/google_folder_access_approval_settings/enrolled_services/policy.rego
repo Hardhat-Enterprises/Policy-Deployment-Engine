@@ -1,6 +1,6 @@
 package terraform.gcp.security.access_approval.google_folder_access_approval_settings.enrolled_services
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.access_approval.google_folder_access_approval_settings.vars
 
 conditions := [[

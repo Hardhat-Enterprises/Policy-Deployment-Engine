@@ -1,5 +1,5 @@
 package terraform.gcp.security.integration_connectors.google_integration_connectors_endpoint.service_attachment
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.integration_connectors.google_integration_connectors_endpoint.vars
 
 conditions := [[

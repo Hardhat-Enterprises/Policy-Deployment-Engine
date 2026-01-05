@@ -1,5 +1,5 @@
 package terraform.gcp.security.chronicle.data_access_scope.allowed_location
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.chronicle.data_access_scope.vars
 
 

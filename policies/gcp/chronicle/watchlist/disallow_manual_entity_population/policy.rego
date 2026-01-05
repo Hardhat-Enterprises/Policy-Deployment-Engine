@@ -1,6 +1,6 @@
 package terraform.gcp.security.chronicle.watchlist.disallow_manual_entity_population
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.chronicle.watchlist.vars
 
 conditions := [

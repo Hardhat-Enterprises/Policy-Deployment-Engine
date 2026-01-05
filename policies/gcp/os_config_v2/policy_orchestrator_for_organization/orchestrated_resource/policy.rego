@@ -1,5 +1,5 @@
 package terraform.gcp.security.os_config_v2.policy_orchestrator_for_organization.orchestrated_resource
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.os_config_v2.policy_orchestrator_for_organization.vars
 
 conditions := [

@@ -1,6 +1,6 @@
 package terraform.gcp.security.service_networking.connection
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.service_networking.connection.vars
 
 allowed_ranges := vars.variables["allowed_ip_ranges"]
