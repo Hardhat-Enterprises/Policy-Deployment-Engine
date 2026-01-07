@@ -1,3 +1,3 @@
 resource "google_apigee_addons_config" "c" {
-  org = "PDE-*"
+  org = "PDE-Project1"
 }
