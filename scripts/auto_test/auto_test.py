@@ -8,6 +8,37 @@ import shutil
 from pathlib import Path
 
 
+def normalize_policies_root(provided_root: Path) -> Path:
+    """
+    Traverse up the directory tree to find the root containing _helpers module.
+    
+    This handles cases where users pass service-specific policy paths (e.g.,
+    ./policies/gcp/service_name) but OPA needs access to the shared helpers
+    located at policies/_helpers. The function ensures OPA can always load
+    the terraform.helpers module and its dependencies.
+    
+    Args:
+        provided_root: The policies root directory provided by the user
+        
+    Returns:
+        The actual policies root containing _helpers directory
+    """
+    current = Path(provided_root).resolve()
+    max_traversal = 5  # Safety limit to prevent infinite loops
+    
+    for _ in range(max_traversal):
+        if (current / "_helpers").exists():
+            return current
+        parent = current.parent
+        if parent == current:  # Reached filesystem root
+            break
+        current = parent
+    
+    # If helpers not found, return original path
+    # (will fail with OPA error showing undefined function)
+    return Path(provided_root).resolve()
+
+
 def extract_path_parts(path: Path):
     if len(path.parts) < 3:
         sys.exit(f"Invalid path: {path}")
@@ -152,7 +183,7 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
     commands = [
         ("terraform init -backend=false"),
         ("terraform plan -refresh=false -lock=false -input=false -out=plan"),
-        ("terraform show -json plan > plan.json")
+        ("terraform show -json plan | cat > plan.json")
     ]
 
     for cmd in commands:
@@ -283,7 +314,15 @@ def cleanup_workspace(workdir: Path):
             except Exception as e:
                 pass
 
-def find_matching_pairs(inputs_root: Path, policies_root: Path):
+def find_matching_pairs(inputs_root: Path, policies_base_root: Path, policies_search_root: Path):
+    """
+    Find matching input/policy directory pairs.
+    
+    Args:
+        inputs_root: Root directory for Terraform input files
+        policies_base_root: The actual root containing _helpers (for OPA evaluation)
+        policies_search_root: The user-provided policies root (for path matching)
+    """
     def is_leaf_terraform_dir(directory: Path) -> bool:
         # Must have .tf in this directory
         if not any(f.suffix == ".tf" for f in directory.glob("*.tf")):
@@ -299,7 +338,7 @@ def find_matching_pairs(inputs_root: Path, policies_root: Path):
 
     for input_dir in input_dirs:
         relative = input_dir.relative_to(inputs_root)
-        policy_dir = policies_root / relative
+        policy_dir = policies_search_root / relative
         if policy_dir.is_dir():
             pairs.append((input_dir, policy_dir))
         else:
@@ -316,9 +355,10 @@ def main():
     args = parser.parse_args()
 
     inputs_root = Path(args.inputs)
-    policies_root = Path(args.policies)
+    policies_search_root = Path(args.policies)
+    policies_base_root = normalize_policies_root(policies_search_root)
 
-    pairs = find_matching_pairs(inputs_root, policies_root)
+    pairs = find_matching_pairs(inputs_root, policies_base_root, policies_search_root)
     if not pairs:
         print(" No matching input/policy pairs found.")
         sys.exit(1)
@@ -326,7 +366,7 @@ def main():
     results = []
     failure_flag = False
     for input_dir, policy_dir in pairs:
-        result = run_policy_check_pair(input_dir, policy_dir, policies_root, verbose=args.verbose)
+        result = run_policy_check_pair(input_dir, policy_dir, policies_base_root, verbose=args.verbose)
         results.append(result)
 
     # Grouped summary by service -> resource

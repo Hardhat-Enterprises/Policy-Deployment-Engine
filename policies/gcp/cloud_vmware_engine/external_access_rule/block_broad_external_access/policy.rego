@@ -1,6 +1,6 @@
 package terraform.gcp.security.cloud_vmware_engine.external_access_rule.block_broad_external_access
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.cloud_vmware_engine.external_access_rule.vars
 
 conditions := [[

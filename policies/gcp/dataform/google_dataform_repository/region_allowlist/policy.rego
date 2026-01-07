@@ -1,6 +1,6 @@
 package terraform.gcp.security.dataform.google_dataform_repository.region_allowlist
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.dataform.google_dataform_repository as repo
 
 # Adjust the allowlist as needed

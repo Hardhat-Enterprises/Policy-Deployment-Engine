@@ -1,6 +1,6 @@
 package terraform.gcp.security.binary_authorization.google_binary_authorization_attestor_iam.attestor_reference
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.binary_authorization.google_binary_authorization_attestor_iam.vars
 
 conditions := [
