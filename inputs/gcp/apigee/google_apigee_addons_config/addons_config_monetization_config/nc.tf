@@ -1,4 +1,4 @@
-resource "google_apigee_addons_config" "c" {
+resource "google_apigee_addons_config" "nc" {
   org = "PDE-Project1"
 
   addons_config {
