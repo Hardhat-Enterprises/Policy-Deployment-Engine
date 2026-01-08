@@ -1,5 +1,5 @@
 package terraform.gcp.security.discovery_engine.engine_sitemap.engine_sitemap_uri
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.discovery_engine.engine_sitemap.vars
 
 #engine_sitemap_uri

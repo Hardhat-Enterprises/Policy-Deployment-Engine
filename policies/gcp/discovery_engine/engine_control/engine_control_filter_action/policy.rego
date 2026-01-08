@@ -1,5 +1,5 @@
 package terraform.gcp.security.discovery_engine.engine_control.engine_control_filter_action
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.discovery_engine.engine_control.vars
 
 #engine_control_filter

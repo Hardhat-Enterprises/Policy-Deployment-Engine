@@ -1,5 +1,5 @@
 package terraform.gcp.security.discovery_engine.data_connector.data_connector_json_params
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.discovery_engine.data_connector.vars
 
 #Data_connector_json

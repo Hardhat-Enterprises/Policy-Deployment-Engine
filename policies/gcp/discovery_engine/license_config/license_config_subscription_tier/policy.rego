@@ -1,5 +1,5 @@
 package terraform.gcp.security.discovery_engine.license_config.license_config_subscription_tier
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.discovery_engine.license_config.vars
 
 #license_config_subscription_tier
