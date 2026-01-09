@@ -6,21 +6,20 @@ import data.terraform.gcp.security.apigee.google_apigee_addons_config.vars
 conditions := [
     [
         {
-            "situation_description": "Organization name must start with 'PDE-'",
+            "situation_description": "Organization name must start with 'PDE-Project1'",
             "remedies": [
-                "Update the org field so it begins with 'PDE-'"
+                "Update the org field so it begins with 'PDE-Project1'"
             ]
         },
         {
-            "condition": "Ensures that the Apigee organization name follows PDE-* naming convention",
+            "condition": "Ensures that the Apigee organization name follows PDE-Project1 naming convention",
 
             # Correct nested attribute path
             "attribute_path": ["org"],
 
             # Allow only org names that match this pattern
-            "values": ["PDE-*",["a-z"]],
-
-            "policy_type": "pattern whitelist"
+            "values": ["PDE-Project1"],
+            "policy_type": "whitelist"
         }
     ]
 ]

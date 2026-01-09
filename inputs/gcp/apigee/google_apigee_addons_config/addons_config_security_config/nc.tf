@@ -5,8 +5,5 @@ resource "google_apigee_addons_config" "nc" {
     api_security_config {
       enabled = false
     }
-    monetization_config {
-      enabled = false
-    }
   }
 }
