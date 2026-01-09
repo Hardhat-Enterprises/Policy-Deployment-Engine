@@ -1,4 +1,4 @@
-package terraform.gcp.security.backup_dr.backup_vault.allowed_regions
+package terraform.gcp.security.backup_dr.backup_vault.location
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.backup_dr.backup_vault.vars
@@ -22,3 +22,6 @@ conditions := [
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
 details := helpers.get_multi_summary(conditions, vars.variables).details
+
+
+
