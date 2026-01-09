@@ -4,7 +4,6 @@ import rego.v1
 import data.terraform.gcp.security.backup_for_gke.backup_channel.vars
 import data.terraform.helpers.policies.pattern_whitelist
 
-# Ensure backup channel uses approved project pattern
 violations := pattern_whitelist.get_violations(
     vars.variables,
     ["destination_project"],

@@ -4,7 +4,6 @@ import rego.v1
 import data.terraform.gcp.security.backup_for_gke.backup_plan.vars
 import data.terraform.helpers.policies.blacklist
 
-# Blacklist all_namespaces=true (violates least privilege)
 violations := blacklist.get_violations(
     vars.variables,
     ["backup_config", 0, "all_namespaces"],

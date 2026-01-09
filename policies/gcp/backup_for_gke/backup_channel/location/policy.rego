@@ -4,7 +4,6 @@ import rego.v1
 import data.terraform.gcp.security.backup_for_gke.backup_channel.vars
 import data.terraform.helpers.policies.whitelist
 
-# Australian data residency requirement
 violations := whitelist.get_violations(
     vars.variables,
     ["location"],
