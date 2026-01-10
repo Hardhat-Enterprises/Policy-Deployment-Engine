@@ -10,10 +10,10 @@ conditions := [
       "remedies": ["Update os_constraints to explicitly include only supported OS types."]
     },
     {
-      "condition": "os_type is not in blacklist",
+      "condition": "os_type is in whitelist",
       "attribute_path": ["access_levels", 0, "basic", 0, "conditions", 0, "device_policy", 0, "os_constraints", 0, "os_type"],
-      "values": ["OS_UNSPECIFIED","ANDROID","IOS"],
-      "policy_type": "blacklist"
+      "values": ["DESKTOP_WINDOWS","DESKTOP_LINUX","DESKTOP_MAC"],
+      "policy_type": "whitelist"
     }
   ]
 ]
