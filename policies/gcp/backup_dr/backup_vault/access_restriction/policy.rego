@@ -1,6 +1,6 @@
 package terraform.gcp.security.backup_dr.backup_vault.access_restriction
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.backup_dr.backup_vault.vars
 
 conditions := [

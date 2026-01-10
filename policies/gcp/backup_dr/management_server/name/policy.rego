@@ -1,6 +1,6 @@
 package terraform.gcp.security.backup_dr.management_server.name
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.backup_dr.management_server.vars
 
 
