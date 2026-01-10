@@ -1,6 +1,6 @@
 package terraform.gcp.security.firebase_hosting.google_firebase_hosting_version.redirect_rules_secure
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.firebase_hosting.google_firebase_hosting_version.vars
 
 conditions := [

@@ -1,5 +1,5 @@
 package terraform.gcp.security.gke_hub.google_gke_hub_feature_membership.git_secure_auth
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.gke_hub.google_gke_hub_feature_membership.vars
 
 

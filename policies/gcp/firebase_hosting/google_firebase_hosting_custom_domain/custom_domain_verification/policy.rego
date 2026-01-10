@@ -1,6 +1,6 @@
 package terraform.gcp.security.firebase_hosting.google_firebase_hosting_custom_domain.custom_domain_verification
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.firebase_hosting.google_firebase_hosting_custom_domain.vars
 
 conditions := [

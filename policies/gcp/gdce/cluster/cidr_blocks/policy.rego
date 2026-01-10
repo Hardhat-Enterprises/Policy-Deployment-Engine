@@ -1,5 +1,5 @@
 package terraform.gcp.security.gdce.cluster.cidr_blocks
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.gdce.cluster.vars
 
 conditions := [
