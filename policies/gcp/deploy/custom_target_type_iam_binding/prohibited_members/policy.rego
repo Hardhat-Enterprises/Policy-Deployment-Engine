@@ -1,5 +1,5 @@
 package terraform.gcp.security.deploy.custom_target_type_iam_binding.prohibited_members
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.deploy.custom_target_type_iam_binding.vars
 
 conditions := [

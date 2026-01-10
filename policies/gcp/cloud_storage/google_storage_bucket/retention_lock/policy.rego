@@ -1,6 +1,6 @@
 package terraform.gcp.security.cloud_storage.google_storage_bucket.retention_lock
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.cloud_storage.google_storage_bucket.vars
 
 conditions := [

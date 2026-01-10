@@ -1,6 +1,6 @@
 package terraform.gcp.security.managed_kafka.google_managed_kafka_topic.secure_topic_config
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.managed_kafka.google_managed_kafka_topic.vars
 
 conditions := [

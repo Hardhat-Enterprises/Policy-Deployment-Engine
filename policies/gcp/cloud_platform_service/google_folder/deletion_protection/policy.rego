@@ -1,6 +1,6 @@
 package terraform.gcp.security.cloud_platform_service.google_folder.deletion_protection
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.cloud_platform_service.google_folder.vars
 
 conditions := [

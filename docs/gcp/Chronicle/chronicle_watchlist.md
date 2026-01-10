@@ -6,7 +6,8 @@ Reference: [Terraform Registry – chronicle_watchlist](https://registry.terrafo
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `display_name` | Required. Display name of the watchlist. Note that it must be at least one character and less than 63 characters (https://google.aip.dev/148). | true | false | None | None | None |
@@ -20,11 +21,13 @@ Reference: [Terraform Registry – chronicle_watchlist](https://registry.terrafo
 | `project` | If it is not provided, the provider project is used. | false | false | None | None | None |
 
 ### entity_population_mechanism Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `manual` | Entities are added manually. | false | true | Manual entry is error-prone and may miss timely threat intelligence, reducing the reliability of the watchlist. | None | Using only manual entity population without automation. |
 
 ### watchlist_user_preferences Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `pinned` | Optional. Whether the watchlist is pinned on the dashboard. | false | false | None | None | None |

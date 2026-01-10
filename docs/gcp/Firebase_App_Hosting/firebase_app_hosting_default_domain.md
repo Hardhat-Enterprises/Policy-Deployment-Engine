@@ -6,7 +6,8 @@ Reference: [Terraform Registry – firebase_app_hosting_default_domain](https://
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `location` | The location of the Backend that this Domain is associated with | true | false | Location inherits from backend configuration and has no independent security policy. | australia-southeast2-a | us-east1 |

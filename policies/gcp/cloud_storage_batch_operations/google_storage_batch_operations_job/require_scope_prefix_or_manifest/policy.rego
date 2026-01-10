@@ -1,6 +1,6 @@
 package terraform.gcp.security.cloud_storage_batch_operations.google_storage_batch_operations_job.require_scope_prefix_or_manifest
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.cloud_storage_batch_operations.google_storage_batch_operations_job.vars
 
 conditions := [[

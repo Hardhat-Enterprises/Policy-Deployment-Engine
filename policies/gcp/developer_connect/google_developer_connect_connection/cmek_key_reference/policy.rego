@@ -1,5 +1,5 @@
 package terraform.gcp.security.developer_connect.google_developer_connect_connection.cmek_key_reference
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.developer_connect.google_developer_connect_connection.vars
 
 conditions := [
