@@ -1,25 +1,29 @@
-package terraform.gcp.apigee.google_apigee_api.apigee_api_config.bundle
+package terraform.gcp.security.apigee.google_apigee_api.apigee_api_config_bundle
 
 import data.terraform.helpers
-import data.terraform.gcp.apigee.google_apigee_api.vars
+import data.terraform.gcp.security.apigee.google_apigee_api.vars
 
 conditions := [
     [
         {
-            "situation_description": "Apigee API config_bundle is not compliant.",
+            "situation_description": "config_bundle should be compliant",
             "remedies": [
-                "Ensure config_bundle is provided and points to a .zip archive"
+                "Ensure config_bundle should is compliant"
             ]
         },
         {
-            "condition": "Check if config_bundle is a zip archive",
+            "condition": "check config_bundle should is compliant",
+
+            # Correct nested attribute path
             "attribute_path": ["config_bundle"],
+
+            # Allow only org names that match this pattern
             "values": ["proxies/MyProxy.zip"],
+
             "policy_type": "whitelist"
         }
     ]
 ]
 
-summary := helpers.get_multi_summary(conditions, vars.variables)
-message := summary.message
-details := summary.details
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details
