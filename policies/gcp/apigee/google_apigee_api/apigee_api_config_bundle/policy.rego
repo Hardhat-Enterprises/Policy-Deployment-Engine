@@ -1,4 +1,4 @@
-package terraform.gcp.apigee.google_apigee_api
+package terraform.gcp.apigee.google_apigee_api.apigee_api_config.bundle
 
 import data.terraform.helpers
 import data.terraform.gcp.apigee.google_apigee_api.vars
@@ -14,8 +14,8 @@ conditions := [
         {
             "condition": "Check if config_bundle is a zip archive",
             "attribute_path": ["config_bundle"],
-            "values": [".zip"],
-            "policy_type": "suffix"
+            "values": ["proxies/MyProxy.zip"],
+            "policy_type": "whitelist"
         }
     ]
 ]
