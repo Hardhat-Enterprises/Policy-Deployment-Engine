@@ -1,5 +1,5 @@
 package terraform.gcp.security.gke_hub.google_gke_hub_feature_membership.pc_enabled_required
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.gke_hub.google_gke_hub_feature_membership.vars
 
 

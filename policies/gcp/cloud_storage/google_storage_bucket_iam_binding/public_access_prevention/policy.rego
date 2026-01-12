@@ -1,6 +1,6 @@
 package terraform.gcp.security.cloud_storage.google_storage_bucket_iam_binding.public_access_prevention
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.cloud_storage.google_storage_bucket_iam_binding.vars
 
 conditions := [

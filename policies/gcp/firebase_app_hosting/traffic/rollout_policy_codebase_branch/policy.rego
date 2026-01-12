@@ -1,6 +1,6 @@
 package terraform.gcp.security.firebase_app_hosting.traffic.rollout_policy_codebase_branch
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.firebase_app_hosting.traffic.vars
 
 conditions := [

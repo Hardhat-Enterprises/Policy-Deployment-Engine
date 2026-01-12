@@ -1,5 +1,5 @@
 package terraform.gcp.security.bigquery_data_policy.google_bigquery_datapolicy_data_policy.location
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.bigquery_data_policy.google_bigquery_datapolicy_data_policy.vars
 
 conditions := [

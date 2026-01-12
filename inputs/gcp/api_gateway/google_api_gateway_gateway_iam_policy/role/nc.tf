@@ -1,0 +1,17 @@
+data "google_iam_policy" "nc" {
+  provider = google-beta
+  binding {
+    role = "roles/apigateway.admin"
+    members = [
+      "user:jane@example.com",
+    ]
+  }
+}
+
+resource "google_api_gateway_gateway_iam_policy" "nc" {
+  provider    = google-beta
+  project     = "reliable-alpha-478205-k9"
+  region      = "australia-southeast1"
+  gateway     = "nc"
+  policy_data = data.google_iam_policy.nc.policy_data
+}
