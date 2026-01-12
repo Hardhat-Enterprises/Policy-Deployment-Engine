@@ -1,4 +1,4 @@
-package terraform.gcp.security.dataform.google_dataform_repository_workflow_config
+package terraform.gcp.security.dataform.google_dataform_repository_workflow_config.vars
 
 # Expose only google_dataform_repository_workflow_config resources
 variables = {

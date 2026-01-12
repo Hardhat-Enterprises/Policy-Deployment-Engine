@@ -1,5 +1,5 @@
 resource "google_looker_instance" "nc" {
-  name = "nc1"
+  name = "nc"
   project = var.project
   # encryption_config intentionally omitted to trigger failure
   oauth_config {
@@ -7,9 +7,3 @@ resource "google_looker_instance" "nc" {
     client_secret = "test-client-secret"
   }
 }
-
-
-
-
-
-
