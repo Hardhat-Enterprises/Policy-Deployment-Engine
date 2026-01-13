@@ -1,4 +1,4 @@
-package terraform.gcp.security.gemini.google_gemini_data_sharing_with_google_setting.disable_preview_data_sharing
+package terraform.gcp.security.gemini.google_gemini_data_sharing_with_google_setting.disable_data_sharing_ga
 
 import data.terraform.helpers
 import data.terraform.gcp.security.gemini.google_gemini_data_sharing_with_google_setting.vars
