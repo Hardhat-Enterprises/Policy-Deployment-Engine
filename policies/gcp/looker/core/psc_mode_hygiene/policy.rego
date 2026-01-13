@@ -1,7 +1,7 @@
 # policies/gcp/looker/core/psc_mode_hygiene/policy.rego
 package terraform.gcp.security.looker.core.psc_mode_hygiene
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.looker.core.vars
 
 # Intent: If PSC is enabled, BOTH public_ip_enabled and private_ip_enabled must be false.

@@ -1,6 +1,6 @@
 package terraform.gcp.security.api_hub.google_apihub_plugin.allowed_service_account
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.api_hub.google_apihub_plugin.vars
 
 conditions := [

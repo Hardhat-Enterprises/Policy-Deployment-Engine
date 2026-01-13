@@ -1,5 +1,5 @@
 package terraform.gcp.security.discovery_engine.engine_schema.engine_schema_json
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.discovery_engine.engine_schema.vars
 
 #engine_schema_json

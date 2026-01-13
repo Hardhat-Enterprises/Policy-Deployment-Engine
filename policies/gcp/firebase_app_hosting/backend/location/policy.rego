@@ -1,6 +1,6 @@
 package terraform.gcp.security.firebase_app_hosting.backend.location
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.firebase_app_hosting.backend.vars
 
 conditions := [

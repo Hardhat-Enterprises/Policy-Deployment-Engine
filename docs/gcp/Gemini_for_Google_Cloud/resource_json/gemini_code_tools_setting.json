@@ -5,8 +5,8 @@
     "enabled_tool": {
       "description": "Represents the full set of enabled tools. Structure is [documented below](#nested_enabled_tool).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Enabling tools affects functionality but not security.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -14,8 +14,8 @@
         "account_connector": {
           "description": "Link to the Dev Connect Account Connector that holds the user credentials. projects/{project}/locations/{location}/accountConnectors/{account_connector_id}",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "References a component that stores user credentials. Just a link to creds, does not reveal them.",
           "compliant": null,
           "non-compliant": null,
           "parent": "enabled_tool"
@@ -23,8 +23,8 @@
         "handle": {
           "description": "Handle used to invoke the tool.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Identifier used for invocation only.",
           "compliant": null,
           "non-compliant": null,
           "parent": "enabled_tool"
@@ -32,8 +32,8 @@
         "tool": {
           "description": "Link to the Tool",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Represents a reference to an existing tool definition, not sensitive on its own.",
           "compliant": null,
           "non-compliant": null,
           "parent": "enabled_tool"
@@ -41,8 +41,8 @@
         "config": {
           "description": "Configuration parameters for the tool. Structure is [documented below](#nested_enabled_tool_enabled_tool_config).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not security-related.",
           "compliant": null,
           "non-compliant": null,
           "parent": "enabled_tool"
@@ -50,8 +50,8 @@
         "uri_override": {
           "description": "Overridden URI, if allowed by Tool.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Not security-related.",
           "compliant": null,
           "non-compliant": null,
           "parent": "enabled_tool"
@@ -61,8 +61,8 @@
     "code_tools_setting_id": {
       "description": "Id of the Code Tools Setting.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Naming identifier only.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -70,8 +70,8 @@
     "labels": {
       "description": "Labels as key value pairs. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Metadata. Not security-related.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -79,19 +79,19 @@
     "location": {
       "description": "Resource ID segment making up resource `name`. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Location determines physical hosting region.",
+      "compliant": ["australia-southeast1", "australia-southeast2"],
+      "non-compliant": ["us-central1", "asia-east1"],
       "parent": null
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": false,
+      "rationale": "Determines resource grouping. Not security-related/",
+      "compliant": "PDE",
+      "non-compliant": "Anything else",
       "parent": null
     },
     "config": {
@@ -106,8 +106,8 @@
         "key": {
           "description": "Key of the configuration item.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Metadata key only. Not security related.",
           "compliant": null,
           "non-compliant": null,
           "parent": "config"
@@ -115,8 +115,8 @@
         "value": {
           "description": "Value of the configuration item.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Value affects operational behaviour only.",
           "compliant": null,
           "non-compliant": null,
           "parent": "config"

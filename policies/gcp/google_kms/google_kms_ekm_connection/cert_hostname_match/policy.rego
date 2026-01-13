@@ -1,5 +1,5 @@
 package terraform.gcp.security.google_kms.google_kms_ekm_connection.cert_hostname_match
-import data.terraform.gcp.helpers as helpers
+import data.terraform.helpers as helpers
 import data.terraform.gcp.security.google_kms.google_kms_ekm_connection.vars as vars
 
 conditions := [

@@ -1,5 +1,5 @@
 package terraform.gcp.security.developer_connect.google_developer_connect_insights_config.insights_security_baseline
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.developer_connect.google_developer_connect_insights_config.vars
 
 allowed_ar_uri := ["*-docker.pkg.dev/*/*/*", [["australia-southeast1","australia-southeast2"], ["pde2025"], ["my-repo"], ["my-image"]]]

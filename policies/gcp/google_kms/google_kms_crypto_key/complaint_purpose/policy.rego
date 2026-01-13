@@ -1,5 +1,5 @@
 package terraform.gcp.security.google_kms.google_kms_crypto_key.complaint_purpose
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.google_kms.google_kms_crypto_key.vars 
 
 conditions := [
