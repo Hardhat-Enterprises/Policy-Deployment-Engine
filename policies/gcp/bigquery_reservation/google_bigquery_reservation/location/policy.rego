@@ -1,7 +1,7 @@
-package terraform.gcp.security.bigquery.google_bigquery_reservation.location
+package terraform.gcp.security.bigquery_reservation.google_bigquery_reservation.location
 
 import data.terraform.helpers
-import data.terraform.gcp.security.bigquery.google_bigquery_reservation.vars
+import data.terraform.gcp.security.bigquery_reservation.google_bigquery_reservation.vars
 
 conditions := [
   [
