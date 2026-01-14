@@ -1,6 +1,7 @@
 package terraform.gcp.security.bigquery_analytics_hub.google_bigquery_analytics_hub_data_exchange_subscription.refresh_policy_not_never
 
 import data.terraform.gcp.security.bigquery_analytics_hub.google_bigquery_analytics_hub_data_exchange_subscription.vars
+import data.terraform.helpers
 
 resource_type := vars.variables.resource_type
 friendly_name := vars.variables.friendly_resource_name

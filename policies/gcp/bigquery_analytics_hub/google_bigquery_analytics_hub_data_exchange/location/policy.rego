@@ -1,6 +1,7 @@
 package terraform.gcp.security.bigquery_analytics_hub.google_bigquery_analytics_hub_data_exchange.location
 
 import data.terraform.gcp.security.bigquery_analytics_hub.google_bigquery_analytics_hub_data_exchange.vars
+import data.terraform.helpers
 
 allowed_locations := {"australia-southeast1"}
 

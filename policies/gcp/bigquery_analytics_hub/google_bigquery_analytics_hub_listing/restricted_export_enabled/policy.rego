@@ -1,6 +1,7 @@
 package terraform.gcp.security.bigquery_analytics_hub.google_bigquery_analytics_hub_listing
 
 import rego.v1
+import data.terraform.helpers
 
 policy_name := "restricted_export_enabled"
 resource_type := "google_bigquery_analytics_hub_listing"

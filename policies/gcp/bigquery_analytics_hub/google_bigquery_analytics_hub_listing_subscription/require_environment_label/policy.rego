@@ -1,6 +1,7 @@
 package terraform.gcp.security.bigquery_analytics_hub.google_bigquery_analytics_hub_listing_subscription
 
 import rego.v1
+import data.terraform.helpers
 
 default message := []
 
