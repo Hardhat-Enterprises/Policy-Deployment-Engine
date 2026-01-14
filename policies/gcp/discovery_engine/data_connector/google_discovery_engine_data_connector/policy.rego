@@ -12,7 +12,7 @@ conditions := [
         },
       {
         "condition": "parms is misconfigured",
-        "attribute_path": ["params",0, "auth_type"],
+        "attribute_path": ["params", "auth_type"],
         "values": ["OAUTH_PASSWORD_GRANT"],
         "policy_type": "whitelist"
       }
