@@ -46,7 +46,7 @@ resource "google_gkeonprem_vmware_admin_cluster" "admin-cluster-full-nc" {
   }
   authorization {
     viewer_users {
-      username = "https://google.com"
+      username = "user1@apple.com"
     }
   }
   auto_repair_config {

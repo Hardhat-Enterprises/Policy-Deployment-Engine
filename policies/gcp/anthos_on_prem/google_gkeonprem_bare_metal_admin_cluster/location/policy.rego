@@ -12,7 +12,19 @@ import data.terraform.gcp.security.anthos_on_prem.google_gkeonprem_bare_metal_ad
         "values" : ["us-west1"],
         "policy_type" : "whitelist" 
     }
+    ],
+
+    [
+    {"situation_description" : "Enforcing bare metal version to be latest",
+    "remedies":[ "Change bare metal version to latest"]},
+    {
+        "condition": "Test if bare metal version is 1.13.4",
+        "attribute_path" : ["bare_metal_version"],
+        "values" : ["1.13.4"],
+        "policy_type" : "whitelist" 
+    }
     ]
+
  ]
 
  message := helpers.get_multi_summary(conditions, vars.variables).message

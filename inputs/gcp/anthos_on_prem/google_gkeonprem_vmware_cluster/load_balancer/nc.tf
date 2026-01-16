@@ -62,7 +62,7 @@ resource "google_gkeonprem_vmware_cluster" "cluster-manuallb-nc" {
   }
   authorization {
     admin_users {
-      username = "https://google.com"
+      username = "testuser@apple.com"
     }
   }
   anti_affinity_groups {
