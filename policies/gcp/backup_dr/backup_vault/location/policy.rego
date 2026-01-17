@@ -6,9 +6,9 @@ import data.terraform.gcp.security.backup_dr.backup_vault.vars
 conditions := [
   [
     {
-      "situation_description": "Location is not compliant.",
+      "situation_description": "location is not compliant.",
       "remedies": [
-        "Location to an approved region only. (australia-southeast1 or australia-southeast2)"
+        "set location to an approved region (australia-southeast1 or australia-southeast2)"
       ] },
     {
       "condition": "Check Location is in an approved region",

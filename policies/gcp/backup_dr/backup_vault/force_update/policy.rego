@@ -6,9 +6,9 @@ import data.terraform.gcp.security.backup_dr.backup_vault.vars
 conditions := [
   [
     {
-      "situation_description": "Force_update is not compliant.",
+      "situation_description": "force_update is not compliant.",
       "remedies": [
-        "Set force_update to false only"
+        "set force_update to false only"
       ] },
     {
       "condition": "Disable Backup_vault_force_update",

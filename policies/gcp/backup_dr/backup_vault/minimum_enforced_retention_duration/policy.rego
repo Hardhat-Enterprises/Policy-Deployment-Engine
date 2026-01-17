@@ -6,9 +6,9 @@ import data.terraform.gcp.security.backup_dr.backup_vault.vars
 conditions := [
   [
     {
-      "situation_description": "Minimum enforced retention duration is not compliant.",
+      "situation_description": "minimum enforced retention duration is not compliant.",
       "remedies": [
-        "Set Minimum_enforced_retention_duration at least to 100000s"
+        "set minimum_enforced_retention_duration to at least 100000s"
       ] },
     {
       "condition": "Check minimum retention duration",

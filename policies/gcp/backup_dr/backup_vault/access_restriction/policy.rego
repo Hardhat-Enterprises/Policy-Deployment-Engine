@@ -6,9 +6,9 @@ import data.terraform.gcp.security.backup_dr.backup_vault.vars
 conditions := [
   [
     {
-      "situation_description": "Access_restriction is not compliant.",
+      "situation_description": "access_restriction is not compliant.",
       "remedies": [
-        "Set Access_restriction to WITHIN_ORGANIZATION only"
+        "set access_restriction to WITHIN_ORGANIZATION only"
       ] },
     {
       "condition": "Restrict Access within the organization only",
