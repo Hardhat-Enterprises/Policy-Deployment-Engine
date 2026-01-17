@@ -6,13 +6,12 @@ import data.terraform.gcp.security.backup_dr.backup_plan.vars
 conditions := [
   [
     {
-      "situation_description": "Backup plan retention days is outside the approved range",
+      "situation_description": "Retention days is not compliant.",
       "remedies": [
-        "Set backup_retention_days to an approved value (e.g., between 7 and 365 days)"
-      ]
-    },
+        "Set Retention_days to an approved value (7 to 365 days)"
+      ] },
     {
-      "condition": "Backup plan backup_retention_days must be between 7 and 365",
+      "condition": "Retention_days must be between 7 and 365",
       "attribute_path": ["backup_rules", 0, "backup_retention_days"],
       "values": [7, 365],
       "policy_type": "range"

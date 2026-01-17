@@ -6,13 +6,12 @@ import data.terraform.gcp.security.backup_dr.backup_vault.vars
 conditions := [
   [
     {
-      "situation_description": "Backup vault access restriction is not set to an approved value",
+      "situation_description": "Access_restriction is not compliant.",
       "remedies": [
-        "Set access_restriction to WITHIN_ORGANIZATION"
-      ]
-    },
+        "Set Access_restriction to WITHIN_ORGANIZATION only"
+      ] },
     {
-      "condition": "Backup vault must restrict access within the organization",
+      "condition": "Restrict Access within the organization only",
       "attribute_path": ["access_restriction"],
       "values": ["WITHIN_ORGANIZATION"],
       "policy_type": "whitelist"

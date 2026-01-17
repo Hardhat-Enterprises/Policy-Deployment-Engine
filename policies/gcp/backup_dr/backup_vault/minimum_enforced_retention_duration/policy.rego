@@ -6,16 +6,15 @@ import data.terraform.gcp.security.backup_dr.backup_vault.vars
 conditions := [
   [
     {
-      "situation_description": "Backup vault minimum enforced retention duration is below the approved threshold",
+      "situation_description": "Minimum enforced retention duration is not compliant.",
       "remedies": [
-        "Increase backup_minimum_enforced_retention_duration to meet the minimum approved value (e.g., >= 100000 seconds)"
-      ]
-    },
+        "Set Minimum_enforced_retention_duration at least to 100000s"
+      ] },
     {
-      "condition": "Backup vault must enforce a minimum retention duration",
+      "condition": "Check minimum retention duration",
       "attribute_path": ["backup_minimum_enforced_retention_duration"],
-      "values": [100000, null],
-      "policy_type": "range"
+      "values": ["100000s"],
+      "policy_type": "whitelist"
     }
   ]
 ]
