@@ -59,30 +59,30 @@
       "parent": null
     },
     "upstreams": {
-      "description": "Optional. List of which upstream resource(s) to forward traffic to. Structure is [documented below](#nested_upstreams).",
+      "description": "Optional. List of upstream resources to forward traffic to. Structure is [documented below](#nested_upstreams).",
       "required": false,
       "security_impact": true,
-      "rationale": "Specifying upstream resources is crucial for ensuring that traffic is properly routed and managed.",
+      "rationale": "Specifying upstream resources ensures that traffic is routed securely and according to organizational policies.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
       "arguments": {
         "egress_policy": {
-          "description": "Optional. Routing policy information. Structure is [documented below](#nested_upstreams_upstreams_egress_policy).",
+          "description": "Optional. Routing policy information. Defines the region of egress to ensure secure and compliant traffic flow.",
           "required": false,
-          "security_impact": false,
-          "rationale": "This attribute will define the region of the egress. This will help to ensure that traffic is routed in a secure manner and complies with data residency requirements.",
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Traffic must be restricted to approved regions for compliance and security reasons.",
+          "compliant": "australia-southeast1, australia-southeast2",
+          "non-compliant": "us-west1, us-west2",
           "parent": "upstreams"
         },
         "network": {
           "description": "Network to forward traffic to. Structure is [documented below](#nested_upstreams_upstreams_network).",
           "required": false,
-          "security_impact": false,
-          "rationale": "The network name needs to be specified to ensure that traffic is forwarded to the correct destination within the organization's infrastructure.",
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Upstream networks must be approved to ensure proper security segmentation.",
+          "compliant": "projects/smooth-verve-467716-v1/global/networks/prod-vpc,projects/smooth-verve-467716-v1/global/networks/shared-services-vpc",
+          "non-compliant": "projects/smooth-verve-467716-v1/global/networks/test-vpc,projects/smooth-verve-467716-v1/global/networks/dev-vpc",
           "parent": "upstreams"
         }
       }
@@ -96,45 +96,14 @@
       "non-compliant": null,
       "parent": null
     },
-    "egress_policy": {
-      "description": "Defines the egress traffic policy for the application. Structure is [documented below](#nested_upstreams_upstreams_egress_policy).",
+    "logging_enabled": {
+      "description": "Enables logging for the Security Gateway Application.",
       "required": false,
       "security_impact": true,
-      "rationale": "This policy is crucial for controlling the flow of egress traffic and ensuring compliance with organizational security requirements.",
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "regions": {
-          "description": "Required. List of regions where the application sends traffic to.",
-          "required": true,
-          "security_impact": true,
-          "rationale": "This attribute will define the regions where the application is allowed to send egress traffic.",
-          "compliant": "australia-southeast1, australia-southeast2",
-          "non-compliant": "us-west1, us-west2",
-          "parent": "egress_policy"
-        }
-      }
-    },
-    "network": {
-      "description": "This network must be in the same project as the BeyondCorp Security Gateway. Structure is [documented below](#nested_upstreams_upstreams_network).",
-      "required": false,
-      "security_impact": true,
-      "rationale": "Specifying the correct network is essential for ensuring that traffic is routed properly and complies with organizational policies.",
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "name": {
-          "description": "Required. Network name is of the format: `projects/{project}/global/networks/{network}`",
-          "required": true,
-          "security_impact": true,
-          "rationale": "The network name needs to be specified to ensure that traffic is forwarded to the correct destination within the organization's infrastructure.",
-          "compliant": "projects/my-proj/global/networks/prod-vpc,projects/my-proj/global/networks/shared-services-vpc",
-          "non-compliant": "projects/my-proj/global/networks/test-vpc,projects/my-proj/global/networks/dev-vpc",
-          "parent": "network"
-        }
-      }
+      "rationale": "Logging must be enabled to allow auditing of application access and support security monitoring.",
+      "compliant": "true",
+      "non-compliant": "false",
+      "parent": null
     }
   }
 }
