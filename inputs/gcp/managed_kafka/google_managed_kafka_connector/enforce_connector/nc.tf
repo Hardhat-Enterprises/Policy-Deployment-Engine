@@ -52,7 +52,7 @@ resource "google_managed_kafka_connect_cluster" "connect_cluster_nc" {
   provider = google-beta
 }
 
-resource "google_managed_kafka_connector" "connector_nc" {
+resource "google_managed_kafka_connector" "nc" {
   project         = google_project.project_nc.project_id
   connector_id    = "noncompliant-connector"
   connect_cluster = google_managed_kafka_connect_cluster.connect_cluster_nc.connect_cluster_id
