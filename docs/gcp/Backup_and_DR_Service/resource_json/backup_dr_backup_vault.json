@@ -24,7 +24,7 @@
       "description": "Required. ID of the requesting object.",
       "required": true,
       "security_impact": false,
-      "rationale": " Vault ID has no impact on the security of the resource or data contained.",
+      "rationale": " This field is an identifier used for referencing the backup vault.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -77,7 +77,7 @@
     "backup_retention_inheritance": {
       "description": "How a backup's enforced retention end time is inherited. Default value is `INHERIT_VAULT_RETENTION` if not provided during creation. Possible values are: `BACKUP_RETENTION_INHERITANCE_UNSPECIFIED`, `INHERIT_VAULT_RETENTION`, `MATCH_BACKUP_EXPIRE_TIME`.",
       "required": true,
-      "security_impact": false,
+      "security_impact": true,
       "rationale": "Inheritance ensures retention policies defined at the backup vault level are consistently enforced.",
       "compliant": null,
       "non-compliant": null,
@@ -93,10 +93,10 @@
       "parent": null
     },
     "force_delete": {
-      "description": "(Deprecated) If set, the following restrictions against deletion of the backup vault instance can be overridden: * deletion of a backup vault instance containing no backups, but still containing empty datasources. * deletion of a backup vault instance that is being referenced by an active backup plan. ~> **Warning:** `force_delete` is deprecated and will be removed in a future major release. Use `ignore_inactive_datasources` instead.",
-      "required": false,
-      "security_impact": false,
-      "rationale": "fDeletion override option; not enforced by policy.",
+      "description": "Overrides deletion safeguards and allows forced deletion of a backup vault.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Forcing deletion of a backup vault can result in permanent loss of backup data.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -132,7 +132,7 @@
       "description": "If it is not provided, the provider project is used.",
       "required": false,
       "security_impact": false,
-      "rationale": "Inheritance ensures retention policies defined at the backup vault level are consistently enforced.",
+      "rationale": "even without manual ID configuration ID will be automatically generated.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
