@@ -10,6 +10,6 @@ Reference: [Terraform Registry – backup_dr_service_config](https://registry.te
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `resource_type` | The resource type to which the default service config will be applied. | true | false | None | None | None |
-| `location` | The location in which the Service config is to be initialized. | true | false | None | None | None |
-| `project` | If it is not provided, the provider project is used. | false | false | None | None | None |
+| `resource_type` | Required. The resource type to which the default service config will be applied. | true | true | Resource type has no impact on the security of the resource or data contained. | None | None |
+| `location` | Required. The GCP location for the backup vault should be on approved region. | true | true | Location determines physical hosting region and data residency. | ['australia-southeast1', 'australia-southeast2'] | ['us-central1'] |
+| `project` | If it is not provided, the provider project is used. | false | false | even without manual ID configuration ID will be automatically generated. | None | None |
