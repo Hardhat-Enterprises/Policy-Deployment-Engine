@@ -211,19 +211,19 @@
     "restricted_export_config": {
       "description": "If set, restricted export configuration will be propagated and enforced on the linked dataset. Structure is [documented below](#nested_restricted_export_config).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Yes. Restricted export helps prevent uncontrolled export of shared data and reduces risk of data leakage from linked datasets.",
+      "rationale": "This policy requires restricted_export_config to be present and enabled to ensure export restrictions are enforced on datasets created from Analytics Hub listings.",
+      "compliant": "Set restricted_export_config and enable it, e.g. restricted_export_config { enabled = true }. Optionally also set restrict_query_result = true if you want to restrict exports derived from query results.",
+      "non-compliant": "restricted_export_config is missing or restricted_export_config.enabled is false, meaning export restrictions are not enforced for the listing.",
       "parent": null,
       "arguments": {
         "enabled": {
           "description": "If true, enable restricted export.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "Yes. If enabled is false (or not set), restricted export protections are not enforced for the listing.",
+          "rationale": "This policy requires restricted_export_config.enabled to be true so restricted export is actively enforced for the listing.",
+          "compliant": "restricted_export_config { enabled = true }",
+          "non-compliant": "restricted_export_config { enabled = false } or missing enabled, resulting in restricted export not being enforced.",
           "parent": "restricted_export_config"
         },
         "restrict_direct_table_access": {
