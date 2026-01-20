@@ -1,4 +1,4 @@
-resource "google_gkeonprem_bare_metal_cluster" "cluster-manuallb-nc" {
+resource "google_gkeonprem_bare_metal_cluster" "nc" {
   name = "cluster-manuallb"
   project = "my-project"
   location = "us-west1"

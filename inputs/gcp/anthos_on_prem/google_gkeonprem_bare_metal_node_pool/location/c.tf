@@ -1,7 +1,7 @@
-resource "google_gkeonprem_bare_metal_cluster" "default-full" {
+resource "google_gkeonprem_bare_metal_cluster" "c" {
   name = "my-cluster"
   project = "my-project"
-  location = "us-west1"
+  location = "australia"
   admin_cluster_membership = "projects/870316890899/locations/global/memberships/gkeonprem-terraform-test"
   bare_metal_version = "1.12.3"
   network_config {

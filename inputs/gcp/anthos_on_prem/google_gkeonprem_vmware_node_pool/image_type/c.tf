@@ -1,7 +1,7 @@
-resource "google_gkeonprem_vmware_cluster" "default-full" {
+resource "google_gkeonprem_vmware_cluster" "c" {
   name = "my-cluster"
   project = "my-project"
-  location = "us-west1"
+  location = "australia"
   admin_cluster_membership = "projects/870316890899/locations/global/memberships/gkeonprem-terraform-test"
   on_prem_version = "1.33.0-gke.35"
   network_config {
@@ -35,7 +35,7 @@ resource "google_gkeonprem_vmware_cluster" "default-full" {
 resource "google_gkeonprem_vmware_node_pool" "nodepool-full" {
   name = "my-nodepool"
   project = "my-project"
-  location = "us-west1"
+  location = "australia"
   vmware_cluster = google_gkeonprem_vmware_cluster.default-full.name
   on_prem_version = "1.33.0-gke.35"
   config {

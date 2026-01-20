@@ -11,7 +11,7 @@ Reference: [Terraform Registry – gkeonprem_vmware_admin_cluster](https://regis
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `network_config` | The VMware admin cluster network configuration. Structure is [documented below](#nested_network_config). | true | false | network config itself is not sensitive, but may contain sensitive data in its nested fields | None | None |
 | `name` | The VMware admin cluster resource name. | true | false | name does not require security considerations | None | None |
-| `location` | The location of the resource. | true | true | location is a sensitive field and should be protected | us-west1 | africa1 |
+| `location` | The location of the resource. | true | true | location is a sensitive field and should be protected | australia | africa1 |
 | `description` | A human readable description of this VMware admin cluster. | false | false | description is not a security sensitive field | None | None |
 | `on_prem_version` | The Anthos clusters on the VMware version for the admin cluster. | false | true | on_prem_version is a sensitive field and should be protected | 1.31.0-gke.35 | 1.30.0-gke.35 |
 | `image_type` | The OS image type for the VMware admin cluster. | false | false | image_type is not security sensitive enough | None | None |

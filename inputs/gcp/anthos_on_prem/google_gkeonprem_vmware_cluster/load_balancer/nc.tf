@@ -1,4 +1,4 @@
-resource "google_gkeonprem_vmware_cluster" "cluster-manuallb-nc" {
+resource "google_gkeonprem_vmware_cluster" "nc" {
   name = "cluster-manuallb"
   project = "my-project"
   location = "us-west1"

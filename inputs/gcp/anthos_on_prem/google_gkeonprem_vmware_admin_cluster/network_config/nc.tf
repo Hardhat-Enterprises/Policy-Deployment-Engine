@@ -1,4 +1,4 @@
-resource "google_gkeonprem_vmware_admin_cluster" "admin-cluster-full-nc" {
+resource "google_gkeonprem_vmware_admin_cluster" "nc" {
   name = "full"
   project = "my-project"
   location = "us-west1"

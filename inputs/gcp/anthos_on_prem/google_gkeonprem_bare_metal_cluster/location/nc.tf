@@ -1,4 +1,4 @@
-resource "google_gkeonprem_bare_metal_cluster" "cluster-basic-nc" {
+resource "google_gkeonprem_bare_metal_cluster" "nc" {
   name                     = "my-cluster"
   project                  = "my-project"
   location                 = "asia1"

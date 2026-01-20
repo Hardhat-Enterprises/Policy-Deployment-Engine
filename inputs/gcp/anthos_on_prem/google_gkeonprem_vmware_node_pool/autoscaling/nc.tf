@@ -1,4 +1,4 @@
-resource "google_gkeonprem_vmware_cluster" "default-full-nc" {
+resource "google_gkeonprem_vmware_cluster" "nc" {
   name = "my-cluster"
   project = "my-project"
   location = "us-west1"

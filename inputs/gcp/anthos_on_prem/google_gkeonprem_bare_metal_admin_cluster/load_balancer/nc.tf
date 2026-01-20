@@ -1,4 +1,4 @@
-resource "google_gkeonprem_bare_metal_admin_cluster" "admin-cluster-basic-nc" {
+resource "google_gkeonprem_bare_metal_admin_cluster" "nc" {
   name = "my-cluster"
   project = "my-project"
   location = "us-west1"
