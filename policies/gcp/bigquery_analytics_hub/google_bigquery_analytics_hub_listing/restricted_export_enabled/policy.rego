@@ -1,41 +1,31 @@
-package terraform.gcp.security.bigquery_analytics_hub.google_bigquery_analytics_hub_listing
+package terraform.gcp.security.bigquery_analytics_hub.google_bigquery_analytics_hub_listing.restricted_export_enabled
 
-import rego.v1
 import data.terraform.helpers
+import data.terraform.gcp.security.bigquery_analytics_hub.google_bigquery_analytics_hub_listing.vars
 
-policy_name := "restricted_export_enabled"
-resource_type := "google_bigquery_analytics_hub_listing"
-
-resources := [r |
-  r := input.resource_changes[_]
-  r.type == resource_type
-]
-
-# TRUE if restricted_export_config exists and enabled == true (Terraform JSON block-list form)
-restricted_export_enabled(after) if {
-  some i
-  after.restricted_export_config[i].enabled == true
-}
-
-non_compliant := [name |
-  r := resources[_]
-  after := r.change.after
-  name := r.name
-
-  not restricted_export_enabled(after)
-]
-
-message := msg if {
-  count(resources) > 0
-  count(non_compliant) > 0
-  msg := [
-    "Situation 1: restricted_export_config.enabled must be true for BigQuery Analytics Hub Listing.",
-    sprintf("Non-Compliant Resources: %v", [non_compliant]),
+conditions := [
+  [
+    {
+      "situation_description": "Listing does not have restricted_export_config enabled.",
+      "remedies": [
+        "Set restricted_export_config { enabled = true } on the listing.",
+        "Optionally set restrict_query_result = true."
+      ]
+    },
+    {
+      "condition": "restricted_export_config must exist",
+      "attribute_path": ["restricted_export_config"],
+      "values": [null, []],
+      "policy_type": "blacklist"
+    },
+    {
+      "condition": "restricted_export_config.enabled must be true",
+      "attribute_path": ["restricted_export_config", 0, "enabled"],
+      "values": [true],
+      "policy_type": "whitelist"
+    }
   ]
-}
+]
 
-message := msg if {
-  count(resources) > 0
-  count(non_compliant) == 0
-  msg := ["All BigQuery Analytics Hub Listings have restricted export enabled."]
-}
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

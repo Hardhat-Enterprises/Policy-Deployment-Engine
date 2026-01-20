@@ -1,49 +1,50 @@
-resource "google_bigquery_analytics_hub_data_exchange" "c_ex" {
-  project          = "pde-test-project"
-  location         = "australia-southeast1"
-  data_exchange_id = "c_ex_ls"
-  display_name     = "c_ex_ls"
-  description      = "exchange for compliant listing subscription"
+# google_bigquery_analytics_hub_listing_subscription (COMPLIANT)
+# destination_dataset.labels.environment is present and non-empty
+
+resource "google_bigquery_analytics_hub_data_exchange" "subscription" {
+  location         = "US"
+  data_exchange_id = "my_data_exchange"
+  display_name     = "my_data_exchange"
+  description      = "Test Description"
 }
 
-resource "google_bigquery_dataset" "c_src_ds" {
-  project     = "pde-test-project"
-  dataset_id  = "c_ls_src_ds"
-  location    = "australia-southeast1"
-  description = "source dataset for compliant listing subscription"
+resource "google_bigquery_dataset" "subscription" {
+  dataset_id    = "my_listing"
+  friendly_name = "my_listing"
+  description   = "Test Description"
+  location      = "US"
 }
 
-resource "google_bigquery_analytics_hub_listing" "c_listing" {
-  project          = "pde-test-project"
-  location         = "australia-southeast1"
-  data_exchange_id = google_bigquery_analytics_hub_data_exchange.c_ex.data_exchange_id
-  listing_id       = "c_listing_ls"
-  display_name     = "c_listing_ls"
-  description      = "listing for compliant listing subscription"
+resource "google_bigquery_analytics_hub_listing" "subscription" {
+  location         = "US"
+  data_exchange_id = google_bigquery_analytics_hub_data_exchange.subscription.data_exchange_id
+  listing_id       = "my_listing"
+  display_name     = "my_listing"
+  description      = "Test Description"
 
   bigquery_dataset {
-    dataset = google_bigquery_dataset.c_src_ds.id
+    dataset = google_bigquery_dataset.subscription.id
   }
 }
 
 resource "google_bigquery_analytics_hub_listing_subscription" "c" {
-  project         = "pde-test-project"
-  location        = "australia-southeast1"
-  data_exchange_id = google_bigquery_analytics_hub_data_exchange.c_ex.data_exchange_id
-  listing_id       = google_bigquery_analytics_hub_listing.c_listing.listing_id
+  location         = "US"
+  data_exchange_id = google_bigquery_analytics_hub_data_exchange.subscription.data_exchange_id
+  listing_id       = google_bigquery_analytics_hub_listing.subscription.listing_id
 
   destination_dataset {
-    description   = "compliant subscription"
-    friendly_name = "c_subscription_dest"
-    location      = "australia-southeast1"
+    description   = "A compliant subscription"
+    friendly_name = "Compliant dataset"
+    location      = "US"
 
     labels = {
-      environment = "development"
+      environment = "dev"
+      testing     = "123"
     }
 
     dataset_reference {
-      project_id = "pde-test-project"
-      dataset_id = "c_ls_dest_ds"
+      dataset_id = "destination_dataset_compliant"
+      project_id = google_bigquery_dataset.subscription.project
     }
   }
 }

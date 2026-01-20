@@ -1,36 +1,26 @@
-package terraform.gcp.security.bigquery_analytics_hub.google_bigquery_analytics_hub_listing_iam_member
+package terraform.gcp.security.bigquery_analytics_hub.google_bigquery_analytics_hub_listing_iam_member.no_public_access
 
 import rego.v1
 import data.terraform.helpers
+import data.terraform.gcp.security.bigquery_analytics_hub.google_bigquery_analytics_hub_listing_iam_member.vars
 
-# Collect all resources of this type from the Terraform plan JSON
-resources := [rc |
-  rc := input.resource_changes[_]
-  rc.type == "google_bigquery_analytics_hub_listing_iam_member"
-  rc.change.after != null
+conditions := [
+  [
+    {
+      "situation_description": "Public access is enabled on BigQuery Analytics Hub Listing IAM Member through allUsers or allAuthenticatedUsers.",
+      "remedies": [
+        "Remove allUsers/allAuthenticatedUsers from the IAM member configuration.",
+        "Use only specific identities like user:, group:, serviceAccount:, domain:, or approved principal identifiers."
+      ]
+    },
+    {
+      "condition": "Deny public principals in member field",
+      "attribute_path": ["member"],
+      "values": ["allUsers", "allAuthenticatedUsers"],
+      "policy_type": "blacklist"
+    }
+  ]
 ]
 
-# Public members are not allowed
-is_public_member(member) if lower(member) == "allusers"
-is_public_member(member) if lower(member) == "allauthenticatedusers"
-
-# List of noncompliant resource names (e.g., ["nc"])
-noncompliant := [rc.name |
-  rc := resources[_]
-  is_public_member(rc.change.after.member)
-]
-
-# Message output (only emit when there is at least one violation)
-message := [
-  "Situation 1: Public access is not allowed on BigQuery Analytics Hub Listing IAM Member.",
-  sprintf("Non-Compliant Resources: %v", [noncompliant]),
-] if {
-  count(resources) > 0
-  count(noncompliant) > 0
-}
-
-# If there are resources but none are noncompliant, emit nothing
-message := [] if {
-  count(resources) > 0
-  count(noncompliant) == 0
-}
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

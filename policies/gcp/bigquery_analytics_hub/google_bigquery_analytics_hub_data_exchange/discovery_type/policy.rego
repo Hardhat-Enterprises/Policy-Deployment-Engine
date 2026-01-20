@@ -3,62 +3,25 @@ package terraform.gcp.security.bigquery_analytics_hub.google_bigquery_analytics_
 import data.terraform.helpers
 import data.terraform.gcp.security.bigquery_analytics_hub.google_bigquery_analytics_hub_data_exchange.vars
 
-approved_discovery_types := {"DISCOVERY_TYPE_PRIVATE"}
+conditions := [
 
-resource_type := vars.variables.resource_type
-friendly_name := vars.variables.friendly_resource_name
-
-resources := [r |
-  r := input.planned_values.root_module.resources[_]
-  r.type == resource_type
-]
-
-non_compliant := [item |
-  r := resources[_]
-  dt := r.values.discovery_type
-  not approved_discovery_types[dt]
-
-  item := {
-    "id": r.name,                # MUST be "c" or "nc"
-    "discovery_type": dt,
-  }
-]
-
-non_compliant_ids := [x.id | x := non_compliant[_]]
-
-# Rego conditional formatting
-nc_display := "None - All passed" if {
-  count(non_compliant_ids) == 0
-}
-
-nc_display := sprintf("%v", [non_compliant_ids]) if {
-  count(non_compliant_ids) > 0
-}
-
-message := [
-  sprintf("Total %s detected: %d ", [friendly_name, count(resources)]),
   [
-    "Situation 1: The BigQuery Analytics Hub data exchange has a non-approved discovery type.",
-    sprintf("Non-Compliant Resources: %s", [nc_display]),
-  ],
-]
-
-details := [
+    {
+      "situation_description": "BigQuery Analytics Hub data exchanges must use an approved discovery_type.",
+      "remedies": [
+        "Set discovery_type to an approved value such as DISCOVERY_TYPE_PRIVATE.",
+        "If you are using a Data Clean Room (sharing_environment_config.dcr_exchange_config), remove discovery_type because it cannot be set for DCR exchanges."
+      ]
+    },
   {
-    "situation": "The BigQuery Analytics Hub data exchange has a non-approved discovery type.",
-    "remedies": [
-      "Set 'discovery_type' to an approved value such as 'DISCOVERY_TYPE_PRIVATE'.",
-    ],
-    "non_compliant_resources": non_compliant_ids,
-    "conditions": [
-      {
-        "discovery_type must be one of the approved values.": non_compliant,
-      },
-    ],
-  },
+      "condition": "Allow only approved discovery_type values",
+      "attribute_path": ["discovery_type"],
+      "values": ["DISCOVERY_TYPE_PRIVATE"],
+      "policy_type": "whitelist"
+    }
+  ]
+
 ]
 
-summary := {
-  "message": message,
-  "details": details,
-}
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details
