@@ -1,16 +1,22 @@
 package terraform.gcp.security.serverless_vpc_access.google_vpc_access_connector.min_instances
 
-import rego.v1
+import data.terraform.helpers
 import data.terraform.gcp.security.serverless_vpc_access.google_vpc_access_connector.vars
-import data.terraform.helpers.policies.range
 
-violations := range.get_violations(
-    vars.variables,
-    ["min_instances"],
-    [2, 9]
-)
-
-message := [m | 
-    some violation in violations
-    m := violation.message
+conditions := [
+    [
+        {
+            "situation_description": "Serverless VPC Access Connector min instances is outside the allowed range",
+            "remedies": ["Set min_instances to a value between 2 and 9"]
+        },
+        {
+            "condition": "The min instances must be between 2 and 9",
+            "attribute_path": ["min_instances"],
+            "values": [2, 9],
+            "policy_type": "range"
+        }
+    ]
 ]
+
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details
