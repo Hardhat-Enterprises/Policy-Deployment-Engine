@@ -1,10 +1,6 @@
 package terraform.gcp.security.biglake.google_biglake_service.service_access
 
-<<<<<<< HEAD
-import data.terraform.gcp.helpers
-=======
 import data.terraform.helpers
->>>>>>> 3380726 (fixing)
 import data.terraform.gcp.security.biglake.google_biglake_service.vars
 
 conditions := [

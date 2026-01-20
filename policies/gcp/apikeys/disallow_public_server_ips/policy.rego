@@ -1,6 +1,10 @@
 package terraform.gcp.security.apikeys.google_apikeys_key.disallow_public_server_ips
 
+<<<<<<< HEAD
 import data.terraform.gcp.helpers
+=======
+import data.terraform.helpers
+>>>>>>> 3380726 (fixing)
 import data.terraform.gcp.security.apikeys.google_apikeys_key.vars
 
 conditions := [
