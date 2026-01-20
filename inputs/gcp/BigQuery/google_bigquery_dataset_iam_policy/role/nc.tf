@@ -7,6 +7,6 @@ data "google_iam_policy" "nc" {
 
 resource "google_bigquery_dataset_iam_policy" "nc" {
   dataset_id    = "nc"
-  project       = "fake-project-123"
+  project       = "PDE"
   policy_data   = data.google_iam_policy.nc.policy_data
 }

@@ -1,6 +1,6 @@
 resource "google_bigquery_job" "nc" {
   job_id = "nc"
-  project = "your-gcp-project-id"
+  project = "PDE"
   location = "global"
   load {
     source_uris = ["invalid_uri"]  

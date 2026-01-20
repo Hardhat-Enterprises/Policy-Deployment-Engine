@@ -1,5 +1,5 @@
 resource "google_bigquery_row_access_policy" "c" {
-  project = "example-project"  
+  project = "PDE"  
   dataset_id        = "c"
   table_id          = "my_table"
   policy_id         = "my_policy"

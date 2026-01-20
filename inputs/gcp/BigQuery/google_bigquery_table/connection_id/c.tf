@@ -1,5 +1,5 @@
 resource "google_bigquery_table" "c" {
-  project = "example-project"
+  project = "PDE"
   dataset_id = "c"
   table_id   = "your_table_id"
 

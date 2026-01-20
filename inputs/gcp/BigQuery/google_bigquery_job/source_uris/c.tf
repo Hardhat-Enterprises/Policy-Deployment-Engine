@@ -1,6 +1,6 @@
 resource "google_bigquery_job" "c" {
   job_id   = "c"
-  project  = "your-gcp-project-id"
+  project  = "PDE"
   location = "australia-southeast1"
 
   load {
