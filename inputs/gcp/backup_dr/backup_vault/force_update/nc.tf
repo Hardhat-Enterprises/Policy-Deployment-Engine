@@ -1,5 +1,5 @@
 resource "google_backup_dr_backup_vault" "nc" {
-  project  = "my-gcp-project"
+  project  = "PDE"
   location = "australia-southeast1"
 
   backup_vault_id    = "nc"
