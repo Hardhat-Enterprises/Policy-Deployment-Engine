@@ -6,7 +6,8 @@ Reference: [Terraform Registry – chronicle_data_access_scope](https://registry
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `location` | The location of the resource. This is the geographical region where the Chronicle instance resides, such as "us" or "europe-west2". | true | true | Restricting to allowed locations ensures compliance with regional data residency, privacy regulations, and service availability. | australia-southeast1 | Any location not in the approved list, e.g., europe-west3, us-central1, asia-northeast1 |
@@ -20,6 +21,7 @@ Reference: [Terraform Registry – chronicle_data_access_scope](https://registry
 | `ingestion_label` |  | false | false | None | None | None |
 
 ### allowed_data_access_labels Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `data_access_label` | The name of the data access label. | false | false | None | None | None |
@@ -29,6 +31,7 @@ Reference: [Terraform Registry – chronicle_data_access_scope](https://registry
 | `display_name` | (Output) Output only. The display name of the label. Data access label and log types's name will match the display name of the resource. The asset namespace will match the namespace itself. The ingestion key value pair will match the key of the tuple. | false | false | None | None | None |
 
 ### denied_data_access_labels Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `display_name` | (Output) Output only. The display name of the label. Data access label and log types's name will match the display name of the resource. The asset namespace will match the namespace itself. The ingestion key value pair will match the key of the tuple. | false | false | None | None | None |
@@ -38,6 +41,7 @@ Reference: [Terraform Registry – chronicle_data_access_scope](https://registry
 | `ingestion_label` | Representation of an ingestion label type. Structure is [documented below](#nested_denied_data_access_labels_denied_data_access_labels_ingestion_label). | false | false | None | None | None |
 
 ### ingestion_label Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `ingestion_label_key` | Required. The key of the ingestion label. Always required. | true | false | None | None | None |

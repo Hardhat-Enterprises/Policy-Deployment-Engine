@@ -6,7 +6,8 @@ Reference: [Terraform Registry – discovery_engine_search_engine](https://regis
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `display_name` | Required. The display name of the engine. Should be human readable. UTF-8 encoded string with limit of 1024 characters. | true | false | Name | None | None |
@@ -20,12 +21,14 @@ Reference: [Terraform Registry – discovery_engine_search_engine](https://regis
 | `project` | If it is not provided, the provider project is used. | true | false | Needed to work | None | None |
 
 ### search_engine_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `search_tier` | The search feature tier of this engine. Defaults to SearchTier.SEARCH_TIER_STANDARD if not specified. Default value is `SEARCH_TIER_STANDARD`. Possible values are: `SEARCH_TIER_STANDARD`, `SEARCH_TIER_ENTERPRISE`. | false | false | None | None | None |
 | `search_add_ons` | The add-on that this search engine enables. Each value may be one of: `SEARCH_ADD_ON_LLM`. | false | false | None | None | None |
 
 ### common_config Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `company_name` | The name of the company, business or entity that is associated with the engine. Setting this may help improve LLM related features.cd | false | false | None | None | None |

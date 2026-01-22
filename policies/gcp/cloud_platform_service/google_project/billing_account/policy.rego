@@ -1,6 +1,6 @@
 package terraform.gcp.security.cloud_platform_service.google_project.billing_account
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.cloud_platform_service.google_project.vars
 
 # Flag projects that have no billing account attached

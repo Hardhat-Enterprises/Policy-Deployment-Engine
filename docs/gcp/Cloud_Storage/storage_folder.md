@@ -6,7 +6,8 @@ Reference: [Terraform Registry – storage_folder](https://registry.terraform.io
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `bucket` | The name of the bucket that contains the folder. | true | false | None | None | None |

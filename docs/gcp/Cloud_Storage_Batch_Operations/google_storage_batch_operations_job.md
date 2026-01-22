@@ -6,7 +6,8 @@ Reference: [Terraform Registry – google_storage_batch_operations_job](https://
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `job_id` | The ID of the job. | false | false | Job ID is an identifier and does not affect security; only identifies the operation. | None | None |
@@ -18,11 +19,13 @@ Reference: [Terraform Registry – google_storage_batch_operations_job](https://
 | `put_metadata` | Allows batch operations to update metadata for objects in bucket. | false | false | Metadata updates are generally safe operations that don't affect data integrity or security. | None | None |
 
 ### bucket_list Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `buckets` | List of buckets and their objects to be transformed. | true | false | Bucket configuration is required for batch operations but doesn't directly impact security. | None | None |
 
 ###   buckets Block
+
   | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
   |----------|-------------|----------|-----------------|-----------|-----------|---------------|
   | `bucket` | Bucket name for the objects to be transformed. | true | false | Bucket name is required for batch operations but doesn't directly impact security. | None | None |
@@ -30,32 +33,38 @@ Reference: [Terraform Registry – google_storage_batch_operations_job](https://
   | `manifest` | Contains the manifest source file that is a CSV file in a Google Cloud Storage bucket. | false | true | Manifest files provide explicit object lists, ensuring operations only affect intended objects. | manifest = [{ manifest_location = 'gs://bucket/manifest.csv' }] | manifest = [] or manifest_location = '' |
 
 ###     prefix_list Block
+
     | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
     |----------|-------------|----------|-----------------|-----------|-----------|---------------|
     | `included_object_prefixes` | List of object name prefixes to include in the batch operation. | true | true | Prefixes ensure operations are scoped to specific objects, preventing accidental mass operations. | included_object_prefixes = ['secure-data/', 'backup/'] | included_object_prefixes = [] or included_object_prefixes = [''] |
 
 ###     manifest Block
+
     | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
     |----------|-------------|----------|-----------------|-----------|-----------|---------------|
     | `manifest_location` | Specifies objects in a manifest file stored in Cloud Storage. | true | true | Valid manifest location ensures operations target only explicitly listed objects. | manifest_location = 'gs://secure-bucket/manifest.csv' | manifest_location = '' or manifest_location = null |
 
 ### delete_object Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `permanent_object_deletion_enabled` | Enable flag to permanently delete object and all object versions if versioning is enabled on bucket. | true | true | Permanent deletion removes recovery options and poses a major security risk for data loss. | permanent_object_deletion_enabled = false | permanent_object_deletion_enabled = true |
 
 ### rewrite_object Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `kms_key` | Valid KMS key for encryption during rewrite operations. | true | true | CMEK ensures encryption is customer-managed rather than default Google-managed keys. | kms_key = 'projects/my-project/locations/us-central1/keyRings/kr/cryptoKeys/key' | kms_key = null or kms_key = '' |
 
 ### put_object_hold Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `event_based_hold` | Set/unset to update event based hold for objects. | false | true | Unsetting event-based holds can allow premature deletion of objects that should be retained. | event_based_hold = 'SET' | event_based_hold = 'UNSET' |
 | `temporary_hold` | Set/unset to update temporary based hold for objects. | false | true | Unsetting temporary holds can allow premature deletion of objects that should be retained. | temporary_hold = 'SET' | temporary_hold = 'UNSET' |
 
 ### put_metadata Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `custom_time` | Updates the objects fixed custom time metadata. | false | false | Custom time metadata is informational and doesn't impact security. | None | None |

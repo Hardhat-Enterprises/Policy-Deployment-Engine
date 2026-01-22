@@ -6,7 +6,8 @@ Reference: [Terraform Registry – iap_app_engine_version_iam](https://registry.
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `app_id` | App Engine application ID used in the IAP resource path (typically the project ID). Identifies which App Engine app’s **version** IAM is managed. | true | true | Must point to the correct application; mis-scoping could attach IAM to the wrong app. | app_id = "my-gcp-project" | app_id = "" |
@@ -19,6 +20,7 @@ Reference: [Terraform Registry – iap_app_engine_version_iam](https://registry.
 | `condition` | Optional IAM Condition block to scope the binding (for example, by host/path/time/device). | false | true | Reduces blast radius by restricting when/where the binding applies. | condition { title = "OnlyProd" expression = "request.host == 'app.example.com'" description = "Limit to prod host" } | condition { } (missing required fields) or an empty expression |
 
 ### condition Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `expression` | CEL expression evaluated to determine if the binding applies. | true | true | A non-empty, precise expression is required for the condition to function. | expression = "request.host == 'app.example.com'" | expression = "" |

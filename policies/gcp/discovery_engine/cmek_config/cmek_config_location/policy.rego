@@ -1,5 +1,5 @@
 package terraform.gcp.security.discovery_engine.cmek_config.cmek_config_location
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.discovery_engine.cmek_config.vars
 
 #cmek_config_location

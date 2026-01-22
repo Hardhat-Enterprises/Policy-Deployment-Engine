@@ -6,7 +6,8 @@ Reference: [Terraform Registry – storage_anywhere_cache](https://registry.terr
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `zone` | The zone in which the cache instance needs to be created. For example, `us-central1-a.` | true | true | Zone location need to be set in Aus regions for data sovereignty purposes | australia-southeast1-b | us-west-2 |

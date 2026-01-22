@@ -6,7 +6,8 @@ Reference: [Terraform Registry – google_project_iam_member_remove](https://reg
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `project` |  | false | false | None | None | None |
