@@ -6,7 +6,8 @@ Reference: [Terraform Registry – beyondcorp_security_gateway_application_iam](
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `security_gateway_id` |  The security gateway identifier. The name is formatted as follows: `projects/{project_id}/locations/{location_id}/securityGateways/{security_gateway_id}`. | true | false | The security gateway ID is required to identify the specific BeyondCorp Security Gateway for which the IAM policy is being managed. | None | None |
@@ -18,6 +19,7 @@ Reference: [Terraform Registry – beyondcorp_security_gateway_application_iam](
 | `condition` | The condition field allows for more granular control over when the IAM policy is applied. Structure is documented below. | false | false | The condition field allows for more granular control over when the IAM policy is applied. | None | None |
 
 ### condition Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `expression` | The expression of the condition in Common Expression Language syntax. | true | false | The expression of the condition is necessary to define the logic that determines when the IAM policy is applied. | None | None |

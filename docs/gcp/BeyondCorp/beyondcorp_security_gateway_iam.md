@@ -6,7 +6,8 @@ Reference: [Terraform Registry – beyondcorp_security_gateway_iam](https://regi
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `location` | the value will be parsed from the identifier of the parent resource. If no location is provided in the parent identifier and no location is specified, it is taken from the provider configuration. | false | false | The location is used to scope the BeyondCorp Security Gateway. If not provided, it will default to the provider's location or be inferred from the parent resource. This ensures that resources are created in the intended geographical region, which can have implications for latency, compliance, and data residency. | None | None |
@@ -18,6 +19,7 @@ Reference: [Terraform Registry – beyondcorp_security_gateway_iam](https://regi
 | `condition` | The condition field allows for more granular control over when the IAM policy is applied. | false | false | The condition field allows for more granular control over when the IAM policy is applied. | None | None |
 
 ### condition Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `expression` | The expression for the condition. See CEL spec for more details. | true | false | The expression is necessary to define the logic that determines when the IAM policy is applied. | None | None |

@@ -2,107 +2,90 @@
   "resource_name": "beyondcorp_security_gateway_application",
   "subcategory": "BeyondCorp",
   "arguments": {
-    "endpoint_matchers": {
-      "description": "Required. Endpoint matchers associated with an application. A combination of hostname and ports as endpoint matcher is used to match the application. Match conditions for OR logic. An array of match conditions to allow for multiple matching criteria. The rule is considered a match if one the conditions are met. The conditions can be one of the following combination (Hostname), (Hostname & Ports) EXAMPLES: Hostname - (\"*.abc.com\"), (\"xyz.abc.com\") Hostname and Ports - (\"abc.com\" and \"22\"), (\"abc.com\" and \"22,33\") etc Structure is [documented below](#nested_endpoint_matchers).",
-      "required": true,
-      "security_impact": true,
-      "rationale": "This is to ensure that only authorized applications can be accessed through the Security Gateway.",
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "hostname": {
-          "description": "Required. Hostname of the application.",
-          "required": true,
-          "security_impact": false,
-          "rationale": "This needs to be specified to ensure proper routing and access control.",
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "endpoint_matchers"
-        },
-        "ports": {
-          "description": "Optional. Ports of the application.",
-          "required": false,
-          "security_impact": true,
-          "rationale": "Specifying the ports is crucial for ensuring that only the intended traffic is allowed through the Security Gateway.",
-          "compliant": "443, 8443",
-          "non-compliant": "80, 8080",
-          "parent": "endpoint_matchers"
-        }
-      }
-    },
     "security_gateway_id": {
       "description": "ID of the Security Gateway resource this belongs to.",
       "required": true,
       "security_impact": false,
-      "rationale": "Security through the Security Gateway is a core part of BeyondCorp, and associating applications with a specific gateway is essential for proper access control and routing.",
-      "compliant": null,
-      "non-compliant": null,
+      "rationale": "Associating the application with a specific gateway ensures proper access control and routing.",
+      "compliant": ["default-sg", "default-sg-spa", "default-sg-spa-proxy", "svc.corp.example.com"],
+      "non-compliant": ["unauthorized-gateway-1", "test-sg", "sg-dev"],
       "parent": null
     },
     "application_id": {
-      "description": "User-settable Application resource ID. * Must start with a letter. * Must contain between 4-63 characters from `/a-z-/`. * Must end with a number or letter.",
+      "description": "User-settable Application resource ID. Must start with a letter, 4-63 characters, can contain /a-z-/ and end with a number or letter.",
       "required": true,
       "security_impact": false,
-      "rationale": "This id corresponds to the 'resource name' of the Application and is used to uniquely identify it within the Security Gateway.",
-      "compliant": null,
-      "non-compliant": null,
+      "rationale": "Used to uniquely identify the application within the Security Gateway.",
+      "compliant": ["gateway-app-c", "app-production", "app-spa-api"],
+      "non-compliant": ["1invalid-app", "app!", "app_with_space"],
       "parent": null
     },
-    "display_name": {
-      "description": "Optional. An arbitrary user-provided name for the Application resource. Cannot exceed 64 characters.",
-      "required": false,
-      "security_impact": false,
-      "rationale": "This is the name that will be displayed in the UI and can help administrators easily identify and manage the application.",
-      "compliant": null,
-      "non-compliant": null,
+    "endpoint_matchers": {
+      "description": "Endpoint matchers to define which hostnames and ports the application uses.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Ensures only authorized application endpoints are accessible through the Security Gateway.",
+      "compliant": ["svc.corp.example.com:443", "svc.corp.example.com:8443"],
+      "non-compliant": ["svc.corp.example.com:80", "example.com:8080"],
       "parent": null
     },
     "upstreams": {
-      "description": "Optional. List of upstream resources to forward traffic to. Structure is [documented below](#nested_upstreams).",
+      "description": "Optional list of upstream resources to forward traffic to.",
       "required": false,
       "security_impact": true,
-      "rationale": "Specifying upstream resources ensures that traffic is routed securely and according to organizational policies.",
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
+      "rationale": "Traffic must be routed securely and through approved upstream networks.",
       "arguments": {
         "egress_policy": {
-          "description": "Optional. Routing policy information. Defines the region of egress to ensure secure and compliant traffic flow.",
+          "description": "Routing policy to define allowed egress regions.",
           "required": false,
           "security_impact": true,
-          "rationale": "Traffic must be restricted to approved regions for compliance and security reasons.",
-          "compliant": "australia-southeast1, australia-southeast2",
-          "non-compliant": "us-west1, us-west2",
+          "rationale": "Traffic must stay within approved regions for compliance.",
+          "compliant": ["australia-southeast1", "australia-southeast2"],
+          "non-compliant": ["us-west1", "us-east1"],
           "parent": "upstreams"
         },
         "network": {
-          "description": "Network to forward traffic to. Structure is [documented below](#nested_upstreams_upstreams_network).",
+          "description": "Network for forwarding traffic.",
           "required": false,
           "security_impact": true,
-          "rationale": "Upstream networks must be approved to ensure proper security segmentation.",
-          "compliant": "projects/smooth-verve-467716-v1/global/networks/prod-vpc,projects/smooth-verve-467716-v1/global/networks/shared-services-vpc",
-          "non-compliant": "projects/smooth-verve-467716-v1/global/networks/test-vpc,projects/smooth-verve-467716-v1/global/networks/dev-vpc",
+          "rationale": "Only approved networks should be used for security reasons.",
+          "compliant": [
+            "projects/smooth-verve-467716-v1/global/networks/prod-vpc",
+            "projects/smooth-verve-467716-v1/global/networks/shared-services-vpc"
+          ],
+          "non-compliant": [
+            "projects/smooth-verve-467716-v1/global/networks/dev-vpc",
+            "projects/smooth-verve-467716-v1/global/networks/test-vpc"
+          ],
           "parent": "upstreams"
         }
       }
     },
-    "project": {
-      "description": "If it is not provided, the provider project is used.",
+    "display_name": {
+      "description": "Optional human-readable name for the application.",
       "required": false,
       "security_impact": false,
-      "rationale": "This field allows for the specification of a project ID, which can be useful for organizing resources and managing access control.",
-      "compliant": null,
-      "non-compliant": null,
+      "rationale": "Helps admins identify the application in the UI.",
+      "compliant": ["My SPA App", "Gateway App Production"],
+      "non-compliant": ["", null],
       "parent": null
     },
     "logging_enabled": {
-      "description": "Enables logging for the Security Gateway Application.",
+      "description": "Enable logging for auditing and monitoring.",
       "required": false,
       "security_impact": true,
-      "rationale": "Logging must be enabled to allow auditing of application access and support security monitoring.",
-      "compliant": "true",
-      "non-compliant": "false",
+      "rationale": "Logging ensures application access can be monitored.",
+      "compliant": ["true"],
+      "non-compliant": ["false"],
+      "parent": null
+    },
+    "project": {
+      "description": "Project ID if different from provider default.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Allows associating the application with a specific project.",
+      "compliant": ["smooth-verve-467716-v1"],
+      "non-compliant": ["other-project-id"],
       "parent": null
     }
   }

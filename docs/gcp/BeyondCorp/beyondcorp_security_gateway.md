@@ -6,7 +6,8 @@ Reference: [Terraform Registry – beyondcorp_security_gateway](https://registry
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `security_gateway_id` | Optional. User-settable SecurityGateway resource ID. * Must start with a letter. * Must contain between 4-63 characters from `/a-z-/`. * Must end with a number or letter. | true | false | This value is used to uniquely identify the SecurityGateway. Since it is user-settable, it may be chosen to follow a specific naming convention relevant to the user's organization. | None | None |
@@ -15,20 +16,16 @@ Reference: [Terraform Registry – beyondcorp_security_gateway](https://registry
 | `location` | , Deprecated) Resource ID segment making up resource `name`. It identifies the resource within its parent collection as described in https://google.aip.dev/122. Must be omitted or set to `global`. ~> **Warning:** `location` is deprecated and will be removed in a future major release. | false | false | The location is fixed to `global` for this resource type, ensuring consistency in resource identification. | None | None |
 | `project` | If it is not provided, the provider project is used. | false | false | The project context is essential for resource management and billing, but does not directly impact security. | None | None |
 | `internet_gateway` | This attribute is read-only and reflects the configuration of the internet gateway associated with the SecurityGateway. Structure is [documented below](#nested_internet_gateway). | false | false | This configuration allows for internet access and management of IP addresses. | None | None |
-| `logging_config` | Logging configuration for the Security Gateway. | false | true | Logging must be enabled to provide visibility into Security Gateway activity, support auditing, and allow forensic investigation if a security incident occurs. | None | None |
 
 ### hubs Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `region` | This refers to the GCP region where the Hub is located. Example: `australia-southeast1`. | true | true | Specifying the region allows for optimized routing and compliance with data residency requirements. | australia-southeast1, australia-southeast2 | us-central1, europe-west1 |
 | `internet_gateway` | Internet Gateway configuration. Structure is [documented below](#nested_hubs_hub_internet_gateway). | false | false | This configuration allows for internet access and management of IP addresses. | None | None |
 
 ### internet_gateway Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `assigned_ips` | (Output) Output only. List of IP addresses assigned to the Cloud NAT. | false | false | This argument provides visibility into the IP addresses assigned to the Cloud NAT, which is important for network management and security monitoring. | None | None |
-
-### logging_config Block
-| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
-|----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `enable` | Specifies whether logging is enabled for the Security Gateway. | false | true | This must be turned on to ensure all gateway actions are traceable and auditable. | true | false |

@@ -6,7 +6,8 @@ Reference: [Terraform Registry – beyondcorp_application_iam](https://registry.
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `security_gateways_id` | The security id of the BeyondCorp Application. In the format: `projects/{project_id}/locations/{location_id}/securityGateways/{security_gateway_id}`. | true | false | The security gateway ID is required to identify the specific BeyondCorp Application for which the IAM policy is being managed. | None | None |
@@ -18,6 +19,7 @@ Reference: [Terraform Registry – beyondcorp_application_iam](https://registry.
 | `condition` | The condition resource defines the conditions under which the IAM policy is applied. Structure is documented below. | false | false | The condition of the IAM policy allows for more granular control over when the policy is applied. | None | None |
 
 ### condition Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `expression` |  The argument of the condition, in the Common Expression Language syntax. The condition's expression must evaluate to a boolean value. If the expression evaluates to true, then the condition is met and the rule is applied. If the expression evaluates to false, then the condition is not met and the rule is not applied. An example expression is: `request.time < timestamp("2020-10-01T00:00:00Z")` | true | false | The expression of the condition is necessary to define the logic that determines when the IAM policy is applied. | None | None |

@@ -15,19 +15,6 @@ conditions := [
       "values": [443, 8443, 9443],
       "policy_type": "whitelist"
     }
-  ],
-
-  [
-    {
-      "situation_description": "Insecure protocol detected.",
-      "remedies": ["Use HTTPS protocol only."]
-    },
-    {
-      "condition": "Only HTTPS protocol is allowed.",
-      "attribute_path": ["application_endpoint", 0, "protocol"],
-      "values": ["https"],
-      "policy_type": "whitelist"
-    }
   ], 
   [
   {

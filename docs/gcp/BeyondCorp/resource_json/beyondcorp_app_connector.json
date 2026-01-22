@@ -12,7 +12,7 @@
       "parent": null
     },
     "principal_info": {
-      "description": "Principal information about the Identity of the AppConnector. Structure is [documented below](#nested_principal_info).",
+      "description": "Principal information about the identity of the AppConnector. Structure is [documented below](#nested_principal_info).",
       "required": true,
       "security_impact": false,
       "rationale": "This information is required to establish the identity of the AppConnector for authentication and authorization purposes.",
@@ -27,7 +27,18 @@
           "rationale": "The service account is used to authenticate the AppConnector with GCP services.",
           "compliant": null,
           "non-compliant": null,
-          "parent": "principal_info"
+          "parent": "principal_info",
+          "arguments": {
+            "email": {
+              "description": "Email address of the service account.",
+              "required": true,
+              "security_impact": false,
+              "rationale": "The email address is used to identify the service account.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "service_account"
+            }
+          }
         }
       }
     },
@@ -40,24 +51,6 @@
       "non-compliant": "europe-west1, us-central1",
       "parent": null
     },
-    "logging_enabled": {
-      "description": "shows logging is enabled or not for the AppConnector.",
-      "required": false,
-      "security_impact": true,
-      "rationale": "Logging is required to provide visibility into connector activity and to support auditing and incident investigation.",
-      "compliant": "true",
-      "non-compliant": "false",
-      "parent": null
-    },
-     "tls_enabled": {
-      "description": "Indicating secure TLS connection or not for communications handled by the AppConnector.",
-      "required": false,
-      "security_impact": true,
-      "rationale": "TLS ensures that data exchanged through the connector is encrypted in transit, protecting it from interception or tampering.",
-      "compliant": "true",
-      "non-compliant": "false",
-      "parent": null
-    },
     "display_name": {
       "description": "An arbitrary user-provided name for the AppConnector.",
       "required": false,
@@ -67,14 +60,13 @@
       "non-compliant": null,
       "parent": null
     },
-    
     "labels": {
-      "description": "Resource labels to represent user provided metadata. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
+      "description": "Resource labels to represent user provided metadata. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. The 'env' label is mandatory for compliance.",
       "required": false,
-      "security_impact": false,
-      "rationale": "Labels are used for metadata and do not directly impact security.",
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "The 'env' label indicates the deployment environment and is required for governance and security compliance.",
+      "compliant": ["env"],
+      "non-compliant": [],
       "parent": null
     },
     "project": {
@@ -85,26 +77,6 @@
       "compliant": null,
       "non-compliant": null,
       "parent": null
-    },
-    "service_account": {
-      "description": "ServiceAccount represents a GCP service account. Structure is [documented below](#nested_principal_info_service_account).",
-      "required": true,
-      "security_impact": false,
-      "rationale": "The service account is used to authenticate the AppConnector with GCP services.",
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "email": {
-          "description": "Email address of the service account.",
-          "required": true,
-          "security_impact": false,
-          "rationale": "The email address is used to identify the service account.",
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "service_account"
-        }
-      }
     }
   }
 }
