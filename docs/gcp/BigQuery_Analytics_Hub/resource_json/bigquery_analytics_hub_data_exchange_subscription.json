@@ -124,8 +124,8 @@
     "refresh_policy": {
       "description": "* `ON_READ`: Default value if not specified. The subscription will be refreshed every time Terraform performs a read operation (e.g., `terraform plan`, `terraform apply`, `terraform refresh`). This ensures the state is always up-to-date. * `ON_STALE`: The subscription will only be refreshed when its reported `state` (an output-only field from the API) is `STATE_STALE` during a Terraform read operation. * `NEVER`: The provider will not automatically refresh the subscription.",
       "required": null,
-      "security_impact": "Yes. Setting refresh_policy to NEVER can cause Terraform to stop refreshing state, which may hide drift and lead to decisions based on stale configuration.",
-      "rationale": "This policy blocks refresh_policy=NEVER to ensure Terraform continues to refresh the Analytics Hub subscription state (ON_READ by default, or ON_STALE). Regular refresh reduces the chance of undetected drift or stale state during plan/apply workflows.",
+      "security_impact": true,
+      "rationale": "Setting refresh_policy to NEVER can cause Terraform to stop refreshing state, which may hide drift and lead to decisions based on stale configuration. This policy blocks refresh_policy=NEVER to ensure Terraform continues to refresh the Analytics Hub subscription state (ON_READ by default, or ON_STALE). Regular refresh reduces the chance of undetected drift or stale state during plan/apply workflows.",
       "compliant": "Do not set refresh_policy (defaults to ON_READ), or explicitly set refresh_policy to ON_READ or ON_STALE.",
       "non-compliant": "Setting refresh_policy to NEVER is non-compliant because it disables automatic refresh during Terraform read operations.",
       "parent": null
