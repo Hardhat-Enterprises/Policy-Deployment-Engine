@@ -13,7 +13,7 @@ conditions := [
       {
         "condition": "data source is set to c-datasource",
         "attribute_path": ["data_source"],
-        "values": ["c-datasource"],
+        "values": ["c-datasource", "salesforce", "jira"", "confluence", "bigquery"],
         "policy_type": "whitelist"
       }
     ]

@@ -8,12 +8,12 @@ conditions := [
     [
     {
         "situation_description": "Is license_config_location configured correctly",
-        "remedies": ["Ensure that it is set to eu"]
+        "remedies": ["Ensure that it is set to a valid location"]
         },
       {
         "condition": "license_config_location is mis-configured",
         "attribute_path": ["location"],
-        "values": ["eu"],
+        "values": ["eu", "us", "global"],
         "policy_type": "whitelist"
       }
     ]

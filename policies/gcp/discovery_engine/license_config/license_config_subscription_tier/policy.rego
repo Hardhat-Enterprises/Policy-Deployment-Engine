@@ -11,7 +11,7 @@ conditions := [
         "remedies": ["Ensure that it is set to SUBSCRIPTION_TIER_ENTERPRISE"]
         },
       {
-        "condition": "search_engine_industry_vertical is mis-configured",
+        "condition": "license_config_subscription_tier is mis-configured",
         "attribute_path": ["subscription_tier"],
         "values": ["SUBSCRIPTION_TIER_ENTERPRISE"],
         "policy_type": "whitelist"

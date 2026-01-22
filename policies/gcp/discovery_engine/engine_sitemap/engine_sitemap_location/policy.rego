@@ -7,13 +7,13 @@ import data.terraform.gcp.security.discovery_engine.engine_sitemap.vars
 conditions := [
     [
     {
-        "situation_description": "Is engine_sitemap_location set to eu?",
-        "remedies": ["Ensure that it is set to eu"]
+        "situation_description": "Is engine_sitemap_location set to a valid location?",
+        "remedies": ["Ensure that it is set to a valid location"]
         },
       {
         "condition": "engine_sitemap_location is mis-configured",
         "attribute_path": ["location"],
-        "values": ["eu"],
+        "values": ["eu", "us", "global"],
         "policy_type": "whitelist"
       }
     ]
