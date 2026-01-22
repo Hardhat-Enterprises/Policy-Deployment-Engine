@@ -1,4 +1,4 @@
-package terraform.gcp.security.beyondcorp.google_beyondcorp_app_connector.logging_policy
+package terraform.gcp.security.beyondcorp.google_beyondcorp_app_connector.logging_enabled
 
 import data.terraform.helpers
 import data.terraform.gcp.security.beyondcorp.google_beyondcorp_app_connector.vars
