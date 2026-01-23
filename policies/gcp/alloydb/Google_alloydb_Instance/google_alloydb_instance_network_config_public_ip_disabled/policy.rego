@@ -1,6 +1,6 @@
 package terraform.gcp.security.alloydb.google_alloydb_instance.network_config_public_ip_disabled
 
-import data.terraform.gcp.helpers as helpers
+import data.terraform.helpers as helpers
 import data.terraform.gcp.security.alloydb.google_alloydb_instance.vars as vars
 
 conditions := [[
