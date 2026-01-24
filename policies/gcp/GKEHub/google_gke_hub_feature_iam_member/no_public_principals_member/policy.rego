@@ -1,5 +1,5 @@
 package terraform.gcp.security.gke_hub.google_gke_hub_feature_iam_member.no_public_principals_member
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.gke_hub.google_gke_hub_feature_iam_member.vars
 
 

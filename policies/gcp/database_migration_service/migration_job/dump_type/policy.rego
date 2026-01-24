@@ -1,5 +1,5 @@
 package terraform.gcp.security.database_migration_service.migration_job.dump_type
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.database_migration_service.migration_job.vars
 
 conditions := [

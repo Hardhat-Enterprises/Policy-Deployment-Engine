@@ -1,6 +1,6 @@
 package terraform.gcp.security.dataproc_metastore.federation.version
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.dataproc_metastore.federation.vars
 
 conditions := [

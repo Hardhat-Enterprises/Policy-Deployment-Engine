@@ -1,6 +1,6 @@
 package terraform.gcp.security.cloud_platform_service.google_service_account.account_id
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.cloud_platform_service.google_service_account.vars
 
 # (account_id) – single, simple blacklist

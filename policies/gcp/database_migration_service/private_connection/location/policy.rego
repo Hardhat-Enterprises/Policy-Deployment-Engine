@@ -1,5 +1,5 @@
 package terraform.gcp.security.database_migration_service.private_connection.location
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.database_migration_service.private_connection.vars
 
 conditions := [

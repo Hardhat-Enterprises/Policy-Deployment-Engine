@@ -1,6 +1,6 @@
 package terraform.gcp.security.dataform.google_dataform_repository.git_ssh_auth
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.dataform.google_dataform_repository as repo
 
 # This policy enforces: if a repo uses SSH authentication,

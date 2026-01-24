@@ -1,6 +1,6 @@
 package terraform.gcp.security.oslogin.google_compute_instance.require_service_account
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.oslogin.google_compute_instance.vars
 
 
