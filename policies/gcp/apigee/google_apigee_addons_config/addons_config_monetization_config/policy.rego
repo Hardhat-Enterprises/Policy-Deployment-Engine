@@ -13,11 +13,7 @@ conditions := [
         },
         {
             "condition": "Ensures that the Apigee Monetization config is enabled",
-
-            # Correct nested attribute path
             "attribute_path": ["addons_config",0,"monetization_config",0,"enabled"],
-
-            # Allow only org names that match this pattern
             "values": true,
 
             "policy_type": "whitelist"

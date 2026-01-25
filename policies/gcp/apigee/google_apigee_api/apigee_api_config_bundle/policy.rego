@@ -13,11 +13,7 @@ conditions := [
         },
         {
             "condition": "check config_bundle should is compliant",
-
-            # Correct nested attribute path
             "attribute_path": ["config_bundle"],
-
-            # Allow only org names that match this pattern
             "values": ["proxies/MyProxy.zip"],
 
             "policy_type": "whitelist"

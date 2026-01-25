@@ -13,11 +13,7 @@ conditions := [
         },
         {
             "condition": "Ensures that the api_security_config is enabled",
-
-            # Correct nested attribute path
             "attribute_path": ["addons_config",0,"api_security_config",0,"enabled"],
-
-            # Allow only org names that match this pattern
             "values": true,
 
             "policy_type": "whitelist"
