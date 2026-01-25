@@ -1,17 +1,21 @@
 package terraform.gcp.security.backup_for_gke.backup_plan.deactivated
-
-import rego.v1
+import data.terraform.helpers
 import data.terraform.gcp.security.backup_for_gke.backup_plan.vars
-import data.terraform.helpers.policies.blacklist
 
-# Backup plans should not be deactivated
-violations := blacklist.get_violations(
-    vars.variables,
-    ["deactivated"],
-    [true]
-)
-
-message := [m | 
-    some violation in violations
-    m := violation.message
+conditions := [
+  [
+    {
+      "situation_description": "Backup Plan must not be deactivated.",
+      "remedies": ["Set deactivated to false."]
+    },
+    {
+      "condition": "Deactivated must not be true",
+      "attribute_path": ["deactivated"],
+      "values": [true],
+      "policy_type": "blacklist"
+    }
+  ]
 ]
+
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

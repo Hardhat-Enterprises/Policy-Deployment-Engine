@@ -1,18 +1,19 @@
 resource "google_gke_backup_backup_plan" "nc" {
-  name     = "permissive-backup-plan"
-  cluster  = "projects/fluent-coder-468700-h4/locations/australia-southeast1/clusters/prod-cluster"
+  name = "nc"
+  cluster  = "projects/PDE/locations/australia-southeast1/clusters/prod-cluster"
   location = "australia-southeast1"
-  project  = var.gcp_project
+  project  = "PDE"
   
   backup_config {
     include_volume_data = true
-    include_secrets = false
-    permissive_mode = true  # SECURITY RISK: Continues backup even with errors
+    include_secrets     = false
+    permissive_mode     = true
     selected_applications {
       namespaced_names {
-        name = "app1"
+        name = "nc"
         namespace = "ns1"
       }
     }
   }
 }
+

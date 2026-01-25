@@ -1,6 +1,7 @@
 resource "google_gke_backup_backup_channel" "nc" {
-  name                = "backup-channel-wrong-project"
+  name = "nc"
   location            = "australia-southeast1"
-  project             = var.gcp_project
-  destination_project = "projects/external-project-123"  # Non-compliant: Different project
+  project             = "PDE"
+  destination_project = "projects/PDE" # Violates projects/backup-*
 }
+

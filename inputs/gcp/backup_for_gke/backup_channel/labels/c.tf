@@ -1,13 +1,15 @@
 resource "google_gke_backup_backup_channel" "c" {
-  name                = "backup-channel-with-labels"
+  name                = "c"
   location            = "australia-southeast1"
-  project             = var.gcp_project
-  destination_project = "projects/fluent-coder-468700-h4"
+  project             = "PDE"
+  destination_project = "projects/PDE"
   
   labels = {
-    environment = "production"
+    environment = "prod"
     team        = "platform"
     compliance  = "required"
     cost-center = "engineering"
+    owner       = "platform-team"
   }
 }
+

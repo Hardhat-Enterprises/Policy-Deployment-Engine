@@ -1,14 +1,17 @@
 resource "google_gke_backup_restore_channel" "c" {
-  name                = "labeled-restore-channel"
+  name                = "c"
   location            = "australia-southeast1"
-  project             = var.gcp_project
-  destination_project = "projects/fluent-coder-468700-h4"
+  project             = "PDE"
+  destination_project = "projects/PDE"
   
   labels = {
-    data-classification = "sensitive"      # SECURE: Data classification
-    compliance         = "required"        # SECURE: Compliance tracking
-    environment       = "production"       # SECURE: Environment identification
-    disaster-recovery = "critical"        # SECURE: DR priority
-    encryption       = "cmek-required"    # SECURE: Encryption requirement
+    data-classification = "sensitive"
+    compliance          = "required"
+    environment         = "prod"
+    disaster-recovery   = "critical"
+    encryption          = "cmek-required"
+    owner               = "platform-team"
+    cost-center         = "engineering"
   }
 }
+

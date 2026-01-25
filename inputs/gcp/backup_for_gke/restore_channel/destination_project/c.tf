@@ -1,7 +1,8 @@
 resource "google_gke_backup_restore_channel" "c" {
-  name                = "secure-restore-channel"
+  name                = "c"
   location            = "australia-southeast1"
-  project             = var.gcp_project
-  destination_project = "projects/fluent-coder-468700-h4"  # SECURE: Same project restore
+  project             = "PDE"
+  destination_project = "projects/PDE"
   description         = "Restore channel for same-project disaster recovery"
 }
+

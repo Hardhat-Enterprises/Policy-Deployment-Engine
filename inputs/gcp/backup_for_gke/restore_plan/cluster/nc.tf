@@ -1,11 +1,12 @@
 resource "google_gke_backup_restore_plan" "nc" {
-  name        = "insecure-restore-plan"
+  name = "nc"
   location    = "australia-southeast1"
-  project     = var.gcp_project
-  backup_plan = "projects/fluent-coder-468700-h4/locations/australia-southeast1/backupPlans/prod-backup-plan"
-  cluster     = "projects/external-project/locations/us-central1/clusters/external-cluster"  # SECURITY RISK: External cluster!
+  project     = "PDE"
+  backup_plan        = "nc"
+  cluster     = "projects/PDE/locations/australia-southeast1/clusters/prod-primary" # Invalid: not a DR cluster
   
   restore_config {
-    all_namespaces = true  # SECURITY RISK: Restore everything
+    all_namespaces = true
   }
 }
+

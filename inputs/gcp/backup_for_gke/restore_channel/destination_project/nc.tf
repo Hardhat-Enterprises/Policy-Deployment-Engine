@@ -1,6 +1,7 @@
 resource "google_gke_backup_restore_channel" "nc" {
-  name                = "cross-project-restore"
+  name = "nc"
   location            = "australia-southeast1"
-  project             = var.gcp_project
-  destination_project = "projects/external-project-12345"  # SECURITY RISK: External project!
+  project             = "PDE"
+  destination_project = "external-project-12345"
 }
+

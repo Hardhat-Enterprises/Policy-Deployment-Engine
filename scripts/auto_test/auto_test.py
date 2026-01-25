@@ -6,7 +6,7 @@ import json
 import re
 import shutil
 from pathlib import Path
-
+from typing import Optional, Union, Any, Dict, List, Set
 
 def normalize_policies_root(provided_root: Path) -> Path:
     """
@@ -54,9 +54,13 @@ def make_success(attribute: str, service: str, resource: str) -> dict:
     return {"service": str(service), "resource": str(resource), "policy": str(attribute), "passed": True}
 
 
-def opa_eval_value(policies_root: Path, plan_json_path: Path, query: str):
+def opa_eval_value(policies_root: Path, plan_json_path: Path, query: str, helpers_root: Optional[Path] = None):
     """Evaluate an OPA query and return the expression value from JSON output or None."""
-    cmd = f'opa eval --data "{policies_root}" --input "{plan_json_path}" --format json "{query}"'
+    cmd = f'opa eval --data "{policies_root}"'
+    if helpers_root and helpers_root.exists():
+        cmd += f' --data "{helpers_root}"'
+    cmd += f' --input "{plan_json_path}" --format json "{query}"'
+    
     result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
     if result.returncode != 0:
         print(f"OPA eval failed: {query}")
@@ -142,8 +146,8 @@ def match_names_in_messages(messages: list[str], candidate_names: set[str]) -> s
     return matched
 
 
-def get_resource_type(policies_root: Path, plan_path: Path, vars_resource_type_query: str):
-    return opa_eval_value(policies_root.resolve(), plan_path, vars_resource_type_query)
+def get_resource_type(policies_root: Path, plan_path: Path, vars_resource_type_query: str, helpers_root: Optional[Path]):
+    return opa_eval_value(policies_root.resolve(), plan_path, vars_resource_type_query, helpers_root)
 
 
 def normalize_messages(messages_value) -> list[str]:
@@ -156,12 +160,12 @@ def normalize_messages(messages_value) -> list[str]:
     return []
 
 
-def get_policy_messages(policies_root: Path, plan_path: Path, message_query: str) -> list[str]:
-    val = opa_eval_value(policies_root.resolve(), plan_path, message_query)
+def get_policy_messages(policies_root: Path, plan_path: Path, message_query: str, helpers_root: Optional[Path]) -> list[str]:
+    val = opa_eval_value(policies_root.resolve(), plan_path, message_query, helpers_root)
     return normalize_messages(val)
 
 
-def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | None:
+def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Optional[Path]:
     env = os.environ.copy()
 
     creds_path = input_dir / "fake-creds.json"
@@ -183,7 +187,7 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
     commands = [
         ("terraform init -backend=false"),
         ("terraform plan -refresh=false -lock=false -input=false -out=plan"),
-        ("terraform show -json plan | cat > plan.json")
+        ("terraform show -json plan > plan.json")
     ]
 
     for cmd in commands:
@@ -197,7 +201,7 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
         )
         if result.returncode != 0:
             if verbose:
-                print(f"❌ Command failed: {cmd}")
+                print(f"[FAILED] Command failed: {cmd}")
                 print("--- stdout ---")
                 print(result.stdout)
                 print("--- stderr ---")
@@ -229,7 +233,7 @@ def log_messages(verbose: bool, message_query: str, messages: list[str]) -> None
         print(m)
 
 
-def validate_policy_output(attribute: str, resource_type: str | None, plan_path: Path, messages: list[str],
+def validate_policy_output(attribute: str, resource_type: Optional[str], plan_path: Path, messages: list[str],
                            verbose: bool, service: str, resource: str) -> dict:
     unique_names = get_unique_resource_names(plan_path, str(resource_type))
     matched = match_names_in_messages(messages, unique_names)
@@ -269,7 +273,7 @@ def validate_policy_output(attribute: str, resource_type: str | None, plan_path:
     return make_success(attribute, service, resource)
 
 
-def run_policy_check_pair(input_dir: Path, policy_dir: Path, policies_root: Path, verbose: bool = False):
+def run_policy_check_pair(input_dir: Path, policy_dir: Path, policies_root: Path, policies_base_root: Optional[Path] = None, verbose: bool = False):
     # Extract data about services and filesystem paths
     abs_input_dir = input_dir.resolve()
     service, resource, attribute = extract_path_parts(input_dir)
@@ -283,12 +287,14 @@ def run_policy_check_pair(input_dir: Path, policy_dir: Path, policies_root: Path
 
     message_query, vars_resource_type_query = get_policy_metadata(policy_dir, service, resource, attribute)
 
-    resource_type = get_resource_type(policies_root, plan_path, vars_resource_type_query)
+    helpers_root = policies_base_root / "_helpers" if policies_base_root else None
+
+    resource_type = get_resource_type(policies_root, plan_path, vars_resource_type_query, helpers_root)
     if resource_type is None:
         res = make_failure(attribute, "Could not find any resources!", service, resource)
         return res
 
-    messages = get_policy_messages(policies_root, plan_path, message_query)
+    messages = get_policy_messages(policies_root, plan_path, message_query, helpers_root)
     if not messages:
         res = make_failure(attribute, "Could not run OPA query!", service, resource)
         return res
@@ -366,7 +372,7 @@ def main():
     results = []
     failure_flag = False
     for input_dir, policy_dir in pairs:
-        result = run_policy_check_pair(input_dir, policy_dir, policies_base_root, verbose=args.verbose)
+        result = run_policy_check_pair(input_dir, policy_dir, policies_search_root, policies_base_root, verbose=args.verbose)
         results.append(result)
 
     # Grouped summary by service -> resource
@@ -380,7 +386,7 @@ def main():
         for resource in sorted(grouped[service]):
             print(f"  Resource: {resource}")
             for res in grouped[service][resource]:
-                status = "✅" if res["passed"] else "❌"
+                status = "[PASS]" if res["passed"] else "[FAIL]"
                 if not res["passed"]:
                     failure_flag = True
                 print(f"    Policy: {res['policy']} - {status}")

@@ -1,17 +1,22 @@
 resource "google_gke_backup_backup_plan" "c" {
-  name     = "cmek-encrypted-backups"
-  cluster  = "projects/fluent-coder-468700-h4/locations/australia-southeast1/clusters/prod-cluster"
+  name                = "c"
+  cluster  = "projects/PDE/locations/australia-southeast1/clusters/my-cluster"
   location = "australia-southeast1"
-  project  = var.gcp_project
-  
+  project  = "PDE"
+
   backup_config {
     include_volume_data = true
-    include_secrets = false
-    selected_namespaces {
-      namespaces = ["default", "production"]
-    }
+    include_secrets     = true
+    all_namespaces      = true
+
     encryption_key {
-      gcp_kms_encryption_key = "projects/fluent-coder-468700-h4/locations/australia-southeast1/keyRings/backup-keyring/cryptoKeys/backup-key"
+      gcp_kms_encryption_key = "projects/PDE/locations/australia-southeast1/keyRings/pde-ring/cryptoKeys/pde-key"
     }
   }
+
+  retention_policy {
+    backup_delete_lock_days = 30
+    backup_retain_days      = 90
+  }
 }
+

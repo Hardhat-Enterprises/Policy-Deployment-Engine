@@ -1,9 +1,9 @@
 resource "google_gke_backup_restore_plan" "c" {
-  name        = "secure-field-transformation"
+  name                = "c"
   location    = "australia-southeast1"
-  project     = var.gcp_project
-  backup_plan = "projects/fluent-coder-468700-h4/locations/australia-southeast1/backupPlans/prod-backup-plan"
-  cluster     = "projects/fluent-coder-468700-h4/locations/australia-southeast1/clusters/prod-cluster"
+  project     = "PDE"
+  backup_plan        = "c"
+  cluster     = "projects/PDE/locations/australia-southeast1/clusters/c"
   
   restore_config {
     selected_namespaces {
@@ -14,7 +14,7 @@ resource "google_gke_backup_restore_plan" "c" {
       description = "Remove service accounts"
       field_actions {
         op   = "REMOVE"
-        path = "/spec/serviceAccountName"  # SECURE: Remove service accounts
+        path = "/spec/serviceAccountName"
       }
     }
     
@@ -22,7 +22,7 @@ resource "google_gke_backup_restore_plan" "c" {
       description = "Remove secrets"
       field_actions {
         op   = "REMOVE"
-        path = "/spec/containers[]/env[]/valueFrom/secretKeyRef"  # SECURE: Remove secret references
+        path = "/spec/containers[]/env[]/valueFrom/secretKeyRef"
       }
     }
     
@@ -31,8 +31,9 @@ resource "google_gke_backup_restore_plan" "c" {
       field_actions {
         op    = "REPLACE"
         path  = "/spec/containers[]/securityContext/privileged"
-        value = "false"  # SECURE: Disable privileged mode
+        value = "false"
       }
     }
   }
 }
+

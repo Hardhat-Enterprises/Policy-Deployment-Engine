@@ -1,16 +1,21 @@
 package terraform.gcp.security.backup_for_gke.backup_channel.name
-
-import rego.v1
+import data.terraform.helpers
 import data.terraform.gcp.security.backup_for_gke.backup_channel.vars
-import data.terraform.helpers.policies.pattern_whitelist
 
-violations := pattern_whitelist.get_violations(
-    vars.variables,
-    ["name"],
-    ["gke-backup-channel-*", [[]]]
-)
-
-message := [m | 
-    some violation in violations
-    m := violation.message
+conditions := [
+  [
+    {
+      "situation_description": "GKE Backup Channel name must follow naming convention.",
+      "remedies": ["Rename to match pattern 'gke-backup-channel-*'."]
+    },
+    {
+      "condition": "Name must match pattern gke-backup-channel-*",
+      "attribute_path": ["name"],
+      "values": ["c"],
+      "policy_type": "whitelist"
+    }
+  ]
 ]
+
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

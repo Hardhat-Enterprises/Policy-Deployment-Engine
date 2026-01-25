@@ -1,16 +1,21 @@
 package terraform.gcp.security.backup_for_gke.backup_plan.backup_delete_lock_days
-
-import rego.v1
+import data.terraform.helpers
 import data.terraform.gcp.security.backup_for_gke.backup_plan.vars
-import data.terraform.helpers.policies.range
 
-violations := range.get_violations(
-    vars.variables,
-    ["retention_policy", 0, "backup_delete_lock_days"],
-    [14, 90]
-)
-
-message := [m | 
-    some violation in violations
-    m := violation.message
+conditions := [
+  [
+    {
+      "situation_description": "Backup Plan delete lock days must be between 14 and 90.",
+      "remedies": ["Set retention_policy.backup_delete_lock_days to a value between 14 and 90."]
+    },
+    {
+      "condition": "Backup delete lock days must be between 14 and 90",
+      "attribute_path": ["retention_policy", 0, "backup_delete_lock_days"],
+      "values": [14, 90],
+      "policy_type": "range"
+    }
+  ]
 ]
+
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

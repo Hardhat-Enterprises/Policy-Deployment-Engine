@@ -1,17 +1,21 @@
 package terraform.gcp.security.backup_for_gke.backup_plan.retention_policy
-
-import rego.v1
+import data.terraform.helpers
 import data.terraform.gcp.security.backup_for_gke.backup_plan.vars
-import data.terraform.helpers.policies.range
 
-# Retention period in days (7 to 90 days)
-violations := range.get_violations(
-    vars.variables,
-    ["retention_policy", 0, "backup_retain_days"],
-    [7, 90]
-)
-
-message := [m | 
-    some violation in violations
-    m := violation.message
+conditions := [
+  [
+    {
+      "situation_description": "Backup Plan retention days must be between 7 and 90.",
+      "remedies": ["Set retention_policy.backup_retain_days to a value between 7 and 90."]
+    },
+    {
+      "condition": "Retention days must be between 7 and 90",
+      "attribute_path": ["retention_policy", 0, "backup_retain_days"],
+      "values": [7, 90],
+      "policy_type": "range"
+    }
+  ]
 ]
+
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

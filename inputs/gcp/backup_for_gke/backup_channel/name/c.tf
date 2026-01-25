@@ -1,6 +1,7 @@
 resource "google_gke_backup_backup_channel" "c" {
-  name                = "prod-backup-channel-001"
+  name                = "c"
   location            = "australia-southeast1"
-  project             = var.gcp_project
-  destination_project = "projects/fluent-coder-468700-h4"
+  project             = "PDE"
+  destination_project = "projects/PDE"
 }
+
