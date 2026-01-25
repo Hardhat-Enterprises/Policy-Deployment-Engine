@@ -1,7 +1,7 @@
 resource "google_gkeonprem_vmware_admin_cluster" "c" {
-  name = "full"
-  project = "my-project"
-  location = "australia"
+  name = "c"
+  project = "PDE"
+  location = "australia_southeast1"
   on_prem_version = "1.31.0-gke.35"
   network_config {
     service_address_cidr_blocks = ["10.96.0.0/12"]

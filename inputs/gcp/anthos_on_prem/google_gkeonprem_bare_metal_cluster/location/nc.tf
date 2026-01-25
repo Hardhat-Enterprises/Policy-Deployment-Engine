@@ -1,6 +1,6 @@
 resource "google_gkeonprem_bare_metal_cluster" "nc" {
-  name                     = "my-cluster"
-  project                  = "my-project"
+  name                     = "nc"
+  project                  = "PDE"
   location                 = "asia1"
   admin_cluster_membership = "projects/870316890899/locations/global/memberships/gkeonprem-terraform-test"
   bare_metal_version       = "1.10.0"

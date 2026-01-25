@@ -4,12 +4,12 @@ import data.terraform.gcp.security.anthos_on_prem.google_gkeonprem_bare_metal_no
 
  conditions := [
  [
-    {"situation_description" : "Enforcing location to be us-west1",
-    "remedies":[ "Change location to us-west1." ],},
+    {"situation_description" : "Enforcing location to be within australia",
+    "remedies":[ "Change location to australia-southeast1." ],},
     {
-        "condition": "Test if the location is us-west1",
+        "condition": "Test if the location is australia-southeast1",
         "attribute_path" : ["location"],
-        "values" : ["us-west1"],
+        "values" : ["australia_southeast1", "australia_southeast2"],
         "policy_type" : "whitelist" 
     }
     

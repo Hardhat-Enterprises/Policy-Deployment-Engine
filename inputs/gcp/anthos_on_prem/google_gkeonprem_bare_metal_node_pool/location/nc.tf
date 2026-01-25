@@ -1,6 +1,6 @@
 resource "google_gkeonprem_bare_metal_cluster" "nc" {
   name = "my-cluster"
-  project = "my-project"
+  project = "PDE"
   location = "asia1"
   admin_cluster_membership = "projects/870316890899/locations/global/memberships/gkeonprem-terraform-test"
   bare_metal_version = "1.11.8"
@@ -66,11 +66,11 @@ resource "google_gkeonprem_bare_metal_cluster" "nc" {
   }
 }
 
-resource "google_gkeonprem_bare_metal_node_pool" "nodepool-full-nc" {
-  name =  "my-nodepool"
-  project =  "my-project"
-  bare_metal_cluster =  google_gkeonprem_bare_metal_cluster.default-full-nc.name
+resource "google_gkeonprem_bare_metal_node_pool" "nc" {
+  name =  "nc"
+  project =  "PDE"
   location = "asia1"
+  bare_metal_cluster =  google_gkeonprem_bare_metal_cluster.nc.name
   node_pool_config {
     operating_system = "WINDOWS"
     node_configs {

@@ -1,7 +1,7 @@
 resource "google_gkeonprem_bare_metal_admin_cluster" "c" {
-  name = "my-cluster"
-  project = "my-project"
-  location = "australia"
+  name = "c"
+  project = "PDE"
+  location = "australia_southeast1"
   control_plane {
     control_plane_node_pool_config {
       node_pool_config {

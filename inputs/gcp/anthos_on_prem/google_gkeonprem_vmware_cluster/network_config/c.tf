@@ -1,7 +1,7 @@
 resource "google_gkeonprem_vmware_cluster" "c" {
-  name = "cluster-manuallb"
-  project = "my-project"
-  location = "australia"
+  name = "c"
+  project = "PDE"
+  location = "australia_southeast1"
   admin_cluster_membership = "projects/870316890899/locations/global/memberships/gkeonprem-terraform-test"
   description = "test cluster"
   on_prem_version = "1.13.1-gke.35"

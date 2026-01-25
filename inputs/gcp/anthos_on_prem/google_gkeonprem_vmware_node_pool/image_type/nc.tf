@@ -1,7 +1,7 @@
 resource "google_gkeonprem_vmware_cluster" "nc" {
-  name = "my-cluster"
-  project = "my-project"
-  location = "us-west1"
+  name = "nc"
+  project = "PDE"
+  location = "us_west1"
   admin_cluster_membership = "projects/870316890899/locations/global/memberships/gkeonprem-terraform-test"
   on_prem_version = "1.33.0-gke.35"
   network_config {
@@ -32,11 +32,11 @@ resource "google_gkeonprem_vmware_cluster" "nc" {
   }
 }
 
-resource "google_gkeonprem_vmware_node_pool" "nodepool-full-nc" {
-  name = "my-nodepool"
-  project = "my-project"
-  location = "us-west1"
-  vmware_cluster = google_gkeonprem_vmware_cluster.default-full.name
+resource "google_gkeonprem_vmware_node_pool" "nc" {
+  name = "nc"
+  project = "PDE"
+  location = "us_west1"
+  vmware_cluster = google_gkeonprem_vmware_cluster.nc.name
   on_prem_version = "1.33.0-gke.35"
   config {
     image_type = "custom_image"

@@ -1,6 +1,6 @@
 resource "google_gkeonprem_bare_metal_admin_cluster" "nc" {
-  name = "my-cluster"
-  project = "my-project"
+  name = "nc"
+  project = "PDE"
   location = "us-west1"
   control_plane {
     control_plane_node_pool_config {

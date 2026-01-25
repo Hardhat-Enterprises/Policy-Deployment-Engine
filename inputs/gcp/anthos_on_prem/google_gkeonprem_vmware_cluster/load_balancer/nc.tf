@@ -1,6 +1,6 @@
 resource "google_gkeonprem_vmware_cluster" "nc" {
-  name = "cluster-manuallb"
-  project = "my-project"
+  name = "nc"
+  project = "PDE"
   location = "us-west1"
   admin_cluster_membership = "projects/870316890899/locations/global/memberships/gkeonprem-terraform-test"
   description = "test cluster"

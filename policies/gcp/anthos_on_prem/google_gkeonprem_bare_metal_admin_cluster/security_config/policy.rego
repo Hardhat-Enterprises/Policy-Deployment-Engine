@@ -7,7 +7,7 @@ import data.terraform.gcp.security.anthos_on_prem.google_gkeonprem_bare_metal_ad
     {"situation_description" : "Enforcing secured username",
     "remedies":[ "Change username to authorised admin username"]},
     {
-        "condition": "Test if a location is us-west1",
+        "condition": "Test if username is secured admin username",
         "attribute_path" : ["security_config","authorization","admin_users","username"],
         "values" : ["admin@hashicorptest.com"],
         "policy_type" : "whitelist" 

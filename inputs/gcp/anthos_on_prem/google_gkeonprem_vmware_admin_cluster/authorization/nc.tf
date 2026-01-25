@@ -1,6 +1,6 @@
 resource "google_gkeonprem_vmware_admin_cluster" "nc" {
-  name = "full"
-  project = "my-project"
+  name = "nc"
+  project = "PDE"
   location = "us-west1"
   on_prem_version = "1.31.0-gke.35"
   network_config {
