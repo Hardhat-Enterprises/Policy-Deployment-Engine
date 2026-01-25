@@ -1,4 +1,4 @@
-package terraform.gcp.security.backup_dr.backup_plan.recurrence 
+package terraform.gcp.security.backup_dr.backup_plan.recurrence_type
 
 import data.terraform.helpers
 import data.terraform.gcp.security.backup_dr.backup_plan.vars
