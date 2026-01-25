@@ -15,6 +15,18 @@ conditions := [
             "values": ["e2-micro", "e2-standard-4", "f1-micro"],
             "policy_type": "whitelist"
         }
+    ],
+    [
+        {
+            "situation_description": "Serverless VPC Access Connector machine type must not be g1-small",
+            "remedies": ["Change machine_type to a different allowed value, g1-small is not permitted for this environment"]
+        },
+        {
+            "condition": "The machine type must not be g1-small",
+            "attribute_path": ["machine_type"],
+            "values": ["g1-small"],
+            "policy_type": "blacklist"
+        }
     ]
 ]
 

@@ -15,6 +15,18 @@ conditions := [
             "values": ["approved-subnet", "production-subnet"],
             "policy_type": "whitelist"
         }
+    ],
+    [
+        {
+            "situation_description": "Serverless VPC Access Connector subnet name must differ from default patterns",
+            "remedies": ["Ensure subnet name follows the naming convention starting with 'subnet-'"]
+        },
+        {
+            "condition": "The subnet name must start with 'subnet-'",
+            "attribute_path": ["subnet", 0, "name"],
+            "values": ["^subnet-.*"],
+            "policy_type": "pattern whitelist"
+        }
     ]
 ]
 

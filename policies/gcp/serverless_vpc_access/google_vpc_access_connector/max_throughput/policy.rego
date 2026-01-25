@@ -15,6 +15,18 @@ conditions := [
             "values": [300, 500],
             "policy_type": "range"
         }
+    ],
+    [
+        {
+            "situation_description": "Serverless VPC Access Connector max throughput exceeds cost limits",
+            "remedies": ["Ensure max_throughput is less than or equal to 900 to align with cost tiers"]
+        },
+        {
+            "condition": "The max throughput must be less than or equal to 900",
+            "attribute_path": ["max_throughput"],
+            "values": [0, 900],
+            "policy_type": "range"
+        }
     ]
 ]
 

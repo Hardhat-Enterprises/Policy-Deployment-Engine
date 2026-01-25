@@ -15,6 +15,18 @@ conditions := [
             "values": ["default", "production-vpc"],
             "policy_type": "whitelist"
         }
+    ],
+    [
+        {
+            "situation_description": "Serverless VPC Access Connector network must not be a test or dev network",
+            "remedies": ["Change network to a production network, avoiding names strictly matching 'test' or 'dev' patterns"]
+        },
+        {
+            "condition": "The network must not be a test or dev network",
+            "attribute_path": ["network"],
+            "values": ["^test-.*", "^dev-.*"],
+            "policy_type": "pattern blacklist"
+        }
     ]
 ]
 

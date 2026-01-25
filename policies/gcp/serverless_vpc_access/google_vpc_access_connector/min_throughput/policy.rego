@@ -15,6 +15,18 @@ conditions := [
             "values": [300, 1000],
             "policy_type": "range"
         }
+    ],
+    [
+        {
+            "situation_description": "Serverless VPC Access Connector min throughput is too low for production",
+            "remedies": ["Ensure min_throughput is at least 300"]
+        },
+        {
+            "condition": "The min throughput must be at least 300",
+            "attribute_path": ["min_throughput"],
+            "values": [300, 10000],
+            "policy_type": "range"
+        }
     ]
 ]
 

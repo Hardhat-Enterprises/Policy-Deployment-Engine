@@ -15,6 +15,18 @@ conditions := [
             "values": [3, 10],
             "policy_type": "range"
         }
+    ],
+    [
+        {
+            "situation_description": "Serverless VPC Access Connector max instances is excessively high",
+            "remedies": ["Reduce max_instances to a value less than 90 to prevent excessive costs"]
+        },
+        {
+            "condition": "The max instances must be less than 90",
+            "attribute_path": ["max_instances"],
+            "values": [0, 89],
+            "policy_type": "range"
+        }
     ]
 ]
 
