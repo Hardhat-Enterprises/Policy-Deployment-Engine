@@ -1,6 +1,6 @@
 package terraform.gcp.security.parameter_manager.regional_parameter.encryption
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.parameter_manager.regional_parameter.vars
 
 conditions := [[

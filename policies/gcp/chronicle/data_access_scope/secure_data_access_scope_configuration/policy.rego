@@ -1,6 +1,6 @@
 package terraform.gcp.security.chronicle.data_access_scope.secure_data_access_scope_configuration
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.chronicle.data_access_scope.vars
 
 conditions := [

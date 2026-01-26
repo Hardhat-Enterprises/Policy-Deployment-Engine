@@ -1,6 +1,6 @@
 package terraform.gcp.security.dataform.google_dataform_repository.encryption
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.dataform.google_dataform_repository as repo
 
 # Require CMEK on repositories (kms_key_name must be set)
