@@ -1,7 +1,8 @@
 package terraform.gcp.security.bigquery_reservation.google_bigquery_capacity_commitment.location
 
 import data.terraform.helpers
-import data.terraform.gcp.security.bigquery_reservation.google_bigquery_capacity_commitment.location.vars as vars
+import data.terraform.gcp.security.bigquery_reservation.google_bigquery_capacity_commitment.vars as vars
+
 
 conditions := [
   [

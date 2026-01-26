@@ -1,6 +1,7 @@
 package terraform.gcp.security.bigquery_reservation.google_bigquery_reservation_assignment.location
 
 import data.terraform.helpers
+import data.terraform.gcp.security.bigquery_reservation.google_bigquery_reservation_assignment.vars as vars
 
 conditions := [
   [
@@ -11,7 +12,7 @@ conditions := [
       ]
     },
     {
-      "condition": "reservation location must be an approved value",
+      "condition": "location must be an approved value",
       "attribute_path": ["location"],
       "values": ["us-central1"],
       "policy_type": "whitelist"
@@ -19,11 +20,5 @@ conditions := [
   ]
 ]
 
-local_vars := {
-  "friendly_resource_name": "BigQuery Reservation",
-  "resource_type": "google_bigquery_reservation",
-  "resource_value_name": "name"
-}
-
-message := data.terraform.helpers.get_multi_summary(conditions, local_vars).message
-details := data.terraform.helpers.get_multi_summary(conditions, local_vars).details
+message := data.terraform.helpers.get_multi_summary(conditions, vars.variables).message
+details := data.terraform.helpers.get_multi_summary(conditions, vars.variables).details

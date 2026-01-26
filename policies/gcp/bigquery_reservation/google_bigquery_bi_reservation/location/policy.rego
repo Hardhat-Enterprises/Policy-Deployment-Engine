@@ -1,12 +1,7 @@
 package terraform.gcp.security.bigquery_reservation.google_bigquery_bi_reservation.location
 
 import data.terraform.helpers
-
-variables := {
-  "friendly_resource_name": "BigQuery BI Reservation",
-  "resource_type": "google_bigquery_bi_reservation",
-  "resource_value_name": "name"
-}
+import data.terraform.gcp.security.bigquery_reservation.google_bigquery_bi_reservation.vars
 
 conditions := [
   [
@@ -25,5 +20,5 @@ conditions := [
   ]
 ]
 
-message := data.terraform.helpers.get_multi_summary(conditions, variables).message
-details := data.terraform.helpers.get_multi_summary(conditions, variables).details
+message := data.terraform.helpers.get_multi_summary(conditions, vars.variables).message
+details := data.terraform.helpers.get_multi_summary(conditions, vars.variables).details

@@ -1,4 +1,4 @@
-package terraform.gcp.security.bigquery_reservation.google_bigquery_capacity_commitment.location.vars
+package terraform.gcp.security.bigquery_reservation.google_bigquery_capacity_commitment.vars
 
 variables := {
   "friendly_resource_name": "BigQuery Capacity Commitment",

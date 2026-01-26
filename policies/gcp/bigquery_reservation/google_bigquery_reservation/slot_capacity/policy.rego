@@ -1,8 +1,7 @@
 package terraform.gcp.security.bigquery_reservation.google_bigquery_reservation.slot_capacity
 
 import data.terraform.helpers
-import data.terraform.gcp.security.bigquery_reservation.google_bigquery_reservation.vars
-
+import data.terraform.gcp.security.bigquery_reservation.google_bigquery_reservation.vars as vars
 
 conditions := [
   [
@@ -23,4 +22,3 @@ conditions := [
 
 message := data.terraform.helpers.get_multi_summary(conditions, vars.variables).message
 details := data.terraform.helpers.get_multi_summary(conditions, vars.variables).details
-
