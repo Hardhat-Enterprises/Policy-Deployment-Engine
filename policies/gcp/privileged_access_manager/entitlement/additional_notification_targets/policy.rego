@@ -1,6 +1,6 @@
 package terraform.gcp.security.privileged_access_manager.entitlement.additional_notification_targets
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.privileged_access_manager.entitlement.vars
 
 conditions := [

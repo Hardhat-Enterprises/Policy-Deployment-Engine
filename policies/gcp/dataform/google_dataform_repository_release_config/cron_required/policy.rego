@@ -1,6 +1,6 @@
 package terraform.gcp.security.dataform.google_dataform_repository_release_config.cron_required
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.dataform.google_dataform_repository_release_config as repo
 
 conditions := [

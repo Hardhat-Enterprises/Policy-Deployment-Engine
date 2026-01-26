@@ -1,6 +1,6 @@
 package terraform.gcp.security.dataform.google_dataform_repository_workflow_config.service_account_required
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.dataform.google_dataform_repository_workflow_config as repo
 
 # Require a service account in invocation_config

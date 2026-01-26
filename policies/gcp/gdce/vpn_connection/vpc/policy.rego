@@ -1,5 +1,5 @@
 package terraform.gcp.security.gdce.vpn_connection.vpc
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.gdce.vpn_connection.vars
 
 conditions := [

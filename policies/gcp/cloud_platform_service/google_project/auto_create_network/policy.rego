@@ -1,6 +1,6 @@
 package terraform.gcp.security.cloud_platform_service.google_project.auto_create_network
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.cloud_platform_service.google_project.vars
 
 # Enforce: auto_create_network must be false

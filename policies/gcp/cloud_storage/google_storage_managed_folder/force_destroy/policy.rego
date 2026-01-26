@@ -1,6 +1,6 @@
 package terraform.gcp.security.cloud_storage.google_storage_managed_folder.force_destroy
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.cloud_storage.google_storage_managed_folder.vars
 
 

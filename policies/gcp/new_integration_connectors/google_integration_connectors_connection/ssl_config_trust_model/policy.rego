@@ -1,5 +1,5 @@
 package terraform.gcp.security.integration_connectors.google_integration_connectors_connection.ssl_config_trust_model
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.integration_connectors.google_integration_connectors_connection.vars
 
 conditions := [

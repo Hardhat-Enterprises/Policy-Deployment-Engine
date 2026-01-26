@@ -1,5 +1,5 @@
 package terraform.gcp.security.google_kms.google_kms_crypto_key_iam_binding.approved_role
-import data.terraform.gcp.helpers as helpers
+import data.terraform.helpers as helpers
 import data.terraform.gcp.security.google_kms.google_kms_crypto_key_iam_binding.vars as vars
 
 conditions := [
