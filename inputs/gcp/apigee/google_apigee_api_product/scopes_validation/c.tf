@@ -6,8 +6,5 @@ resource "google_apigee_api_product" "c" {
   approval_type = "auto"
   proxies = ["proxies-compliant"]
   environments = ["Production"]
-  scopes = [
-    "write:reports",
-    "read:weather",
-  ]
+  scopes = ["read:*"]
 }
