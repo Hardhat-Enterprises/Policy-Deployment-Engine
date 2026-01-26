@@ -14,8 +14,8 @@ conditions := [
     {
       "condition": "Label 'env' must be present",
       "attribute_path": ["labels", "env"],
-      "values": [""],
-      "policy_type": "blocklist"
+      "values": ["test", "qa", "production", "sandbox"],
+      "policy_type": "whitelist"
     }
   ]
 ]

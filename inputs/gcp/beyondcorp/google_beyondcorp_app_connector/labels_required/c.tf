@@ -16,6 +16,6 @@ resource "google_beyondcorp_app_connector" "c" {
   }
 
   labels = {
-    env = "prod"
+    env = "production"
   }
 }
