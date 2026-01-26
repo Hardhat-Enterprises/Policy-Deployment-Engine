@@ -1,7 +1,7 @@
 resource "google_apphub_application" "c1"{
   project = "PDE"
-  location = "control-plane namespace"
-  application_id = "example-application-c1"
+  location = "australia-southeast1"
+  application_id = "c1"
   scope {
     type = "REGIONAL"
   }
@@ -17,8 +17,8 @@ resource "google_apphub_application" "c1"{
 
 resource "google_apphub_application" "c2"{
   project = "PDE"
-  location = "control-plane namespace"
-  application_id = "example-application-c2"
+  location = "australia-southeast1"
+  application_id = "c2"
   scope {
     type = "REGIONAL"
   }
@@ -34,8 +34,8 @@ resource "google_apphub_application" "c2"{
 
 resource "google_apphub_application" "c3"{
   project = "PDE"
-  location = "control-plane namespace"
-  application_id = "example-application-c3"
+  location = "australia-southeast1"
+  application_id = "c3"
   scope {
     type = "REGIONAL"
   }
@@ -51,8 +51,8 @@ resource "google_apphub_application" "c3"{
 
 resource "google_apphub_application" "c4"{
   project = "PDE"
-  location = "control-plane namespace"
-  application_id = "example-application-c4"
+  location = "australia-southeast1"
+  application_id = "c4"
   scope {
     type = "REGIONAL"
   }
