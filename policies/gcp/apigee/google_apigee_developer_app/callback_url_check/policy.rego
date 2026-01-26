@@ -1,20 +1,20 @@
-package terraform.gcp.security.apigee.google_apigee_dns_zone.dns_zone_id_validation
+package terraform.gcp.security.apigee.google_apigee_developer_app.callback_url_check
 
 import data.terraform.helpers
-import data.terraform.gcp.security.apigee.google_apigee_dns_zone.vars
+import data.terraform.gcp.security.apigee.google_apigee_developer_app.vars
 
 conditions := [
     [
         {
-            "situation_description": "dns_zone_id should be compliant",
+            "situation_description": "callback_url should be compliant",
             "remedies": [
-                "Ensure dns_zone_id should is compliant"
+                "Ensure callback_url should is compliant"
             ]
         },
         {
             "condition": "check callback_url should is compliant",
-            "attribute_path": ["dns_zone_id"],
-            "values": ["my-dns-zone-id"],
+            "attribute_path": ["callback_url"],
+            "values": ["https://example-call.url"],
 
             "policy_type": "whitelist"
         }
