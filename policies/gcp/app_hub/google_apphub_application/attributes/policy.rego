@@ -26,15 +26,9 @@ conditions := [
     },
     {
       "condition": "attributes.criticality.type must be an allowed value",
-      "attribute_path": ["attributes", 0, "environment", 0, "type"],
-      "policy_type": "blacklist",
-      "values": "MISSION_CRITICAL"
-    },
-    {
-      "condition": "attributes.criticality.type must be an allowed value",
       "attribute_path": ["attributes", 0, "criticality", 0, "type"],
       "policy_type": "whitelist",
-      "values": "TEST"
+      "values": criticalities
     }
   ]
 ]
