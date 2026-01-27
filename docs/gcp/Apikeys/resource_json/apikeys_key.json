@@ -5,7 +5,7 @@
     "name": {
       "description": "The resource name of the key. The name must be unique within the project, must conform with RFC-1034, is restricted to lower-cased letters, and has a maximum length of 63 characters. In another word, the name must match the regular expression: `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`. - - -",
       "required": true,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -14,7 +14,7 @@
     "display_name": {
       "description": "Human-readable display name of this API key. Modifiable by user.",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -23,7 +23,7 @@
     "project": {
       "description": "The project for the resource",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -32,7 +32,7 @@
     "restrictions": {
       "description": "Key restrictions.",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -41,10 +41,10 @@
         "android_key_restrictions": {
           "description": "The Android apps that are allowed to use the key.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "API key restrictions limit how and where the key can be used. API keys without restrictions may be abused or used outside their intended context.",
+          "compliant": "At least one restriction block is defined",
+          "non-compliant": "No restrictions are configured",
           "parent": "restrictions"
         },
         "api_targets": {
@@ -88,7 +88,7 @@
     "android_key_restrictions": {
       "description": "",
       "required": null,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -98,7 +98,7 @@
           "description": "A list of Android applications that are allowed to make API calls with this key.",
           "required": true,
           "security_impact": null,
-          "rationale": null,
+          "rationale": "Restricting Android applications ensures that only trusted mobile apps can use the API key.",
           "compliant": null,
           "non-compliant": null,
           "parent": "android_key_restrictions"
@@ -137,7 +137,7 @@
     "api_targets": {
       "description": "",
       "required": null,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -146,19 +146,24 @@
         "methods": {
           "description": "Optional. List of one or more methods that can be called. If empty, all methods for the service are allowed. A wildcard (*) can be used as the last symbol. Valid examples: `google.cloud.translate.v2.TranslateService.GetSupportedLanguage` `TranslateText` `Get*` `translate.googleapis.com.Get*`",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Allowing wildcard methods significantly increases the attack surface of the API key.",
+          "compliant": [
+            "TranslateText",
+            "DetectLanguage"
+          ],
+          "non-compliant": [
+            "*"
+          ],
           "parent": "api_targets"
         },
         "service": {
           "description": "The service for this restriction. It should be the canonical service name, for example: `translate.googleapis.com`. You can use `gcloud services list` to get a list of services that are enabled in the project.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Restricting API targets ensures that the API key can only be used with explicitly approved Google Cloud services.",
+          "compliant": "translate.googleapis.com",
+          "non-compliant": "*",
           "parent": "api_targets"
         }
       }
@@ -166,7 +171,7 @@
     "browser_key_restrictions": {
       "description": "",
       "required": null,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -175,10 +180,14 @@
         "allowed_referrers": {
           "description": "A list of regular expressions for the referrer URLs that are allowed to make API calls with this key.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Restricting browser referrers prevents unauthorized websites from using the API key.",
+          "compliant": [
+            "https://example.com"
+          ],
+          "non-compliant": [
+            "*"
+          ],
           "parent": "browser_key_restrictions"
         }
       }
@@ -186,7 +195,7 @@
     "ios_key_restrictions": {
       "description": "",
       "required": null,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -195,8 +204,8 @@
         "allowed_bundle_ids": {
           "description": "A list of bundle IDs that are allowed when making API calls with this key.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Restricting iOS bundle IDs ensures that only trusted iOS applications can use the API key.",
           "compliant": null,
           "non-compliant": null,
           "parent": "ios_key_restrictions"
@@ -206,7 +215,7 @@
     "server_key_restrictions": {
       "description": "",
       "required": null,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -215,10 +224,14 @@
         "allowed_ips": {
           "description": "A list of the caller IP addresses that are allowed to make API calls with this key.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Restricting server IP addresses ensures that only trusted network locations can use the API key.",
+          "compliant": [
+            "203.0.113.0/24"
+          ],
+          "non-compliant": [
+            "0.0.0.0/0"
+          ],
           "parent": "server_key_restrictions"
         }
       }
