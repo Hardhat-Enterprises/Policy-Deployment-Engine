@@ -9,7 +9,7 @@ resource "google_bigquery_analytics_hub_data_exchange_subscription" "nc" {
 
   data_exchange_project  = "pde-test-project"
   data_exchange_location = "australia-southeast1"
-  data_exchange_id       = "my_test_dataexchange"
+  data_exchange_id       = "nc"
 
   subscription_id = "sub_bad"
 

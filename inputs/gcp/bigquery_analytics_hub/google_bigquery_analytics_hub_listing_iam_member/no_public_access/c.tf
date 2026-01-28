@@ -3,8 +3,8 @@
 
 resource "google_bigquery_analytics_hub_listing_iam_member" "c" {
   location         = "australia-southeast1"
-  data_exchange_id = "my_data_exchange"
-  listing_id       = "my_listing"
+  data_exchange_id = "c"
+  listing_id       = "c"
   role             = "roles/viewer"
   member           = "user:jane@example.com"
 }

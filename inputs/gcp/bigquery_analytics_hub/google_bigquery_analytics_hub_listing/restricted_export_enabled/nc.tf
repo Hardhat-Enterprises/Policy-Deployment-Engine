@@ -3,14 +3,14 @@
 
 resource "google_bigquery_analytics_hub_data_exchange" "nc" {
   location         = "australia-southeast1"
-  data_exchange_id = "nc_data_exchange"
-  display_name     = "nc_data_exchange"
+  data_exchange_id = "nc"
+  display_name     = "nc"
   description      = "Data exchange for nc listing"
 }
 
 resource "google_bigquery_dataset" "nc" {
-  dataset_id    = "nc_listing_dataset"
-  friendly_name = "nc_listing_dataset"
+  dataset_id    = "nc"
+  friendly_name = "nc"
   description   = "Dataset used by nc listing"
   location      = "australia-southeast1"
 }
@@ -18,8 +18,8 @@ resource "google_bigquery_dataset" "nc" {
 resource "google_bigquery_analytics_hub_listing" "nc" {
   location         = "australia-southeast1"
   data_exchange_id = google_bigquery_analytics_hub_data_exchange.nc.data_exchange_id
-  listing_id       = "nc_listing"
-  display_name     = "nc_listing"
+  listing_id       = "nc"
+  display_name     = "nc"
   description      = "nc listing with restricted export enabled"
 
   bigquery_dataset {

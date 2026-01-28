@@ -1,36 +1,36 @@
 # google_bigquery_analytics_hub_listing_subscription (COMPLIANT)
 # destination_dataset.labels.environment is present and non-empty
 
-resource "google_bigquery_analytics_hub_data_exchange" "subscription" {
+resource "google_bigquery_analytics_hub_data_exchange" "c" {
   location         = "US"
-  data_exchange_id = "my_data_exchange"
-  display_name     = "my_data_exchange"
+  data_exchange_id = "c"
+  display_name     = "c"
   description      = "Test Description"
 }
 
-resource "google_bigquery_dataset" "subscription" {
-  dataset_id    = "my_listing"
-  friendly_name = "my_listing"
+resource "google_bigquery_dataset" "c" {
+  dataset_id    = "c"
+  friendly_name = "c"
   description   = "Test Description"
   location      = "US"
 }
 
-resource "google_bigquery_analytics_hub_listing" "subscription" {
+resource "google_bigquery_analytics_hub_listing" "c" {
   location         = "US"
-  data_exchange_id = google_bigquery_analytics_hub_data_exchange.subscription.data_exchange_id
-  listing_id       = "my_listing"
-  display_name     = "my_listing"
+  data_exchange_id = google_bigquery_analytics_hub_data_exchange.c.data_exchange_id
+  listing_id       = "c"
+  display_name     = "c"
   description      = "Test Description"
 
   bigquery_dataset {
-    dataset = google_bigquery_dataset.subscription.id
+    dataset = google_bigquery_dataset.c.id
   }
 }
 
 resource "google_bigquery_analytics_hub_listing_subscription" "c" {
   location         = "US"
-  data_exchange_id = google_bigquery_analytics_hub_data_exchange.subscription.data_exchange_id
-  listing_id       = google_bigquery_analytics_hub_listing.subscription.listing_id
+  data_exchange_id = google_bigquery_analytics_hub_data_exchange.c.data_exchange_id
+  listing_id       = google_bigquery_analytics_hub_listing.c.listing_id
 
   destination_dataset {
     description   = "A compliant subscription"
@@ -44,7 +44,7 @@ resource "google_bigquery_analytics_hub_listing_subscription" "c" {
 
     dataset_reference {
       dataset_id = "destination_dataset_compliant"
-      project_id = google_bigquery_dataset.subscription.project
+      project_id = google_bigquery_dataset.c.project
     }
   }
 }

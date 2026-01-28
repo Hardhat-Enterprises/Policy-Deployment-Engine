@@ -4,8 +4,8 @@
 resource "google_bigquery_analytics_hub_data_exchange" "nc" {
   provider         = google-beta
   location         = "australia-southeast1"
-  data_exchange_id = "nc_data_exchange_discovery"
-  display_name     = "nc_data_exchange_discovery"
+  data_exchange_id = "nc"
+  display_name     = "nc"
   description      = "Non-compliant exchange - discovery_type is not approved"
 
   discovery_type = "DISCOVERY_TYPE_PUBLIC"
