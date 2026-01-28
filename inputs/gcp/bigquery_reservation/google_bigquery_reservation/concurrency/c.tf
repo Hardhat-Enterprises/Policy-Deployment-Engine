@@ -1,5 +1,5 @@
 resource "google_bigquery_reservation" "c" {
-  name          = "c-reservation"
+  name          = "c"
   location      = "us-central1"
   slot_capacity = 100
   edition       = "ENTERPRISE"

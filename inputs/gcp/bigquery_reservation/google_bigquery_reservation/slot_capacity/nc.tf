@@ -1,5 +1,5 @@
 resource "google_bigquery_reservation" "nc" {
-  name          = "nc-reservation"
+  name          = "nc"
   location      = "us-central1"
   slot_capacity = 0
   edition       = "ENTERPRISE"
@@ -7,7 +7,5 @@ resource "google_bigquery_reservation" "nc" {
   ignore_idle_slots = true
   concurrency       = 0
 
-  autoscale {
-    max_slots = 200
-  }
+  autoscale { max_slots = 200 }
 }

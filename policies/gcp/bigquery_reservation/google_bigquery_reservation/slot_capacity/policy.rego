@@ -14,11 +14,12 @@ conditions := [
     {
       "condition": "slot_capacity must be greater than 0",
       "attribute_path": ["slot_capacity"],
-      "values": [1, null],
+      "values": [1, 999999999],
       "policy_type": "range"
     }
   ]
 ]
 
-message := data.terraform.helpers.get_multi_summary(conditions, vars.variables).message
-details := data.terraform.helpers.get_multi_summary(conditions, vars.variables).details
+summary := data.terraform.helpers.get_multi_summary(conditions, vars.variables)
+message := summary.message
+details := summary.details
