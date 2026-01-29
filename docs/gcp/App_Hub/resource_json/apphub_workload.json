@@ -50,36 +50,36 @@
     "description": {
       "description": "User-defined description of a Workload.",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "attributes": {
-      "description": "Consumer provided attributes. Structure is [documented below](#nested_attributes).",
-      "required": false,
+      "description": "Required. Consumer provided attributes. Structure is [documented below](#nested_attributes).",
+      "required": true,
       "security_impact": null,
-      "rationale": null,
+      "rationale": "attributes has no impact on the security of the resource or data contained.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
       "arguments": {
         "criticality": {
           "description": "Criticality of the Application, Service, or Workload Structure is [documented below](#nested_attributes_criticality).",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
+          "required": true,
+          "security_impact": false,
+          "rationale": "The policy whitelists criticality.type to a known set so risk/criticality reporting and downstream controls remain reliable.",
+          "compliant": "['MISSION_CRITICAL', 'HIGH', 'MEDIUM', 'LOW']",
           "non-compliant": null,
           "parent": "attributes"
         },
         "environment": {
           "description": "Environment of the Application, Service, or Workload Structure is [documented below](#nested_attributes_environment).",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
+          "required": true,
+          "security_impact": false,
+          "rationale": "The policy whitelists environment.type to a known set to keep environment labels consistent for governance and reporting.",
+          "compliant": "['DEVELOPMENT', 'TEST', 'STAGING', 'PRODUCTION']",
           "non-compliant": null,
           "parent": "attributes"
         },
@@ -134,8 +134,8 @@
           "description": "Criticality type. Possible values are: `MISSION_CRITICAL`, `HIGH`, `MEDIUM`, `LOW`.",
           "required": true,
           "security_impact": null,
-          "rationale": null,
-          "compliant": null,
+          "rationale": "Must be one of: MISSION_CRITICAL, HIGH, MEDIUM, LOW (whitelist).",
+          "compliant": "['MISSION_CRITICAL', 'HIGH', 'MEDIUM', 'LOW']",
           "non-compliant": null,
           "parent": "criticality"
         }
@@ -154,8 +154,8 @@
           "description": "Environment type. Possible values are: `PRODUCTION`, `STAGING`, `TEST`, `DEVELOPMENT`.",
           "required": true,
           "security_impact": null,
-          "rationale": null,
-          "compliant": null,
+          "rationale": "Must be one of: DEVELOPMENT, TEST, STAGING, PRODUCTION (whitelist).",
+          "compliant": "['DEVELOPMENT', 'TEST', 'STAGING', 'PRODUCTION']",
           "non-compliant": null,
           "parent": "environment"
         }

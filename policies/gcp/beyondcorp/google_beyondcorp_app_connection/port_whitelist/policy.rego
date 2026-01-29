@@ -15,8 +15,7 @@ conditions := [
       "values": [443, 8443, 9443],
       "policy_type": "whitelist"
     }
-  ],
-
+  ], 
   [
   {
     "situation_description": "Application endpoint host is not an approved IP address.",
