@@ -1,0 +1,53 @@
+{
+  "resource_name": "google_alloydb_backup",
+  "subcategory": "AlloyDB",
+  "arguments": {
+    "backup_id": {
+      "description": "ID for the backup.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Identifier only.",
+      "compliant": "backup_cmek_on",
+      "non-compliant": null,
+      "parent": null
+    },
+    "cluster_name": {
+      "description": "Cluster resource name to back up.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Ensures backup belongs to the intended cluster.",
+      "compliant": "projects/p/locations/us-central1/clusters/cluster-a",
+      "non-compliant": "",
+      "parent": null
+    },
+    "location": {
+      "description": "Region storing the backup.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Data residency and latency.",
+      "compliant": "us-central1",
+      "non-compliant": "",
+      "parent": null
+    },
+    "encryption_config": {
+      "description": "CMEK for backup object.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "CMEK for backup at rest.",
+      "compliant": "Refer to child kms_key_name.",
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "kms_key_name": {
+          "description": "KMS key for the backup.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Customer control of encryption keys.",
+          "compliant": "projects/p/locations/us-central1/keyRings/kr/cryptoKeys/key",
+          "non-compliant": "",
+          "parent": "encryption_config"
+        }
+      }
+    }
+  }
+}

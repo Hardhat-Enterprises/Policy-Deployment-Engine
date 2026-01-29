@@ -1,6 +1,6 @@
 package terraform.gcp.security.alloydb.google_alloydb_instance.client_connection_config
 
-import data.terraform.helpers as helpers
+import data.terraform.gcp.helpers
 import data.terraform.gcp.security.alloydb.google_alloydb_instance.vars
 
 conditions := [[
