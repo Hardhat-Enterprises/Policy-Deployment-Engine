@@ -5,10 +5,10 @@
     "destination_dataset": {
       "description": "The destination dataset for this subscription. Structure is [documented below](#nested_destination_dataset).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "This dataset is where shared data lands for the subscriber; labels are used for governance, classification, and policy-driven controls (billing, access, monitoring, and lifecycle management). This policy requires a non-empty destination_dataset.labels.environment value so subscriptions are consistently tagged for governance and operational controls (e.g., separating dev/test/prod and applying the right guardrails).",
+      "compliant": "destination_dataset { labels = { environment = \"dev\" } } (or \"test\", \"stage\", \"prod\"). The environment label exists and is not an empty string.",
+      "non-compliant": "destination_dataset.labels.environment is missing, null, or set to an empty string (\"\"), which breaks environment classification and governance.",
       "parent": null,
       "arguments": {
         "location": {
@@ -50,10 +50,10 @@
         "labels": {
           "description": "The labels associated with this dataset. You can use these to organize and group your datasets.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Labels are commonly used for governance and automation (cost allocation, policy enforcement, monitoring, retention rules). Missing required labels can cause misclassification and weaker controls. This policy enforces the presence of a non-empty 'environment' label under destination_dataset.labels to ensure consistent environment tagging (dev/test/stage/prod) for governance and operational controls.",
+          "compliant": "labels = { environment = \"prod\" } (or dev/test/stage). The key exists and the value is not empty.",
+          "non-compliant": "labels missing entirely, environment key missing, environment is null, or environment is an empty string \"\".",
           "parent": "destination_dataset"
         }
       }
