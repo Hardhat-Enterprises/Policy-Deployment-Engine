@@ -8,6 +8,6 @@ resource "google_alloydb_cluster" "nc" {
 
   continuous_backup_config {
     enabled = false
-    # encryption_config block omitted to trigger CMEK violation
+  
   }
 }

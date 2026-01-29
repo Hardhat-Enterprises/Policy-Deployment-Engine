@@ -12,7 +12,7 @@ resource "google_alloydb_cluster" "nc" {
     password = "weak-pass"
   }
 
-  # Non-compliant: retention too low (1 day)
+  
   automated_backup_policy {
     location = "us"
     time_based_retention {
