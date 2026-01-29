@@ -131,7 +131,7 @@ def check_resource_deprecation(content: str) -> Tuple[bool, Optional[str]]:
 
 
 def extract_resource_name(content: str) -> Optional[str]:
-    """
+    r"""
     Extract resource name from markdown title.
     
     Different providers use different title formats for their resources.
@@ -145,24 +145,39 @@ def extract_resource_name(content: str) -> Optional[str]:
     
     Supported Patterns:
         - AWS: "# Resource: aws_s3_bucket" or "# Data Source: aws_s3_bucket"
-        - Azure: "# azurerm_storage_account"
-        - GCP: "# google_storage_bucket"
+        - Azure: "# azurerm_storage_account" or "# azurerm\_storage\_account"
+        - GCP: "# google_storage_bucket" or "# google\_biglake\_catalog"
+    
+    Note:
+        Handles escaped underscores (\_) in resource names by unescaping them.
     
     Example:
-        >>> content = "# Resource: aws_s3_bucket\\nManages an S3 bucket."
+        >>> content = "# Resource: aws_s3_bucket\nManages an S3 bucket."
         >>> name = extract_resource_name(content)
         >>> print(name)  # "aws_s3_bucket"
+        >>> content = r"# google\_biglake\_catalog" + "\nManages a BigLake catalog."
+        >>> name = extract_resource_name(content)
+        >>> print(name)  # "google_biglake_catalog"
     """
     # Pattern 1 (AWS): # Resource: aws_s3_bucket or # Data Source: aws_s3_bucket
     pattern1 = r'^#\s+(?:Resource|Data Source):\s+(\S+)'
     match = re.search(pattern1, content, re.MULTILINE)
     if match:
-        return match.group(1)
+        resource_name = match.group(1)
+        # Unescape markdown escaped underscores
+        return resource_name.replace(r'\_', '_')
     
     # Pattern 2 (Azure/GCP): # azurerm_storage_account or # google_storage_bucket
-    pattern2 = r'^#\s+((?:azurerm|google|aws)_\S+)'
+    # Also handles escaped underscores: # google\_biglake\_catalog
+    # Pattern matches provider name followed by underscore (escaped or not) and remaining name
+    pattern2 = r'^#\s+((?:azurerm|google|aws)(?:_|\\_)\S+)'
     match = re.search(pattern2, content, re.MULTILINE)
-    return match.group(1) if match else None
+    if match:
+        resource_name = match.group(1)
+        # Unescape markdown escaped underscores
+        return resource_name.replace(r'\_', '_')
+    
+    return None
 
 
 def extract_argument_section(content: str) -> Optional[str]:
