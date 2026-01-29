@@ -1,6 +1,6 @@
 package terraform.gcp.security.scc.google_scc_organization_scc_big_query_export.big_query_export_id
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.scc.google_scc_organization_scc_big_query_export.vars
 
 conditions := [

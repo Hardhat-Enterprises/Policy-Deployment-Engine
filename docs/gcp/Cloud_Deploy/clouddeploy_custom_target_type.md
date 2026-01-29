@@ -6,7 +6,8 @@ Reference: [Terraform Registry – clouddeploy_custom_target_type](https://regis
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `name` | Name of the `CustomTargetType`. | true | false | Simple string identifier with no security implications. Cannot be used to access resources or execute code. | None | None |
@@ -22,6 +23,7 @@ Reference: [Terraform Registry – clouddeploy_custom_target_type](https://regis
 | `google_cloud_build_repo` |  | false | false | None | None | None |
 
 ### custom_actions Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `render_action` | The Skaffold custom action responsible for render operations. If not provided then Cloud Deploy will perform the render operations via `skaffold render`. | false | true | Can execute arbitrary code during render phase. Should be restricted to approved render actions only. | render-action | unauthorized-render |
@@ -29,6 +31,7 @@ Reference: [Terraform Registry – clouddeploy_custom_target_type](https://regis
 | `include_skaffold_modules` | List of Skaffold modules Cloud Deploy will include in the Skaffold Config as required before performing diagnose. Structure is [documented below](#nested_custom_actions_include_skaffold_modules). | false | true | Can include external Skaffold configurations that may contain malicious code or reference untrusted sources. | None | None |
 
 ### include_skaffold_modules Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `configs` | The Skaffold Config modules to use from the specified source. | false | false | Simple list of configuration names - no direct security impact as it doesn't specify sources. | None | None |
@@ -37,6 +40,7 @@ Reference: [Terraform Registry – clouddeploy_custom_target_type](https://regis
 | `google_cloud_build_repo` | Cloud Build 2nd gen repository containing the Skaffold Config modules. Structure is [documented below](#nested_custom_actions_include_skaffold_modules_include_skaffold_modules_google_cloud_build_repo). | false | true | References external Cloud Build repositories which could contain malicious configurations or be compromised. | approved-cloud-build-repos | unauthorized-cloud-build-repos |
 
 ### git Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `repo` | Git repository the package should be cloned from. | true | false | None | None | None |
@@ -44,12 +48,14 @@ Reference: [Terraform Registry – clouddeploy_custom_target_type](https://regis
 | `ref` | Git ref the package should be cloned from. | false | false | None | None | None |
 
 ### google_cloud_storage Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `source` | Cloud Storage source paths to copy recursively. For example, providing `gs://my-bucket/dir/configs/*` will result in Skaffold copying all files within the `dir/configs` directory in the bucket `my-bucket`. | true | false | None | None | None |
 | `path` | Relative path from the source to the Skaffold file. | false | false | None | None | None |
 
 ### google_cloud_build_repo Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `repository` | Cloud Build 2nd gen repository in the format of 'projects/<project>/locations/<location>/connections/<connection>/repositories/<repository>'. | true | false | None | None | None |

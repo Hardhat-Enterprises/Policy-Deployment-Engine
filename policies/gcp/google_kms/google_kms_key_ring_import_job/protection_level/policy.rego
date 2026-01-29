@@ -1,5 +1,5 @@
 package terraform.gcp.security.google_kms.google_kms_key_ring_import_job.protection_level
-import data.terraform.gcp.helpers as helpers
+import data.terraform.helpers as helpers
 import data.terraform.gcp.security.google_kms.google_kms_key_ring_import_job.vars as vars
 
 conditions := [

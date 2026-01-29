@@ -1,5 +1,5 @@
 package terraform.gcp.security.scc.event_threat_detection_custom_module.enablement_state
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.scc.event_threat_detection_custom_module.vars
 
 conditions := [

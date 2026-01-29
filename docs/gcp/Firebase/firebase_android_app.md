@@ -6,7 +6,8 @@ Reference: [Terraform Registry – firebase_android_app](https://registry.terraf
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `display_name` | The user-assigned display name of the AndroidApp. | true | false | Display Name has no impact on the security of the resource or data contained. | None | None |

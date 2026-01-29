@@ -1,7 +1,7 @@
 
 package terraform.gcp.security.beyondcorp.google_beyondcorp_app_connector.region_whitelist
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.beyondcorp.google_beyondcorp_app_connector.vars
 
 conditions := [
@@ -11,7 +11,7 @@ conditions := [
       "remedies": ["Use region 'australia-southeast1' or 'australia-southeast2' only."]
     },
     {
-      "condition": "Region must be inside the approved one",
+      "condition": "Region must be approved",
       "attribute_path": ["region"],
       "values": ["australia-southeast1", "australia-southeast2"],
       "policy_type": "whitelist"

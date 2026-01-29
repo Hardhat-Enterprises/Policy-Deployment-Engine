@@ -1,6 +1,6 @@
 package terraform.gcp.security.application_integration.google_integrations_client.cloud_kms_config.kms_ring
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.application_integration.google_integrations_client.vars
 
 # Define the conditions for valid kms_ring

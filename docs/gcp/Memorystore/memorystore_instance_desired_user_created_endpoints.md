@@ -6,7 +6,8 @@ Reference: [Terraform Registry – memorystore_instance_desired_user_created_end
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `name` | The name of the Memorystore instance these endpoints should be added to. | true | false | None | None | None |
@@ -17,16 +18,19 @@ Reference: [Terraform Registry – memorystore_instance_desired_user_created_end
 | `psc_connection` |  | false | false | None | None | None |
 
 ### desired_user_created_endpoints Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `connections` | Structure is [documented below](#nested_desired_user_created_endpoints_desired_user_created_endpoints_connections). | false | false | None | None | None |
 
 ### connections Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `psc_connection` | Detailed information of a PSC connection that is created by the customer who owns the cluster. Structure is [documented below](#nested_desired_user_created_endpoints_desired_user_created_endpoints_connections_connections_psc_connection). | false | false | None | None | None |
 
 ### psc_connection Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `psc_connection_id` | The PSC connection id of the forwarding rule connected to the service attachment. | true | false | None | None | None |

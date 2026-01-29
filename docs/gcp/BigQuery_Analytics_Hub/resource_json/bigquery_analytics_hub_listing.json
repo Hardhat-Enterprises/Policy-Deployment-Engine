@@ -84,7 +84,7 @@
       "parent": null
     },
     "data_provider": {
-      "description": "Details of the data provider who owns the source data. Structure is [documented below](#nested_data_provider).",
+      "description": "Details of the data provider who owns the source data. Structure is documented below.",
       "required": false,
       "security_impact": null,
       "rationale": null,
@@ -113,7 +113,7 @@
       }
     },
     "publisher": {
-      "description": "Details of the publisher who owns the listing and who can share the source data. Structure is [documented below](#nested_publisher).",
+      "description": "Details of the publisher who owns the listing and who can share the source data. Structure is documented below.",
       "required": false,
       "security_impact": null,
       "rationale": null,
@@ -151,7 +151,7 @@
       "parent": null
     },
     "bigquery_dataset": {
-      "description": "Shared dataset i.e. BigQuery dataset source. Structure is [documented below](#nested_bigquery_dataset).",
+      "description": "Shared dataset i.e. BigQuery dataset source. Structure is documented below.",
       "required": false,
       "security_impact": null,
       "rationale": null,
@@ -169,7 +169,7 @@
           "parent": "bigquery_dataset"
         },
         "selected_resources": {
-          "description": "Resource in this dataset that is selectively shared. This field is required for data clean room exchanges. Structure is [documented below](#nested_bigquery_dataset_selected_resources).",
+          "description": "Resource in this dataset that is selectively shared. This field is required for data clean room exchanges. Structure is documented below.",
           "required": false,
           "security_impact": null,
           "rationale": null,
@@ -180,7 +180,7 @@
       }
     },
     "pubsub_topic": {
-      "description": "Pub/Sub topic source. Structure is [documented below](#nested_pubsub_topic).",
+      "description": "Pub/Sub topic source. Structure is documented below.",
       "required": false,
       "security_impact": null,
       "rationale": null,
@@ -198,7 +198,7 @@
           "parent": "pubsub_topic"
         },
         "data_affinity_regions": {
-          "description": "Region hint on where the data might be published. Data affinity regions are modifiable. See https://cloud.google.com/about/locations for full listing of possible Cloud regions.",
+          "description": "Region hint on where the data might be published.",
           "required": false,
           "security_impact": null,
           "rationale": null,
@@ -209,21 +209,21 @@
       }
     },
     "restricted_export_config": {
-      "description": "If set, restricted export configuration will be propagated and enforced on the linked dataset. Structure is [documented below](#nested_restricted_export_config).",
+      "description": "If set, restricted export configuration will be propagated and enforced on the linked dataset. Structure is documented below.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Restricted export helps prevent uncontrolled export of shared data and reduces risk of data leakage from linked datasets. This policy requires restricted_export_config to be present and enabled to ensure export restrictions are enforced on datasets created from Analytics Hub listings.",
+      "compliant": "Set restricted_export_config and enable it, e.g. restricted_export_config { enabled = true }. Optionally also set restrict_query_result = true if you want to restrict exports derived from query results.",
+      "non-compliant": "restricted_export_config is missing or restricted_export_config.enabled is false, meaning export restrictions are not enforced for the listing.",
       "parent": null,
       "arguments": {
         "enabled": {
           "description": "If true, enable restricted export.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "If enabled is false (or not set), restricted export protections are not enforced for the listing. This policy requires restricted_export_config.enabled to be true so restricted export is actively enforced for the listing.",
+          "compliant": "restricted_export_config { enabled = true }",
+          "non-compliant": "restricted_export_config { enabled = false } or missing enabled, resulting in restricted export not being enforced.",
           "parent": "restricted_export_config"
         },
         "restrict_direct_table_access": {
@@ -256,7 +256,7 @@
       "parent": null
     },
     "discovery_type": {
-      "description": "Specifies the type of discovery on the discovery page. Cannot be set for a restricted listing. Note that this does not control the visibility of the exchange/listing which is defined by IAM permission. Possible values are: `DISCOVERY_TYPE_PRIVATE`, `DISCOVERY_TYPE_PUBLIC`.",
+      "description": "Specifies the type of discovery on the discovery page. Cannot be set for a restricted listing.",
       "required": false,
       "security_impact": null,
       "rationale": null,
@@ -301,7 +301,7 @@
       "parent": null,
       "arguments": {
         "table": {
-          "description": "Format: For table: projects/{projectId}/datasets/{datasetId}/tables/{tableId} Example:\"projects/test_project/datasets/test_dataset/tables/test_table\"",
+          "description": "Format: For table: projects/{projectId}/datasets/{datasetId}/tables/{tableId}",
           "required": false,
           "security_impact": null,
           "rationale": null,
@@ -310,7 +310,7 @@
           "parent": "selected_resources"
         },
         "routine": {
-          "description": ", [Beta](https://terraform.io/docs/providers/google/guides/provider_versions.html)) Format: For routine: projects/{projectId}/datasets/{datasetId}/routines/{routineId} Example:\"projects/test_project/datasets/test_dataset/routines/test_routine\"",
+          "description": "Format: For routine: projects/{projectId}/datasets/{datasetId}/routines/{routineId}",
           "required": false,
           "security_impact": null,
           "rationale": null,

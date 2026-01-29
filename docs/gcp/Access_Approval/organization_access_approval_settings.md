@@ -6,7 +6,8 @@ Reference: [Terraform Registry – organization_access_approval_settings](https:
 
 ---
 
-## Argument Reference
+## Argument Reference  
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `enrolled_services` | A list of Google Cloud Services for which the given resource has Access Approval enrolled. Access requests for the resource given by name against any of these services contained here will be required to have explicit approval. Enrollment can be done for individual services. A maximum of 10 enrolled services will be enforced, to be expanded as the set of supported services is expanded. Structure is [documented below](#nested_enrolled_services). | true | false | None | None | None |
@@ -15,6 +16,7 @@ Reference: [Terraform Registry – organization_access_approval_settings](https:
 | `active_key_version` | The asymmetric crypto key version to use for signing approval requests. Empty active_key_version indicates that a Google-managed key should be used for signing. | false | false | None | None | None |
 
 ### enrolled_services Block
+
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `cloud_product` | The product for which Access Approval will be enrolled. Allowed values are listed (case-sensitive): all appengine.googleapis.com bigquery.googleapis.com bigtable.googleapis.com cloudkms.googleapis.com compute.googleapis.com dataflow.googleapis.com iam.googleapis.com pubsub.googleapis.com storage.googleapis.com | true | false | Allow access to Google services depending on the organization. | Set cloud_product to all | Other cloud product types are invalidated. |

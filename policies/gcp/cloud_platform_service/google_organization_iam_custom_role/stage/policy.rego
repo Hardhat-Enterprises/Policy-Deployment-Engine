@@ -1,6 +1,6 @@
 package terraform.gcp.security.cloud_platform_service.google_organization_iam_custom_role.stage
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.cloud_platform_service.google_organization_iam_custom_role.vars
 
 conditions := [
