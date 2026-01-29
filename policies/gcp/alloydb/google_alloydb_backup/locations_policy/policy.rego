@@ -1,6 +1,6 @@
 package terraform.gcp.security.alloydb.google_alloydb_backup.locations_policy
 
-import data.terraform.gcp.helpers as helpers
+import data.terraform.helpers as helpers
 import data.terraform.gcp.security.alloydb.google_alloydb_backup.vars as vars
 
 conditions := [
@@ -18,7 +18,6 @@ conditions := [
   ],
 ]
 
-summary := {
-  "message": helpers.get_multi_summary(conditions, vars.variables).message,
-  "details": helpers.get_multi_summary(conditions, vars.variables).details,
-}
+
+   message:= helpers.get_multi_summary(conditions, vars.variables).message
+   details:= helpers.get_multi_summary(conditions, vars.variables).details
