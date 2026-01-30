@@ -6,7 +6,7 @@ terraform {
   }
 }
 
-# Minimal provider config just for planning
+
 provider "google" {
   project = "pde-demo"
   region  = "us-central1"
