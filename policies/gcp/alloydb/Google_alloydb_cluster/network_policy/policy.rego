@@ -1,6 +1,6 @@
 package terraform.gcp.security.alloydb.google_alloydb_cluster.network_policy
 
-import data.terraform.gcp.helpers as helpers
+import data.terraform.helpers as helpers
 import data.terraform.gcp.security.alloydb.google_alloydb_cluster.vars as vars
 
 conditions := [[
