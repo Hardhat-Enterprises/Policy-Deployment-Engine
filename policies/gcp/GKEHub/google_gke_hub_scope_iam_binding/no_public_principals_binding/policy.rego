@@ -1,5 +1,5 @@
 package terraform.gcp.security.gke_hub.google_gke_hub_scope_iam_binding.no_public_principals_binding
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.gke_hub.google_gke_hub_scope_iam_binding.vars
 
 conditions := [

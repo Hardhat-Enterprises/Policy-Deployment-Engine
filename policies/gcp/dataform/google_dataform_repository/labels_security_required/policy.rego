@@ -1,6 +1,6 @@
 package terraform.gcp.security.dataform.google_dataform_repository.labels_security_required
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.dataform.google_dataform_repository as repo
 
 # Security-oriented required labels

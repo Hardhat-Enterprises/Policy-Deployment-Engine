@@ -1,5 +1,5 @@
 package terraform.gcp.security.developer_connect.google_developer_connect_connection.gitlab_enterprise_config_sub_attributes
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.developer_connect.google_developer_connect_connection.vars
 
 conditions := [

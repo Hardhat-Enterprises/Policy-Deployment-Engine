@@ -1,6 +1,6 @@
 package terraform.gcp.security.chronicle.rule_deployment.detect_alerts
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.chronicle.rule_deployment.vars
 
 conditions := [

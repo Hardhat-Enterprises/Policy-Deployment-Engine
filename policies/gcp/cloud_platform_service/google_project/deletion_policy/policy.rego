@@ -1,6 +1,6 @@
 package terraform.gcp.security.cloud_platform_service.google_project.deletion_policy
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.cloud_platform_service.google_project.vars
 
 # Enforce deletion guard at the project level

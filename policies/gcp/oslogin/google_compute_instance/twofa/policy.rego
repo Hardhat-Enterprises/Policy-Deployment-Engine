@@ -1,6 +1,6 @@
 package terraform.gcp.security.oslogin.google_compute_instance.twofa
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.oslogin.google_compute_instance.vars
 
 conditions := [

@@ -1,5 +1,5 @@
 package terraform.gcp.security.discovery_engine.search_engine.search_engine_industry_vertical
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.discovery_engine.search_engine.vars
 
 #search_engine_industry_vertical

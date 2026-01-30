@@ -1,6 +1,6 @@
 package terraform.gcp.security.beyondcorp.google_beyondcorp_app_connection.port_whitelist
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.beyondcorp.google_beyondcorp_app_connection.vars
 
 conditions := [
@@ -15,8 +15,7 @@ conditions := [
       "values": [443, 8443, 9443],
       "policy_type": "whitelist"
     }
-  ],
-
+  ], 
   [
   {
     "situation_description": "Application endpoint host is not an approved IP address.",

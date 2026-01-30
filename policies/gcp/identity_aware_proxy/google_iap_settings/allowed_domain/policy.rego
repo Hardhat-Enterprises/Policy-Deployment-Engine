@@ -1,6 +1,6 @@
 package terraform.gcp.security.identity_aware_proxy.google_iap_settings.allowed_domain
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.identity_aware_proxy.google_iap_settings.vars
 
 # Enforce Allowed Domains: feature enabled + corporate domain only

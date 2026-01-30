@@ -1,5 +1,5 @@
 package terraform.gcp.security.gke_hub.google_gke_hub_fleet.binauthz_policy_binding_approved
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.gke_hub.google_gke_hub_fleet.vars
 
 
