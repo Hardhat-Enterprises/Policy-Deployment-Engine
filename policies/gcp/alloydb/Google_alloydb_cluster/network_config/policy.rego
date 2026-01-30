@@ -10,7 +10,7 @@ conditions := [[
   },
   {
     "condition": "VPC network must be on the allowlist.",
-    "attribute_path": ["network"],
+    "attribute_path": ["network_config", 0, "network" ],
     "values": [
       "projects/pde-demo/global/networks/prod-vpc",
       "projects/shared-host-project/global/networks/shared-vpc"
