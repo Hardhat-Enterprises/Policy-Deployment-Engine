@@ -1,8 +1,8 @@
-## 🛡️ Policy Deployment Engine: `biglake_table`
+## 🛡️ Policy Deployment Engine: `google_biglake_table`
 
-This section provides a concise policy evaluation for the `biglake_table` resource in GCP.
+This section provides a concise policy evaluation for the `google_biglake_table` resource in GCP.
 
-Reference: [Terraform Registry – biglake_table](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/biglake_table)
+Reference: [Terraform Registry – google_biglake_table](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/google_biglake_table)
 
 ---
 
@@ -10,24 +10,22 @@ Reference: [Terraform Registry – biglake_table](https://registry.terraform.io/
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `name` | Output only. The name of the Table. Format: projects/{project_id_or_number}/locations/{locationId}/catalogs/{catalogId}/databases/{databaseId}/tables/{tableId} | true | false | None | None | None |
-| `type` | The database type. Possible values are: `HIVE`. | false | false | None | None | None |
-| `hive_options` | Options of a Hive table. Structure is [documented below](#nested_hive_options). | false | false | None | None | None |
-| `database` | The id of the parent database. | false | false | None | None | None |
-| `storage_descriptor` |  | false | false | None | None | None |
+| `name` | The name of the BigLake table. | true | false | None | None | None |
+| `database` | The BigLake database that contains this table. | true | false | None | None | None |
+| `type` | The type of the BigLake table. | true | false | None | None | None |
+| `hive_options` | Hive-specific options for the BigLake table. | false | false | None | None | None |
 
 ### hive_options Block
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `parameters` | Stores user supplied Hive table parameters. An object containing a list of "key": value pairs. Example: { "name": "wrench", "mass": "1.3kg", "count": "3" }. | false | false | None | None | None |
-| `table_type` | Hive table type. For example, MANAGED_TABLE, EXTERNAL_TABLE. | false | false | None | None | None |
-| `storage_descriptor` | Stores physical storage information on the data. Structure is [documented below](#nested_hive_options_storage_descriptor). | false | false | None | None | None |
+| `storage_descriptor` | Storage descriptor for the BigLake table. | true | false | None | None | None |
 
-### storage_descriptor Block
+###   storage_descriptor Block
 
-| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
-|----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `location_uri` | Cloud Storage folder URI where the table data is stored, starting with "gs://". | false | true | The table storage location determines where table data is stored and must be secured to prevent unauthorized data access. | Table data is stored in a secured Cloud Storage bucket | Table data is stored in an unsecured or public bucket |
-| `input_format` | The fully qualified Java class name of the input format. | false | false | None | None | None |
-| `output_format` | The fully qualified Java class name of the output format. | false | false | None | None | None |
+  | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+  |----------|-------------|----------|-----------------|-----------|-----------|---------------|
+  | `location_uri` | The Cloud Storage location where table data is stored. | true | true | The table storage location determines where data is physically stored. Insecure or public locations may expose sensitive data or violate data governance requirements. | gs://secure-private-bucket/table-path | gs://public-bucket/table-path |
+  | `input_format` | The input format of the table data. | false | false | None | None | None |
+  | `output_format` | The output format of the table data. | false | false | None | None | None |
+  | `parameters` | Custom parameters for the table storage descriptor. | false | false | None | None | None |
