@@ -1,19 +1,14 @@
 resource "google_gke_backup_restore_plan" "c" {
-  name                = "c"
-  location    = "australia-southeast1"
-  project     = "PDE"
-  backup_plan        = "c"
-  cluster     = "projects/PDE/locations/australia-southeast1/clusters/c"
-  
+  name     = "rp-volume-bindings-c"
+  project  = "PDE"
+  location = "australia-southeast1"
+  backup_plan = "projects/PDE/locations/australia-southeast1/backupPlans/bp1"
+  cluster  = "projects/PDE/locations/australia-southeast1/clusters/c1"
   restore_config {
-    selected_namespaces {
-      namespaces = ["production"]
+    volume_data_restore_policy = "RESTORE_VOLUME_DATA_FROM_BACKUP"
+    cluster_resource_restore_scope {
+        all_group_kinds = true
     }
-    
-    volume_data_restore_policy_bindings {
-      policy      = "NO_VOLUME_DATA_RESTORATION"
-      volume_type = "GCE_PERSISTENT_DISK"
-    }
+    all_namespaces = true
   }
 }
-

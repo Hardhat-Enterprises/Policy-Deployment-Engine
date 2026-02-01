@@ -3,7 +3,7 @@ resource "google_gke_backup_restore_plan" "nc" {
   location    = "australia-southeast1"
   project     = "PDE"
   backup_plan        = "nc"
-  cluster     = "projects/PDE/locations/australia-southeast1/clusters/prod-primary" # Invalid: not a DR cluster
+  cluster     = "" # Invalid: empty
   
   restore_config {
     all_namespaces = true

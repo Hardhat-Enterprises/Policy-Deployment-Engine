@@ -10,3 +10,14 @@ resource "google_gke_backup_backup_plan_iam_binding" "c" {
   ]
 }
 
+resource "google_gke_backup_backup_plan_iam_binding" "c_owner_group" {
+  name     = "c_owner_group"
+  location = "australia-southeast1"
+  project  = "PDE"
+  role     = "roles/owner"
+  
+  members = [
+    "group:admins@example.com"
+  ]
+}
+

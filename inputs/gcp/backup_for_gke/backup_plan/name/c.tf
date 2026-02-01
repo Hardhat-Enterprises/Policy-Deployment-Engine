@@ -1,7 +1,11 @@
 resource "google_gke_backup_backup_plan" "c" {
-  name                = "gke-backup-plan-prod"
-  cluster  = "projects/PDE/locations/australia-southeast1/clusters/prod-cluster"
-  location = "australia-southeast1"
+  name     = "gke-backup-plan-daily-prod"
   project  = "PDE"
+  cluster  = "projects/PDE/locations/us-central1/clusters/cluster-1"
+  location = "us-central1"
+  backup_config {
+    include_volume_data = true
+    include_secrets     = true
+    all_namespaces      = true
+  }
 }
-

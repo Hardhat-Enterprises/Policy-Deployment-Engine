@@ -8,28 +8,14 @@ conditions := [
       "situation_description": "Restore Plan IAM must strictly prohibit public access to prevent unauthorized data restoration.",
       "remedies": ["Remove 'allUsers' and 'allAuthenticatedUsers' from IAM bindings."]
     },
-    { "custom_evaluation": true }
+    {
+      "condition": "Public access forbidden",
+      "attribute_path": ["members"],
+      "values": ["allUsers", "allAuthenticatedUsers"],
+      "policy_type": "element_blacklist"
+    }
   ]
 ]
 
-get_violations(tf_variables, attribute_path, values) = results if {
-    results := { violation |
-        resource := input.planned_values.root_module.resources[_]
-        resource.type == tf_variables.resource_type
-        
-        member := resource.values.members[_]
-        public_principals := {"allUsers", "allAuthenticatedUsers"}
-        public_principals[member]
-        
-        violation := {
-            "name": resource.values.name,
-            "message": sprintf("Restore Plan IAM binding '%s' grants access to '%s'. Public access is strictly forbidden for backup restoration.", [
-                resource.values.name,
-                member
-            ])
-        }
-    }
-}
-
-message := get_violations(vars.variables, [], [])
-details := {}
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

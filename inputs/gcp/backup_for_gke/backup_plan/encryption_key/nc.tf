@@ -9,7 +9,7 @@ resource "google_gke_backup_backup_plan" "nc" {
     include_secrets     = true
     all_namespaces      = true
     encryption_key {
-      gcp_kms_encryption_key = "projects/PDE/locations/us-central1/keyRings/pde-ring/cryptoKeys/pde-key"
+      gcp_kms_encryption_key = ""
     }
   }
 

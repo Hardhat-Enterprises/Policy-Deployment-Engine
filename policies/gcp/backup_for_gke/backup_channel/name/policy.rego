@@ -11,8 +11,8 @@ conditions := [
     {
       "condition": "Name must match pattern gke-backup-channel-*",
       "attribute_path": ["name"],
-      "values": ["c"],
-      "policy_type": "whitelist"
+      "values": ["^gke-backup-channel-.*"],
+      "policy_type": "pattern_whitelist"
     }
   ]
 ]

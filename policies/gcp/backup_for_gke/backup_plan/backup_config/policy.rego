@@ -23,8 +23,8 @@ conditions := [
     {
       "condition": "include_volume_data must be defined",
       "attribute_path": ["backup_config", 0, "include_volume_data"],
-      "values": [true, false],
-      "policy_type": "whitelist"
+      "values": [null],
+      "policy_type": "blacklist"
     }
   ]
 ]

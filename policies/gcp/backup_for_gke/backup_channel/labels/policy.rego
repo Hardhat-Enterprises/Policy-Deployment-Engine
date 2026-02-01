@@ -32,6 +32,18 @@ conditions := [
       "values": ["^.+$"],
       "policy_type": "pattern_whitelist"
     }
+  ],
+  [
+    {
+      "situation_description": "To prevent network congestion during business hours, backup channels must define a bandwidth limit.",
+      "remedies": ["Add label 'bandwidth-limit' with a value."]
+    },
+    {
+      "condition": "Must have bandwidth-limit label",
+      "attribute_path": ["labels", "bandwidth-limit"],
+      "values": ["^.+$"],
+      "policy_type": "pattern_whitelist"
+    }
   ]
 ]
 

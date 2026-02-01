@@ -1,12 +1,12 @@
 resource "google_gke_backup_restore_plan_iam_binding" "c" {
-  name                = "c"
+  name     = "rp-iam-c"
   location = "australia-southeast1"
-  project = "PDE"
-  
-  role = "roles/gkebackup.restoreAdmin"
+  project  = "PDE"
+  role     = "roles/gkebackup.restoreViewer"
   
   members = [
-    "serviceAccount:restore-sa@fluent-coder-468700-h4.iam.gserviceaccount.com",
-    "group:sre-oncall@yourdomain.com"  # SECURE: Multiple members for accountability
+    "user:alice@example.com",
+    "user:bob@example.com",
+    "group:viewers@example.com"
   ]
 }

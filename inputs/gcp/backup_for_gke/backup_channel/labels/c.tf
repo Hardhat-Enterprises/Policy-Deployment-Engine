@@ -10,6 +10,7 @@ resource "google_gke_backup_backup_channel" "c" {
     compliance  = "required"
     cost-center = "engineering"
     owner       = "platform-team"
+    bandwidth-limit = "50mbps"
   }
 }
 

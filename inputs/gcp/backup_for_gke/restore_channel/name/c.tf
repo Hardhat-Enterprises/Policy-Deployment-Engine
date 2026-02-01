@@ -1,8 +1,14 @@
-resource "google_gke_backup_restore_channel" "c" {
-  name                = "gke-restore-channel-prod"
-  location            = "australia-southeast1"
-  project             = "PDE"
-  destination_project = "projects/PDE"
-  description         = "Production restore channel for Australia Southeast 1"
+resource "google_gke_backup_restore_plan" "c" {
+  name     = "gke-restore-channel-daily"
+  project  = "PDE"
+  location = "australia-southeast1"
+  backup_plan = "projects/PDE/locations/australia-southeast1/backupPlans/bp1"
+  cluster  = "projects/PDE/locations/australia-southeast1/clusters/c1"
+  restore_config {
+    volume_data_restore_policy = "RESTORE_VOLUME_DATA_FROM_BACKUP"
+    cluster_resource_restore_scope {
+        all_group_kinds = true
+    }
+    all_namespaces = true
+  }
 }
-
