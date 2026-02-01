@@ -3,7 +3,7 @@
 
 resource "google_biglake_database" "c" {
   name    = "location_uri_allowlist_compliant"
-  catalog = google_biglake_catalog.catalog.id
+  catalog = "projects/pde-dummy-project/locations/au/catalogs/pde_dummy_catalog"
   type    = "HIVE"
 
   hive_options {

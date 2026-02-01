@@ -3,7 +3,7 @@
 
 resource "google_biglake_database" "nc" {
   name    = "enforce_type_hive_non_compliant"
-  catalog = google_biglake_catalog.catalog.id
+  catalog = "projects/pde-dummy-project/locations/au/catalogs/pde_dummy_catalog"
   type    = "ICEBERG" # not allowed
 
   hive_options {
