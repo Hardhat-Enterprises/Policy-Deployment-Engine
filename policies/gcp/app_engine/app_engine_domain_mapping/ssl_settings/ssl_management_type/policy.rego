@@ -1,4 +1,4 @@
-package terraform.gcp.security.app_engine.app_engine_domain_mapping.ssl_management_type
+package terraform.gcp.security.app_engine.app_engine_domain_mapping.ssl_settings.ssl_management_type
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.app_engine.app_engine_domain_mapping.vars
