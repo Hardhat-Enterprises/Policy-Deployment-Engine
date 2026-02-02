@@ -1,6 +1,6 @@
 package terraform.gcp.security.app_engine.app_engine_flexible_app_version.liveness_check.timeout
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.app_engine.app_engine_flexible_app_version.vars
 
 conditions := [

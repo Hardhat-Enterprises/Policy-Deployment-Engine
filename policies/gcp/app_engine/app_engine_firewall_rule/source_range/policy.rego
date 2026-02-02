@@ -1,6 +1,6 @@
 package terraform.gcp.security.app_engine.app_engine_firewall_rule.source_range
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.app_engine.app_engine_firewall_rule.vars
 
 conditions := [
