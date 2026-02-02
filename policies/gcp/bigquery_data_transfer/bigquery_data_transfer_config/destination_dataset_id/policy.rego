@@ -1,5 +1,5 @@
 package terraform.gcp.security.bigquery_data_transfer.bigquery_data_transfer_config.destination_dataset_id
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.bigquery_data_transfer.bigquery_data_transfer_config.vars
 
 conditions := [

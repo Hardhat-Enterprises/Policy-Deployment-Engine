@@ -76,11 +76,11 @@
         },
         "connection_id": {
           "description": "external storage, such as Azure Blob, Cloud Storage, or S3. The `connection_id` can have the form `{{project}}.{{location}}.{{connection_id}}` or `projects/{{project}}/locations/{{location}}/connections/{{connection_id}}`. ~>**NOTE:** If you set `external_data_configuration.connection_id`, the table schema must be specified using the top-level `schema` field [documented above](#schema).",
-          "required": null,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "required": true,
+          "security_impact": true,
+          "rationale": "connection_id specifies the external storage connection",
+          "compliant": "valid_connection_id",
+          "non-compliant": "invalid_connection_id",
           "parent": "external_data_configuration"
         },
         "csv_options": {
@@ -194,10 +194,10 @@
         "source_uris": {
           "description": "your data in Google Cloud.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "source_uris specify the location of the external data",
+          "compliant": "valid_uris",
+          "non-compliant": "invalid_uris",
           "parent": "external_data_configuration"
         },
         "file_set_spec_type": {
@@ -297,10 +297,10 @@
     "max_staleness": {
       "description": "returned when the table (or stale MV) is queried. Staleness encoded as a string encoding of [SQL IntervalValue type](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#interval_type).",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "max_staleness defines the freshness of the data returned when queried",
+      "compliant": 0,
+      "non-compliant": 3600,
       "parent": null
     },
     "encryption_configuration": {
@@ -416,10 +416,10 @@
         "require_partition_filter": {
           "description": "require a partition filter that can be used for partition elimination to be specified. `require_partition_filter` is deprecated and will be removed in a future major release. Use the top level field with the same name instead.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "require_partition_filter improves security by mandating partition filters",
+          "compliant": true,
+          "non-compliant": false,
           "parent": "time_partitioning"
         }
       }
@@ -548,9 +548,9 @@
         "kms_key_name": {
           "description": "encrypt this table.  Note that the default bigquery service account will need to have encrypt/decrypt permissions on this key - you may want to see the `google_bigquery_default_service_account` datasource and the `google_kms_crypto_key_iam_binding` resource.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
+          "security_impact": true,
+          "rationale": "kms_key_name specifies the encryption key for the table",
+          "compliant": "valid_kms_key_name",
           "non-compliant": null,
           "parent": "materialized_view"
         }
@@ -559,10 +559,10 @@
     "deletion_protection": {
       "description": "When the field is set to true or unset in Terraform state, a `terraform apply` or `terraform destroy` that would delete the table will fail. When the field is set to false, deleting the table is allowed..",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "deletion_protection prevents accidental deletion of the table",
+      "compliant": true,
+      "non-compliant": false,
       "parent": null
     },
     "table_constraints": {

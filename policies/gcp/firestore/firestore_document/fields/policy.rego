@@ -1,6 +1,6 @@
 package terraform.gcp.security.firestore_document.fields
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.firestore.firestore_document.vars
 import future.keywords.if
 

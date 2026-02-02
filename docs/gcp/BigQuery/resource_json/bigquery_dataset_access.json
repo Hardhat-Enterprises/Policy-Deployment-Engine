@@ -5,8 +5,8 @@
     "dataset_id": {
       "description": "A unique ID for this dataset, without the project name. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "no security mechanisms",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,8 +14,8 @@
     "role": {
       "description": "Describes the rights granted to the user specified by the other member of the access object. Basic, predefined, and custom roles are supported. Predefined roles that have equivalent basic roles are swapped by the API to their basic counterparts, and will show a diff post-create. See [official docs](https://cloud.google.com/bigquery/docs/access-control).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "role defines access permissions",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -23,35 +23,35 @@
     "user_by_email": {
       "description": "An email address of a user to grant access to. For example: fred@example.com",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "user email defines access permissions",
+      "compliant": "admin@example.com",
+      "non-compliant": "invalid@gmail.com",
       "parent": null
     },
     "group_by_email": {
       "description": "An email address of a Google Group to grant access to.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "group email defines access permissions",
+      "compliant": "example@company.com",
+      "non-compliant": "invalid@example.com",
       "parent": null
     },
     "domain": {
       "description": "A domain to grant access to. Any users signed in with the domain specified will be granted the specified access",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "domain defines access permissions",
+      "compliant": "example.com",
+      "non-compliant": "invalid.com",
       "parent": null
     },
     "special_group": {
       "description": "A special group to grant access to. Possible values include: * `projectOwners`: Owners of the enclosing project. * `projectReaders`: Readers of the enclosing project. * `projectWriters`: Writers of the enclosing project. * `allAuthenticatedUsers`: All authenticated BigQuery users.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "group email defines access permissions",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -59,8 +59,8 @@
     "iam_member": {
       "description": "Some other type of member that appears in the IAM Policy but isn't a user, group, domain, or special group. For example: `allUsers`",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "iam member defines access permissions",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -227,10 +227,10 @@
         "location": {
           "description": "String indicating the location of the expression for error reporting, e.g. a file name and a position in the file.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "location determines where acess condition is applied",
+          "compliant": "australia-southeast1",
+          "non-compliant": "global",
           "parent": "condition"
         }
       }

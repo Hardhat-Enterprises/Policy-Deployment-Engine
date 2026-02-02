@@ -1,6 +1,6 @@
 package terraform.gcp.security.cloud_platform_service.google_project_default_service_accounts.action
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.cloud_platform_service.google_project_default_service_accounts.vars
 
 

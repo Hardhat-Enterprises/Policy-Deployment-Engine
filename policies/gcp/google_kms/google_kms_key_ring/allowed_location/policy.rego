@@ -1,5 +1,5 @@
 package terraform.gcp.security.google_kms.google_kms_key_ring.allowed_location
-import data.terraform.gcp.helpers as helpers
+import data.terraform.helpers as helpers
 import data.terraform.gcp.security.google_kms.google_kms_key_ring.vars as vars
 
 conditions :=[
