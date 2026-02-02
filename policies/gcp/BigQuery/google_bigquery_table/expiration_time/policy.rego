@@ -1,0 +1,19 @@
+package terraform.gcp.security.BigQuery.google_bigquery_table.expiration_time
+import data.terraform.helpers
+import data.terraform.gcp.security.BigQuery.google_bigquery_table.vars
+
+conditions := [
+    [
+        {"situation_description" : "Check for valid expiration_time",
+         "remedies": ["Add valid expiration_time"]},
+        {
+            "condition": "Check for valid_expiration_time",
+            "attribute_path": ["expiration_time"],
+            "values" : [1625097600000],
+            "policy_type" : "whitelist"
+        }
+    ]
+]
+
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details
