@@ -1,0 +1,6 @@
+resource "google_bigquery_dataset_access" "nc" {
+  dataset_id    = "nc"
+  project       = "PDE" 
+  role          = "VIEWER"
+  iam_member = "allUsers"
+}
