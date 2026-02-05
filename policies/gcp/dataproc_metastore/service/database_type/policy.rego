@@ -12,7 +12,7 @@ conditions := [
     {
       "condition": "check database type is compliant",
       "attribute_path": ["database_type"],
-      "values": ["MYSQL","SPANNER"],
+      "values": ["MYSQL"],
       "policy_type": "whitelist"
     }
   ]
