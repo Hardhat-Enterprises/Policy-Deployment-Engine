@@ -1,6 +1,6 @@
 
 resource "google_firebase_apple_app" "nc" {
-    display_name = "testfirebaseappleapp-nc"
+    display_name = "nc"
     bundle_id = "apple.app.12345"
     project = "1013881984426"
     
