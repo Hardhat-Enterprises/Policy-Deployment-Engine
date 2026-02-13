@@ -9,7 +9,7 @@ conditions := [
     {
         "condition": "Validating location",
         "attribute_path" : ["location"],
-        "values" : ["australia-southeast1-a, australia-southeast1-b, australia-southeast1-c, australia-southeast2-a, australia-southeast2-b, australia-southeast2-"], 
+        "values" : ["australia-southeast1-a", "australia-southeast1-b", "australia-southeast1-c", "australia-southeast2-a", "australia-southeast2-b", "australia-southeast2-c"], 
         "policy_type" : "whitelist"
     }
     ]
