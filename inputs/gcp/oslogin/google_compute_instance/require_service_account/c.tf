@@ -1,6 +1,6 @@
 resource "google_compute_instance" "c" {
   project      = "dummy-project"
-  name         = "good-instance"
+  name         = "c"
   machine_type = "e2-micro"
   zone         = "australia-southeast1-a"
 
@@ -20,7 +20,7 @@ resource "google_compute_instance" "c" {
   }
 
   service_account {
-    email  = "good-sa@dummy-project.iam.gserviceaccount.com"
+    email  = "oslogin-sa@dummy-project.iam.gserviceaccount.com"
     scopes = ["https://www.googleapis.com/auth/logging.write"]
   }
 }
