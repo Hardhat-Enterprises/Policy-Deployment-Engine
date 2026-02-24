@@ -1,8 +1,9 @@
 # Compliant example for allowed_api_targets policy
 
 resource "google_apikeys_key" "c" {
-  name         = "apikey_allowed_api_targets_compliant"
+  name         = "c"
   display_name = "Compliant API key for allowed_api_targets test"
+  project = "my-gcp-project"
 
   restrictions {
     api_targets {

@@ -14,9 +14,9 @@ conditions := [
     {
         "condition": "Check that restrictions block is present.",
         # restrictions is the top-level attribute in google_apikeys_key values
-        "attribute_path" : ["restrictions"],
+        "attribute_path" : ["restrictions", 0, "api_targets"],
         # If restrictions is null/empty, helper will treat this as a match for blacklist values
-        "values" : [null],
+        "values" : [""],
         "policy_type" : "blacklist"
     }
     ]

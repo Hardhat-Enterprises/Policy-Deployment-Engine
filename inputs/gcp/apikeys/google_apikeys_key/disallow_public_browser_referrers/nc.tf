@@ -1,9 +1,10 @@
 # Non-compliant example for disallow_public_browser_referrers
 
 resource "google_apikeys_key" "nc" {
-  name         = "apikey_browser_referrer_non_compliant"
+  name         = "nc"
   display_name = "Non-compliant browser key (public referrers)"
-
+  project = "my-gcp-project"
+  
   restrictions {
     api_targets {
       service = "maps.googleapis.com"
