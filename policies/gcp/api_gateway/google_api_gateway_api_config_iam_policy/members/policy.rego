@@ -1,4 +1,4 @@
-package terraform.gcp.security.api_gateway.google_api_gateway_api_config_iam_policy.member
+package terraform.gcp.security.api_gateway.google_api_gateway_api_config_iam_policy.members
 import data.terraform.helpers
 import data.terraform.gcp.security.api_gateway.google_api_gateway_api_config_iam_policy.vars
 
@@ -23,7 +23,7 @@ conditions := [
     {
       "condition": "policy_data must NOT grant high privilege roles for allAuthenticatedUsers",
       "attribute_path": ["policy_data"],
-      "values": ["{\"bindings\":[{\"members\":[\"allAuthenticatedUsers\"],\"role\":\"roles/owner\"}]}"],
+      "values": ["{\"bindings\":[{\"members\":[\"allAuthenticatedUsers\"],\"role\":\"roles/apigateway.admin\"}]}"],
       "policy_type": "blacklist"
     }
   ]
