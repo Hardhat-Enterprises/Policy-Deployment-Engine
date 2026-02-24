@@ -2,7 +2,7 @@
 # Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
 
 resource "google_biglake_database" "nc" {
-  name    = "enforce_type_hive_non_compliant"
+  name    = "nc"
   catalog = "projects/pde-dummy-project/locations/au/catalogs/pde_dummy_catalog"
   type    = "ICEBERG" # not allowed
 

@@ -1,5 +1,4 @@
-package terraform.gcp.security.biglake.google_biglake_table.storage_location_allowlist # Edit here
-
+package terraform.gcp.security.biglake.google_biglake_table.storage_location_allowlist 
 import data.terraform.helpers
 import data.terraform.gcp.security.biglake.google_biglake_table.vars
 
@@ -13,9 +12,9 @@ conditions := [
     },
     {
       "condition": "Restrict table storage location to approved GCS prefixes",
-      "attribute_path": ["hive_options", "storage_descriptor", "location_uri"],
-      "values": ["gs://org-au-biglake-data/*"],
-      "policy_type": "pattern whitelist"
+      "attribute_path": ["hive_options", 0,"storage_descriptor", 0, "location_uri"],
+      "values": ["gs://org-au-biglake-data/data/"],
+      "policy_type": "whitelist"
     }
   ]
 ]

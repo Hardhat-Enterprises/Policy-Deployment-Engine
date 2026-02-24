@@ -2,7 +2,7 @@
 # Keep "c" as the name to indicate that this resource and its attributes are compliant
 
 resource "google_biglake_table" "c" {
-  name     = "storage_location_allowlist_compliant"
+  name     = "c"
   database = "projects/pde-dummy-project/locations/au/catalogs/pde_dummy_catalog/databases/pde_dummy_database"
   type     = "HIVE"
 
