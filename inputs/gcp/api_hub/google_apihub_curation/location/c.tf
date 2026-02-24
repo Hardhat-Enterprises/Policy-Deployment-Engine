@@ -1,5 +1,5 @@
 resource "google_apihub_curation" "c" {
-  location = "us-central1"
+  location = "australia-southeast1"
   curation_id = "test"
   project = "PDE"
   display_name = "API Hub Curation Location Compliant Test C1"
