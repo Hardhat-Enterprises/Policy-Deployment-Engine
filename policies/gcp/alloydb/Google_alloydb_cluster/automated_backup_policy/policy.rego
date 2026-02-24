@@ -11,9 +11,9 @@ conditions := [
     },
     {
       "condition": "Retention period must be at least 7 days.",
-      "attribute_path": ["automated_backup_policy", "time_based_retention", "retention_period"],
-      "values": [604800],
-      "policy_type": "min",
+      "attribute_path": ["automated_backup_policy", 0, "time_based_retention", 0, "retention_period"],
+      "values": ["604800s"],
+      "policy_type": "whitelist",
     },
   ],
 ]

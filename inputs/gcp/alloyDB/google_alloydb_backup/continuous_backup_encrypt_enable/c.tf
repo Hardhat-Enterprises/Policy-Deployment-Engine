@@ -10,6 +10,9 @@ resource "google_alloydb_backup" "c" {
     label = "key"
   }
 
+  encryption_config {
+    kms_key_name = "projects/project123/locations/australia-southeast-1/keyRings/test-keyring/cryptoKeys/test-key"
+  }
   
 }
 
