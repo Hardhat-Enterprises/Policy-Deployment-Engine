@@ -8,7 +8,8 @@ resource "google_bigquery_reservation" "nc" {
 }
 
 resource "google_bigquery_reservation_assignment" "nc" {
-  assignee    = "projects/pde-dummy-project"
+  assignee    = "nc"
   job_type    = "QUERY"
   reservation = google_bigquery_reservation.nc.id
+  location = "us-west2"
 }
