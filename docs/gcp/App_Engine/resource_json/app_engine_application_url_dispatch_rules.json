@@ -5,8 +5,8 @@
     "dispatch_rules": {
       "description": "Rules to match an HTTP request and dispatch that request to a service. Structure is [documented below](#nested_dispatch_rules).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "Establishes centralized routing logic to ensure requests are directed to the correct microservices based on URL patterns, preventing leaky traffic/unauthorized cross-service access.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -14,37 +14,37 @@
         "domain": {
           "description": "Domain name to match against. The wildcard \"*\" is supported if specified before a period: \"*.\". Defaults to matching all domains: \"*\".",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "To enforce strict hostname mapping to ensure traffic is only routed through approved domains, preventing 'Host Header Injection' and ensuring cross-site requests are properly isolated.",
+          "compliant": "hardhat.pythonanywhere.com",
+          "non-compliant": "invalid-domain.com",
           "parent": "dispatch_rules"
         },
         "path": {
           "description": "Pathname within the host. Must start with a \"/\". A single \"*\" can be included at the end of the path. The sum of the lengths of the domain and path may not exceed 100 characters.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "To define explicit URL patterns to ensure sensitive application paths are strictly mapped to their intended microservices, preventing accidental exposure of internal endpoints",
+          "compliant": "/*",
+          "non-compliant": "admin/*",
           "parent": "dispatch_rules"
         },
         "service": {
           "description": "Pathname within the host. Must start with a \"/\". A single \"*\" can be included at the end of the path. The sum of the lengths of the domain and path may not exceed 100 characters.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "To enforce explicit mapping of URL patterns to specific microservices to ensure architectural isolation and prevent traffic from falling back to a service that may not have the appropriate security context/permissions",
+          "compliant": "default",
+          "non-compliant": "unauthorized-service",
           "parent": "dispatch_rules"
         }
       }
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "Unnecessary as it defaults to the provider-level project configuration if it is not provided, ensuring the resource is naturally governed by the existing project-level access controls.",
       "compliant": null,
       "non-compliant": null,
       "parent": null

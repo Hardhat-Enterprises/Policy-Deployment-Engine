@@ -1,6 +1,6 @@
 
 resource "google_firebase_android_app" "c" {
-    display_name = "testfirebaseandroidapp-c"
+    display_name = "c"
     package_name = "com.example.myapp"
     project = "1013881984426"
     

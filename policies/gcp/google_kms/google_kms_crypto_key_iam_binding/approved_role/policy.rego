@@ -25,12 +25,6 @@ conditions := [
       "remedies": ["Only service accounts should be granted the admin role"]
     },
     {
-      "condition": "Role is admin",
-      "attribute_path": ["role"],
-      "values": ["roles/cloudkms.admin"],
-      "policy_type": "whitelist"
-    },
-    {
       "condition": "Member must be a service account",
       "attribute_path": ["members", 0],
       "values": ["*:admin-user@example.com", [["serviceAccount"]]], 

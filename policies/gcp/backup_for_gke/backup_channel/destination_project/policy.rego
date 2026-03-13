@@ -1,0 +1,21 @@
+package terraform.gcp.security.backup_for_gke.backup_channel.destination_project
+import data.terraform.helpers
+import data.terraform.gcp.security.backup_for_gke.backup_channel.vars
+
+conditions := [
+  [
+    {
+      "situation_description": "Destination project must be set.",
+      "remedies": ["Ensure destination_project is configured."]
+    },
+    {
+      "condition": "Destination Project must not be empty",
+      "attribute_path": ["destination_project"],
+      "values": [null, ""],
+      "policy_type": "blacklist"
+    }
+  ]
+]
+
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

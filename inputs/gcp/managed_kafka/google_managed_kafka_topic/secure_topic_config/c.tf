@@ -3,7 +3,7 @@
 
 resource "google_managed_kafka_topic" "c" {
   topic_id           = "secure-topic"
-  cluster            = "my-secure-cluster"
+  cluster            = "c"
   location           = "us-central1"
   partition_count    = 3
   replication_factor = 3

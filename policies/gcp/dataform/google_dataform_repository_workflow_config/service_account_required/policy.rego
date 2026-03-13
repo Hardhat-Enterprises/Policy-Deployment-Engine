@@ -1,7 +1,7 @@
 package terraform.gcp.security.dataform.google_dataform_repository_workflow_config.service_account_required
 
 import data.terraform.helpers
-import data.terraform.gcp.security.dataform.google_dataform_repository_workflow_config as repo
+import data.terraform.gcp.security.dataform.google_dataform_repository_workflow_config.vars
 
 # Require a service account in invocation_config
 # NOTE: Terraform encodes nested blocks as single-element arrays in plan JSON.
@@ -17,12 +17,6 @@ conditions := [
       ]
     },
     {
-      "condition": "invocation_config is configured",
-      "attribute_path": ["invocation_config"],
-      "policy_type": "whitelist",
-      "values": [null, []]
-    },
-    {
       "condition": "service_account must be set",
       "attribute_path": ["invocation_config", 0, "service_account"],
       "policy_type": "blacklist",
@@ -31,5 +25,7 @@ conditions := [
   ]
 ]
 
-message := helpers.get_multi_summary(conditions, repo.variables).message
-details := helpers.get_multi_summary(conditions, repo.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details

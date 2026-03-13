@@ -1,6 +1,6 @@
 package terraform.gcp.security.gemini.google_gemini_logging_setting.force_log_prompts_responses
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.google_gemini_logging_setting.vars
 
 conditions := [

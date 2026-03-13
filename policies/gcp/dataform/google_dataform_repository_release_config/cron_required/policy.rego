@@ -1,7 +1,7 @@
 package terraform.gcp.security.dataform.google_dataform_repository_release_config.cron_required
 
 import data.terraform.helpers
-import data.terraform.gcp.security.dataform.google_dataform_repository_release_config as repo
+import data.terraform.gcp.security.dataform.google_dataform_repository_release_config.vars
 
 conditions := [
   [
@@ -20,5 +20,7 @@ conditions := [
   ]
 ]
 
-message := helpers.get_multi_summary(conditions, repo.variables).message
-details := helpers.get_multi_summary(conditions, repo.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details

@@ -16,8 +16,8 @@ conditions := [
     {
       "condition": "replication_factor must be at least 3",
       "attribute_path": ["replication_factor"],
-      "values": [3, null],
-      "policy_type": "range"
+      "values": [3],
+      "policy_type": "whitelist"
 
     }
   ],
@@ -79,7 +79,5 @@ conditions := [
   ]
 ]
 
-summary := {
-  "message": helpers.get_multi_summary(conditions, vars.variables).message,
-  "details": helpers.get_multi_summary(conditions, vars.variables).details
-}
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

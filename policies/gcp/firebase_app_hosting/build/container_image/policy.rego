@@ -1,6 +1,5 @@
 package terraform.gcp.security.firebase_app_hosting.build.container_image
-
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.firebase_app_hosting.build.vars
 
 conditions := [

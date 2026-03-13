@@ -25,7 +25,7 @@ conditions := [
     },
     {
         "condition": "Check label",
-        "attribute_path" : ["labels",0,"signing"],
+        "attribute_path" : ["labels","signing"],
         "values" : ["true"],
         "policy_type" : "whitelist" 
     }

@@ -19,7 +19,7 @@ conditions := [
     {
       "condition": "Guard: PSC is ON",
       "attribute_path": ["psc_enabled"],
-      "policy_type": "blacklist",
+      "policy_type": "whitelist",
       "values": [true]
     },
     {
@@ -42,7 +42,7 @@ conditions := [
     {
       "condition": "Guard: PSC is ON",
       "attribute_path": ["psc_enabled"],
-      "policy_type": "blacklist",
+      "policy_type": "whitelist",
       "values": [true]
     },
     {

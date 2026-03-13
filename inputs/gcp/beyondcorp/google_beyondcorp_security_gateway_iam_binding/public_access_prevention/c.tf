@@ -1,4 +1,3 @@
-
 resource "google_beyondcorp_security_gateway" "sg" {
   security_gateway_id = "c"
   project = "smooth-verve-467716-v1"
