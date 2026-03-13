@@ -1,6 +1,6 @@
 resource "google_beyondcorp_security_gateway_application" "c" {
   security_gateway_id = "default-sg"
-  application_id      = "gateway-app-c"
+  application_id      = "c"
   project             = "smooth-verve-467716-v1"
 
   endpoint_matchers {

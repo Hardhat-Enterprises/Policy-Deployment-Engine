@@ -8,7 +8,7 @@ import data.terraform.gcp.security.anthos_on_prem.google_gkeonprem_bare_metal_ad
     "remedies":[ "Change username to authorised admin username"]},
     {
         "condition": "Test if username is secured admin username",
-        "attribute_path" : ["security_config","authorization","admin_users","username"],
+        "attribute_path" : ["security_config", 0, "authorization", 0, "admin_users", 0, "username"],
         "values" : ["admin@hashicorptest.com"],
         "policy_type" : "whitelist" 
     }

@@ -1,8 +1,9 @@
 # Compliant example for disallow_wildcard_methods
 
 resource "google_apikeys_key" "c" {
-  name         = "apikey_wildcard_methods_compliant"
+  name         = "c"
   display_name = "Compliant key (no wildcard methods)"
+  project = "my-gcp-project"
 
   restrictions {
     api_targets {

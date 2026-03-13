@@ -8,7 +8,7 @@ resource "google_bigquery_reservation" "nc" {
 }
 
 resource "google_bigquery_reservation_assignment" "nc" {
-  assignee    = "projects/pde-dummy-project"
-  job_type    = "CONTINUOUS"
+  assignee    = "nc"
+  job_type    = "JOB_TYPE_UNSPECIFIED"
   reservation = google_bigquery_reservation.nc.id
 }

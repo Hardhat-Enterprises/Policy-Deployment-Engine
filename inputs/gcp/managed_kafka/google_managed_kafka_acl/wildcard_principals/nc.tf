@@ -1,9 +1,9 @@
 # Describe your resource type here
 # Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
 
-resource "google_managed_kafka_acl" "non_compliant_acl" {
+resource "google_managed_kafka_acl" "nc" {
   acl_id   = "non-compliant-acl"
-  cluster  = "projects/my-project/locations/australia-southeast2/clusters/example-cluster"
+  cluster  = "nc"
   location = "us-central1"
   project  = "123"
 

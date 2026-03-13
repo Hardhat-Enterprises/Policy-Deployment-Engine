@@ -15,7 +15,7 @@ conditions := [
     {
       "condition": "location must be set to an approved location",
       "attribute_path": ["location"],
-      "values": ["US", "EU", "asia-northeast1"],
+      "values": ["australia-southeast1"],
       "policy_type": "whitelist"
     }
   ]

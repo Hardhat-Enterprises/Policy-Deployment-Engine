@@ -2,7 +2,7 @@
 
 resource "google_dataform_repository" "nc" {
   provider     = google-beta
-  project      = var.project
+  project      = "reliable-alpha-478205-k9"
   region       = "australia-southeast1"
   name         = "nc"
   display_name = "nc"

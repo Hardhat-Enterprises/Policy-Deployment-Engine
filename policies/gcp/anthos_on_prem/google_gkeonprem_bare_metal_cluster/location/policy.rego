@@ -32,7 +32,7 @@ import data.terraform.gcp.security.anthos_on_prem.google_gkeonprem_bare_metal_cl
     "remedies":[ "Change operaton system to LINUX." ],},
     {
         "condition": "Test if the operation system is LINUX",
-        "attribute_path" : ["operating_system"],
+        "attribute_path" : ["control_plane", 0,"control_plane_node_pool_config", 0,"node_pool_config", 0,"operating_system"],
         "values" : ["LINUX"],
         "policy_type" : "whitelist" 
     } 
@@ -44,7 +44,7 @@ import data.terraform.gcp.security.anthos_on_prem.google_gkeonprem_bare_metal_cl
     "remedies":[ "Change load balancer port to 443." ],},
     {
         "condition": "Test if the load balancer port is 443",
-        "attribute_path" : ["load_balancer_port"],
+        "attribute_path" : ["load_balancer", 0,"port_config", 0,"control_plane_load_balancer_port"],
         "values" : [443],
         "policy_type" : "whitelist" 
     }  

@@ -6,12 +6,12 @@ conditions := [
     [
         {
             "situation_description": "Database instance must be a valid desired state",
-            "remedies": ["Set desired state to be active or disabled"]
+            "remedies": ["Set desired state to be active"]
         },
         {
-             "condition": "desired state is either ACTIVE OR DISABLED",
+             "condition": "desired state is ACTIVE",
              "attribute_path" : ["desired_state"], 
-             "values" : ["ACTIVE", "DISABLED"],
+             "values" : ["ACTIVE"],
              "policy_type": "whitelist"
         }
     ]

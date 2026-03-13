@@ -8,13 +8,13 @@ conditions := [
     {
       "situation_description": "BigQuery reservation assignment is linked to a reservation in an unapproved location",
       "remedies": [
-        "Use a reservation located in an approved region (for example, us-central1)."
+        "Use a reservation located in an approved region (for example, australia-southeast1)."
       ]
     },
     {
       "condition": "location must be an approved value",
       "attribute_path": ["location"],
-      "values": ["us-central1"],
+      "values": ["australia-southeast1"],
       "policy_type": "whitelist"
     }
   ]

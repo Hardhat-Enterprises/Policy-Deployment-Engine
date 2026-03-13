@@ -1,6 +1,6 @@
 package terraform.gcp.security.gemini.google_gemini_gemini_gcp_enablement_setting.force_enterprise_web_grounding
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.gemini.google_gemini_gemini_gcp_enablement_setting.vars
 
 conditions := [

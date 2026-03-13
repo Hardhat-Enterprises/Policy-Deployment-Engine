@@ -10,7 +10,7 @@ conditions := [[
 	},
 	{
 		"condition": "SSL mode must be ENCRYPTED_ONLY.",
-		"attribute_path": ["client_connection_config", "ssl_config", "ssl_mode"],
+		"attribute_path": ["client_connection_config", 0, "ssl_config", 0, "ssl_mode"],
 		"values": ["ENCRYPTED_ONLY"],
 		"policy_type": "whitelist",
 	},

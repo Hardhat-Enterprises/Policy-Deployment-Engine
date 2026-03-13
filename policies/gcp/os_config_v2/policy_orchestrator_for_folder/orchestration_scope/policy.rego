@@ -14,7 +14,7 @@ conditions := [
     },
     {
         "condition": "Only Testing labelled environments are allowed in orchestration scope",
-        "attribute_path" : ["label",0,"environment"], 
+        "attribute_path" : ["labels","environment"], 
         "values" : ["Test","test","TEST","testing","Testing","TESTING"],
         "policy_type" : "whitelist" 
     },

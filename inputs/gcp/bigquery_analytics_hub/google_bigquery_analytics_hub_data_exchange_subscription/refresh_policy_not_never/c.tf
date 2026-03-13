@@ -11,7 +11,7 @@ resource "google_bigquery_analytics_hub_data_exchange_subscription" "c" {
   data_exchange_location = "australia-southeast1"
   data_exchange_id       = "c"
 
-  subscription_id = "sub_ok"
+  subscription_id = "c"
 
   # Compliant
   refresh_policy = "ON_READ"

@@ -1,8 +1,9 @@
 # Non-compliant example for disallow_wildcard_methods
 
 resource "google_apikeys_key" "nc" {
-  name         = "apikey_wildcard_methods_non_compliant"
+  name         = "nc"
   display_name = "Non-compliant key (wildcard methods)"
+  project = "my-gcp-project"
 
   restrictions {
     api_targets {

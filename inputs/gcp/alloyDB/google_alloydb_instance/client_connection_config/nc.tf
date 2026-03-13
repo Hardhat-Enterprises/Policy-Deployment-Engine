@@ -1,6 +1,6 @@
 resource "google_alloydb_instance" "nc" {
   cluster       = "projects/p/locations/us-central1/clusters/cluster-nc"
-  instance_id   = "inst-ssl-off"
+  instance_id   = "nc"
   instance_type = "PRIMARY"
   gce_zone      = "us-central1-a"
 

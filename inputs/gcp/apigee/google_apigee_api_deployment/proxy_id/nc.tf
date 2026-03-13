@@ -4,7 +4,7 @@ resource "google_apigee_api" "apigee_api_proxy_nc" {
   config_bundle   = "random/Apigee_Proxies.zip"
 }
 
-resource "google_apigee_api_deployment" "apigee_api_deployment_nc" {
+resource "google_apigee_api_deployment" "nc" {
   environment = "Prod"
   org_id = "Test"
   revision = google_apigee_api.apigee_api_proxy_nc.latest_revision_id

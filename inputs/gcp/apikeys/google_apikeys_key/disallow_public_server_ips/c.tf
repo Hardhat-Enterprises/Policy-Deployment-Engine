@@ -1,9 +1,11 @@
 # Compliant example for disallow_public_server_ips
 
 resource "google_apikeys_key" "c" {
-  name         = "apikey_server_ips_compliant"
+  name         = "c"
   display_name = "Compliant server key (restricted IPs)"
 
+  project = "my-gcp-project"
+  
   restrictions {
     api_targets {
       service = "maps.googleapis.com"

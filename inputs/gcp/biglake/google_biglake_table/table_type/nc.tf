@@ -2,9 +2,9 @@
 # Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
 
 resource "google_biglake_table" "nc" {
-  name     = "table_type_non_compliant"
+  name     = "nc"
   database = "projects/pde-dummy-project/locations/au/catalogs/pde_dummy_catalog/databases/pde_dummy_database"
-  type     = "CUSTOM"
+  type     = ""
 
   hive_options {
     storage_descriptor {

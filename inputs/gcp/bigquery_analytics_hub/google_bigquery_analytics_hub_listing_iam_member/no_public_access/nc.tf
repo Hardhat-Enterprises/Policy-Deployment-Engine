@@ -1,27 +1,27 @@
 # Resource type: google_bigquery_analytics_hub_listing_iam_member
 # NON-COMPLIANT: allUsers always banned
-resource "google_bigquery_analytics_hub_listing_iam_member" "nc" {
+resource "google_bigquery_analytics_hub_listing_iam_member" "nc1" {
   location         = "australia-southeast1"
-  data_exchange_id = "nc"
-  listing_id       = "nc"
+  data_exchange_id = "nc1"
+  listing_id       = "nc1"
   role             = "roles/viewer"
   member           = "allUsers"
 }
 
 # NON-COMPLIANT: allAuthenticatedUsers + high-priv role (should be blocked)
-resource "google_bigquery_analytics_hub_listing_iam_member" "bad_auth" {
+resource "google_bigquery_analytics_hub_listing_iam_member" "nc2" {
   location         = "australia-southeast1"
-  data_exchange_id = "nc"
-  listing_id       = "nc"
+  data_exchange_id = "nc2"
+  listing_id       = "nc2"
   role             = "roles/editor"
   member           = "allAuthenticatedUsers"
 }
 
 # COMPLIANT : allAuthenticatedUsers + low-priv role (should be allowed)
-resource "google_bigquery_analytics_hub_listing_iam_member" "auth_viewer" {
+resource "google_bigquery_analytics_hub_listing_iam_member" "nc3" {
   location         = "australia-southeast1"
-  data_exchange_id = "nc"
-  listing_id       = "nc"
+  data_exchange_id = "nc3"
+  listing_id       = "nc3"
   role             = "roles/viewer"
   member           = "allAuthenticatedUsers"
 }

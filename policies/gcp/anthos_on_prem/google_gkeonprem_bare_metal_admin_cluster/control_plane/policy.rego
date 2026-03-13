@@ -8,7 +8,7 @@ import data.terraform.gcp.security.anthos_on_prem.google_gkeonprem_bare_metal_ad
     "remedies":[ "Change node IP to be private." ],},
     {
         "condition": "Test if the node IP is within the assigned private IP range",
-        "attribute_path" : ["control_plane","control_plane_node_pool_config","node_pool_config","node_configs","node_ip"],
+        "attribute_path" : ["control_plane", 0,"control_plane_node_pool_config", 0,"node_pool_config", 0,"node_configs", 0,"node_ip"],
         "values" : ["10.200.0.2","10.200.0.3","10.200.0.4"],
         "policy_type" : "whitelist" 
     }
@@ -20,7 +20,7 @@ import data.terraform.gcp.security.anthos_on_prem.google_gkeonprem_bare_metal_ad
     "remedies":[ "Change operation system to Linux." ],},
     {
         "condition": "Test if the operation system is Linux",
-        "attribute_path" : ["control_plane","control_plane_node_pool_config","node_pool_config","operating_system"],
+        "attribute_path" : ["control_plane", 0,"control_plane_node_pool_config", 0,"node_pool_config", 0,"operating_system"],
         "values" : ["LINUX"],
         "policy_type" : "whitelist" 
     }

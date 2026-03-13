@@ -1,6 +1,6 @@
 resource "google_alloydb_cluster" "nc" {
   location   = "us-central1"
-  cluster_id = "cluster-cbk-off"
+  cluster_id = "nc"
   project = "123"
 
   network_config {

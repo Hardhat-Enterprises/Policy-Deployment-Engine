@@ -10,9 +10,9 @@ conditions := [
          "remedies": ["Enable mTLS by configuring tls_config.trust_config.cas_configs with a valid CA pool."]},
         {
             "condition": "tls_config.trust_config.cas_configs must be properly defined",
-            "attribute_path": ["tls_config", "trust_config", "cas_configs", 0, "ca_pool"],
-            "values": ["projects/my-project/locations/us-central1/caPools/my-ca-pool"],
-            "policy_type": "whitelist"
+            "attribute_path": ["tls_config"],
+            "values": [null],
+            "policy_type": "blacklist"
         }
     ],
 
@@ -24,13 +24,12 @@ conditions := [
         {
             "condition": "tls_config must be configured",
             "attribute_path": ["tls_config"],
-            "values": [""],
+            "values": [null],
             "policy_type": "blacklist"
         }
     ]
 
 ]
-summary := {
-    "message": helpers.get_multi_summary(conditions, vars.variables).message,
-    "details": helpers.get_multi_summary(conditions, vars.variables).details
-}
+
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

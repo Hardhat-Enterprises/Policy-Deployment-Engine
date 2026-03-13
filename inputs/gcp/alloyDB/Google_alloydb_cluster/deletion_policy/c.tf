@@ -1,5 +1,5 @@
 resource "google_alloydb_cluster" "c" {
-  cluster_id = "secure-cluster"
+  cluster_id = "c"
   location   = "us-central1"
   project = "123"
 
