@@ -6,7 +6,7 @@ import data.terraform.gcp.security.access_context_manager_vpc_service_controls.g
 conditions := [
     [
     {
-      "situation_description": "Ensure access is not granted to unspecified or unsupported OS types.",
+      "situation_description": "Ensure access is only allowed for supported OS including Android",
       "remedies": ["Update os_constraints to explicitly include only supported OS types."]
     },
     {
