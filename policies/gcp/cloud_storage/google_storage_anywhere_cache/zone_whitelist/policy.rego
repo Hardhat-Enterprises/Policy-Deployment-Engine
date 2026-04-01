@@ -1,6 +1,6 @@
 package terraform.gcp.security.cloud_storage.google_storage_anywhere_cache.zone_whitelist
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.cloud_storage.google_storage_anywhere_cache.vars
 
 conditions := [

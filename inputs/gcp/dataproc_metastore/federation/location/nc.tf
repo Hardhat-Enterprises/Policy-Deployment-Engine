@@ -1,6 +1,6 @@
 resource "google_dataproc_metastore_federation" "nc" {
   version = "3.0.0"   
-  federation_id = "metastore-fed"
+  federation_id = "nc"
   location = "global"
   project = 2 
 

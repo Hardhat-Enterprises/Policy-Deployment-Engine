@@ -1,7 +1,7 @@
 package terraform.gcp.security.dataform.google_dataform_repository.git_ssh_auth
 
-import data.terraform.gcp.helpers
-import data.terraform.gcp.security.dataform.google_dataform_repository as repo
+import data.terraform.helpers
+import data.terraform.gcp.security.dataform.google_dataform_repository.vars
 
 # This policy enforces: if a repo uses SSH authentication,
 # then both user_private_key_secret_version and host_public_key must be set.
@@ -21,12 +21,6 @@ conditions := [
       ]
     },
     {
-      "condition": "SSH authentication is configured",
-      "attribute_path": ["git_remote_settings", 0, "ssh_authentication_config"],
-      "policy_type": "whitelist",
-      "values": [null, []]
-    },
-    {
       "condition": "SSH private key secret must be set",
       "attribute_path": ["git_remote_settings", 0, "ssh_authentication_config", 0, "user_private_key_secret_version"],
       "policy_type": "blacklist",
@@ -44,12 +38,6 @@ conditions := [
       ]
     },
     {
-      "condition": "SSH authentication is configured",
-      "attribute_path": ["git_remote_settings", 0, "ssh_authentication_config"],
-      "policy_type": "whitelist",
-      "values": [null, []]
-    },
-    {
       "condition": "SSH host public key must be set",
       "attribute_path": ["git_remote_settings", 0, "ssh_authentication_config", 0, "host_public_key"],
       "policy_type": "blacklist",
@@ -58,5 +46,7 @@ conditions := [
   ]
 ]
 
-message := helpers.get_multi_summary(conditions, repo.variables).message
-details := helpers.get_multi_summary(conditions, repo.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details

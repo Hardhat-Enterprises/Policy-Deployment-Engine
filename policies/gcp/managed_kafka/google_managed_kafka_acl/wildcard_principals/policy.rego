@@ -1,5 +1,5 @@
 package terraform.gcp.security.managed_kafka.google_managed_kafka_acl.wildcard_principals 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.managed_kafka.google_managed_kafka_acl.vars
 
 
@@ -18,8 +18,6 @@ conditions := [
 
     ]
 ]
-summary := {
-    "message": helpers.get_multi_summary(conditions, vars.variables).message,
-    "details": helpers.get_multi_summary(conditions, vars.variables).details
-}
 
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

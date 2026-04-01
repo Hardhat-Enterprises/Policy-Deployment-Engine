@@ -1,6 +1,6 @@
 package terraform.gcp.security.firebase_hosting.google_firebase_hosting_version.headers_security
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.firebase_hosting.google_firebase_hosting_version.vars
 
 # We validate concrete, safe values so presence + correctness are both enforced.

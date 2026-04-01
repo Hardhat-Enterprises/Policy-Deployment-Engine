@@ -1,8 +1,8 @@
 # Describe your resource type here
 # Keep "c" as the name to indicate that this resource and its attributes are compliant
 
-resource "google_managed_kafka_cluster" "secure_tls_cluster" {
-  cluster_id = "secure-tls-cluster"
+resource "google_managed_kafka_cluster" "c" {
+  cluster_id = "c"
   location   = "us-central1"
   project = "123"
 

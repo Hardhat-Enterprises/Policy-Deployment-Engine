@@ -1,4 +1,4 @@
-package terraform.gcp.security.dataform.google_dataform_repository_release_config
+package terraform.gcp.security.dataform.google_dataform_repository_release_config.vars
 
 variables := {
   "resource_type": "google_dataform_repository_release_config",

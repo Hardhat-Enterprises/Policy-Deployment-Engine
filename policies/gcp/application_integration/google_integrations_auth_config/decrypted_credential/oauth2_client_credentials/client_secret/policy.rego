@@ -1,6 +1,6 @@
 package terraform.gcp.security.application_integration.google_integrations_auth_config.decrypted_credential.oauth2_client_credentials.client_secret
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.application_integration.google_integrations_auth_config.vars
 
 conditions := [

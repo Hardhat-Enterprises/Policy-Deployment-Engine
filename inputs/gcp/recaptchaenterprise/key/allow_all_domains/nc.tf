@@ -3,7 +3,7 @@
 
 resource "google_recaptcha_enterprise_key" "nc" {
   project      = var.project
-  display_name = "recaptcha-web-noncompliant"
+  display_name = "nc"
 
   web_settings {
     allow_all_domains = true

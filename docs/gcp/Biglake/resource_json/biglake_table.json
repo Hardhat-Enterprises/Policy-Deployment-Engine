@@ -1,107 +1,93 @@
 {
-  "resource_name": "biglake_table",
+  "_metadata": {
+    "provider": "gcp",
+    "version": "v5.29.0"
+  },
+  "resource_name": "google_biglake_table",
   "subcategory": "Biglake",
   "arguments": {
     "name": {
-      "description": "Output only. The name of the Table. Format: projects/{project_id_or_number}/locations/{locationId}/catalogs/{catalogId}/databases/{databaseId}/tables/{tableId}",
+      "description": "The name of the BigLake table.",
       "required": true,
-      "security_impact": null,
+      "security_impact": false,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "database": {
+      "description": "The BigLake database that contains this table.",
+      "required": true,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "type": {
-      "description": "The database type. Possible values are: `HIVE`.",
-      "required": false,
-      "security_impact": null,
+      "description": "The type of the BigLake table.",
+      "required": true,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "hive_options": {
-      "description": "Options of a Hive table. Structure is [documented below](#nested_hive_options).",
+      "description": "Hive-specific options for the BigLake table.",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
       "parent": null,
       "arguments": {
-        "parameters": {
-          "description": "Stores user supplied Hive table parameters. An object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "hive_options"
-        },
-        "table_type": {
-          "description": "Hive table type. For example, MANAGED_TABLE, EXTERNAL_TABLE.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "hive_options"
-        },
         "storage_descriptor": {
-          "description": "Stores physical storage information on the data. Structure is [documented below](#nested_hive_options_storage_descriptor).",
-          "required": false,
-          "security_impact": null,
+          "description": "Storage descriptor for the BigLake table.",
+          "required": true,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
-          "parent": "hive_options"
-        }
-      }
-    },
-    "database": {
-      "description": "The id of the parent database.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "storage_descriptor": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "location_uri": {
-          "description": "Cloud Storage folder URI where the table data is stored, starting with \"gs://\".",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "storage_descriptor"
-        },
-        "input_format": {
-          "description": "The fully qualified Java class name of the input format.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "storage_descriptor"
-        },
-        "output_format": {
-          "description": "The fully qualified Java class name of the output format.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "storage_descriptor"
+          "parent": "hive_options",
+          "arguments": {
+            "location_uri": {
+              "description": "The Cloud Storage location where table data is stored.",
+              "required": true,
+              "security_impact": true,
+              "rationale": "The table storage location determines where data is physically stored. Insecure or public locations may expose sensitive data or violate data governance requirements.",
+              "compliant": "gs://secure-private-bucket/table-path",
+              "non-compliant": "gs://public-bucket/table-path",
+              "parent": "storage_descriptor"
+            },
+            "input_format": {
+              "description": "The input format of the table data.",
+              "required": false,
+              "security_impact": false,
+              "rationale": null,
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "storage_descriptor"
+            },
+            "output_format": {
+              "description": "The output format of the table data.",
+              "required": false,
+              "security_impact": false,
+              "rationale": null,
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "storage_descriptor"
+            },
+            "parameters": {
+              "description": "Custom parameters for the table storage descriptor.",
+              "required": false,
+              "security_impact": false,
+              "rationale": null,
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "storage_descriptor"
+            }
+          }
         }
       }
     }

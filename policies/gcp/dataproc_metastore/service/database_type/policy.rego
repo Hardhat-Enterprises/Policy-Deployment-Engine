@@ -1,5 +1,5 @@
 package terraform.gcp.security.dataproc_metastore.service.database_type
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.dataproc_metastore.service.vars
 
 
@@ -12,7 +12,7 @@ conditions := [
     {
       "condition": "check database type is compliant",
       "attribute_path": ["database_type"],
-      "values": ["MYSQL","SPANNER"],
+      "values": ["MYSQL"],
       "policy_type": "whitelist"
     }
   ]

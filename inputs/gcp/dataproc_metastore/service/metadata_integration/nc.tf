@@ -1,5 +1,5 @@
 resource "google_dataproc_metastore_service" "nc" {
-  service_id = "metastore-srv"
+  service_id = "nc"
   project = 1
 
   metadata_integration {

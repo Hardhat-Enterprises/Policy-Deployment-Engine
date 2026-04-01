@@ -5,17 +5,17 @@
     "service": {
       "description": "The name of the service these settings apply to.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Enforced to establish a verifiable network perimeter at the application layer.",
+      "compliant": "app-internal-service",
+      "non-compliant": "internal-service",
       "parent": null
     },
     "network_settings": {
       "description": "Ingress settings for this service. Will apply to all versions. Structure is [documented below](#nested_network_settings).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "Enforced to ensure the definition of the fundamental trust boundary of the application",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -23,19 +23,19 @@
         "ingress_traffic_allowed": {
           "description": "The ingress settings for version or service. Default value is `INGRESS_TRAFFIC_ALLOWED_UNSPECIFIED`. Possible values are: `INGRESS_TRAFFIC_ALLOWED_UNSPECIFIED`, `INGRESS_TRAFFIC_ALLOWED_ALL`, `INGRESS_TRAFFIC_ALLOWED_INTERNAL_ONLY`, `INGRESS_TRAFFIC_ALLOWED_INTERNAL_AND_LB`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Is enforced to mitigate the risk of direct-to-origin attacks from occurring. By ensuring that the default unshielded App Engine URL is disabled.",
+          "compliant": "INGRESS_TRAFFIC_ALLOWED_INTERNAL_ONLY",
+          "non-compliant": "INGRESS_TRAFFIC_ALLOWED_ALL",
           "parent": "network_settings"
         }
       }
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "To automatically inherit the provider-level project ID.",
       "compliant": null,
       "non-compliant": null,
       "parent": null

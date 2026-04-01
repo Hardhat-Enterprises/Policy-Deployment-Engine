@@ -1,6 +1,6 @@
 package terraform.gcp.security.identity_aware_proxy.google_iap_web_iam.condition
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.identity_aware_proxy.google_iap_web_iam as vars
 
 # Enforce: every IAP Web IAM binding must include a non-empty 'condition' block.

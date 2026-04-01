@@ -1,7 +1,7 @@
 # policies/gcp/looker/core/custom_domain_when_private/policy.rego
 package terraform.gcp.security.looker.core.custom_domain_when_private
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.looker.core.vars
 
 # IF public_ip_enabled == false THEN custom_domain.domain must be set
@@ -19,7 +19,7 @@ conditions := [
     {
       "condition": "Guard: public IP is OFF",
       "attribute_path": ["public_ip_enabled"],
-      "policy_type": "whitelist",
+      "policy_type": "blacklist",
       "values": [true]
     },
     # Requirement: domain must be present → violate when missing/empty

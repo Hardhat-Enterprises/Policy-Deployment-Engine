@@ -1,6 +1,6 @@
 package terraform.gcp.security.scc.google_scc_source_iam_binding.members
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.scc.google_scc_source_iam_binding.vars
 
 conditions := [

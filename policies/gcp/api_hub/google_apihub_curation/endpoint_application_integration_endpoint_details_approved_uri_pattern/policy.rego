@@ -1,6 +1,6 @@
 package terraform.gcp.security.api_hub.google_apihub_curation.endpoint_application_integration_endpoint_details_approved_uri_pattern
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.api_hub.google_apihub_curation.vars
 
 conditions := [

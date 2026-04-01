@@ -1,6 +1,6 @@
 package terraform.gcp.security.dataproc_metastore.federation.metastore_type
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.dataproc_metastore.federation.vars
 
 
@@ -12,7 +12,7 @@ conditions := [
     },
     {
       "condition": "Checks that metastore_type is in the approved list.",
-      "attribute_path": ["backend_metastore", 0, "metastore_type"  ],
+      "attribute_path": ["backend_metastores", 0, "metastore_type"  ],
       "values": ["DATAPROC_METASTORE", "BIGQUERY"],
       "policy_type": "whitelist"
     }

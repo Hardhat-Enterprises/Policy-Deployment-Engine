@@ -1,5 +1,5 @@
 package terraform.gcp.security.dataproc_metastore.service.port
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.dataproc_metastore.service.vars
 
 conditions := [
@@ -11,7 +11,7 @@ conditions := [
         {
             "condition": "Check if the metastore port is set to the default (9083).",
             "attribute_path": ["port"],
-            "values": ["9083", "443"],
+            "values": [9083],
             "policy_type": "whitelist"
         }
     ]

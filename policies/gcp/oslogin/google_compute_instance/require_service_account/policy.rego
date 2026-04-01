@@ -1,6 +1,6 @@
 package terraform.gcp.security.oslogin.google_compute_instance.require_service_account
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.oslogin.google_compute_instance.vars
 
 
@@ -15,8 +15,8 @@ conditions := [
     },
     {
       "condition": "Check service_account block is defined",
-      "attribute_path": ["service_account"],
-      "values": ["oslogin-sa@my-project.iam.gserviceaccount.com"],        
+      "attribute_path": ["service_account", 0, "email"],
+      "values": ["oslogin-sa@dummy-project.iam.gserviceaccount.com"],        
       "policy_type": "whitelist"
     }
   ]

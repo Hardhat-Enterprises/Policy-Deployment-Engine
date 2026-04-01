@@ -1,7 +1,7 @@
 # Google reCAPTCHA Enterprise Key (Web) — non-compliant (integration_type != "SCORE")
 resource "google_recaptcha_enterprise_key" "nc" {
   project      = var.project
-  display_name = "recaptcha-web-noncompliant-challenge-security"
+  display_name = "nc"
 
 
   web_settings {
