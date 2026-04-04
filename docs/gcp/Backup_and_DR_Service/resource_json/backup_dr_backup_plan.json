@@ -5,17 +5,17 @@
     "backup_vault": {
       "description": "Required. Backup vault where the backups gets stored using this Backup plan.",
       "required": true,
-      "security_impact": false,
-      "rationale": "This setting is not enforced by policy and does not directly impact security controls for this service.",
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Choosing the wrong vault can affect retention enforcement, immutability, access boundaries, and compliance requirements",
+      "compliant": "approved production backup vault in the designated region",
+      "non-compliant": "test or non-approved vault",
       "parent": null
     },
     "resource_type": {
       "description": "Required. The resource type to which the `BackupPlan` will be applied. Examples include, \"compute.googleapis.com/Instance\", \"compute.googleapis.com/Disk\", \"sqladmin.googleapis.com/Instance\" and \"storage.googleapis.com/Bucket\".",
       "required": true,
       "security_impact": true,
-      "rationale": "Incorrect or missing resource type may lead unproper backups, impacting data recovery and security.",
+      "rationale": "An incorrect resource type can make the plan unusable for the intended workload or lead to misconfigured protection",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -61,8 +61,8 @@
               "required": true,
               "security_impact": true,
               "rationale": "Frequency period impacts recovery and compliance. Values outside the approved range increase data loss and compliance risk.",
-              "compliant": ["DAILY", "WEEKLY"],
-              "non-compliant": ["HOURLY"],
+              "compliant": ["HOURLY", "DAILY", "WEEKLY"],
+              "non-compliant": ["FORTNIGHTLY"],
               "parent": "standard_schedule"
             },
             "hourly_frequency": {
