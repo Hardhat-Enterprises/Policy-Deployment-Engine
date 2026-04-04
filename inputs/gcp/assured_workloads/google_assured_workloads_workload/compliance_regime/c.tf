@@ -1,5 +1,5 @@
 resource "google_assured_workloads_workload" "c" {
-  display_name       = "compliant-workload"
+  display_name       = "c"
   compliance_regime  = "FEDRAMP_MODERATE"
   location           = "us-central1"
   organization       = "123456789"

@@ -1,5 +1,5 @@
 resource "google_assured_workloads_workload" "nc" {
-  display_name       = "non-compliant-workload"
+  display_name       = "c"
   compliance_regime  = "COMPLIANCE_REGIME_UNSPECIFIED"
   location           = "us-central1"
   organization       = "123456789"
