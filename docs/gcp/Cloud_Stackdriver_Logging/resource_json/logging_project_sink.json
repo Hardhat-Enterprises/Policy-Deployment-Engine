@@ -1,0 +1,145 @@
+{
+  "resource_name": "logging_project_sink",
+  "subcategory": "Cloud (Stackdriver) Logging",
+  "arguments": {
+    "name": {
+      "description": "The name of the logging sink. Must be unique within the project.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Name is a unique identifier for the sink. It has no security implications beyond being a reference name.",
+      "compliant": "audit-log-sink",
+      "non-compliant": null,
+      "parent": null
+    },
+    "destination": {
+      "description": "The destination where logs will be exported. Supported destinations: Cloud Storage bucket, Pub/Sub topic, BigQuery dataset, or Cloud Logging bucket. Examples: - `storage.googleapis.com/[GCS_BUCKET]` - `bigquery.googleapis.com/projects/[PROJECT_ID]/datasets/[DATASET]` - `pubsub.googleapis.com/projects/[PROJECT_ID]/topics/[TOPIC_ID]` - `logging.googleapis.com/projects/[PROJECT_ID]/locations/global/buckets/[BUCKET_ID]` The writer associated with the sink must have access to write to the above resource.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Destination determines where logs are exported. Exporting to unauthorized or external destinations can lead to log exfiltration, data leakage, and compliance violations. Destinations must be within the organization's approved projects and follow security best practices.",
+      "compliant": "storage.googleapis.com/audit-logs-bucket",
+      "non-compliant": "pubsub.googleapis.com/projects/attacker-project/topics/logs",
+      "parent": null
+    },
+    "filter": {
+      "description": "An advanced logs filter that selects which log entries to export. See [Advanced Log Filters](https://cloud.google.com/logging/docs/view/advanced-filters) for information on how to write a filter.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Filter determines which logs are exported. Overly restrictive filters can exclude critical security logs (audit logs, IAM changes, firewall changes), creating blind spots for security monitoring and incident response.",
+      "compliant": "resource.type = \"gce_instance\" OR logName = \"cloudaudit.googleapis.com%2Factivity\"",
+      "non-compliant": "severity < ERROR",
+      "parent": null
+    },
+    "description": {
+      "description": "A user-provided description of the logging sink. Maximum length of 800 characters.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Description is metadata only and does not affect any security controls.",
+      "compliant": "Export audit logs to centralized storage for compliance",
+      "non-compliant": null,
+      "parent": null
+    },
+    "disabled": {
+      "description": "Whether the sink is disabled. If set to true, the sink will not export logs. Default: false.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "If disabled is set to true, log export stops working. Disabling critical log sinks can break security monitoring, compliance reporting, and incident response capabilities.",
+      "compliant": "false",
+      "non-compliant": "true",
+      "parent": null
+    },
+    "project": {
+      "description": "The project that will own the sink. Format: projects/PROJECT_ID. If not provided, the provider project is used.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "This identifies which project owns the sink. It has no direct security impact on the sink's behavior.",
+      "compliant": "projects/my-project",
+      "non-compliant": null,
+      "parent": null
+    },
+    "unique_writer_identity": {
+      "description": "If set to true, a unique service account is created and used for this sink. If you wish to publish logs across projects or utilize bigquery_options, you must set unique_writer_identity to true.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Unique writer identity creates a dedicated service account for this sink, improving security through isolation and least privilege. Required for cross-project exports and BigQuery options. Without this, the default Logging service account is used, which may have broader permissions.",
+      "compliant": "true",
+      "non-compliant": "false",
+      "parent": null
+    },
+    "custom_writer_identity": {
+      "description": "A custom service account email address to be used as the writer identity. The format must be serviceAccount:some@email. This field can only be specified if you are routing logs to a destination outside this sink's project. If not specified, a Logging service account will automatically be generated.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Custom writer identity allows specifying a specific service account for log export. This provides fine-grained control over permissions and follows the principle of least privilege. The service account must have appropriate permissions on the destination.",
+      "compliant": "serviceAccount:logs-exporter@my-project.iam.gserviceaccount.com",
+      "non-compliant": null,
+      "parent": null
+    },
+    "bigquery_options": {
+      "description": "Options for sinks exporting to BigQuery. Configures how logs are organized in BigQuery tables. Requires unique_writer_identity = true.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "BigQuery options affect table organization and query performance but have no direct security impact on log data or access controls.",
+      "compliant": "Refer to child arguments",
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "use_partitioned_tables": {
+          "description": "By default, Logging creates dated tables based on the log entries' timestamps, e.g. syslog_20170523. With partitioned tables, the date suffix is no longer present and [special query syntax](https://cloud.google.com/bigquery/docs/querying-partitioned-tables) has to be used instead. In both cases, tables are sharded based on UTC timezone.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Partitioned tables improve query performance and cost management but have no security implications.",
+          "compliant": "true",
+          "non-compliant": "false",
+          "parent": "bigquery_options"
+        }
+      }
+    },
+    "exclusions": {
+      "description": "Log entries that match any of the exclusion filters will not be exported by the sink. Multiple exclusions can be specified.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Exclusions allow selective filtering of logs before export. Excluding security-critical logs (audit logs, high severity, IAM changes) creates blind spots and violates compliance requirements.",
+      "compliant": "Refer to child arguments",
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "name": {
+          "description": "The name of the exclusion filter. Must be unique within the sink.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Name is a unique identifier for the exclusion. Has no security implications.",
+          "compliant": "health-check-exclusion",
+          "non-compliant": null,
+          "parent": "exclusions"
+        },
+        "description": {
+          "description": "A user-provided description of the exclusion filter.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Description is metadata only and does not affect security controls.",
+          "compliant": "Exclude health check logs from export",
+          "non-compliant": null,
+          "parent": "exclusions"
+        },
+        "filter": {
+          "description": "An advanced logs filter that matches log entries to be excluded from export. See [Advanced Log Filters](https://cloud.google.com/logging/docs/view/advanced-filters) for information on how to write a filter.",
+          "required": true,
+          "security_impact": true,
+          "rationale": "Filter determines which logs are excluded from export. Excluding audit logs, IAM changes, or high severity logs creates critical security blind spots.",
+          "compliant": "resource.type = \"k8s_container\" AND jsonPayload.health_check = true",
+          "non-compliant": "logName = \"cloudaudit.googleapis.com%2Factivity\"",
+          "parent": "exclusions"
+        },
+        "disabled": {
+          "description": "Whether the exclusion is disabled. If set to true, the exclusion will not be applied. Default: false.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "When disabled, the exclusion stops filtering logs (less risky). Has lower security impact than active exclusions.",
+          "compliant": "false",
+          "non-compliant": "true",
+          "parent": "exclusions"
+        }
+      }
+    }
+  }
+}

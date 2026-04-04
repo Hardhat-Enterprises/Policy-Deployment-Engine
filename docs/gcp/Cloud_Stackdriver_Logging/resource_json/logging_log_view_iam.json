@@ -1,0 +1,107 @@
+{
+  "resource_name": "logging_log_view_iam",
+  "subcategory": "Cloud (Stackdriver) Logging",
+  "arguments": {
+    "parent": {
+      "description": "The parent resource of the log view. Format: projects/PROJECT_ID/locations/LOCATION/buckets/BUCKET_ID",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Parent identifies which bucket contains the log view. Has no direct security impact beyond resource identification.",
+      "compliant": "projects/my-project/locations/global/buckets/audit-bucket",
+      "non-compliant": null,
+      "parent": null
+    },
+    "location": {
+      "description": "The location of the resource. If no location is provided in the parent identifier and no location is specified, it is taken from the provider configuration. Examples: global, us-central1, eu",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Location selection affects data residency but has no direct impact on IAM security controls.",
+      "compliant": "global",
+      "non-compliant": null,
+      "parent": null
+    },
+    "bucket": {
+      "description": "The logging bucket that contains the log view. Format: buckets/BUCKET_ID",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Bucket identifies which logging bucket contains the view. Has no direct security impact beyond resource identification.",
+      "compliant": "buckets/audit-log-bucket",
+      "non-compliant": null,
+      "parent": null
+    },
+    "name": {
+      "description": "The name of the log view. Format: views/VIEW_NAME",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Name is a unique identifier for the log view. Has no security implications beyond being a reference name.",
+      "compliant": "views/_Default",
+      "non-compliant": null,
+      "parent": null
+    },
+    "member/members": {
+      "description": "Identities that will be granted the role. Each entry can be: allUsers, allAuthenticatedUsers, user:{emailid}, serviceAccount:{emailid}, group:{emailid}, domain:{domain}, projectOwner:projectid, projectEditor:projectid, projectViewer:projectid",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Members determine who has access to view logs. Granting access to allUsers or allAuthenticatedUsers exposes logs to unauthorized parties, violating confidentiality and compliance requirements. Overly permissive access (e.g., projectViewer) may grant log access to unintended users.",
+      "compliant": "[\"serviceAccount:security-auditor@my-project.iam.gserviceaccount.com\"]",
+      "non-compliant": "[\"allUsers\", \"allAuthenticatedUsers\", \"user:unauthorized@gmail.com\"]",
+      "parent": null
+    },
+    "role": {
+      "description": "The IAM role to grant to the members. Valid roles include: roles/logging.viewAccessor, roles/logging.privateLogViewer, roles/logging.logWriter. Custom roles format: [projects|organizations]/{parent-name}/roles/{role-name}",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Role determines what actions members can perform on logs. Granting overly permissive roles (e.g., roles/logging.logWriter) allows log modification or deletion. Only grant roles/logging.viewAccessor for read-only access to logs.",
+      "compliant": "roles/logging.viewAccessor",
+      "non-compliant": "roles/logging.logWriter",
+      "parent": null
+    },
+    "policy_data": {
+      "description": "The policy data from a google_iam_policy data source. Use this for fine-grained control over the entire IAM policy. Conflicts with member/members and role.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Policy data defines the complete IAM policy. Misconfiguration can inadvertently remove critical permissions or grant excessive access.",
+      "compliant": "data.google_iam_policy.admin_policy.policy_data",
+      "non-compliant": null,
+      "parent": null
+    },
+    "condition": {
+      "description": "An IAM condition that restricts when the role binding is active. Structure documented below.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Conditions can be used to enforce time-based or attribute-based access controls (e.g., only allow access during business hours or from specific IP ranges). Misconfigured conditions may grant unintended access or block legitimate access.",
+      "compliant": "Refer to child arguments",
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "expression": {
+          "description": "A Common Expression Language (CEL) expression that defines the condition. Example: request.time < timestamp('2025-01-01T00:00:00Z')",
+          "required": true,
+          "security_impact": true,
+          "rationale": "Expression defines the logic for when access is granted. Incorrect expressions can bypass security controls or lock out legitimate users.",
+          "compliant": "request.time >= timestamp('2025-01-01T00:00:00Z')",
+          "non-compliant": "true",
+          "parent": "condition"
+        },
+        "title": {
+          "description": "A title for the condition that describes its purpose.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Title is descriptive metadata and has no security impact.",
+          "compliant": "Temporary audit access - expires Jan 2025",
+          "non-compliant": null,
+          "parent": "condition"
+        },
+        "description": {
+          "description": "A description of the condition. ~> **Warning:** Terraform considers the role and condition contents (title+description+expression) as the identifier for the binding. This means that if any part of the condition is changed out-of-band, Terraform will consider it to be an entirely different resource.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Description is metadata only and does not affect security controls.",
+          "compliant": "Temporary access for compliance audit until 2025-01-01",
+          "non-compliant": null,
+          "parent": "condition"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "resource_name": "logging_log_scope",
+  "subcategory": "Cloud (Stackdriver) Logging",
+  "arguments": {
+    "name": {
+      "description": "The resource name of the log scope. Format: projects/PROJECT_ID/locations/global/logScopes/LOG_SCOPE_NAME",
+      "required": true,
+      "security_impact": false,
+      "rationale": "The log scope name is a unique identifier for the resource. It has no direct security implications beyond being a reference name.",
+      "compliant": "projects/my-project/locations/global/logScopes/security-audit-scope",
+      "non-compliant": null,
+      "parent": null
+    },
+    "resource_names": {
+      "description": "Names of one or more parent resources that define which logs are included in this scope. Can be projects: 'projects/[PROJECT_ID]' or log views: 'projects/[PROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID]'. A log scope can include a maximum of 50 projects and a maximum of 100 resources in total.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Resource names determine which logs are visible within the scope. Including sensitive projects or views can inadvertently expose logs to unauthorized users if the scope has broad IAM permissions. Conversely, excluding critical projects creates monitoring blind spots.",
+      "compliant": "[\"projects/prod-project-1\", \"projects/prod-project-2\"]",
+      "non-compliant": "[\"projects/attacker-project\", \"projects/unmonitored-project\"]",
+      "parent": null
+    },
+    "description": {
+      "description": "A user-provided description of the log scope. Maximum length of 8000 characters.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Description is metadata only and does not affect any security controls.",
+      "compliant": "Log scope for security team to monitor production audit logs",
+      "non-compliant": null,
+      "parent": null
+    },
+    "parent": {
+      "description": "The parent resource of the log scope. Format: projects/PROJECT_ID/locations/global",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Parent identifies the resource hierarchy location. Has no direct security impact on the log scope.",
+      "compliant": "projects/my-project/locations/global",
+      "non-compliant": null,
+      "parent": null
+    },
+    "location": {
+      "description": "The location of the resource. The only supported location is global.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Location is fixed to global for log scopes. No security implications.",
+      "compliant": "global",
+      "non-compliant": null,
+      "parent": null
+    }
+  }
+}
