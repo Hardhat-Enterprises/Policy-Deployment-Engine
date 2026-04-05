@@ -9,7 +9,15 @@ conditions := [
     {
         "condition": "Only approved Cloud Billing IAM roles are allowed",
         "attribute_path" : ["role"],
-        "values": ["roles/billing.*", [["creator", "admin", "costsManager", "viewer", "projectCostsManager", "user", "projectManager"]]],
+        "values": ["roles/*", [[
+                "billing.creator",
+                "billing.admin",
+                "billing.costsManager",
+                "billing.viewer",
+                "billing.projectCostsManager",
+                "billing.user",
+                "billing.projectManager"
+            ]]],
         "policy_type" : "pattern whitelist"
     }
     ]
