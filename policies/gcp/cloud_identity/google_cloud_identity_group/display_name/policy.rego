@@ -7,4 +7,5 @@ deny contains msg if {
     resource.type == vars.variables.resource_type
     not resource.change.after.display_name
 
-    msg := "Cloud Identity Group must have a display_name"}
+    msg := "Cloud Identity Group must have a display_name"
+    }
