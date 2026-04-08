@@ -6,10 +6,10 @@ import data.terraform.gcp.security.apigee.google_apigee_env_references.vars
 conditions := [
     [
         {
-            "situation_description": "resource_type must be KeyStore or TrustStore to ensure proper TLS/SSL certificate management",
+            "situation_description": "resource_type must be set to KeyStore or TrustStore to ensure Apigee environment references are linked to a valid TLS/SSL certificate store, preventing misconfigured or unauthorized certificate usage",
             "remedies": [
-                "Ensure resource_type is set to KeyStore for storing private keys and certificates",
-                "Ensure resource_type is set to TrustStore for storing trusted certificates"
+                "Ensure resource_type is set to KeyStore for storing private keys and server certificates used in TLS/SSL",
+                "Ensure resource_type is set to TrustStore for storing trusted CA certificates used to verify connections"
             ]
         },
         {
