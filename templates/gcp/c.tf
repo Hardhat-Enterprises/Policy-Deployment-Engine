@@ -3,6 +3,7 @@ resource "google_cloudbuildv2_connection" "c" {
   location = "australia-southeast2"
   name     = "my-connection"
 
+<<<<<<< HEAD
   bitbucket_cloud_config {
     workspace                  = "my-workspace"
     webhook_secret_secret_version = "projects/my-project-c/secrets/webhook-secret/versions/1"
@@ -13,4 +14,8 @@ resource "google_cloudbuildv2_connection" "c" {
       user_token_secret_version = "projects/my-project-c/secrets/read-token/versions/1"
     }
   }
+=======
+resource "RESOURCE TYPE" "c" {
+  
+>>>>>>> origin/dev
 }

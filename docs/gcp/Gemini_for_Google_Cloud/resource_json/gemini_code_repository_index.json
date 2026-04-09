@@ -1,0 +1,60 @@
+{
+  "resource_name": "gemini_code_repository_index",
+  "subcategory": "Gemini for Google Cloud",
+  "arguments": {
+    "location": {
+      "description": "The location of the Code Repository Index, for example `us-central1`.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Location dictates data residency and compliance. Must align with approved regional policy (e.g. AU only).",
+      "compliant": ["australia-southeast1, australia-southeast2"],
+      "non-compliant": ["us-central1", "europe-west3"],
+      "parent": null
+    },
+    "code_repository_index_id": {
+      "description": "Required. Id of the Code Repository Index.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Identifier controls naming only. Security risk is minimal provided no sensitive data is embedded in the ID.",
+      "compliant": ["c", "c1", "c2"],
+      "non-compliant": ["anything else"],
+      "parent": null
+    },
+    "labels": {
+      "description": "Optional. Labels as key value pairs. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Labels are metadata only and do not affect access control or encryption. Should not contain secrets.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "kms_key": {
+      "description": "Optional. Immutable. Customer-managed encryption key name, in the format `projects/*/locations/*/keyRings/*/cryptoKeys/*`.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "CMKs ensure data-at-rest encryption is fully customer-controlled.",
+      "compliant":  ["projects/pde/locations/australia-southeast1/keyRings/app/cryptoKeys/code-index"],
+      "non-compliant": "Blank",
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Required for documentation",
+      "compliant": "PDE",
+      "non-compliant": "Anything else",
+      "parent": null
+    },
+    "force_destroy": {
+      "description": "When set to true, the Code Repository Index can be deleted even if it contains content.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Force deletion bypasses standard safety and retention controls",
+      "compliant": [false],
+      "non-compliant": [true],
+      "parent": null
+    }
+  }
+}

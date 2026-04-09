@@ -1,0 +1,51 @@
+{
+  "resource_name": "scc_notification_config",
+  "subcategory": "Security Command Center (SCC)",
+  "arguments": {
+    "pubsub_topic": {
+      "description": "The Pub/Sub topic to send notifications to. Its format is \"projects/[project_id]/topics/[topic]\".",
+      "required": true,
+      "security_impact": "If the Pub/Sub topic is misconfigured or points to an unapproved destination, security notifications may be lost or exposed to unauthorized subscribers.",
+      "rationale": "Notifications must be delivered to approved, secured Pub/Sub topics to maintain the integrity and confidentiality of security alerts.",
+      "compliant": "Pub/Sub topic is correctly configured and points to an approved, secured topic within the organization.",
+      "non-compliant": "Pub/Sub topic is missing, invalid, or points to an unapproved/unsecured destination.",
+      "parent": "organization"
+    },
+    "streaming_config": {
+      "description": "The config for triggering streaming-based notifications. Structure is [documented below](#nested_streaming_config).",
+      "required": true,
+      "security_impact": "Improper filters may cause critical findings to be missed or irrelevant alerts to be generated, reducing monitoring effectiveness.",
+      "rationale": "Streaming configuration must include properly scoped filters to ensure only relevant findings generate alerts.",
+      "compliant": "Streaming config includes a valid filter that correctly targets relevant findings or assets.",
+      "non-compliant": "Streaming config is missing, invalid, or has overly broad/narrow filters leading to loss of visibility or noise.",
+      "parent": "organization"
+    },
+    "organization": {
+      "description": "The organization whose Cloud Security Command Center the Notification Config lives in.",
+      "required": true,
+      "security_impact": "false",
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "config_id": {
+      "description": "This must be unique within the organization.",
+      "required": true,
+      "security_impact": "If config_id is not unique or poorly managed, it may overwrite or conflict with existing notification configurations, leading to loss of alerts.",
+      "rationale": "Each notification config must have a unique identifier to ensure proper management and avoid conflicts within the organization.",
+      "compliant": "Config_id is unique within the organization and follows naming conventions.",
+      "non-compliant": "Config_id is missing, not unique, or conflicts with existing notification configurations.",
+      "parent": "organization"
+    },
+    "description": {
+      "description": "The description of the notification config (max of 1024 characters).",
+      "required": false,
+      "security_impact": "false",
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    }
+  }
+}

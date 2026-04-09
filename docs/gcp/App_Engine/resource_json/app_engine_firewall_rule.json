@@ -1,0 +1,51 @@
+{
+  "resource_name": "app_engine_firewall_rule",
+  "subcategory": "App Engine",
+  "arguments": {
+    "source_range": {
+      "description": "IP address or range, defined using CIDR notation, of requests that this rule applies to.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Enforces strict IP CIDR boundaries to minimize the application's attack surface by ensuring only trusted networks or specific geographic IP ranges can interact with the App Engine environment.",
+      "compliant": "192.168.1.0/24",
+      "non-compliant": "*",
+      "parent": null
+    },
+    "action": {
+      "description": "The action to take if this rule matches. Possible values are: `UNSPECIFIED_ACTION`, `ALLOW`, `DENY`.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Is the explicit binary outcome for a network request, ensuring that the firewall behaves as a definitive gatekeeper rather than allowing traffic to pass through ambiguity.",
+      "compliant": "ALLOW",
+      "non-compliant": "DENY",
+      "parent": null
+    },
+    "description": {
+      "description": "An optional string description of this rule.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Is an informative field that does not influence the network logic/security enforcement of the firewall rule.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "priority": {
+      "description": "A positive integer that defines the order of rule evaluation. Rules with the lowest priority are evaluated first. A default rule at priority Int32.MaxValue matches all IPv4 and IPv6 traffic when no previous rule matches. Only the action of this rule can be modified by the user.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Enforces an ordering of firewall rules to ensure that specific security 'Allow' or 'Deny' logic is evaluated in the correct sequence.",
+      "compliant": "1000",
+      "non-compliant": "2147483647",
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Is automatically constrained by the Google provider's project configuration, ensuring that firewall rules are strictly applied to the intended environment without manual entry.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    }
+  }
+}

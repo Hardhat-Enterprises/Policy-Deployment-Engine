@@ -1,0 +1,167 @@
+{
+  "resource_name": "deployment_manager_deployment",
+  "subcategory": "Cloud Deployment Manager",
+  "arguments": {
+    "name": {
+      "description": "Unique name for the deployment",
+      "required": true,
+      "security_impact": "low",
+      "rationale": "Identifier only; does not change security posture.",
+      "compliant": "Name is set and follows org/project naming standard.",
+      "non-compliant": "Missing name or violates naming standard.",
+      "parent": null
+    },
+    "target": {
+      "description": "Parameters that define your deployment, including the deployment configuration and relevant templates. Structure is [documented below](#nested_target).",
+      "required": true,
+      "security_impact": "high",
+      "rationale": "Configuration and templates determine which resources are created and with what permissions.",
+      "compliant": "Target block is present and references a validated config plus (if used) signed/approved templates.",
+      "non-compliant": "Target is missing, points to an empty/invalid config, or references unapproved templates.",
+      "parent": null,
+      "arguments": {
+        "config": {
+          "description": "The root configuration file to use for this deployment. Structure is [documented below](#nested_target_config).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "target"
+        },
+        "imports": {
+          "description": "Specifies import files for this configuration. This can be used to import templates or other files. For example, you might import a text file in order to use the file in a template. Structure is [documented below](#nested_target_imports).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "target"
+        }
+      }
+    },
+    "description": {
+      "description": "Optional user-provided description of deployment.",
+      "required": false,
+      "security_impact": "low",
+      "rationale": "Metadata only.",
+      "compliant": "Description provided and useful for change/audit history.",
+      "non-compliant": "No description for production changes.",
+      "parent": null
+    },
+    "labels": {
+      "description": "Key-value pairs to apply to this labels. Structure is [documented below](#nested_labels).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "key": {
+          "description": "Key for label.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "labels"
+        },
+        "value": {
+          "description": "Value of label.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "labels"
+        }
+      }
+    },
+    "create_policy": {
+      "description": "Set the policy to use for creating new resources. Only used on create and update. Valid values are `CREATE_OR_ACQUIRE` (default) or `ACQUIRE`. If set to `ACQUIRE` and resources do not already exist, the deployment will fail. Note that updating this field does not actually affect the deployment, just how it is updated. Default value is `CREATE_OR_ACQUIRE`. Possible values are: `ACQUIRE`, `CREATE_OR_ACQUIRE`.",
+      "required": false,
+      "security_impact": "high",
+      "rationale": "Controls whether new resources may be created implicitly.",
+      "compliant": "Value is `ACQUIRE` (only adopt pre-provisioned/approved resources).",
+      "non-compliant": "Value is `CREATE_OR_ACQUIRE` in production (may create resources outside change control).",
+      "parent": null
+    },
+    "delete_policy": {
+      "description": "Set the policy to use for deleting new resources on update/delete. Valid values are `DELETE` (default) or `ABANDON`. If `DELETE`, resource is deleted after removal from Deployment Manager. If `ABANDON`, the resource is only removed from Deployment Manager and is not actually deleted. Note that updating this field does not actually change the deployment, just how it is updated. Default value is `DELETE`. Possible values are: `ABANDON`, `DELETE`.",
+      "required": false,
+      "security_impact": "high",
+      "rationale": "Abandoned resources become unmanaged and may violate lifecycle controls.",
+      "compliant": "Value is `DELETE` (no orphaned resources). Exceptions require approved RFC with fallback plan.",
+      "non-compliant": "Value is `ABANDON` without an approved exception.",
+      "parent": null
+    },
+    "preview": {
+      "description": "If set to true, a deployment is created with \"shell\" resources that are not actually instantiated. This allows you to preview a deployment. It can be updated to false to actually deploy with real resources. ~>**NOTE:** Deployment Manager does not allow update of a deployment in preview (unless updating to preview=false). Thus, Terraform will force-recreate deployments if either preview is updated to true or if other fields are updated while preview is true.",
+      "required": false,
+      "security_impact": "medium",
+      "rationale": "Preview=true prevents real changes and can mask policy signals; production deployments must be concrete and auditable.",
+      "compliant": "Set to `false` in production environments.",
+      "non-compliant": "Set to `true` in production (shell deployments).",
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "content": {
+          "description": "The full YAML contents of your configuration file.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "config"
+        }
+      }
+    },
+    "imports": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "content": {
+          "description": "The full contents of the template that you want to import.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "imports"
+        },
+        "name": {
+          "description": "The name of the template to import, as declared in the YAML configuration.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "imports"
+        }
+      }
+    }
+  }
+}

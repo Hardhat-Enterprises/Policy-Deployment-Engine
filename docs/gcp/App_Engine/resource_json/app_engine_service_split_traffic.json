@@ -1,0 +1,62 @@
+{
+  "resource_name": "app_engine_service_split_traffic",
+  "subcategory": "App Engine",
+  "arguments": {
+    "service": {
+      "description": "The name of the service these settings apply to.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "To ensure that traffic splitting configurations are explicitly mapped to the correct logical microservice.",
+      "compliant": "hardhat-main-api",
+      "non-compliant": "generic-api",
+      "parent": null
+    },
+    "split": {
+      "description": "Mapping that defines fractional HTTP traffic diversion to different versions within the service. Structure is [documented below](#nested_split).",
+      "required": true,
+      "security_impact": true,
+      "rationale": "To ensure that traffic distribution is managed as code and providing an automated way to transition users to new versions while maintaining a clear record of routing logic.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "shard_by": {
+          "description": "Mechanism used to determine which version a request is sent to. The traffic selection algorithm will be stable for either type until allocations are changed. Possible values are: `UNSPECIFIED`, `COOKIE`, `IP`, `RANDOM`.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "To define how traffic is distributed through versions, ensuring that users have a consistent experience by consistently routing them to the same version based on their IP address.",
+          "compliant": "IP",
+          "non-compliant": "RANDOM",
+          "parent": "split"
+        },
+        "allocations": {
+          "description": "Mapping from version IDs within the service to fractional (0.000, 1] allocations of traffic for that version. Each version can be specified only once, but some versions in the service may not have any traffic allocation. Services that have traffic allocated cannot be deleted until either the service is deleted or their traffic allocation is removed. Allocations must sum to 1. Up to two decimal place precision is supported for IP-based splits and up to three decimal places is supported for cookie-based splits.",
+          "required": true,
+          "security_impact": true,
+          "rationale": "Ensuring to provide precise control over the percentage of traffic directed to specific versions.",
+          "compliant": "v1 = 0.8 v2 = 0.2",
+          "non-compliant": "v1 = 0.0 v2 = 1.0",
+          "parent": "split"
+        }
+      }
+    },
+    "migrate_traffic": {
+      "description": "If set to true traffic will be migrated to this version.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Allowing to ensure the system to warm up new instances and preventing sudden latency spikes for users during a deployment.",
+      "compliant": "false",
+      "non-compliant": "true",
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "To automatically inherit the provider-level project ID.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    }
+  }
+}

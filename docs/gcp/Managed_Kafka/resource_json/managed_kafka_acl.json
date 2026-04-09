@@ -1,0 +1,89 @@
+{
+  "resource_name": "managed_kafka_acl",
+  "subcategory": "Managed Kafka",
+  "arguments": {
+    "acl_entries": {
+      "description": "The acl entries that apply to the resource pattern. The maximum number of allowed entries is 100. Structure is [documented below](#nested_acl_entries).",
+      "required": true,
+      "security_impact": true,
+      "rationale": "ACLs are used to control access to Kafka resources, ensuring that only authorized users can perform specific operations. Properly configured ACLs help maintain the security and integrity of the Kafka environment by preventing unauthorized access and potential data breaches.",
+      "compliant": ["User:specific-user@project.iam.gserviceaccount.com", "permission_type: ALLOW", "operation: READ or WRITE"],
+      "non-compliant": ["User:*", "permission_type: ALLOW", "operation: ALL"],
+      "parent": null,
+      "arguments": {
+        "principal": {
+          "description": "The principal. Specified as Google Cloud account, with the Kafka StandardAuthorizer prefix User:\". For example: \"User:test-kafka-client@test-project.iam.gserviceaccount.com\". Can be the wildcard \"User:*\" to refer to all users.",
+          "required": true,
+          "security_impact": true,
+          "rationale": "Specifying the principal is crucial for defining who has access to Kafka resources. Using specific user accounts enhances security by limiting access to authorized individuals, while using wildcards can expose resources to unauthorized access.",
+          "compliant": ["User:app-client@project.iam.gserviceaccount.com"],
+          "non-compliant": ["User:*"],
+          "parent": "acl_entries"
+        },
+        "permission_type": {
+          "description": "The permission type. Accepted values are (case insensitive): ALLOW, DENY.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Setting the permission type is essential for controlling access to Kafka resources. Using 'ALLOW' grants specific permissions to users, while 'DENY' can be used to explicitly restrict access. Properly configuring permission types helps enforce security policies and prevent unauthorized actions.",
+          "compliant": ["DENY (when access should be blocked)", "ALLOW (on least privilege basis)"],
+          "non-compliant": ["ALLOW to global principals without constraints"],
+          "parent": "acl_entries"
+        },
+        "operation": {
+          "description": "The operation type. Allowed values are (case insensitive): ALL, READ, WRITE, CREATE, DELETE, ALTER, DESCRIBE, CLUSTER_ACTION, DESCRIBE_CONFIGS, ALTER_CONFIGS, and IDEMPOTENT_WRITE. See https://kafka.apache.org/documentation/#operations_resources_and_protocols for valid combinations of resource_type and operation for different Kafka API requests.",
+          "required": true,
+          "security_impact": true,
+          "rationale": "Defining the operation type is vital for specifying what actions a principal can perform on Kafka resources. By restricting operations to only those necessary for a user's role, organizations can minimize the risk of accidental or malicious actions that could compromise data integrity or availability.",
+          "compliant": ["READ", "WRITE", "DESCRIBE"],
+          "non-compliant": ["ALL", "ALTER_CONFIGS"],
+          "parent": "acl_entries"
+        },
+        "host": {
+          "description": "The host. Must be set to \"*\" for Managed Service for Apache Kafka.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "This is fixed for Managed Kafka and does not alter access scope beyond the ACL definition.",
+          "compliant": "none",
+          "non-compliant": "none",
+          "parent": "acl_entries"
+        }
+      }
+    },
+    "location": {
+      "description": "ID of the location of the Kafka resource. See https://cloud.google.com/managed-kafka/docs/locations for a list of supported locations.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Specifies the geographic region; not directly related to access control or data protection.",
+      "compliant": "none",
+      "non-compliant": "none",
+      "parent": null
+    },
+    "cluster": {
+      "description": "The cluster name.",
+      "required": true,
+      "security_impact": false,
+      "rationale":"This is a reference to the cluster and does not impact access control itself.",
+      "compliant": "none",
+      "non-compliant": "none",
+      "parent": null
+    },
+    "acl_id": {
+      "description": "The ID to use for the acl, which will become the final component of the acl's name. The structure of `aclId` defines the Resource Pattern (resource_type, resource_name, pattern_type) of the acl. `aclId` is structured like one of the following: For acls on the cluster: `cluster` For acls on a single resource within the cluster: `topic/{resource_name}` `consumerGroup/{resource_name}` `transactionalId/{resource_name}` For acls on all resources that match a prefix: `topicPrefixed/{resource_name}` `consumerGroupPrefixed/{resource_name}` `transactionalIdPrefixed/{resource_name}` For acls on all resources of a given type (i.e. the wildcard literal '*''): `allTopics` (represents `topic/*`) `allConsumerGroups` (represents `consumerGroup/*`) `allTransactionalIds` (represents `transactionalId/*`).",
+      "required": true,
+      "security_impact": true,
+      "rationale": "ACL ID defines the resource scope of the ACL. Using global scopes (e.g., allTopics) can expose all resources to the defined principal.",
+      "compliant":["topic/my-topic", "consumerGroup/my-group"],
+      "non-compliant":  ["allTopics", "allConsumerGroups"],
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Project identifier used for resource scoping; does not define security posture of the resource.",
+      "compliant": "none",
+      "non-compliant": "none",
+      "parent": null
+    }
+  }
+}

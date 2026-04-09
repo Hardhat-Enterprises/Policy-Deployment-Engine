@@ -1,0 +1,843 @@
+{
+  "resource_name": "privateca_ca_pool",
+  "subcategory": "Certificate Authority Service",
+  "arguments": {
+    "name": {
+      "description": "The name for this CaPool.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "tier": {
+      "description": "The Tier of this CaPool. Possible values are: `ENTERPRISE`, `DEVOPS`.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "location": {
+      "description": "Location of the CaPool. A full list of valid locations can be found by running `gcloud privateca locations list`.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "issuance_policy": {
+      "description": "The IssuancePolicy to control how Certificates will be issued from this CaPool. Structure is [documented below](#nested_issuance_policy).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "allowed_key_types": {
+          "description": "If any AllowedKeyType is specified, then the certificate request's public key must match one of the key types listed here. Otherwise, any key may be used. Structure is [documented below](#nested_issuance_policy_allowed_key_types).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "issuance_policy"
+        },
+        "backdate_duration": {
+          "description": "The duration to backdate all certificates issued from this CaPool. If not set, the certificates will be issued with a not_before_time of the issuance time (i.e. the current time). If set, the certificates will be issued with a not_before_time of the issuance time minus the backdate_duration. The not_after_time will be adjusted to preserve the requested lifetime. The backdate_duration must be less than or equal to 48 hours.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "issuance_policy"
+        },
+        "maximum_lifetime": {
+          "description": "The maximum lifetime allowed for issued Certificates. Note that if the issuing CertificateAuthority expires before a Certificate's requested maximumLifetime, the effective lifetime will be explicitly truncated to match it.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "issuance_policy"
+        },
+        "allowed_issuance_modes": {
+          "description": "IssuanceModes specifies the allowed ways in which Certificates may be requested from this CaPool. Structure is [documented below](#nested_issuance_policy_allowed_issuance_modes).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "issuance_policy"
+        },
+        "identity_constraints": {
+          "description": "Describes constraints on identities that may appear in Certificates issued through this CaPool. If this is omitted, then this CaPool will not add restrictions on a certificate's identity. Structure is [documented below](#nested_issuance_policy_identity_constraints).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "issuance_policy"
+        },
+        "baseline_values": {
+          "description": "A set of X.509 values that will be applied to all certificates issued through this CaPool. If a certificate request includes conflicting values for the same properties, they will be overwritten by the values defined here. If a certificate request uses a CertificateTemplate that defines conflicting predefinedValues for the same properties, the certificate issuance request will fail. Structure is [documented below](#nested_issuance_policy_baseline_values).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "issuance_policy"
+        }
+      }
+    },
+    "publishing_options": {
+      "description": "The PublishingOptions to follow when issuing Certificates from any CertificateAuthority in this CaPool. Structure is [documented below](#nested_publishing_options).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "publish_ca_cert": {
+          "description": "When true, publishes each CertificateAuthority's CA certificate and includes its URL in the \"Authority Information Access\" X.509 extension in all issued Certificates. If this is false, the CA certificate will not be published and the corresponding X.509 extension will not be written in issued certificates.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "publishing_options"
+        },
+        "publish_crl": {
+          "description": "When true, publishes each CertificateAuthority's CRL and includes its URL in the \"CRL Distribution Points\" X.509 extension in all issued Certificates. If this is false, CRLs will not be published and the corresponding X.509 extension will not be written in issued certificates. CRLs will expire 7 days from their creation. However, we will rebuild daily. CRLs are also rebuilt shortly after a certificate is revoked.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "publishing_options"
+        },
+        "encoding_format": {
+          "description": "Specifies the encoding format of each CertificateAuthority's CA certificate and CRLs. If this is omitted, CA certificates and CRLs will be published in PEM. Possible values are: `PEM`, `DER`.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "publishing_options"
+        }
+      }
+    },
+    "labels": {
+      "description": "Labels with user-defined metadata. An object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "allowed_key_types": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "rsa": {
+          "description": "Describes an RSA key that may be used in a Certificate issued from a CaPool. Structure is [documented below](#nested_issuance_policy_allowed_key_types_allowed_key_types_rsa).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "allowed_key_types"
+        },
+        "elliptic_curve": {
+          "description": "Represents an allowed Elliptic Curve key type. Structure is [documented below](#nested_issuance_policy_allowed_key_types_allowed_key_types_elliptic_curve).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "allowed_key_types"
+        }
+      }
+    },
+    "rsa": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "min_modulus_size": {
+          "description": "The minimum allowed RSA modulus size, in bits. If this is not set, or if set to zero, the service-level min RSA modulus size will continue to apply.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rsa"
+        },
+        "max_modulus_size": {
+          "description": "The maximum allowed RSA modulus size, in bits. If this is not set, or if set to zero, the service will not enforce an explicit upper bound on RSA modulus sizes.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rsa"
+        }
+      }
+    },
+    "elliptic_curve": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "signature_algorithm": {
+          "description": "The algorithm used. Possible values are: `ECDSA_P256`, `ECDSA_P384`, `EDDSA_25519`.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "elliptic_curve"
+        }
+      }
+    },
+    "allowed_issuance_modes": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "allow_csr_based_issuance": {
+          "description": "When true, allows callers to create Certificates by specifying a CSR.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "allowed_issuance_modes"
+        },
+        "allow_config_based_issuance": {
+          "description": "When true, allows callers to create Certificates by specifying a CertificateConfig.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "allowed_issuance_modes"
+        }
+      }
+    },
+    "identity_constraints": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "allow_subject_passthrough": {
+          "description": "If this is set, the Subject field may be copied from a certificate request into the signed certificate. Otherwise, the requested Subject will be discarded.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "identity_constraints"
+        },
+        "allow_subject_alt_names_passthrough": {
+          "description": "If this is set, the SubjectAltNames extension may be copied from a certificate request into the signed certificate. Otherwise, the requested SubjectAltNames will be discarded.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "identity_constraints"
+        },
+        "cel_expression": {
+          "description": "A CEL expression that may be used to validate the resolved X.509 Subject and/or Subject Alternative Name before a certificate is signed. To see the full allowed syntax and some examples, see https://cloud.google.com/certificate-authority-service/docs/cel-guide Structure is [documented below](#nested_issuance_policy_identity_constraints_cel_expression).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "identity_constraints"
+        }
+      }
+    },
+    "cel_expression": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "expression": {
+          "description": "Textual representation of an expression in Common Expression Language syntax.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cel_expression"
+        },
+        "title": {
+          "description": "Title for the expression, i.e. a short string describing its purpose. This can be used e.g. in UIs which allow to enter the expression.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cel_expression"
+        },
+        "description": {
+          "description": "Description of the expression. This is a longer text which describes the expression, e.g. when hovered over it in a UI.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cel_expression"
+        },
+        "location": {
+          "description": "String indicating the location of the expression for error reporting, e.g. a file name and a position in the file.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cel_expression"
+        }
+      }
+    },
+    "baseline_values": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "additional_extensions": {
+          "description": "Specifies an X.509 extension, which may be used in different parts of X.509 objects like certificates, CSRs, and CRLs. Structure is [documented below](#nested_issuance_policy_baseline_values_additional_extensions).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "baseline_values"
+        },
+        "policy_ids": {
+          "description": "Describes the X.509 certificate policy object identifiers, per https://tools.ietf.org/html/rfc5280#section-4.2.1.4. Structure is [documented below](#nested_issuance_policy_baseline_values_policy_ids).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "baseline_values"
+        },
+        "aia_ocsp_servers": {
+          "description": "Describes Online Certificate Status Protocol (OCSP) endpoint addresses that appear in the \"Authority Information Access\" extension in the certificate.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "baseline_values"
+        },
+        "ca_options": {
+          "description": "Describes values that are relevant in a CA certificate. Structure is [documented below](#nested_issuance_policy_baseline_values_ca_options).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "baseline_values"
+        },
+        "key_usage": {
+          "description": "Indicates the intended use for keys that correspond to a certificate. Structure is [documented below](#nested_issuance_policy_baseline_values_key_usage).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "baseline_values"
+        },
+        "name_constraints": {
+          "description": "Describes the X.509 name constraints extension. Structure is [documented below](#nested_issuance_policy_baseline_values_name_constraints).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "baseline_values"
+        }
+      }
+    },
+    "additional_extensions": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "critical": {
+          "description": "Indicates whether or not this extension is critical (i.e., if the client does not know how to handle this extension, the client should consider this to be an error).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "additional_extensions"
+        },
+        "value": {
+          "description": "The value of this X.509 extension. A base64-encoded string.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "additional_extensions"
+        },
+        "object_id": {
+          "description": "Describes values that are relevant in a CA certificate. Structure is [documented below](#nested_issuance_policy_baseline_values_additional_extensions_additional_extensions_object_id).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "additional_extensions"
+        }
+      }
+    },
+    "object_id": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "object_id_path": {
+          "description": "An ObjectId specifies an object identifier (OID). These provide context and describe types in ASN.1 messages.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "object_id"
+        }
+      }
+    },
+    "policy_ids": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "object_id_path": {
+          "description": "An ObjectId specifies an object identifier (OID). These provide context and describe types in ASN.1 messages.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "policy_ids"
+        }
+      }
+    },
+    "ca_options": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "is_ca": {
+          "description": "When true, the \"CA\" in Basic Constraints extension will be set to true.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "ca_options"
+        },
+        "non_ca": {
+          "description": "When true, the \"CA\" in Basic Constraints extension will be set to false. If both `is_ca` and `non_ca` are unset, the extension will be omitted from the CA certificate.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "ca_options"
+        },
+        "max_issuer_path_length": {
+          "description": "Refers to the \"path length constraint\" in Basic Constraints extension. For a CA certificate, this value describes the depth of subordinate CA certificates that are allowed. If this value is less than 0, the request will fail.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "ca_options"
+        },
+        "zero_max_issuer_path_length": {
+          "description": "When true, the \"path length constraint\" in Basic Constraints extension will be set to 0. if both `max_issuer_path_length` and `zero_max_issuer_path_length` are unset, the max path length will be omitted from the CA certificate.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "ca_options"
+        }
+      }
+    },
+    "key_usage": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "base_key_usage": {
+          "description": "Describes high-level ways in which a key may be used. Structure is [documented below](#nested_issuance_policy_baseline_values_key_usage_base_key_usage).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "key_usage"
+        },
+        "extended_key_usage": {
+          "description": "Describes high-level ways in which a key may be used. Structure is [documented below](#nested_issuance_policy_baseline_values_key_usage_extended_key_usage).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "key_usage"
+        },
+        "unknown_extended_key_usages": {
+          "description": "An ObjectId specifies an object identifier (OID). These provide context and describe types in ASN.1 messages. Structure is [documented below](#nested_issuance_policy_baseline_values_key_usage_unknown_extended_key_usages).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "key_usage"
+        }
+      }
+    },
+    "base_key_usage": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "digital_signature": {
+          "description": "The key may be used for digital signatures.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "base_key_usage"
+        },
+        "content_commitment": {
+          "description": "The key may be used for cryptographic commitments. Note that this may also be referred to as \"non-repudiation\".",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "base_key_usage"
+        },
+        "key_encipherment": {
+          "description": "The key may be used to encipher other keys.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "base_key_usage"
+        },
+        "data_encipherment": {
+          "description": "The key may be used to encipher data.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "base_key_usage"
+        },
+        "key_agreement": {
+          "description": "The key may be used in a key agreement protocol.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "base_key_usage"
+        },
+        "cert_sign": {
+          "description": "The key may be used to sign certificates.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "base_key_usage"
+        },
+        "crl_sign": {
+          "description": "The key may be used sign certificate revocation lists.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "base_key_usage"
+        },
+        "encipher_only": {
+          "description": "The key may be used to encipher only.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "base_key_usage"
+        },
+        "decipher_only": {
+          "description": "The key may be used to decipher only.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "base_key_usage"
+        }
+      }
+    },
+    "extended_key_usage": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "server_auth": {
+          "description": "Corresponds to OID 1.3.6.1.5.5.7.3.1. Officially described as \"TLS WWW server authentication\", though regularly used for non-WWW TLS.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "extended_key_usage"
+        },
+        "client_auth": {
+          "description": "Corresponds to OID 1.3.6.1.5.5.7.3.2. Officially described as \"TLS WWW client authentication\", though regularly used for non-WWW TLS.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "extended_key_usage"
+        },
+        "code_signing": {
+          "description": "Corresponds to OID 1.3.6.1.5.5.7.3.3. Officially described as \"Signing of downloadable executable code client authentication\".",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "extended_key_usage"
+        },
+        "email_protection": {
+          "description": "Corresponds to OID 1.3.6.1.5.5.7.3.4. Officially described as \"Email protection\".",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "extended_key_usage"
+        },
+        "time_stamping": {
+          "description": "Corresponds to OID 1.3.6.1.5.5.7.3.8. Officially described as \"Binding the hash of an object to a time\".",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "extended_key_usage"
+        },
+        "ocsp_signing": {
+          "description": "Corresponds to OID 1.3.6.1.5.5.7.3.9. Officially described as \"Signing OCSP responses\".",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "extended_key_usage"
+        }
+      }
+    },
+    "unknown_extended_key_usages": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "object_id_path": {
+          "description": "An ObjectId specifies an object identifier (OID). These provide context and describe types in ASN.1 messages.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "unknown_extended_key_usages"
+        }
+      }
+    },
+    "name_constraints": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "critical": {
+          "description": "Indicates whether or not the name constraints are marked critical.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "name_constraints"
+        },
+        "permitted_dns_names": {
+          "description": "Contains permitted DNS names. Any DNS name that can be constructed by simply adding zero or more labels to the left-hand side of the name satisfies the name constraint. For example, `example.com`, `www.example.com`, `www.sub.example.com` would satisfy `example.com` while `example1.com` does not.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "name_constraints"
+        },
+        "excluded_dns_names": {
+          "description": "Contains excluded DNS names. Any DNS name that can be constructed by simply adding zero or more labels to the left-hand side of the name satisfies the name constraint. For example, `example.com`, `www.example.com`, `www.sub.example.com` would satisfy `example.com` while `example1.com` does not.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "name_constraints"
+        },
+        "permitted_ip_ranges": {
+          "description": "Contains the permitted IP ranges. For IPv4 addresses, the ranges are expressed using CIDR notation as specified in RFC 4632. For IPv6 addresses, the ranges are expressed in similar encoding as IPv4 addresses.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "name_constraints"
+        },
+        "excluded_ip_ranges": {
+          "description": "Contains the excluded IP ranges. For IPv4 addresses, the ranges are expressed using CIDR notation as specified in RFC 4632. For IPv6 addresses, the ranges are expressed in similar encoding as IPv4 addresses.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "name_constraints"
+        },
+        "permitted_email_addresses": {
+          "description": "Contains the permitted email addresses. The value can be a particular email address, a hostname to indicate all email addresses on that host or a domain with a leading period (e.g. `.example.com`) to indicate all email addresses in that domain.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "name_constraints"
+        },
+        "excluded_email_addresses": {
+          "description": "Contains the excluded email addresses. The value can be a particular email address, a hostname to indicate all email addresses on that host or a domain with a leading period (e.g. `.example.com`) to indicate all email addresses in that domain.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "name_constraints"
+        },
+        "permitted_uris": {
+          "description": "Contains the permitted URIs that apply to the host part of the name. The value can be a hostname or a domain with a leading period (like `.example.com`)",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "name_constraints"
+        },
+        "excluded_uris": {
+          "description": "Contains the excluded URIs that apply to the host part of the name. The value can be a hostname or a domain with a leading period (like `.example.com`)",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "name_constraints"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,250 @@
+{
+  "resource_name": "compute_region_network_endpoint_group",
+  "subcategory": "Compute Engine",
+  "arguments": {
+    "name": {
+      "description": "Name of the resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "region": {
+      "description": "A reference to the region where the regional NEGs reside.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "An optional description of this resource. Provide this property when you create the resource.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "network_endpoint_type": {
+      "description": "Type of network endpoints in this network endpoint group. Defaults to SERVERLESS. Default value is `SERVERLESS`. Possible values are: `SERVERLESS`, `PRIVATE_SERVICE_CONNECT`, `INTERNET_IP_PORT`, `INTERNET_FQDN_PORT`, `GCE_VM_IP_PORTMAP`.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "psc_target_service": {
+      "description": "This field is only used for PSC and INTERNET NEGs. The target service url used to set up private service connection to a Google API or a PSC Producer Service Attachment.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "network": {
+      "description": "This field is only used for PSC and INTERNET NEGs. The URL of the network to which all network endpoints in the NEG belong. Uses \"default\" project network if unspecified.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "subnetwork": {
+      "description": "This field is only used for PSC NEGs. Optional URL of the subnetwork to which all network endpoints in the NEG belong.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "psc_data": {
+      "description": "This field is only used for PSC NEGs. Structure is [documented below](#nested_psc_data).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "producer_port": {
+          "description": "The PSC producer port to use when consumer PSC NEG connects to a producer. If this flag isn't specified for a PSC NEG with endpoint type private-service-connect, then PSC NEG will be connected to a first port in the available PSC producer port range.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "psc_data"
+        }
+      }
+    },
+    "cloud_run": {
+      "description": "This field is only used for SERVERLESS NEGs. Only one of cloud_run, app_engine, cloud_function or serverless_deployment may be set. Structure is [documented below](#nested_cloud_run).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "service": {
+          "description": "Cloud Run service is the main resource of Cloud Run. The service must be 1-63 characters long, and comply with RFC1035. Example value: \"run-service\".",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_run"
+        },
+        "tag": {
+          "description": "Cloud Run tag represents the \"named-revision\" to provide additional fine-grained traffic routing information. The tag must be 1-63 characters long, and comply with RFC1035. Example value: \"revision-0010\".",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_run"
+        },
+        "url_mask": {
+          "description": "A template to parse service and tag fields from a request URL. URL mask allows for routing to multiple Run services without having to create multiple network endpoint groups and backend services. For example, request URLs \"foo1.domain.com/bar1\" and \"foo1.domain.com/bar2\" an be backed by the same Serverless Network Endpoint Group (NEG) with URL mask \".domain.com/\". The URL mask will parse them to { service=\"bar1\", tag=\"foo1\" } and { service=\"bar2\", tag=\"foo2\" } respectively.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_run"
+        }
+      }
+    },
+    "app_engine": {
+      "description": "This field is only used for SERVERLESS NEGs. Only one of cloud_run, app_engine, cloud_function or serverless_deployment may be set. Structure is [documented below](#nested_app_engine).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "service": {
+          "description": "Optional serving service. The service name must be 1-63 characters long, and comply with RFC1035. Example value: \"default\", \"my-service\".",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "app_engine"
+        },
+        "version": {
+          "description": "Optional serving version. The version must be 1-63 characters long, and comply with RFC1035. Example value: \"v1\", \"v2\".",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "app_engine"
+        },
+        "url_mask": {
+          "description": "A template to parse service and version fields from a request URL. URL mask allows for routing to multiple App Engine services without having to create multiple Network Endpoint Groups and backend services. For example, the request URLs \"foo1-dot-appname.appspot.com/v1\" and \"foo1-dot-appname.appspot.com/v2\" can be backed by the same Serverless NEG with URL mask \"-dot-appname.appspot.com/\". The URL mask will parse them to { service = \"foo1\", version = \"v1\" } and { service = \"foo1\", version = \"v2\" } respectively.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "app_engine"
+        }
+      }
+    },
+    "cloud_function": {
+      "description": "This field is only used for SERVERLESS NEGs. Only one of cloud_run, app_engine, cloud_function or serverless_deployment may be set. Structure is [documented below](#nested_cloud_function).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "function": {
+          "description": "A user-defined name of the Cloud Function. The function name is case-sensitive and must be 1-63 characters long. Example value: \"func1\".",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_function"
+        },
+        "url_mask": {
+          "description": "A template to parse function field from a request URL. URL mask allows for routing to multiple Cloud Functions without having to create multiple Network Endpoint Groups and backend services. For example, request URLs \"mydomain.com/function1\" and \"mydomain.com/function2\" can be backed by the same Serverless NEG with URL mask \"/\". The URL mask will parse them to { function = \"function1\" } and { function = \"function2\" } respectively.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cloud_function"
+        }
+      }
+    },
+    "serverless_deployment": {
+      "description": ", [Beta](https://terraform.io/docs/providers/google/guides/provider_versions.html)) This field is only used for SERVERLESS NEGs. Only one of cloudRun, appEngine, cloudFunction or serverlessDeployment may be set. Structure is [documented below](#nested_serverless_deployment).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "platform": {
+          "description": "The platform of the NEG backend target(s). Possible values: API Gateway: apigateway.googleapis.com",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "serverless_deployment"
+        },
+        "resource": {
+          "description": "The user-defined name of the workload/instance. This value must be provided explicitly or in the urlMask. The resource identified by this value is platform-specific and is as follows: API Gateway: The gateway ID, App Engine: The service name, Cloud Functions: The function name, Cloud Run: The service name",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "serverless_deployment"
+        },
+        "version": {
+          "description": "The optional resource version. The version identified by this value is platform-specific and is follows: API Gateway: Unused, App Engine: The service version, Cloud Functions: Unused, Cloud Run: The service tag",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "serverless_deployment"
+        },
+        "url_mask": {
+          "description": "A template to parse platform-specific fields from a request URL. URL mask allows for routing to multiple resources on the same serverless platform without having to create multiple Network Endpoint Groups and backend resources. The fields parsed by this template are platform-specific and are as follows: API Gateway: The gateway ID, App Engine: The service and version, Cloud Functions: The function name, Cloud Run: The service and tag",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "serverless_deployment"
+        }
+      }
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    }
+  }
+}

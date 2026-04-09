@@ -1,6 +1,10 @@
 package terraform.gcp.security.cloud_vmware_engine.network.allowed_location
 
+<<<<<<< HEAD
 import data.terraform.gcp.helpers
+=======
+import data.terraform.helpers
+>>>>>>> origin/dev
 import data.terraform.gcp.security.cloud_vmware_engine.network.vars
 
 conditions := [[

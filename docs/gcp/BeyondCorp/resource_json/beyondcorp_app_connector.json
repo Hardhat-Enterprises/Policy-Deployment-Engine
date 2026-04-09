@@ -1,0 +1,86 @@
+{
+  "resource_name": "beyondcorp_app_connector",
+  "subcategory": "BeyondCorp",
+  "arguments": {
+    "name": {
+      "description": "ID of the AppConnector.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "The name field is required to uniquely identify the AppConnector resource within a project and location.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "principal_info": {
+      "description": "Principal information about the identity of the AppConnector. Structure is [documented below](#nested_principal_info).",
+      "required": true,
+      "security_impact": false,
+      "rationale": "This information is required to establish the identity of the AppConnector for authentication and authorization purposes.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "service_account": {
+          "description": "ServiceAccount represents a GCP service account. Structure is [documented below](#nested_principal_info_service_account).",
+          "required": true,
+          "security_impact": false,
+          "rationale": "The service account is used to authenticate the AppConnector with GCP services.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "principal_info",
+          "arguments": {
+            "email": {
+              "description": "Email address of the service account.",
+              "required": true,
+              "security_impact": false,
+              "rationale": "The email address is used to identify the service account.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "service_account"
+            }
+          }
+        }
+      }
+    },
+    "region": {
+      "description": "The region of the AppConnector.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "The region field is used to specify the geographical location of the AppConnector, which can have implications for data residency and latency.",
+      "compliant": "australia-southeast1, australia-southeast2",
+      "non-compliant": "europe-west1, us-central1",
+      "parent": null
+    },
+    "display_name": {
+      "description": "An arbitrary user-provided name for the AppConnector.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Display name is for user convenience and does not impact security.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "labels": {
+  "description": "Resource labels to represent user-provided metadata. **Note**: This field is non-authoritative, but the 'env' label is mandatory and must be set to an approved value.",
+  "required": false,
+  "security_impact": true,
+  "rationale": "The 'env' label indicates the deployment environment and is required for governance, security compliance, and consistent resource classification.",
+  "compliant": {
+    "env": ["test", "qa", "production", "sandbox"]
+  },
+  "non-compliant": {
+    "env": ["", "prod", "dev", "staging", "undefined"]
+  },
+  "parent": null
+},
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "The project field is used to identify the project resource. Some organisations may have policies that restrict which projects can be used, but this is not inherently a security issue.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    }
+  }
+}
