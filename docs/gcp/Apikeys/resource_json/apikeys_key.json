@@ -1,0 +1,201 @@
+{
+  "_metadata": {
+    "provider": "gcp",
+    "version": "v5.29.0",
+    "generated_at": "2026-01-31T08:47:59.566381+00:00"
+  },
+  "resource_name": "google_apikeys_key",
+  "subcategory": "Apikeys",
+  "arguments": {
+    "name": {
+      "description": "The resource name of the API key.",
+      "required": true,
+      "security_impact": false,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "display_name": {
+      "description": "Human-readable display name of the API key.",
+      "required": false,
+      "security_impact": false,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "project": {
+      "description": "The project that the API key belongs to.",
+      "required": false,
+      "security_impact": false,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "restrictions": {
+      "description": "Restrictions applied to the API key.",
+      "required": false,
+      "security_impact": false,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "api_targets": {
+          "description": "API targets that this API key is allowed to use.",
+          "required": false,
+          "security_impact": false,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "restrictions",
+          "arguments": {
+            "service": {
+              "description": "The service that this API key is allowed to call.",
+              "required": true,
+              "security_impact": true,
+              "rationale": "Restricting API targets ensures that the API key can only be used with approved Google Cloud services, reducing the risk of misuse.",
+              "compliant": [
+                "maps.googleapis.com",
+                "places.googleapis.com",
+                "translate.googleapis.com"
+              ],
+              "non-compliant": [
+                "*"
+              ],
+              "parent": "api_targets"
+            },
+            "methods": {
+              "description": "The allowed methods for the specified API target.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "Limiting callable methods reduces the attack surface of the API key and prevents unintended API usage.",
+              "compliant": [
+                "TranslateText",
+                "DetectLanguage"
+              ],
+              "non-compliant": [
+                "*"
+              ],
+              "parent": "api_targets"
+            }
+          }
+        },
+        "browser_key_restrictions": {
+          "description": "Browser restrictions for the API key.",
+          "required": false,
+          "security_impact": false,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "restrictions",
+          "arguments": {
+            "allowed_referrers": {
+              "description": "Allowed HTTP referrers for browser usage.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "Restricting HTTP referrers prevents unauthorized websites from using the API key.",
+              "compliant": [
+                "https://example.com"
+              ],
+              "non-compliant": [
+                "*"
+              ],
+              "parent": "browser_key_restrictions"
+            }
+          }
+        },
+        "server_key_restrictions": {
+          "description": "Server restrictions for the API key.",
+          "required": false,
+          "security_impact": false,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "restrictions",
+          "arguments": {
+            "allowed_ips": {
+              "description": "Allowed IP addresses for server usage.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "Restricting server IP addresses ensures that only trusted network locations can use the API key.",
+              "compliant": [
+                "203.0.113.0/24"
+              ],
+              "non-compliant": [
+                "0.0.0.0/0"
+              ],
+              "parent": "server_key_restrictions"
+            }
+          }
+        },
+        "android_key_restrictions": {
+          "description": "Android application restrictions for the API key.",
+          "required": false,
+          "security_impact": false,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "restrictions",
+          "arguments": {
+            "allowed_applications": {
+              "description": "Allowed Android applications.",
+              "required": false,
+              "security_impact": false,
+              "rationale": null,
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "android_key_restrictions",
+              "arguments": {
+                "package_name": {
+                  "description": "The package name of the Android application.",
+                  "required": true,
+                  "security_impact": true,
+                  "rationale": "Restricting Android package names ensures that only trusted mobile applications can use the API key.",
+                  "compliant": "com.example.app",
+                  "non-compliant": "*",
+                  "parent": "allowed_applications"
+                },
+                "sha1_fingerprint": {
+                  "description": "The SHA1 fingerprint of the Android application certificate.",
+                  "required": true,
+                  "security_impact": true,
+                  "rationale": "Restricting SHA1 fingerprints prevents unauthorised Android applications from using the API key.",
+                  "compliant": "AA:BB:CC:DD:EE:FF",
+                  "non-compliant": "*",
+                  "parent": "allowed_applications"
+                }
+              }
+            }
+          }
+        },
+        "ios_key_restrictions": {
+          "description": "iOS application restrictions for the API key.",
+          "required": false,
+          "security_impact": false,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "restrictions",
+          "arguments": {
+            "allowed_bundle_ids": {
+              "description": "Allowed iOS bundle identifiers.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "Restricting iOS bundle identifiers ensures that only trusted iOS applications can use the API key.",
+              "compliant": [
+                "com.example.iosapp"
+              ],
+              "non-compliant": [
+                "*"
+              ],
+              "parent": "ios_key_restrictions"
+            }
+          }
+        }
+      }
+    }
+  }
+}

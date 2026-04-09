@@ -1,0 +1,100 @@
+{
+  "resource_name": "apihub_curation",
+  "subcategory": "API Hub",
+  "arguments": {
+    "display_name": {
+      "description": "The display name of the curation.",
+      "required": true,
+      "security_impact": "Purely informational field with no effect on security. Should not contain sensitive information.",
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "endpoint": {
+      "description": "The endpoint to be triggered for curation. The endpoint will be invoked with a request payload containing ApiMetadata. Response should contain curated data in the form of ApiMetadata. Structure is [documented below](#nested_endpoint).",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Endpoint configuration determines where API metadata is routed",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "application_integration_endpoint_details": {
+          "description": "The details of the Application Integration endpoint to be triggered for curation. Structure is [documented below](#nested_endpoint_application_integration_endpoint_details).",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Controls workflow routing for API metadata.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "endpoint"
+        }
+      }
+    },
+    "location": {
+      "description": "Resource ID segment making up resource `name`. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Location controls regional compliance and data residency.",
+      "compliant": ["australia-southeast1", "australia-southeast2"],
+      "non-compliant": ["us-central1", "europe-west1"],
+      "parent": null
+    },
+    "curation_id": {
+      "description": "The ID to use for the curation resource, which will become the final component of the curations's resource name. This field is optional. * If provided, the same will be used. The service will throw an error if the specified ID is already used by another curation resource in the API hub. * If not provided, a system generated ID will be used. This value should be 4-500 characters, and valid characters are /a-z[0-9]-_/.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Identifier only.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "The description of the curation.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Purely informational field with no effect on security.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Required so that terraform operates normally",
+      "compliant": ["PDE"],
+      "non-compliant": ["Anything else"],
+      "parent": null
+    },
+    "application_integration_endpoint_details": {
+      "description": "",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Arguments inside may impact security",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "trigger_id": {
+          "description": "The API trigger ID of the Application Integration workflow.",
+          "required": true,
+          "security_impact": true,
+          "rationale": "Trigger IDs must follow strict naming conventions to prevent routing to unauthorized workflows.",
+          "compliant": ["api_trigger/curation_API_PDE_1", "api_trigger/curation_API_PDE_2", "api_trigger/curation_API_PDE_3"],
+          "non-compliant": ["RANDOM_9999", "api_trigger/aaaa", ""],
+          "parent": "application_integration_endpoint_details"
+        },
+        "uri": {
+          "description": "The endpoint URI should be a valid REST URI for triggering an Application Integration. Format: `https://integrations.googleapis.com/v1/{name=projects/*/locations/*/integrations/*}:execute` or `https://{location}-integrations.googleapis.com/v1/{name=projects/*/locations/*/integrations/*}:execute`",
+          "required": true,
+          "security_impact": true,
+          "rationale": "Defines endpoint where metadata is sent. Unapproved URIs may result in data leakage.",
+          "compliant": ["https://integrations.googleapis.com/v1/projects/1082615593856/locations/us-central1/integrations/curation:execute"],
+          "non-compliant": ["http://unsecure-endpoint.local", "https://randomsite.com/invoke"],
+          "parent": "application_integration_endpoint_details"
+        }
+      }
+    }
+  }
+}

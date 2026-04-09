@@ -1,6 +1,10 @@
 package terraform.gcp.security.parameter_manager.parameter.encryption
 
+<<<<<<< HEAD
 import data.terraform.gcp.helpers
+=======
+import data.terraform.helpers
+>>>>>>> origin/dev
 import data.terraform.gcp.security.parameter_manager.parameter.vars
 
 conditions := [[

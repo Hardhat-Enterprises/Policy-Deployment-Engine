@@ -1,0 +1,105 @@
+{
+  "resource_name": "app_engine_application",
+  "subcategory": "App Engine",
+  "arguments": {
+    "project": {
+      "description": "~>**NOTE:** GCP only accepts project ID, not project number. If you are using number, you may get a \"Permission denied\" error.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "To enforce the use of Project IDs over Project Numbers to prevent API resolution failures and (Permission Denied) errors during deployment.",
+      "compliant": "gcp-project-12345",
+      "non-compliant": "123456789",
+      "parent": null
+    },
+    "location_id": {
+      "description": "The location to serve the app from.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "To esnure data residency compliance, prevents deployment to unauthorized regions, as App Engine locations cannot be changed once set.",
+      "compliant": "australia-southeast1",
+      "non-compliant": "europe-west1",
+      "parent": null
+    },
+    "auth_domain": {
+      "description": "The domain to authenticate users with when using App Engine's User API.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Modern identity management is handled via Identity-Aware Proxy IAP), making the legacy domain setting redundant for security enforcement.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "database_type": {
+      "description": "Can be `CLOUD_FIRESTORE` or `CLOUD_DATASTORE_COMPATIBILITY` for new instances.  To support old instances, the value `CLOUD_DATASTORE` is accepted by the provider, but will be rejected by the API. To create a Cloud Firestore database without creating an App Engine application, use the [`google_firestore_database`](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/firestore_database) resource instead.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "To enforce the selection of Cloud Firestore so the application uses Google's latest scalable database technology with modern security and consistency features.",
+      "compliant": "CLOUD_FIRESTORE",
+      "non-compliant": "CLOUD_DATASTORE_COMPATIBILITY",
+      "parent": null
+    },
+    "serving_status": {
+      "description": "The serving status of the app.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Ensures applications are deployed in an active state and prevents accidental service outages caused by manual or uncoordinated status overrides.",
+      "compliant": "SERVING",
+      "non-compliant": "USER_DISABLED",
+      "parent": null
+    },
+    "feature_settings": {
+      "description": "A block of optional settings to configure specific App Engine features:",
+      "required": false,
+      "security_impact": true,
+      "rationale": "to enforce the use of modern split health checks to ensure precise monitoring of application readiness and liveness, replacing legacy combined health checks.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "split_health_checks": {
+      "description": "Set to false to use the legacy health check instead of the readiness and liveness checks.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Enables the separation of readiness and liveness probes to improve deployment reliability and prevent traffic from being routed to instances that are still initializing.",
+      "compliant": "split_health_checks = true",
+      "non-compliant": "split_health_checks = false",
+      "parent": "feature_settings"
+    },
+    "iap": {
+      "description": "Settings for enabling Cloud Identity Aware Proxy",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Enforces Identity-Aware Proxy to establish a Zero Trust security layer, ensuring that only authenticated and authorized users can access the application, regardless of network location.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "oauth2_client_id": {
+      "description": "OAuth2 client ID to use for the authentication flow.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Mandates a valid OAuth2 Client ID to securely link the IAP to the organization's identity provider, ensuring only verified corporate credentials can grant access.",
+      "compliant": "12345.apps.googleusercontent.com",
+      "non-compliant": "incorrect-id.apps.googleusercontent.com",
+      "parent": "iap"
+    },
+    "oauth2_client_secret": {
+      "description": "OAuth2 client secret to use for the authentication flow. The SHA-256 hash of the value is returned in the oauth2ClientSecretSha256 field.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Ensures the authenticity of the handshake between Google Cloud and the Identity Provider to prevent man-in-the-middle attacks/unauthorized identity spoofing.",
+      "compliant": "GOCSPX-abc123def456_actual_secret",
+      "non-compliant": "12345",
+      "parent": "iap"
+    },
+    "ssl_policy": {
+      "description": "A list of the SSL policy that will be applied. Each block has a SSL_POLICY_UNSPECIFIED, DEFAULT, and MODERN field.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "To enforce secure managed SSL certificates to ensure all data in transit is encrypted using modern protocols and to prevent service outages caused by manual certificate expiration.",
+      "compliant": "AUTOMATIC",
+      "non-compliant": "MANUAL",
+      "parent": null
+    }
+  }
+}

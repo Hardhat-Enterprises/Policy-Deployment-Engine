@@ -1,0 +1,71 @@
+{
+  "resource_name": "bigquery_bi_reservation",
+  "subcategory": "BigQuery Reservation",
+  "arguments": {
+    "location": {
+      "description": "The geographic location where the BigQuery BI Reservation is created.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Location must be restricted to approved regions to support data residency and compliance requirements.",
+      "compliant": "us-central1",
+      "non-compliant": "us-west2",
+      "parent": null
+    },
+    "size": {
+      "description": "Size of a reservation, in bytes.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "This setting only controls the amount of BI capacity available and does not affect access, permissions, or security controls.",
+      "compliant": "3000000000",
+      "non-compliant": "0",
+      "parent": null
+    },
+    "preferred_tables": {
+      "description": "Preferred tables to use BI capacity for. Structure is documented below.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "This setting only determines which tables use BI capacity and does not change who can access the data.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "project_id": {
+          "description": "The assigned project ID of the project.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "This simply identifies the project and does not grant permissions or impact security controls.",
+          "compliant": "my-project-id",
+          "non-compliant": null,
+          "parent": "preferred_tables"
+        },
+        "dataset_id": {
+          "description": "The ID of the dataset in the above project.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "This only references the dataset and does not affect access control, encryption, or data exposure.",
+          "compliant": "analytics_dataset",
+          "non-compliant": null,
+          "parent": "preferred_tables"
+        },
+        "table_id": {
+          "description": "The ID of the table in the above dataset.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "This only points to a specific table and does not modify permissions or security settings.",
+          "compliant": "sales_table",
+          "non-compliant": null,
+          "parent": "preferred_tables"
+        }
+      }
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "This just specifies which project the resource belongs to and does not impact security on its own.",
+      "compliant": "my-project-id",
+      "non-compliant": null,
+      "parent": null
+    }
+  }
+}

@@ -1,11 +1,19 @@
 package terraform.gcp.security.cloud_vmware_engine.external_access_rule.block_broad_external_access
 
+<<<<<<< HEAD
 import data.terraform.gcp.helpers
+=======
+import data.terraform.helpers
+>>>>>>> origin/dev
 import data.terraform.gcp.security.cloud_vmware_engine.external_access_rule.vars
 
 conditions := [[
 	{
+<<<<<<< HEAD
 		"situation_description": "ip range is too broad",
+=======
+		"situation_description": "Network configuration is too broad",
+>>>>>>> origin/dev
 		"remedies": ["Set  ip range for required ips and make sure that all ports are not opened"],
 	},
 	{
@@ -17,7 +25,11 @@ conditions := [[
 	{
 		"condition": "c2 valid for tcp or udp",
 		"attribute_path": ["ip_protocol"],
+<<<<<<< HEAD
 		"values": ["TCP", "UDP"],
+=======
+		"values": ["UDP"],
+>>>>>>> origin/dev
 		"policy_type": "blacklist",
 	},
 	{

@@ -1,0 +1,438 @@
+{
+  "resource_name": "vmwareengine_private_cloud",
+  "subcategory": "Cloud VMware Engine",
+  "arguments": {
+    "network_config": {
+      "description": "Network configuration in the consumer project with which the peering has to be done. Structure is [documented below](#nested_network_config).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "management_cidr": {
+          "description": "Management CIDR used by VMware management appliances.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "network_config"
+        },
+        "vmware_engine_network": {
+          "description": "The relative resource name of the VMware Engine network attached to the private cloud. Specify the name in the following form: projects/{project}/locations/{location}/vmwareEngineNetworks/{vmwareEngineNetworkId} where {project} can either be a project number or a project ID.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "network_config"
+        },
+        "vmware_engine_network_canonical": {
+          "description": "(Output) The canonical name of the VMware Engine network in the form: projects/{project_number}/locations/{location}/vmwareEngineNetworks/{vmwareEngineNetworkId}",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "network_config"
+        },
+        "management_ip_address_layout_version": {
+          "description": "(Output) The IP address layout version of the management IP address range. Possible versions include: * managementIpAddressLayoutVersion=1: Indicates the legacy IP address layout used by some existing private clouds. This is no longer supported for new private clouds as it does not support all features. * managementIpAddressLayoutVersion=2: Indicates the latest IP address layout used by all newly created private clouds. This version supports all current features.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "network_config"
+        },
+        "dns_server_ip": {
+          "description": "(Output) DNS Server IP of the Private Cloud.",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "network_config"
+        }
+      }
+    },
+    "management_cluster": {
+      "description": "The management cluster for this private cloud. This used for creating and managing the default cluster. Structure is [documented below](#nested_management_cluster).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "cluster_id": {
+          "description": "The user-provided identifier of the new Cluster. The identifier must meet the following requirements: * Only contains 1-63 alphanumeric characters and hyphens * Begins with an alphabetical character * Ends with a non-hyphen character * Not formatted as a UUID * Complies with RFC 1034 (https://datatracker.ietf.org/doc/html/rfc1034) (section 3.5)",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "management_cluster"
+        },
+        "node_type_configs": {
+          "description": "The map of cluster node types in this cluster, where the key is canonical identifier of the node type (corresponds to the NodeType). Structure is [documented below](#nested_management_cluster_node_type_configs).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "management_cluster"
+        },
+        "stretched_cluster_config": {
+          "description": "The stretched cluster configuration for the private cloud. Structure is [documented below](#nested_management_cluster_stretched_cluster_config).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "management_cluster"
+        },
+        "autoscaling_settings": {
+          "description": "Configuration of the autoscaling applied to this cluster Private cloud must have a minimum of 3 nodes to add autoscale settings Structure is [documented below](#nested_management_cluster_autoscaling_settings).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "management_cluster"
+        }
+      }
+    },
+    "location": {
+      "description": "The location where the PrivateCloud should reside.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "name": {
+      "description": "The ID of the PrivateCloud.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "User-provided description for this private cloud.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "type": {
+      "description": "Initial type of the private cloud. Possible values are: `STANDARD`, `TIME_LIMITED`, `STRETCHED`.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "deletion_delay_hours": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "send_deletion_delay_hours_if_zero": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "node_type_configs": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "node_type_id": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_type_configs"
+        },
+        "node_count": {
+          "description": "The number of nodes of this type in the cluster.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_type_configs"
+        },
+        "custom_core_count": {
+          "description": "Customized number of cores available to each node of the type. This number must always be one of `nodeType.availableCustomCoreCounts`. If zero is provided max value from `nodeType.availableCustomCoreCounts` will be used. This cannot be changed once the PrivateCloud is created.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "node_type_configs"
+        }
+      }
+    },
+    "stretched_cluster_config": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "preferred_location": {
+          "description": "Zone that will remain operational when connection between the two zones is lost. Specify the zone in the following format: projects/{project}/locations/{location}.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "stretched_cluster_config"
+        },
+        "secondary_location": {
+          "description": "Additional zone for a higher level of availability and load balancing. Specify the zone in the following format: projects/{project}/locations/{location}.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "stretched_cluster_config"
+        }
+      }
+    },
+    "autoscaling_settings": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "autoscaling_policies": {
+          "description": "The map with autoscaling policies applied to the cluster. The key is the identifier of the policy. It must meet the following requirements: * Only contains 1-63 alphanumeric characters and hyphens * Begins with an alphabetical character * Ends with a non-hyphen character * Not formatted as a UUID * Complies with [RFC 1034](https://datatracker.ietf.org/doc/html/rfc1034) (section 3.5) Currently the map must contain only one element that describes the autoscaling policy for compute nodes. Structure is [documented below](#nested_management_cluster_autoscaling_settings_autoscaling_policies).",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_settings"
+        },
+        "min_cluster_node_count": {
+          "description": "Minimum number of nodes of any type in a cluster. Mandatory for successful addition of autoscaling settings in cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_settings"
+        },
+        "max_cluster_node_count": {
+          "description": "Maximum number of nodes of any type in a cluster. Mandatory for successful addition of autoscaling settings in cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_settings"
+        },
+        "cool_down_period": {
+          "description": "The minimum duration between consecutive autoscale operations. It starts once addition or removal of nodes is fully completed. Minimum cool down period is 30m. Cool down period must be in whole minutes (for example, 30m, 31m, 50m). Mandatory for successful addition of autoscaling settings in cluster.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_settings"
+        }
+      }
+    },
+    "autoscaling_policies": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "autoscale_policy_id": {
+          "description": "",
+          "required": null,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_policies"
+        },
+        "node_type_id": {
+          "description": "The canonical identifier of the node type to add or remove.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_policies"
+        },
+        "scale_out_size": {
+          "description": "Number of nodes to add to a cluster during a scale-out operation. Must be divisible by 2 for stretched clusters.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_policies"
+        },
+        "cpu_thresholds": {
+          "description": "Utilization thresholds pertaining to CPU utilization. Structure is [documented below](#nested_management_cluster_autoscaling_settings_autoscaling_policies_autoscaling_policy_cpu_thresholds).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_policies"
+        },
+        "consumed_memory_thresholds": {
+          "description": "Utilization thresholds pertaining to amount of consumed memory. Structure is [documented below](#nested_management_cluster_autoscaling_settings_autoscaling_policies_autoscaling_policy_consumed_memory_thresholds).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_policies"
+        },
+        "storage_thresholds": {
+          "description": "Utilization thresholds pertaining to amount of consumed storage. Structure is [documented below](#nested_management_cluster_autoscaling_settings_autoscaling_policies_autoscaling_policy_storage_thresholds).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_policies"
+        }
+      }
+    },
+    "cpu_thresholds": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "scale_out": {
+          "description": "The utilization triggering the scale-out operation in percent.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cpu_thresholds"
+        },
+        "scale_in": {
+          "description": "The utilization triggering the scale-in operation in percent.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cpu_thresholds"
+        }
+      }
+    },
+    "consumed_memory_thresholds": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "scale_out": {
+          "description": "The utilization triggering the scale-out operation in percent.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "consumed_memory_thresholds"
+        },
+        "scale_in": {
+          "description": "The utilization triggering the scale-in operation in percent.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "consumed_memory_thresholds"
+        }
+      }
+    },
+    "storage_thresholds": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "scale_out": {
+          "description": "The utilization triggering the scale-out operation in percent.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "storage_thresholds"
+        },
+        "scale_in": {
+          "description": "The utilization triggering the scale-in operation in percent.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "storage_thresholds"
+        }
+      }
+    }
+  }
+}

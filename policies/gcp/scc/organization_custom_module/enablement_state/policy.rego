@@ -1,6 +1,10 @@
 package terraform.gcp.security.scc.organization_custom_module.enablement_state
+<<<<<<< HEAD
 
 import data.terraform.gcp.helpers
+=======
+import data.terraform.helpers
+>>>>>>> origin/dev
 import data.terraform.gcp.security.scc.organization_custom_module.vars
 
 conditions := [[

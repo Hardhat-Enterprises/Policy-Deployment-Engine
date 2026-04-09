@@ -1,0 +1,109 @@
+{
+  "resource_name": "chronicle_watchlist",
+  "subcategory": "Chronicle",
+  "arguments": {
+    "display_name": {
+      "description": "Required. Display name of the watchlist. Note that it must be at least one character and less than 63 characters (https://google.aip.dev/148).",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "entity_population_mechanism": {
+      "description": "Mechanism to populate entities in the watchlist. Structure is [documented below](#nested_entity_population_mechanism).",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Manual population can lead to incomplete or outdated watchlists, increasing risk of missing threats. Automated population ensures timely and accurate data.",
+      "compliant": ["api", "integration", "automated"],
+      "non-compliant": ["manual"],
+      "parent": null,
+      "arguments": {
+        "manual": {
+          "description": "Entities are added manually.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Manual entry is error-prone and may miss timely threat intelligence, reducing the reliability of the watchlist.",
+          "compliant": null,
+          "non-compliant": "Using only manual entity population without automation.",
+          "parent": "entity_population_mechanism"
+        }
+      }
+    },
+    "location": {
+      "description": "The location of the resource. This is the geographical region where the Chronicle instance resides, such as \"us\" or \"europe-west2\".",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Restricting Chronicle resources to approved regions ensures compliance with data residency and service availability requirements.",
+      "compliant": "australia-southeast1",
+      "non-compliant": "Any location other than 'australia-southeast1', such as 'europe-west3', is considered non-compliant.",
+      "parent": null
+    },
+    "instance": {
+      "description": "The unique identifier for the Chronicle instance, which is the same as the customer ID.",
+      "required": true,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "multiplying_factor": {
+      "description": "Optional. Weight applied to the risk score for entities in this watchlist. The default is 1.0 if it is not specified.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "Optional. Description of the watchlist.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "watchlist_user_preferences": {
+      "description": "A collection of user preferences for watchlist UI configuration. Structure is [documented below](#nested_watchlist_user_preferences).",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "pinned": {
+          "description": "Optional. Whether the watchlist is pinned on the dashboard.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "watchlist_user_preferences"
+        }
+      }
+    },
+    "watchlist_id": {
+      "description": "Optional. The ID to use for the watchlist, which will become the final component of the watchlist's resource name. This value should be 4-63 characters, and valid characters are /a-z-/.",
+      "required": false,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    }
+  }
+}
