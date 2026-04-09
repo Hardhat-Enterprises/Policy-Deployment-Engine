@@ -1,14 +1,12 @@
-resource "google_bigquery_connection" "c" {
-  connection_id = "spark-conn-compliant"
+
+resource "google_bigquery_connection" "c_spark" {
+  connection_id = "spark-conn-ok"
   location      = "australia-southeast2"
-  project       = "my-project"
-  friendly_name = "compliant spark connection"
-  description   = "Spark connection using approved AU Dataproc cluster"
+  project       = "my-project-c"
 
   spark {
     spark_history_server_config {
-      # Matches your whitelist exactly
-      dataproc_cluster = "projects/my-project/regions/australia-southeast2/clusters/approved-cluster"
+      dataproc_cluster = "projects/my-project-c/regions/australia-southeast2/clusters/approved-cluster"
     }
   }
 }

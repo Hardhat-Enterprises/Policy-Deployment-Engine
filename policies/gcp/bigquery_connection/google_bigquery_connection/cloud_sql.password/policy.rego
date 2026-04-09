@@ -1,4 +1,4 @@
-package terraform.gcp.security.bigquery_connection.google_bigquery_connection.cloud_sql.password # Edit here
+package terraform.gcp.security.bigquery_connection.google_bigquery_connection.cloud_sql.password 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.bigquery_connection.google_bigquery_connection.vars
 

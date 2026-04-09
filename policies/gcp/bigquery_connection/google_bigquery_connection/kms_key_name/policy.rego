@@ -7,18 +7,16 @@ conditions := [[
   {
     "situation_description": "Require CMEK key in approved AU regions",
     "remedies": [
-      "Set kms_key_name to a Cloud KMS key in australia-southeast1 or australia-southeast2"
+      "Set kms_key_name to a Cloud KMS key under locations/australia-southeast1 or locations/australia-southeast2"
     ]
   },
   {
-    "condition": "kms_key_name must match AU KMS key resource pattern",
-    "attribute_path": ["kms_key_name"],
+    "condition": "kms_key_name must reference a Cloud KMS key in australia-southeast1 or australia-southeast2",
+    "attribute_path": ["after", "kms_key_name"],
     "values": [
-       "projects/my-project-c/locations/australia-southeast2/keyRings/australia-southeast2/cryptoKeys/bq-key", 
-       "projects/my-project-c/locations/australia-southeast1/keyRings/australia-southeast1/cryptoKeys/bq-key"
-
+      "(?i)^projects/[^/]+/locations/australia-southeast(1|2)/keyRings/[^/]+/cryptoKeys/[^/]+$"
     ],
-    "policy_type": "whitelist"
+    "policy_type": "pattern whitelist"
   }
 ]]
 

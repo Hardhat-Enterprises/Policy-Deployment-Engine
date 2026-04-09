@@ -1,27 +1,30 @@
-package terraform.gcp.security.bigquery_connection.google_bigquery_connection.spark
+package terraform.gcp.security.bigquery_connection.google_bigquery_connection.connection_id
 
 import data.terraform.gcp.helpers
 import data.terraform.gcp.security.bigquery_connection.google_bigquery_connection.vars
 
-conditions := [[
-  {
-    "situation_description": "Require Spark History Server to use an approved Dataproc cluster",
-    "remedies": [
-      "Set spark.spark_history_server_config.dataproc_cluster to a valid cluster in australia-southeast1 or australia-southeast2"
-    ]
-  },
-  {
-    "condition": "spark_history_server_config.dataproc_cluster must be in approved regions",
-    "attribute_path": ["spark", 0, "spark_history_server_config", 0, "dataproc_cluster"],
-    "policy_type": "whitelist",
-    "values": [
-      "projects/my-project/regions/australia-southeast1/clusters/approved-cluster",
-      "projects/my-project/regions/australia-southeast2/clusters/approved-cluster"
-    ]
-  }
-]]
+# STEP 1: STUDY YOUR RESOURCE AND ITS ATTRIBUTES, THEN FILL IN THE VARS FILE
+
+# STEP 2: CREATE SCENARIOS (can be simple (one condition) or complex (multiple linked conditions) )
+conditions := [
+  [
+    {
+      "situation_description": "BigQuery connection_id must not use disallowed names",
+      "remedies": [
+        "Do not use these exact IDs: cloud-resource-nc, test-connection"
+      ]
+    },
+    {
+      "condition": "connection_id must not match blacklisted values",
+      "attribute_path": ["after", "connection_id"],
+      "values": [
+        "cloud-resource-nc",
+        "test-connection"
+      ],
+      "policy_type": "blacklist"
+    }
+  ]
+]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
 details := helpers.get_multi_summary(conditions, vars.variables).details
-
-
