@@ -5,6 +5,18 @@ import os
 def normalize_path(path):
     return path.replace("\\", "/")
 
+def get_staged_files():
+    """
+    Get all staged files (added, modified, or not yet committed)
+    """
+    result = subprocess.run(
+        ["git", "diff", "--cached", "--name-only"],
+        capture_output=True,
+        text=True
+    )
+    return set(result.stdout.splitlines())
+
+
 def get_deleted_files():
     """
     Get deleted files from staged changes
@@ -58,7 +70,9 @@ def is_relevant_file(file_path):
 
 
 def main():
-    staged_files = set(sys.argv[1:])
+    # Get all staged files (added, modified, renamed, etc.)
+    staged_files = get_staged_files()
+    # Get deleted files from staged changes
     deleted_files = get_deleted_files()
 
     all_files = staged_files.union(deleted_files)
