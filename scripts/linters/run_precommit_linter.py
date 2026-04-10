@@ -59,12 +59,14 @@ def extract_csp_and_service(file_path):
 def is_relevant_file(file_path):
     """
     Check if file is inside PDE policies or inputs
-    (no extension filtering to support deleted files)
+    Git returns paths relative to repo root, so check both with and without repo folder prefix
     """
     file_path = normalize_path(file_path)
 
     return (
-        file_path.startswith("Policy-Deployment-Engine/policies/")
+        file_path.startswith("policies/")
+        or file_path.startswith("inputs/")
+        or file_path.startswith("Policy-Deployment-Engine/policies/")
         or file_path.startswith("Policy-Deployment-Engine/inputs/")
     )
 
