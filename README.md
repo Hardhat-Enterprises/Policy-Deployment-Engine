@@ -9,14 +9,11 @@ Last updated: T3 2025
 Before working on a service in PDE, all contributors must follow these steps:
 
 ### 1. **Pass the Contributor Test**
-You must pass the contributor test to be assigned a service. This ensures you understand the project structure and quality standards.
-
-```bash
-python scripts/auto_test/auto_test.py --help
-# Run sample tests to verify your setup
-```
+You must pass the contributor test to be assigned a service. This ensures you understand the project structure and quality standards. Test will be shared in week 02. 
 
 ### 2. **Clone the Repository**
+Clone the repository to working on your service. Please note that we do not accept PRs from forked repos. 
+
 ```bash
 git clone https://github.com/your-org/Policy-Deployment-Engine.git
 cd Policy-Deployment-Engine
