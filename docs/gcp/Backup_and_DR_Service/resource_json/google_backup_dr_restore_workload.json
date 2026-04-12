@@ -1,0 +1,897 @@
+{
+  "resource_name": "google_backup_dr_restore_workload",
+  "subcategory": "Backup and DR Service",
+  "arguments": {
+    "location": {
+      "description": "Required. The location for the backup vault.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Location is a clear generic security control because it can be enforced through an approved-region whitelist for governance and data residency.",
+      "compliant": ["australia-southeast1", "australia-southeast2"],
+      "non-compliant": ["us-central1"],
+      "parent": null
+    },
+    "backup_vault_id": {
+      "description": "Required. The ID of the backup vault.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "This is a resource reference rather than a generic explicit security control.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "data_source_id": {
+      "description": "Required. The ID of the data source.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "This is a resource reference rather than a generic explicit security control.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "backup_id": {
+      "description": "Required. The ID of the backup to restore from.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "This identifies the backup source but is not itself a generic explicit security control.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "name": {
+      "description": "Optional, deprecated. The resource name of the backup instance.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "This is deprecated and acts as an identifier rather than a security control.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "request_id": {
+      "description": "Optional. An optional request ID to identify requests.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "This is an idempotency and request-tracking field, not a generic explicit security control.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "clear_overrides_field_mask": {
+      "description": "Optional. A field mask used to clear server-side default values during restore.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "This is operational restore behavior, not a generic explicit security control.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "delete_restored_instance": {
+      "description": "Optional. If true (default), running terraform destroy will delete the live resource in GCP.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "This is a clear generic safeguard because disabling automatic deletion reduces the risk of unintentionally removing restored resources during destroy operations.",
+      "compliant": [false],
+      "non-compliant": [true],
+      "parent": null
+    },
+
+    "compute_instance_target_environment": {
+      "description": "Optional. The destination environment for GCE VM restoration.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "This is a container block. Security controls apply to specific fields inside it.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "project": {
+          "description": "Required. Target project for the Compute Engine instance.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Project is an administrative scoping field rather than a direct generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_target_environment"
+        },
+        "zone": {
+          "description": "Required. The zone of the Compute Engine instance.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Zone placement is operational context and is better handled by service-specific validation than a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_target_environment"
+        }
+      }
+    },
+
+    "disk_target_environment": {
+      "description": "Optional. The destination environment for zonal disk restoration.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "This is a container block. Security controls apply to specific fields inside it.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "project": {
+          "description": "Required. Target project for the disk.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Project is an administrative scoping field rather than a direct generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "disk_target_environment"
+        },
+        "zone": {
+          "description": "Required. Target zone for the disk.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Zone placement is operational context and is better handled by service-specific validation than a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "disk_target_environment"
+        }
+      }
+    },
+
+    "region_disk_target_environment": {
+      "description": "Optional. The destination environment for regional disk restoration.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "This is a container block. Security controls apply to specific fields inside it.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "project": {
+          "description": "Required. Target project for the disk.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Project is an administrative scoping field rather than a direct generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "region_disk_target_environment"
+        },
+        "region": {
+          "description": "Required. Target region for the disk.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Region placement is operational context and is better handled by service-specific validation than a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "region_disk_target_environment"
+        },
+        "replica_zones": {
+          "description": "Required. Target URLs of the replica zones for the disk.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "This is restore placement logic rather than a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "region_disk_target_environment"
+        }
+      }
+    },
+
+    "compute_instance_restore_properties": {
+      "description": "Optional. Compute Engine instance properties to be overridden during restore.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "This is a container block. Security controls apply to specific fields inside it.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "name": {
+          "description": "Required. Name of the compute instance.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Name is an identifier and not a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties"
+        },
+        "advanced_machine_features": {
+          "description": "Optional. Controls for advanced machine-related behavior features.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Container block for machine behavior settings, not itself a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties",
+          "arguments": {
+            "enable_nested_virtualization": {
+              "description": "Optional. Whether to enable nested virtualization.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "Nested virtualization is a clear security-sensitive capability and can be controlled with a simple boolean rule.",
+              "compliant": [false],
+              "non-compliant": [true],
+              "parent": "advanced_machine_features"
+            },
+            "threads_per_core": {
+              "description": "Optional. The number of threads per physical core.",
+              "required": false,
+              "security_impact": false,
+              "rationale": "Performance tuning field, not a generic explicit security control.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "advanced_machine_features"
+            },
+            "visible_core_count": {
+              "description": "Optional. The number of physical cores to expose to an instance.",
+              "required": false,
+              "security_impact": false,
+              "rationale": "Performance sizing field, not a generic explicit security control.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "advanced_machine_features"
+            },
+            "enable_uefi_networking": {
+              "description": "Optional. Whether to enable UEFI networking for instance creation.",
+              "required": false,
+              "security_impact": false,
+              "rationale": "Boot/network compatibility setting rather than a generic explicit security control.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "advanced_machine_features"
+            }
+          }
+        },
+        "can_ip_forward": {
+          "description": "Optional. Allows this instance to send and receive packets with non-matching destination or source IPs.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "IP forwarding is a clear generic security control because enabling it expands networking capability and exposure.",
+          "compliant": [false],
+          "non-compliant": [true],
+          "parent": "compute_instance_restore_properties"
+        },
+        "confidential_instance_config": {
+          "description": "Optional. Controls Confidential Compute options on the instance.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Container block. Security controls apply to fields inside it.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties",
+          "arguments": {
+            "enable_confidential_compute": {
+              "description": "Optional. Defines whether the instance should have confidential compute enabled.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "Confidential Compute is a clear explicit security control and can be enforced with a simple boolean rule.",
+              "compliant": [true],
+              "non-compliant": [false],
+              "parent": "confidential_instance_config"
+            }
+          }
+        },
+        "deletion_protection": {
+          "description": "Optional. Whether the resource should be protected against deletion.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Deletion protection is a clear explicit security control and can be enforced with a simple boolean rule.",
+          "compliant": [true],
+          "non-compliant": [false],
+          "parent": "compute_instance_restore_properties"
+        },
+        "description": {
+          "description": "Optional. An optional description of this resource.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Description does not affect security enforcement.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties"
+        },
+        "disks": {
+          "description": "Optional. Array of disks associated with this instance.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "This is a complex container block and is better handled with custom validation than a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties"
+        },
+        "display_device": {
+          "description": "Optional. Enables display device for the instance.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Display enablement is not usually treated as a generic explicit security control in this context.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties"
+        },
+        "guest_accelerators": {
+          "description": "Optional. A list of accelerator cards attached to this instance.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Performance/hardware configuration rather than a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties"
+        },
+        "hostname": {
+          "description": "Optional. Specifies the hostname of the instance.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Identifier/operational field, not a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties"
+        },
+        "instance_encryption_key": {
+          "description": "Optional. Encrypts suspended data for an instance with a customer-managed encryption key.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Encryption key configuration is a clear explicit security control, though the exact field values are better validated with custom rules.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties",
+          "arguments": {
+            "raw_key": {
+              "description": "Optional.",
+              "required": false,
+              "security_impact": false,
+              "rationale": "Raw key presence is sensitive but better handled through custom validation than a generic explicit control.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "instance_encryption_key"
+            },
+            "rsa_encrypted_key": {
+              "description": "Optional.",
+              "required": false,
+              "security_impact": false,
+              "rationale": "Key material field better handled through custom validation.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "instance_encryption_key"
+            },
+            "kms_key_name": {
+              "description": "Optional.",
+              "required": false,
+              "security_impact": false,
+              "rationale": "KMS selection is security-relevant but usually needs custom organizational validation.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "instance_encryption_key"
+            },
+            "kms_key_service_account": {
+              "description": "Optional.",
+              "required": false,
+              "security_impact": false,
+              "rationale": "Service account selection needs custom validation rather than a simple generic control.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "instance_encryption_key"
+            }
+          }
+        },
+        "key_revocation_action_type": {
+          "description": "Optional. KeyRevocationActionType of the instance.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "This is conditional key-management behavior rather than a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties"
+        },
+        "labels": {
+          "description": "Optional. Labels to apply to this instance.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Labels are metadata rather than a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties"
+        },
+        "machine_type": {
+          "description": "Optional. Full or partial URL of the machine type resource.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Sizing/performance field, not a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties"
+        },
+        "metadata": {
+          "description": "Optional. Includes custom metadata and predefined keys.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Instance metadata can affect security posture and is a common explicit control point, though the allowed keys usually require custom validation.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties"
+        },
+        "min_cpu_platform": {
+          "description": "Optional. Minimum CPU platform to use for this instance.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Hardware preference field, not a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties"
+        },
+        "network_interfaces": {
+          "description": "Optional. An array of network configurations for this instance.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "This is a container block. Security controls apply to specific fields inside it.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties",
+          "arguments": {
+            "network": {
+              "description": "Optional. URL of the VPC network resource.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "Network attachment is a clear generic security control because it can be restricted to approved networks.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "network_interfaces"
+            },
+            "subnetwork": {
+              "description": "Optional. URL of the subnetwork resource.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "Subnetwork attachment is a clear generic security control because it can be restricted to approved subnetworks.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "network_interfaces"
+            },
+            "ip_address": {
+              "description": "Optional. An IPv4 internal IP address.",
+              "required": false,
+              "security_impact": false,
+              "rationale": "Address selection is operational and better handled through custom validation.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "network_interfaces"
+            },
+            "ipv6_address": {
+              "description": "Optional. An IPv6 internal network address.",
+              "required": false,
+              "security_impact": false,
+              "rationale": "Address selection is operational and better handled through custom validation.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "network_interfaces"
+            },
+            "internal_ipv6_prefix_length": {
+              "description": "Optional. The prefix length of the primary internal IPv6 range.",
+              "required": false,
+              "security_impact": false,
+              "rationale": "Network sizing field, not a generic explicit security control.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "network_interfaces"
+            },
+            "access_configs": {
+              "description": "Optional.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "Public access configuration is a clear generic security control because it can expose the instance externally.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "network_interfaces",
+              "arguments": {
+                "type": {
+                  "description": "Optional. The type of configuration.",
+                  "required": false,
+                  "security_impact": true,
+                  "rationale": "Access config type is a clear explicit security control because it governs external connectivity.",
+                  "compliant": null,
+                  "non-compliant": null,
+                  "parent": "access_configs"
+                },
+                "name": {
+                  "description": "Optional. The name of this access configuration.",
+                  "required": false,
+                  "security_impact": false,
+                  "rationale": "Identifier only.",
+                  "compliant": null,
+                  "non-compliant": null,
+                  "parent": "access_configs"
+                },
+                "external_ip": {
+                  "description": "Optional.",
+                  "required": false,
+                  "security_impact": true,
+                  "rationale": "Assigning an external IP is a clear explicit security control because it exposes the instance publicly.",
+                  "compliant": null,
+                  "non-compliant": null,
+                  "parent": "access_configs"
+                },
+                "external_ipv6": {
+                  "description": "Optional.",
+                  "required": false,
+                  "security_impact": true,
+                  "rationale": "Assigning an external IPv6 address is a clear explicit security control because it exposes the instance publicly.",
+                  "compliant": null,
+                  "non-compliant": null,
+                  "parent": "access_configs"
+                },
+                "external_ipv6_prefix_length": {
+                  "description": "Optional.",
+                  "required": false,
+                  "security_impact": false,
+                  "rationale": "Address sizing field, not a generic explicit security control.",
+                  "compliant": null,
+                  "non-compliant": null,
+                  "parent": "access_configs"
+                },
+                "set_public_ptr": {
+                  "description": "Optional.",
+                  "required": false,
+                  "security_impact": false,
+                  "rationale": "DNS pointer behavior is not usually enforced as a generic explicit security control here.",
+                  "compliant": null,
+                  "non-compliant": null,
+                  "parent": "access_configs"
+                },
+                "public_ptr_domain_name": {
+                  "description": "Optional.",
+                  "required": false,
+                  "security_impact": false,
+                  "rationale": "DNS naming field, not a generic explicit security control.",
+                  "compliant": null,
+                  "non-compliant": null,
+                  "parent": "access_configs"
+                },
+                "network_tier": {
+                  "description": "Optional.",
+                  "required": false,
+                  "security_impact": false,
+                  "rationale": "Networking service tier selection is operational rather than a generic explicit security control.",
+                  "compliant": null,
+                  "non-compliant": null,
+                  "parent": "access_configs"
+                }
+              }
+            },
+            "ipv6_access_configs": {
+              "description": "Optional.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "IPv6 public access configuration is a clear generic security control because it can expose the instance externally.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "network_interfaces"
+            },
+            "alias_ip_ranges": {
+              "description": "Optional.",
+              "required": false,
+              "security_impact": false,
+              "rationale": "Network address allocation logic is operational and better handled through custom validation.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "network_interfaces"
+            },
+            "stack_type": {
+              "description": "Optional.",
+              "required": false,
+              "security_impact": false,
+              "rationale": "Protocol stack choice is generally operational rather than a generic explicit security control.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "network_interfaces"
+            },
+            "ipv6_access_type": {
+              "description": "Optional.",
+              "required": false,
+              "security_impact": false,
+              "rationale": "Addressing mode is better handled through custom validation than a simple generic control.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "network_interfaces"
+            },
+            "queue_count": {
+              "description": "Optional.",
+              "required": false,
+              "security_impact": false,
+              "rationale": "Performance tuning field, not a generic explicit security control.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "network_interfaces"
+            },
+            "nic_type": {
+              "description": "Optional.",
+              "required": false,
+              "security_impact": false,
+              "rationale": "Hardware/network performance field, not a generic explicit security control.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "network_interfaces"
+            },
+            "network_attachment": {
+              "description": "Optional.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "Network attachment is a clear generic security control because it determines connectivity scope.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "network_interfaces"
+            }
+          }
+        },
+        "network_performance_config": {
+          "description": "Optional. Configure network performance.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Performance configuration rather than a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties"
+        },
+        "params": {
+          "description": "Optional. Additional params passed with the request.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Container block for ancillary settings, not itself a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties"
+        },
+        "private_ipv6_google_access": {
+          "description": "Optional. The private IPv6 Google access type for the VM.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "This is conditional networking behavior better handled through custom validation.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties"
+        },
+        "allocation_affinity": {
+          "description": "Optional. Specifies the reservations that this instance can consume from.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Reservation consumption policy is operational rather than a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties"
+        },
+        "resource_policies": {
+          "description": "Optional. Resource policies applied to this instance.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "This is a resource reference list rather than a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties"
+        },
+        "scheduling": {
+          "description": "Optional. Sets the scheduling options for this instance.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Container block for scheduling behavior, not itself a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties"
+        },
+        "service_accounts": {
+          "description": "Optional. A list of service accounts with scopes.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Service account assignment is a clear explicit security control because it governs workload identity and permissions.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties"
+        },
+        "shielded_instance_config": {
+          "description": "Optional. Controls Shielded compute options on the instance.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Container block. Security controls apply to fields inside it.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties",
+          "arguments": {
+            "enable_secure_boot": {
+              "description": "Optional.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "Secure Boot is a clear explicit security control and can be enforced with a simple boolean rule.",
+              "compliant": [true],
+              "non-compliant": [false],
+              "parent": "shielded_instance_config"
+            },
+            "enable_vtpm": {
+              "description": "Optional.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "vTPM is a clear explicit security control and can be enforced with a simple boolean rule.",
+              "compliant": [true],
+              "non-compliant": [false],
+              "parent": "shielded_instance_config"
+            },
+            "enable_integrity_monitoring": {
+              "description": "Optional.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "Integrity monitoring is a clear explicit security control and can be enforced with a simple boolean rule.",
+              "compliant": [true],
+              "non-compliant": [false],
+              "parent": "shielded_instance_config"
+            }
+          }
+        },
+        "tags": {
+          "description": "Optional. Tags to apply to this instance.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Tags are metadata rather than a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "compute_instance_restore_properties"
+        }
+      }
+    },
+
+    "disk_restore_properties": {
+      "description": "Optional. Disk properties to be overridden during restore.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "This is a container block. Security controls apply to specific fields inside it.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "name": {
+          "description": "Required. Name of the disk.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Identifier only.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "disk_restore_properties"
+        },
+        "description": {
+          "description": "Optional. An optional description of this resource.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Description does not affect security enforcement.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "disk_restore_properties"
+        },
+        "size_gb": {
+          "description": "Required. The size of the disk in GB.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Capacity field, not a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "disk_restore_properties"
+        },
+        "licenses": {
+          "description": "Optional. A list of publicly available licenses applicable to this backup.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Licensing metadata rather than a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "disk_restore_properties"
+        },
+        "guest_os_feature": {
+          "description": "Optional. A list of features to enable in the guest operating system.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Feature compatibility/configuration rather than a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "disk_restore_properties"
+        },
+        "disk_encryption_key": {
+          "description": "Optional. Encrypts the disk using a customer-supplied encryption key.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Disk encryption configuration is a clear explicit security control, though detailed validation usually requires custom rules.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "disk_restore_properties"
+        },
+        "physical_block_size_bytes": {
+          "description": "Optional. Physical block size of the persistent disk.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Performance/storage tuning field, not a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "disk_restore_properties"
+        },
+        "provisioned_iops": {
+          "description": "Optional. Indicates how many IOPS to provision for the disk.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Performance field, not a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "disk_restore_properties"
+        },
+        "provisioned_throughput": {
+          "description": "Optional. Indicates how much throughput to provision for the disk.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Performance field, not a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "disk_restore_properties"
+        },
+        "enable_confidential_compute": {
+          "description": "Optional. Indicates whether this disk is using confidential compute mode.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Confidential Compute is a clear explicit security control and can be enforced with a simple boolean rule.",
+          "compliant": [true],
+          "non-compliant": [false],
+          "parent": "disk_restore_properties"
+        },
+        "storage_pool": {
+          "description": "Optional. The storage pool in which the new disk is created.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Placement/operational field rather than a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "disk_restore_properties"
+        },
+        "access_mode": {
+          "description": "Optional. The access mode of the disk.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Access mode is a clear explicit security control because it affects read/write sharing behavior.",
+          "compliant": ["READ_WRITE_SINGLE"],
+          "non-compliant": ["READ_WRITE_MANY", "READ_ONLY_MANY"],
+          "parent": "disk_restore_properties"
+        },
+        "architecture": {
+          "description": "Optional. The architecture of the source disk.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Compatibility field rather than a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "disk_restore_properties"
+        },
+        "resource_policy": {
+          "description": "Optional. Resource policies applied to this disk.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Resource reference rather than a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "disk_restore_properties"
+        },
+        "type": {
+          "description": "Required. URL of the disk type resource describing which disk type to use.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Disk type choice is usually performance/compatibility driven rather than a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "disk_restore_properties"
+        },
+        "labels": {
+          "description": "Optional. Labels to apply to this disk.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Labels are metadata rather than a generic explicit security control.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "disk_restore_properties"
+        },
+        "resource_manager_tags": {
+          "description": "Optional. Resource manager tags to be bound to the disk.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Tags are governance metadata but not a generic explicit security control by themselves in this schema.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "disk_restore_properties"
+        }
+      }
+    }
+  }
+}
