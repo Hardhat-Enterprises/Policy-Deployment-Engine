@@ -6,8 +6,8 @@
       "description": "Required. Minimum enforced retention duration for backups stored in the backup vault. Minimum enforced retention duration should be at least 100000s",
       "required": true,
       "security_impact": true,
-      "rationale":  "Prevents premature deletion of backups and supports recovery and retention requirements.",
-      "compliant": ["100000s"],
+      "rationale":  "Minimum enforced retention needs security policy because it can be enforced through a simple minimum or range-based rule to reduce early deletion risk.",
+      "compliant": ["300000s"],
       "non-compliant": ["1000s"],
       "parent": null
     },
@@ -15,7 +15,7 @@
       "description": "Required. The GCP location for the backup vault should be on approved region.",
       "required": true,
       "security_impact": true,
-      "rationale": "Location determines physical hosting region and data residency.",
+      "rationale": "Location determines physical hosting region and data residency. Location has security policy because it can be enforced through an approved-region whitelist for governance and data residency.",
       "compliant": ["australia-southeast1", "australia-southeast2"],
       "non-compliant": ["us-central1"],
       "parent": null
@@ -24,7 +24,7 @@
       "description": "Required. ID of the requesting object.",
       "required": true,
       "security_impact": false,
-      "rationale": " This field is an identifier used for referencing the backup vault.",
+      "rationale": "Backup vault ID is an identifier and does not have any security implications.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -48,7 +48,7 @@
       "parent": null
     },
     "effective_time": {
-      "description": "Optional. Time after which the BackupVault resource is locked.",
+      "description": "Optional. It is the time after which the BackupVault resource is locked.",
       "required": false,
       "security_impact": false,
       "rationale": "Effective time has no impact on the security of the resource or data contained.",
@@ -66,26 +66,46 @@
       "parent": null
     },
     "access_restriction": {
-      "description": "Required. Specifies the access restriction level for the backup vault. Restricted WITHIN_ORGANIZATION only",
-      "required": true,
+      "description": "Optional. Specifies the access restriction level for the backup vault. Restricted WITHIN_ORGANIZATION only",
+      "required": false,
       "security_impact": true,
-      "rationale": "Controls where backup data can be accessed from. Unrestricted access increases threats",
+      "rationale": "Access restriction has security impact because it can be enforced through a whitelist of approved restrictive values to limit exposure.",
       "compliant": ["WITHIN_ORGANIZATION"],
       "non-compliant": ["UNRESTRICTED"],
       "parent": null
     },
     "backup_retention_inheritance": {
-      "description": "How a backup's enforced retention end time is inherited. Default value is `INHERIT_VAULT_RETENTION` if not provided during creation. Possible values are: `BACKUP_RETENTION_INHERITANCE_UNSPECIFIED`, `INHERIT_VAULT_RETENTION`, `MATCH_BACKUP_EXPIRE_TIME`.",
-      "required": true,
-      "security_impact": true,
-      "rationale": "Inheritance ensures retention policies defined at the backup vault level are consistently enforced.",
+      "description": "Optional. How a backup's enforced retention end time is inherited. Default value is `INHERIT_VAULT_RETENTION` if not provided during creation. Possible values are: `BACKUP_RETENTION_INHERITANCE_UNSPECIFIED`, `INHERIT_VAULT_RETENTION`, `MATCH_BACKUP_EXPIRE_TIME`.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "This affects retention behavior, but it is service-specific and better handled through custom validation rather than an explicit security control.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
+    "encryption_config": {
+      "description": "Optional. Encryption configuration for the backup vault.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "This is a container block. Controls apply to specific fields inside it.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "kms_key_name": {
+          "description": "Optional. The Resource name of the Cloud KMS key to be used to encrypt new backups. The key must be in the same location as the backup vault. The key must be a Cloud KMS CryptoKey.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "KMS-based encryption has security impacts, although the exact key validation is usually organization-specific.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "encryption_config"
+        }
+      }
+    },
     "force_update": {
-      "description": "Required. Forces updates to the backup vault configuration even if they might disrupt operations.",
-      "required": true,
+      "description": "Optional. If set, allow update to extend the minimum enforced retention for backup vault. This overrides the restriction against conflicting retention periods. This conflict may occur when the expiration schedule defined by the associated backup plan is shorter than the minimum retention set by the backup vault.",
+      "required": false,
       "security_impact": true,
       "rationale": "Force updates may override protective measures and result in unwanted changes to configuration or data.",
       "compliant": [false],
@@ -93,16 +113,16 @@
       "parent": null
     },
     "force_delete": {
-      "description": "Overrides deletion safeguards and allows forced deletion of a backup vault.",
-      "required": true,
+      "description": "Optional. Overrides deletion safeguards and allows forced deletion of a backup vault.",
+      "required": false,
       "security_impact": true,
-      "rationale": "Forcing deletion of a backup vault can result in permanent loss of backup data.",
-      "compliant": null,
-      "non-compliant": null,
+      "rationale": "Forcing deletion of a backup vault can result in permanent loss of backup data, but it is deprecated",
+      "compliant": [false],
+      "non-compliant": [true],
       "parent": null
     },
     "ignore_inactive_datasources": {
-      "description": "If set, the following restrictions against deletion of the backup vault instance can be overridden: * deletion of a backup vault instance containing no backups, but still containing empty datasources.",
+      "description": "Optional. If set, the following restrictions against deletion of the backup vault instance can be overridden: * deletion of a backup vault instance containing no backups, but still containing empty datasources.",
       "required": false,
       "security_impact": false,
       "rationale": "Deletion behavior option; not enforced by policy.",
@@ -111,7 +131,7 @@
       "parent": null
     },
     "ignore_backup_plan_references": {
-      "description": "If set, the following restrictions against deletion of the backup vault instance can be overridden: * deletion of a backup vault instance that is being referenced by an active backup plan.",
+      "description": "Optional. If set, the following restrictions against deletion of the backup vault instance can be overridden: * deletion of a backup vault instance that is being referenced by an active backup plan.",
       "required": false,
       "security_impact": false,
       "rationale": "Deletion behavior option; not enforced by policy.",
@@ -120,7 +140,7 @@
       "parent": null
     },
     "allow_missing": {
-      "description": "Allow idempotent deletion of backup vault. The request will still succeed in case the backup vault does not exist.",
+      "description": "Optional. Allow idempotent deletion of backup vault. The request will still succeed in case the backup vault does not exist.",
       "required": false,
       "security_impact": false,
       "rationale": "Idempotent delete behavior; not enforced by policy.",
@@ -129,10 +149,10 @@
       "parent": null
     },
     "project": {
-      "description": "If it is not provided, the provider project is used.",
+      "description": "Optional. If it is not provided, the provider project is used.",
       "required": false,
       "security_impact": false,
-      "rationale": "even without manual ID configuration ID will be automatically generated.",
+      "rationale": "Project is an administrative scoping field used to determine where the resource is created. It does not directly define or enforce a generic explicit security control for the vault itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
