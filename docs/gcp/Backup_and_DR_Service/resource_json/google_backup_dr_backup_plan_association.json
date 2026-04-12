@@ -5,8 +5,8 @@
     "resource": {
       "description": "Required. The resource for which BPA needs to be created",
       "required": true,
-      "security_impact": true,
-      "rationale": "Incorrect or missing resource may lead unproper backups, impacting data recovery and security.",
+      "security_impact": false,
+      "rationale": "This is a resource reference and would require service-specific validation to confirm that the correct workload is being protected. It is not an explicit security control.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,8 +14,8 @@
     "backup_plan": {
       "description": "Required. The BP with which resource needs to be created Note: - A Backup Plan configured for 'compute.googleapis.com/Instance', can only protect instance type resources. - A Backup Plan configured for 'compute.googleapis.com/Disk' can be used to protect both standard Disks and Regional Disks resources.",
       "required": true,
-      "security_impact": true,
-      "rationale": "Incorrect or missing backup plan may lead unproper backups, impacting data recovery and security.",
+      "security_impact": false,
+      "rationale": "This is a configuration setting and does not directly impact security.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -23,8 +23,8 @@
     "resource_type": {
       "description": "Required. The resource type of workload on which backupplan is applied. Examples include, \"compute.googleapis.com/Instance\", \"compute.googleapis.com/Disk\", and \"compute.googleapis.com/RegionDisk\"",
       "required": true,
-      "security_impact": true,
-      "rationale": "Incorrect or missing resource type may lead improper backups, impacting data recovery and security.",
+      "security_impact": false,
+      "rationale": "This affects workload compatibility and intended usage. This is a configuration setting and does not directly impact security.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -33,7 +33,7 @@
       "description": "Required. The GCP location for the backup vault should be on approved region.",
       "required": true,
       "security_impact": true,
-      "rationale": "Location determines physical hosting region and data residency.",
+      "rationale": "Location is a clear generic security control because it can be enforced through an approved-region whitelist for governance and data residency.",
       "compliant": ["australia-southeast1", "australia-southeast2"],
       "non-compliant": ["us-central1"],
       "parent": null
@@ -51,7 +51,7 @@
       "description": "Optional. If it is not provided, the provider project is used.",
       "required": false,
       "security_impact": false,
-      "rationale": "even without manual ID configuration ID will be automatically generated.",
+      "rationale": "Project is an administrative scoping field used to determine where the resource is created. It does not directly define or enforce an explicit security control for the association itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null

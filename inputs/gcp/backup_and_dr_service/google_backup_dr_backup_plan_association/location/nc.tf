@@ -1,20 +1,38 @@
-# Backup plan association with non-approved location
-# Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
+resource "google_compute_instance" "myinstance-nc" {
+  name         = "my-instance"
+  machine_type = "n2-standard-2"
+  zone         = "us-central1-a"
+  
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-11"
+      labels = {
+        my_label = "value"
+      }
+    }
+  }
+  network_interface {
+    network = "default"
+    access_config {
+      // Ephemeral public IP
+    }
+  }
+}
 
 resource "google_backup_dr_backup_vault" "nc" {
-  project  = "PDE"
+  project  = "tamim-shahriar"
   location = "us-central1"
-
-  backup_vault_id                           = "nc"
-  access_restriction                        = "WITHIN_ORGANIZATION"
-  backup_minimum_enforced_retention_duration = "100000s"
+  backup_vault_id    = "backup-vault-compliant"
+  access_restriction = "WITHIN_ORGANIZATION"
+  backup_minimum_enforced_retention_duration = "300000s"
 }
 
 resource "google_backup_dr_backup_plan" "nc" {
+  project        = "tamim-shahriar"
   location       = "us-central1"
-  backup_plan_id = "backup-plan-noncompliant"
+  backup_plan_id = "backup-plan-compliant"
   resource_type  = "compute.googleapis.com/Instance"
-  backup_vault   = google_backup_dr_backup_vault.nc.name
+  backup_vault   = google_backup_dr_backup_vault.nc.id
 
   backup_rules {
     rule_id               = "daily-rule"
@@ -32,27 +50,11 @@ resource "google_backup_dr_backup_plan" "nc" {
   }
 }
 
-resource "google_compute_instance" "nc" {
-  name         = "instance-nc"
-  machine_type = "e2-micro"
-  zone         = "us-central1-a"
-
-  boot_disk {
-    initialize_params {
-      image = "debian-cloud/debian-12"
-    }
-  }
-
-  network_interface {
-    network = "default"
-    access_config {}
-  }
-}
-
 resource "google_backup_dr_backup_plan_association" "nc" {
-  location                   = "us-central1"
-  backup_plan_association_id = "association-nc"
-  resource                   = google_compute_instance.nc.id
-  resource_type              = "compute.googleapis.com/Instance"
-  backup_plan                = google_backup_dr_backup_plan.nc.name
+  project       = "tamim-shahriar"
+  location      = "us-central1"
+  resource_type = "compute.googleapis.com/Instance"
+  backup_plan_association_id    = "bpa-non-compliant"
+  resource      = google_compute_instance.myinstance-nc.id
+  backup_plan   = google_backup_dr_backup_plan.nc.id
 }
