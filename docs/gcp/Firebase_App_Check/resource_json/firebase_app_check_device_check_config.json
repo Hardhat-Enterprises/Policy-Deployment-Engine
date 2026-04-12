@@ -14,10 +14,10 @@
     "private_key": {
       "description": "The contents of the private key (.p8) file associated with the key specified by keyId. **Note**: This property is sensitive and will not be displayed in the plan.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "DeviceCheck follows the Apple App Store's security guidelines and requires a private key for verification. Hardcoding this key or using an unencrypted format increases the risk of exfiltration. Using Secret Manager ensures encryption at rest and audit logging of key access.",
+      "compliant": "projects/my-project/secrets/apple-devicecheck-key",
+      "non-compliant": "MIIEvAIBADANBgkqhkiG9w0BAQEFAASC...",
       "parent": null
     },
     "app_id": {
@@ -32,10 +32,10 @@
     "token_ttl": {
       "description": "Specifies the duration for which App Check tokens exchanged from DeviceCheck artifacts will be valid. If unset, a default value of 1 hour is assumed. Must be between 30 minutes and 7 days, inclusive. A duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.5s\".",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "The Token TTL (Time To Live) defines the window of validity for an App Check token. A shorter TTL limits the replay window for intercepted tokens. 24 hours (86400s) is the maximum recommended duration to balance user experience and security.",
+      "compliant": "3600s",
+      "non-compliant": "86401s",
       "parent": null
     },
     "project": {

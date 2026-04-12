@@ -145,7 +145,7 @@ class MetadataManager:
             file_path = history_dir / filename
             
             # Write metadata as JSON
-            with open(file_path, 'w') as f:
+            with open(file_path, 'w', encoding='utf-8') as f:
                 json.dump(metadata.to_json_dict(), f, indent=2)
             
             return file_path
@@ -238,7 +238,7 @@ class MetadataManager:
         
         # Parse and return the metadata
         try:
-            with open(latest_file, 'r') as f:
+            with open(latest_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
             
             # Reconstruct Statistics object
