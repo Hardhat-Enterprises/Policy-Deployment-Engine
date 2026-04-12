@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_identity.google_cloud_identity_group.vars
+package terraform.gcp.security.cloud_identity.google_cloud_identity_group.display_name.vars
 
 variables := {
   "friendly_resource_name": "Cloud Identity Group",

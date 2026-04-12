@@ -1,4 +1,4 @@
-resource "google_cloud_identity_group" "c" {
+resource "google_cloud_identity_group" "good" {
   display_name = "my-secure-group"
   parent       = "customers/my_customer"
 

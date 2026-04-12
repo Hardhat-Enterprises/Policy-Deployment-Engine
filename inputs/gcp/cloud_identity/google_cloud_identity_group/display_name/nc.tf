@@ -1,4 +1,4 @@
-resource "google_cloud_identity_group" "nc" {
+resource "google_cloud_identity_group" "bad" {
   parent = "customers/my_customer"
 
   group_key {
