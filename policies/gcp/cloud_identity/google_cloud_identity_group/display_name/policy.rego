@@ -1,19 +1,12 @@
 package terraform.gcp.security.cloud_identity.google_cloud_identity_group.display_name
 
-import data.terraform.helpers
 import data.terraform.gcp.security.cloud_identity.google_cloud_identity_group.vars
 
-# (display_name) – exact matches only
-conditions := [
-  [
-    {"situation_description": "Avoid placeholder display names for Cloud Identity groups.",
-     "remedies": ["Use a descriptive production group name instead of generic placeholders."]},
-    {"condition": "Placeholder display_name",
-    "attribute_path": ["display_name"],
-     "values": ["nc", "test", "demo", "sample"],
-     "policy_type": "blacklist"}
-  ]
-]
+message[msg] if {
+  resource := input.resource_changes[_]
+  resource.type == vars.variables.resource_type
+  resource.change.after != null
+  object.get(resource.change.after, vars.variables.resource_value_name, null) == null
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+  msg := sprintf("%s %s is missing required attribute '%s'.", [vars.variables.friendly_resource_name, resource.address, vars.variables.resource_value_name])
+}
