@@ -5,10 +5,10 @@
     "location": {
       "description": "Location of Blockchain Node being created.",
       "required": true,
-      "security_impact": null,
+      "security_impact": true,
       "rationale": "Restricting to allowed locations ensures compliance, so use a supported location such as 'us-central1'.",
-      "compliant": null,
-      "non-compliant": null,
+      "compliant": "us-central1",
+      "non-compliant": "null or any other location in the approved list of locations for Blockchain Node Engine",
       "parent": null
     },
     "blockchain_node_id": {
@@ -68,55 +68,55 @@
         "network": {
           "description": "The Ethereum environment being accessed. Possible values are: `MAINNET`, `TESTNET_GOERLI_PRATER`, `TESTNET_SEPOLIA`.",
           "required": true,
-          "security_impact": null,
+          "security_impact": true,
           "rationale": "Specifying the Ethereum network ensures that the node is configured to connect to the correct environment, which is essential for its intended use and compliance with network-specific requirements.",
-          "compliant": null,
-          "non-compliant": null,
+          "compliant": "MAINNET, TESTNET_GOERLI_PRATER, TESTNET_SEPOLIA",
+          "non-compliant": "null or any other value not in compliant list",
           "parent": "ethereum_details"
         },
         "node_type": {
           "description": "The type of Ethereum node. Possible values are: `LIGHT`, `FULL`, `ARCHIVE`.",
           "required": true,
-          "security_impact": null,
+          "security_impact": true,
           "rationale": "Choosing the appropriate node type is crucial for performance and resource management. For example, a LIGHT node requires fewer resources than a FULL or ARCHIVE node, which may be necessary for certain use cases or to comply with organizational policies on resource usage.",
-          "compliant": null,
-          "non-compliant": null,
+          "compliant": "FULL, ARCHIVE, LIGHT",
+          "non-compliant": "null or any other value not in compliant list",
           "parent": "ethereum_details"
         },
         "execution_client": {
           "description": "The execution client Possible values are: `EXECUTION_CLIENT_UNSPECIFIED`, `GETH`, `ERIGON`.",
           "required": true,
-          "security_impact": null,
+          "security_impact": true,
           "rationale": "Selecting the execution client is essential for ensuring compatibility with the Ethereum network and for meeting specific requirements related to performance, features, or security. For instance, Geth is a widely used execution client that offers robust performance and a rich set of features, making it a common choice for many users.",
-          "compliant": null,
-          "non-compliant": null,
+          "compliant": "GETH, ERIGON, EXECUTION_CLIENT_UNSPECIFIED",
+          "non-compliant": "null or any other value not in compliant list",
           "parent": "ethereum_details"
         },
         "consensus_client": {
           "description": "The consensus client Possible values are: `CONSENSUS_CLIENT_UNSPECIFIED`, `LIGHTHOUSE`.",
           "required": true,
-          "security_impact": null,
+          "security_impact": true,
           "rationale": "Selecting the consensus client is crucial for ensuring that the beacon client can effectively participate in the Ethereum consensus mechanism. For example, Lighthouse is a popular consensus client that is known for its performance and reliability, making it a suitable choice for many users.",
-          "compliant": null,
-          "non-compliant": null,
+          "compliant": "LIGHTHOUSE, CONSENSUS_CLIENT_UNSPECIFIED",
+          "non-compliant": "null or any other value not in compliant list",
           "parent": "ethereum_details"
         },
         "api_enable_admin": {
           "description": "Enables JSON-RPC access to functions in the admin namespace. Defaults to false.",
           "required": true,
-          "security_impact": null,
+          "security_impact": true,
           "rationale": "Enabling the admin API can pose security risks if not properly secured, as it provides access to sensitive functions. Therefore, it is important to carefully consider whether to enable this API based on the specific use case and security requirements.",
-          "compliant": null,
-          "non-compliant": null,
+          "compliant": "false",
+          "non-compliant": "true",
           "parent": "ethereum_details"
         },
         "api_enable_debug": {
           "description": "Enables JSON-RPC access to functions in the debug namespace. Defaults to false.",
           "required": true,
-          "security_impact": null,
+          "security_impact": true,
           "rationale": "Enabling the debug API can pose security risks if not properly secured, as it provides access to sensitive functions. Therefore, it is important to carefully consider whether to enable this API based on the specific use case and security requirements.",
-          "compliant": null,
-          "non-compliant": null,
+          "compliant": "false",
+          "non-compliant": "true",
           "parent": "ethereum_details"
         }
       }
@@ -124,10 +124,10 @@
     "blockchain_type": {
       "description": "User-provided key-value pairs Possible values are: `ETHEREUM`.",
       "required": true,
-      "security_impact": null,
+      "security_impact": true,
       "rationale": "Specifying the blockchain type is essential for ensuring that the node is configured correctly for the intended blockchain network. For example, if the node is meant to connect to the Ethereum network, setting the blockchain type to `ETHEREUM` ensures that the appropriate configurations and settings are applied for compatibility and optimal performance.",
-      "compliant": null,
-      "non-compliant": null,
+      "compliant": "ETHEREUM",
+      "non-compliant": "null or any other value not in compliant list",
       "parent": null
     },
     "project": {
@@ -151,10 +151,10 @@
         "mev_relay_urls": {
           "description": "URLs for MEV-relay services to use for block building. When set, a managed MEV-boost service is configured on the beacon client.",
           "required": true,
-          "security_impact": null,
+          "security_impact": true,
           "rationale": "Configuring MEV relay URLs is important for validators that want to participate in MEV (Miner Extractable Value) opportunities, which can enhance the profitability of their validation activities. By connecting to MEV relays, validators can access a wider range of block-building opportunities and potentially increase their rewards.",
-          "compliant": null,
-          "non-compliant": null,
+          "compliant": "https://mev1.example.org/, https://mev2.example.org/",
+          "non-compliant": "null or any other URL not in compliant list",
           "parent": "validator_config"
         }
       }
@@ -171,10 +171,10 @@
         "garbage_collection_mode": {
           "description": "Blockchain garbage collection modes. Only applicable when NodeType is FULL or ARCHIVE. Possible values are: `FULL`, `ARCHIVE`. The `additional_endpoints` block contains:",
           "required": true,
-          "security_impact": null,
+          "security_impact": true,
           "rationale": "Selecting the appropriate garbage collection mode is important for managing disk space and performance of the Geth execution client. For example, a FULL node with aggressive garbage collection may use less disk space but could have slower response times for certain queries, while an ARCHIVE node retains all historical data but requires significantly more disk space.",
-          "compliant": null,
-          "non-compliant": null,
+          "compliant": "FULL, ARCHIVE",
+          "non-compliant": "null or any other value not in compliant list",
           "parent": "geth_details"
         },
         "beacon_api_endpoint": {
