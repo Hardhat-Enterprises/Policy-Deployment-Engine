@@ -6,11 +6,11 @@ import data.terraform.gcp.security.access_context_manager_vpc_service_controls.g
 conditions := [
   [
     {
-      "situation_description": "Whether the device needs to be approved by the customer admin.",
-      "remedies": ["Update require_admin_approval to include only allowed values as per organizational policy."]
+      "situation_description": "Ensure that administrative approval is required before allowing device access to enhance security control.",
+      "remedies": ["Enable require_admin_approval to ensure only approved devices can access the service."]
     },
     {
-      "condition": "os_type is not in blacklist",
+      "condition": "administrative approval must be enforced",
       "attribute_path": ["basic", 0, "conditions", 0, "device_policy", 0, "require_admin_approval"],
       "values": [true],
       "policy_type": "whitelist"

@@ -6,11 +6,11 @@ import data.terraform.gcp.security.access_context_manager_vpc_service_controls.g
 conditions := [
   [
     {
-      "situation_description": "A list of allowed encryptions statuses. An empty list allows all statuses. Each value may be one of: ENCRYPTION_UNSPECIFIED, ENCRYPTION_UNSUPPORTED, UNENCRYPTED, ENCRYPTED.",
-      "remedies": ["Update allowed_encryption_statuses to include only allowed values as per organizational policy."]
+      "situation_description": "Ensure that only secure encryption states are permitted, preventing unencrypted or unsupported communication.",
+      "remedies": ["Restrict allowed_encryption_statuses to only secure values such as ENCRYPTED."]
     },
     {
-      "condition": "os_type is not in blacklist",
+      "condition": "encryption status must be secure",
       "attribute_path": ["basic", 0, "conditions", 0, "device_policy", 0, "allowed_encryption_statuses"],
       "values": ["ENCRYPTED"],
       "policy_type": "whitelist"
