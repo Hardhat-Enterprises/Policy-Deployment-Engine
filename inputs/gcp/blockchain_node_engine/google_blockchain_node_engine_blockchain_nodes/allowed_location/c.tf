@@ -14,5 +14,5 @@ resource "google_blockchain_node_engine_blockchain_nodes" "c1" {
   labels = {
     environment = "prod"
   }
-  
+
 }

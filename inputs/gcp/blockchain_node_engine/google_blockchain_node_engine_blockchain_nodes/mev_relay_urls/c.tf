@@ -8,7 +8,7 @@ resource "google_blockchain_node_engine_blockchain_nodes" "c1" {
     api_enable_admin = false
     api_enable_debug = false
     validator_config {
-      mev_relay_urls = ["https://mev1.example.org/","https://mev2.example.org/"]
+      mev_relay_urls = ["https://mev1.example.org/", "https://mev2.example.org/"]
     }
     node_type        = "FULL"
     consensus_client = "LIGHTHOUSE"
@@ -19,5 +19,5 @@ resource "google_blockchain_node_engine_blockchain_nodes" "c1" {
   labels = {
     environment = "prod"
   }
-  
+
 }
