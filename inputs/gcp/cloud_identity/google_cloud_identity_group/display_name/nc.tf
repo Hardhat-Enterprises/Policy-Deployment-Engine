@@ -1,5 +1,5 @@
 resource "google_cloud_identity_group" "bad" {
-  parent = "customers/my_customer"
+  parent = "customers/C123abc"
 
   group_key {
     id = "group@example.com"
