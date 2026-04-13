@@ -8,14 +8,14 @@ conditions := [
         {
             "situation_description": "The location is not in the allowed list of regions.",
             "remedies": [
-                "Use a supported location such as 'us-central1'",
+                "Use a supported location such as 'australia-southeast1', 'us-central1'",
                 "Consult Google Blockchain_Node_Engine documentation for available locations."
             ]
         },
         {
             "condition": "Check if location is not in the allowed whitelist",
             "attribute_path": ["location"],
-            "values": ["us-central1"],
+            "values": ["australia-southeast1"],
             "policy_type": "whitelist"
         }
     ]
