@@ -1,21 +1,19 @@
-package terraform.gcp.security.Cloud_IAM.google_iam_folders_policy_binding.location_validation
+package terraform.gcp.security.Cloud_IAM.google_iam_oauth_client.client_type_validation
 
 import data.terraform.helpers
-import data.terraform.gcp.security.Cloud_IAM.google_iam_folders_policy_binding.location_validation.vars
+import data.terraform.gcp.security.Cloud_IAM.google_iam_oauth_client.client_type_validation.vars
 
 conditions := [
   [
     {
-      "situation_description": "Location must be global",
-      "remedies": [
-        "Use location = \"global\""
-      ]
+      "situation_description": "Only approved OAuth client types are allowed",
+      "remedies": ["Use PUBLIC_CLIENT or CONFIDENTIAL_CLIENT"]
     },
     {
-      "condition": "Validate location whitelist",
-      "attribute_path": ["location"],
-      "values": ["global"],
-      "policy_type": "exact whitelist"
+      "condition": "Validate client_type",
+      "attribute_path": ["client_type"],
+      "values": ["PUBLIC_CLIENT", "CONFIDENTIAL_CLIENT"],
+      "policy_type": "whitelist"
     }
   ]
 ]

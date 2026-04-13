@@ -14,7 +14,7 @@ resource "google_iam_oauth_client" "client" {
 resource "google_iam_oauth_client_credential" "nc" {
   oauthclient                = google_iam_oauth_client.client.oauth_client_id
   location                   = "global"
-  oauth_client_credential_id = "gcp-cred-01a"   # ❌ violates pattern
+  oauth_client_credential_id = "gcp-cred-01a"   
   disabled                   = false
   display_name               = "Invalid Credential"
 }

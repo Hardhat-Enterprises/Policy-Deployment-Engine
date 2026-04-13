@@ -6,16 +6,16 @@ import data.terraform.gcp.security.Cloud_IAM.google_iam_folders_policy_binding.l
 conditions := [
   [
     {
-      "situation_description": "Location must be global",
+      "situation_description": "Location must strictly be global for IAM folder policy bindings",
       "remedies": [
-        "Use location = \"global\""
+        "Set location = global"
       ]
     },
     {
-      "condition": "Validate location whitelist",
+      "condition": "Validate allowed location",
       "attribute_path": ["location"],
       "values": ["global"],
-      "policy_type": "exact whitelist"
+      "policy_type": "whitelist"
     }
   ]
 ]
