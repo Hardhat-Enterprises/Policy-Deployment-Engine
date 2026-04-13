@@ -17,7 +17,7 @@ conditions := [
             "condition": "Check if service account is in the disallowed blacklist",
             "attribute_path": ["config", 0, "node_config", 0, "service_account"],
             "values": ["unauthorized-sa@my-project.iam.gserviceaccount.com", "123456789012-compute@developer.gserviceaccount.com"],
-            "policy_type": "blacklist"
+            "policy_type": "whitelist"
         }
     ]
 ]
