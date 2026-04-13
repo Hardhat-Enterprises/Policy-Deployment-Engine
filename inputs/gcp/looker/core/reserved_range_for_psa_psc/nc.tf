@@ -1,5 +1,5 @@
 resource "google_looker_instance" "nc" {
-  name = "nc1"
+  name = "nc"
   project = var.project
   # reserved_range intentionally omitted to trigger failure
   oauth_config {

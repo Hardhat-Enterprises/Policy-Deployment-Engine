@@ -9,7 +9,7 @@ conditions := [
   },
   {
     "condition": "trust_model must not be INSECURE",
-    "attribute_path": ["ssl_config","0","trust_model"],
+    "attribute_path": ["ssl_config",0,"trust_model"],
     "values": ["INSECURE"],
     "policy_type": "blacklist",
   }

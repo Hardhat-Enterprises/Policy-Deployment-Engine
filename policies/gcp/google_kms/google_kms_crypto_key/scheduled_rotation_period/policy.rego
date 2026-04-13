@@ -13,8 +13,8 @@ conditions :=[
   {
     "condition": "Purpose check",
     "attribute_path": ["purpose"],
-    "values": ["ENCRYPT_DECRYPT"],
-    "policy_type": "blacklist"
+    "values": ["ENCRYPT_DECRYPT", "ASYMMETRIC_SIGN"],
+    "policy_type": "whitelist"
   },
   {
     "condition": "Rotation period check",
@@ -31,7 +31,7 @@ conditions :=[
   },
   {
     "condition": "Label check",
-    "attribute_path": ["labels", 0, "env"],
+    "attribute_path": ["labels", "env"],
     "values": ["prod"],
     "policy_type": "whitelist"
   },

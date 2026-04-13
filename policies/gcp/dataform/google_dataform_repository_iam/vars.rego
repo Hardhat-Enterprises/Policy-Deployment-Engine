@@ -1,4 +1,4 @@
-package terraform.gcp.security.dataform.google_dataform_repository_iam
+package terraform.gcp.security.dataform.google_dataform_repository_iam.vars
 
 variables := {
   "resource_type": "google_dataform_repository_iam_binding",

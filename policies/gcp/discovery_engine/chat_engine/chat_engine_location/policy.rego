@@ -1,5 +1,6 @@
-package terraform.gcp.security.discovery_engine.chat_engine.chat_engine_location # Edit here 
+package terraform.gcp.security.discovery_engine.chat_engine.chat_engine_location
 import data.terraform.helpers
+
 import data.terraform.gcp.security.discovery_engine.chat_engine.vars
 
 #location check

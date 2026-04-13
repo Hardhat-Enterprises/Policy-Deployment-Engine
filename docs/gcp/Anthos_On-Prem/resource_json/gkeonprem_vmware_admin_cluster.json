@@ -5,8 +5,8 @@
     "network_config": {
       "description": "The VMware admin cluster network configuration. Structure is [documented below](#nested_network_config).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "network config itself is not sensitive, but may contain sensitive data in its nested fields",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -14,26 +14,26 @@
         "service_address_cidr_blocks": {
           "description": "All services in the cluster are assigned an RFC1918 IPv4 address from these ranges. Only a single range is supported.. This field cannot be changed after creation.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "service_address_cidr_blocks contains sensitive network configuration data",
+          "compliant": "10.96.0.0/12",
+          "non-compliant": "8.8.8.8/12",
           "parent": "network_config"
         },
         "pod_address_cidr_blocks": {
           "description": "All pods in the cluster are assigned an RFC1918 IPv4 address from these ranges. Only a single range is supported. This field cannot be changed after creation.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "pod_address_cidr_blocks contains sensitive network configuration data",
+          "compliant": "192.168.0.0/16",
+          "non-compliant": "1.1.1.1/16",
           "parent": "network_config"
         },
         "static_ip_config": {
           "description": "Configuration settings for a static IP configuration. Structure is [documented below](#nested_network_config_static_ip_config).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "static ip config is not security sensitive enough",
           "compliant": null,
           "non-compliant": null,
           "parent": "network_config"
@@ -41,8 +41,8 @@
         "dhcp_ip_config": {
           "description": "Configuration settings for a DHCP IP configuration. Structure is [documented below](#nested_network_config_dhcp_ip_config).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "dhcp ip config does not require security considerations",
           "compliant": null,
           "non-compliant": null,
           "parent": "network_config"
@@ -50,8 +50,8 @@
         "vcenter_network": {
           "description": "vcenter_network specifies vCenter network name.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "vcenter network name is not sensitive information",
           "compliant": null,
           "non-compliant": null,
           "parent": "network_config"
@@ -59,8 +59,8 @@
         "host_config": {
           "description": "Represents common network settings irrespective of the host's IP address. Structure is [documented below](#nested_network_config_host_config).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "host config is not security sensitive enough",
           "compliant": null,
           "non-compliant": null,
           "parent": "network_config"
@@ -68,8 +68,8 @@
         "ha_control_plane_config": {
           "description": "Configuration for HA admin cluster control plane. Structure is [documented below](#nested_network_config_ha_control_plane_config).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "ha control plane config does not require security considerations",
           "compliant": null,
           "non-compliant": null,
           "parent": "network_config"
@@ -79,8 +79,8 @@
     "name": {
       "description": "The VMware admin cluster resource name.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "name does not require security considerations",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -88,17 +88,17 @@
     "location": {
       "description": "The location of the resource.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "location is a sensitive field and should be protected",
+      "compliant": "australia_southeast1",
+      "non-compliant": "africa1",
       "parent": null
     },
     "description": {
       "description": "A human readable description of this VMware admin cluster.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "description is not a security sensitive field",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -106,17 +106,17 @@
     "on_prem_version": {
       "description": "The Anthos clusters on the VMware version for the admin cluster.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "on_prem_version is a sensitive field and should be protected",
+      "compliant": "1.31.0-gke.35",
+      "non-compliant": "1.30.0-gke.35",
       "parent": null
     },
     "image_type": {
       "description": "The OS image type for the VMware admin cluster.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "image_type is not security sensitive enough",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -124,8 +124,8 @@
     "bootstrap_cluster_membership": {
       "description": "The bootstrap cluster this VMware admin cluster belongs to.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "bootstrap_cluster_membership is not security sensitive enough",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -133,8 +133,8 @@
     "annotations": {
       "description": "Annotations on the VMware Admin Cluster. This field has the same restrictions as Kubernetes annotations. The total size of all keys and values combined is limited to 256k. Key can have 2 segments: prefix (optional) and name (required), separated by a slash (/). Prefix must be a DNS subdomain. Name must be 63 characters or less, begin and end with alphanumerics, with dashes (-), underscores (_), dots (.), and alphanumerics between. **Note**: This field is non-authoritative, and will only manage the annotations present in your configuration. Please refer to the field `effective_annotations` for all of the annotations present on the resource.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "annotations is not a security sensitive field",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -142,8 +142,8 @@
     "control_plane_node": {
       "description": "The VMware admin cluster control plane node configuration. Structure is [documented below](#nested_control_plane_node).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "control_plane_node does not require security considerations",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -151,8 +151,8 @@
         "cpus": {
           "description": "The number of vCPUs for the control-plane node of the admin cluster.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "cpus is not a security sensitive field",
           "compliant": null,
           "non-compliant": null,
           "parent": "control_plane_node"
@@ -160,8 +160,8 @@
         "memory": {
           "description": "The number of mebibytes of memory for the control-plane node of the admin cluster.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "memory is not a security sensitive field",
           "compliant": null,
           "non-compliant": null,
           "parent": "control_plane_node"
@@ -169,8 +169,8 @@
         "replicas": {
           "description": "The number of control plane nodes for this VMware admin cluster.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "replicas is not a security sensitive field",
           "compliant": null,
           "non-compliant": null,
           "parent": "control_plane_node"
@@ -180,8 +180,8 @@
     "addon_node": {
       "description": "The VMware admin cluster addon node configuration. Structure is [documented below](#nested_addon_node).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "addon_node does not require security considerations",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -189,8 +189,8 @@
         "auto_resize_config": {
           "description": "Specifies auto resize config. Structure is [documented below](#nested_addon_node_auto_resize_config).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "auto_resize_config is not a security sensitive field",
           "compliant": null,
           "non-compliant": null,
           "parent": "addon_node"
@@ -200,8 +200,8 @@
     "load_balancer": {
       "description": "Specifies the load balancer configuration for VMware admin cluster. Structure is [documented below](#nested_load_balancer).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "load_balancer itself is not sensitive, but may contain sensitive data in its nested fields",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -209,8 +209,8 @@
         "vip_config": {
           "description": "Specified the VMware Load Balancer Config Structure is [documented below](#nested_load_balancer_vip_config).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "vip_config itself is not sensitive, but may contain sensitive data in its nested fields",
           "compliant": null,
           "non-compliant": null,
           "parent": "load_balancer"
@@ -218,8 +218,8 @@
         "f5_config": {
           "description": "Configuration for F5 Big IP typed load balancers. Structure is [documented below](#nested_load_balancer_f5_config).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "f5_config is not a security sensitive field",
           "compliant": null,
           "non-compliant": null,
           "parent": "load_balancer"
@@ -227,8 +227,8 @@
         "manual_lb_config": {
           "description": "Manually configured load balancers. Structure is [documented below](#nested_load_balancer_manual_lb_config).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "manual_lb_config is not a security sensitive field",
           "compliant": null,
           "non-compliant": null,
           "parent": "load_balancer"
@@ -236,8 +236,8 @@
         "metal_lb_config": {
           "description": "Metal LB load balancers. Structure is [documented below](#nested_load_balancer_metal_lb_config).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "metal_lb_config is not a security sensitive field",
           "compliant": null,
           "non-compliant": null,
           "parent": "load_balancer"
@@ -247,8 +247,8 @@
     "vcenter": {
       "description": "Specifies vCenter config for the admin cluster. Structure is [documented below](#nested_vcenter).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "vcenter is not sensitive information",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -256,8 +256,8 @@
         "resource_pool": {
           "description": "The name of the vCenter resource pool for the admin cluster.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "resource_pool is not a security sensitive field",
           "compliant": null,
           "non-compliant": null,
           "parent": "vcenter"
@@ -265,8 +265,8 @@
         "datastore": {
           "description": "The name of the vCenter datastore for the admin cluster.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "datastore is not a security sensitive field",
           "compliant": null,
           "non-compliant": null,
           "parent": "vcenter"
@@ -274,8 +274,8 @@
         "datacenter": {
           "description": "The name of the vCenter datacenter for the admin cluster.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "datacenter is not a security sensitive field",
           "compliant": null,
           "non-compliant": null,
           "parent": "vcenter"
@@ -283,8 +283,8 @@
         "cluster": {
           "description": "The name of the vCenter cluster for the admin cluster.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "cluster is not a security sensitive field",
           "compliant": null,
           "non-compliant": null,
           "parent": "vcenter"
@@ -292,8 +292,8 @@
         "folder": {
           "description": "The name of the vCenter folder for the admin cluster.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "folder is not a security sensitive field",
           "compliant": null,
           "non-compliant": null,
           "parent": "vcenter"
@@ -301,8 +301,8 @@
         "ca_cert_data": {
           "description": "Contains the vCenter CA certificate public key for SSL verification.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "ca_cert_data is not a security sensitive field",
           "compliant": null,
           "non-compliant": null,
           "parent": "vcenter"
@@ -310,8 +310,8 @@
         "address": {
           "description": "The vCenter IP address.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "address is not a security sensitive field",
           "compliant": null,
           "non-compliant": null,
           "parent": "vcenter"
@@ -319,8 +319,8 @@
         "data_disk": {
           "description": "The name of the virtual machine disk (VMDK) for the admin cluster.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "data_disk is not a security sensitive field",
           "compliant": null,
           "non-compliant": null,
           "parent": "vcenter"
@@ -328,8 +328,8 @@
         "storage_policy_name": {
           "description": "The name of the vCenter storage policy for the user cluster.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "storage_policy_name is not a security sensitive field",
           "compliant": null,
           "non-compliant": null,
           "parent": "vcenter"
@@ -339,8 +339,8 @@
     "anti_affinity_groups": {
       "description": "AAGConfig specifies whether to spread VMware Admin Cluster nodes across at least three physical hosts in the datacenter. Structure is [documented below](#nested_anti_affinity_groups).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "anti_affinity_groups does not require security considerations",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -348,8 +348,8 @@
         "aag_config_disabled": {
           "description": "Spread nodes across at least three physical hosts (requires at least three hosts). Enabled by default.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "aag_config_disabled is not a security sensitive field",
           "compliant": null,
           "non-compliant": null,
           "parent": "anti_affinity_groups"
@@ -359,8 +359,8 @@
     "auto_repair_config": {
       "description": "Configuration for auto repairing. Structure is [documented below](#nested_auto_repair_config).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "auto_repair_config does not require security considerations",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -368,8 +368,8 @@
         "enabled": {
           "description": "Whether auto repair is enabled.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "enabled is not a security sensitive field",
           "compliant": null,
           "non-compliant": null,
           "parent": "auto_repair_config"
@@ -379,8 +379,8 @@
     "authorization": {
       "description": "The VMware admin cluster authorization configuration. Structure is [documented below](#nested_authorization).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "authorization itself is not sensitive, but may contain sensitive data in its nested fields",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -388,10 +388,10 @@
         "viewer_users": {
           "description": "Users that will be granted the cluster-admin role on the cluster, providing full access to the cluster. Structure is [documented below](#nested_authorization_viewer_users).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "viewer_users contains sensitive user information and should be protected",
+          "compliant": "user1@gmail.com",
+          "non-compliant": "user1@apple.com",
           "parent": "authorization"
         }
       }
@@ -399,8 +399,8 @@
     "platform_config": {
       "description": "The VMware platform configuration. Structure is [documented below](#nested_platform_config).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "platform config itself is not sensitive, but may contain sensitive data in its nested fields",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -408,17 +408,17 @@
         "required_platform_version": {
           "description": "The required platform version e.g. 1.13.1. If the current platform version is lower than the target version, the platform version will be updated to the target version. If the target version is not installed in the platform (bundle versions), download the target version bundle.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "required_platform_version is a sensitive field that specifies the version of the platform to be used",
+          "compliant": "1.31.0",
+          "non-compliant": "1.30.0",
           "parent": "platform_config"
         },
         "platform_version": {
           "description": "(Output) The platform version e.g. 1.13.2.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "platform version is only an output field and does not require security considerations",
           "compliant": null,
           "non-compliant": null,
           "parent": "platform_config"
@@ -426,8 +426,8 @@
         "bundles": {
           "description": "(Output) The list of bundles installed in the admin cluster. Structure is [documented below](#nested_platform_config_bundles).",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "bundles is only an output field and does not require security considerations",
           "compliant": null,
           "non-compliant": null,
           "parent": "platform_config"
@@ -435,8 +435,8 @@
         "status": {
           "description": "(Output) ResourceStatus representing detailed cluster state. Structure is [documented below](#nested_platform_config_bundles_bundles_status). The `status` block contains:",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "status is only an output field and does not require security considerations",
           "compliant": null,
           "non-compliant": null,
           "parent": "platform_config"
@@ -444,8 +444,8 @@
         "version": {
           "description": "(Output) The version of the bundle.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "version is only an output field and does not require security considerations",
           "compliant": null,
           "non-compliant": null,
           "parent": "platform_config"
@@ -453,8 +453,8 @@
         "error_message": {
           "description": "(Output) Human-friendly representation of the error message from the admin cluster controller. The error message can be temporary as the admin cluster controller creates a cluster or node pool. If the error message persists for a longer period of time, it can be used to surface error message to indicate real problems requiring user intervention.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "error_message is only an output field and does not require security considerations",
           "compliant": null,
           "non-compliant": null,
           "parent": "platform_config"
@@ -462,8 +462,8 @@
         "conditions": {
           "description": "(Output) ResourceConditions provide a standard mechanism for higher-level status reporting from admin cluster controller. Structure is [documented below](#nested_platform_config_status_conditions). The `conditions` block contains:",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "conditions is only an output field and does not require security considerations",
           "compliant": null,
           "non-compliant": null,
           "parent": "platform_config"
@@ -471,8 +471,8 @@
         "type": {
           "description": "(Output) Type of the condition. (e.g., ClusterRunning, NodePoolRunning or ServerSidePreflightReady)",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "type is only an output field and does not require security considerations",
           "compliant": null,
           "non-compliant": null,
           "parent": "platform_config"
@@ -480,8 +480,8 @@
         "reason": {
           "description": "(Output) Machine-readable message indicating details about last transition.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "reason is only an output field and does not require security considerations",
           "compliant": null,
           "non-compliant": null,
           "parent": "platform_config"
@@ -489,8 +489,8 @@
         "message": {
           "description": "(Output) Human-readable message indicating details about last transition.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "message is only an output field and does not require security considerations",
           "compliant": null,
           "non-compliant": null,
           "parent": "platform_config"
@@ -498,8 +498,8 @@
         "last_transition_time": {
           "description": "(Output) Last time the condition transit from one status to another.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "last_transition_time is only an output field and does not require security considerations",
           "compliant": null,
           "non-compliant": null,
           "parent": "platform_config"
@@ -507,8 +507,8 @@
         "state": {
           "description": "(Output) The lifecycle state of the condition.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "state is only an output field and does not require security considerations",
           "compliant": null,
           "non-compliant": null,
           "parent": "platform_config"
@@ -518,8 +518,8 @@
     "private_registry_config": {
       "description": "Configuration for private registry. Structure is [documented below](#nested_private_registry_config).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "private registry config does not require security considerations",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -527,8 +527,8 @@
         "address": {
           "description": "The registry address.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "address is not a security sensitive field",
           "compliant": null,
           "non-compliant": null,
           "parent": "private_registry_config"
@@ -536,8 +536,8 @@
         "ca_cert": {
           "description": "The CA certificate public key for private registry.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "ca_cert is not a security sensitive field",
           "compliant": null,
           "non-compliant": null,
           "parent": "private_registry_config"
@@ -547,8 +547,8 @@
     "project": {
       "description": "If it is not provided, the provider project is used.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "project is not a security sensitive field",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -565,8 +565,8 @@
         "ip_blocks": {
           "description": "Represents the configuration values for static IP allocation to nodes. Structure is [documented below](#nested_network_config_static_ip_config_ip_blocks).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "static_ip_config is not security sensitive enough",
           "compliant": null,
           "non-compliant": null,
           "parent": "static_ip_config"
@@ -585,8 +585,8 @@
         "netmask": {
           "description": "The netmask used by the VMware Admin Cluster.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "netmask is not security sensitive enough",
           "compliant": null,
           "non-compliant": null,
           "parent": "ip_blocks"
@@ -594,8 +594,8 @@
         "gateway": {
           "description": "The network gateway used by the VMware Admin Cluster.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "gateway is not security sensitive enough",
           "compliant": null,
           "non-compliant": null,
           "parent": "ip_blocks"
@@ -603,8 +603,8 @@
         "ips": {
           "description": "The node's network configurations used by the VMware Admin Cluster. Structure is [documented below](#nested_network_config_static_ip_config_ip_blocks_ip_blocks_ips).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "ips is not security sensitive enough",
           "compliant": null,
           "non-compliant": null,
           "parent": "ip_blocks"
@@ -623,8 +623,8 @@
         "ip": {
           "description": "IP could be an IP address (like 1.2.3.4) or a CIDR (like 1.2.3.0/24).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "ip is not security sensitive enough",
           "compliant": null,
           "non-compliant": null,
           "parent": "ips"
@@ -632,8 +632,8 @@
         "hostname": {
           "description": "Hostname of the machine. VM's name will be used if this field is empty.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "hostname is not security sensitive enough",
           "compliant": null,
           "non-compliant": null,
           "parent": "ips"
@@ -652,8 +652,8 @@
         "enabled": {
           "description": "enabled is a flag to mark if DHCP IP allocation is used for VMware admin clusters.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "enabled is not a security sensitive field",
           "compliant": null,
           "non-compliant": null,
           "parent": "dhcp_ip_config"
@@ -672,8 +672,8 @@
         "dns_servers": {
           "description": "DNS servers.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "dns_servers is not security sensitive enough",
           "compliant": null,
           "non-compliant": null,
           "parent": "host_config"
@@ -681,8 +681,8 @@
         "ntp_servers": {
           "description": "NTP servers.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "ntp_servers is not security sensitive enough",
           "compliant": null,
           "non-compliant": null,
           "parent": "host_config"
@@ -690,8 +690,8 @@
         "dns_search_domains": {
           "description": "DNS search domains.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "dns_search_domains is not security sensitive enough",
           "compliant": null,
           "non-compliant": null,
           "parent": "host_config"
@@ -710,8 +710,8 @@
         "control_plane_ip_block": {
           "description": "Static IP addresses for the control plane nodes. Structure is [documented below](#nested_network_config_ha_control_plane_config_control_plane_ip_block).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "control_plane_ip_block is not security sensitive enough",
           "compliant": null,
           "non-compliant": null,
           "parent": "ha_control_plane_config"
@@ -730,8 +730,8 @@
         "netmask": {
           "description": "The netmask used by the VMware Admin Cluster.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "netmask is not security sensitive enough",
           "compliant": null,
           "non-compliant": null,
           "parent": "control_plane_ip_block"
@@ -739,8 +739,8 @@
         "gateway": {
           "description": "The network gateway used by the VMware Admin Cluster.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "gateway is not security sensitive enough",
           "compliant": null,
           "non-compliant": null,
           "parent": "control_plane_ip_block"
@@ -748,8 +748,8 @@
         "ips": {
           "description": "The node's network configurations used by the VMware Admin Cluster. Structure is [documented below](#nested_network_config_ha_control_plane_config_control_plane_ip_block_ips).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "ips is not security sensitive enough",
           "compliant": null,
           "non-compliant": null,
           "parent": "control_plane_ip_block"
@@ -768,8 +768,8 @@
         "enabled": {
           "description": "Whether to enable controle plane node auto resizing.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "auto_resize_config does not require security considerations",
           "compliant": null,
           "non-compliant": null,
           "parent": "auto_resize_config"
@@ -788,17 +788,17 @@
         "control_plane_vip": {
           "description": "The VIP which you previously set aside for the Kubernetes API of this VMware Admin Cluster.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "control_plane_vip is a critical network configuration and must be properly secured",
+          "compliant": "10.251.133.5",
+          "non-compliant": "8.8.8.8",
           "parent": "vip_config"
         },
         "addons_vip": {
           "description": "The VIP to configure the load balancer for add-ons.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "addons_vip is not security sensitive enough",
           "compliant": null,
           "non-compliant": null,
           "parent": "vip_config"
@@ -817,8 +817,8 @@
         "address": {
           "description": "The load balancer's IP address.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "address is not security sensitive enough",
           "compliant": null,
           "non-compliant": null,
           "parent": "f5_config"
@@ -826,8 +826,8 @@
         "partition": {
           "description": "he preexisting partition to be used by the load balancer. T his partition is usually created for the admin cluster for example: 'my-f5-admin-partition'.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "partition is not security sensitive enough",
           "compliant": null,
           "non-compliant": null,
           "parent": "f5_config"
@@ -835,8 +835,8 @@
         "snat_pool": {
           "description": "The pool name. Only necessary, if using SNAT.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "snat_pool does not require security considerations",
           "compliant": null,
           "non-compliant": null,
           "parent": "f5_config"
@@ -855,8 +855,8 @@
         "ingress_http_node_port": {
           "description": "NodePort for ingress service's http. The ingress service in the admin cluster is implemented as a Service of type NodePort (ex. 32527).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "ingress_http_node_port is not security sensitive enough",
           "compliant": null,
           "non-compliant": null,
           "parent": "manual_lb_config"
@@ -864,8 +864,8 @@
         "ingress_https_node_port": {
           "description": "NodePort for ingress service's https. The ingress service in the admin cluster is implemented as a Service of type NodePort (ex. 30139).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "ingress_https_node_port is not security sensitive enough",
           "compliant": null,
           "non-compliant": null,
           "parent": "manual_lb_config"
@@ -873,8 +873,8 @@
         "control_plane_node_port": {
           "description": "NodePort for control plane service. The Kubernetes API server in the admin cluster is implemented as a Service of type NodePort (ex. 30968).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "control_plane_node_port is not security sensitive enough",
           "compliant": null,
           "non-compliant": null,
           "parent": "manual_lb_config"
@@ -882,8 +882,8 @@
         "konnectivity_server_node_port": {
           "description": "NodePort for konnectivity server service running as a sidecar in each kube-apiserver pod (ex. 30564).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "konnectivity_server_node_port is not security sensitive enough",
           "compliant": null,
           "non-compliant": null,
           "parent": "manual_lb_config"
@@ -891,8 +891,8 @@
         "addons_node_port": {
           "description": "NodePort for add-ons server in the admin cluster.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "addons_node_port does not require security considerations",
           "compliant": null,
           "non-compliant": null,
           "parent": "manual_lb_config"
@@ -911,8 +911,8 @@
         "enabled": {
           "description": "Metal LB is enabled.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Metal LB does not require security considerations",
           "compliant": null,
           "non-compliant": null,
           "parent": "metal_lb_config"
@@ -931,10 +931,10 @@
         "username": {
           "description": "The name of the user, e.g. `my-gcp-id@gmail.com`.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "viewer_users contains sensitive user information and should be protected",
+          "compliant": "user1@gmail.com",
+          "non-compliant": "user1@apple.com",
           "parent": "viewer_users"
         }
       }

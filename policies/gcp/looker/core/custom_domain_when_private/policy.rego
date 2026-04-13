@@ -19,7 +19,7 @@ conditions := [
     {
       "condition": "Guard: public IP is OFF",
       "attribute_path": ["public_ip_enabled"],
-      "policy_type": "whitelist",
+      "policy_type": "blacklist",
       "values": [true]
     },
     # Requirement: domain must be present → violate when missing/empty

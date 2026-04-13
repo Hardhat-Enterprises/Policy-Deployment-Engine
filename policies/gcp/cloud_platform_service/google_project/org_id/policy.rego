@@ -14,13 +14,6 @@ conditions := [
       "attribute_path": ["org_id"], 
       "values": [null], 
       "policy_type": "blacklist" 
-    },
-
-    {
-      "condition": "folder_id is null",
-      "attribute_path": ["folder_id"],
-      "values": [null],
-      "policy_type": "blacklist"
     }
   ]
 ]

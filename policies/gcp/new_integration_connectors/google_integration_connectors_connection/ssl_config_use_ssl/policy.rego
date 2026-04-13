@@ -9,7 +9,7 @@ conditions := [
   },
   {
     "condition": "Password must come from Secret Manager",
-    "attribute_path": ["ssl_config","0","use_ssl"],
+    "attribute_path": ["ssl_config",0,"use_ssl"],
     "values": ["true"],
     "policy_type": "whitelist",
   }

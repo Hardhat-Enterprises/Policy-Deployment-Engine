@@ -1,3 +1,4 @@
-variable "project" { type = string }
-
-
+variable "project" { 
+    type = string 
+    default = "reliable-alpha-478205-k9"
+}

@@ -5,17 +5,17 @@
     "runtime": {
       "description": "Desired runtime. Example python27.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Ensuring the application executes in the correct environment with the specific language version required for its dependencies.",
+      "compliant": "nodejs20",
+      "non-compliant": "nodejs10",
       "parent": null
     },
     "deployment": {
       "description": "Code and application artifacts that make up this version. Structure is [documented below](#nested_deployment).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "To define the specific source code and files that constitute the application version ensuring that Terraform can verify and upload the correct assets to the environment.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -23,8 +23,8 @@
         "zip": {
           "description": "Zip File Structure is [documented below](#nested_deployment_zip).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Provides a direct way to package the application's source code.",
           "compliant": null,
           "non-compliant": null,
           "parent": "deployment"
@@ -32,8 +32,8 @@
         "files": {
           "description": "Manifest of the files stored in Google Cloud Storage that are included as part of this version. All files must be readable using the credentials supplied with this call. Structure is [documented below](#nested_deployment_files).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "To simplify the configuration and ensure that the application package is deployed as a single consistent unit rather than managing individual file paths manually.",
           "compliant": null,
           "non-compliant": null,
           "parent": "deployment"
@@ -43,8 +43,8 @@
     "entrypoint": {
       "description": "The entrypoint for the application. Structure is [documented below](#nested_entrypoint).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "To provide the specific command required to start the application, ensuring that the environment knows how to execute the code, with which port/startup script to initialize.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -52,10 +52,10 @@
         "shell": {
           "description": "The format should be a shell command that can be fed to bash -c.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "To define the startup command, as it allows for the execution of complex scripts/multiple commands within the standard shell environment.",
+          "compliant": "node ./app.js",
+          "non-compliant": "bash ./app.js",
           "parent": "entrypoint"
         }
       }
@@ -63,17 +63,17 @@
     "service": {
       "description": "AppEngine service resource",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Ensuring the application is deployed as a specific microservice, allowing for independent scaling and routing logic within the larger App Engine project.",
+      "compliant": "default",
+      "non-compliant": "unauthorized-app-name",
       "parent": null
     },
     "version_id": {
       "description": "Relative name of the version within the service. For example, `v1`. Version names can contain only lowercase letters, numbers, or hyphens. Reserved names,\"default\", \"latest\", and any name with the prefix \"ah-\".",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "To automatically generate unique timestamp identifiers for each deployment, inturn preventing naming conflicts and ensuring that new releases do not accidentally overwrite existing versions.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -81,8 +81,8 @@
     "service_account": {
       "description": "The identity that the deployed version will run as. Admin API will use the App Engine Appspot service account as default if this field is neither provided in app.yaml file nor through CLI flag.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Having utilise the default App Engine service account, simplifying permission management by leveraging the standard identity provided by the platform for accessing Google Cloud resources.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -90,8 +90,8 @@
     "threadsafe": {
       "description": "Whether multiple requests can be dispatched to this version at once.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Environment to use its default concurrency settings, ensuring the application remains stable and avoids race conditions if the codebase is not optimized for parallel request handling.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -99,8 +99,8 @@
     "app_engine_apis": {
       "description": "Allows App Engine second generation runtimes to access the legacy bundled services.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "To ensure the application remains modern and portable",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -108,8 +108,8 @@
     "runtime_api_version": {
       "description": "The version of the API in the given runtime environment. Please see the app.yaml reference for valid values at `https://cloud.google.com/appengine/docs/standard/<language>/config/appref`\\ Substitute `<language>` with `python`, `java`, `php`, `ruby`, `go` or `nodejs`.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The application utilises a second-generation runtime where the API version is automatically managed by the platform, ensuring the environment always uses the most compatible interface without manual intervention.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -117,8 +117,8 @@
     "handlers": {
       "description": "An ordered list of URL-matching patterns that should be applied to incoming requests. The first matching URL handles the request and other request handlers are not attempted. Structure is [documented below](#nested_handlers).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "For a more flexible and unified approach to request handling without platform-specific configuration.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -191,8 +191,8 @@
     "libraries": {
       "description": "Configuration for third-party Python runtime libraries that are required by the application. Structure is [documented below](#nested_libraries).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Uses a second-generation runtime that manages dependencies through standard package managers.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -220,8 +220,8 @@
     "env_variables": {
       "description": "Environment variables available to the application.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Avoid hardcoding sensitive/environment-specific data in the deployment manifest.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -229,8 +229,8 @@
     "vpc_access_connector": {
       "description": "Enables VPC connectivity for standard apps. Structure is [documented below](#nested_vpc_access_connector).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "interacts with public APIs/managed services that do not require a private connection to a Virtual Private Cloud which reduces infrastructure complexity.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -258,8 +258,8 @@
     "inbound_services": {
       "description": "A list of the types of messages that this application is able to receive. Each value may be one of: `INBOUND_SERVICE_MAIL`, `INBOUND_SERVICE_MAIL_BOUNCE`, `INBOUND_SERVICE_XMPP_ERROR`, `INBOUND_SERVICE_XMPP_MESSAGE`, `INBOUND_SERVICE_XMPP_SUBSCRIBE`, `INBOUND_SERVICE_XMPP_PRESENCE`, `INBOUND_SERVICE_CHANNEL_PRESENCE`, `INBOUND_SERVICE_WARMUP`.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Does not require specialised App Engine-specific features, allowing it to remain a standard web service with a smaller configuration footprint.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -267,17 +267,17 @@
     "instance_class": {
       "description": "Instance class that is used to run this version. Valid values are AutomaticScaling: F1, F2, F4, F4_1G BasicScaling or ManualScaling: B1, B2, B4, B4_1G, B8 Defaults to F1 for AutomaticScaling and B2 for ManualScaling and BasicScaling. If no scaling is specified, AutomaticScaling is chosen.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Defined to ensure the application has the specific CPU and memory resources required for its workload.",
+      "compliant": "F1",
+      "non-compliant": "F2",
       "parent": null
     },
     "automatic_scaling": {
       "description": "Automatic scaling is based on request rate, response latencies, and other application metrics. Structure is [documented below](#nested_automatic_scaling).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "To prevent the application from scaling up to aggressively during minor traffic fluctuations.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -341,8 +341,8 @@
     "basic_scaling": {
       "description": "Basic scaling creates instances when your application receives requests. Each instance will be shut down when the application becomes idle. Basic scaling is ideal for work that is intermittent or driven by user activity. Structure is [documented below](#nested_basic_scaling).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Avoid the latency delays in relation with starting instances from zero after periods of inactivity.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -370,8 +370,8 @@
     "manual_scaling": {
       "description": "A service with manual scaling runs continuously, allowing you to perform complex initialization and rely on the state of its memory over time. Structure is [documented below](#nested_manual_scaling).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "To ensure the system can instead respond dynamically to traffic changes without the risk of over-provisioning/service outages during unexpected load.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -389,36 +389,36 @@
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "To automatically inherit the provider-level project ID.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "noop_on_destroy": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "If set to true, the application version will not be deleted.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "To ensure Terraform can fully decommission the application version.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "delete_service_on_destroy": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "If set to true, the service will be deleted if it is the last version.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Prevent the accidental removal of the entire service and its versions when a specific version is decommissioned.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "zip": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "Zip",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Provides a direct way to package the application's source code.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -426,10 +426,10 @@
         "source_url": {
           "description": "Source URL",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Ensuring that the deployment process uses a verified artifact that is consistent across all environments.",
+          "compliant": "https://storage.googleapis.com/appengine-static-content/hello-world.zip",
+          "non-compliant": "https://storage.googleapis.com/malicious-bucket/exploit.zip",
           "parent": "zip"
         },
         "files_count": {

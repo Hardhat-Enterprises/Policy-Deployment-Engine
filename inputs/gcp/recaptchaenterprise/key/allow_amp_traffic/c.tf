@@ -3,7 +3,7 @@
 
 resource "google_recaptcha_enterprise_key" "c" {
   project      = var.project
-  display_name = "recaptcha-web-compliant-allow-amp"
+  display_name = "c"
 
   web_settings {
     allow_all_domains = false
@@ -17,4 +17,7 @@ resource "google_recaptcha_enterprise_key" "c" {
 }
 
 # Inline declaration so you can pass -var on the CLI (no new files needed)
-variable "project" { type = string }
+variable "project" { 
+  type = string 
+  default = "reliable-alpha-478205-k9"
+}

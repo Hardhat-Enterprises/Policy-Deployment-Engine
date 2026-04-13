@@ -13,11 +13,16 @@ resource "google_beyondcorp_security_gateway_application" "sga_nc" {
   application_id = "nc"
   endpoint_matchers {
 <<<<<<< HEAD
+<<<<<<< HEAD
    hostname = "google.com"
    ports = ["443", "8443", "9443"]
 =======
     hostname = "google.com"
     ports = [80, 443]
+>>>>>>> origin/dev
+=======
+   hostname = "google.com"
+   ports = ["443", "8443", "9443"]
 >>>>>>> origin/dev
   }
 

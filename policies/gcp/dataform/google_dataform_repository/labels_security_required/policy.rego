@@ -1,7 +1,7 @@
 package terraform.gcp.security.dataform.google_dataform_repository.labels_security_required
 
 import data.terraform.helpers
-import data.terraform.gcp.security.dataform.google_dataform_repository as repo
+import data.terraform.gcp.security.dataform.google_dataform_repository.vars
 
 # Security-oriented required labels
 required_label_keys := [
@@ -54,7 +54,10 @@ value_conditions := [
 
 conditions := array.concat(presence_conditions, value_conditions)
 
-message := helpers.get_multi_summary(conditions, repo.variables).message
-details := helpers.get_multi_summary(conditions, repo.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details
+
 
 

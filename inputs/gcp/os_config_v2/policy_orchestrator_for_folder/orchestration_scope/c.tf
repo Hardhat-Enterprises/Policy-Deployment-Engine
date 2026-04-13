@@ -99,6 +99,7 @@ resource "google_os_config_v2_policy_orchestrator_for_folder" "c" {
     }
     labels = {
         state = "active"
+        environment = "test"
     }
     orchestration_scope {
         selectors {

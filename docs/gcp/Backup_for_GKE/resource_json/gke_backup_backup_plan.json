@@ -23,10 +23,10 @@
     "location": {
       "description": "The region of the Backup Plan.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Data sovereignty requires backups to be stored in specific Australian regions.",
+      "compliant": "australia-southeast1",
+      "non-compliant": "us-central1",
       "parent": null
     },
     "description": {
@@ -59,10 +59,10 @@
         "backup_retain_days": {
           "description": "The default maximum age of a Backup created via this BackupPlan. This field MUST be an integer value >= 0 and <= 365. If specified, a Backup created under this BackupPlan will be automatically deleted after its age reaches (createTime + backupRetainDays). If not specified, Backups created under this BackupPlan will NOT be subject to automatic deletion. Updating this field does NOT affect existing Backups under it. Backups created AFTER a successful update will automatically pick up the new value. NOTE: backupRetainDays must be >= backupDeleteLockDays. If cronSchedule is defined, then this must be <= 360 * the creation interval. If rpo_config is defined, then this must be <= 360 * targetRpoMinutes/(1440minutes/day)",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Retention period must be sufficient for disaster recovery but not exceed data retention policies (7-90 days).",
+          "compliant": "30",
+          "non-compliant": "1",
           "parent": "retention_policy"
         },
         "locked": {
@@ -79,10 +79,10 @@
     "labels": {
       "description": "Description: A set of custom labels supplied by the user. A list of key->value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": false,
+      "rationale": "Labels are required for cost allocation and ownership tracking.",
+      "compliant": "environment='prod', cost-center='123', owner='team'",
+      "non-compliant": "missing required labels",
       "parent": null
     },
     "backup_schedule": {
@@ -97,10 +97,10 @@
         "cron_schedule": {
           "description": "A standard cron string that defines a repeating schedule for creating Backups via this BackupPlan. This is mutually exclusive with the rpoConfig field since at most one schedule can be defined for a BackupPlan. If this is defined, then backupRetainDays must also be defined.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Backups should run during off-peak hours to minimize impact.",
+          "compliant": "0 2 * * *",
+          "non-compliant": "* * * * *",
           "parent": "backup_schedule"
         },
         "paused": {
@@ -126,19 +126,19 @@
     "deactivated": {
       "description": "This flag indicates whether this BackupPlan has been deactivated. Setting this field to True locks the BackupPlan such that no further updates will be allowed (except deletes), including the deactivated field itself. It also prevents any new Backups from being created via this BackupPlan (including scheduled Backups).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Deactivated plans do not create backups, putting data at risk.",
+      "compliant": "false",
+      "non-compliant": "true",
       "parent": null
     },
     "backup_config": {
       "description": "Defines the configuration of Backups created via this BackupPlan. Structure is [documented below](#nested_backup_config).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Backup configuration must explicitly define secret handling and encryption.",
+      "compliant": "See sub-arguments",
+      "non-compliant": "See sub-arguments",
       "parent": null,
       "arguments": {
         "include_volume_data": {
@@ -417,10 +417,10 @@
         "gcp_kms_encryption_key": {
           "description": "Google Cloud KMS encryption key. Format: projects/*/locations/*/keyRings/*/cryptoKeys/*",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "CMEK keys must be in the same region as the backup plan (australia-southeast1).",
+          "compliant": "projects/p/locations/australia-southeast1/keyRings/k/cryptoKeys/c",
+          "non-compliant": "projects/p/locations/us-central1/keyRings/k/cryptoKeys/c",
           "parent": "encryption_key"
         }
       }
