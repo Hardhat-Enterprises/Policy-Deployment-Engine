@@ -2,6 +2,11 @@ package terraform.gcp.security.assured_workloads.google_assured_workloads_worklo
 import data.terraform.helpers
 import data.terraform.gcp.security.assured_workloads.google_assured_workloads_workload.vars
 
+# Policy: compliance_regime
+# Description: Ensures that the Assured Workloads workload uses an approved compliance regime.
+# Approved regimes enforce regulatory requirements such as FedRAMP, IL4, IL5, and ITAR.
+# Resource: google_assured_workloads_workload
+
 conditions := [
     [
     {"situation_description": "Workload is not using an approved compliance regime",
@@ -14,20 +19,9 @@ conditions := [
         "values": ["FEDRAMP_MODERATE", "FEDRAMP_HIGH", "IL4", "IL5", "ITAR", "ASSURED_WORKLOADS_FOR_PARTNERS"],
         "policy_type": "whitelist"
     }
-    ],
-    [
-    {"situation_description": "Violation notifications are disabled on the workload",
-    "remedies": [
-        "Set violation_notifications_enabled to true to receive alerts when compliance violations occur"
-    ]},
-    {
-        "condition": "Check violation_notifications_enabled is true",
-        "attribute_path": ["violation_notifications_enabled"],
-        "values": [true],
-        "policy_type": "whitelist"
-    }
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+message := result.message
+details := result.details
