@@ -8,8 +8,8 @@ data "google_iam_policy" "c" {
 }
 
 resource "google_artifact_registry_repository_iam_policy" "c" {
-  project = "my-project"
-  location = "australia-southeast1"
-  repository = "c"
+  project     = "my-project"
+  location    = "australia-southeast1"
+  repository  = "c"
   policy_data = data.google_iam_policy.c.policy_data
 }
