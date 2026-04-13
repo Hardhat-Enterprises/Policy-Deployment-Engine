@@ -4,7 +4,7 @@ resource "google_clouddeploy_custom_target_type" "nc2" {
   project  = "my-project-name"
 
   custom_actions {
-    render_action = "unauthorized-render"     
-    deploy_action = "deploy-action"        
+    render_action = "unauthorized-render"
+    deploy_action = "deploy-action"
   }
 }

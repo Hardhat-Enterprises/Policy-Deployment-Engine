@@ -5,10 +5,10 @@ resource "google_dataform_repository" "c" {
   region       = "australia-southeast1"
   name         = "c"
   display_name = "c"
-  
+
   git_remote_settings {
-    url             = "https://github.com/example/repo.git"
-    default_branch  = "main"
+    url                                 = "https://github.com/example/repo.git"
+    default_branch                      = "main"
     authentication_token_secret_version = "projects/example-project/secrets/git-token/versions/1"
   }
 }

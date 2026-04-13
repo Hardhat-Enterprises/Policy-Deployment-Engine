@@ -7,8 +7,8 @@ resource "google_dataform_repository" "nc" {
   display_name = "nc"
 
   labels = {
-    security_contact     = ""  # Empty string - non-compliant for testing policy enforcement
-    data_classification  = "invalid_value"  # Invalid value - non-compliant for testing policy enforcement
+    security_contact     = ""              # Empty string - non-compliant for testing policy enforcement
+    data_classification  = "invalid_value" # Invalid value - non-compliant for testing policy enforcement
     business_criticality = "high"
     compliance_regime    = "none"
   }

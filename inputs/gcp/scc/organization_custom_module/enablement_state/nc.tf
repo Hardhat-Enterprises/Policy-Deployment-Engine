@@ -1,6 +1,6 @@
 resource "google_scc_organization_custom_module" "nc" {
-  organization = "123456789"
-  display_name = "nc"
+  organization     = "123456789"
+  display_name     = "nc"
   enablement_state = "DISABLED"
   custom_config {
     predicate {
@@ -11,8 +11,8 @@ resource "google_scc_organization_custom_module" "nc" {
         "cloudkms.googleapis.com/CryptoKey",
       ]
     }
-    description = "The rotation period of the identified cryptokey resource exceeds 30 days."
+    description    = "The rotation period of the identified cryptokey resource exceeds 30 days."
     recommendation = "Set the rotation period to at most 30 days."
-    severity = "MEDIUM"
+    severity       = "MEDIUM"
   }
 }

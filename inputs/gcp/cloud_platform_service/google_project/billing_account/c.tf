@@ -6,5 +6,5 @@ resource "google_project" "c123" {
   deletion_policy     = "PREVENT"
 
   # ✅ valid billing account attached
-  billing_account     = "000000-000000-000000"
+  billing_account = "000000-000000-000000"
 }

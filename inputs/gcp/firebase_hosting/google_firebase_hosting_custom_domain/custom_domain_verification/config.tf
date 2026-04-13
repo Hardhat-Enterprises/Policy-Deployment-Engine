@@ -8,6 +8,6 @@ terraform {
 }
 
 provider "google-beta" {
-  project = "dummy-project"   
+  project = "dummy-project"
   region  = "us-central1"
 }

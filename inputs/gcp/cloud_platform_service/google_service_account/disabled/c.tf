@@ -3,5 +3,5 @@ resource "google_service_account" "c" {
   display_name = "Notifier"
   description  = "Sends notifications"
   project      = "my-secure-project"
-  disabled     = false                               # ✅ active
+  disabled     = false # ✅ active
 }

@@ -1,5 +1,5 @@
 resource "google_looker_instance" "c1" {
-  name = "c1"
+  name    = "c1"
   project = var.project
   maintenance_window {
     day_of_week = "SUNDAY"

@@ -2,7 +2,7 @@
 # data_store_location
 
 resource "google_discovery_engine_data_store" "nc" {
-project = "735927692082"
+  project                      = "735927692082"
   location                     = "global"
   data_store_id                = "nc"
   display_name                 = "tf-test-structured-datastore"

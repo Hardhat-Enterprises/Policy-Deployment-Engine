@@ -7,7 +7,7 @@ resource "google_app_engine_standard_app_version" "nc" {
 
   entrypoint { shell = "node ./app.js" }
 
-  
+
   deployment {
     zip { source_url = "https://storage.googleapis.com/appengine-static-content/hello-world.zip" }
   }

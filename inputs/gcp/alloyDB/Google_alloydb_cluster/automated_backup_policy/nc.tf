@@ -1,7 +1,7 @@
 resource "google_alloydb_cluster" "nc" {
   cluster_id = "nc"
   location   = "us-central1"
-  project = "123"
+  project    = "123"
 
   network_config {
     network = "projects/pde-demo/global/networks/default"
@@ -12,7 +12,7 @@ resource "google_alloydb_cluster" "nc" {
     password = "weak-pass"
   }
 
-  
+
   automated_backup_policy {
     location = "us"
     time_based_retention {

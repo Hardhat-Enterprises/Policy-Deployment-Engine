@@ -3,8 +3,8 @@
 resource "google_apikeys_key" "nc" {
   name         = "nc"
   display_name = "Non-compliant server key (public IP range)"
-  project = "my-gcp-project"
-  
+  project      = "my-gcp-project"
+
   restrictions {
     api_targets {
       service = "maps.googleapis.com"

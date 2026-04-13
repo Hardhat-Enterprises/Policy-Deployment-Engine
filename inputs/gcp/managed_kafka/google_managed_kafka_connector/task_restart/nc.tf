@@ -33,10 +33,10 @@ resource "google_managed_kafka_cluster" "gmk_cluster_nc" {
 }
 
 resource "google_managed_kafka_connect_cluster" "nc" {
-  project             = google_project.project_nc.project_id
-  connect_cluster_id  = "noncompliant-connect-cluster"
-  kafka_cluster       = "projects/${google_project.project_nc.project_id}/locations/us-central1/clusters/${google_managed_kafka_cluster.gmk_cluster_nc.cluster_id}"
-  location            = "us-central1"
+  project            = google_project.project_nc.project_id
+  connect_cluster_id = "noncompliant-connect-cluster"
+  kafka_cluster      = "projects/${google_project.project_nc.project_id}/locations/us-central1/clusters/${google_managed_kafka_cluster.gmk_cluster_nc.cluster_id}"
+  location           = "us-central1"
 
   capacity_config {
     vcpu_count   = 4
@@ -77,8 +77,8 @@ resource "google_managed_kafka_connector" "nc" {
   }
 
   task_restart_policy {
-    minimum_backoff = "10s"    # ❌ Too short
-    maximum_backoff = "7200s"  # ❌ Too long
+    minimum_backoff = "10s"   # ❌ Too short
+    maximum_backoff = "7200s" # ❌ Too long
   }
 
   provider = google-beta

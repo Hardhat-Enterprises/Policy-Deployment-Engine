@@ -1,6 +1,6 @@
 resource "google_bigquery_dataset_access" "nc" {
-  dataset_id    = "nc"
-  project       = "PDE" 
-  role          = "VIEWER"
-  group_by_email = "invalid@gmail.com"  
+  dataset_id     = "nc"
+  project        = "PDE"
+  role           = "VIEWER"
+  group_by_email = "invalid@gmail.com"
 }

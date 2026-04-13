@@ -2,7 +2,7 @@
 # data_store_kms_key_name
 
 resource "google_discovery_engine_data_store" "c" {
-project = "735927692082"
+  project                     = "735927692082"
   location                    = "us"
   data_store_id               = "c"
   display_name                = "tf-test-structured-datastore"

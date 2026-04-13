@@ -3,7 +3,7 @@
 resource "google_apikeys_key" "nc" {
   name         = "nc"
   display_name = "Non-compliant key (wildcard methods)"
-  project = "my-gcp-project"
+  project      = "my-gcp-project"
 
   restrictions {
     api_targets {

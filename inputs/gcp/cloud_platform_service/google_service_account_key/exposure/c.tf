@@ -1,7 +1,7 @@
 resource "google_service_account" "c_sa" {
   account_id   = "compliant-sa"
   display_name = "Compliant Service Account"
-  project      = "proj-sec-test123"  
+  project      = "proj-sec-test123"
 }
 
 resource "time_rotating" "rotation" {

@@ -2,7 +2,7 @@
 #data_store_document_processing_config
 
 resource "google_discovery_engine_data_store" "nc" {
-project = "735927692082"
+  project = "735927692082"
 
   location                    = "eu"
   data_store_id               = "nc"

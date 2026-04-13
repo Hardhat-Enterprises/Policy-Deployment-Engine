@@ -1,7 +1,7 @@
 resource "google_cloudfunctions2_function" "nc" {
 
-  name = "nc"
-  location = "australia-southeast1"
+  name        = "nc"
+  location    = "australia-southeast1"
   description = "a new function"
 
   build_config {

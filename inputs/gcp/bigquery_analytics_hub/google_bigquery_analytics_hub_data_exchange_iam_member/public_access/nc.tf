@@ -2,8 +2,8 @@
 # Non-compliant because member is public (allUsers / allAuthenticatedUsers)
 
 resource "google_bigquery_analytics_hub_data_exchange_iam_member" "nc1" {
-  project         = "my-project-id"
-  location        = "us"
+  project          = "my-project-id"
+  location         = "us"
   data_exchange_id = "nc1"
 
   role   = "roles/viewer"

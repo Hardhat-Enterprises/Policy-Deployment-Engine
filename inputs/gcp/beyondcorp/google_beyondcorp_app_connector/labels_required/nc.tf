@@ -5,12 +5,12 @@ resource "google_service_account" "accnt_nc" {
 }
 
 resource "google_beyondcorp_app_connector" "nc" {
-  name = "nc"
+  name    = "nc"
   project = "smooth-verve-467716-v1"
-  region = "us-central1"
+  region  = "us-central1"
   principal_info {
-    service_account { 
-      email = google_service_account.accnt_nc.email 
+    service_account {
+      email = google_service_account.accnt_nc.email
     }
   }
 }

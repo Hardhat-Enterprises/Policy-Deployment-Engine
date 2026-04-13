@@ -3,10 +3,10 @@
 
 # ❌ Non-Compliant Kafka Connect Cluster (Publicly exposed)
 resource "google_managed_kafka_connect_cluster" "nc" {
-  project             = "nc"
-  connect_cluster_id  = "ncc"
-  kafka_cluster       = "projects/nc/locations/us-central1/clusters/ncc"
-  location            = "us-central1"
+  project            = "nc"
+  connect_cluster_id = "ncc"
+  kafka_cluster      = "projects/nc/locations/us-central1/clusters/ncc"
+  location           = "us-central1"
 
   capacity_config {
     vcpu_count   = 4
@@ -16,8 +16,8 @@ resource "google_managed_kafka_connect_cluster" "nc" {
   gcp_config {
     access_config {
       network_configs {
-        primary_subnet   = "projects/nc/regions/us-central1/subnetworks/public-subnet-1"
-        
+        primary_subnet = "projects/nc/regions/us-central1/subnetworks/public-subnet-1"
+
       }
     }
   }

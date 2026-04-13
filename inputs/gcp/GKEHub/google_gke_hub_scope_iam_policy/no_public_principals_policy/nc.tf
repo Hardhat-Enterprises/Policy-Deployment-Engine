@@ -8,7 +8,7 @@ data "google_iam_policy" "nc" {
 }
 
 resource "google_gke_hub_scope_iam_policy" "nc" {
-  project    = "example-project-123"
-  scope_id   = "nc"
+  project     = "example-project-123"
+  scope_id    = "nc"
   policy_data = data.google_iam_policy.nc.policy_data
 }

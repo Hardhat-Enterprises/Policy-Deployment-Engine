@@ -6,5 +6,5 @@ resource "google_project" "nc123" {
   deletion_policy     = "PREVENT"
 
   # ❌ missing billing account (null/empty will be flagged)
-  billing_account     = null
+  billing_account = null
 }

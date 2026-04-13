@@ -1,6 +1,6 @@
 
 resource "google_edgecontainer_cluster" "nc" {
-  name     = "nc" #Required
+  name     = "nc"                   #Required
   location = "australia-southeast1" #Required
 
   networking {
@@ -8,7 +8,7 @@ resource "google_edgecontainer_cluster" "nc" {
     cluster_ipv4_cidr_blocks  = ["0.0.0.0/0"]
     services_ipv4_cidr_blocks = ["0.0.0.0/0"]
   } #Required
- 
+
   authorization {
     #invalid/unapproved admin email
     admin_users {

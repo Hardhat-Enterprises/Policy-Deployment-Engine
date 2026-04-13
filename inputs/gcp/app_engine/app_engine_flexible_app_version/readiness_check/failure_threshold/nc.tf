@@ -21,11 +21,11 @@ resource "google_app_engine_flexible_app_version" "nc" {
   }
 
   liveness_check {
-    path              = "/"
+    path = "/"
   }
 
   readiness_check {
-    path = "/"
+    path              = "/"
     failure_threshold = 0
   }
 

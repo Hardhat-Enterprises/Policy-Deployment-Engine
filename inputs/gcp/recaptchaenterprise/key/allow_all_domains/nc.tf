@@ -8,7 +8,7 @@ resource "google_recaptcha_enterprise_key" "nc" {
   web_settings {
     allow_all_domains = true
     # Intentionally no allow-list when wildcarding
-    integration_type  = "SCORE"
+    integration_type              = "SCORE"
     challenge_security_preference = "BALANCE"
   }
 }

@@ -1,14 +1,14 @@
 resource "google_cloudfunctions2_function" "c" {
   name     = "c"
   location = "australia-southeast1"
-  project = "c project"
+  project  = "c project"
   build_config {
     runtime     = "python311"
     entry_point = "hello_world"
     source {
       storage_source {
-        bucket = "dummy-bucket" 
-        object = "source.zip"   
+        bucket = "dummy-bucket"
+        object = "source.zip"
       }
     }
   }

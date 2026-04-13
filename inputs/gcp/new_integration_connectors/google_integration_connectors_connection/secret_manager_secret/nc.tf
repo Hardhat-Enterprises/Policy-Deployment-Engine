@@ -1,6 +1,6 @@
 resource "google_secret_manager_secret" "non_compliant_secret" {
-  secret_id     = "test-secret"
-  project = "PDE-connectors"
+  secret_id = "test-secret"
+  project   = "PDE-connectors"
   replication {
     user_managed {
       replicas {
@@ -11,7 +11,7 @@ resource "google_secret_manager_secret" "non_compliant_secret" {
 }
 
 resource "google_secret_manager_secret_version" "secret-version-non_compliant" {
-  secret = google_secret_manager_secret.non_compliant_secret.id
+  secret      = google_secret_manager_secret.non_compliant_secret.id
   secret_data = "dummypassword"
 }
 

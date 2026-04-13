@@ -4,11 +4,11 @@
 resource "google_managed_kafka_cluster" "c" {
   cluster_id = "c"
   location   = "us-central1"
-  project = "123"
+  project    = "123"
 
   capacity_config {
-    vcpu_count    = 3
-    memory_bytes  = 3221225472
+    vcpu_count   = 3
+    memory_bytes = 3221225472
   }
 
   gcp_config {
@@ -22,7 +22,7 @@ resource "google_managed_kafka_cluster" "c" {
   tls_config {
     trust_config {
       cas_configs {
-        ca_pool = google_privateca_ca_pool.ca_pool.id  
+        ca_pool = google_privateca_ca_pool.ca_pool.id
       }
     }
   }

@@ -11,19 +11,19 @@ resource "google_scc_folder_custom_module" "nc" {
 
   custom_config {
     predicate {
-      expression   = "resource.rotationPeriod > duration(\"2592000s\")"
-      title        = "Purpose of the expression"
-      description  = "description of the expression"
-      location     = "location of the expression"
+      expression  = "resource.rotationPeriod > duration(\"2592000s\")"
+      title       = "Purpose of the expression"
+      description = "description of the expression"
+      location    = "location of the expression"
     }
     custom_output {
       properties {
         name = "duration"
         value_expression {
-          expression   = "resource.rotationPeriod"
-          title        = "Purpose of the expression"
-          description  = "description of the expression"
-          location     = "location of the expression"
+          expression  = "resource.rotationPeriod"
+          title       = "Purpose of the expression"
+          description = "description of the expression"
+          location    = "location of the expression"
         }
       }
     }

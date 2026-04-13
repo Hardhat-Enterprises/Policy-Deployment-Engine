@@ -4,7 +4,7 @@ resource "google_firebase_hosting_version" "nc" {
 
   config {
     headers {
-      glob    = "/api/**"
+      glob = "/api/**"
       headers = {
         "Access-Control-Allow-Origin"      = "*"
         "Access-Control-Allow-Credentials" = "true"

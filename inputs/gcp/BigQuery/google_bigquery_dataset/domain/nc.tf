@@ -1,9 +1,9 @@
 resource "google_bigquery_dataset" "nc" {
-  dataset_id    = "nc"
-  project       = "PDE" 
-  location      = "global"
-access {
-  role   = "READER"
-  domain = "invalid.com"
+  dataset_id = "nc"
+  project    = "PDE"
+  location   = "global"
+  access {
+    role   = "READER"
+    domain = "invalid.com"
   }
 }

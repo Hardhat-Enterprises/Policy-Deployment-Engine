@@ -1,6 +1,6 @@
 resource "google_scc_project_custom_module" "c" {
-  project = "cefwed"
-  display_name = "c"
+  project          = "cefwed"
+  display_name     = "c"
   enablement_state = "ENABLED"
   custom_config {
     predicate {
@@ -11,7 +11,7 @@ resource "google_scc_project_custom_module" "c" {
         "cloudkms.googleapis.com/CryptoKey",
       ]
     }
-    severity = "LOW"
+    severity       = "LOW"
     recommendation = "Steps to resolve violation"
   }
 }

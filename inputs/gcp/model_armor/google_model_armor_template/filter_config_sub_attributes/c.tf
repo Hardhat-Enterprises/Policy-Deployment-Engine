@@ -1,12 +1,12 @@
 resource "google_model_armor_template" "c" {
-   template_id = "c"
-   project = "c project"
+  template_id = "c"
+  project     = "c project"
   location    = "global"
 
   filter_config {
-     sdp_settings {
+    sdp_settings {
       basic_config {
-          filter_enforcement = "ENABLED"
+        filter_enforcement = "ENABLED"
       }
     }
     pi_and_jailbreak_filter_settings {

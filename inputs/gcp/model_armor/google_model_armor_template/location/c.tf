@@ -1,11 +1,11 @@
 resource "google_model_armor_template" "c" {
-   template_id = "c"
-   project = "c project"
+  template_id = "c"
+  project     = "c project"
   location    = "global"
-  
+
   filter_config {
-     rai_settings {
-         rai_filters {
+    rai_settings {
+      rai_filters {
         filter_type      = "DANGEROUS"
         confidence_level = "MEDIUM_AND_ABOVE"
       }
@@ -13,6 +13,6 @@ resource "google_model_armor_template" "c" {
         filter_type      = "SEXUAL"
         confidence_level = "MEDIUM_AND_ABOVE"
       }
-     }
+    }
   }
 }

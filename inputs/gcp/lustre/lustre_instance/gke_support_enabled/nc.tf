@@ -9,7 +9,7 @@ resource "google_lustre_instance" "nc" {
   capacity_gib                = 18000
   network                     = "network1"
   per_unit_storage_throughput = 1000
-  gke_support_enabled = false
+  gke_support_enabled         = false
   labels = {
     test = "value"
   }

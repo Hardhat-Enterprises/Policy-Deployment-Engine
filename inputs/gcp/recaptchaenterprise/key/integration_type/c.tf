@@ -8,7 +8,7 @@ resource "google_recaptcha_enterprise_key" "c" {
     allowed_domains   = ["example.com", "shop.example.com"]
 
     # policy focus
-    integration_type  = "SCORE"
+    integration_type = "SCORE"
 
     # keep neutral so only integration_type is tested here
     challenge_security_preference = "BALANCE"
@@ -16,7 +16,7 @@ resource "google_recaptcha_enterprise_key" "c" {
 }
 
 # declare once per inputs folder so you can pass -var="project=..."
-variable "project" { 
-  type = string 
+variable "project" {
+  type    = string
   default = "reliable-alpha-478205-k9"
 }

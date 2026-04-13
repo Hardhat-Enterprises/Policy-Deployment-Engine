@@ -1,6 +1,6 @@
 resource "google_bigquery_dataset_access" "nc" {
   dataset_id    = "nc"
-  project       = "PDE" 
+  project       = "PDE"
   role          = "VIEWER"
-  special_group =  ""  
+  special_group = ""
 }

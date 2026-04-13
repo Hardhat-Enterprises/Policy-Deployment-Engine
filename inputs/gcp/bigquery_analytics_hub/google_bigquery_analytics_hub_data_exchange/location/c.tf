@@ -7,5 +7,5 @@ resource "google_bigquery_analytics_hub_data_exchange" "c" {
   data_exchange_id = "c"
   display_name     = "c"
   description      = "Compliant exchange - location is approved"
-  discovery_type = "DISCOVERY_TYPE_PRIVATE"
+  discovery_type   = "DISCOVERY_TYPE_PRIVATE"
 }

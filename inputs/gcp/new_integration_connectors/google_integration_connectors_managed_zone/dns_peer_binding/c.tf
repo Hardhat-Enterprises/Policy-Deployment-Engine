@@ -1,6 +1,6 @@
 resource "google_project" "target_project" {
-  name            = "test"
-  project_id      = "pde"
+  name       = "test"
+  project_id = "pde"
 }
 
 resource "google_project_iam_member" "dns_peer_binding" {

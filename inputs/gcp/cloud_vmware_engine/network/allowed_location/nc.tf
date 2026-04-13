@@ -1,14 +1,14 @@
 resource "google_vmwareengine_network" "nc" {
   project     = google_project_service.acceptance_nc.project
-  name        = "nc" 
+  name        = "nc"
   location    = "us-west1"
   type        = "LEGACY"
   description = "VMwareEngine legacy network sample"
 }
 
 resource "google_project_service" "acceptance_nc" {
-  project  = google_project.acceptance_nc.project_id
-  service  = "vmwareengine.googleapis.com"
+  project = google_project.acceptance_nc.project_id
+  service = "vmwareengine.googleapis.com"
 }
 
 resource "google_project" "acceptance_nc" {

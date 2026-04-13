@@ -1,10 +1,10 @@
 resource "google_bigquery_table" "c" {
-  project = "PDE"
+  project    = "PDE"
   dataset_id = "c"
   table_id   = "your_table_id"
 
   external_data_configuration {
-    autodetect = true
+    autodetect    = true
     connection_id = "valid_connection_id"
     source_uris   = ["gs://your-bucket/your-data/*.csv"]
   }

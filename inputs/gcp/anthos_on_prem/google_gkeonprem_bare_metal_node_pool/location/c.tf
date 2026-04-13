@@ -1,13 +1,13 @@
 resource "google_gkeonprem_bare_metal_cluster" "c" {
-  name = "my-cluster"
-  project = "PDE"
-  location = "australia_southeast1"
+  name                     = "my-cluster"
+  project                  = "PDE"
+  location                 = "australia_southeast1"
   admin_cluster_membership = "projects/870316890899/locations/global/memberships/gkeonprem-terraform-test"
-  bare_metal_version = "1.12.3"
+  bare_metal_version       = "1.12.3"
   network_config {
     island_mode_cidr {
       service_address_cidr_blocks = ["172.26.0.0/16"]
-      pod_address_cidr_blocks = ["10.240.0.0/13"]
+      pod_address_cidr_blocks     = ["10.240.0.0/13"]
     }
   }
   control_plane {
@@ -26,7 +26,7 @@ resource "google_gkeonprem_bare_metal_cluster" "c" {
     }
     vip_config {
       control_plane_vip = "10.200.0.13"
-      ingress_vip = "10.200.0.14"
+      ingress_vip       = "10.200.0.14"
     }
     metal_lb_config {
       address_pools {
@@ -48,12 +48,12 @@ resource "google_gkeonprem_bare_metal_cluster" "c" {
   storage {
     lvp_share_config {
       lvp_config {
-        path = "/mnt/localpv-share"
+        path          = "/mnt/localpv-share"
         storage_class = "local-shared"
       }
     }
     lvp_node_mounts_config {
-      path = "/mnt/localpv-disk"
+      path          = "/mnt/localpv-disk"
       storage_class = "local-disks"
     }
   }
@@ -67,10 +67,10 @@ resource "google_gkeonprem_bare_metal_cluster" "c" {
 }
 
 resource "google_gkeonprem_bare_metal_node_pool" "c" {
-  name =  "c"
-  project =  "PDE"
-  location = "australia_southeast1"
-  bare_metal_cluster =  google_gkeonprem_bare_metal_cluster.c.name
+  name               = "c"
+  project            = "PDE"
+  location           = "australia_southeast1"
+  bare_metal_cluster = google_gkeonprem_bare_metal_cluster.c.name
   node_pool_config {
     operating_system = "LINUX"
     node_configs {

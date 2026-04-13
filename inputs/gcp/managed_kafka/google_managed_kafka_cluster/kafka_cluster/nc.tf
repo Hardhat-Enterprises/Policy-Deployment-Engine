@@ -14,7 +14,7 @@ resource "google_managed_kafka_cluster" "nc" {
         subnet = ""
       }
     }
-    
+
     kms_key = google_kms_crypto_key.key_nc.id
   }
 }
@@ -26,7 +26,7 @@ resource "google_kms_key_ring" "key_ring_nc" {
 }
 
 resource "google_kms_crypto_key" "key_nc" {
-  name     = "insecure-key"
-  
+  name = "insecure-key"
+
   key_ring = google_kms_key_ring.key_ring_nc.id
 }

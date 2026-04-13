@@ -33,4 +33,4 @@ resource "google_managed_kafka_connect_cluster" "c" {
   provider = google-beta
 }
 
-   
+

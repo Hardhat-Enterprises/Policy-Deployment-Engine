@@ -3,8 +3,8 @@
 resource "google_apikeys_key" "c" {
   name         = "c"
   display_name = "Compliant browser key (no public referrers)"
-  project = "my-gcp-project"
-  
+  project      = "my-gcp-project"
+
   restrictions {
     api_targets {
       service = "maps.googleapis.com"

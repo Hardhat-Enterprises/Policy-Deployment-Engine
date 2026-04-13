@@ -1,5 +1,5 @@
 resource "google_edgecontainer_cluster" "c" {
-  name     = "c" #Required
+  name     = "c"                    #Required
   location = "australia-southeast1" #Required
 
   #Policy to be tested 
@@ -25,7 +25,7 @@ resource "google_edgecontainer_cluster" "c" {
     }
   } #Required
 
- fleet {
-  project = "projects/gdce-dev"
-} #Required
+  fleet {
+    project = "projects/gdce-dev"
+  } #Required
 }

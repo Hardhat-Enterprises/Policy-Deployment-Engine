@@ -1,9 +1,9 @@
 resource "google_gkeonprem_bare_metal_cluster" "c" {
-  name                       = "c"
-  project                    = "PDE"
-  location                   = "australia_southeast1"
-  admin_cluster_membership   = "projects/870316890899/locations/global/memberships/gkeonprem-terraform-test"
-  bare_metal_version         = "1.12.3"
+  name                     = "c"
+  project                  = "PDE"
+  location                 = "australia_southeast1"
+  admin_cluster_membership = "projects/870316890899/locations/global/memberships/gkeonprem-terraform-test"
+  bare_metal_version       = "1.12.3"
 
   network_config {
     island_mode_cidr {
@@ -15,8 +15,8 @@ resource "google_gkeonprem_bare_metal_cluster" "c" {
   control_plane {
     control_plane_node_pool_config {
       node_pool_config {
-        labels            = {}
-        operating_system  = "LINUX"
+        labels           = {}
+        operating_system = "LINUX"
       }
     }
   }

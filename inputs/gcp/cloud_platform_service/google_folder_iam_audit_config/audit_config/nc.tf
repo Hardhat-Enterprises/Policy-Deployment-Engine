@@ -3,7 +3,7 @@ resource "google_folder_iam_audit_config" "nc1" {
   service = "allServices"
 
   audit_log_config {
-    log_type = "ADMIN_READ"
+    log_type         = "ADMIN_READ"
     exempted_members = ["user:admin@example.com"] # ❌ exemptions not allowed
   }
 }
@@ -13,7 +13,7 @@ resource "google_folder_iam_audit_config" "nc2" {
   service = "allServices"
 
   audit_log_config {
-    log_type = "DATA_READ"
+    log_type         = "DATA_READ"
     exempted_members = [] # ❌ exemptions not allowed
   }
 }

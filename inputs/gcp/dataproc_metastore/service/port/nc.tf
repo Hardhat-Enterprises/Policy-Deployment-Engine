@@ -2,7 +2,7 @@ resource "google_dataproc_metastore_service" "nc" {
   service_id = "nc"
   port       = 8080
   tier       = "DEVELOPER"
-  project = "1"
+  project    = "1"
 
   maintenance_window {
     hour_of_day = 2

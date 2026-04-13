@@ -1,6 +1,6 @@
 resource "google_gkeonprem_bare_metal_admin_cluster" "c" {
-  name = "c"
-  project = "PDE"
+  name     = "c"
+  project  = "PDE"
   location = "australia_southeast1"
   control_plane {
     control_plane_node_pool_config {
@@ -20,11 +20,11 @@ resource "google_gkeonprem_bare_metal_admin_cluster" "c" {
 
   }
 
-security_config {
+  security_config {
     authorization {
       admin_users {
         username = "admin@hashicorptest.com"
       }
     }
   }
-  }
+}

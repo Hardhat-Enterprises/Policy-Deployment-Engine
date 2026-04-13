@@ -8,8 +8,8 @@ data "google_iam_policy" "c" {
 }
 
 resource "google_bigquery_table_iam_policy" "c" {
-  project = "PDE"
-  dataset_id = "c"
-  table_id = "google_bigquery_table.test.table_id"
+  project     = "PDE"
+  dataset_id  = "c"
+  table_id    = "google_bigquery_table.test.table_id"
   policy_data = data.google_iam_policy.c.policy_data
 }

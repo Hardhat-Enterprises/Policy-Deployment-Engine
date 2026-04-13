@@ -6,9 +6,9 @@ resource "google_bigquery_data_transfer_config" "c" {
   location               = "australia-southeast1"
 
   params = {
-    query                          = "SELECT CURRENT_DATE()"
+    query                           = "SELECT CURRENT_DATE()"
     destination_table_name_template = "output_table"
-    write_disposition              = "WRITE_TRUNCATE"
+    write_disposition               = "WRITE_TRUNCATE"
   }
 
   service_account_name = "service-1234567890@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com"

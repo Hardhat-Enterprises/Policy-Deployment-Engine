@@ -3,5 +3,5 @@ resource "google_gke_hub_feature_iam_member" "c" {
   location = "global"
   name     = "c"
   role     = "roles/gkehub.viewer"
-  member   = "group:secops@example.com"  
+  member   = "group:secops@example.com"
 }

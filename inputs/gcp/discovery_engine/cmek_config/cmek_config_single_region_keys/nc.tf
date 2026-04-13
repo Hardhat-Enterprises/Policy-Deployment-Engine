@@ -6,10 +6,10 @@ resource "google_discovery_engine_cmek_config" "nc" {
   cmek_config_id = "nc"
 
   # Default CMEK for multi-regional "eu"
-  kms_key        = ""
+  kms_key = ""
 
-  project        = "735927692082"
-  set_default    = true
+  project     = "735927692082"
+  set_default = true
 
   # Single-region CMEKs
   single_region_keys {

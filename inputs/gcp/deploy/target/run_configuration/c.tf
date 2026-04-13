@@ -5,7 +5,7 @@ resource "google_clouddeploy_target" "c" {
   location = "us-central1"
   name     = "c"
   project  = "my-project-name"
-  
+
   run {
     location = "projects/my-project-name/locations/us-central1"
   }

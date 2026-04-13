@@ -1,5 +1,5 @@
 resource "google_edgecontainer_cluster" "c" {
-  name     = "c" #Required
+  name     = "c"                    #Required
   location = "australia-southeast1" #Required
 
   networking {
@@ -13,7 +13,7 @@ resource "google_edgecontainer_cluster" "c" {
     }
   } #Required
 
- fleet {
-  project = "projects/gdce-dev"
-} #Required
+  fleet {
+    project = "projects/gdce-dev"
+  } #Required
 }

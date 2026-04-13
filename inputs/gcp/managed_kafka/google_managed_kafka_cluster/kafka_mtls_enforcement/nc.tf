@@ -4,11 +4,11 @@
 resource "google_managed_kafka_cluster" "nc" {
   cluster_id = "nc"
   location   = "us-central1"
-  project = "123"
+  project    = "123"
 
   capacity_config {
-    vcpu_count    = 3
-    memory_bytes  = 3221225472
+    vcpu_count   = 3
+    memory_bytes = 3221225472
   }
 
   gcp_config {
@@ -19,5 +19,5 @@ resource "google_managed_kafka_cluster" "nc" {
     }
   }
 
-  
+
 }

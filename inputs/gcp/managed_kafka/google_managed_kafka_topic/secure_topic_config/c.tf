@@ -7,11 +7,11 @@ resource "google_managed_kafka_topic" "c" {
   location           = "us-central1"
   partition_count    = 3
   replication_factor = 3
-  project = "123"
+  project            = "123"
 
   configs = {
-    "cleanup.policy"  = "delete"
-    "retention.ms"    = "604800000" # 7 days
+    "cleanup.policy"      = "delete"
+    "retention.ms"        = "604800000" # 7 days
     "min.insync.replicas" = "2"
   }
 }

@@ -1,6 +1,6 @@
 data "google_iam_policy" "c1" {
   binding {
-    role = "roles/viewer"
+    role    = "roles/viewer"
     members = ["user:jane@example.com"]
   }
 }

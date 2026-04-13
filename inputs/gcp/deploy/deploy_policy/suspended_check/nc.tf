@@ -9,10 +9,10 @@ resource "google_clouddeploy_deploy_policy" "nc" {
     delivery_pipeline {
       id = "cd-pipeline"
       labels = {
-          foo = "bar"
+        foo = "bar"
       }
     }
-   }
+  }
   suspended = true
   rules {
     rollout_restriction {
@@ -20,14 +20,14 @@ resource "google_clouddeploy_deploy_policy" "nc" {
       time_windows {
         time_zone = "America/Los_Angeles"
         weekly_windows {
-            start_time {
-                hours = "12"
-                minutes = "00"                
-            }
-            end_time {
-                hours = "13"
-                minutes = "00"
-            }
+          start_time {
+            hours   = "12"
+            minutes = "00"
+          }
+          end_time {
+            hours   = "13"
+            minutes = "00"
+          }
         }
       }
     }

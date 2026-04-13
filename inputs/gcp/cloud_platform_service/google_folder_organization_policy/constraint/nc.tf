@@ -4,7 +4,7 @@ resource "google_folder_organization_policy" "nc1" {
 
   list_policy {
     deny {
-      values = ["cloudresourcemanager.googleapis.com"]  
+      values = ["cloudresourcemanager.googleapis.com"]
     }
   }
 }
@@ -14,7 +14,7 @@ resource "google_folder_organization_policy" "nc2" {
   constraint = "serviceuser.services"
 
   restore_policy {
-    default = true 
+    default = true
   }
 }
 resource "google_folder_organization_policy" "nc3" {
@@ -22,7 +22,7 @@ resource "google_folder_organization_policy" "nc3" {
   constraint = "serviceuser.services"
 
   list_policy {
-    inherit_from_parent = true  
+    inherit_from_parent = true
     allow {
       all = true
     }

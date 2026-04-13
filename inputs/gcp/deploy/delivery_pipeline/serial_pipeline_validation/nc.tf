@@ -4,5 +4,5 @@
 resource "google_clouddeploy_delivery_pipeline" "nc" {
   name     = "nc"
   location = "us-central1"
-  project  = "my-project-name"  
+  project  = "my-project-name"
 }

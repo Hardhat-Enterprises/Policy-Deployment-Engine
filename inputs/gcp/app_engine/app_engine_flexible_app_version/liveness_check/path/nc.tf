@@ -1,7 +1,7 @@
 resource "google_app_engine_flexible_app_version" "nc" {
   version_id = "v1"
   project    = "gcp-project-12345"
-  service    = "unauthorized-service" 
+  service    = "unauthorized-service"
   runtime    = "python27"
 
   entrypoint {

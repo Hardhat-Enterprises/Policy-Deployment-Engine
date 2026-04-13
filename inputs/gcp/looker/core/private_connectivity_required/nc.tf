@@ -1,5 +1,5 @@
 resource "google_looker_instance" "nc" {
-  name = "nc"
+  name              = "nc"
   project           = var.project
   public_ip_enabled = true
   # private_ip_enabled = false (default/omitted)

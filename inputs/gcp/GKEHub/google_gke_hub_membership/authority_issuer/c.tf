@@ -1,5 +1,5 @@
 resource "google_gke_hub_membership" "c" {
-  project      = "example-project-123"
+  project       = "example-project-123"
   membership_id = "c"
   endpoint {
     gke_cluster {

@@ -8,7 +8,7 @@ resource "google_managed_kafka_acl" "c" {
   project  = "123"
 
   acl_entries {
-    principal       = "User:producer-client@my-project.iam.gserviceaccount.com"  # Ensure principal is not a wildcard
+    principal       = "User:producer-client@my-project.iam.gserviceaccount.com" # Ensure principal is not a wildcard
     permission_type = "ALLOW"
     operation       = "WRITE"
     host            = "*"

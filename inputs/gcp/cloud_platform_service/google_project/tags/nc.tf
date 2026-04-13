@@ -7,6 +7,6 @@ resource "google_project" "nc123" {
 
   # ❌ either omit the tag entirely, or set an invalid value
   tags = {
-    "tagKeys/env" = "tagValues/staging"  # not in dev/test/prod → will be flagged
+    "tagKeys/env" = "tagValues/staging" # not in dev/test/prod → will be flagged
   }
 }

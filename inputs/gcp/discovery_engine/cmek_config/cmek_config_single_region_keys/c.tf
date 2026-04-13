@@ -5,10 +5,10 @@ resource "google_discovery_engine_cmek_config" "c" {
   cmek_config_id = "c"
 
   # Default CMEK for multi-regional "eu"
-  kms_key        = "projects/735927692082/locations/eu/keyRings/my-ring/cryptoKeys/my-eu-key"
+  kms_key = "projects/735927692082/locations/eu/keyRings/my-ring/cryptoKeys/my-eu-key"
 
-  project        = "735927692082"
-  set_default    = true
+  project     = "735927692082"
+  set_default = true
 
   # Single-region CMEKs
   single_region_keys {

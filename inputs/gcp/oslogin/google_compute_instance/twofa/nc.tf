@@ -16,6 +16,6 @@ resource "google_compute_instance" "nc" {
 
   metadata = {
     enable-oslogin     = "TRUE"
-    enable-oslogin-2fa = "FALSE"  
+    enable-oslogin-2fa = "FALSE"
   }
 }

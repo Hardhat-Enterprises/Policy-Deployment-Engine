@@ -6,7 +6,7 @@ resource "google_bigquery_data_transfer_config" "nc" {
   location               = "us-central1"
 
   params = {
-    query = "SELECT CURRENT_DATE()"
+    query                           = "SELECT CURRENT_DATE()"
     destination_table_name_template = "sample_output"
     write_disposition               = "WRITE_TRUNCATE"
   }

@@ -1,6 +1,6 @@
 data "google_iam_policy" "nc1" {
   binding {
-    role = "roles/owner" # ❌ blocked role
+    role    = "roles/owner" # ❌ blocked role
     members = ["user:bob@example.com"]
   }
 }

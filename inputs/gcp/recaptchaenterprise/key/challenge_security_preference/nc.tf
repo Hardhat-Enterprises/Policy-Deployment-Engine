@@ -9,7 +9,7 @@ resource "google_recaptcha_enterprise_key" "nc" {
     allowed_domains   = ["example.com", "shop.example.com"]
 
     # policy focus (intentionally wrong)
-    integration_type  = "SCORE"
+    integration_type = "SCORE"
 
     challenge_security_preference = "USABILITY"
   }

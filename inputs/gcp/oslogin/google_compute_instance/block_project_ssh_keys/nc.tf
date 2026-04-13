@@ -16,6 +16,6 @@ resource "google_compute_instance" "nc" {
 
   metadata = {
     enable-oslogin         = "TRUE"
-    block-project-ssh-keys = "FALSE"  
+    block-project-ssh-keys = "FALSE"
   }
 }

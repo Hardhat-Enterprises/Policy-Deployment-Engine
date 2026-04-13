@@ -8,6 +8,6 @@ resource "google_alloydb_instance" "c" {
     ssl_config {
       ssl_mode = "ENCRYPTED_ONLY"
     }
-    
+
   }
 }

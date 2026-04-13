@@ -1,10 +1,10 @@
 resource "google_model_armor_floorsetting" "c" {
-  parent      = "c"
-  location    = "global"
+  parent   = "c"
+  location = "global"
 
   filter_config {
-     rai_settings {
-         rai_filters {
+    rai_settings {
+      rai_filters {
         filter_type      = "DANGEROUS"
         confidence_level = "MEDIUM_AND_ABOVE"
       }
@@ -12,6 +12,6 @@ resource "google_model_armor_floorsetting" "c" {
         filter_type      = "SEXUAL"
         confidence_level = "MEDIUM_AND_ABOVE"
       }
-     }
+    }
   }
 }

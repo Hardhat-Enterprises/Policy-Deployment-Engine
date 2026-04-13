@@ -5,14 +5,14 @@ resource "google_clouddeploy_delivery_pipeline" "c" {
   name     = "c"
   location = "us-central1"
   project  = "my-project-name"
-  
+
   serial_pipeline {
     stages {
       target_id = "dev"
       profiles  = ["dev"]
     }
     stages {
-      target_id = "staging" 
+      target_id = "staging"
       profiles  = ["staging"]
     }
     stages {

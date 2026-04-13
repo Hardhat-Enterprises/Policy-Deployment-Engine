@@ -1,5 +1,5 @@
-resource "google_apphub_boundary" "c"{
-  project = "PDE-payment"
+resource "google_apphub_boundary" "c" {
+  project  = "PDE-payment"
   location = "global"
 }
 

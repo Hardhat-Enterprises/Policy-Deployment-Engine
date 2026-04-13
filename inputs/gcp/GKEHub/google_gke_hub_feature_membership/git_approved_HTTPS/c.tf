@@ -7,7 +7,7 @@ resource "google_gke_hub_feature_membership" "c" {
     config_sync {
       enabled = true
       git {
-        https_proxy = "https://proxy.yourcompany.com" 
+        https_proxy = "https://proxy.yourcompany.com"
       }
     }
   }

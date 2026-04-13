@@ -29,10 +29,10 @@ resource "google_managed_kafka_cluster" "gmk_cluster_c" {
 }
 
 resource "google_managed_kafka_connect_cluster" "connect_cluster_c" {
-  project             = google_project.project_c.project_id
-  connect_cluster_id  = "connect-cluster-c"
-  kafka_cluster       = "projects/${google_project.project_c.project_id}/locations/us-central1/clusters/${google_managed_kafka_cluster.gmk_cluster_c.cluster_id}"
-  location            = "us-central1"
+  project            = google_project.project_c.project_id
+  connect_cluster_id = "connect-cluster-c"
+  kafka_cluster      = "projects/${google_project.project_c.project_id}/locations/us-central1/clusters/${google_managed_kafka_cluster.gmk_cluster_c.cluster_id}"
+  location           = "us-central1"
 
   capacity_config {
     vcpu_count   = 4
@@ -58,14 +58,14 @@ resource "google_managed_kafka_connector" "c" {
   location        = "us-central1"
 
   configs = {
-    "connector.class"  = "com.google.pubsub.kafka.sink.CloudPubSubSinkConnector"
-    "name"             = "compliant-connector"
-    "tasks.max"        = "1"
-    "topics"           = "topics"
-    "cps.topic"        = "compliant-pubsub"
-    "cps.project"      = google_project.project_c.project_id
-    "value.converter"  = "org.apache.kafka.connect.storage.StringConverter"
-    "key.converter"    = "org.apache.kafka.connect.storage.StringConverter"
+    "connector.class" = "com.google.pubsub.kafka.sink.CloudPubSubSinkConnector"
+    "name"            = "compliant-connector"
+    "tasks.max"       = "1"
+    "topics"          = "topics"
+    "cps.topic"       = "compliant-pubsub"
+    "cps.project"     = google_project.project_c.project_id
+    "value.converter" = "org.apache.kafka.connect.storage.StringConverter"
+    "key.converter"   = "org.apache.kafka.connect.storage.StringConverter"
   }
 
   task_restart_policy {

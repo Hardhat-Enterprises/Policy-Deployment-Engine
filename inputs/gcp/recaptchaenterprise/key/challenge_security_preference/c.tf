@@ -9,7 +9,7 @@ resource "google_recaptcha_enterprise_key" "c" {
     allowed_domains   = ["example.com", "shop.example.com"]
 
     # policy focus
-    integration_type  = "SCORE"
+    integration_type = "SCORE"
 
     # keep consistent posture with other tests
     challenge_security_preference = "BALANCE"
@@ -17,7 +17,7 @@ resource "google_recaptcha_enterprise_key" "c" {
 }
 
 # inline variable so you can pass -var from CLI
-variable "project" { 
-  type = string 
+variable "project" {
+  type    = string
   default = "reliable-alpha-478205-k9"
 }

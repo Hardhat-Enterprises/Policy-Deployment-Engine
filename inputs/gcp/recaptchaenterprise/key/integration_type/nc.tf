@@ -8,7 +8,7 @@ resource "google_recaptcha_enterprise_key" "nc" {
     allowed_domains   = ["example.com", "shop.example.com"]
 
     # policy focus (intentionally wrong)
-    integration_type  = "CHECKBOX"
+    integration_type = "CHECKBOX"
 
     # keep neutral so this folder only fails on integration_type
     challenge_security_preference = "BALANCE"

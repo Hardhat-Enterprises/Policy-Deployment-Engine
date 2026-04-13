@@ -1,5 +1,5 @@
 resource "google_app_engine_standard_app_version" "nc" {
-  project = "gcp-project-12345"
+  project    = "gcp-project-12345"
   version_id = "v1"
   service    = "unauthorized-app-name"
   runtime    = "nodejs10"

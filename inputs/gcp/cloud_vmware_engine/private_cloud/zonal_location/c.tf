@@ -10,15 +10,15 @@ resource "google_vmwareengine_private_cloud" "c" {
   management_cluster {
     cluster_id = "sample-mgmt-cluster"
 
-      stretched_cluster_config {
-        preferred_location = "projects/projectabc/locations/australia-southeast1-a"
-        secondary_location = "projects/projectabc/locations/australia-southeast2-b"
-    
-  }
+    stretched_cluster_config {
+      preferred_location = "projects/projectabc/locations/australia-southeast1-a"
+      secondary_location = "projects/projectabc/locations/australia-southeast2-b"
+
+    }
   }
 
 }
- 
+
 
 
 resource "google_vmwareengine_network" "pc-nw" {

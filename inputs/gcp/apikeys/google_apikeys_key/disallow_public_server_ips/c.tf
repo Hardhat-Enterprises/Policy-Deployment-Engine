@@ -5,7 +5,7 @@ resource "google_apikeys_key" "c" {
   display_name = "Compliant server key (restricted IPs)"
 
   project = "my-gcp-project"
-  
+
   restrictions {
     api_targets {
       service = "maps.googleapis.com"

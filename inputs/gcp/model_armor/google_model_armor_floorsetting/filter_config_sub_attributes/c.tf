@@ -1,12 +1,12 @@
 resource "google_model_armor_floorsetting" "c" {
-  location    = "global"
-  parent      = "c"
+  location = "global"
+  parent   = "c"
 
   filter_config {
 
     sdp_settings {
       basic_config {
-          filter_enforcement = "ENABLED"
+        filter_enforcement = "ENABLED"
       }
     }
     pi_and_jailbreak_filter_settings {

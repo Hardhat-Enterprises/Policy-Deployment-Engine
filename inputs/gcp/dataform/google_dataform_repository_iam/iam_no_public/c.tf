@@ -14,7 +14,7 @@ resource "google_dataform_repository_iam_binding" "c" {
   region     = google_dataform_repository.repo_c.region
   repository = "projects/${var.project}/locations/${google_dataform_repository.repo_c.region}/repositories/${google_dataform_repository.repo_c.name}"
 
-  role    = "roles/dataform.viewer"
+  role = "roles/dataform.viewer"
   members = [
     "user:alice@example.com"
   ]

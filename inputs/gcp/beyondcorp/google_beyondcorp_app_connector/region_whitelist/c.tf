@@ -5,12 +5,12 @@ resource "google_service_account" "accnt_c" {
 }
 
 resource "google_beyondcorp_app_connector" "c" {
-  name = "c"
+  name    = "c"
   project = "smooth-verve-467716-v1"
-  region = "australia-southeast1"
+  region  = "australia-southeast1"
   principal_info {
-    service_account { 
-      email = google_service_account.accnt_c.email 
+    service_account {
+      email = google_service_account.accnt_c.email
     }
   }
 }

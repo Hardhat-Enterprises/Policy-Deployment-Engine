@@ -10,15 +10,15 @@ resource "google_vmwareengine_private_cloud" "nc" {
   management_cluster {
     cluster_id = "sample-mgmt-cluster"
 
-      stretched_cluster_config {
-        preferred_location = "projects/projectabc/locations/asia-southeast2-c"
-        secondary_location = "projects/projectabc/locations/asia-southeast1-b"
-    
-  }
+    stretched_cluster_config {
+      preferred_location = "projects/projectabc/locations/asia-southeast2-c"
+      secondary_location = "projects/projectabc/locations/asia-southeast1-b"
+
+    }
   }
 
 }
- 
+
 
 
 resource "google_vmwareengine_network" "pc-nw_nc" {

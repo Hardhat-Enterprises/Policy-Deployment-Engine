@@ -1,14 +1,14 @@
 resource "google_cloudfunctions2_function" "nc" {
   name     = "nc"
-   location = "us-central1"
+  location = "us-central1"
 
   build_config {
     runtime     = "python311"
     entry_point = "hello_world"
     source {
       storage_source {
-        bucket = "dummy-bucket" 
-        object = "source.zip"   
+        bucket = "dummy-bucket"
+        object = "source.zip"
       }
     }
   }

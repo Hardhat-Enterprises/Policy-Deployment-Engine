@@ -1,5 +1,5 @@
 resource "google_deployment_manager_deployment" "nc" {
-    name = "nc"
+  name = "nc"
 
   target {
     config {

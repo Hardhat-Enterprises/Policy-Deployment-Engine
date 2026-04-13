@@ -3,7 +3,7 @@ resource "google_folder_organization_policy" "c1" {
   constraint = "compute.disableSerialPortAccess"
 
   boolean_policy {
-    enforced = true 
+    enforced = true
   }
 }
 resource "google_folder_organization_policy" "c2" {
@@ -22,6 +22,6 @@ resource "google_folder_organization_policy" "c3" {
   constraint = "serviceuser.services"
 
   restore_policy {
-    default = false 
+    default = false
   }
 }

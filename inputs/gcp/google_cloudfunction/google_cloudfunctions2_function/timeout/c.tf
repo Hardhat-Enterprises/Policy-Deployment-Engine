@@ -7,8 +7,8 @@ resource "google_cloudfunctions2_function" "c" {
     entry_point = "hello_world"
     source {
       storage_source {
-        bucket = "dummy-bucket" 
-        object = "source.zip"   
+        bucket = "dummy-bucket"
+        object = "source.zip"
       }
     }
   }

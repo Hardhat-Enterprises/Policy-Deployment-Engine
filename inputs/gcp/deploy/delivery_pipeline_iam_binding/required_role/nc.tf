@@ -7,7 +7,7 @@ resource "google_clouddeploy_delivery_pipeline_iam_binding" "nc" {
   location = "us-central1"
   name     = "nc"
   role     = "roles/editor"
-  
+
   members = [
     "user:admin-user@example.com",
   ]

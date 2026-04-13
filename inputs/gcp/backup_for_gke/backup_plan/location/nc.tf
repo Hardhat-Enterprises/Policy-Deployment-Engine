@@ -1,5 +1,5 @@
 resource "google_gke_backup_backup_plan" "nc" {
-  name = "nc"
+  name     = "nc"
   cluster  = "projects/PDE/locations/us-central1/clusters/my-cluster"
   location = "us-central1"
   project  = "PDE"

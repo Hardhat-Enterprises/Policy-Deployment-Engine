@@ -9,5 +9,5 @@ terraform {
   }
 }
 
-provider "google" {  
+provider "google" {
 }

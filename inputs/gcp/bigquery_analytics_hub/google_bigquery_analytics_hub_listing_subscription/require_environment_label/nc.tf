@@ -1,4 +1,4 @@
-﻿# google_bigquery_analytics_hub_listing_subscription (NON-COMPLIANT)
+# google_bigquery_analytics_hub_listing_subscription (NON-COMPLIANT)
 # This resource is non-compliant because destination_dataset.labels.environment is missing or empty
 
 resource "google_bigquery_analytics_hub_data_exchange" "nc" {

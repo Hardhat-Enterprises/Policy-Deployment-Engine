@@ -11,5 +11,5 @@ resource "google_bigquery_reservation_assignment" "nc" {
   assignee    = "nc"
   job_type    = "QUERY"
   reservation = google_bigquery_reservation.nc.id
-  location = "us-west2"
+  location    = "us-west2"
 }

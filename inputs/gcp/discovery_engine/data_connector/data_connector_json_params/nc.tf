@@ -8,7 +8,7 @@ resource "google_discovery_engine_data_connector" "nc" {
   collection_id                = "nc"
   collection_display_name      = "tf-c-dataconnector"
   data_source                  = "nc-datasource"
-  json_params				   = "invalid-string"
+  json_params                  = "invalid-string"
   refresh_interval             = "86400s"
   incremental_refresh_interval = "21600s"
 }

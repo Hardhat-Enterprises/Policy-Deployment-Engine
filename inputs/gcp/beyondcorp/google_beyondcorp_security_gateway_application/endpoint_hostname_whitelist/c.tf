@@ -1,10 +1,10 @@
 
 resource "google_beyondcorp_security_gateway_application" "c" {
   security_gateway_id = "c"
-  project = "smooth-verve-467716-v1"
-  application_id = "c"
+  project             = "smooth-verve-467716-v1"
+  application_id      = "c"
   endpoint_matchers {
     hostname = "web.corp.example.com"
-    ports = [443 , 8443]
+    ports    = [443, 8443]
   }
 }

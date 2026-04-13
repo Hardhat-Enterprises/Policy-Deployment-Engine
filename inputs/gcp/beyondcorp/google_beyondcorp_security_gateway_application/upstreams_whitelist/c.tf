@@ -2,7 +2,7 @@
 resource "google_beyondcorp_security_gateway_application" "c" {
   security_gateway_id = "c"
   application_id      = "c"
-  project            = "smooth-verve-467716-v1"
+  project             = "smooth-verve-467716-v1"
   endpoint_matchers {
     hostname = "svc.corp.example.com"
   }

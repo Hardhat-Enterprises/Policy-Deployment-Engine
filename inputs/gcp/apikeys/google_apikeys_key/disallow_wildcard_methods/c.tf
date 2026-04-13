@@ -3,7 +3,7 @@
 resource "google_apikeys_key" "c" {
   name         = "c"
   display_name = "Compliant key (no wildcard methods)"
-  project = "my-gcp-project"
+  project      = "my-gcp-project"
 
   restrictions {
     api_targets {

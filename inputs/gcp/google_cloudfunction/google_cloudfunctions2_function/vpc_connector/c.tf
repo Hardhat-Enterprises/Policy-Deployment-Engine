@@ -17,7 +17,7 @@ resource "google_cloudfunctions2_function" "c" {
     max_instance_count = 2
     available_memory   = "512M"
     timeout_seconds    = 120
-    ingress_settings   = "ALLOW_INTERNAL_ONLY"  # Updated for ingress policy
+    ingress_settings   = "ALLOW_INTERNAL_ONLY" # Updated for ingress policy
     vpc_connector      = "projects/my-project/locations/us-central1/connectors/my-vpc-connector"
     environment_variables = {
       GREETING = "Hello"

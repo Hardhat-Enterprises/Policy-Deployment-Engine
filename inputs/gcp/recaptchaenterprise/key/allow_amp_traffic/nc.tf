@@ -7,9 +7,9 @@ resource "google_recaptcha_enterprise_key" "nc" {
 
   web_settings {
     # Keep wildcarding off so the failure is only about AMP
-    allow_all_domains = false
-    allowed_domains   = ["example.com", "shop.example.com"]
-    integration_type  = "SCORE"
+    allow_all_domains             = false
+    allowed_domains               = ["example.com", "shop.example.com"]
+    integration_type              = "SCORE"
     challenge_security_preference = "BALANCE"
 
     # Policy focus

@@ -5,6 +5,6 @@ resource "google_beyondcorp_security_gateway_application" "c" {
 
   endpoint_matchers {
     hostname = "svc.corp.example.com"
-    ports    = [443]  
+    ports    = [443]
   }
 }

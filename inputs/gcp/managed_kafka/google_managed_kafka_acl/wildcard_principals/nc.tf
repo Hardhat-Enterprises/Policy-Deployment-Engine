@@ -8,7 +8,7 @@ resource "google_managed_kafka_acl" "nc" {
   project  = "123"
 
   acl_entries {
-    principal       = "User:*"  
+    principal       = "User:*"
     permission_type = "ALLOW"
     operation       = "ALL"
     host            = "*"

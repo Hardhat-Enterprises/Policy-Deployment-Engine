@@ -5,8 +5,8 @@ resource "google_gke_hub_feature_iam_binding" "nc" {
   role     = "roles/gkehub.viewer"
 
   members = [
-    "allUsers",                                       
-    "allAuthenticatedUsers"            
+    "allUsers",
+    "allAuthenticatedUsers"
   ]
 }
 

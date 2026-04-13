@@ -6,10 +6,10 @@ resource "google_dataform_repository" "nc" {
   region       = "australia-southeast1"
   name         = "nc"
   display_name = "nc"
-  
+
   git_remote_settings {
-    url             = "https://github.com/example/repo.git"
-    default_branch  = ""  # Empty string - non-compliant for testing policy enforcement
+    url                                 = "https://github.com/example/repo.git"
+    default_branch                      = "" # Empty string - non-compliant for testing policy enforcement
     authentication_token_secret_version = "projects/example-project/secrets/git-token/versions/1"
   }
 }

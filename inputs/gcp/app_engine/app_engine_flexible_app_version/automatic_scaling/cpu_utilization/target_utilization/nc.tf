@@ -16,7 +16,7 @@ resource "google_app_engine_flexible_app_version" "nc" {
 
   automatic_scaling {
     cpu_utilization {
-      target_utilization = 0.9 
+      target_utilization = 0.9
     }
   }
 

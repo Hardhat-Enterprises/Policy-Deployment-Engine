@@ -6,6 +6,6 @@ resource "google_project" "c123" {
   labels = {
     owner = "security-team"
     env   = "dev"
-    team = "infra"
+    team  = "infra"
   }
 }

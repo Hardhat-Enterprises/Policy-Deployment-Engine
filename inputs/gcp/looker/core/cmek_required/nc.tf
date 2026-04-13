@@ -1,5 +1,5 @@
 resource "google_looker_instance" "nc" {
-  name = "nc"
+  name    = "nc"
   project = var.project
   # encryption_config intentionally omitted to trigger failure
   oauth_config {

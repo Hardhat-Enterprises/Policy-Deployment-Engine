@@ -1,12 +1,12 @@
 resource "google_model_armor_template" "nc" {
-   template_id = "nc"
-   project = "nc project"
-   location    = "global"
+  template_id = "nc"
+  project     = "nc project"
+  location    = "global"
 
   filter_config {
-     sdp_settings {
+    sdp_settings {
       basic_config {
-          filter_enforcement = "DISABLED"
+        filter_enforcement = "DISABLED"
       }
     }
 

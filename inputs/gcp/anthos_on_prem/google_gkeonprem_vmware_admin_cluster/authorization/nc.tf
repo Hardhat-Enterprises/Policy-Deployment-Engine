@@ -1,16 +1,16 @@
 resource "google_gkeonprem_vmware_admin_cluster" "nc" {
-  name = "nc"
-  project = "PDE"
-  location = "us-west1"
+  name            = "nc"
+  project         = "PDE"
+  location        = "us-west1"
   on_prem_version = "1.31.0-gke.35"
   network_config {
     service_address_cidr_blocks = ["10.96.0.0/12"]
-    pod_address_cidr_blocks = ["192.168.0.0/16"]
+    pod_address_cidr_blocks     = ["192.168.0.0/16"]
     ha_control_plane_config {
       control_plane_ip_block {
         gateway = "10.0.0.3"
         ips {
-          ip       = "10.0.0.4"
+          ip = "10.0.0.4"
         }
         netmask = "10.0.0.3/32"
       }
@@ -19,7 +19,7 @@ resource "google_gkeonprem_vmware_admin_cluster" "nc" {
       ip_blocks {
         gateway = "10.0.0.1"
         ips {
-          ip       = "10.0.0.2"
+          ip = "10.0.0.2"
         }
         netmask = "10.0.0.3/32"
       }
@@ -29,12 +29,12 @@ resource "google_gkeonprem_vmware_admin_cluster" "nc" {
     vip_config {
       control_plane_vip = "10.251.133.5"
     }
-      f5_config {
-      address = "10.251.135.22"
+    f5_config {
+      address   = "10.251.135.22"
       partition = "test-parition"
       snat_pool = "test-snat-pool"
     }
-    
+
   }
   addon_node {
     auto_resize_config {

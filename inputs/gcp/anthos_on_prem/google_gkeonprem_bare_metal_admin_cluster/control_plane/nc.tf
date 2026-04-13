@@ -1,6 +1,6 @@
 resource "google_gkeonprem_bare_metal_admin_cluster" "nc" {
-  name = "nc"
-  project = "PDE"
+  name     = "nc"
+  project  = "PDE"
   location = "us-west1"
   control_plane {
     control_plane_node_pool_config {
@@ -19,7 +19,7 @@ resource "google_gkeonprem_bare_metal_admin_cluster" "nc" {
     }
     api_server_args {
       argument = "test argument"
-      value = "test value"
+      value    = "test value"
     }
   }
 }

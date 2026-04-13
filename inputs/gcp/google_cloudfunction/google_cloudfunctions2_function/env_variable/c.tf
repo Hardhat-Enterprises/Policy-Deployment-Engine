@@ -1,7 +1,7 @@
 resource "google_cloudfunctions2_function" "c" {
 
-  name = ""
-  location = "us-central1"
+  name        = ""
+  location    = "us-central1"
   description = "a new function"
 
   build_config {

@@ -1,7 +1,7 @@
 resource "google_alloydb_cluster" "c" {
   cluster_id = "c1"
   location   = "us-central1"
-  project = "123"
+  project    = "123"
 
   network_config {
     network = "projects/p/global/networks/prod-vpc"

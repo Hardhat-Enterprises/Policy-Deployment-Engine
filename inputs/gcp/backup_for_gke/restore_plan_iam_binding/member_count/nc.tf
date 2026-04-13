@@ -3,7 +3,7 @@ resource "google_gke_backup_restore_plan_iam_binding" "nc" {
   location = "australia-southeast1"
   project  = "PDE"
   role     = "roles/gkebackup.restoreViewer"
-  
+
   members = [
     "user:user1@example.com",
     "user:user2@example.com",
