@@ -20,7 +20,7 @@ resource "google_compute_instance" "myinstance" {
 }
 
 resource "google_backup_dr_backup_vault" "c" {
-  project  = "tamim-shahriar"
+  project  = "my-project-4418-1743628379470"
   location = "australia-southeast1"
   backup_vault_id    = "backup-vault-compliant"
   access_restriction = "WITHIN_ORGANIZATION"
@@ -28,7 +28,7 @@ resource "google_backup_dr_backup_vault" "c" {
 }
 
 resource "google_backup_dr_backup_plan" "c" {
-  project        = "tamim-shahriar"
+  project        = "my-project-4418-1743628379470"
   location       = "australia-southeast1"
   backup_plan_id = "backup-plan-compliant"
   resource_type  = "compute.googleapis.com/Instance"
@@ -51,7 +51,7 @@ resource "google_backup_dr_backup_plan" "c" {
 }
 
 resource "google_backup_dr_backup_plan_association" "c" {
-  project       = "tamim-shahriar"
+  project       = "my-project-4418-1743628379470"
   location      = "australia-southeast1"
   resource_type = "compute.googleapis.com/Instance"
   backup_plan_association_id    = "bpa-compliant"

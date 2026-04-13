@@ -1,5 +1,5 @@
 resource "google_backup_dr_backup_vault" "nc" {
-  project  = "tamim-shahriar"
+  project  = "my-project-4418-1743628379470"
   location = "us-central1"
   backup_vault_id    = "backup-vault-non-compliant"
   access_restriction = "WITHIN_ORGANIZATION"
@@ -7,7 +7,7 @@ resource "google_backup_dr_backup_vault" "nc" {
 }
 
 resource "google_backup_dr_backup_plan" "nc" {
-  project        = "tamim-shahriar"
+  project        = "my-project-4418-1743628379470"
   location       = "us-central1"
   backup_plan_id = "backup-plan-non-compliant"
   resource_type  = "compute.googleapis.com/Instance"
