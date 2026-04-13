@@ -1,4 +1,4 @@
-resource "google_blockchain_node_engine_blockchain_nodes" "c1" {
+resource "google_blockchain_node_engine_blockchain_nodes" "c" {
   project            = "my-secure-project"
   blockchain_node_id = "c"
   location           = "australia-southeast1"
