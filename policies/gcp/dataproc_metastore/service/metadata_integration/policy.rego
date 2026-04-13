@@ -9,8 +9,8 @@ conditions := [
     "remedies":[ "Set metadata intergration, data catalog, enabled to true"]},
     {
         "condition": "Data catalog sync enabled",
-        "attribute_path" : ["data_catalog_config", 0, "enabled"], 
-        "values" : ["true"], 
+        "attribute_path" : ["metadata_integration", 0, "data_catalog_config", 0, "enabled"], 
+        "values" : [true], 
         "policy_type" : "whitelist" 
     }
     ]

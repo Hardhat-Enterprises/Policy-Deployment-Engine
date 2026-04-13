@@ -23,10 +23,10 @@
     "cluster": {
       "description": "The source cluster from which Restores will be created via this RestorePlan.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Restores must target a designated DR cluster in the approved region.",
+      "compliant": "projects/*/locations/australia-southeast1/clusters/*-dr",
+      "non-compliant": "projects/*/locations/us-central1/clusters/*-dr",
       "parent": null
     },
     "restore_config": {
@@ -113,10 +113,10 @@
         "cluster_resource_conflict_policy": {
           "description": "Defines the behavior for handling the situation where cluster-scoped resources being restored already exist in the target cluster. This MUST be set to a value other than `CLUSTER_RESOURCE_CONFLICT_POLICY_UNSPECIFIED` if `clusterResourceRestoreScope` is anyting other than `noGroupKinds`. See https://cloud.google.com/kubernetes-engine/docs/add-on/backup-for-gke/reference/rest/v1/RestoreConfig#clusterresourceconflictpolicy for more information on each policy option. Possible values are: `USE_EXISTING_VERSION`, `USE_BACKUP_VERSION`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Conflict policy should default to using existing versions to preserve state stability.",
+          "compliant": "USE_EXISTING_VERSION",
+          "non-compliant": "USE_BACKUP_VERSION",
           "parent": "restore_config"
         },
         "transformation_rules": {
@@ -151,10 +151,10 @@
     "location": {
       "description": "The region of the Restore Plan.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Restore plans must be created in the approved region (australia-southeast1).",
+      "compliant": "australia-southeast1",
+      "non-compliant": "us-central1",
       "parent": null
     },
     "description": {
@@ -285,10 +285,10 @@
         "all_group_kinds": {
           "description": "If True, all valid cluster-scoped resources will be restored. Mutually exclusive to any other field in `clusterResourceRestoreScope`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Avoid full cluster restores to prevent overwriting critical existing resources unless explicitly intended.",
+          "compliant": "selected_group_kinds",
+          "non-compliant": "all_group_kinds=true",
           "parent": "cluster_resource_restore_scope"
         },
         "excluded_group_kinds": {

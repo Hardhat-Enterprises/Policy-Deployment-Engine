@@ -1,5 +1,5 @@
 resource "google_dataproc_metastore_service" "c" {
-  service_id = "metastore-srv"
+  service_id = "c"
   project = 1
 
   encryption_config {

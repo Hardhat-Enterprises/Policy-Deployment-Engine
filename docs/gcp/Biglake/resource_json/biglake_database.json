@@ -1,62 +1,66 @@
 {
-  "resource_name": "biglake_database",
+  "_metadata": {
+    "provider": "gcp",
+    "version": "v5.29.0"
+  },
+  "resource_name": "google_biglake_database",
   "subcategory": "Biglake",
   "arguments": {
-    "type": {
-      "description": "The database type.",
+    "name": {
+      "description": "The name of the BigLake database.",
       "required": true,
-      "security_impact": null,
+      "security_impact": false,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "catalog": {
+      "description": "The BigLake catalog that contains this database.",
+      "required": true,
+      "security_impact": false,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "type": {
+      "description": "The type of the BigLake database.",
+      "required": true,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "hive_options": {
-      "description": "Options of a Hive database. Structure is [documented below](#nested_hive_options).",
-      "required": true,
-      "security_impact": null,
+      "description": "Hive-specific options for the BigLake database.",
+      "required": false,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
       "parent": null,
       "arguments": {
         "location_uri": {
-          "description": "Cloud Storage folder URI where the database data is stored, starting with \"gs://\".",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "description": "The Cloud Storage location where the database data is stored.",
+          "required": true,
+          "security_impact": true,
+          "rationale": "The storage location determines where database data is physically stored. Misconfigured or public storage locations may lead to unauthorised data access or violations of data residency requirements.",
+          "compliant": "gs://secure-private-bucket/database-path",
+          "non-compliant": "gs://public-bucket/database-path",
           "parent": "hive_options"
         },
         "parameters": {
-          "description": "Stores user supplied Hive database parameters. An object containing a list of\"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.",
+          "description": "Custom parameters for the Hive database.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
           "parent": "hive_options"
         }
       }
-    },
-    "catalog": {
-      "description": "The parent catalog.",
-      "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "name": {
-      "description": "The name of the database.",
-      "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
     }
   }
 }

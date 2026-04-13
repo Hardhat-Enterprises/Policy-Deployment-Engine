@@ -10,7 +10,7 @@ Reference: [Terraform Registry – discovery_engine_sitemap](https://registry.te
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `location` | The geographic location where the data store should reside. The value can only be one of "global", "us" and "eu". | true | false | None | None | None |
+| `location` | The geographic location where the data store should reside. The value can only be one of "global", "us" and "eu". | true | true | laws apply based on location | eu, us, global | US-West23 |
 | `data_store_id` | The unique id of the data store. | true | false | None | None | None |
 | `uri` | Public URI for the sitemap, e.g. "www.example.com/sitemap.xml". | false | false | None | None | None |
 | `project` | If it is not provided, the provider project is used. | false | false | None | None | None |

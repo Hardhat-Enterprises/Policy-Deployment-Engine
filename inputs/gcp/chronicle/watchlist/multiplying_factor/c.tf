@@ -5,7 +5,7 @@ resource "google_chronicle_watchlist" "c" {
   watchlist_id  = "c"
   description   = "Critical assets"
   display_name  = "Secure Watchlist"
-  multiplying_factor = 1.5
+  multiplying_factor = 1.0
 
   entity_population_mechanism {
     manual {}

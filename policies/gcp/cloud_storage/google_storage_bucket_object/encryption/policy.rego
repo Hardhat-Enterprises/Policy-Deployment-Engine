@@ -18,7 +18,7 @@ conditions := [
 
         {
             "condition": "Encryption should be done.",
-            "attribute_path": ["customer_encryption",0],
+            "attribute_path": ["customer_encryption"],
             "values": [null],  
             "policy_type": "blacklist"
         }

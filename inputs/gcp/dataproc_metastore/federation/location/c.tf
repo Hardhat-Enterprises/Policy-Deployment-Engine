@@ -1,6 +1,6 @@
 resource "google_dataproc_metastore_federation" "c" {
   version = "3.1.2"   
-  federation_id = "metastore-fed" 
+  federation_id = "c" 
   location = "australia-southeast2"
   project = 2 
 

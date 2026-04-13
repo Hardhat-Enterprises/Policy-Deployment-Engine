@@ -8,12 +8,12 @@ conditions := [
     [
     {
         "situation_description": "Location is set to the wrong place",
-        "remedies": ["Ensure Location is set to eu"]
+        "remedies": ["Ensure Location is set to a valid location"]
         },
       {
         "condition": "Location is mis-configured",
         "attribute_path": ["location"],
-        "values": ["eu"],
+        "values": ["eu", "us", "global"],
         "policy_type": "whitelist"
       }
     ]

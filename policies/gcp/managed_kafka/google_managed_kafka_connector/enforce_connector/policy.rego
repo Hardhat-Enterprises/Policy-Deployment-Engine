@@ -35,7 +35,7 @@ conditions := [
     
     {
     "condition": "configs must contain topics, tasks.max, and cps.project",
-    "attribute_path": ["configs"],
+    "attribute_path": ["configs", "topics"],
     "values": ["topics", "tasks.max", "cps.project"],
     "policy_type": "whitelist"
     }
@@ -60,7 +60,7 @@ conditions := [
     {
       "condition": "maximum_backoff must be at most 3600s",
       "attribute_path": ["task_restart_policy", "maximum_backoff"],
-      "values": ["30s", "60s", "300s", "900s", "1800s", "3600s"],
+      "values": ["30s", "60s", "300s", "600s", "900s", "1800s", "3600s"],
       "policy_type": "whitelist"
     }
 
@@ -68,7 +68,5 @@ conditions := [
 
 ]
 
-summary := {
-  "message": helpers.get_multi_summary(conditions, vars.variables).message,
-  "details": helpers.get_multi_summary(conditions, vars.variables).details
-}
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

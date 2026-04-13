@@ -1,6 +1,6 @@
 package terraform.gcp.security.gemini.google_gemini_release_channel_setting.force_stable_channel
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.google_gemini_release_channel_setting.vars
 
 conditions := [

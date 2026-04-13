@@ -1,6 +1,6 @@
 resource "google_compute_instance" "c" {
   project      = "dummy-project"
-  name         = "good-instance"
+  name         = "c"
   machine_type = "e2-micro"
   zone         = "australia-southeast1-a"
 

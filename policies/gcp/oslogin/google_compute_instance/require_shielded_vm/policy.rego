@@ -14,7 +14,7 @@ conditions := [
         {
             "condition": "Shielded VM secure boot must be enabled",
             "attribute_path": ["shielded_instance_config", 0, "enable_secure_boot"],
-            "values": ["true"],
+            "values": [true],
             "policy_type": "whitelist"
         }
     ]

@@ -5,15 +5,15 @@ import data.terraform.gcp.security.managed_kafka.google_managed_kafka_cluster.va
 
 conditions := [
 
-  # Situation 1 – Whitelist subnets using pattern-based path
+  # Situation 1 – Blacklist empty subnets using pattern-based path
   [
     { "situation_description": "Kafka clusters should not use public IPs; private networking must be enabled for better security.", 
     "remedies": ["Set subnet inside network_configs to a private subnet."] 
     },
     { "condition": "network_configs.subnet must be defined", 
-    "attribute_path": ["gcp_config", "access_config", "network_configs", 0, "subnet"],
+    "attribute_path": ["gcp_config", 0, "access_config", 0, "network_configs", 0, "subnet"],
      "values": [""], 
-     "policy_type": "whitelist"
+     "policy_type": "blacklist"
     } 
   ],
 
@@ -25,8 +25,8 @@ conditions := [
     },
     {
       "condition": "vcpu_count >= 2",
-      "attribute_path": ["capacity_config", "vcpu_count"],
-      "values": [2, null],
+      "attribute_path": ["capacity_config", 0, "vcpu_count"],
+      "values": [1, 2],
       "policy_type": "range"
 
     }
@@ -40,15 +40,13 @@ conditions := [
     },
     {
       "condition": "memory_bytes >= 2147483648",
-      "attribute_path": ["capacity_config", "memory_bytes"],
-      "values": [2147483648, null],
+      "attribute_path": ["capacity_config", 0, "memory_bytes"],
+      "values": [2147483648, 8589934592],
       "policy_type": "range"
 
     }
   ]
 ]
 
-summary := {
-  "message": helpers.get_multi_summary(conditions, vars.variables).message,
-  "details": helpers.get_multi_summary(conditions, vars.variables).details
-}
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

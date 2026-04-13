@@ -1,5 +1,5 @@
 resource "google_looker_instance" "nc" {
-  name = "nc1"
+  name = "nc"
   project = var.project
   oauth_config {
     client_id     = ""  # Empty client_id to trigger failure

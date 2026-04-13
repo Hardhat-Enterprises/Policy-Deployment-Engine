@@ -1,4 +1,4 @@
-resource "google_looker_instance" "c" {
+resource "google_looker_instance" "c1" {
   name = "c1"
   project        = var.project
   reserved_range = "projects/test-project-123/global/addresses/test-reserved-range"

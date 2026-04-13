@@ -1,8 +1,7 @@
 package terraform.gcp.security.dataform.google_dataform_repository_iam.iam_no_public
 
 import data.terraform.helpers
-import data.terraform.gcp.security.dataform.google_dataform_repository_iam as repo
-
+import data.terraform.gcp.security.dataform.google_dataform_repository_iam.vars
 # Disallow public principals on repository IAM bindings
 
 conditions := [
@@ -23,5 +22,7 @@ conditions := [
   ]
 ]
 
-message := helpers.get_multi_summary(conditions, repo.variables).message
-details := helpers.get_multi_summary(conditions, repo.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details

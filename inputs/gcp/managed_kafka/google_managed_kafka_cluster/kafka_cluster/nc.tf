@@ -1,17 +1,17 @@
-resource "google_managed_kafka_cluster" "insecure_cluster" {
-  cluster_id = "insecure-cluster"
+resource "google_managed_kafka_cluster" "nc" {
+  cluster_id = "nc"
   location   = "us-central1"
   project    = "my-project"
 
   capacity_config {
-    vcpu_count   = 3
-    memory_bytes = 3221225472
+    vcpu_count   = 4
+    memory_bytes = 2147483350
   }
 
   gcp_config {
     access_config {
       network_configs {
-        subnet = ""  
+        subnet = ""
       }
     }
     
