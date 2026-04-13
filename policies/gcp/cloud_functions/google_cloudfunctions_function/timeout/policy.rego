@@ -10,7 +10,7 @@ conditions := [
     {
         "condition": "Test whether the function timeout exceeds 540 seconds",
         "attribute_path" : ["timeout"],
-        "values" : ["60","540"],
+        "values" : [60,540],
         "policy_type" : "range"
     }
     ]

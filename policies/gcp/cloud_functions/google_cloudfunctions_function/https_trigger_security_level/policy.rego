@@ -2,6 +2,7 @@ package terraform.gcp.security.cloud_functions.google_cloudfunctions_function.ht
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_functions.google_cloudfunctions_function.vars
 
+
 conditions := [
     [
     {"situation_description" : "Cloud function is not enforcing a secure HTTPS trigger level ",

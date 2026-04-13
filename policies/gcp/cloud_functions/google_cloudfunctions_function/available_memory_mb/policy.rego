@@ -9,7 +9,7 @@ conditions := [
     {
         "condition": "Test if cloud function has enough available memory in order for resource to run effectively",
         "attribute_path" : ["available_memory_mb" ],
-        "values" : ["128", "256", "512", "1024", "2048"],
+        "values" : [128, 256, 512, 1024, 2048],
         "policy_type" : "whitelist" 
     }
     ]

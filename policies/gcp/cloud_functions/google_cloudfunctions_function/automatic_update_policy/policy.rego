@@ -9,7 +9,7 @@ conditions := [
     {
         "condition": "Test whether automatic update policy is enabled",
         "attribute_path" : ["automatic_update_policy" ],
-        "values" : [""],
+        "values" : [{}],
         "policy_type" : "whitelist" 
     }
     ]

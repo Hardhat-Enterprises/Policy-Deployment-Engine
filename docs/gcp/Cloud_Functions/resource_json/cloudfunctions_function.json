@@ -60,7 +60,7 @@
       "description": "A source that fires events in response to a condition in another service.",
       "required": false,
       "security_impact": false,
-      "rationale":"event_trigger cannot be used with trigger http, which a policy has been written for",
+      "rationale":"event_trigger does not have any security effect to the resource or the data contained",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -69,7 +69,7 @@
           "description": "See the documentation on [calling Cloud Functions](https://cloud.google.com/functions/docs/calling/) for a full reference of accepted triggers.",
           "required": true,
           "security_impact": false,
-          "rationale":"event_trigger cannot be used with trigger http, which a policy has been written for",
+          "rationale":"An event type which triggers a funcion does not effect the security of the resource or the data contained",
           "compliant": null,
           "non-compliant": null,
           "parent": "event_trigger"
@@ -78,7 +78,7 @@
           "description": "which to observe events. For example, `\"myBucket\"` or `\"projects/my-project/topics/my-topic\"`",
           "required": true,
           "security_impact": false,
-          "rationale":"event_trigger cannot be used with trigger http, which a policy has been written for",
+          "rationale":"Only identifies the resource of the event and does not modify anything regarding the resource security or the data",
           "compliant": null,
           "non-compliant": null,
           "parent": "event_trigger"
@@ -87,7 +87,7 @@
           "description": "Specifies policy for failed executions",
           "required": false,
           "security_impact": false,
-          "rationale": "event_trigger cannot be used with trigger http, which a policy has been written for",
+          "rationale": "retry behaivour on failure has no impact on the resource security or the data contained",
           "compliant": null,
           "non-compliant": null,
           "parent": "event_trigger"
@@ -98,7 +98,7 @@
       "description": "",
       "required":false,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "HTTP triggers only focus on how the function is invoked, and therefore have no impact on the resource security or the data contained",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -151,8 +151,8 @@
     "service_account_email": {
       "description": "If provided, the self-provided service account to run the function with.",
       "required": false,
-      "security_impact":"A provided email has no impact on the security of the resource or the data contained",
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "A provided email has no impact on the security of the resource or the data contained",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -232,7 +232,7 @@
     "source_repository": {
       "description": "Cannot be set alongside `source_archive_bucket` or `source_archive_object`. Structure is [documented below](#nested_source_repository). It must match the pattern `projects/{project}/locations/{location}/repositories/{repository}`.*",
       "required": false,
-      "security_impact": true,
+      "security_impact": false,
       "rationale": "The source repository does not have an impact on the security of the resource or the data contained",
       "compliant": null,
       "non-compliant": null,
@@ -254,8 +254,8 @@
       "required": false,
       "security_impact": true,
       "rationale": "CONTAINER_REGISTRY has been depreciated and can therefore cause security risks to the resource and its data",
-      "compliant": null,
-      "non-compliant": null,
+      "compliant": "ARTIFACT_REGISTRY",
+      "non-compliant": "CONTAINER_REGISTRY",
       "parent": null
     },
     "docker_repository": {
@@ -393,8 +393,8 @@
       "required": false,
       "security_impact": true,
       "rationale": "automatic updates can patch security misconfigurations and therefore protect the security of the resource or the data contained",
-      "compliant": "",
-      "non-compliant": "automatic_update_policy = true",
+      "compliant": null,
+      "non-compliant": null,
       "parent": null
     },
     "on_deploy_update_policy": {
@@ -421,7 +421,7 @@
       "description": "",
       "required": false,
       "security_impact": true,
-      "rationale": "",
+      "rationale": "If a function fails, not restarting it can lead to data being lost or corrupted",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
