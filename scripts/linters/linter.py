@@ -19,7 +19,7 @@ class ErrorLogger:
 
     def summary(self):
         n = len(self.errors)
-        print("✅ No errors found." if n == 0 else f"\n❌ {n} error(s) found.")
+        print("[OK] No errors found." if n == 0 else f"\n[FAIL] {n} error(s) found.")
         return n
 
 
@@ -387,16 +387,16 @@ def main():
     policies = PolicyValidator(policies_root, logger)
 
     if args.gcp:
-        print(f"\n🔍 Linting only service: {args.gcp}\n")
-        print("\n🔍 Checking INPUTS folder \n")
+        print(f"\n[*] Linting only service: {args.gcp}\n")
+        print("\n[*] Checking INPUTS folder \n")
         inputs.validate_service(args.gcp)
-        print("\n🔍 Checking POLICIES folder \n")
+        print("\n[*] Checking POLICIES folder \n")
         policies.validate_service(args.gcp)
     else:
-        print("\n🔍 Linting all GCP services...\n")
-        print("\n🔍 Checking INPUTS folder \n")
+        print("\n[*] Linting all GCP services...\n")
+        print("\n[*] Checking INPUTS folder \n")
         inputs.validate()
-        print("\n🔍 Checking POLICIES folder \n")
+        print("\n[*] Checking POLICIES folder \n")
         policies.validate()
 
     if logger.summary():
