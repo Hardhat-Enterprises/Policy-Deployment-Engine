@@ -1,4 +1,4 @@
-resource "google_iam_oauth_client" "client" {
+resource "google_iam_oauth_client" "client_c" {
   oauth_client_id       = "example-client-id"
   display_name          = "Valid OAuth Client"
   description           = "Compliant OAuth client"
@@ -12,7 +12,7 @@ resource "google_iam_oauth_client" "client" {
 }
 
 resource "google_iam_oauth_client_credential" "c" {
-  oauthclient                = google_iam_oauth_client.client.oauth_client_id
+  oauthclient                = google_iam_oauth_client.client_c.oauth_client_id
   location                   = "global"
   oauth_client_credential_id = "cred-01a"
   disabled                   = false
