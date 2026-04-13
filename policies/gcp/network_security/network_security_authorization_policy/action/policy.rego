@@ -1,0 +1,21 @@
+package terraform.gcp.security.network_security.network_security_authorization_policy.action
+import data.terraform.helpers
+import data.terraform.gcp.security.network_security.network_security_authorization_policy.vars
+
+conditions := [
+    [
+        {
+            "situation_description": "Only allow action value ALLOW",
+            "remedies": ["Set the action to ALLOW"]
+        },
+        {
+            "condition": "Authorization policy action must be ALLOW",
+            "attribute_path": ["action"],
+            "values": ["ALLOW"],
+            "policy_type": "whitelist"
+        }
+    ]
+]
+
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details
