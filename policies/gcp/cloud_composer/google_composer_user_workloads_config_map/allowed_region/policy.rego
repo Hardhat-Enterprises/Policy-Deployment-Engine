@@ -16,7 +16,7 @@ conditions := [
         {
             "condition": "Check if region is not in the allowed whitelist",
             "attribute_path": ["region"],
-            "values": ["us-central1", "europe-west1"],
+            "values": ["australia-southeast1"],
             "policy_type": "whitelist"
         }
     ]
