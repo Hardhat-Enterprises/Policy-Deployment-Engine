@@ -1,7 +1,7 @@
 resource "google_composer_environment" "c" {
   name    = "c"
   project = "fake-project"
-  region  = "us-central1"
+  region  = "australia-southeast1"
 
   config {
     enable_private_environment = true

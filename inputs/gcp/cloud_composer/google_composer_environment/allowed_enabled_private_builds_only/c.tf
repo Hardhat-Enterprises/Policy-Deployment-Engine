@@ -1,6 +1,6 @@
 resource "google_composer_environment" "c" {
   name    = "c"
-  region  = "us-central1"
+  region  = "australia-southeast1"
   project = "fake-project"
 
   config {
