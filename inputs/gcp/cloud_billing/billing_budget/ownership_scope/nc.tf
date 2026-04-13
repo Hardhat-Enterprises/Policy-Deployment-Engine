@@ -1,6 +1,3 @@
-# Describe your resource type here
-# Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
-
 resource "google_billing_budget" "nc"{
   billing_account = "000000-0000000-0000000-000000"
   display_name = "Example Billing Budget"
