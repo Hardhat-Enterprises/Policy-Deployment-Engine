@@ -56,23 +56,23 @@
       "non-compliant": null,
       "parent": null
     },
-    "unique_writer_identity": {
-      "description": "If set to true, a unique service account is created and used for this sink. If you wish to publish logs across projects or utilize bigquery_options, you must set unique_writer_identity to true.",
-      "required": false,
-      "security_impact": true,
-      "rationale": "Unique writer identity creates a dedicated service account for this sink, improving security through isolation and least privilege. Required for cross-project exports and BigQuery options. Without this, the default Logging service account is used, which may have broader permissions.",
-      "compliant": "true",
-      "non-compliant": "false",
-      "parent": null
+   "unique_writer_identity": {
+  "description": "If set to true, a unique service account is created and used for this sink. If you wish to publish logs across projects or utilize bigquery_options, you must set unique_writer_identity to true.",
+  "required": false,
+  "security_impact": true,
+  "rationale": "Unique writer identity creates a dedicated service account for each sink, following the principle of least privilege. It prevents sharing the default Logging service account across multiple sinks and is required for cross-project log exports.",
+  "compliant": "true",
+  "non-compliant": "false (or omitted)",
+  "parent": null
     },
-    "custom_writer_identity": {
-      "description": "A custom service account email address to be used as the writer identity. The format must be serviceAccount:some@email. This field can only be specified if you are routing logs to a destination outside this sink's project. If not specified, a Logging service account will automatically be generated.",
-      "required": false,
-      "security_impact": true,
-      "rationale": "Custom writer identity allows specifying a specific service account for log export. This provides fine-grained control over permissions and follows the principle of least privilege. The service account must have appropriate permissions on the destination.",
-      "compliant": "serviceAccount:logs-exporter@my-project.iam.gserviceaccount.com",
-      "non-compliant": null,
-      "parent": null
+   "custom_writer_identity": {
+  "description": "A custom service account email address to be used as the writer identity. The format must be serviceAccount:some@email. This field can only be specified if you are routing logs to a destination outside this sink's project. If not specified, a Logging service account will automatically be generated.",
+  "required": false,
+  "security_impact": false,
+  "rationale": "No security policy has been implemented for this argument. Custom writer identity configuration is left to the discretion of the resource owner. Note that unique_writer_identity must be set to true to use this feature.",
+  "compliant": null,
+  "non-compliant": null,
+  "parent": null
     },
     "bigquery_options": {
       "description": "Options for sinks exporting to BigQuery. Configures how logs are organized in BigQuery tables. Requires unique_writer_identity = true.",

@@ -20,14 +20,14 @@
       "non-compliant": null,
       "parent": null
     },
-    "destination": {
-      "description": "The destination where logs will be exported. Supported destinations: Cloud Storage bucket, Pub/Sub topic, BigQuery dataset, or Cloud Logging bucket. Examples: - `storage.googleapis.com/[GCS_BUCKET]` - `bigquery.googleapis.com/projects/[PROJECT_ID]/datasets/[DATASET]` - `pubsub.googleapis.com/projects/[PROJECT_ID]/topics/[TOPIC_ID]` - `logging.googleapis.com/projects/[PROJECT_ID]/locations/global/buckets/[BUCKET_ID]` The writer associated with the sink must have access to write to the above resource.",
-      "required": true,
-      "security_impact": true,
-      "rationale": "Destination determines where all organization logs are exported. Exporting to unauthorized or external destinations can lead to organization-wide log exfiltration, massive data leakage, and severe compliance violations. Destinations must be within the organization's approved projects and follow security best practices.",
-      "compliant": "storage.googleapis.com/org-audit-logs-bucket",
-      "non-compliant": "pubsub.googleapis.com/projects/attacker-project/topics/logs",
-      "parent": null
+   "destination": {
+  "description": "The destination where logs will be exported. Supported destinations: Cloud Storage bucket, Pub/Sub topic, BigQuery dataset, or Cloud Logging bucket.",
+  "required": true,
+  "security_impact": false,
+  "rationale": "Destination must be within the organization's approved projects to prevent log exfiltration. External destinations can lead to data leakage and compliance violations.",
+  "compliant": "storage.googleapis.com/audit-logs-bucket",
+  "non-compliant": "pubsub.googleapis.com/projects/attacker-project/topics/logs",
+  "parent": null
     },
     "filter": {
       "description": "An advanced logs filter that selects which log entries to export. See [Advanced Log Filters](https://cloud.google.com/logging/docs/view/advanced-filters) for information on how to write a filter.",

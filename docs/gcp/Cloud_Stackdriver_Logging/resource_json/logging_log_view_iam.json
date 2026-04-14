@@ -38,23 +38,23 @@
       "non-compliant": null,
       "parent": null
     },
-    "member/members": {
-      "description": "Identities that will be granted the role. Each entry can be: allUsers, allAuthenticatedUsers, user:{emailid}, serviceAccount:{emailid}, group:{emailid}, domain:{domain}, projectOwner:projectid, projectEditor:projectid, projectViewer:projectid",
-      "required": true,
-      "security_impact": true,
-      "rationale": "Members determine who has access to view logs. Granting access to allUsers or allAuthenticatedUsers exposes logs to unauthorized parties, violating confidentiality and compliance requirements. Overly permissive access (e.g., projectViewer) may grant log access to unintended users.",
-      "compliant": "[\"serviceAccount:security-auditor@my-project.iam.gserviceaccount.com\"]",
-      "non-compliant": "[\"allUsers\", \"allAuthenticatedUsers\", \"user:unauthorized@gmail.com\"]",
-      "parent": null
+   "member/members": {
+  "description": "Identities that will be granted the role. Each entry can be: allUsers, allAuthenticatedUsers, user:{emailid}, serviceAccount:{emailid}, group:{emailid}, domain:{domain}, projectOwner:projectid, projectEditor:projectid, projectViewer:projectid",
+  "required": true,
+  "security_impact": true,
+  "rationale": "Members determine who can view logs. 'allUsers' exposes logs to the entire internet. 'allAuthenticatedUsers' exposes logs to anyone with a Google account. Use specific service accounts or user emails only.",
+  "compliant": "[\"serviceAccount:security-auditor@my-project.iam.gserviceaccount.com\"]",
+  "non-compliant": "[\"allUsers\", \"allAuthenticatedUsers\"]",
+  "parent": null
     },
     "role": {
-      "description": "The IAM role to grant to the members. Valid roles include: roles/logging.viewAccessor, roles/logging.privateLogViewer, roles/logging.logWriter. Custom roles format: [projects|organizations]/{parent-name}/roles/{role-name}",
-      "required": true,
-      "security_impact": true,
-      "rationale": "Role determines what actions members can perform on logs. Granting overly permissive roles (e.g., roles/logging.logWriter) allows log modification or deletion. Only grant roles/logging.viewAccessor for read-only access to logs.",
-      "compliant": "roles/logging.viewAccessor",
-      "non-compliant": "roles/logging.logWriter",
-      "parent": null
+  "description": "The IAM role to grant to the members. Valid roles include: roles/logging.viewAccessor, roles/logging.privateLogViewer, roles/logging.logWriter. Custom roles format: [projects|organizations]/{parent-name}/roles/{role-name}",
+  "required": true,
+  "security_impact": true,
+  "rationale": "Only roles/logging.viewAccessor should be used for read-only log access. roles/logging.logWriter allows log modification which can break audit trails. roles/logging.privateLogViewer may expose sensitive data.",
+  "compliant": "roles/logging.viewAccessor",
+  "non-compliant": "roles/logging.logWriter",
+  "parent": null
     },
     "policy_data": {
       "description": "The policy data from a google_iam_policy data source. Use this for fine-grained control over the entire IAM policy. Conflicts with member/members and role.",
@@ -76,11 +76,11 @@
       "arguments": {
         "expression": {
           "description": "A Common Expression Language (CEL) expression that defines the condition. Example: request.time < timestamp('2025-01-01T00:00:00Z')",
-          "required": true,
-          "security_impact": true,
+          "required": false,
+          "security_impact": false,
           "rationale": "Expression defines the logic for when access is granted. Incorrect expressions can bypass security controls or lock out legitimate users.",
           "compliant": "request.time >= timestamp('2025-01-01T00:00:00Z')",
-          "non-compliant": "true",
+          "non-compliant": "null",
           "parent": "condition"
         },
         "title": {

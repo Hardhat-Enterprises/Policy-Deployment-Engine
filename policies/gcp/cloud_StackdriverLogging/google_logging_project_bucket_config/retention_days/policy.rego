@@ -6,10 +6,11 @@ import data.terraform.gcp.security.cloud_StackdriverLogging.google_logging_proje
 conditions := [
     [
         {
-            "situation_description": "Stackdriver log retention period is insufficient for compliance requirements",
+            "situation_description": "Log retention period is insufficient for compliance requirements",
             "remedies": [
-                "Set retention_days to 30 days or higher (recommended: 90+ days for audit logs)",
-                "Minimum retention: 30 days, Recommended: 90 days, Maximum: 3650 days"
+                "Set retention_days to at least 30 days (minimum compliance requirement)",
+                "Recommended: 90+ days for audit logs",
+                "Maximum: 3650 days"
             ]
         },
         {
@@ -18,13 +19,24 @@ conditions := [
             "values": [30, 3650],
             "policy_type": "range"
         }
+    ],
+    [
+        {
+            "situation_description": "Audit log retention period is below recommended 90 days",
+            "remedies": [
+                "Set retention_days to 90 days or higher for audit logs",
+                "CIS GCP Benchmark recommends 90+ days for audit log retention"
+            ]
+        },
+        {
+            "condition": "retention_days should be 90 days or higher for audit compliance",
+            "attribute_path": ["retention_days"],
+            "values": [90, 3650],
+            "policy_type": "range"
+        }
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
-
-summary := {
-    "message": message,
-    "details": details
-}
+result := helpers.get_multi_summary(conditions, vars.variables)
+message := result.message
+details := result.details

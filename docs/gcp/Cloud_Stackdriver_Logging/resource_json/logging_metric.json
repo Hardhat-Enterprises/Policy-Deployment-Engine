@@ -14,7 +14,7 @@
     "filter": {
       "description": "An advanced logs filter which is used to match log entries for this metric. See [Advanced Log Filters](https://cloud.google.com/logging/docs/view/advanced-filters) for syntax.",
       "required": true,
-      "security_impact": true,
+      "security_impact": false,
       "rationale": "Filter determines which log entries are counted by this metric. For security monitoring, filters must include critical audit events (IAM changes, firewall changes, VPC changes). Excluding security events creates monitoring blind spots.",
       "compliant": "logName = \"projects/my-project/logs/cloudaudit.googleapis.com%2Factivity\" AND protoPayload.methodName = \"SetIamPolicy\"",
       "non-compliant": "severity < ERROR AND logName != \"cloudaudit.googleapis.com%2Factivity\"",
@@ -39,13 +39,13 @@
       "parent": null
     },
     "disabled": {
-      "description": "If set to True, this metric is disabled and does not generate any data points.",
-      "required": false,
-      "security_impact": true,
-      "rationale": "Disabling security metrics prevents monitoring of critical events (IAM changes, firewall changes, audit config changes), violating CIS GCP Benchmark requirements and creating security blind spots.",
-      "compliant": "false",
-      "non-compliant": "true",
-      "parent": null
+  "description": "If set to True, this metric is disabled and does not generate any data points.",
+  "required": false,
+  "security_impact": true,
+  "rationale": "Security metrics must always be active to monitor critical events. Disabling metrics creates blind spots for IAM changes, firewall changes, and other security-critical events. CIS GCP Benchmark requires active alerting.",
+  "compliant": "false (or omit the attribute entirely)",
+  "non-compliant": "true",
+  "parent": null
     },
     "metric_descriptor": {
       "description": "The metric descriptor associated with the logs-based metric. If unspecified, uses default DELTA metric kind, INT64 value type, with no labels and unit of '1' (counts log entries).",
