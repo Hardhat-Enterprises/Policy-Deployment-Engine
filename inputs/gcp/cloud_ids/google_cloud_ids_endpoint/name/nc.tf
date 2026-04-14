@@ -1,5 +1,5 @@
 resource "google_cloud_ids_endpoint" "nc" {
-  name        = "ids-test"   # ❌ contains "test"
+  name        = "ids-test"   
   location    = "australia-southeast1"
   network     = "projects/my-project/global/networks/private-vpc"
   severity    = "HIGH"

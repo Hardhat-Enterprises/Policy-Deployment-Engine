@@ -4,5 +4,5 @@ resource "google_cloud_ids_endpoint" "c" {
   network           = "projects/my-project/global/networks/private-vpc"
   severity          = "HIGH"
   description       = "prod"
-  threat_exceptions = ["safe-id"]   # ✅ pass
+  threat_exceptions = ["safe-id"]   
 }
