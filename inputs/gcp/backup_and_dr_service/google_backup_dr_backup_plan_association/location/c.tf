@@ -1,8 +1,9 @@
-resource "google_compute_instance" "myinstance" {
-  name         = "my-instance"
+resource "google_compute_instance" "c1" {
+  project      = "my-project-4418-1743628379470"
+  name         = "c1"
   machine_type = "n2-standard-2"
   zone         = "australia-southeast1-a"
-  
+
   boot_disk {
     initialize_params {
       image = "debian-cloud/debian-11"
@@ -19,20 +20,20 @@ resource "google_compute_instance" "myinstance" {
   }
 }
 
-resource "google_backup_dr_backup_vault" "c" {
-  project  = "my-project-4418-1743628379470"
-  location = "australia-southeast1"
-  backup_vault_id    = "backup-vault-compliant"
-  access_restriction = "WITHIN_ORGANIZATION"
+resource "google_backup_dr_backup_vault" "c2" {
+  project                                    = "my-project-4418-1743628379470"
+  location                                   = "australia-southeast1"
+  backup_vault_id                            = "c2"
+  access_restriction                         = "WITHIN_ORGANIZATION"
   backup_minimum_enforced_retention_duration = "300000s"
 }
 
-resource "google_backup_dr_backup_plan" "c" {
+resource "google_backup_dr_backup_plan" "c3" {
   project        = "my-project-4418-1743628379470"
   location       = "australia-southeast1"
-  backup_plan_id = "backup-plan-compliant"
+  backup_plan_id = "c3"
   resource_type  = "compute.googleapis.com/Instance"
-  backup_vault   = google_backup_dr_backup_vault.c.id
+  backup_vault   = google_backup_dr_backup_vault.c2.id
 
   backup_rules {
     rule_id               = "daily-rule"
@@ -50,11 +51,11 @@ resource "google_backup_dr_backup_plan" "c" {
   }
 }
 
-resource "google_backup_dr_backup_plan_association" "c" {
-  project       = "my-project-4418-1743628379470"
-  location      = "australia-southeast1"
-  resource_type = "compute.googleapis.com/Instance"
-  backup_plan_association_id    = "bpa-compliant"
-  resource      = google_compute_instance.myinstance.id
-  backup_plan   = google_backup_dr_backup_plan.c.id
+resource "google_backup_dr_backup_plan_association" "c4" {
+  project                    = "my-project-4418-1743628379470"
+  location                   = "australia-southeast1"
+  resource_type              = "compute.googleapis.com/Instance"
+  backup_plan_association_id = "c4"
+  resource                   = google_compute_instance.c1.id
+  backup_plan                = google_backup_dr_backup_plan.c3.id
 }

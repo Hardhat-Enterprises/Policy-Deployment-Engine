@@ -6,17 +6,17 @@ import data.terraform.gcp.security.backup_and_dr_service.google_backup_dr_backup
 conditions := [
     [
         {
-            "situation_description": "Backup recurrence type is not set to a supported value, which may result in an invalid or non-compliant backup schedule.",
+            "situation_description": "Backup recurrence type is too infrequent and may not meet organisational recovery requirements.",
             "remedies": [
-                "Set recurrence_type to one of the supported values: HOURLY, DAILY, WEEKLY, MONTHLY, or YEARLY.",
-                "Ensure the selected recurrence_type matches the intended backup frequency and business recovery requirements.",
-                "Review related schedule fields such as hourly_frequency, days_of_week, days_of_month, week_day_of_month, and months for consistency with the selected recurrence_type."
+                "Set recurrence_type to an approved frequency such as HOURLY, DAILY, or WEEKLY.",
+                "Avoid using infrequent schedules that reduce backup coverage and recovery readiness.",
+                "Review backup frequency requirements for the protected workload."
             ]
         },
         {
-            "condition": "Check whether recurrence_type is set to a supported value.",
+            "condition": "Check whether recurrence_type is set to an approved backup frequency.",
             "attribute_path": ["backup_rules", 0, "standard_schedule", 0, "recurrence_type"],
-            "values": ["HOURLY", "DAILY", "WEEKLY", "MONTHLY", "YEARLY"],
+            "values": ["HOURLY", "DAILY", "WEEKLY"],
             "policy_type": "whitelist"
         }
     ]

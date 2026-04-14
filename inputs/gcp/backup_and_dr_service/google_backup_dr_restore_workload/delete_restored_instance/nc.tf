@@ -1,8 +1,8 @@
 resource "google_backup_dr_restore_workload" "nc" {
-  location         = "australia-southeast1"
-  backup_vault_id  = "backup-vault"
-  data_source_id   = "data-source"
-  backup_id        = "backup"
+  location        = "australia-southeast1"
+  backup_vault_id = "backup-vault"
+  data_source_id  = "nc"
+  backup_id       = "backup"
 
   # Set to false to keep the restored resource in GCP after terraform destroy
   delete_restored_instance = true
