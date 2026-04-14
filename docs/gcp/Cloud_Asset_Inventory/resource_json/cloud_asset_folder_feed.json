@@ -5,8 +5,8 @@
     "billing_project": {
       "description": "The project whose identity will be used when sending messages to the destination pubsub topic. It also specifies the project for API enablement check, quota, and billing.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Used for billing and API access. No direct security impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,8 +14,8 @@
     "feed_id": {
       "description": "This is the client-assigned asset feed identifier and it needs to be unique under a specific parent.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale":"Identifier only. No direct security impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -23,11 +23,11 @@
     "feed_output_config": {
       "description": "Output configuration for asset feed destination. Structure is [documented below](#nested_feed_output_config).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
+      "security_impact": true,
+      "rationale": "Determines the destination of asset monitoring data. Incorrect configuration may result in loss or redirection of security logs.",
+      "compliant": "projects/projectExample/topics/topicExample",
+      "non-compliant": "projects/unknown/topics/invalidTopic",
+      "parent": "feed_output_config",
       "arguments": {
         "pubsub_destination": {
           "description": "Destination on Cloud Pubsub. Structure is [documented below](#nested_feed_output_config_pubsub_destination).",
@@ -43,8 +43,8 @@
     "folder": {
       "description": "The folder this feed should be created in.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Defines scope of monitoring but No direct security impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -53,52 +53,54 @@
       "description": "A list of the full names of the assets to receive updates. You must specify either or both of assetNames and assetTypes. Only asset updates matching specified assetNames and assetTypes are exported to the feed. For example: //compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1. See https://cloud.google.com/apis/design/resourceNames#fullResourceName for more info.",
       "required": false,
       "security_impact": null,
-      "rationale": null,
+      "rationale": "Optional filtering field. No direct security impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "asset_types": {
-      "description": "A list of types of the assets to receive updates. You must specify either or both of assetNames and assetTypes. Only asset updates matching specified assetNames and assetTypes are exported to the feed. For example: \"compute.googleapis.com/Disk\" See https://cloud.google.com/asset-inventory/docs/supported-asset-types for a list of all supported asset types.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "List of asset types to monitor.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Defines which resources are monitored. Missing critical types reduces visibility.",
+      "compliant": ["compute.googleapis.com/Instance"],
+      "non-compliant": ["storage.googleapis.com/Bucket"],
       "parent": null
     },
     "content_type": {
-      "description": "Asset content type. If not specified, no content but the asset name and type will be returned. Possible values are: `CONTENT_TYPE_UNSPECIFIED`, `RESOURCE`, `IAM_POLICY`, `ORG_POLICY`, `OS_INVENTORY`, `ACCESS_POLICY`.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "Type of asset data to collect.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Determines what security-relevant data is captured such as IAM policies and configurations.",
+      "compliant": ["RESOURCE", "IAM_POLICY", "ORG_POLICY", "ACCESS_POLICY"],
+      "non-compliant": ["OS_INVENTORY"],
       "parent": null
     },
+   
     "condition": {
-      "description": "A condition which determines whether an asset update should be published. If specified, an asset will be returned only when the expression evaluates to true. When set, expression field must be a valid CEL expression on a TemporalAsset with name temporal_asset. Example: a Feed with expression \"temporal_asset.deleted == true\" will only publish Asset deletions. Other fields of condition are optional. Structure is [documented below](#nested_condition).",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "Condition to filter asset updates.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Controls which events are monitored. Incorrect conditions may miss critical events.",
+      "compliant": ["temporal_asset.deleted == true"],
+      "non-compliant": ["temporal_asset.deleted == false"],
       "parent": null,
       "arguments": {
         "expression": {
-          "description": "Textual representation of an expression in Common Expression Language syntax.",
+          "description": "CEL expression defining filtering condition (Common Expression Language).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Ensures monitoring focuses on relevant security events.",
+          "compliant": ["temporal_asset.deleted == true"],
+          "non-compliant": ["temporal_asset.deleted == false"],
           "parent": "condition"
+
         },
         "title": {
           "description": "Title for the expression, i.e. a short string describing its purpose. This can be used e.g. in UIs which allow to enter the expression.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "No direct security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "condition"
@@ -106,8 +108,8 @@
         "description": {
           "description": "Description of the expression. This is a longer text which describes the expression, e.g. when hovered over it in a UI.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "No direct security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "condition"
@@ -124,21 +126,21 @@
       }
     },
     "pubsub_destination": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
+      "description": "Destination on Cloud Pub/Sub.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Defines where asset monitoring data is sent.",
+      "compliant": "projects/projectExample/topics/topicExample",
+      "non-compliant": "projects/unknown/topics/invalidTopic",
+      "parent": "feed_output_config",
       "arguments": {
         "topic": {
           "description": "Destination on Cloud Pubsub topic.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "The topic determines the exact destination of asset monitoring data. An unapproved topic may cause loss, redirection, or unauthorized exposure of security logs." ,
+          "compliant": "projects/projectExample/topics/topicExample",
+          "non-compliant": "projects/unknown/topics/invalidTopic",
           "parent": "pubsub_destination"
         }
       }
