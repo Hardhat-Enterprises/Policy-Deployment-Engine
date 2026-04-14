@@ -1,5 +1,5 @@
 resource "google_storage_bucket" "nc" {
-  project                     = "my-gcp-project"
+  project                     = "83797152308"
   provider                    = google-beta
   name                        = "test_bucket_nc"
   location                    = "US"
@@ -8,6 +8,6 @@ resource "google_storage_bucket" "nc" {
 
 resource "google_firebase_storage_bucket" "nc" {
   provider  = google-beta
-  project   = "my-project-name"
+  project   = "83797152308"
   bucket_id = google_storage_bucket.nc.name
 }

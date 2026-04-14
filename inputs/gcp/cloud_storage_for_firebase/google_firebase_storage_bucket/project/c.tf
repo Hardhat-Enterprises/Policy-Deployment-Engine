@@ -1,4 +1,5 @@
 resource "google_storage_bucket" "c" {
+  project                     = "83797152308"
   provider                    = google-beta
   name                        = "test_bucket"
   location                    = "US"
@@ -7,6 +8,6 @@ resource "google_storage_bucket" "c" {
 
 resource "google_firebase_storage_bucket" "c" {
   provider  = google-beta
-  project   = "my-project-name"
+  project   = "83797152308"
   bucket_id = google_storage_bucket.c.name
 }

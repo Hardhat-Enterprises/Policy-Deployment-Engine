@@ -1,4 +1,5 @@
 resource "google_storage_bucket" "nc" {
+  project                     = "83797152308"
   provider                    = google-beta
   name                        = "test_bucket"
   location                    = "US"
