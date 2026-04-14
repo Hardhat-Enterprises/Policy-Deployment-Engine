@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_asset_inventory.google_cloud_asset_folder_feed.condition
+package terraform.gcp.security.cloud_asset_inventory.google_cloud_asset_folder_feed.condition_expression
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_asset_inventory.google_cloud_asset_folder_feed.vars
@@ -6,13 +6,13 @@ import data.terraform.gcp.security.cloud_asset_inventory.google_cloud_asset_fold
 conditions := [
     [
         {
-            "situation_description": "Cloud Asset Folder Feed uses an approved condition expression for security-relevant monitoring.",
+            "situation_description": "Cloud Asset Folder Feed is using an unapproved condition expression.",
             "remedies": [
-                "Ensure the condition expression is configured to capture approved security-relevant asset updates."
+                "Set the condition expression to an approved value for security-relevant monitoring."
             ]
         },
         {
-            "condition": "Checks whether the feed condition expression matches the approved value.",
+            "condition": "Checks whether the feed condition expression is in the approved list.",
             "attribute_path": ["condition", 0, "expression"],
             "values": ["temporal_asset.deleted == true"],
             "policy_type": "whitelist"

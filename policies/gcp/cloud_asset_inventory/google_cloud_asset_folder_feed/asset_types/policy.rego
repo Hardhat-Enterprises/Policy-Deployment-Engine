@@ -6,14 +6,14 @@ import data.terraform.gcp.security.cloud_asset_inventory.google_cloud_asset_fold
 conditions := [
     [
         {
-            "situation_description": "Cloud Asset Folder Feed monitors approved asset types.",
+            "situation_description": "Cloud Asset Folder Feed is using an unapproved asset type.",
             "remedies": [
-                "Ensure the feed includes only approved asset types for security monitoring."
+                "Set asset_types to approved values for security monitoring."
             ]
         },
         {
-            "condition": "Checks whether the asset type matches the approved value.",
-            "attribute_path": ["asset_types", 0],
+            "condition": "Checks whether the asset type is in the approved list.",
+            "attribute_path": ["asset_types"],
             "values": ["compute.googleapis.com/Instance"],
             "policy_type": "whitelist"
         }
