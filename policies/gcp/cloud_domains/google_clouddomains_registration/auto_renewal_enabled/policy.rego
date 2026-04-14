@@ -7,11 +7,11 @@ conditions := [
     [
         {
             "situation_description": "Cloud Domain registration has automatic renewal disabled",
-            "remedies": ["Enable automatic renewal by setting 'management_settings.renewal_method' to 'AUTOMATIC_RENEWAL'"]
+            "remedies": ["Enable automatic renewal by setting 'management_settings.preferred_renewal_method' to 'AUTOMATIC_RENEWAL'"]
         },
         {
             "condition": "Check if automatic renewal is enabled",
-            "attribute_path": ["management_settings", "renewal_method"],
+            "attribute_path": ["management_settings", "preferred_renewal_method"],
             "values": ["AUTOMATIC_RENEWAL"],
             "policy_type": "whitelist"
         }
