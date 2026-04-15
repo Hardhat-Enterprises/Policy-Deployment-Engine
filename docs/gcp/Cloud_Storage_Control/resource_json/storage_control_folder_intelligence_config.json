@@ -5,8 +5,8 @@
     "name": {
       "description": "Identifier of the GCP Folder. For GCP Folder, this field can be folder number.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "This is a required identifier field used to reference the GCP Folder. It does not control any security behaviour or access permissions.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,17 +14,17 @@
     "edition_config": {
       "description": "Edition configuration of the Storage Intelligence resource. Valid values are INHERIT, TRIAL, DISABLED and STANDARD.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Setting edition_config to DISABLED removes Storage Intelligence monitoring at the folder level, eliminating security visibility, anomaly detection, and compliance monitoring across all buckets within the folder.",
+      "compliant": "STANDARD",
+      "non-compliant": "DISABLED",
       "parent": null
     },
     "filter": {
       "description": "Filter over location and bucket using include or exclude semantics. Resources that match the include or exclude filter are exclusively included or excluded from the Storage Intelligence plan. Structure is [documented below](#nested_filter).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "The filter block controls the scope of Storage Intelligence monitoring. Misconfigured filters can exclude sensitive buckets or unapproved locations from monitoring coverage, creating security blind spots.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -32,7 +32,7 @@
         "excluded_cloud_storage_buckets": {
           "description": "Buckets to exclude from the Storage Intelligence plan. Structure is [documented below](#nested_filter_excluded_cloud_storage_buckets).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -41,8 +41,8 @@
         "included_cloud_storage_buckets": {
           "description": "Buckets to include in the Storage Intelligence plan. Structure is [documented below](#nested_filter_included_cloud_storage_buckets).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Including specific buckets in Storage Intelligence is an operational scoping decision. Without a defined organisational bucket naming convention, this field cannot be enforced as a security policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "filter"
@@ -50,8 +50,8 @@
         "excluded_cloud_storage_locations": {
           "description": "Locations to exclude from the Storage Intelligence plan. Structure is [documented below](#nested_filter_excluded_cloud_storage_locations).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Excluding locations from Storage Intelligence monitoring is an operational and cost management decision. It does not directly affect access control or data protection and is therefore not considered a security policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "filter"
@@ -59,8 +59,8 @@
         "included_cloud_storage_locations": {
           "description": "Locations to include in the Storage Intelligence plan. Structure is [documented below](#nested_filter_included_cloud_storage_locations).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Restricting Storage Intelligence monitoring to approved regions enforces data sovereignty requirements. Monitoring buckets outside approved regions may expose sensitive data patterns beyond approved geographic boundaries, violating regulatory obligations such as IRAP.",
           "compliant": null,
           "non-compliant": null,
           "parent": "filter"
@@ -70,8 +70,8 @@
     "excluded_cloud_storage_buckets": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "This is a nested block supporting the filter argument. Excluding buckets from monitoring is an operational decision and does not directly enforce a security control.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -79,8 +79,8 @@
         "bucket_id_regexes": {
           "description": "List of bucket id regexes to exclude in the storage intelligence plan.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Bucket exclusion regexes are operational scoping patterns. Without defined organisational bucket naming conventions, these cannot be enforced as a security policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "excluded_cloud_storage_buckets"
@@ -90,8 +90,8 @@
     "included_cloud_storage_buckets": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "This is a nested block supporting the filter argument. Including specific buckets in monitoring is an operational scoping decision and does not directly enforce a security control.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -99,8 +99,8 @@
         "bucket_id_regexes": {
           "description": "List of bucket id regexes to exclude in the storage intelligence plan.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Bucket inclusion regexes are operational scoping patterns. Without defined organisational bucket naming conventions, these cannot be enforced as a security policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "included_cloud_storage_buckets"
@@ -110,8 +110,8 @@
     "excluded_cloud_storage_locations": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "This is a nested block supporting the filter argument. Excluding locations from monitoring is an operational and cost management decision, not a security control.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -119,8 +119,8 @@
         "locations": {
           "description": "List of locations.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Location exclusion values are operational scope decisions. They do not enforce data protection or access control and are therefore not considered security relevant.",
           "compliant": null,
           "non-compliant": null,
           "parent": "excluded_cloud_storage_locations"
@@ -130,8 +130,8 @@
     "included_cloud_storage_locations": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "This nested block enforces data sovereignty by restricting Storage Intelligence monitoring to approved GCP regions only.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -139,10 +139,10 @@
         "locations": {
           "description": "List of locations.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Storage Intelligence must only monitor buckets within approved Australian regions to comply with data sovereignty and regulatory requirements such as IRAP. Monitoring buckets in unapproved regions risks exposing sensitive data patterns outside approved geographic boundaries.",
+          "compliant": ["australia-southeast1", "australia-southeast2"],
+          "non-compliant": ["us-central1", "europe-west1"],
           "parent": "included_cloud_storage_locations"
         }
       }
