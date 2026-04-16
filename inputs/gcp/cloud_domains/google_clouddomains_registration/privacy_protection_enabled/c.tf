@@ -15,7 +15,7 @@ resource "google_clouddomains_registration" "c" {
       email        = "admin@example.com"
       phone_number = "+12065550100"
       postal_address {
-        region_code = "US"
+        region_code   = "US"
         address_lines = ["1600 Amphitheatre Parkway"]
       }
     }
@@ -23,7 +23,7 @@ resource "google_clouddomains_registration" "c" {
       email        = "admin@example.com"
       phone_number = "+12065550100"
       postal_address {
-        region_code = "US"
+        region_code   = "US"
         address_lines = ["1600 Amphitheatre Parkway"]
       }
     }
@@ -31,14 +31,14 @@ resource "google_clouddomains_registration" "c" {
       email        = "admin@example.com"
       phone_number = "+12065550100"
       postal_address {
-        region_code = "US"
+        region_code   = "US"
         address_lines = ["1600 Amphitheatre Parkway"]
       }
     }
   }
 
   management_settings {
-    transfer_lock_state = "TRANSFER_LOCK_ENABLED"
+    transfer_lock_state      = "TRANSFER_LOCK_ENABLED"
     preferred_renewal_method = "AUTOMATIC_RENEWAL"
   }
 }

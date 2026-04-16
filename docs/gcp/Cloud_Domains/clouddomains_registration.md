@@ -15,7 +15,7 @@ Reference: [Terraform Registry – clouddomains_registration](https://registry.t
 | `location` | The location for the resource | true | false | None | None | None |
 | `domain_name` | Required. The domain name. Unicode domain names must be expressed in Punycode format. | true | false | None | None | None |
 | `labels` | Set of labels associated with the Registration. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | false | Mandatory labels are used for resource governance, cost tracking, and environment classification (e.g., 'env', 'owner'). | { "env": "production", "owner": "it-team" } | {} |
-| `domain_notices` | The list of domain notices that you acknowledge. Possible value is HSTS_PRELOADED | false | false | None | None | None |
+| `domain_notices` | The list of domain notices that you acknowledge. Possible value is HSTS_PRELOADED | false | true | Acknowledging HSTS preloading ensures that the domain is included in the HSTS preload list, which forces browsers to always use HTTPS, preventing SSL stripping and man-in-the-middle attacks. | ["HSTS_PRELOADED"] | [] |
 | `contact_notices` | The list of contact notices that the caller acknowledges. Possible value is PUBLIC_CONTACT_DATA_ACKNOWLEDGEMENT | false | false | None | None | None |
 | `management_settings` | Settings for management of the Registration, including renewal, billing, and transfer Structure is [documented below](#nested_management_settings). | false | false | None | None | None |
 | `dns_settings` | Settings controlling the DNS configuration of the Registration. Structure is [documented below](#nested_dns_settings). | false | false | None | None | None |
@@ -32,7 +32,7 @@ Reference: [Terraform Registry – clouddomains_registration](https://registry.t
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `currency_code` | The three-letter currency code defined in ISO 4217. | false | false | None | None | None |
+| `currency_code` | The three-letter currency code defined in ISO 4217. | false | false | Restricting the payment currency to USD ensures predictable billing and avoids exchange rate fluctuations or unauthorized regional cost variations. | USD | EUR |
 | `units` | The whole units of the amount. For example if currencyCode is "USD", then 1 unit is one US dollar. | false | false | None | None | None |
 
 ### contact_settings Block
@@ -63,7 +63,7 @@ Reference: [Terraform Registry – clouddomains_registration](https://registry.t
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `email` | Required. Email address of the contact. | true | false | None | None | None |
+| `email` | Required. Email address of the contact. | true | true | Restricting contact emails to official organizational domains ensures that critical domain management communications and password resets are controlled by the organization rather than personal accounts. | user@example.com | user@gmail.com |
 | `phone_number` | Required. Phone number of the contact in international format. For example, "+1-800-555-0123". | true | false | None | None | None |
 | `fax_number` | Fax number of the contact in international format. For example, "+1-800-555-0123". | false | false | None | None | None |
 | `postal_address` | Required. Postal address of the contact. Structure is [documented below](#nested_contact_settings_registrant_contact_postal_address). | true | false | None | None | None |
@@ -72,11 +72,11 @@ Reference: [Terraform Registry – clouddomains_registration](https://registry.t
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `region_code` | Required. CLDR region code of the country/region of the address. This is never inferred and it is up to the user to ensure the value is correct. See https://cldr.unicode.org/ and https://www.unicode.org/cldr/charts/30/supplemental/territory_information.html for details. Example: "CH" for Switzerland. | true | false | None | None | None |
+| `region_code` | Required. CLDR region code of the country/region of the address. This is never inferred and it is up to the user to ensure the value is correct. See https://cldr.unicode.org/ and https://www.unicode.org/cldr/charts/30/supplemental/territory_information.html for details. Example: "CH" for Switzerland. | true | false | Restricting the registration region code (e.g., to AU) ensures compliance with local data residency regulations and organizational geographic governance policies. | AU | US |
 | `postal_code` | Postal code of the address. Not all countries use or require postal codes to be present, but where they are used, they may trigger additional validation with other parts of the address (e.g. state/zip validation in the U.S.A.). | false | false | None | None | None |
 | `administrative_area` | Highest administrative subdivision which is used for postal addresses of a country or region. For example, this can be a state, a province, an oblast, or a prefecture. Specifically, for Spain this is the province and not the autonomous community (e.g. "Barcelona" and not "Catalonia"). Many countries don't use an administrative area in postal addresses. E.g. in Switzerland this should be left unpopulated. | false | false | None | None | None |
 | `locality` | Generally refers to the city/town portion of the address. Examples: US city, IT comune, UK post town. In regions of the world where localities are not well defined or do not fit into this structure well, leave locality empty and use addressLines. | false | false | None | None | None |
-| `organization` | The name of the organization at the address. | false | false | None | None | None |
+| `organization` | The name of the organization at the address. | false | false | Enforcing the corporate organization name in contact details ensures legal consistency and prevents domain registration under unauthorized entities. | Example Corp | Hacker Inc |
 | `address_lines` | Unstructured address lines describing the lower levels of an address. Because values in addressLines do not have type information and may sometimes contain multiple values in a single field (e.g. "Austin, TX"), it is important that the line order is clear. The order of address lines should be "envelope order" for the country/region of the address. In places where this can vary (e.g. Japan), address_language is used to make it explicit (e.g. "ja" for large-to-small ordering and "ja-Latn" or "en" for small-to-large). This way, the most specific line of an address can be selected based on the language. | false | false | None | None | None |
 | `recipients` | The recipient at the address. This field may, under certain circumstances, contain multiline information. For example, it might contain "care of" information. | false | false | None | None | None |
 
@@ -102,8 +102,8 @@ Reference: [Terraform Registry – clouddomains_registration](https://registry.t
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `name_servers` | Required. A list of name servers that store the DNS zone for this domain. Each name server is a domain name, with Unicode domain names expressed in Punycode format. | true | false | None | None | None |
-| `ds_records` | The list of DS records for this domain, which are used to enable DNSSEC. The domain's DNS provider can provide the values to set here. If this field is empty, DNSSEC is disabled. Structure is [documented below](#nested_dns_settings_custom_dns_ds_records). | false | false | None | None | None |
+| `name_servers` | Required. A list of name servers that store the DNS zone for this domain. Each name server is a domain name, with Unicode domain names expressed in Punycode format. | true | true | Using authorized name servers (e.g., Google Cloud DNS) is critical to prevent DNS hijacking and ensure high availability of domain resolution. | ["ns-cloud-c*.googledomains.com."] | ["ns1.unauthorized.com."] |
+| `ds_records` | The list of DS records for this domain, which are used to enable DNSSEC. The domain's DNS provider can provide the values to set here. If this field is empty, DNSSEC is disabled. Structure is [documented below](#nested_dns_settings_custom_dns_ds_records). | false | true | DNSSEC signs DNS records with digital signatures, ensuring that the DNS response received by a client has not been tampered with or forged, thus preventing DNS hijacking and cache poisoning. | ds_records { ... } (non-empty) | (empty list) |
 
 ### ds_records Block
 

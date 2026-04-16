@@ -10,28 +10,30 @@ resource "google_clouddomains_registration" "nc" {
 
   contact_settings {
     privacy = "PRIVATE_CONTACT_DATA"
-
     registrant_contact {
       email        = "admin@example.com"
-      phone_number = "+12065550100"
+      phone_number = "+61212345678"
       postal_address {
-        region_code   = "US"
+        region_code   = "AU"
+        organization  = "Hacker Inc" # Non-compliant
         address_lines = ["1600 Amphitheatre Parkway"]
       }
     }
     admin_contact {
       email        = "admin@example.com"
-      phone_number = "+12065550100"
+      phone_number = "+61212345678"
       postal_address {
-        region_code   = "US"
+        region_code   = "AU"
+        organization  = "Hacker Inc"
         address_lines = ["1600 Amphitheatre Parkway"]
       }
     }
     technical_contact {
       email        = "admin@example.com"
-      phone_number = "+12065550100"
+      phone_number = "+61212345678"
       postal_address {
-        region_code   = "US"
+        region_code   = "AU"
+        organization  = "Hacker Inc"
         address_lines = ["1600 Amphitheatre Parkway"]
       }
     }
@@ -39,7 +41,6 @@ resource "google_clouddomains_registration" "nc" {
 
   management_settings {
     transfer_lock_state      = "TRANSFER_LOCK_ENABLED"
-    preferred_renewal_method = "RENEWAL_DISABLED"
+    preferred_renewal_method = "AUTOMATIC_RENEWAL"
   }
 }
-

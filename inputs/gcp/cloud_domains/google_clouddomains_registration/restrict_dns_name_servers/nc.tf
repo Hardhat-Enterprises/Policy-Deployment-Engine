@@ -10,36 +10,40 @@ resource "google_clouddomains_registration" "nc" {
 
   contact_settings {
     privacy = "PRIVATE_CONTACT_DATA"
-
     registrant_contact {
       email        = "admin@example.com"
-      phone_number = "+12065550100"
+      phone_number = "+61212345678"
       postal_address {
-        region_code   = "US"
+        region_code   = "AU"
         address_lines = ["1600 Amphitheatre Parkway"]
       }
     }
     admin_contact {
       email        = "admin@example.com"
-      phone_number = "+12065550100"
+      phone_number = "+61212345678"
       postal_address {
-        region_code   = "US"
+        region_code   = "AU"
         address_lines = ["1600 Amphitheatre Parkway"]
       }
     }
     technical_contact {
       email        = "admin@example.com"
-      phone_number = "+12065550100"
+      phone_number = "+61212345678"
       postal_address {
-        region_code   = "US"
+        region_code   = "AU"
         address_lines = ["1600 Amphitheatre Parkway"]
       }
     }
   }
 
+  dns_settings {
+    custom_dns {
+      name_servers = ["ns1.hacker-dns.com."] # Non-compliant
+    }
+  }
+
   management_settings {
     transfer_lock_state      = "TRANSFER_LOCK_ENABLED"
-    preferred_renewal_method = "RENEWAL_DISABLED"
+    preferred_renewal_method = "AUTOMATIC_RENEWAL"
   }
 }
-

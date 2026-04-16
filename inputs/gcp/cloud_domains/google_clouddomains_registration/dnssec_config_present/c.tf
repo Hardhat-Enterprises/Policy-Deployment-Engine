@@ -1,5 +1,5 @@
-resource "google_clouddomains_registration" "nc" {
-  domain_name = "nc"
+resource "google_clouddomains_registration" "c" {
+  domain_name = "c"
   location    = "global"
   project     = "c"
 
@@ -13,33 +13,44 @@ resource "google_clouddomains_registration" "nc" {
 
     registrant_contact {
       email        = "admin@example.com"
-      phone_number = "+12065550100"
+      phone_number = "+61212345678"
       postal_address {
-        region_code   = "US"
+        region_code   = "AU"
         address_lines = ["1600 Amphitheatre Parkway"]
       }
     }
     admin_contact {
       email        = "admin@example.com"
-      phone_number = "+12065550100"
+      phone_number = "+61212345678"
       postal_address {
-        region_code   = "US"
+        region_code   = "AU"
         address_lines = ["1600 Amphitheatre Parkway"]
       }
     }
     technical_contact {
       email        = "admin@example.com"
-      phone_number = "+12065550100"
+      phone_number = "+61212345678"
       postal_address {
-        region_code   = "US"
+        region_code   = "AU"
         address_lines = ["1600 Amphitheatre Parkway"]
+      }
+    }
+  }
+
+  dns_settings {
+    custom_dns {
+      name_servers = ["ns-cloud-c1.googledomains.com."]
+      ds_records {
+        key_tag     = 12345
+        algorithm   = "RSASHA256"
+        digest_type = "SHA256"
+        digest      = "A1B2C3D4E5F6"
       }
     }
   }
 
   management_settings {
     transfer_lock_state      = "TRANSFER_LOCK_ENABLED"
-    preferred_renewal_method = "RENEWAL_DISABLED"
+    preferred_renewal_method = "AUTOMATIC_RENEWAL"
   }
 }
-
