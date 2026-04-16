@@ -11,7 +11,7 @@ conditions := [
         },
         {
             "condition": "Check registrant contact region",
-            "attribute_path": ["contact_settings", "registrant_contact", "postal_address", "region_code"],
+            "attribute_path": ["contact_settings", 0, "registrant_contact", 0, "postal_address", 0, "region_code"],
             "values": ["AU"],
             "policy_type": "whitelist"
         }
@@ -23,7 +23,7 @@ conditions := [
         },
         {
             "condition": "Check admin contact region",
-            "attribute_path": ["contact_settings", "admin_contact", "postal_address", "region_code"],
+            "attribute_path": ["contact_settings", 0, "admin_contact", 0, "postal_address", 0, "region_code"],
             "values": ["AU"],
             "policy_type": "whitelist"
         }
@@ -35,7 +35,7 @@ conditions := [
         },
         {
             "condition": "Check technical contact region",
-            "attribute_path": ["contact_settings", "technical_contact", "postal_address", "region_code"],
+            "attribute_path": ["contact_settings", 0, "technical_contact", 0, "postal_address", 0, "region_code"],
             "values": ["AU"],
             "policy_type": "whitelist"
         }

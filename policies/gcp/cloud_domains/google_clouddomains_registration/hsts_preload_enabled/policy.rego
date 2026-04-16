@@ -11,7 +11,7 @@ conditions := [
         },
         {
             "condition": "Check if HSTS_PRELOADED notice is acknowledged",
-            "attribute_path": ["domain_notices"],
+            "attribute_path": ["domain_notices", 0],
             "values": ["HSTS_PRELOADED"],
             "policy_type": "whitelist"
         }

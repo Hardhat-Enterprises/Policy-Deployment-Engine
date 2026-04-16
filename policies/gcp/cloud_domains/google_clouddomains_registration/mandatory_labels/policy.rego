@@ -10,10 +10,16 @@ conditions := [
             "remedies": ["Add 'env' and 'owner' labels to the 'labels' block."]
         },
         {
-            "condition": "Check for mandatory labels",
-            "attribute_path": ["labels"],
-            "values": ["env", "owner"],
-            "policy_type": "whitelist"
+            "condition": "Check for mandatory env label",
+            "attribute_path": ["labels", "env"],
+            "values": [null],
+            "policy_type": "blacklist"
+        },
+        {
+            "condition": "Check for mandatory owner label",
+            "attribute_path": ["labels", "owner"],
+            "values": [null],
+            "policy_type": "blacklist"
         }
     ]
 ]

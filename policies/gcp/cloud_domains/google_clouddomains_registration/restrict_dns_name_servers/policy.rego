@@ -11,7 +11,7 @@ conditions := [
         },
         {
             "condition": "Check name servers from custom_dns",
-            "attribute_path": ["dns_settings", "custom_dns", "name_servers"],
+            "attribute_path": ["dns_settings", 0, "custom_dns", 0, "name_servers"],
             "values": ["ns-cloud-c1.googledomains.com.", "ns-cloud-c2.googledomains.com.", "ns-cloud-c3.googledomains.com.", "ns-cloud-c4.googledomains.com."],
             "policy_type": "whitelist"
         }

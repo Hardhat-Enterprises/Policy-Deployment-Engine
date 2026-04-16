@@ -11,7 +11,7 @@ conditions := [
         },
         {
             "condition": "Check registrant contact organization",
-            "attribute_path": ["contact_settings", "registrant_contact", "postal_address", "organization"],
+            "attribute_path": ["contact_settings", 0, "registrant_contact", 0, "postal_address", 0, "organization"],
             "values": ["Example Corp"],
             "policy_type": "whitelist"
         }
@@ -23,7 +23,7 @@ conditions := [
         },
         {
             "condition": "Check admin contact organization",
-            "attribute_path": ["contact_settings", "admin_contact", "postal_address", "organization"],
+            "attribute_path": ["contact_settings", 0, "admin_contact", 0, "postal_address", 0, "organization"],
             "values": ["Example Corp"],
             "policy_type": "whitelist"
         }
@@ -35,7 +35,7 @@ conditions := [
         },
         {
             "condition": "Check technical contact organization",
-            "attribute_path": ["contact_settings", "technical_contact", "postal_address", "organization"],
+            "attribute_path": ["contact_settings", 0, "technical_contact", 0, "postal_address", 0, "organization"],
             "values": ["Example Corp"],
             "policy_type": "whitelist"
         }
