@@ -6,13 +6,13 @@ import data.terraform.gcp.security.cloud_domains.google_clouddomains_registratio
 conditions := [
     [
         {
-            "situation_description": "Cloud Domain registration does not have contact privacy enabled",
-            "remedies": ["Enable contact privacy by setting 'contact_settings.privacy' to 'PRIVATE_CONTACT_DATA'"]
+            "situation_description": "Cloud Domain contact privacy is not set to PRIVATE_CONTACT_DATA or REDACTED_CONTACT_DATA.",
+            "remedies": ["Set 'contact_settings.privacy' to 'PRIVATE_CONTACT_DATA' or 'REDACTED_CONTACT_DATA'."]
         },
         {
-            "condition": "Check if contact privacy is enabled",
+            "condition": "Check contact privacy settings",
             "attribute_path": ["contact_settings", "privacy"],
-            "values": ["PRIVATE_CONTACT_DATA"],
+            "values": ["PRIVATE_CONTACT_DATA", "REDACTED_CONTACT_DATA"],
             "policy_type": "whitelist"
         }
     ]
