@@ -12,8 +12,8 @@ conditions := [
         {
             "condition": "Check if DNSSEC ds_records are present",
             "attribute_path": ["dns_settings", "custom_dns", "ds_records"],
-            "values": [[]],
-            "policy_type": "blacklist"
+            "values": [],
+            "policy_type": "presence"
         }
     ]
 ]

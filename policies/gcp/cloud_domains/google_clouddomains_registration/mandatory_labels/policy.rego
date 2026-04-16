@@ -6,14 +6,26 @@ import data.terraform.gcp.security.cloud_domains.google_clouddomains_registratio
 conditions := [
     [
         {
-            "situation_description": "Cloud Domain registration is missing mandatory labels 'env' and 'owner'.",
-            "remedies": ["Add 'env' and 'owner' labels to the 'labels' block."]
+            "situation_description": "Cloud Domain registration is missing mandatory labels",
+            "remedies": ["Add mandatory labels such as 'env' and 'owner' to the resource"]
         },
         {
-            "condition": "Check for mandatory labels",
+            "condition": "Check if labels are present",
             "attribute_path": ["labels"],
-            "values": ["env", "owner"],
-            "policy_type": "whitelist"
+            "values": [null],
+            "policy_type": "blacklist"
+        }
+    ],
+    [
+        {
+            "situation_description": "Cloud Domain registration is missing 'env' label",
+            "remedies": ["Add 'env' label to the resource"]
+        },
+        {
+            "condition": "Check if 'env' label exists",
+            "attribute_path": ["labels"],
+            "values": ["env", ["*"]],
+            "policy_type": "pattern whitelist"
         }
     ]
 ]

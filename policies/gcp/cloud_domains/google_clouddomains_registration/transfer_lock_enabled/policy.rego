@@ -6,8 +6,8 @@ import data.terraform.gcp.security.cloud_domains.google_clouddomains_registratio
 conditions := [
     [
         {
-            "situation_description": "Cloud Domain registration has Transfer Lock disabled.",
-            "remedies": ["Enable transfer lock by setting 'management_settings.transfer_lock_state' to 'TRANSFER_LOCK_ENABLED'."]
+            "situation_description": "Cloud Domain registration has Transfer Lock disabled",
+            "remedies": ["Enable transfer lock by setting 'management_settings.transfer_lock_state' to 'TRANSFER_LOCK_ENABLED'"]
         },
         {
             "condition": "Check if transfer lock is enabled",

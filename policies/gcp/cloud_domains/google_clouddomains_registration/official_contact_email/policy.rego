@@ -1,7 +1,6 @@
 package terraform.gcp.security.cloud_domains.google_clouddomains_registration.official_contact_email
 
-import data.terraform.helpers
-import data.terraform.gcp.security.cloud_domains.google_clouddomains_registration.vars
+import data.terraform.gcp.security.cloud_domains.google_clouddomains_registration.vars as vars
 
 conditions := [
     [
