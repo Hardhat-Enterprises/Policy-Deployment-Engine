@@ -7,7 +7,7 @@ resource "google_cloud_asset_folder_feed" "nc" {
   asset_types = ["compute.googleapis.com/Instance"]
 
   condition {
-    expression = "temporal_asset.deleted == false"
+    expression = "temporal_asset.deleted == true"
   }
 
   feed_output_config {

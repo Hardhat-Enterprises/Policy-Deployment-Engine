@@ -80,20 +80,22 @@
     "condition": {
       "description": "Condition to filter asset updates.",
       "required": true,
-      "security_impact": false,
+      "security_impact": true,
       "rationale": "Controls which events are monitored. Incorrect conditions may miss critical events.",
-      "compliant": ["temporal_asset.deleted == true"],
-      "non-compliant": ["temporal_asset.deleted == false"],
+      "compliant": ["temporal_asset.deleted == false"],
+      "non-compliant": ["temporal_asset.deleted == true"],
       "parent": null,
       "arguments": {
         "expression": {
           "description": "CEL expression defining filtering condition (Common Expression Language).",
           "required": true,
           "security_impact": true,
-          "rationale": "Ensures monitoring focuses on relevant security events.",
-          "compliant": ["temporal_asset.deleted == true"],
-          "non-compliant": ["temporal_asset.deleted == false"],
+          "rationale": "Ensures monitoring includes active assets for effective security visibility.",
+          "compliant": ["temporal_asset.deleted == false"],
+          "non-compliant": ["temporal_asset.deleted == true"],
           "parent": "condition"
+          
+          
 
         },
         "title": {

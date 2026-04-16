@@ -8,13 +8,14 @@ conditions := [
         {
             "situation_description": "Cloud Asset Folder Feed is using an unapproved condition expression.",
             "remedies": [
-                "Set the condition expression to an approved value for security-relevant monitoring."
+                "Set the condition expression to 'temporal_asset.deleted == false' to ensure monitoring covers active assets."
+            
             ]
         },
         {
             "condition": "Checks whether the feed condition expression is in the approved list.",
-            "attribute_path": ["condition", 0, "expression"],
-            "values": ["temporal_asset.deleted == true"],
+            "attribute_path": ["condition", "expression"],
+            "values": ["temporal_asset.deleted == false"],
             "policy_type": "whitelist"
         }
     ]
