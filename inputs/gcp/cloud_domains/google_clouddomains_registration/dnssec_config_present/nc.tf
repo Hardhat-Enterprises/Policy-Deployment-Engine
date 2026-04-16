@@ -1,22 +1,26 @@
 resource "google_clouddomains_registration" "nc" {
+    project = "hardhat-project"
   domain_name = "nc"
   location    = "global"
-  project     = "c"
-
-  yearly_price {
-    currency_code = "USD"
-    units         = "12"
+  
+  dns_settings {
+    custom_dns {
+      name_servers = ["ns-cloud-c1.googledomains.com.", "ns-cloud-c2.googledomains.com."]
+      # VIOLATION: dnssec_config_present (Missing ds_records)
+    }
   }
 
   contact_settings {
     privacy = "PRIVATE_CONTACT_DATA"
-
     registrant_contact {
       email        = "admin@example.com"
       phone_number = "+61212345678"
       postal_address {
         region_code   = "AU"
-        address_lines = ["1600 Amphitheatre Parkway"]
+        address_lines = ["123 Eagle St"]
+        locality      = "Brisbane"
+        postal_code   = "4000"
+        organization  = "Example Corp"
       }
     }
     admin_contact {
@@ -24,7 +28,10 @@ resource "google_clouddomains_registration" "nc" {
       phone_number = "+61212345678"
       postal_address {
         region_code   = "AU"
-        address_lines = ["1600 Amphitheatre Parkway"]
+        address_lines = ["123 Eagle St"]
+        locality      = "Brisbane"
+        postal_code   = "4000"
+        organization  = "Example Corp"
       }
     }
     technical_contact {
@@ -32,20 +39,28 @@ resource "google_clouddomains_registration" "nc" {
       phone_number = "+61212345678"
       postal_address {
         region_code   = "AU"
-        address_lines = ["1600 Amphitheatre Parkway"]
+        address_lines = ["123 Eagle St"]
+        locality      = "Brisbane"
+        postal_code   = "4000"
+        organization  = "Example Corp"
       }
-    }
-  }
-
-  dns_settings {
-    custom_dns {
-      name_servers = ["ns-cloud-c1.googledomains.com."]
-      # Missing ds_records -> Non-compliant
     }
   }
 
   management_settings {
     transfer_lock_state      = "TRANSFER_LOCK_ENABLED"
     preferred_renewal_method = "AUTOMATIC_RENEWAL"
+  }
+
+  yearly_price {
+    currency_code = "USD"
+    units         = "12"
+  }
+
+  domain_notices = ["HSTS_PRELOADED"]
+
+  labels = {
+    env   = "prod"
+    owner = "admin"
   }
 }
