@@ -1,8 +1,8 @@
 resource "google_clouddomains_registration" "nc" {
-    project = "hardhat-project"
+  project     = "hardhat-project"
   domain_name = "nc"
   location    = "global"
-  
+
   dns_settings {
     custom_dns {
       name_servers = ["ns1.hacker.com"] # VIOLATION: restrict_dns_name_servers

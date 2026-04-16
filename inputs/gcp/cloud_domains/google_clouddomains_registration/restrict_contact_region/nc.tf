@@ -1,16 +1,16 @@
 resource "google_clouddomains_registration" "nc" {
-    project = "hardhat-project"
+  project     = "hardhat-project"
   domain_name = "nc"
   location    = "global"
-  
+
   dns_settings {
     custom_dns {
       name_servers = ["ns-cloud-c1.googledomains.com.", "ns-cloud-c2.googledomains.com."]
       ds_records {
-        key_tag    = 12345
-        algorithm  = 13
+        key_tag     = 12345
+        algorithm   = 13
         digest_type = 2
-        digest     = "4E32367....[TRUNCATED]"
+        digest      = "4E32367....[TRUNCATED]"
       }
     }
   }
@@ -29,14 +29,14 @@ resource "google_clouddomains_registration" "nc" {
       email        = "admin@example.com"
       phone_number = "+61212345678"
       postal_address {
-        region_code   = "US"
+        region_code = "US"
       }
     }
     technical_contact {
       email        = "admin@example.com"
       phone_number = "+61212345678"
       postal_address {
-        region_code   = "US"
+        region_code = "US"
       }
     }
   }

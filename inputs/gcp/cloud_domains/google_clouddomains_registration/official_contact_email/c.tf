@@ -1,17 +1,17 @@
 resource "google_clouddomains_registration" "c" {
   project     = "hardhat-project"
-  domain_name = "example.com"
+  domain_name = "c"
   location    = "global"
-  
+
   # DNSSEC and Custom DNS
   dns_settings {
     custom_dns {
       name_servers = ["ns-cloud-c1.googledomains.com.", "ns-cloud-c2.googledomains.com."]
       ds_records {
-        key_tag    = 12345
-        algorithm  = 13
+        key_tag     = 12345
+        algorithm   = 13
         digest_type = 2
-        digest     = "4E32367....[TRUNCATED]"
+        digest      = "4E32367....[TRUNCATED]"
       }
     }
   }
