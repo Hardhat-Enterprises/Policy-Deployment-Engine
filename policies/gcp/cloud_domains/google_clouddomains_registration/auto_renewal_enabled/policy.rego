@@ -6,8 +6,8 @@ import data.terraform.gcp.security.cloud_domains.google_clouddomains_registratio
 conditions := [
     [
         {
-            "situation_description": "Cloud Domain registration has automatic renewal disabled",
-            "remedies": ["Enable automatic renewal by setting 'management_settings.preferred_renewal_method' to 'AUTOMATIC_RENEWAL'"]
+            "situation_description": "Cloud Domain registration does not have automatic renewal enabled.",
+            "remedies": ["Set 'management_settings.preferred_renewal_method' to 'AUTOMATIC_RENEWAL' to prevent domain expiration."]
         },
         {
             "condition": "Check if automatic renewal is enabled",

@@ -1,27 +1,22 @@
 package terraform.gcp.security.cloud_domains.google_clouddomains_registration.hsts_preload_enabled
 
-import data.terraform.gcp.security.cloud_domains.google_clouddomains_registration.vars as vars
+import data.terraform.helpers
+import data.terraform.gcp.security.cloud_domains.google_clouddomains_registration.vars
 
-# Default to false
-default hsts_preload_enabled := false
+conditions := [
+    [
+        {
+            "situation_description": "Cloud Domain registration does not acknowledge HSTS_PRELOADED notice.",
+            "remedies": ["Add 'HSTS_PRELOADED' to the 'domain_notices' list."]
+        },
+        {
+            "condition": "Check if HSTS_PRELOADED notice is acknowledged",
+            "attribute_path": ["domain_notices"],
+            "values": ["HSTS_PRELOADED"],
+            "policy_type": "whitelist"
+        }
+    ]
+]
 
-# Check if HSTS_PRELOADED is in domain_notices
-hsts_preload_enabled := true {
-    input.resource_type == vars.variables.resource_type
-    notices := input.resource_config.domain_notices[_]
-    notices == "HSTS_PRELOADED"
-}
-
-# Policy Response
-deny[msg] {
-    input.resource_type == vars.variables.resource_type
-    not hsts_preload_enabled
-
-    msg := {
-        "situation_description": "Cloud Domain registration does not acknowledge HSTS_PRELOAD_ENABLED notice.",
-        "remedies": ["Include 'HSTS_PRELOADED' in the 'domain_notices' list to enhance web security."],
-        "attribute_path": ["domain_notices"],
-        "values": [],
-        "policy_type": "presence"
-    }
-}
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

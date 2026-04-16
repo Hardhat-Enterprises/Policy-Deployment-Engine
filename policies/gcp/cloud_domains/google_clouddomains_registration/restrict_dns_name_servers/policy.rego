@@ -1,30 +1,22 @@
 package terraform.gcp.security.cloud_domains.google_clouddomains_registration.restrict_dns_name_servers
 
-import data.terraform.gcp.security.cloud_domains.google_clouddomains_registration.vars as vars
+import data.terraform.helpers
+import data.terraform.gcp.security.cloud_domains.google_clouddomains_registration.vars
 
-# List of authorized name servers (Google Cloud Domains defaults)
-authorized_patterns := [".googledomains.com."]
+conditions := [
+    [
+        {
+            "situation_description": "Cloud Domain registration uses unauthorized name servers.",
+            "remedies": ["Use authorized name servers ending with '.googledomains.com.'"]
+        },
+        {
+            "condition": "Check name servers from custom_dns",
+            "attribute_path": ["dns_settings", "custom_dns", "name_servers"],
+            "values": ["ns-cloud-c1.googledomains.com.", "ns-cloud-c2.googledomains.com.", "ns-cloud-c3.googledomains.com.", "ns-cloud-c4.googledomains.com."],
+            "policy_type": "whitelist"
+        }
+    ]
+]
 
-# Helper to check if a name server is authorized
-is_authorized(ns) {
-    some pattern
-    authorized_patterns[pattern]
-    endswith(ns, pattern)
-}
-
-# Deny if any name server is not authorized
-deny[msg] {
-    input.resource_type == vars.variables.resource_type
-    ns_list := input.resource_config.dns_settings[_].custom_dns[_].name_servers
-    some i
-    ns := ns_list[i]
-    not is_authorized(ns)
-
-    msg := {
-        "situation_description": sprintf("Unauthorized name server '%s' detected.", [ns]),
-        "remedies": ["Use authorized name servers ending with '.googledomains.com.'"],
-        "attribute_path": ["dns_settings", "custom_dns", "name_servers"],
-        "values": [ns],
-        "policy_type": "whitelist"
-    }
-}
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details
