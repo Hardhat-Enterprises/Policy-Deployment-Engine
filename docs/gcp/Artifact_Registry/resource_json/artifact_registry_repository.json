@@ -5,10 +5,19 @@
     "format": {
       "description": "The format of packages that are stored in the repository. Supported formats can be found [here](https://cloud.google.com/artifact-registry/docs/supported-formats). You can only create alpha formats if you are a member of the [alpha user group](https://cloud.google.com/artifact-registry/docs/supported-formats#alpha-access).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Controls what artifact types may be stored. Restricting formats reduces unsupported or higher-risk package ecosystems in the environment.",
+      "rationale": "The approved_formats policy whitelists DOCKER, MAVEN, NPM, and PYTHON only.",
+      "compliant": [
+        "format = \"DOCKER\"",
+        "format = \"MAVEN\"",
+        "format = \"NPM\"",
+        "format = \"PYTHON\""
+      ],
+      "non-compliant": [
+        "format = \"APT\"",
+        "format = \"GO\"",
+        "format = \"KFP\""
+      ],
       "parent": null
     },
     "repository_id": {
@@ -41,10 +50,18 @@
     "kms_key_name": {
       "description": "The Cloud KMS resource name of the customer managed encryption key that\u2019s used to encrypt the contents of the Repository. Has the form: `projects/my-project/locations/my-region/keyRings/my-kr/cryptoKeys/my-key`. This value may not be changed after the Repository has been created.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Determines whether repository contents use customer-managed encryption and whether the key belongs to an approved project, region, key ring, and crypto key.",
+      "rationale": "Two policies apply: cmek_required requires kms_key_name to be set, and approved_cmek_keys restricts it to approved CMEK path patterns and approved project/location/key identifiers.",
+      "compliant": [
+        "kms_key_name = \"projects/project-1/locations/us-central1/keyRings/artifact-ring/cryptoKeys/artifact-key\"",
+        "kms_key_name = \"projects/project-2/locations/australia-southeast1/keyRings/platform-ring/cryptoKeys/repo-key\""
+      ],
+      "non-compliant": [
+        "kms_key_name = null",
+        "kms_key_name = \"\"",
+        "kms_key_name = \"kms-key\"",
+        "kms_key_name = \"projects/other-project/locations/europe-west1/keyRings/test/cryptoKeys/key1\""
+      ],
       "parent": null
     },
     "docker_config": {
@@ -59,10 +76,14 @@
         "immutable_tags": {
           "description": "The repository which enabled this flag prevents all tags from being modified, moved or deleted. This does not prevent tags from being created.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "Mutable Docker tags can be retagged or overwritten, which weakens artifact integrity and traceability.",
+          "rationale": "The docker_immutable_tags policy requires immutable_tags = true when format is DOCKER.",
+          "compliant": [
+            "docker_config { immutable_tags = true }"
+          ],
+          "non-compliant": [
+            "docker_config { immutable_tags = false }"
+          ],
           "parent": "docker_config"
         }
       }
@@ -79,10 +100,14 @@
         "allow_snapshot_overwrites": {
           "description": "The repository with this flag will allow publishing the same snapshot versions.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "Allowing snapshot overwrites can make Maven builds non-reproducible and weaken artifact integrity.",
+          "rationale": "The maven_snapshot_overwrite_disallowed policy blocks allow_snapshot_overwrites = true when format is MAVEN.",
+          "compliant": [
+            "maven_config { allow_snapshot_overwrites = false }"
+          ],
+          "non-compliant": [
+            "maven_config { allow_snapshot_overwrites = true }"
+          ],
           "parent": "maven_config"
         },
         "version_policy": {
@@ -99,10 +124,17 @@
     "mode": {
       "description": "The mode configures the repository to serve artifacts from different sources. Default value is `STANDARD_REPOSITORY`. Possible values are: `STANDARD_REPOSITORY`, `VIRTUAL_REPOSITORY`, `REMOTE_REPOSITORY`.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Controls whether the repository behaves as standard, remote, or virtual. This affects which upstream and trust-related controls apply.",
+      "rationale": "The approved_modes policy whitelists STANDARD_REPOSITORY, REMOTE_REPOSITORY, and VIRTUAL_REPOSITORY only.",
+      "compliant": [
+        "mode = \"STANDARD_REPOSITORY\"",
+        "mode = \"REMOTE_REPOSITORY\"",
+        "mode = \"VIRTUAL_REPOSITORY\""
+      ],
+      "non-compliant": [
+        "mode = \"UNKNOWN_MODE\"",
+        "mode = \"PROXY_REPOSITORY\""
+      ],
       "parent": null
     },
     "virtual_repository_config": {
@@ -117,10 +149,17 @@
         "upstream_policies": {
           "description": "Policies that configure the upstream artifacts distributed by the Virtual Repository. Upstream policies cannot be set on a standard repository. Structure is [documented below](#nested_virtual_repository_config_upstream_policies).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "Upstream policy ordering affects which upstream source wins during resolution inside virtual repositories.",
+          "rationale": "The virtual_upstream_priority_range policy requires upstream_policies.priority to stay within 1 to 100 when mode is VIRTUAL_REPOSITORY.",
+          "compliant": [
+            "upstream_policies { priority = 1 }",
+            "upstream_policies { priority = 50 }",
+            "upstream_policies { priority = 100 }"
+          ],
+          "non-compliant": [
+            "upstream_policies { priority = 0 }",
+            "upstream_policies { priority = 101 }"
+          ],
           "parent": "virtual_repository_config"
         }
       }
@@ -136,7 +175,7 @@
       "arguments": {
         "id": {
           "description": "",
-          "required": null,
+          "required": true,
           "security_impact": null,
           "rationale": null,
           "compliant": null,
@@ -146,28 +185,44 @@
         "action": {
           "description": "Policy action. Possible values are: `DELETE`, `KEEP`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "Cleanup actions can delete artifacts. Unsafe DELETE and KEEP settings may remove tagged artifacts or too many recent versions.",
+          "rationale": "The cleanup_policy_guardrails policy forbids DELETE rules targeting TAGGED artifacts and expects KEEP policies to retain at least 3 recent versions.",
+          "compliant": [
+            "action = \"DELETE\" with condition.tag_state = \"UNTAGGED\"",
+            "action = \"KEEP\" with most_recent_versions.keep_count = 3"
+          ],
+          "non-compliant": [
+            "action = \"DELETE\" with condition.tag_state = \"TAGGED\"",
+            "action = \"KEEP\" with most_recent_versions.keep_count = 1"
+          ],
           "parent": "cleanup_policies"
         },
         "condition": {
           "description": "Policy condition for matching versions. Structure is [documented below](#nested_cleanup_policies_cleanup_policies_condition).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "Condition fields define which artifact versions a cleanup rule matches. Unsafe matching can delete protected or important versions.",
+          "rationale": "Your guardrail policy specifically checks condition.tag_state for DELETE policies and blocks TAGGED artifacts from matching deletion.",
+          "compliant": [
+            "condition { tag_state = \"UNTAGGED\" }"
+          ],
+          "non-compliant": [
+            "condition { tag_state = \"TAGGED\" }"
+          ],
           "parent": "cleanup_policies"
         },
         "most_recent_versions": {
           "description": "Policy condition for retaining a minimum number of versions. May only be specified with a Keep action. Structure is [documented below](#nested_cleanup_policies_cleanup_policies_most_recent_versions).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "Retention settings determine rollback and recovery availability after cleanup runs.",
+          "rationale": "Your guardrail policy requires KEEP policies to retain at least 3 recent versions via most_recent_versions.keep_count.",
+          "compliant": [
+            "most_recent_versions { keep_count = 3 }",
+            "most_recent_versions { keep_count = 10 }"
+          ],
+          "non-compliant": [
+            "most_recent_versions { keep_count = 1 }",
+            "most_recent_versions { keep_count = 2 }"
+          ],
           "parent": "cleanup_policies"
         }
       }
@@ -247,10 +302,16 @@
         "common_repository": {
           "description": "Specific settings for an Artifact Registory remote repository. Structure is [documented below](#nested_remote_repository_config_common_repository).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "The upstream URI defines the remote source of packages and is a major supply-chain trust boundary.",
+          "rationale": "The approved_remote_upstreams policy allows only approved upstream Artifact Registry URIs for REMOTE_REPOSITORY mode.",
+          "compliant": [
+            "common_repository { uri = \"https://us-central1-docker.pkg.dev/trusted-project/base-images\" }",
+            "common_repository { uri = \"https://australia-southeast1-docker.pkg.dev/shared-artifacts/approved-upstream\" }"
+          ],
+          "non-compliant": [
+            "common_repository { uri = \"https://docker.io/library\" }",
+            "common_repository { uri = \"https://europe-west1-docker.pkg.dev/unknown-project/test\" }"
+          ],
           "parent": "remote_repository_config"
         },
         "upstream_credentials": {
@@ -265,10 +326,14 @@
         "disable_upstream_validation": {
           "description": "If true, the remote repository upstream and upstream credentials will not be validated.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "Disabling upstream validation prevents validation of remote source settings and credentials, increasing trust and supply-chain risk.",
+          "rationale": "The remote_upstream_validation_required policy blocks disable_upstream_validation = true for REMOTE_REPOSITORY mode.",
+          "compliant": [
+            "disable_upstream_validation = false"
+          ],
+          "non-compliant": [
+            "disable_upstream_validation = true"
+          ],
           "parent": "remote_repository_config"
         }
       }
@@ -276,10 +341,14 @@
     "cleanup_policy_dry_run": {
       "description": "If true, the cleanup pipeline is prevented from deleting versions in this repository.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Disabling dry-run can allow cleanup rules to delete artifacts immediately before their effect is reviewed.",
+      "rationale": "The cleanup_policy_guardrails policy requires cleanup_policy_dry_run to be true.",
+      "compliant": [
+        "cleanup_policy_dry_run = true"
+      ],
+      "non-compliant": [
+        "cleanup_policy_dry_run = false"
+      ],
       "parent": null
     },
     "vulnerability_scanning_config": {
@@ -294,15 +363,19 @@
         "enablement_config": {
           "description": "This configures whether vulnerability scanning is automatically performed for artifacts pushed to this repository. Possible values are: `INHERITED`, `DISABLED`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "This setting controls whether artifact vulnerability scanning remains active. Disabling it reduces visibility into known package and image issues.",
+          "rationale": "The vulnerability_scanning_enabled policy requires enablement_config to resolve to INHERITED rather than DISABLED.",
+          "compliant": [
+            "vulnerability_scanning_config { enablement_config = \"INHERITED\" }"
+          ],
+          "non-compliant": [
+            "vulnerability_scanning_config { enablement_config = \"DISABLED\" }"
+          ],
           "parent": "vulnerability_scanning_config"
         },
         "enablement_state": {
           "description": "(Output) This field returns whether scanning is active for this repository.",
-          "required": null,
+          "required": false,
           "security_impact": null,
           "rationale": null,
           "compliant": null,
@@ -311,7 +384,7 @@
         },
         "enablement_state_reason": {
           "description": "(Output) This provides an explanation for the state of scanning on this repository.",
-          "required": null,
+          "required": false,
           "security_impact": null,
           "rationale": null,
           "compliant": null,
@@ -323,10 +396,17 @@
     "location": {
       "description": "The name of the repository's location. In addition to specific regions, special values for multi-region locations are `asia`, `europe`, and `us`. See [here](https://cloud.google.com/artifact-registry/docs/repositories/repo-locations), or use the [google_artifact_registry_locations](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/artifact_registry_locations) data source for possible values.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Repository location determines residency and deployment boundary. The written policy only allows approved Australia zones/regions.",
+      "rationale": "The approved_locations policy whitelists only australia-southeast1-a/b/c and australia-southeast2-a/b/c.",
+      "compliant": [
+        "location = \"australia-southeast1-a\"",
+        "location = \"australia-southeast2-b\""
+      ],
+      "non-compliant": [
+        "location = \"us-central1\"",
+        "location = \"europe-west1\"",
+        "location = \"asia\""
+      ],
       "parent": null
     },
     "project": {
@@ -368,10 +448,17 @@
         "priority": {
           "description": "Entries with a greater priority value take precedence in the pull order.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "Priority controls upstream pull order in virtual repositories. Out-of-range values can make resolution behaviour inconsistent or unmanaged.",
+          "rationale": "The virtual_upstream_priority_range policy requires priority to stay within 1 to 100.",
+          "compliant": [
+            "priority = 1",
+            "priority = 50",
+            "priority = 100"
+          ],
+          "non-compliant": [
+            "priority = 0",
+            "priority = 101"
+          ],
           "parent": "upstream_policies"
         }
       }
@@ -388,10 +475,15 @@
         "tag_state": {
           "description": "Match versions by tag status. Default value is `ANY`. Possible values are: `TAGGED`, `UNTAGGED`, `ANY`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "Tag-state matching inside cleanup rules determines whether promoted/tagged artifacts can be deleted.",
+          "rationale": "The cleanup_policy_guardrails policy blocks DELETE cleanup rules from using tag_state = TAGGED.",
+          "compliant": [
+            "tag_state = \"UNTAGGED\"",
+            "tag_state = \"ANY\" for non-delete review scenarios"
+          ],
+          "non-compliant": [
+            "tag_state = \"TAGGED\" under a DELETE action"
+          ],
           "parent": "condition"
         },
         "tag_prefixes": {
@@ -462,10 +554,18 @@
         "keep_count": {
           "description": "Minimum number of versions to keep.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "Too small a keep_count can remove rollback points and operational recovery versions.",
+          "rationale": "The cleanup_policy_guardrails policy enforces a keep_count range of 3 to 100 for the checked KEEP policy.",
+          "compliant": [
+            "keep_count = 3",
+            "keep_count = 5",
+            "keep_count = 100"
+          ],
+          "non-compliant": [
+            "keep_count = 1",
+            "keep_count = 2",
+            "keep_count = 101"
+          ],
           "parent": "most_recent_versions"
         }
       }
@@ -687,10 +787,16 @@
         "uri": {
           "description": "One of: a. Artifact Registry Repository resource, e.g. `projects/UPSTREAM_PROJECT_ID/locations/REGION/repositories/UPSTREAM_REPOSITORY` b. URI to the registry, e.g. `\"https://registry-1.docker.io\"` c. URI to Artifact Registry Repository, e.g. `\"https://REGION-docker.pkg.dev/UPSTREAM_PROJECT_ID/UPSTREAM_REPOSITORY\"`",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "The remote upstream URI is the actual package source and directly affects supply-chain trust.",
+          "rationale": "The approved_remote_upstreams policy allows only approved URI patterns and approved region/project/repository combinations.",
+          "compliant": [
+            "uri = \"https://us-central1-docker.pkg.dev/trusted-project/base-images\"",
+            "uri = \"https://australia-southeast1-docker.pkg.dev/shared-artifacts/approved-upstream\""
+          ],
+          "non-compliant": [
+            "uri = \"https://registry-1.docker.io\"",
+            "uri = \"https://europe-west1-docker.pkg.dev/random/repo\""
+          ],
           "parent": "common_repository"
         }
       }
