@@ -10,7 +10,7 @@ conditions := [
         },
         {
             "condition": "Client TLS policy certificate provider instance must use google_cloud_private_spiffe",
-            "attribute_path": ["server_certificate", 0, "certificate_provider_instance", 0, "plugin_instance"],
+            "attribute_path": ["client_certificate", 0, "certificate_provider_instance", 0, "plugin_instance"],
             "values": ["google_cloud_private_spiffe"],
             "policy_type": "whitelist"
         }

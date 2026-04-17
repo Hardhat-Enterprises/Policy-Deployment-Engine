@@ -5,5 +5,5 @@ resource "google_network_security_address_group" "c" {
   location = "australia-southeast1"
   type     = "IPV4"
   capacity = 100
-  items    = ["10.10.0.1"]
+  items    = ["10.10.0.1/30"]
 }

@@ -6,5 +6,5 @@ resource "google_network_security_address_group" "nc" {
   location = "global"
   type     = "IPV4"
   capacity = 100
-  purpose = "DEFAULT"
+  purpose = ["DEFAULT"]
 }

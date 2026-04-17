@@ -5,13 +5,13 @@ import data.terraform.gcp.security.network_security.network_security_address_gro
 conditions := [
     [
         {
-            "situation_description": "Only allow specific IP address 10.10.0.1 in address group items",
-            "remedies": ["Set items to ['10.10.0.1']"]
+            "situation_description": "Only allow specific IP address 10.10.0.1/30 in address group items",
+            "remedies": ["Set items to ['10.10.0.1/30']"]
         },
         {
-            "condition": "Address group items must be 10.10.0.1",
+            "condition": "Address group items must be 10.10.0.1/30",
             "attribute_path": ["items"],
-            "values": ["10.10.0.1"],
+            "values": ["10.10.0.1/30"],
             "policy_type": "whitelist"
         }
     ]
