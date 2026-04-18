@@ -9,14 +9,15 @@ conditions := [
     "remedies":[ "Set vpcsc_policy to DENY."]},
     {
         "condition": "Require VPCSC policy to be DENY",
-        "attribute_path" : ["vpcsc_policy"], # An array of strings and indicies eg. ["rsa",0,"key"]
-        "values" : ["DENY"], # Values to compare against
-        "policy_type" : "whitelist" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
+        "attribute_path" : ["vpcsc_policy"],
+        "values" : ["DENY"],
+        "policy_type" : "whitelist"
     }
     ]
 ]
 
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+  
+message := result.message
+details := result.details

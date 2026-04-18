@@ -22,9 +22,8 @@ conditions := [
             "condition": "Remote upstream URI must follow an approved pattern",
             "attribute_path": ["remote_repository_config", 0, "common_repository", 0, "uri"],
             "values": [
-                "https://*-docker.pkg.dev/*/*",
+                "https://australia-southeast1-docker.pkg.dev/*/*",
                 [
-                    ["us-central1", "australia-southeast1"],
                     ["trusted-project", "shared-artifacts"],
                     ["base-images", "approved-upstream"]
                 ]
@@ -34,5 +33,7 @@ conditions := [
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+  
+message := result.message
+details := result.details
