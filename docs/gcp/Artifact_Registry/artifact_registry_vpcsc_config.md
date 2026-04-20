@@ -10,6 +10,6 @@ Reference: [Terraform Registry – artifact_registry_vpcsc_config](https://regis
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `vpcsc_policy` | The VPC SC policy for project and location. Possible values are: `DENY`, `ALLOW`. | false | false | Your vpcsc_policy policy requires the value DENY. | ['vpcsc_policy = "DENY"'] | ['vpcsc_policy = "ALLOW"'] |
-| `location` | The name of the location this config is located in. | false | false | Your VPC SC location policy whitelists only australia-southeast1-a/b/c and australia-southeast2-a/b/c. | ['location = "australia-southeast1-a"', 'location = "australia-southeast2-c"'] | ['location = "us-central1"', 'location = "europe-west1"'] |
-| `project` | If it is not provided, the provider project is used. | false | false | None | None | None |
+| `vpcsc_policy` | The VPC SC policy for project and location. Possible values are: `DENY`, `ALLOW`. | false | true | Your vpcsc_policy policy requires the value DENY. | DENY | ALLOW |
+| `location` | The name of the location this config is located in. | false | true | Your VPC SC location policy whitelists only australia-southeast1-a/b/c and australia-southeast2-a/b/c. | australia-southeast1-a | us-central1 |
+| `project` | If it is not provided, the provider project is used. | true | false | None | None | None |

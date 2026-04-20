@@ -5,25 +5,16 @@
     "format": {
       "description": "The format of packages that are stored in the repository. Supported formats can be found [here](https://cloud.google.com/artifact-registry/docs/supported-formats). You can only create alpha formats if you are a member of the [alpha user group](https://cloud.google.com/artifact-registry/docs/supported-formats#alpha-access).",
       "required": true,
-      "security_impact": "Controls what artifact types may be stored. Restricting formats reduces unsupported or higher-risk package ecosystems in the environment.",
+      "security_impact":true,
       "rationale": "The approved_formats policy whitelists DOCKER, MAVEN, NPM, and PYTHON only.",
-      "compliant": [
-        "format = \"DOCKER\"",
-        "format = \"MAVEN\"",
-        "format = \"NPM\"",
-        "format = \"PYTHON\""
-      ],
-      "non-compliant": [
-        "format = \"APT\"",
-        "format = \"GO\"",
-        "format = \"KFP\""
-      ],
+      "compliant": ["DOCKER", "MAVEN", "NPM", "PYTHON"],
+      "non-compliant": ["APT", "GO", "KFP"],
       "parent": null
     },
     "repository_id": {
       "description": "The last part of the repository name, for example: \"repo1\"",
       "required": true,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -32,7 +23,7 @@
     "description": {
       "description": "The user-provided description of the repository.",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -41,7 +32,7 @@
     "labels": {
       "description": "Labels with user-defined metadata. This field may contain up to 64 entries. Label keys and values may be no longer than 63 characters. Label keys must begin with a lowercase letter and may only contain lowercase letters, numeric characters, underscores, and dashes. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -50,24 +41,16 @@
     "kms_key_name": {
       "description": "The Cloud KMS resource name of the customer managed encryption key that\u2019s used to encrypt the contents of the Repository. Has the form: `projects/my-project/locations/my-region/keyRings/my-kr/cryptoKeys/my-key`. This value may not be changed after the Repository has been created.",
       "required": false,
-      "security_impact": "Determines whether repository contents use customer-managed encryption and whether the key belongs to an approved project, region, key ring, and crypto key.",
+      "security_impact": true,
       "rationale": "Two policies apply: cmek_required requires kms_key_name to be set, and approved_cmek_keys restricts it to approved CMEK path patterns and approved project/location/key identifiers.",
-      "compliant": [
-        "kms_key_name = \"projects/project-1/locations/us-central1/keyRings/artifact-ring/cryptoKeys/artifact-key\"",
-        "kms_key_name = \"projects/project-2/locations/australia-southeast1/keyRings/platform-ring/cryptoKeys/repo-key\""
-      ],
-      "non-compliant": [
-        "kms_key_name = null",
-        "kms_key_name = \"\"",
-        "kms_key_name = \"kms-key\"",
-        "kms_key_name = \"projects/other-project/locations/europe-west1/keyRings/test/cryptoKeys/key1\""
-      ],
+      "compliant": "projects/project-2/locations/australia-southeast1/keyRings/platform-ring/cryptoKeys/repo-key",
+      "non-compliant": ["null", "", "kms-key", "projects/other-project/locations/europe-west1/keyRings/test/cryptoKeys/key1"],
       "parent": null
     },
     "docker_config": {
       "description": "Docker repository config contains repository level configuration for the repositories of docker type. Structure is [documented below](#nested_docker_config).",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -76,14 +59,10 @@
         "immutable_tags": {
           "description": "The repository which enabled this flag prevents all tags from being modified, moved or deleted. This does not prevent tags from being created.",
           "required": false,
-          "security_impact": "Mutable Docker tags can be retagged or overwritten, which weakens artifact integrity and traceability.",
+          "security_impact": true,
           "rationale": "The docker_immutable_tags policy requires immutable_tags = true when format is DOCKER.",
-          "compliant": [
-            "docker_config { immutable_tags = true }"
-          ],
-          "non-compliant": [
-            "docker_config { immutable_tags = false }"
-          ],
+          "compliant": "true",
+          "non-compliant": "false",
           "parent": "docker_config"
         }
       }
@@ -91,7 +70,7 @@
     "maven_config": {
       "description": "MavenRepositoryConfig is maven related repository details. Provides additional configuration details for repositories of the maven format type. Structure is [documented below](#nested_maven_config).",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -100,20 +79,16 @@
         "allow_snapshot_overwrites": {
           "description": "The repository with this flag will allow publishing the same snapshot versions.",
           "required": false,
-          "security_impact": "Allowing snapshot overwrites can make Maven builds non-reproducible and weaken artifact integrity.",
+          "security_impact": true,
           "rationale": "The maven_snapshot_overwrite_disallowed policy blocks allow_snapshot_overwrites = true when format is MAVEN.",
-          "compliant": [
-            "maven_config { allow_snapshot_overwrites = false }"
-          ],
-          "non-compliant": [
-            "maven_config { allow_snapshot_overwrites = true }"
-          ],
+          "compliant": "false",
+          "non-compliant": "true",
           "parent": "maven_config"
         },
         "version_policy": {
           "description": "Version policy defines the versions that the registry will accept. Default value is `VERSION_POLICY_UNSPECIFIED`. Possible values are: `VERSION_POLICY_UNSPECIFIED`, `RELEASE`, `SNAPSHOT`.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -124,23 +99,16 @@
     "mode": {
       "description": "The mode configures the repository to serve artifacts from different sources. Default value is `STANDARD_REPOSITORY`. Possible values are: `STANDARD_REPOSITORY`, `VIRTUAL_REPOSITORY`, `REMOTE_REPOSITORY`.",
       "required": false,
-      "security_impact": "Controls whether the repository behaves as standard, remote, or virtual. This affects which upstream and trust-related controls apply.",
+      "security_impact": true,
       "rationale": "The approved_modes policy whitelists STANDARD_REPOSITORY, REMOTE_REPOSITORY, and VIRTUAL_REPOSITORY only.",
-      "compliant": [
-        "mode = \"STANDARD_REPOSITORY\"",
-        "mode = \"REMOTE_REPOSITORY\"",
-        "mode = \"VIRTUAL_REPOSITORY\""
-      ],
-      "non-compliant": [
-        "mode = \"UNKNOWN_MODE\"",
-        "mode = \"PROXY_REPOSITORY\""
-      ],
+      "compliant": ["STANDARD_REPOSITORY", "REMOTE_REPOSITORY", "VIRTUAL_REPOSITORY"],
+      "non-compliant": [ "UNKNOWN_MODE", "PROXY_REPOSITORY" ],
       "parent": null
     },
     "virtual_repository_config": {
       "description": "Configuration specific for a Virtual Repository. Structure is [documented below](#nested_virtual_repository_config).",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -149,17 +117,10 @@
         "upstream_policies": {
           "description": "Policies that configure the upstream artifacts distributed by the Virtual Repository. Upstream policies cannot be set on a standard repository. Structure is [documented below](#nested_virtual_repository_config_upstream_policies).",
           "required": false,
-          "security_impact": "Upstream policy ordering affects which upstream source wins during resolution inside virtual repositories.",
+          "security_impact": true,
           "rationale": "The virtual_upstream_priority_range policy requires upstream_policies.priority to stay within 1 to 100 when mode is VIRTUAL_REPOSITORY.",
-          "compliant": [
-            "upstream_policies { priority = 1 }",
-            "upstream_policies { priority = 50 }",
-            "upstream_policies { priority = 100 }"
-          ],
-          "non-compliant": [
-            "upstream_policies { priority = 0 }",
-            "upstream_policies { priority = 101 }"
-          ],
+          "compliant": [ "1", "50", "100" ],
+          "non-compliant": [ "0", "101" ],
           "parent": "virtual_repository_config"
         }
       }
@@ -167,7 +128,7 @@
     "cleanup_policies": {
       "description": "Cleanup policies for this repository. Cleanup policies indicate when certain package versions can be automatically deleted. Map keys are policy IDs supplied by users during policy creation. They must unique within a repository and be under 128 characters in length. Structure is [documented below](#nested_cleanup_policies).",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -176,7 +137,7 @@
         "id": {
           "description": "",
           "required": true,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -185,44 +146,28 @@
         "action": {
           "description": "Policy action. Possible values are: `DELETE`, `KEEP`.",
           "required": false,
-          "security_impact": "Cleanup actions can delete artifacts. Unsafe DELETE and KEEP settings may remove tagged artifacts or too many recent versions.",
+          "security_impact": true,
           "rationale": "The cleanup_policy_guardrails policy forbids DELETE rules targeting TAGGED artifacts and expects KEEP policies to retain at least 3 recent versions.",
-          "compliant": [
-            "action = \"DELETE\" with condition.tag_state = \"UNTAGGED\"",
-            "action = \"KEEP\" with most_recent_versions.keep_count = 3"
-          ],
-          "non-compliant": [
-            "action = \"DELETE\" with condition.tag_state = \"TAGGED\"",
-            "action = \"KEEP\" with most_recent_versions.keep_count = 1"
-          ],
+          "compliant": "DELETE with condition.tag_state = UNTAGGED or KEEP with most_recent_versions.keep_count >= 3",
+          "non-compliant": "DELETE with condition.tag_state = TAGGED or KEEP with most_recent_versions.keep_count < 3",
           "parent": "cleanup_policies"
         },
         "condition": {
           "description": "Policy condition for matching versions. Structure is [documented below](#nested_cleanup_policies_cleanup_policies_condition).",
           "required": false,
-          "security_impact": "Condition fields define which artifact versions a cleanup rule matches. Unsafe matching can delete protected or important versions.",
+          "security_impact": true,
           "rationale": "Your guardrail policy specifically checks condition.tag_state for DELETE policies and blocks TAGGED artifacts from matching deletion.",
-          "compliant": [
-            "condition { tag_state = \"UNTAGGED\" }"
-          ],
-          "non-compliant": [
-            "condition { tag_state = \"TAGGED\" }"
-          ],
+          "compliant": "UNTAGGED",
+          "non-compliant": "TAGGED",
           "parent": "cleanup_policies"
         },
         "most_recent_versions": {
           "description": "Policy condition for retaining a minimum number of versions. May only be specified with a Keep action. Structure is [documented below](#nested_cleanup_policies_cleanup_policies_most_recent_versions).",
           "required": false,
-          "security_impact": "Retention settings determine rollback and recovery availability after cleanup runs.",
+          "security_impact": true,
           "rationale": "Your guardrail policy requires KEEP policies to retain at least 3 recent versions via most_recent_versions.keep_count.",
-          "compliant": [
-            "most_recent_versions { keep_count = 3 }",
-            "most_recent_versions { keep_count = 10 }"
-          ],
-          "non-compliant": [
-            "most_recent_versions { keep_count = 1 }",
-            "most_recent_versions { keep_count = 2 }"
-          ],
+          "compliant": [ "3", "10" ],
+          "non-compliant": [ "1", "2" ],
           "parent": "cleanup_policies"
         }
       }
@@ -230,7 +175,7 @@
     "remote_repository_config": {
       "description": "Configuration specific for a Remote Repository. Structure is [documented below](#nested_remote_repository_config).",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -239,7 +184,7 @@
         "description": {
           "description": "The description of the remote source.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -248,7 +193,7 @@
         "apt_repository": {
           "description": "Specific settings for an Apt remote repository. Structure is [documented below](#nested_remote_repository_config_apt_repository).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -257,7 +202,7 @@
         "docker_repository": {
           "description": "Specific settings for a Docker remote repository. Structure is [documented below](#nested_remote_repository_config_docker_repository).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -266,7 +211,7 @@
         "maven_repository": {
           "description": "Specific settings for a Maven remote repository. Structure is [documented below](#nested_remote_repository_config_maven_repository).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -275,7 +220,7 @@
         "npm_repository": {
           "description": "Specific settings for an Npm remote repository. Structure is [documented below](#nested_remote_repository_config_npm_repository).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -284,7 +229,7 @@
         "python_repository": {
           "description": "Specific settings for a Python remote repository. Structure is [documented below](#nested_remote_repository_config_python_repository).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -293,7 +238,7 @@
         "yum_repository": {
           "description": "Specific settings for an Yum remote repository. Structure is [documented below](#nested_remote_repository_config_yum_repository).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -302,22 +247,16 @@
         "common_repository": {
           "description": "Specific settings for an Artifact Registory remote repository. Structure is [documented below](#nested_remote_repository_config_common_repository).",
           "required": false,
-          "security_impact": "The upstream URI defines the remote source of packages and is a major supply-chain trust boundary.",
+          "security_impact": true,
           "rationale": "The approved_remote_upstreams policy allows only approved upstream Artifact Registry URIs for REMOTE_REPOSITORY mode.",
-          "compliant": [
-            "common_repository { uri = \"https://us-central1-docker.pkg.dev/trusted-project/base-images\" }",
-            "common_repository { uri = \"https://australia-southeast1-docker.pkg.dev/shared-artifacts/approved-upstream\" }"
-          ],
-          "non-compliant": [
-            "common_repository { uri = \"https://docker.io/library\" }",
-            "common_repository { uri = \"https://europe-west1-docker.pkg.dev/unknown-project/test\" }"
-          ],
+          "compliant": [ "https://us-central1-docker.pkg.dev/trusted-project/base-images", "https://australia-southeast1-docker.pkg.dev/shared-artifacts/approved-upstream" ],
+          "non-compliant": [ "https://docker.io/library", "https://europe-west1-docker.pkg.dev/unknown-project/test" ],
           "parent": "remote_repository_config"
         },
         "upstream_credentials": {
           "description": "The credentials used to access the remote repository. Structure is [documented below](#nested_remote_repository_config_upstream_credentials).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -326,14 +265,10 @@
         "disable_upstream_validation": {
           "description": "If true, the remote repository upstream and upstream credentials will not be validated.",
           "required": false,
-          "security_impact": "Disabling upstream validation prevents validation of remote source settings and credentials, increasing trust and supply-chain risk.",
+          "security_impact": true,
           "rationale": "The remote_upstream_validation_required policy blocks disable_upstream_validation = true for REMOTE_REPOSITORY mode.",
-          "compliant": [
-            "disable_upstream_validation = false"
-          ],
-          "non-compliant": [
-            "disable_upstream_validation = true"
-          ],
+          "compliant": "false",
+          "non-compliant": "true",
           "parent": "remote_repository_config"
         }
       }
@@ -341,20 +276,16 @@
     "cleanup_policy_dry_run": {
       "description": "If true, the cleanup pipeline is prevented from deleting versions in this repository.",
       "required": false,
-      "security_impact": "Disabling dry-run can allow cleanup rules to delete artifacts immediately before their effect is reviewed.",
+      "security_impact": true,
       "rationale": "The cleanup_policy_guardrails policy requires cleanup_policy_dry_run to be true.",
-      "compliant": [
-        "cleanup_policy_dry_run = true"
-      ],
-      "non-compliant": [
-        "cleanup_policy_dry_run = false"
-      ],
+      "compliant": "true",
+      "non-compliant": "false",
       "parent": null
     },
     "vulnerability_scanning_config": {
       "description": "Configuration for vulnerability scanning of artifacts stored in this repository. Structure is [documented below](#nested_vulnerability_scanning_config).",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -363,20 +294,16 @@
         "enablement_config": {
           "description": "This configures whether vulnerability scanning is automatically performed for artifacts pushed to this repository. Possible values are: `INHERITED`, `DISABLED`.",
           "required": false,
-          "security_impact": "This setting controls whether artifact vulnerability scanning remains active. Disabling it reduces visibility into known package and image issues.",
+          "security_impact": true,
           "rationale": "The vulnerability_scanning_enabled policy requires enablement_config to resolve to INHERITED rather than DISABLED.",
-          "compliant": [
-            "vulnerability_scanning_config { enablement_config = \"INHERITED\" }"
-          ],
-          "non-compliant": [
-            "vulnerability_scanning_config { enablement_config = \"DISABLED\" }"
-          ],
+          "compliant": "INHERITED",
+          "non-compliant": "DISABLED",
           "parent": "vulnerability_scanning_config"
         },
         "enablement_state": {
           "description": "(Output) This field returns whether scanning is active for this repository.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -385,7 +312,7 @@
         "enablement_state_reason": {
           "description": "(Output) This provides an explanation for the state of scanning on this repository.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -396,23 +323,16 @@
     "location": {
       "description": "The name of the repository's location. In addition to specific regions, special values for multi-region locations are `asia`, `europe`, and `us`. See [here](https://cloud.google.com/artifact-registry/docs/repositories/repo-locations), or use the [google_artifact_registry_locations](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/artifact_registry_locations) data source for possible values.",
       "required": false,
-      "security_impact": "Repository location determines residency and deployment boundary. The written policy only allows approved Australia zones/regions.",
+      "security_impact": true,
       "rationale": "The approved_locations policy whitelists only australia-southeast1-a/b/c and australia-southeast2-a/b/c.",
-      "compliant": [
-        "location = \"australia-southeast1-a\"",
-        "location = \"australia-southeast2-b\""
-      ],
-      "non-compliant": [
-        "location = \"us-central1\"",
-        "location = \"europe-west1\"",
-        "location = \"asia\""
-      ],
+      "compliant": [ "australia-southeast1-a", "australia-southeast2-b" ],
+      "non-compliant": ["us-central1", "europe-west1", "asia" ],
       "parent": null
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
+      "required": true,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -421,7 +341,7 @@
     "upstream_policies": {
       "description": "",
       "required": null,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -430,7 +350,7 @@
         "id": {
           "description": "The user-provided ID of the upstream policy.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -439,7 +359,7 @@
         "repository": {
           "description": "A reference to the repository resource, for example: \"projects/p1/locations/us-central1/repository/repo1\".",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -448,17 +368,10 @@
         "priority": {
           "description": "Entries with a greater priority value take precedence in the pull order.",
           "required": false,
-          "security_impact": "Priority controls upstream pull order in virtual repositories. Out-of-range values can make resolution behaviour inconsistent or unmanaged.",
+          "security_impact": true,
           "rationale": "The virtual_upstream_priority_range policy requires priority to stay within 1 to 100.",
-          "compliant": [
-            "priority = 1",
-            "priority = 50",
-            "priority = 100"
-          ],
-          "non-compliant": [
-            "priority = 0",
-            "priority = 101"
-          ],
+          "compliant": [ 1, 50, 100 ],
+          "non-compliant": [ 0, 101 ],
           "parent": "upstream_policies"
         }
       }
@@ -466,7 +379,7 @@
     "condition": {
       "description": "",
       "required": null,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -475,21 +388,16 @@
         "tag_state": {
           "description": "Match versions by tag status. Default value is `ANY`. Possible values are: `TAGGED`, `UNTAGGED`, `ANY`.",
           "required": false,
-          "security_impact": "Tag-state matching inside cleanup rules determines whether promoted/tagged artifacts can be deleted.",
+          "security_impact": true,
           "rationale": "The cleanup_policy_guardrails policy blocks DELETE cleanup rules from using tag_state = TAGGED.",
-          "compliant": [
-            "tag_state = \"UNTAGGED\"",
-            "tag_state = \"ANY\" for non-delete review scenarios"
-          ],
-          "non-compliant": [
-            "tag_state = \"TAGGED\" under a DELETE action"
-          ],
+          "compliant": [ "UNTAGGED", "ANY" ],
+          "non-compliant": "TAGGED",
           "parent": "condition"
         },
         "tag_prefixes": {
           "description": "Match versions by tag prefix. Applied on any prefix match.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -498,7 +406,7 @@
         "version_name_prefixes": {
           "description": "Match versions by version name prefix. Applied on any prefix match.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -507,7 +415,7 @@
         "package_name_prefixes": {
           "description": "Match versions by package prefix. Applied on any prefix match.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -516,7 +424,7 @@
         "older_than": {
           "description": "Match versions older than a duration.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -525,7 +433,7 @@
         "newer_than": {
           "description": "Match versions newer than a duration.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -536,7 +444,7 @@
     "most_recent_versions": {
       "description": "",
       "required": null,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -545,7 +453,7 @@
         "package_name_prefixes": {
           "description": "Match versions by package prefix. Applied on any prefix match.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -554,18 +462,10 @@
         "keep_count": {
           "description": "Minimum number of versions to keep.",
           "required": false,
-          "security_impact": "Too small a keep_count can remove rollback points and operational recovery versions.",
+          "security_impact": true,
           "rationale": "The cleanup_policy_guardrails policy enforces a keep_count range of 3 to 100 for the checked KEEP policy.",
-          "compliant": [
-            "keep_count = 3",
-            "keep_count = 5",
-            "keep_count = 100"
-          ],
-          "non-compliant": [
-            "keep_count = 1",
-            "keep_count = 2",
-            "keep_count = 101"
-          ],
+          "compliant": ["3","5","100"],
+          "non-compliant": ["1","2","101"],
           "parent": "most_recent_versions"
         }
       }
@@ -573,7 +473,7 @@
     "apt_repository": {
       "description": "",
       "required": null,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -582,7 +482,7 @@
         "public_repository": {
           "description": "One of the publicly available Apt repositories supported by Artifact Registry. Structure is [documented below](#nested_remote_repository_config_apt_repository_public_repository).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -593,7 +493,7 @@
     "public_repository": {
       "description": "",
       "required": null,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -602,7 +502,7 @@
         "repository_base": {
           "description": "A common public repository base for Yum. Possible values are: `CENTOS`, `CENTOS_DEBUG`, `CENTOS_VAULT`, `CENTOS_STREAM`, `ROCKY`, `EPEL`.",
           "required": true,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -611,7 +511,7 @@
         "repository_path": {
           "description": "Specific repository from the base, e.g. `\"pub/rocky/9/BaseOS/x86_64/os\"`",
           "required": true,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -622,7 +522,7 @@
     "docker_repository": {
       "description": "",
       "required": null,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -631,7 +531,7 @@
         "public_repository": {
           "description": "Address of the remote repository. Default value is `DOCKER_HUB`. Possible values are: `DOCKER_HUB`.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -640,7 +540,7 @@
         "custom_repository": {
           "description": "[Deprecated, please use commonRepository instead] Settings for a remote repository with a custom uri. Structure is [documented below](#nested_remote_repository_config_docker_repository_custom_repository).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -651,7 +551,7 @@
     "custom_repository": {
       "description": "",
       "required": null,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -660,7 +560,7 @@
         "uri": {
           "description": "Specific uri to the registry, e.g. `\"https://pypi.io\"`",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -671,7 +571,7 @@
     "maven_repository": {
       "description": "",
       "required": null,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -680,7 +580,7 @@
         "public_repository": {
           "description": "Address of the remote repository. Default value is `MAVEN_CENTRAL`. Possible values are: `MAVEN_CENTRAL`.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -689,7 +589,7 @@
         "custom_repository": {
           "description": "[Deprecated, please use commonRepository instead] Settings for a remote repository with a custom uri. Structure is [documented below](#nested_remote_repository_config_maven_repository_custom_repository).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -700,7 +600,7 @@
     "npm_repository": {
       "description": "",
       "required": null,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -709,7 +609,7 @@
         "public_repository": {
           "description": "Address of the remote repository. Default value is `NPMJS`. Possible values are: `NPMJS`.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -718,7 +618,7 @@
         "custom_repository": {
           "description": "[Deprecated, please use commonRepository instead] Settings for a remote repository with a custom uri. Structure is [documented below](#nested_remote_repository_config_npm_repository_custom_repository).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -729,7 +629,7 @@
     "python_repository": {
       "description": "",
       "required": null,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -738,7 +638,7 @@
         "public_repository": {
           "description": "Address of the remote repository. Default value is `PYPI`. Possible values are: `PYPI`.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -747,7 +647,7 @@
         "custom_repository": {
           "description": "[Deprecated, please use commonRepository instead] Settings for a remote repository with a custom uri. Structure is [documented below](#nested_remote_repository_config_python_repository_custom_repository).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -758,7 +658,7 @@
     "yum_repository": {
       "description": "",
       "required": null,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -767,7 +667,7 @@
         "public_repository": {
           "description": "One of the publicly available Yum repositories supported by Artifact Registry. Structure is [documented below](#nested_remote_repository_config_yum_repository_public_repository).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -778,7 +678,7 @@
     "common_repository": {
       "description": "",
       "required": null,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -787,16 +687,10 @@
         "uri": {
           "description": "One of: a. Artifact Registry Repository resource, e.g. `projects/UPSTREAM_PROJECT_ID/locations/REGION/repositories/UPSTREAM_REPOSITORY` b. URI to the registry, e.g. `\"https://registry-1.docker.io\"` c. URI to Artifact Registry Repository, e.g. `\"https://REGION-docker.pkg.dev/UPSTREAM_PROJECT_ID/UPSTREAM_REPOSITORY\"`",
           "required": true,
-          "security_impact": "The remote upstream URI is the actual package source and directly affects supply-chain trust.",
+          "security_impact": true,
           "rationale": "The approved_remote_upstreams policy allows only approved URI patterns and approved region/project/repository combinations.",
-          "compliant": [
-            "uri = \"https://us-central1-docker.pkg.dev/trusted-project/base-images\"",
-            "uri = \"https://australia-southeast1-docker.pkg.dev/shared-artifacts/approved-upstream\""
-          ],
-          "non-compliant": [
-            "uri = \"https://registry-1.docker.io\"",
-            "uri = \"https://europe-west1-docker.pkg.dev/random/repo\""
-          ],
+          "compliant": ["https://us-central1-docker.pkg.dev/trusted-project/base-images", "https://australia-southeast1-docker.pkg.dev/shared-artifacts/approved-upstream"],
+          "non-compliant": ["https://registry-1.docker.io\"", "https://europe-west1-docker.pkg.dev/random/repo"],
           "parent": "common_repository"
         }
       }
@@ -804,7 +698,7 @@
     "upstream_credentials": {
       "description": "",
       "required": null,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -813,7 +707,7 @@
         "username_password_credentials": {
           "description": "Use username and password to access the remote repository. Structure is [documented below](#nested_remote_repository_config_upstream_credentials_username_password_credentials).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -824,7 +718,7 @@
     "username_password_credentials": {
       "description": "",
       "required": null,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -833,7 +727,7 @@
         "username": {
           "description": "The username to access the remote repository.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -842,7 +736,7 @@
         "password_secret_version": {
           "description": "The Secret Manager key version that holds the password to access the remote repository. Must be in the format of `projects/{project}/secrets/{secret}/versions/{version}`.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,

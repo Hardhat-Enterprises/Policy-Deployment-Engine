@@ -1,4 +1,4 @@
-package terraform.gcp.security.artifact_registry.google_artifact_registry_repository.approved_locations # Edit here 
+package terraform.gcp.security.artifact_registry.google_artifact_registry_repository.approved_locations
 import data.terraform.helpers
 import data.terraform.gcp.security.artifact_registry.google_artifact_registry_repository.vars
 

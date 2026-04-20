@@ -5,7 +5,7 @@
     "location": {
       "description": "special values for multi-region locations are `asia`, `europe`, and `us`. See [here](https://cloud.google.com/artifact-registry/docs/repositories/repo-locations), or use the [google_artifact_registry_locations](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/artifact_registry_locations) data source for possible values. Used to find the parent resource to bind the IAM policy to. If not specified, the value will be parsed from the identifier of the parent resource. If no location is provided in the parent identifier and no location is specified, it is taken from the provider configuration.",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -14,7 +14,7 @@
     "repository": {
       "description": "Used to find the parent resource to bind the IAM policy to. If not specified, the value will be parsed from the identifier of the parent resource.",
       "required": true,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -22,8 +22,8 @@
     },
     "project": {
       "description": "If it is not provided, the project will be parsed from the identifier of the parent resource. If no project is provided in the parent identifier and no project is specified, the provider project is used.",
-      "required": false,
-      "security_impact": null,
+      "required": true,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -32,49 +32,28 @@
     "member/members": {
       "description": "Specifies principals (users, service accounts, groups, domains, or project roles) to bind the IAM role to. Cannot use allUsers or allAuthenticatedUsers.",
       "required": true,
-      "security_impact": "Public principals can expose repository contents broadly and bypass least-privilege access design.",
-      "rationale": "Your IAM binding/member policies blacklist allUsers and allAuthenticatedUsers for members/member values.",
-      "compliant": [
-      "member = \"serviceAccount:ci@example-project.iam.gserviceaccount.com\"",
-      "members = [\"group:devops@example.com\", \"user:alice@example.com\"]"
-      ],
-      "non-compliant": [
-      "member = \"allUsers\"",
-      "member = \"allAuthenticatedUsers\"",
-      "members = [\"allUsers\"]"
-      ],
+      "security_impact": true,
+      "rationale": "IAM binding/member policies blacklist allUsers and allAuthenticatedUsers for members/member values.",
+      "compliant": ["serviceAccount:ci@example-project.iam.gserviceaccount.com",  "group:devops@example.com", "user:alice@example.com"],
+      "non-compliant": ["allUsers", "allAuthenticatedUsers"],
       "parent": null
     },
     "role": {
       "description": "`google_artifact_registry_repository_iam_binding` can be used per role. Note that custom roles must be of the format `[projects|organizations]/{parent-name}/roles/{role-name}`.",
       "required": true,
-      "security_impact": "The assigned IAM role determines the scope of access. Broad administrative roles can grant unnecessary control over repositories.",
+      "security_impact": true,
       "rationale": "Your IAM role policies allow Artifact Registry roles only through a pattern whitelist: roles/artifactregistry.reader, roles/artifactregistry.writer, or roles/artifactregistry.admin.",
-      "compliant": [
-        "role = \"roles/artifactregistry.reader\"",
-        "role = \"roles/artifactregistry.writer\"",
-        "role = \"roles/artifactregistry.admin\""
-      ],
-      "non-compliant": [
-        "role = \"roles/owner\"",
-        "role = \"roles/editor\"",
-        "role = \"roles/viewer\""
-      ],
+      "compliant": ["roles/artifactregistry.reader", "roles/artifactregistry.writer", "roles/artifactregistry.admin"],
+      "non-compliant": ["roles/owner", "roles/editor", "roles/viewer"],
       "parent": null
     },
     "policy_data": {
       "description": "a `google_iam_policy` data source.",
       "required": false,
-      "security_impact": "Inline IAM policy JSON can grant broad access if it contains over-privileged roles.",
+      "security_impact": true,
       "rationale": "Your IAM policy_data policy expects embedded roles in policy_data to match approved Artifact Registry roles only.",
-      "compliant": [
-        "policy_data containing roles/artifactregistry.reader",
-        "policy_data containing roles/artifactregistry.writer"
-      ],
-      "non-compliant": [
-        "policy_data containing roles/owner",
-        "policy_data containing roles/editor"
-      ],
+      "compliant": ["roles/artifactregistry.reader", "roles/artifactregistry.writer"],
+      "non-compliant": ["roles/owner", "roles/editor"],
       "parent": null
     }
   }

@@ -1,4 +1,4 @@
-package terraform.gcp.security.artifact_registry.google_artifact_registry_vpcsc_config.vpcsc_policy # Edit here 
+package terraform.gcp.security.artifact_registry.google_artifact_registry_vpcsc_config.vpcsc_policy
 import data.terraform.helpers
 import data.terraform.gcp.security.artifact_registry.google_artifact_registry_vpcsc_config.vars
 
