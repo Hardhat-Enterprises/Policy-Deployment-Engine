@@ -62,6 +62,8 @@ jobs:
         if: steps.extract-services.outputs.services != ''
         run: |
           services="${{ steps.extract-services.outputs.services }}"
+          test_output=""
+          overall_status="✅ All checks passed"
           
           for service in $services; do
             echo "Running tests for service: $service"
@@ -82,11 +84,50 @@ jobs:
             
             # Run tests if at least one path exists
             if [ -n "$inputs_path" ] || [ -n "$policies_path" ]; then
-              python3 scripts/auto_test/auto_test.py \
+              if python3 scripts/auto_test/auto_test.py \
                 ${inputs_path:+--inputs "$inputs_path"} \
                 ${policies_path:+--policies "$policies_path"} \
-                --verbose
+                --verbose 2>&1 | tee -a test_results.txt; then
+                :
+              else
+                overall_status="❌ Some checks failed"
+              fi
             else
               echo "No inputs or policies found for service: $service"
             fi
           done
+          
+          # Write summary to GitHub Actions summary
+          {
+            echo "## Policy Check Results"
+            echo ""
+            echo "$overall_status"
+            echo ""
+            echo "### Details"
+            echo "\`\`\`"
+            cat test_results.txt
+            echo "\`\`\`"
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: Comment on PR
+        if: always() && github.event_name == 'pull_request'
+        run: |
+          # Create PR comment with test results
+          {
+            echo "## 🔍 Policy Check Results"
+            echo ""
+            if grep -q "❌" test_results.txt 2>/dev/null; then
+              echo "**Status**: ❌ Some checks failed"
+            else
+              echo "**Status**: ✅ All checks passed"
+            fi
+            echo ""
+            echo "### Test Output"
+            echo "\`\`\`"
+            cat test_results.txt
+            echo "\`\`\`"
+          } > pr_comment.md
+          
+          gh pr comment ${{ github.event.pull_request.number }} -F pr_comment.md
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
