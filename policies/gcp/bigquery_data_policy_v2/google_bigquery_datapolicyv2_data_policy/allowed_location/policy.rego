@@ -7,16 +7,18 @@ conditions := [
     [
         {
             "situation_description": "location is outside the approved deployment region for this data policy.",
-            "remedies": ["Set location to us-central1."]
+            "remedies": ["Set location to australia-southeast1."]
         },
         {
             "condition": "location is set to an approved region",
             "attribute_path": ["location"],
-            "values": ["us-central1"],
+            "values": ["australia-southeast1"],
             "policy_type": "whitelist"
         }
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details

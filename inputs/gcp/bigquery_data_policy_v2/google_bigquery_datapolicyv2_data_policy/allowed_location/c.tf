@@ -1,6 +1,6 @@
 resource "google_bigquery_datapolicyv2_data_policy" "c" {
   provider         = google-beta
-  location         = "us-central1"
+  location         = "australia-southeast1"
   data_policy_id   = "c"
   data_policy_type = "COLUMN_LEVEL_SECURITY_POLICY"
   project          = "PDE"
