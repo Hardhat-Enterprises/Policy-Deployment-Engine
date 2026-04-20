@@ -9,7 +9,7 @@ resource "google_binary_authorization_attestor" "c1" {
     public_keys {
       id = "secure-key"
       pkix_public_key {
-        public_key_pem = <<EOT
+        public_key_pem      = <<EOT
 -----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr3y...
 -----END PUBLIC KEY-----

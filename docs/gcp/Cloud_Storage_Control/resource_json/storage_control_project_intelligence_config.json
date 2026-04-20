@@ -5,8 +5,8 @@
     "name": {
       "description": "Identifier of the GCP project. For GCP project, this field can be project name or project number.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "This is a required identifier field used to reference the GCP Project. It does not control any security behaviour or access permissions.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,53 +14,53 @@
     "edition_config": {
       "description": "Edition configuration of the Storage Intelligence resource. Valid values are INHERIT, TRIAL, DISABLED and STANDARD.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Setting edition_config to DISABLED removes Storage Intelligence monitoring at the project level, eliminating security visibility, anomaly detection, and compliance monitoring across all buckets within the project. Storage Intelligence must remain active to maintain security coverage at the project level.",
+      "compliant": "STANDARD",
+      "non-compliant": "DISABLED",
       "parent": null
     },
     "filter": {
-      "description": "Filter over location and bucket using include or exclude semantics. Resources that match the include or exclude filter are exclusively included or excluded from the Storage Intelligence plan. Structure is [documented below](#nested_filter).",
+      "description": "Filter over location and bucket using include or exclude semantics. Resources that match the include or exclude filter are exclusively included or excluded from the Storage Intelligence plan.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "At the project level, location filtering is not considered a security policy because the project can inherit location restrictions from the parent folder or organization where data sovereignty policies are already enforced. Configuring filters at the project level is an operational scoping decision.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
       "arguments": {
         "excluded_cloud_storage_buckets": {
-          "description": "Buckets to exclude from the Storage Intelligence plan. Structure is [documented below](#nested_filter_excluded_cloud_storage_buckets).",
+          "description": "Buckets to exclude from the Storage Intelligence plan.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Excluding specific buckets from Storage Intelligence monitoring is an operational scoping decision. Location and monitoring policies are inherited from the parent folder or organization.",
           "compliant": null,
           "non-compliant": null,
           "parent": "filter"
         },
         "included_cloud_storage_buckets": {
-          "description": "Buckets to include in the Storage Intelligence plan. Structure is [documented below](#nested_filter_included_cloud_storage_buckets).",
+          "description": "Buckets to include in the Storage Intelligence plan.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Including specific buckets is an operational scoping decision. It does not directly impact security posture at the project level.",
           "compliant": null,
           "non-compliant": null,
           "parent": "filter"
         },
         "excluded_cloud_storage_locations": {
-          "description": "Locations to exclude from the Storage Intelligence plan. Structure is [documented below](#nested_filter_excluded_cloud_storage_locations).",
+          "description": "Locations to exclude from the Storage Intelligence plan.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Excluding locations is an operational and cost management decision at the project level. Data sovereignty is enforced at the parent folder or organization level.",
           "compliant": null,
           "non-compliant": null,
           "parent": "filter"
         },
         "included_cloud_storage_locations": {
-          "description": "Locations to include in the Storage Intelligence plan. Structure is [documented below](#nested_filter_included_cloud_storage_locations).",
+          "description": "Locations to include in the Storage Intelligence plan.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "At the project level, location restrictions are inherited from the parent folder or organization where data sovereignty policies are already enforced. Configuring locations at the project level is therefore not considered a security policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "filter"
@@ -70,8 +70,8 @@
     "excluded_cloud_storage_buckets": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "This is a nested block supporting the filter argument. Bucket exclusions are operational decisions and are not considered security-relevant at the project level.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -79,8 +79,8 @@
         "bucket_id_regexes": {
           "description": "List of bucket id regexes to exclude in the storage intelligence plan.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Regex patterns for bucket exclusions are operational scoping values. No security policy is enforced at this level.",
           "compliant": null,
           "non-compliant": null,
           "parent": "excluded_cloud_storage_buckets"
@@ -90,17 +90,17 @@
     "included_cloud_storage_buckets": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "This is a nested block supporting the filter argument. Bucket inclusions are operational decisions and are not considered security-relevant at the project level.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
       "arguments": {
         "bucket_id_regexes": {
-          "description": "List of bucket id regexes to exclude in the storage intelligence plan.",
+          "description": "List of bucket id regexes to include in the storage intelligence plan.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Regex patterns for bucket inclusions are operational scoping values. No security policy is enforced at this level.",
           "compliant": null,
           "non-compliant": null,
           "parent": "included_cloud_storage_buckets"
@@ -110,17 +110,17 @@
     "excluded_cloud_storage_locations": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "This is a nested block supporting the filter argument. Location exclusions are operational decisions at the project level. Data sovereignty is enforced at the parent folder or organization level.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
       "arguments": {
         "locations": {
-          "description": "List of locations.",
+          "description": "List of locations to exclude from the Storage Intelligence plan.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The list of excluded locations is an operational scoping value at the project level. No security policy is enforced here.",
           "compliant": null,
           "non-compliant": null,
           "parent": "excluded_cloud_storage_locations"
@@ -130,17 +130,17 @@
     "included_cloud_storage_locations": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "This nested block is not considered a security policy at the project level. Location restrictions are inherited from the parent folder or organization where data sovereignty policies are already enforced.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
       "arguments": {
         "locations": {
-          "description": "List of locations.",
+          "description": "List of locations to include in the Storage Intelligence plan.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Location values at the project level are not enforced as a security policy. Data sovereignty requirements are managed at the parent folder or organization level via the intelligence_by_locations policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "included_cloud_storage_locations"
