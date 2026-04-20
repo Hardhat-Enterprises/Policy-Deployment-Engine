@@ -121,16 +121,22 @@ jobs:
           {
             echo "## 🔍 Policy Check Results"
             echo ""
-            if grep -q "❌" test_results.txt 2>/dev/null; then
-              echo "**Status**: ❌ Some checks failed"
+            if [ -f "test_results.txt" ]; then
+              if grep -q "❌" test_results.txt 2>/dev/null; then
+                echo "**Status**: ❌ Some checks failed"
+              else
+                echo "**Status**: ✅ All checks passed"
+              fi
+              echo ""
+              echo "### Test Output"
+              echo "\`\`\`"
+              cat test_results.txt
+              echo "\`\`\`"
             else
-              echo "**Status**: ✅ All checks passed"
+              echo "**Status**: ℹ️ No policy files changed"
+              echo ""
+              echo "No input or policy files were modified in this PR"
             fi
-            echo ""
-            echo "### Test Output"
-            echo "\`\`\`"
-            cat test_results.txt
-            echo "\`\`\`"
           } > pr_comment.md
           
           gh pr comment ${{ github.event.pull_request.number }} -F pr_comment.md
