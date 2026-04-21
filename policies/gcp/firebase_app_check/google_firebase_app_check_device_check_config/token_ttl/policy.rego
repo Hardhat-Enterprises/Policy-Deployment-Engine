@@ -5,13 +5,13 @@ import data.terraform.gcp.security.firebase_app_check.google_firebase_app_check_
 
 conditions := [
   [
-    {"situation_description": "Firebase DeviceCheck token_ttl must not exceed 86400s (24 hours) to limit the replay attack window.",
-     "remedies": ["Set token_ttl to 86400s or less. Example: '3600s' (1 hour)."]},
+    {"situation_description": "Firebase DeviceCheck token_ttl must be between 1800s (30 min) and 86400s (24 hours) to balance usability and security.",
+     "remedies": ["Set token_ttl to a value between 1800 and 86400 seconds. Example: 3600 (1 hour)."]},
     {
-      "condition": "token_ttl exceeds the maximum permitted value of 86400s.",
+      "condition": "token_ttl must be within the permitted range of 1800s to 86400s.",
       "attribute_path": ["token_ttl"],
-      "values": ["604800s", "86401s"],
-      "policy_type": "blacklist"
+      "values": [1800, 86400],
+      "policy_type": "range"
     }
   ]
 ]
