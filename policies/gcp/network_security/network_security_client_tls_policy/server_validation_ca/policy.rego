@@ -5,14 +5,14 @@ import data.terraform.gcp.security.network_security.network_security_client_tls_
 conditions := [
     [
         {
-            "situation_description": "Ensure server_validation_ca is configured to TLS validation",
-            "remedies": ["Add server_validation_ca block with grpc_endpoint and valid target_uri"]
+            "situation_description": "Ensure server_validation_ca uses a valid unix target_uri",
+            "remedies": ["Set server_validation_ca.grpc_endpoint.target_uri to unix:mypath"]
         },
         {
-            "condition": "server_validation_ca must be defined",
-            "attribute_path": ["server_validation_ca"],
-            "policy_type": "whitelist",
-            "values": ["*"]
+            "condition": "server_validation_ca.grpc_endpoint.target_uri must be unix:mypath",
+            "attribute_path": ["server_validation_ca", 0, "grpc_endpoint", 0, "target_uri"],
+            "values": ["unix:mypath"],
+            "policy_type": "whitelist"
         }
     ]
 ]

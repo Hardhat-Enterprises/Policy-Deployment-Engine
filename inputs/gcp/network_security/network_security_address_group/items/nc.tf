@@ -1,5 +1,5 @@
 resource "google_network_security_address_group" "nc" {
-    
+
   name     = "nc"
   parent   = "projects/123"
   location = "australia-southeast1"

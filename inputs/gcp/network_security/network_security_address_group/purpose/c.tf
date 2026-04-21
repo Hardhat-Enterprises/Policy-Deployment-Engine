@@ -6,5 +6,5 @@ resource "google_network_security_address_group" "c" {
   location = "global"
   type     = "IPV4"
   capacity = 100
-  purpose = ["CLOUD_ARMOR"]
+  purpose  = ["CLOUD_ARMOR"]
 }
