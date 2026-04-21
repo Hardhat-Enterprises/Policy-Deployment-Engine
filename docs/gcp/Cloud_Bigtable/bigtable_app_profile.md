@@ -10,31 +10,31 @@ Reference: [Terraform Registry – bigtable_app_profile](https://registry.terraf
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `app_profile_id` | The unique name of the app profile in the form `[_a-zA-Z0-9][-_.a-zA-Z0-9]*`. | true | false | This argument is primarily operational and should follow platform standards. | None | None |
-| `description` | Long form description of the use case for this app profile. | false | false | This argument is primarily operational and should follow platform standards. | None | None |
-| `multi_cluster_routing_use_any` | If true, read/write requests are routed to the nearest cluster in the instance, and will fail over to the nearest cluster that is available in the event of transient errors or delays. Clusters in a region are considered equidistant. Choosing this option sacrifices read-your-writes consistency to improve availability. | false | false | This argument is primarily operational and should follow platform standards. | None | None |
-| `single_cluster_routing` | Use a single-cluster routing policy. Structure is [documented below](#nested_single_cluster_routing). | false | false | This argument is primarily operational and should follow platform standards. | None | None |
-| `standard_isolation` | The standard options used for isolating this app profile's traffic from other use cases. Structure is [documented below](#nested_standard_isolation). | false | false | This argument is primarily operational and should follow platform standards. | None | None |
-| `data_boost_isolation_read_only` | Specifies that this app profile is intended for read-only usage via the Data Boost feature. Structure is [documented below](#nested_data_boost_isolation_read_only). | false | false | This argument is primarily operational and should follow platform standards. | None | None |
-| `instance` | The name of the instance to create the app profile within. | false | false | This argument is primarily operational and should follow platform standards. | None | None |
+| `app_profile_id` | The unique name of the app profile in the form `[_a-zA-Z0-9][-_.a-zA-Z0-9]*`. | true | false | Terraform resource name for this app profile; used with routing blocks to identify traffic policy. | None | None |
+| `description` | Long form description of the use case for this app profile. | false | false | Operator-facing notes about why this profile exists; does not change IAM or encryption by itself. | None | None |
+| `multi_cluster_routing_use_any` | If true, read/write requests are routed to the nearest cluster in the instance, and will fail over to the nearest cluster that is available in the event of transient errors or delays. Clusters in a region are considered equidistant. Choosing this option sacrifices read-your-writes consistency to improve availability. | false | false | When enabled, sends requests to the nearest cluster for availability; differs from strict read-your-writes consistency. | None | None |
+| `single_cluster_routing` | Use a single-cluster routing policy. Structure is [documented below](#nested_single_cluster_routing). | false | false | Nested block that pins routing to one cluster when multi-cluster-any routing is not used. | None | None |
+| `standard_isolation` | The standard options used for isolating this app profile's traffic from other use cases. Structure is [documented below](#nested_standard_isolation). | false | false | Optional traffic isolation bucket so workloads do not contend on shared priority. | None | None |
+| `data_boost_isolation_read_only` | Specifies that this app profile is intended for read-only usage via the Data Boost feature. Structure is [documented below](#nested_data_boost_isolation_read_only). | false | false | Marks this profile as read-only analytics via Data Boost. | None | None |
+| `instance` | The name of the instance to create the app profile within. | false | false | Bigtable instance this app profile belongs to. | None | None |
 | `ignore_warnings` | If true, ignore safety checks when deleting/updating the app profile. | false | true | Ignoring warnings can bypass safety checks and increase risk during updates/deletes. | false | true |
-| `project` | If it is not provided, the provider project is used. | true | false | This argument can affect security posture or operational safety and should align with organizational policy. | None | None |
+| `project` | If it is not provided, the provider project is used. | true | false | GCP project ID for API calls and billing context. | None | None |
 
 ### single_cluster_routing Block
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `cluster_id` | The cluster to which read/write requests should be routed. | true | false | This argument is primarily operational and should follow platform standards. | None | None |
+| `cluster_id` | The cluster to which read/write requests should be routed. | true | false | Names the cluster that receives reads and writes under single-cluster routing. | None | None |
 | `allow_transactional_writes` | If true, CheckAndMutateRow and ReadModifyWriteRow requests are allowed by this app profile. It is unsafe to send these requests to the same table/row/column in multiple clusters. | false | true | This control requires transactional writes to remain disabled for single-cluster routing under your governance standard. | false | true |
 
 ### standard_isolation Block
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `priority` | The priority of requests sent using this app profile. Possible values are: `PRIORITY_LOW`, `PRIORITY_MEDIUM`, `PRIORITY_HIGH`. | true | false | This argument is primarily operational and should follow platform standards. | None | None |
+| `priority` | The priority of requests sent using this app profile. Possible values are: `PRIORITY_LOW`, `PRIORITY_MEDIUM`, `PRIORITY_HIGH`. | true | false | Priority tier for isolated traffic (`PRIORITY_LOW`, `PRIORITY_MEDIUM`, `PRIORITY_HIGH`). | None | None |
 
 ### data_boost_isolation_read_only Block
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `compute_billing_owner` | The Compute Billing Owner for this Data Boost App Profile. Possible values are: `HOST_PAYS`. | true | false | This argument is primarily operational and should follow platform standards. | None | None |
+| `compute_billing_owner` | The Compute Billing Owner for this Data Boost App Profile. Possible values are: `HOST_PAYS`. | true | false | Who pays for Data Boost compute (`HOST_PAYS`). | None | None |
