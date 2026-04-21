@@ -1,8 +1,8 @@
 ## 🛡️ Policy Deployment Engine: `pubsub_topic_iam`
 
-This section provides a concise policy evaluation for the `google_pubsub_topic_iam_binding`, `google_pubsub_topic_iam_member`, and `google_pubsub_topic_iam_policy` resources in GCP.
+This section provides a concise policy evaluation for the `pubsub_topic_iam` resource in GCP.
 
-Reference: [Terraform Registry – google_pubsub_topic_iam](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/pubsub_topic_iam)
+Reference: [Terraform Registry – pubsub_topic_iam](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/pubsub_topic_iam)
 
 ---
 
@@ -10,7 +10,8 @@ Reference: [Terraform Registry – google_pubsub_topic_iam](https://registry.ter
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `topic` | The topic name or ID to bind the IAM policy to. | true | false | None | None | None |
-| `role` | The IAM role to grant. Custom roles must use the format `[projects\|organizations]/{parent-name}/roles/{role-name}`. | true | false | None | None | None |
-| `member/members` | Identities granted the role. Can be user, serviceAccount, group, or domain. | true | true | Granting access to `allUsers` or `allAuthenticatedUsers` makes the topic publicly accessible, exposing sensitive messages and enabling abuse. Only named, authenticated principals should be permitted — this prevents data leakage and unauthorized message publishing. | serviceAccount:my-sa@my-project.iam.gserviceaccount.com | allUsers |
-| `project` | The project the topic belongs to. If not provided, it is parsed from the topic identifier. | false | false | None | None | None |
+| `topic` |  | false | false | None | None | None |
+| `project` | If it is not provided, the project will be parsed from the identifier of the parent resource. If no project is provided in the parent identifier and no project is specified, the provider project is used. | false | false | None | None | None |
+| `member/members` | Each entry can have one of the following values: * **allUsers**: A special identifier that represents anyone who is on the internet; with or without a Google account. * **allAuthenticatedUsers**: A special identifier that represents anyone who is authenticated with a Google account or a service account. * **user:{emailid}**: An email address that represents a specific Google account. For example, alice@gmail.com or joe@example.com. * **serviceAccount:{emailid}**: An email address that represents a service account. For example, my-other-app@appspot.gserviceaccount.com. * **group:{emailid}**: An email address that represents a Google group. For example, admins@example.com. * **domain:{domain}**: A G Suite domain (primary, instead of alias) name that represents all the users of that domain. For example, google.com or example.com. * **projectOwner:projectid**: Owners of the given project. For example, "projectOwner:my-example-project" * **projectEditor:projectid**: Editors of the given project. For example, "projectEditor:my-example-project" * **projectViewer:projectid**: Viewers of the given project. For example, "projectViewer:my-example-project" | false | true | Granting access to `allUsers` or `allAuthenticatedUsers` makes the topic publicly accessible, allowing anyone to publish messages. This can lead to unauthorized data injection, spam, quota exhaustion, and downstream processing of untrusted payloads. | user:admin@example.com | allUsers |
+| `role` | `google_pubsub_topic_iam_binding` can be used per role. Note that custom roles must be of the format `[projects|organizations]/{parent-name}/roles/{role-name}`. | false | false | None | None | None |
+| `policy_data` | a `google_iam_policy` data source. | false | false | None | None | None |

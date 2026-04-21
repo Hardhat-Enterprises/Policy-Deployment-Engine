@@ -14,10 +14,10 @@
     "kms_key_name": {
       "description": "The resource name of the Cloud KMS CryptoKey to be used to protect access to messages published on this topic. Your project's PubSub service account (`service-{{PROJECT_NUMBER}}@gcp-sa-pubsub.iam.gserviceaccount.com`) must have `roles/cloudkms.cryptoKeyEncrypterDecrypter` to use this feature. The expected format is `projects/*/locations/*/keyRings/*/cryptoKeys/*`",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Without CMEK, Pub/Sub topics rely on Google-managed encryption. Specifying a customer-managed key gives full control over encryption, supports compliance requirements, and allows key revocation to immediately block data access.",
+      "compliant": "projects/my-project/locations/global/keyRings/my-ring/cryptoKeys/my-key",
+      "non-compliant": "None (key not set)",
       "parent": null
     },
     "labels": {
