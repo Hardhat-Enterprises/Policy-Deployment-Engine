@@ -1,6 +1,6 @@
-resource "google_workbench_instance" "c1" {
-  project = "my-secure-project" 
-  name     = "c1"
+resource "google_workbench_instance" "nc1" {
+  project  = "my-secure-project"
+  name     = "workbench-instance"
   location = "us-central1-a"
   gce_setup {
     machine_type = "n1-standard-4"
@@ -16,12 +16,7 @@ resource "google_workbench_instance" "c1" {
     confidential_instance_config {
       confidential_instance_type = "SEV"
     }
-
     disable_public_ip = true
-
-    service_accounts {
-      email = "my@service-account.com"
-    }
     boot_disk {
       disk_size_gb    = 310
       disk_type       = "PD_SSD"
