@@ -16,7 +16,7 @@ conditions := [
         {
             "condition": "Check whether access_mode is set to the approved value.",
             "attribute_path": ["disk_restore_properties", 0, "access_mode"],
-            "values": ["READ_WRITE_SINGLE", null],
+            "values": ["READ_WRITE_SINGLE"],
             "policy_type": "whitelist"
         }
     ]

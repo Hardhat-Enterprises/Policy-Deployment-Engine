@@ -1,17 +1,9 @@
-resource "google_backup_dr_backup_vault" "nc1" {
-  project                                    = "my-project-4418-1743628379470"
-  location                                   = "australia-southeast1"
-  backup_vault_id                            = "nc1"
-  access_restriction                         = "WITHIN_ORGANIZATION"
-  backup_minimum_enforced_retention_duration = "300000s"
-}
-
-resource "google_backup_dr_backup_plan" "nc2" {
+resource "google_backup_dr_backup_plan" "nc" {
   project        = "my-project-4418-1743628379470"
   location       = "australia-southeast1"
-  backup_plan_id = "nc2"
+  backup_plan_id = "nc"
   resource_type  = "compute.googleapis.com/Instance"
-  backup_vault   = google_backup_dr_backup_vault.nc1.id
+  backup_vault   = "nc2"
 
   backup_rules {
     rule_id               = "daily-rule"

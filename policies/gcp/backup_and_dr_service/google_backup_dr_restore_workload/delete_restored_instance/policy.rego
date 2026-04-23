@@ -16,7 +16,7 @@ conditions := [
         {
             "condition": "Check whether delete_restored_instance is disabled.",
             "attribute_path": ["delete_restored_instance"],
-            "values": [false, null],
+            "values": [false],
             "policy_type": "whitelist"
         }
     ]

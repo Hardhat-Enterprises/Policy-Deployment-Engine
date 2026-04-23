@@ -16,7 +16,7 @@ conditions := [
         {
             "condition": "Check whether can_ip_forward is disabled.",
             "attribute_path": ["compute_instance_restore_properties", 0, "can_ip_forward"],
-            "values": [false, null],
+            "values": [false],
             "policy_type": "whitelist"
         }
     ]

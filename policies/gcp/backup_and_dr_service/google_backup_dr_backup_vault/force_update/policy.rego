@@ -16,7 +16,7 @@ conditions := [
         {
             "condition": "Check whether force_update is disabled.",
             "attribute_path": ["force_update"],
-            "values": [false, null],
+            "values": [false],
             "policy_type": "whitelist"
         }
     ]

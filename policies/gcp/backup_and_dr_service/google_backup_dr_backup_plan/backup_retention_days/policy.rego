@@ -16,7 +16,7 @@ conditions := [
         {
             "condition": "Check whether backup_retention_days is at least 30 days.",
             "attribute_path": ["backup_rules", 0, "backup_retention_days"],
-            "values": [30, null],
+            "values": [30,10000],
             "policy_type": "range"
         }
     ]
