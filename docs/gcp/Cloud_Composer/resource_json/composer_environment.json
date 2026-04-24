@@ -142,10 +142,10 @@
     "region": {
       "description": "The location or Compute Engine region for the environment.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Restricting deployment to approved regions ensures compliance with data residency, governance, and organizational security requirements.",
+      "compliant": "australia-southeast1",
+      "non-compliant": "any other region not in the approved list",
       "parent": null
     },
     "project": {
@@ -187,10 +187,10 @@
         "network": {
           "description": "The Compute Engine network to be used for machine communications, specified as a self-link, relative resource name (for example \"projects/{project}/global/networks/{network}\"), by name. The network must belong to the environment's project. If unspecified, the \"default\" network ID in the environment's project is used. If a Custom Subnet Network is provided, subnetwork must also be provided.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Restricting Composer environments to approved VPC networks reduces exposure to untrusted network boundaries and enforces organizational network governance.",
+          "compliant": "projects/my-project/global/networks/approved-network-1,projects/my-project/global/networks/approved-network-2",
+          "non-compliant": "any network not in the approved list",
           "parent": "node_config"
         },
         "subnetwork": {
@@ -223,10 +223,10 @@
         "service_account": {
           "description": "The Google Cloud Platform Service Account to be used by the node VMs. If a service account is not specified, the \"default\" Compute Engine service account is used. Cannot be updated. If given, note that the service account must have `roles/composer.worker` for any GCP resources created under the Cloud Composer Environment.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Restricting service accounts reduces the risk of privilege escalation and ensures workloads run with only approved and least-privileged identities.",
+          "compliant": "approved-sa@my-project.iam.gserviceaccount.com",
+          "non-compliant": "unauthorized-sa@my-project.iam.gserviceaccount.com,123456789012-compute@developer.gserviceaccount.com",
           "parent": "node_config"
         },
         "tags": {
@@ -297,10 +297,10 @@
         "env_variables": {
           "description": "Additional environment variables to provide to the Apache Airflow scheduler, worker, and webserver processes. Environment variable names must match the regular expression `[a-zA-Z_][a-zA-Z0-9_]*`. They cannot specify Apache Airflow software configuration overrides (they cannot match the regular expression `AIRFLOW__[A-Z0-9_]+__[A-Z0-9_]+`), and they cannot match any of the following reserved names: ``` AIRFLOW_DATABASE_VERSION AIRFLOW_HOME AIRFLOW_SRC_DIR AIRFLOW_WEBSERVER AUTO_GKE CLOUDSDK_METRICS_ENVIRONMENT CLOUD_LOGGING_ONLY COMPOSER_ENVIRONMENT COMPOSER_GKE_LOCATION COMPOSER_GKE_NAME COMPOSER_GKE_ZONE COMPOSER_LOCATION COMPOSER_OPERATION_UUID COMPOSER_PYTHON_VERSION COMPOSER_VERSION CONTAINER_NAME C_FORCE_ROOT DAGS_FOLDER GCP_PROJECT GCP_TENANT_PROJECT GCSFUSE_EXTRACTED GCS_BUCKET GKE_CLUSTER_NAME GKE_IN_TENANT GOOGLE_APPLICATION_CREDENTIALS MAJOR_VERSION MINOR_VERSION PATH PIP_DISABLE_PIP_VERSION_CHECK PORT PROJECT_ID PYTHONPYCACHEPREFIX SQL_DATABASE SQL_HOST SQL_INSTANCE SQL_PASSWORD SQL_PROJECT SQL_REGION SQL_USER ```",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Preventing sensitive data in environment variables reduces the risk of secret exposure and enforces the use of secure storage mechanisms like Secret Manager.",
+          "compliant": "any variable name except DB_PASSWORD and other restricted keys",
+          "non-compliant": "DB_PASSWORD",
           "parent": "software_config"
         },
         "image_version": {
@@ -510,12 +510,12 @@
       }
     },
     "encryption_config": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "This policy ensures that Cloud Composer environments are configured to use a Customer-Managed Encryption Key (CMEK) via encryption_config.kms_key_name",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Ensuring encryption_config.kms_key_name is set enforces the use of customer-managed encryption keys (CMEK), providing greater control over data security, access, and compliance.",
+      "compliant": "projects/<project-id>/locations/<location>/keyRings/<keyring>/cryptoKeys/<key>",
+      "non-compliant": "",
       "parent": null,
       "arguments": {
         "kms_key_name": {
