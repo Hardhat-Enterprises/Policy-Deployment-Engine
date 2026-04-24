@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_source_repositories.google_sourcerepo_repository_member.vars
+package terraform.gcp.security.cloud_source_repositories.google_sourcerepo_repository.vars
 
 variables := {
 	"friendly_resource_name": "google_sourcerepo",
