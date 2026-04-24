@@ -14,8 +14,8 @@
     "pubsub_configs": {
       "description": "How this repository publishes a change in the repository through Cloud Pub/Sub. Keyed by the topic names. Structure is [documented below](#nested_pubsub_configs).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "Enabling pubsub_configs allows for monitoring and audit logging of repository changes, which is crucial for security and compliance. It provides visibility into repository activity and helps detect unauthorized changes.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -32,10 +32,10 @@
         "message_format": {
           "description": "The format of the Cloud Pub/Sub messages. - PROTOBUF: The message payload is a serialized protocol buffer of SourceRepoEvent. - JSON: The message payload is a JSON string of SourceRepoEvent. Possible values are: `PROTOBUF`, `JSON`.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Using JSON format for Cloud Pub/Sub messages allows for easier integration with various monitoring and logging tools, enhancing the ability to track repository changes and maintain an audit trail. This is crucial for security and compliance purposes, as it provides visibility into repository activity and helps detect unauthorized changes.",
+          "compliant": "Json",
+          "non-compliant": "Protobuf",
           "parent": "pubsub_configs"
         },
         "service_account_email": {
@@ -59,12 +59,12 @@
       "parent": null
     },
     "create_ignore_already_exists": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "When true, creates the repository if it does not already exist. If false, creation will fail if the repository already exists. Default value is false.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Setting create_ignore_already_exists to true allows for idempotent creation of repositories, preventing errors when attempting to create an existing repository. This is useful in automated deployment scenarios where the presence of a repository may not be guaranteed.",
+      "compliant": true,
+      "non-compliant": false,
       "parent": null
     }
   }
