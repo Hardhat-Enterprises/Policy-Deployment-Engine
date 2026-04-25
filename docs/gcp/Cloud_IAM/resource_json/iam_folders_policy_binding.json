@@ -2,132 +2,143 @@
   "resource_name": "iam_folders_policy_binding",
   "subcategory": "Cloud IAM",
   "arguments": {
-    "target": {
-      "description": "Target is the full resource name of the resource to which the policy will be bound. Immutable once set. Structure is [documented below](#nested_target).",
+    "folder": {
+      "description": "The parent folder for the IAM policy binding. Must be a valid numeric GCP folder ID.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Ensures IAM policy is applied only at a valid folder scope.",
+      "compliant": "224774388",
+      "non-compliant": "my-folder",
+      "parent": null
+    },
+
+    "location": {
+      "description": "The location of the policy binding. Must always be global for folder IAM bindings.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "IAM folder bindings are global to ensure consistent access control.",
+      "compliant": "global",
+      "non-compliant": "us-central1",
+      "parent": null
+    },
+
+    "policy_binding_id": {
+      "description": "Unique identifier for the policy binding.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Ensures each binding is uniquely identifiable.",
+      "compliant": "folder-binding-01",
+      "non-compliant": "Folder Binding 01",
+      "parent": null
+    },
+
+    "display_name": {
+      "description": "Optional human-readable name for the policy binding (max 63 characters).",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Used only for display purposes.",
+      "compliant": "Folder IAM Binding",
+      "non-compliant": "This name is way too long and not valid for IAM folder binding display name usage",
+      "parent": null
+    },
+
+    "annotations": {
+      "description": "Optional metadata used for tagging and classification.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Does not affect IAM security enforcement.",
+      "compliant": {
+        "environment": "dev",
+        "team": "security"
+      },
+      "non-compliant": {
+        "notes": "this is an invalid overly long annotation example used for testing purposes and should not be used in production environments because it violates expected size constraints"
+      },
+      "parent": null
+    },
+
+    "policy_kind": {
+      "description": "Type of IAM policy being applied (e.g., ACCESS or PRINCIPAL_ACCESS_BOUNDARY).",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Defines how IAM policy is enforced.",
+      "compliant": "ACCESS",
+      "non-compliant": "INVALID_TYPE",
+      "parent": null
+    },
+
+    "target": {
+      "description": "Full resource name of the target folder where the policy is applied.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Defines the exact scope of IAM enforcement.",
+      "compliant": "//cloudresourcemanager.googleapis.com/folders/224774388",
+      "non-compliant": "//invalid/resource",
       "parent": null,
+
       "arguments": {
         "principal_set": {
-          "description": "Required. Immutable. Full Resource Name of the principal set used for principal access boundary policy bindings. Examples for each one of the following supported principal set types: * Folder: `//cloudresourcemanager.googleapis.com/folders/FOLDER_ID` It must be parent by the policy binding's parent (the folder).",
+          "description": "Principal set used for access boundary enforcement within the folder.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Restricts access to approved identities within folder boundary.",
+          "compliant": "//cloudresourcemanager.googleapis.com/folders/224774388",
+          "non-compliant": "//cloudresourcemanager.googleapis.com/projects/123",
           "parent": "target"
         }
       }
     },
-    "policy": {
-      "description": "Required. Immutable. The resource name of the policy to be bound. The binding parent and policy must belong to the same Organization (or Project).",
-      "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "folder": {
-      "description": "The parent folder for the PolicyBinding.",
-      "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "location": {
-      "description": "The location of the PolicyBinding.",
-      "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "policy_binding_id": {
-      "description": "The Policy Binding ID.",
-      "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "display_name": {
-      "description": "Optional. The description of the policy binding. Must be less than or equal to 63 characters.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "annotations": {
-      "description": "Optional. User defined annotations. See https://google.aip.dev/148#annotations for more details such as format and size limitations **Note**: This field is non-authoritative, and will only manage the annotations present in your configuration. Please refer to the field `effective_annotations` for all of the annotations present on the resource.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "policy_kind": {
-      "description": "Immutable. The kind of the policy to attach in this binding. This field must be one of the following:  - Left empty (will be automatically set to the policy kind) - The input policy kind   Possible values:  POLICY_KIND_UNSPECIFIED PRINCIPAL_ACCESS_BOUNDARY ACCESS",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
+
     "condition": {
-      "description": "Represents a textual expression in the Common Expression Language (CEL) syntax. CEL is a C-like expression language. The syntax and semantics of CEL are documented at https://github.com/google/cel-spec. Example (Comparison): title: \\\"Summary size limit\\\" description: \\\"Determines if a summary is less than 100 chars\\\" expression: \\\"document.summary.size() < 100\\\" Example (Equality): title: \\\"Requestor is owner\\\" description: \\\"Determines if requestor is the document owner\\\" expression: \\\"document.owner == request.auth.claims.email\\\"  Example (Logic): title: \\\"Public documents\\\" description: \\\"Determine whether the document should be publicly visible\\\" expression: \\\"document.type != 'private' && document.type != 'internal'\\\" Example (Data Manipulation): title: \\\"Notification string\\\" description: \\\"Create a notification string with a timestamp.\\\" expression: \\\"'New message received at ' + string(document.create_time)\\\" The exact variables and functions that may be referenced within an expression are determined by the service that evaluates it. See the service documentation for additional information. Structure is [documented below](#nested_condition).",
+      "description": "Optional CEL condition for conditional IAM access control.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Enables fine-grained access control rules.",
+      "compliant": {
+        "expression": "resource.name.startsWith('folders/')",
+        "title": "Folder access rule",
+        "description": "Allows access only to folder resources"
+      },
+      "non-compliant": {
+        "expression": "true"
+      },
       "parent": null,
+
       "arguments": {
         "expression": {
-          "description": "Textual representation of an expression in Common Expression Language syntax.",
+          "description": "CEL expression defining IAM condition logic.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Controls conditional access behavior.",
+          "compliant": "resource.name.startsWith('folders/')",
+          "non-compliant": "true",
           "parent": "condition"
         },
         "title": {
-          "description": "Optional. Title for the expression, i.e. a short string describing its purpose. This can be used e.g. in UIs which allow to enter the expression.",
+          "description": "Short title for the condition.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": false,
+          "rationale": "For readability only.",
+          "compliant": "Folder Condition",
+          "non-compliant": "",
           "parent": "condition"
         },
         "description": {
-          "description": "Optional. Description of the expression. This is a longer text which describes the expression, e.g. when hovered over it in a UI.",
+          "description": "Detailed explanation of the condition.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": false,
+          "rationale": "Documentation purpose only.",
+          "compliant": "Restricts access to folder-level resources",
+          "non-compliant": "",
           "parent": "condition"
         },
         "location": {
-          "description": "Optional. String indicating the location of the expression for error reporting, e.g. a file name and a position in the file.",
+          "description": "Debug location for condition evaluation.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": false,
+          "rationale": "Used for error tracing.",
+          "compliant": "global",
+          "non-compliant": "",
           "parent": "condition"
         }
       }
