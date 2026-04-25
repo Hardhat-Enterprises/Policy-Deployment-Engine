@@ -34,111 +34,14 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v44
 
-      - name: List all changed files
-        run: |
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-            echo "$file was changed"
-          done
-
-      - name: Extract affected services
-        id: extract-services
-        run: |
-          # Extract unique service names from changed files
-          services=$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | \
-            tr ' ' '\n' | \
-            grep -E '^(inputs|policies)/gcp/' | \
-            awk -F'/' '{print $3}' | \
-            sort -u | \
-            tr '\n' ' ')
-          
-          echo "Affected services: $services"
-          echo "services=$services" >> $GITHUB_OUTPUT
-
       - name: Set up plugin cache config
         run: |
           bash scripts/auto_test/cache_setup.sh
  
       - name: Run policy checks (Terraform + OPA)
-        if: steps.extract-services.outputs.services != ''
-        run: |
-          set -o pipefail
-          services="${{ steps.extract-services.outputs.services }}"
-          overall_status="✅ All checks passed"
-          exit_code=0
-          
-          for service in $services; do
-            echo "Running tests for service: $service"
-            
-            # Check if inputs directory exists for this service
-            if [ -d "inputs/gcp/$service" ]; then
-              inputs_path="inputs/gcp/$service"
-            else
-              inputs_path=""
-            fi
-            
-            # Check if policies directory exists for this service
-            if [ -d "policies/gcp/$service" ]; then
-              policies_path="policies/gcp/$service"
-            else
-              policies_path=""
-            fi
-            
-            # Run tests if at least one path exists
-            if [ -n "$inputs_path" ] || [ -n "$policies_path" ]; then
-              python3 scripts/auto_test/auto_test.py \
-                ${inputs_path:+--inputs "$inputs_path"} \
-                ${policies_path:+--policies "$policies_path"} \
-                --verbose 2>&1 | tee -a test_results.txt || exit_code=$?
-            else
-              echo "No inputs or policies found for service: $service"
-            fi
-          done
-          
-          # Determine final status
-          if [ $exit_code -ne 0 ]; then
-            overall_status="❌ Some checks failed"
-          fi
-          
-          # Write summary to GitHub Actions summary
-          {
-            echo "## Policy Check Results"
-            echo ""
-            echo "$overall_status"
-            echo ""
-            echo "### Details"
-            echo "\`\`\`"
-            cat test_results.txt
-            echo "\`\`\`"
-          } >> $GITHUB_STEP_SUMMARY
-          
-          # Exit with captured code to fail the step
-          exit $exit_code
-
-      - name: Comment on PR
-        if: always() && github.event_name == 'pull_request'
-        run: |
-          # Create PR comment with test results
-          {
-            echo "## 🔍 Policy Check Results"
-            echo ""
-            if [ -f "test_results.txt" ]; then
-              if grep -q "❌" test_results.txt 2>/dev/null; then
-                echo "**Status**: ❌ Some checks failed"
-              else
-                echo "**Status**: ✅ All checks passed"
-              fi
-              echo ""
-              echo "### Test Output"
-              echo "\`\`\`"
-              cat test_results.txt
-              echo "\`\`\`"
-            else
-              echo "**Status**: ℹ️ No policy files changed"
-              echo ""
-              echo "No input or policy files were modified in this PR"
-            fi
-          } > pr_comment.md
-          
-          gh pr comment ${{ github.event.pull_request.number }} -F pr_comment.md
         env:
+          CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 scripts/auto_test/workflow_orchestrator.py
