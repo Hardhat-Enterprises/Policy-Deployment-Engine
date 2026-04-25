@@ -106,14 +106,14 @@ def write_github_summary(overall_status: str, test_output: str) -> None:
         return
     
     summary_content = f"""## Policy Check Results
-    
-        {overall_status}
 
-        ### Details
-        ```
-        {test_output}
-        ```
-        """
+{overall_status}
+
+### Details
+```
+{test_output}
+```
+"""
     
     with open(summary_file, "a") as f:
         f.write(summary_content)
@@ -124,30 +124,30 @@ def create_pr_comment(test_output: str, has_failures: bool) -> str:
     if not test_output:
         return """## 🔍 Policy Check Results
 
-    **Status**: ℹ️ No policy files changed
+**Status**: ℹ️ No policy files changed
 
-    No input or policy files were modified in this PR"""
+No input or policy files were modified in this PR"""
     
     if has_failures:
         return f"""## 🔍 Policy Check Results
 
-    **Status**: ❌ CHECKS FAILED
+**Status**: ❌ CHECKS FAILED
 
-    ⚠️ **Your PR will not be reviewed until you fix all policy check failures below:**
+⚠️ **Your PR will not be reviewed until you fix all policy check failures below:**
 
-    ### Output
-    ```
-    {test_output}
-    ```"""
-        
+### Test Output
+```
+{test_output}
+```"""
+    
     return f"""## 🔍 Policy Check Results
 
-    **Status**: ✅ All checks passed
+**Status**: ✅ All checks passed
 
-    ### Output
-    ```
-    {test_output}
-    ```"""
+### Test Output
+```
+{test_output}
+```"""
 
 
 def post_pr_comment(comment: str) -> int:
