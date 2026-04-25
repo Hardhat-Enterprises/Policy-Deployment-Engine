@@ -9,7 +9,3 @@ resource "google_artifact_registry_repository" "nc" {
 
   ]
 }
-
-data "google_project" "nc" {
-  project_id = "pde-dev-493206"
-}

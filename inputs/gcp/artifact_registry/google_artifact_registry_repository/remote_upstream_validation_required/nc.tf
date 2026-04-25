@@ -1,9 +1,5 @@
-data "google_project" "nc" {
-  project_id = "pde-dev-493206"
-}
-
 resource "google_artifact_registry_repository" "nc" {
-  project       = data.google_project.nc.id
+  project       = "my-project-id"
   location      = "us-central1"
   repository_id = "example-dockerhub-remote"
   description   = "example remote dockerhub repository with credentials"

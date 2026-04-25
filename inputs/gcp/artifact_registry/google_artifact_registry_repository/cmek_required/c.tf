@@ -9,7 +9,3 @@ resource "google_artifact_registry_repository" "c" {
 
   ]
 }
-
-data "google_project" "c" {
-  project_id = "pde-dev-493206"
-}

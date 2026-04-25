@@ -8,7 +8,7 @@ resource "google_artifact_registry_repository" "c" {
   remote_repository_config {
     description = "pull-through cache of another Artifact Registry repository"
     common_repository {
-      uri = "https://us-central1-docker.pkg.dev/trusted-project/base-images"
+      uri = "https://australia-southeast1-docker.pkg.dev/trusted-project/base-images"
     }
   }
 }

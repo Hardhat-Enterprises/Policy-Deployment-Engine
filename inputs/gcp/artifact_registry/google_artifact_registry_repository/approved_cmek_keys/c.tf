@@ -1,5 +1,5 @@
 resource "google_artifact_registry_repository" "c" {
-  project       = data.google_project.c.project_id
+  project       = "my-project-id"
   location      = "us-central1"
   repository_id = "my-repository"
   description   = "example docker repository with cmek"
@@ -8,8 +8,4 @@ resource "google_artifact_registry_repository" "c" {
   depends_on = [
 
   ]
-}
-
-data "google_project" "c" {
-  project_id = "pde-dev-493206"
 }
