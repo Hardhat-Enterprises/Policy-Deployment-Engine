@@ -1,4 +1,4 @@
-resource "google_dns_managed_zone" "private-zone" {
+resource "google_dns_managed_zone" "c" {
   name        = "private-zone"
   dns_name    = "private.example.com."
   description = "Example private DNS zone"
