@@ -3,7 +3,7 @@ import data.terraform.helpers
 import data.terraform.gcp.security.assured_workloads.google_assured_workloads_workload.vars
 
 # Policy: kms_settings
-# Description: Ensures KMS key rotation period is not set to an insecure long duration.
+# Description: Ensures KMS key rotation period is set to 90 days or less.
 # Regular key rotation reduces the risk of key compromise.
 # Resource: google_assured_workloads_workload
 
@@ -14,10 +14,10 @@ conditions := [
         "Set kms_settings.rotation_period to 7776000s (90 days) or less to ensure regular key rotation"
     ]},
     {
-        "condition": "Check KMS rotation period is not set to an insecure value",
+        "condition": "Check KMS rotation period is 90 days or less",
         "attribute_path": ["kms_settings", 0, "rotation_period"],
-        "values": ["31536000s", "15552000s", "10368000s"],
-        "policy_type": "blacklist"
+        "values": [null, 7776000],
+        "policy_type": "range"
     }
     ]
 ]
