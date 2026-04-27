@@ -1,5 +1,3 @@
-
-
 data "google_iam_policy" "admin_public" {
   binding {
     role = "roles/owner"
@@ -8,9 +6,8 @@ data "google_iam_policy" "admin_public" {
     ]
   }
 }
-
 resource "google_dns_managed_zone_iam_policy" "nc" {
   project      = "demo-project"
-  managed_zone = "example-zone-public"
+  managed_zone = "nc"
   policy_data  = data.google_iam_policy.admin_public.policy_data
 }
