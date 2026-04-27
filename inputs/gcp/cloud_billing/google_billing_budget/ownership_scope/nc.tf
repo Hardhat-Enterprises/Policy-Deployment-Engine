@@ -8,4 +8,7 @@ resource "google_billing_budget" "nc" {
       units         = "500"
     }
   }
+  threshold_rules {
+    threshold_percent = 1
+  }
 }

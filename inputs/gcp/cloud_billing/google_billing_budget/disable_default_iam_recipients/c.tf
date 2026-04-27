@@ -8,6 +8,12 @@ resource "google_billing_budget" "c" {
       units         = "500"
     }
   }
+  all_updates_rule {
+    monitoring_notification_channels = [
+      "projects/project-test/notificationChannels/1234567890",
+    ]
+    disable_default_iam_recipients = false
+  }
   threshold_rules {
     threshold_percent = 1
   }

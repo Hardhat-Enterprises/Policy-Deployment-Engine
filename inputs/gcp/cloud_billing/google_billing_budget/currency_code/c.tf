@@ -1,5 +1,5 @@
-resource "google_billing_budget" "nc" {
-  billing_account = ""
+resource "google_billing_budget" "c" {
+  billing_account = "000000-0000000-0000000-000000"
   display_name    = "Example Billing Budget"
   ownership_scope = "BILLING_ACCOUNT"
   amount {
