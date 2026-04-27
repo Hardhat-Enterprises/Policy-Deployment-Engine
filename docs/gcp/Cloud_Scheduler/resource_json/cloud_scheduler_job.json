@@ -32,8 +32,8 @@
     "time_zone": {
       "description": "Specifies the time zone to be used in interpreting schedule. The value of this field must be a time zone name from the tz database.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "Timezone must be set to an australian timezone to enforce data residency",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -41,8 +41,8 @@
     "paused": {
       "description": "Sets the job to a paused state. Jobs default to being enabled when this property is not set.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Controls the whether the job is haulted but does not affect the security aspect of the service",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -50,8 +50,8 @@
     "attempt_deadline": {
       "description": "The deadline for job attempts. If the request handler does not respond by this deadline then the request is cancelled and the attempt is marked as a DEADLINE_EXCEEDED failure. The failed attempt can be viewed in execution logs. Cloud Scheduler will retry the job according to the RetryConfig. The allowed duration for this deadline is: * For HTTP targets, between 15 seconds and 30 minutes. * For App Engine HTTP targets, between 15 seconds and 24 hours. * **Note**: For PubSub targets, this field is ignored - setting it will introduce an unresolvable diff. A duration in seconds with up to nine fractional digits, terminated by 's'. Example: \"3.5s\"",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Only needed for controlling the time of timeouts which does not affect the security intergrity of the service",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -59,8 +59,8 @@
     "retry_config": {
       "description": "By default, if a job does not complete successfully, meaning that an acknowledgement is not received from the handler, then it will be retried with exponential backoff according to the settings Structure is [documented below](#nested_retry_config).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Used for the configuration for retries thus not security related",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -68,8 +68,8 @@
         "retry_count": {
           "description": "The number of attempts that the system will make to run a job using the exponential backoff procedure described by maxDoublings. Values greater than 5 and negative values are not allowed.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Controls the amount of retries but does not affect the authorization or authentication aspects",
           "compliant": null,
           "non-compliant": null,
           "parent": "retry_config"
@@ -77,8 +77,8 @@
         "max_retry_duration": {
           "description": "The time limit for retrying a failed job, measured from time when an execution was first attempted. If specified with retryCount, the job will be retried until both limits are reached. A duration in seconds with up to nine fractional digits, terminated by 's'.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Used to dictate the maxiumum amount of retries thus not a security related attribute",
           "compliant": null,
           "non-compliant": null,
           "parent": "retry_config"
@@ -86,8 +86,8 @@
         "min_backoff_duration": {
           "description": "The minimum amount of time to wait before retrying a job after it fails. A duration in seconds with up to nine fractional digits, terminated by 's'.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Oly used to dictate the minimum backoff thus not a security related attribute",
           "compliant": null,
           "non-compliant": null,
           "parent": "retry_config"
@@ -95,8 +95,8 @@
         "max_backoff_duration": {
           "description": "The maximum amount of time to wait before retrying a job after it fails. A duration in seconds with up to nine fractional digits, terminated by 's'.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Only used to dictate the maximum backoff thus not a security related attribute",
           "compliant": null,
           "non-compliant": null,
           "parent": "retry_config"
@@ -104,8 +104,8 @@
         "max_doublings": {
           "description": "The time between retries will double maxDoublings times. A job's retry interval starts at minBackoffDuration, then doubles maxDoublings times, then increases linearly, and finally retries retries at intervals of maxBackoffDuration up to retryCount times.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Used to control the timer of max_doublings and has no impact on the securtiy of the service",
           "compliant": null,
           "non-compliant": null,
           "parent": "retry_config"
@@ -115,8 +115,8 @@
     "pubsub_target": {
       "description": "Pub/Sub target If the job providers a Pub/Sub target the cron will publish a message to the provided topic Structure is [documented below](#nested_pubsub_target).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Purpose is just the target of pubsub which would not affect the security of the security of the service",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -134,7 +134,7 @@
           "description": "The message payload for PubsubMessage. Pubsub message must contain either non-empty data, or at least one attribute. A base64-encoded string.",
           "required": false,
           "security_impact": false,
-          "rationale": "",
+          "rationale": "Holds the data of the message but does not have direct impact on security attruibutes of the service",
           "compliant": null,
           "non-compliant": null,
           "parent": "pubsub_target"
@@ -142,8 +142,8 @@
         "attributes": {
           "description": "Attributes for PubsubMessage. Pubsub message must contain either non-empty data, or at least one attribute.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The metadata of the pubsubmessage which does not have influence on securty aspects of the service",
           "compliant": null,
           "non-compliant": null,
           "parent": "pubsub_target"
@@ -153,8 +153,8 @@
     "app_engine_http_target": {
       "description": "App Engine HTTP target. If the job providers a App Engine HTTP target the cron will send a request to the service instance Structure is [documented below](#nested_app_engine_http_target).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "This is only the app engine http target itself which is not related to security qualities",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -162,8 +162,8 @@
         "http_method": {
           "description": "Which HTTP method to use for the request.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Indicates http method but does not impact the security",
           "compliant": null,
           "non-compliant": null,
           "parent": "app_engine_http_target"
@@ -171,8 +171,8 @@
         "app_engine_routing": {
           "description": "App Engine Routing setting for the job. Structure is [documented below](#nested_app_engine_http_target_app_engine_routing).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The configuration of the route for app_engine which does not have an effect on the security principles",
           "compliant": null,
           "non-compliant": null,
           "parent": "app_engine_http_target"
@@ -180,8 +180,8 @@
         "relative_uri": {
           "description": "The relative URI. The relative URL must begin with \"/\" and must be a valid HTTP relative URL. It can contain a path, query string arguments, and \\# fragments. If the relative URL is empty, then the root path \"/\" will be used. No spaces are allowed, and the maximum length allowed is 2083 characters",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Used for indicator for the app_engine_http target which has no relation to the security of theservice",
           "compliant": null,
           "non-compliant": null,
           "parent": "app_engine_http_target"
@@ -189,8 +189,8 @@
         "body": {
           "description": "HTTP request body. A request body is allowed only if the HTTP method is POST or PUT. It will result in invalid argument error to set a body on a job with an incompatible HttpMethod. A base64-encoded string.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Only used in methods POST or PUT and is just HTTP data thus would not affect security aspects",
           "compliant": null,
           "non-compliant": null,
           "parent": "app_engine_http_target"
@@ -198,8 +198,8 @@
         "headers": {
           "description": "HTTP request headers. This map contains the header field names and values. Headers can be set when the job is created.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Only used to provide addtional context which has no effect on the security",
           "compliant": null,
           "non-compliant": null,
           "parent": "app_engine_http_target"
@@ -209,8 +209,8 @@
     "http_target": {
       "description": "HTTP target. If the job providers a http_target the cron will send a request to the targeted url Structure is [documented below](#nested_http_target).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The http target itself which would have no impact on security properties",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -218,8 +218,8 @@
         "uri": {
           "description": "The full URI path that the request will be sent to.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Must use HTTPS in order to improve upon encryption",
           "compliant": null,
           "non-compliant": null,
           "parent": "http_target"
@@ -227,8 +227,8 @@
         "http_method": {
           "description": "Which HTTP method to use for the request.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Indicates http method but does not impact the security",
           "compliant": null,
           "non-compliant": null,
           "parent": "http_target"
@@ -236,7 +236,7 @@
         "body": {
           "description": "HTTP request body. A request body is allowed only if the HTTP method is POST, PUT, or PATCH. It is an error to set body on a job with an incompatible HttpMethod. A base64-encoded string.",
           "required": false,
-          "security_impact": null,
+          "security_impact": "Contains the main data for http but does not effect the security of service",
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -246,7 +246,7 @@
           "description": "This map contains the header field names and values. Repeated headers are not supported, but a header value can contain commas.",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "Only used to provide addtional context which has no effect on the security",
           "compliant": null,
           "non-compliant": null,
           "parent": "http_target"
@@ -254,8 +254,8 @@
         "oauth_token": {
           "description": "Contains information needed for generating an OAuth token. This type of authorization should be used when sending requests to a GCP endpoint. Structure is [documented below](#nested_http_target_oauth_token).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Must be implemented to apply authentication upon the use of this service",
           "compliant": null,
           "non-compliant": null,
           "parent": "http_target"
@@ -263,8 +263,8 @@
         "oidc_token": {
           "description": "Contains information needed for generating an OpenID Connect token. This type of authorization should be used when sending requests to third party endpoints or Cloud Run. Structure is [documented below](#nested_http_target_oidc_token).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Must be implemented to apply authentication upon the use of this service",
           "compliant": null,
           "non-compliant": null,
           "parent": "http_target"
@@ -274,8 +274,8 @@
     "region": {
       "description": "Region where the scheduler job resides. If it is not provided, Terraform will use the provider default.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": "true",
+      "rationale": "Region must be set to australia to enforce data residency",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -283,8 +283,8 @@
     "project": {
       "description": "If it is not provided, the provider project is used.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Used for the project idenfication but does not have direct effects on the security of the service",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -292,8 +292,8 @@
     "app_engine_routing": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Used to route the request to the specified service and does not have any effect on security",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -302,7 +302,7 @@
           "description": "App service. By default, the job is sent to the service which is the default service when the job is attempted.",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "Only used to choose the service to be routed to thus does not directly affect security",
           "compliant": null,
           "non-compliant": null,
           "parent": "app_engine_routing"
@@ -310,8 +310,8 @@
         "version": {
           "description": "App version. By default, the job is sent to the version which is the default version when the job is attempted.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Only used to select version of service thus does not directly affect security",
           "compliant": null,
           "non-compliant": null,
           "parent": "app_engine_routing"
@@ -319,8 +319,8 @@
         "instance": {
           "description": "App instance. By default, the job is sent to an instance which is available when the job is attempted.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The available app instance which does not directly affect the security.",
           "compliant": null,
           "non-compliant": null,
           "parent": "app_engine_routing"
@@ -330,8 +330,8 @@
     "oauth_token": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "Need to be implemented to add a level of authentication when required",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -339,8 +339,8 @@
         "service_account_email": {
           "description": "Service account email to be used for generating OAuth token. The service account must be within the same project as the job.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Service account email should be correctly configured and not use overly priviledged default service accounts",
           "compliant": null,
           "non-compliant": null,
           "parent": "oauth_token"
@@ -348,7 +348,7 @@
         "scope": {
           "description": "OAuth scope to be used for generating OAuth access token. If not specified, \"https://www.googleapis.com/auth/cloud-platform\" will be used.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -359,8 +359,8 @@
     "oidc_token": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "Need to be implemented to add a level of authentication when required",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -368,8 +368,8 @@
         "service_account_email": {
           "description": "Service account email to be used for generating OAuth token. The service account must be within the same project as the job.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Service account email should be correctly configured and not use overly priviledged default service accounts",
           "compliant": null,
           "non-compliant": null,
           "parent": "oidc_token"
