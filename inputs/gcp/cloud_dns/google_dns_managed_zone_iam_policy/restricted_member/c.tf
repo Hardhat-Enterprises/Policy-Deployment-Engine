@@ -1,0 +1,16 @@
+
+
+data "google_iam_policy" "admin" {
+  binding {
+    role = "roles/viewer"
+    members = [
+      "user:jane@example.com",
+    ]
+  }
+}
+
+resource "google_dns_managed_zone_iam_policy" "policy" {
+  project      = "demo-project"
+  managed_zone = "example-zone"
+  policy_data  = data.google_iam_policy.admin.policy_data
+}
