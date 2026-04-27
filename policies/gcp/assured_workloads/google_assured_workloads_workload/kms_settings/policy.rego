@@ -16,7 +16,7 @@ conditions := [
     {
         "condition": "Check KMS rotation period is 90 days or less",
         "attribute_path": ["kms_settings", 0, "rotation_period"],
-        "values": [7776001],
+        "values": ["31536000s", "15552000s", "10368000s", "8640000s"],
         "policy_type": "blacklist"
     }
     ]
