@@ -1,4 +1,4 @@
-resource "google_tpu_v2_queued_resource" "qr_compliant" {
+resource "google_tpu_v2_queued_resource" "c" {
   provider = google-beta
 
   name    = "test-qr"
