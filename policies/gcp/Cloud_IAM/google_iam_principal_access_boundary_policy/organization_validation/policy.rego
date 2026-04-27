@@ -1,7 +1,7 @@
 package terraform.gcp.security.Cloud_IAM.google_iam_principal_access_boundary_policy.organization_validation
 
 import data.terraform.helpers
-import data.terraform.gcp.security.Cloud_IAM.google_iam_principal_access_boundary_policy.organization_validation.vars
+import data.terraform.gcp.security.Cloud_IAM.google_iam_principal_access_boundary_policy.vars
 
 conditions := [
   [
@@ -14,7 +14,7 @@ conditions := [
     },
     {
       "condition": "Validate organization format",
-      "attribute_path": ["organization"],
+      "attribute_path": ["address"],
       "values": ["^[0-9]+$"],
       "policy_type": "pattern whitelist"
     }

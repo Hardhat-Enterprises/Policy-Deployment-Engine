@@ -1,6 +1,6 @@
 package terraform.gcp.security.Cloud_IAM.google_iam_principal_access_boundary_policy.location_validation
 import data.terraform.helpers
-import data.terraform.gcp.security.Cloud_IAM.google_iam_principal_access_boundary_policy.location_validation.vars
+import data.terraform.gcp.security.Cloud_IAM.google_iam_principal_access_boundary_policy.vars
 
 conditions := [
   [
@@ -12,7 +12,7 @@ conditions := [
     },
     {
       "condition": "Validate location whitelist",
-      "attribute_path": ["location"],
+      "attribute_path": ["address"],
       "values": ["global"],
       "policy_type": "whitelist"
     }

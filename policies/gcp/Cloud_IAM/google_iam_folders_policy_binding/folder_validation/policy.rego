@@ -1,7 +1,7 @@
 package terraform.gcp.security.Cloud_IAM.google_iam_folders_policy_binding.folder_validation
 
 import data.terraform.helpers
-import data.terraform.gcp.security.Cloud_IAM.google_iam_folders_policy_binding.folder_validation.vars
+import data.terraform.gcp.security.Cloud_IAM.google_iam_folders_policy_binding.vars
 
 conditions := [
   [
@@ -14,7 +14,7 @@ conditions := [
     },
     {
       "condition": "Validate folder format using pattern",
-      "attribute_path": ["folder"],
+      "attribute_path": ["address"],
       "values": ["^[0-9]+$"],
       "policy_type": "pattern whitelist"
     }

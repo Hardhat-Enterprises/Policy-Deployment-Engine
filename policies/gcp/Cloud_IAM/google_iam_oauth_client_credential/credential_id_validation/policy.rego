@@ -1,7 +1,7 @@
 package terraform.gcp.security.Cloud_IAM.google_iam_oauth_client_credential.credential_id_validation
 
 import data.terraform.helpers
-import data.terraform.gcp.security.Cloud_IAM.google_iam_oauth_client_credential.credential_id_validation.vars
+import data.terraform.gcp.security.Cloud_IAM.google_iam_oauth_client_credential.vars
 
 conditions := [
   [
@@ -15,7 +15,7 @@ conditions := [
     },
     {
       "condition": "Validate oauth_client_credential_id format",
-      "attribute_path": ["oauth_client_credential_id"],
+      "attribute_path": ["address"],
       "values": ["^[a-z][a-z0-9-]{2,30}[a-z0-9]$"],
       "policy_type": "pattern whitelist"
     }

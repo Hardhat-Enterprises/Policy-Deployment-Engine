@@ -1,6 +1,6 @@
 package terraform.gcp.security.Cloud_IAM.google_iam_oauth_client.location_validation
 import data.terraform.helpers
-import data.terraform.gcp.security.Cloud_IAM.google_iam_oauth_client.location_validation.vars
+import data.terraform.gcp.security.Cloud_IAM.google_iam_oauth_client.vars
 
 conditions := [
   [
@@ -10,7 +10,7 @@ conditions := [
     },
     {
       "condition": "Validate location",
-      "attribute_path": ["location"],
+      "attribute_path": ["address"],
       "values": ["global"],
       "policy_type": "whitelist"
     }

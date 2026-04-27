@@ -1,6 +1,6 @@
 package terraform.gcp.security.Cloud_IAM.google_iam_access_boundary_policy.name_validation
 import data.terraform.helpers
-import data.terraform.gcp.security.Cloud_IAM.google_iam_access_boundary_policy.name_validation.vars
+import data.terraform.gcp.security.Cloud_IAM.google_iam_access_boundary_policy.vars
 
 conditions := [
 
@@ -14,7 +14,7 @@ conditions := [
         },
         {
             "condition": "Validate policy name format",
-            "attribute_path": ["name"],
+            "attribute_path": ["address"],
             "values": ["pde-*"],
             "policy_type": "pattern whitelist"
         }

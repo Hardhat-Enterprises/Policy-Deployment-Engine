@@ -1,7 +1,7 @@
 package terraform.gcp.security.Cloud_IAM.google_iam_organizations_policy_binding.organization_validation
 
 import data.terraform.helpers
-import data.terraform.gcp.security.Cloud_IAM.google_iam_organizations_policy_binding.organization_validation.vars
+import data.terraform.gcp.security.Cloud_IAM.google_iam_organizations_policy_binding.vars
 
 conditions := [
   [
@@ -14,7 +14,7 @@ conditions := [
     },
     {
       "condition": "Validate organization ID pattern",
-      "attribute_path": ["organization"],
+      "attribute_path": ["address"],
       "values": ["^[0-9]+$"],
       "policy_type": "pattern whitelist"
     }
