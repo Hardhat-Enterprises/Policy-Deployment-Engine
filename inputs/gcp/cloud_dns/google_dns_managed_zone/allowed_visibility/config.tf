@@ -8,4 +8,4 @@ terraform {
 }
 provider "google" {
   project = "demo-project"
-}
+}# cloud_dns policies
