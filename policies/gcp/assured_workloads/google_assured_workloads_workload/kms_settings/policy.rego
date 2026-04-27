@@ -11,13 +11,13 @@ conditions := [
     [
     {"situation_description": "KMS key rotation period exceeds 90 days",
     "remedies": [
-        "Set kms_settings.rotation_period to 7776000s (90 days) or less to ensure regular key rotation"
+        "Set kms_settings.rotation_period to 7776000 (90 days) or less to ensure regular key rotation"
     ]},
     {
         "condition": "Check KMS rotation period is 90 days or less",
         "attribute_path": ["kms_settings", 0, "rotation_period"],
-        "values": [null, 7776000],
-        "policy_type": "range"
+        "values": [7776001],
+        "policy_type": "blacklist"
     }
     ]
 ]
