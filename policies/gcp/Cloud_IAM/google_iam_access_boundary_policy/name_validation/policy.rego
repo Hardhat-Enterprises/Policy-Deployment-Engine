@@ -14,7 +14,7 @@ conditions := [
         },
         {
             "condition": "Validate policy name format",
-            "attribute_path": ["address"],
+            "attribute_path": ["name"],
             "values": ["pde-*"],
             "policy_type": "pattern whitelist"
         }

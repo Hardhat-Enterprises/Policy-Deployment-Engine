@@ -15,7 +15,7 @@ conditions := [
     },
     {
       "condition": "Validate oauth_client_credential_id format",
-      "attribute_path": ["address"],
+      "attribute_path": ["oauth_client_credential_id"],
       "values": ["^[a-z][a-z0-9-]{2,30}[a-z0-9]$"],
       "policy_type": "pattern whitelist"
     }

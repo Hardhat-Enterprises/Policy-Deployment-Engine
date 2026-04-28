@@ -10,7 +10,7 @@ conditions := [
     },
     {
       "condition": "Validate parent format",
-      "attribute_path": ["address"],
+      "attribute_path": ["parent"],
       "values": ["cloudresourcemanager.googleapis.com/projects/*"],
       "policy_type": "pattern whitelist"
     }

@@ -11,7 +11,7 @@ conditions := [
     },
     {
       "condition": "Validate client_type",
-      "attribute_path": ["address"],
+      "attribute_path": ["client_type"],
       "values": ["PUBLIC_CLIENT", "CONFIDENTIAL_CLIENT"],
       "policy_type": "whitelist"
     }

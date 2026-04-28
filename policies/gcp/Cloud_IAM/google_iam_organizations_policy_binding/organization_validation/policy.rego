@@ -14,7 +14,7 @@ conditions := [
     },
     {
       "condition": "Validate organization ID pattern",
-      "attribute_path": ["address"],
+      "attribute_path": ["organization"],
       "values": ["^[0-9]+$"],
       "policy_type": "pattern whitelist"
     }

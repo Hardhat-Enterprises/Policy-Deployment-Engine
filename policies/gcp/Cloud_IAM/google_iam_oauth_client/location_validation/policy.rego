@@ -10,7 +10,7 @@ conditions := [
     },
     {
       "condition": "Validate location",
-      "attribute_path": ["address"],
+      "attribute_path": ["location"],
       "values": ["global"],
       "policy_type": "whitelist"
     }

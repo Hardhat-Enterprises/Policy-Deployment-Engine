@@ -14,7 +14,7 @@ conditions := [
     },
     {
       "condition": "Validate folder format using pattern",
-      "attribute_path": ["address"],
+      "attribute_path": ["folder"],
       "values": ["^[0-9]+$"],
       "policy_type": "pattern whitelist"
     }

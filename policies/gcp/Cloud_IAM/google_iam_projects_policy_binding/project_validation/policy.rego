@@ -11,7 +11,7 @@ conditions := [
     },
     {
       "condition": "Validate project format",
-      "attribute_path": ["address"],
+      "attribute_path": ["project"],
       "values": ["^[a-z][a-z0-9-]{4,28}[a-z0-9]$"],
       "policy_type": "pattern whitelist"
     }
