@@ -1,4 +1,4 @@
-##### DO NOT EDIT ######
+##### DO NOT EDIT #####
 
 terraform {
   required_providers {
@@ -9,7 +9,6 @@ terraform {
 }
 
 provider "google" {}
-
 
 resource "google_access_context_manager_access_policy" "access-policy" {
   parent = "organizations/123456789"
@@ -35,7 +34,6 @@ resource "google_access_context_manager_access_level" "access-level-service-acco
       ]
     }
   }
-
   lifecycle {
     ignore_changes = [basic.0.conditions]
   }
