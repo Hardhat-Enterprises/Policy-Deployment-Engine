@@ -8,8 +8,8 @@ resource "google_cloud_scheduler_job" "c" {
 
   
   http_target {
-    http_method = "GET"
-    uri         = "https://cloudscheduler.googleapis.com/v1/projects/my-project-name/locations/australia-southeast1/jobs"
+    http_method = "POST"
+    uri         = "https://my-service.australia-southeast1.run.app/process"
 
   oidc_token {
       service_account_email = "c_scheduler@pde.iam.gserviceaccount.com"
