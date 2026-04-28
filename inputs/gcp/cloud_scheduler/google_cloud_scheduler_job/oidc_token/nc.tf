@@ -8,11 +8,7 @@ resource "google_cloud_scheduler_job" "nc" {
   
   http_target {
     http_method = "GET"
-    uri         = "https://cloudscheduler.googleapis.com/v1/projects/my-project-name/locations/australia-southeast1/jobs"
-
-    oidc_token {
-      service_account_email = "nc_pde@appspot.gserviceaccount.com"
-    }
+    uri         = "https://my-service.australia-southeast1.run.app/process"
   }
   
 }
