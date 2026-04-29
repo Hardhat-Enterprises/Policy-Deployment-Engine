@@ -3,8 +3,8 @@
   "subcategory": "Dataflow",
   "arguments": {
     "name": {
-      "description": "",
-      "required": null,
+      "description": "A unique name for the resource, required by Dataflow.",
+      "required": true,
       "security_impact": null,
       "rationale": null,
       "compliant": null,
@@ -12,8 +12,8 @@
       "parent": null
     },
     "container_spec_gcs_path": {
-      "description": "Template. - - -",
-      "required": null,
+      "description": "The GCS path to the Dataflow Flex Template spec file.",
+      "required": true,
       "security_impact": null,
       "rationale": null,
       "compliant": null,
@@ -21,8 +21,8 @@
       "parent": null
     },
     "additional_experiments": {
-      "description": "",
-      "required": null,
+      "description": "List of experiments that should be used by the job.",
+      "required": false,
       "security_impact": null,
       "rationale": null,
       "compliant": null,
@@ -30,8 +30,8 @@
       "parent": null
     },
     "additional_pipeline_options": {
-      "description": "",
-      "required": null,
+      "description": "Additional pipeline options to pass to the Flex Template job.",
+      "required": false,
       "security_impact": null,
       "rationale": null,
       "compliant": null,
@@ -39,8 +39,8 @@
       "parent": null
     },
     "autoscaling_algorithm": {
-      "description": "",
-      "required": null,
+      "description": "The algorithm to allow Dataflow to scale between minWorkers and maxWorkers.",
+      "required": false,
       "security_impact": null,
       "rationale": null,
       "compliant": null,
@@ -48,8 +48,8 @@
       "parent": null
     },
     "parameters": {
-      "description": "case-sensitive based on the language on which the pipeline is coded, mostly Java. **Note**: do not configure Dataflow options here in parameters.",
-      "required": null,
+      "description": "Key/value pairs to be passed to the Dataflow job (as used in the template). Keys are case-sensitive based on the language on which the pipeline is coded, mostly Java. Note: do not configure Dataflow options here in parameters.",
+      "required": false,
       "security_impact": null,
       "rationale": null,
       "compliant": null,
@@ -57,35 +57,35 @@
       "parent": null
     },
     "enable_streaming_engine": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "Indicates if the job should use the streaming engine feature. When enabled, the Dataflow service runs the pipeline steps on the Dataflow service backend, reducing the number of persistent disks and worker CPUs needed.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Streaming Engine offloads pipeline execution to the managed Dataflow service backend, reducing the number of worker VMs and persistent disks. This minimizes the attack surface and improves resource efficiency.",
+      "compliant": "true",
+      "non-compliant": "false",
       "parent": null
     },
     "ip_configuration": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "The configuration for VM IPs. Options are 'WORKER_IP_PUBLIC' or 'WORKER_IP_PRIVATE'.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Assigning public IPs to Dataflow workers increases the attack surface by exposing VMs to the internet. Using private IPs ensures workers communicate only within the VPC, reducing the risk of unauthorized access.",
+      "compliant": "WORKER_IP_PRIVATE",
+      "non-compliant": "WORKER_IP_PUBLIC",
       "parent": null
     },
     "kms_key_name": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "The name for the Cloud KMS key for the job. Key format is: projects/PROJECT_ID/locations/LOCATION/keyRings/KEY_RING/cryptoKeys/KEY.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Customer-managed encryption keys (CMEK) ensure that data processed by Dataflow is encrypted with keys controlled by the organization, meeting compliance requirements and providing an additional layer of data protection.",
+      "compliant": "projects/my-project/locations/us-central1/keyRings/my-keyring/cryptoKeys/my-key",
+      "non-compliant": "(not set — uses Google-managed keys)",
       "parent": null
     },
     "labels": {
-      "description": "should follow the restrictions specified in the [labeling restrictions](https://cloud.google.com/compute/docs/labeling-resources#restrictions) page. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
-      "required": null,
+      "description": "User labels to be specified for the job. Keys and values should follow the restrictions specified in the labeling restrictions page. Note: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field effective_labels for all of the labels present on the resource.",
+      "required": false,
       "security_impact": null,
       "rationale": null,
       "compliant": null,
@@ -94,7 +94,7 @@
     },
     "terraform_labels": {
       "description": "The combination of labels configured directly on the resource and default labels configured on the provider.",
-      "required": null,
+      "required": false,
       "security_impact": null,
       "rationale": null,
       "compliant": null,
@@ -103,7 +103,7 @@
     },
     "effective_labels": {
       "description": "All of labels (key/value pairs) present on the resource in GCP, including the labels configured through Terraform, other clients and services.",
-      "required": null,
+      "required": false,
       "security_impact": null,
       "rationale": null,
       "compliant": null,
@@ -111,8 +111,8 @@
       "parent": null
     },
     "launcher_machine_type": {
-      "description": "",
-      "required": null,
+      "description": "The machine type to use for launching the job. The default is n1-standard-1.",
+      "required": false,
       "security_impact": null,
       "rationale": null,
       "compliant": null,
@@ -120,8 +120,8 @@
       "parent": null
     },
     "machine_type": {
-      "description": "",
-      "required": null,
+      "description": "The machine type to use for the job.",
+      "required": false,
       "security_impact": null,
       "rationale": null,
       "compliant": null,
@@ -129,8 +129,8 @@
       "parent": null
     },
     "max_workers": {
-      "description": "",
-      "required": null,
+      "description": "The maximum number of Google Compute Engine instances to be made available to your pipeline during execution, from 1 to 1000.",
+      "required": false,
       "security_impact": null,
       "rationale": null,
       "compliant": null,
@@ -138,17 +138,17 @@
       "parent": null
     },
     "network": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "The network to which VMs will be assigned. If it is not provided, 'default' will be used.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "The default VPC network lacks proper firewall rules and network segmentation. Using a dedicated VPC ensures that Dataflow workers operate within a controlled network boundary with appropriate security controls.",
+      "compliant": "projects/my-project/global/networks/approved-vpc",
+      "non-compliant": "default",
       "parent": null
     },
     "num_workers": {
-      "description": "",
-      "required": null,
+      "description": "The initial number of Google Compute Engine instances for the job.",
+      "required": false,
       "security_impact": null,
       "rationale": null,
       "compliant": null,
@@ -156,8 +156,8 @@
       "parent": null
     },
     "on_delete": {
-      "description": "deletion during `terraform destroy`.  See above note.",
-      "required": null,
+      "description": "One of 'drain' or 'cancel'. Specifies behavior of deletion during terraform destroy.",
+      "required": false,
       "security_impact": null,
       "rationale": null,
       "compliant": null,
@@ -165,8 +165,8 @@
       "parent": null
     },
     "project": {
-      "description": "provided, the provider project is used.",
-      "required": null,
+      "description": "The project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
       "security_impact": null,
       "rationale": null,
       "compliant": null,
@@ -174,8 +174,8 @@
       "parent": null
     },
     "region": {
-      "description": "",
-      "required": null,
+      "description": "The region in which the created job should run.",
+      "required": false,
       "security_impact": null,
       "rationale": null,
       "compliant": null,
@@ -183,8 +183,8 @@
       "parent": null
     },
     "sdk_container_image": {
-      "description": "",
-      "required": null,
+      "description": "Docker registry location of container image to use for the 'worker harness'. Default is the container for the version of the SDK.",
+      "required": false,
       "security_impact": null,
       "rationale": null,
       "compliant": null,
@@ -192,17 +192,17 @@
       "parent": null
     },
     "service_account_email": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "The Service Account email used to create the job. This should be just an email e.g. myserviceaccount@myproject.iam.gserviceaccount.com.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Specifying a dedicated service account enforces the principle of least privilege. Without it, the default Compute Engine service account is used, which typically has overly broad permissions.",
+      "compliant": "dataflow-sa@my-project.iam.gserviceaccount.com",
+      "non-compliant": "(not set — uses default Compute Engine SA)",
       "parent": null
     },
     "skip_wait_on_job_termination": {
-      "description": "treat `DRAINING` and `CANCELLING` as terminal states when deleting the resource, and will remove the resource from terraform state and move on.  See above note.",
-      "required": null,
+      "description": "If true, treat DRAINING and CANCELLING as terminal states and do not wait for further changes before removing from terraform state and moving on.",
+      "required": false,
       "security_impact": null,
       "rationale": null,
       "compliant": null,
@@ -210,8 +210,8 @@
       "parent": null
     },
     "staging_location": {
-      "description": "",
-      "required": null,
+      "description": "The GCS path for staging files. A random subdirectory will be created under the bucket for job staging.",
+      "required": false,
       "security_impact": null,
       "rationale": null,
       "compliant": null,
@@ -219,8 +219,8 @@
       "parent": null
     },
     "subnetwork": {
-      "description": "",
-      "required": null,
+      "description": "The subnetwork to which VMs will be assigned. Should be of the form 'regions/REGION/subnetworks/SUBNETWORK'.",
+      "required": false,
       "security_impact": null,
       "rationale": null,
       "compliant": null,
@@ -228,8 +228,8 @@
       "parent": null
     },
     "temp_location": {
-      "description": "",
-      "required": null,
+      "description": "The GCS path for temporary files. A random subdirectory will be created under the bucket for temp data.",
+      "required": false,
       "security_impact": null,
       "rationale": null,
       "compliant": null,
@@ -237,8 +237,8 @@
       "parent": null
     },
     "transform_name_mapping": {
-      "description": "",
-      "required": null,
+      "description": "Only applicable when updating a pipeline. Map of transform name prefixes of the job to be replaced with the corresponding name prefixes of the new job.",
+      "required": false,
       "security_impact": null,
       "rationale": null,
       "compliant": null,
