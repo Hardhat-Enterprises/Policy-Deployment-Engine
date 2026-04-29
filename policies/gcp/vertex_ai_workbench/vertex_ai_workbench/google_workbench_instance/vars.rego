@@ -2,7 +2,7 @@ package terraform.gcp.security.vertex_ai_workbench.vertex_ai_workbench.google_wo
 
 
 variables := {
-    "friendly_resource_name": "Cloud AI Notebooks",
+    "friendly_resource_name": "Vertex AI Workbench",
     "resource_type":  "google_workbench_instance",
     "resource_value_name" : "name"
 }
