@@ -7,6 +7,6 @@ resource "google_bigtable_authorized_view" "nc" {
   deletion_protection = "UNPROTECTED"
 
   subset_view {
-    row_prefixes = [""]
+    row_prefixes = [base64encode("")]
   }
 }

@@ -7,7 +7,7 @@ resource "google_bigtable_authorized_view" "c" {
   subset_view {
     family_subsets {
       family_name        = "cf1"
-      qualifier_prefixes = ["user_"]
+      qualifier_prefixes = [base64encode("user_")]
     }
   }
 }

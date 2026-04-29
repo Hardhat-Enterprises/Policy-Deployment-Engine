@@ -4,9 +4,9 @@
   "arguments": {
     "app_profile_id": {
       "description": "The unique name of the app profile in the form `[_a-zA-Z0-9][-_.a-zA-Z0-9]*`.",
-      "required": true,
+      "required": false,
       "security_impact": false,
-      "rationale": "Terraform resource name for this app profile; used with routing blocks to identify traffic policy.",
+      "rationale": "Terraform resource name for this app profile; used with routing blocks to identify traffic policy. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -15,7 +15,7 @@
       "description": "Long form description of the use case for this app profile.",
       "required": false,
       "security_impact": false,
-      "rationale": "Operator-facing notes about why this profile exists; does not change IAM or encryption by itself.",
+      "rationale": "Operator-facing notes about why this profile exists; does not change IAM or encryption by itself. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -24,7 +24,7 @@
       "description": "If true, read/write requests are routed to the nearest cluster in the instance, and will fail over to the nearest cluster that is available in the event of transient errors or delays. Clusters in a region are considered equidistant. Choosing this option sacrifices read-your-writes consistency to improve availability.",
       "required": false,
       "security_impact": false,
-      "rationale": "When enabled, sends requests to the nearest cluster for availability; differs from strict read-your-writes consistency.",
+      "rationale": "When enabled, sends requests to the nearest cluster for availability; differs from strict read-your-writes consistency. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -33,7 +33,7 @@
       "description": "Use a single-cluster routing policy. Structure is [documented below](#nested_single_cluster_routing).",
       "required": false,
       "security_impact": false,
-      "rationale": "Nested block that pins routing to one cluster when multi-cluster-any routing is not used.",
+      "rationale": "Nested block that pins routing to one cluster when multi-cluster-any routing is not used. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -42,7 +42,7 @@
           "description": "The cluster to which read/write requests should be routed.",
           "required": true,
           "security_impact": false,
-          "rationale": "Names the cluster that receives reads and writes under single-cluster routing.",
+          "rationale": "Names the cluster that receives reads and writes under single-cluster routing. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
           "compliant": null,
           "non-compliant": null,
           "parent": "single_cluster_routing"
@@ -62,7 +62,7 @@
       "description": "The standard options used for isolating this app profile's traffic from other use cases. Structure is [documented below](#nested_standard_isolation).",
       "required": false,
       "security_impact": false,
-      "rationale": "Optional traffic isolation bucket so workloads do not contend on shared priority.",
+      "rationale": "Optional traffic isolation bucket so workloads do not contend on shared priority. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -71,7 +71,7 @@
           "description": "The priority of requests sent using this app profile. Possible values are: `PRIORITY_LOW`, `PRIORITY_MEDIUM`, `PRIORITY_HIGH`.",
           "required": true,
           "security_impact": false,
-          "rationale": "Priority tier for isolated traffic (`PRIORITY_LOW`, `PRIORITY_MEDIUM`, `PRIORITY_HIGH`).",
+          "rationale": "Priority tier for isolated traffic (`PRIORITY_LOW`, `PRIORITY_MEDIUM`, `PRIORITY_HIGH`). It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
           "compliant": null,
           "non-compliant": null,
           "parent": "standard_isolation"
@@ -82,7 +82,7 @@
       "description": "Specifies that this app profile is intended for read-only usage via the Data Boost feature. Structure is [documented below](#nested_data_boost_isolation_read_only).",
       "required": false,
       "security_impact": false,
-      "rationale": "Marks this profile as read-only analytics via Data Boost.",
+      "rationale": "Marks this profile as read-only analytics via Data Boost. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -91,7 +91,7 @@
           "description": "The Compute Billing Owner for this Data Boost App Profile. Possible values are: `HOST_PAYS`.",
           "required": true,
           "security_impact": false,
-          "rationale": "Who pays for Data Boost compute (`HOST_PAYS`).",
+          "rationale": "Who pays for Data Boost compute (`HOST_PAYS`). It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
           "compliant": null,
           "non-compliant": null,
           "parent": "data_boost_isolation_read_only"
@@ -102,7 +102,7 @@
       "description": "The name of the instance to create the app profile within.",
       "required": false,
       "security_impact": false,
-      "rationale": "Bigtable instance this app profile belongs to.",
+      "rationale": "Bigtable instance this app profile belongs to. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -118,9 +118,9 @@
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
-      "required": true,
+      "required": false,
       "security_impact": false,
-      "rationale": "GCP project ID for API calls and billing context.",
+      "rationale": "GCP project ID for API calls and billing context. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null

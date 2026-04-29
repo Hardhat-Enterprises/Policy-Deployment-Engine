@@ -4,9 +4,9 @@
   "arguments": {
     "table": {
       "description": "Configuration for table on this Cloud Bigtable resource.",
-      "required": false,
+      "required": true,
       "security_impact": false,
-      "rationale": "Table whose column family GC rules apply to.",
+      "rationale": "Table whose column family GC rules apply to. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -15,7 +15,7 @@
       "description": "Configuration for instance_name on this Cloud Bigtable resource.",
       "required": true,
       "security_impact": false,
-      "rationale": "Bigtable instance that contains the table.",
+      "rationale": "Bigtable instance that contains the table. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -24,16 +24,16 @@
       "description": "Configuration for column_family on this Cloud Bigtable resource.",
       "required": true,
       "security_impact": false,
-      "rationale": "Column family name this GC policy attaches to.",
+      "rationale": "Column family name this GC policy attaches to. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "project": {
       "description": "Configuration for project on this Cloud Bigtable resource.",
-      "required": true,
+      "required": false,
       "security_impact": false,
-      "rationale": "GCP project ID for the GC policy resource.",
+      "rationale": "GCP project ID for the GC policy resource. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -42,7 +42,7 @@
       "description": "Configuration for mode on this Cloud Bigtable resource.",
       "required": false,
       "security_impact": false,
-      "rationale": "How multiple GC rules combine (`intersection` or `union`).",
+      "rationale": "How multiple GC rules combine (`intersection` or `union`). It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -51,7 +51,7 @@
       "description": "Configuration for max_age on this Cloud Bigtable resource.",
       "required": false,
       "security_impact": false,
-      "rationale": "Block for age-based retention in the GC rule.",
+      "rationale": "Block for age-based retention in the GC rule. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -60,7 +60,7 @@
       "description": "Configuration for max_version on this Cloud Bigtable resource.",
       "required": false,
       "security_impact": false,
-      "rationale": "Block for version-based retention in the GC rule.",
+      "rationale": "Block for version-based retention in the GC rule. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -69,7 +69,7 @@
       "description": "Configuration for gc_rules on this Cloud Bigtable resource.",
       "required": false,
       "security_impact": false,
-      "rationale": "Alternative JSON representation of GC rules.",
+      "rationale": "Alternative JSON representation of GC rules. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -78,7 +78,7 @@
       "description": "Setting ABANDON allows the resource to be abandoned rather than deleted. This is useful for GC policy as it cannot be deleted in a replicated instance. Possible values are: `ABANDON`.",
       "required": false,
       "security_impact": false,
-      "rationale": "Behavior when deleting the GC policy resource (e.g. `ABANDON`).",
+      "rationale": "Behavior when deleting the GC policy resource (e.g. `ABANDON`). It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -87,7 +87,7 @@
       "description": "Setting this to `true` allows relaxing the gc policy for replicated clusters by up to 90 days, but keep in mind this may increase how long clusters are inconsistent. Make sure you understand the risks listed at https://cloud.google.com/bigtable/docs/garbage-collection#increasing before setting this option. ----- `max_age` supports the following arguments:",
       "required": false,
       "security_impact": false,
-      "rationale": "Allows relaxing retention on replicated clusters; increases inconsistency risk.",
+      "rationale": "Allows relaxing retention on replicated clusters; increases inconsistency risk. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -97,26 +97,26 @@
       "required": false,
       "security_impact": true,
       "rationale": "Retention longer than policy allows increases lifetime of stale/sensitive data.",
-      "compliant": "90",
-      "non-compliant": "120",
+      "compliant": "30",
+      "non-compliant": "180",
       "parent": null
     },
     "duration": {
       "description": "----- `max_version` supports the following arguments:",
       "required": false,
       "security_impact": false,
-      "rationale": "Alternative max-age duration format within `max_age`.",
+      "rationale": "Alternative max-age duration format within `max_age`. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "number": {
       "description": "----- `gc_rules` include 2 fields: - `mode`: optional, either `intersection` or `union`. - `rules`: an array of GC policy rule, can be specified as JSON object: `{\"max_age\": \"16h\"}` or `{\"max_version\": 2}` - If `mode` is not specified, `rules` can only contains one GC policy. If `mode` is specified, `rules` must have at least 2 policies.",
-      "required": false,
+      "required": true,
       "security_impact": true,
       "rationale": "Keeping too many versions increases recoverable historical data beyond approved retention posture.",
-      "compliant": "5",
-      "non-compliant": "6",
+      "compliant": "3",
+      "non-compliant": "10",
       "parent": null
     }
   }

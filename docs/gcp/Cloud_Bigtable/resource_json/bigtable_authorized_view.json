@@ -6,7 +6,7 @@
       "description": "Configuration for name on this Cloud Bigtable resource.",
       "required": true,
       "security_impact": false,
-      "rationale": "Terraform name for the authorized view.",
+      "rationale": "Terraform name for the authorized view. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -15,7 +15,7 @@
       "description": "is not provided, the provider project is used.",
       "required": true,
       "security_impact": false,
-      "rationale": "GCP project ID managing this view.",
+      "rationale": "GCP project ID managing this view. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -24,7 +24,7 @@
       "description": "Configuration for instance_name on this Cloud Bigtable resource.",
       "required": true,
       "security_impact": false,
-      "rationale": "Bigtable instance hosting the backing table.",
+      "rationale": "Bigtable instance hosting the backing table. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -33,7 +33,7 @@
       "description": "Configuration for table_name on this Cloud Bigtable resource.",
       "required": true,
       "security_impact": false,
-      "rationale": "Backing table for the authorized view.",
+      "rationale": "Backing table for the authorized view. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -42,7 +42,7 @@
       "description": "Configuration for column_family on this Cloud Bigtable resource.",
       "required": true,
       "security_impact": false,
-      "rationale": "Column family exposed or constrained by the view.",
+      "rationale": "Column family exposed or constrained by the view. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -60,7 +60,7 @@
       "description": "----- `subset_view` supports the following arguments:",
       "required": false,
       "security_impact": false,
-      "rationale": "Wrapper for subset filters such as row prefixes.",
+      "rationale": "Wrapper for subset filters such as row prefixes. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -70,15 +70,15 @@
       "required": false,
       "security_impact": true,
       "rationale": "Empty row prefix grants full-row access; scoped prefixes enforce least privilege.",
-      "compliant": "[\"user_\"]",
-      "non-compliant": "[\"\"]",
+      "compliant": "[base64encode(\"user_\")]",
+      "non-compliant": "[base64encode(\"\")]",
       "parent": null
     },
     "family_subsets": {
       "description": "----- `family_subsets` supports the following arguments:",
       "required": false,
       "security_impact": false,
-      "rationale": "Per-family qualifier subsets for fine-grained column access.",
+      "rationale": "Per-family qualifier subsets for fine-grained column access. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -87,7 +87,7 @@
       "description": "Configuration for family_name on this Cloud Bigtable resource.",
       "required": false,
       "security_impact": false,
-      "rationale": "Column family targeted by an adjacent subset block.",
+      "rationale": "Column family targeted by an adjacent subset block. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -96,7 +96,7 @@
       "description": "Configuration for qualifiers on this Cloud Bigtable resource.",
       "required": false,
       "security_impact": false,
-      "rationale": "Explicit base64-encoded qualifiers allowed in the view.",
+      "rationale": "Explicit base64-encoded qualifiers allowed in the view. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -106,8 +106,8 @@
       "required": false,
       "security_impact": true,
       "rationale": "Empty qualifier prefix grants full qualifier access within a family and increases data exposure.",
-      "compliant": "[\"user_\"]",
-      "non-compliant": "[\"\"]",
+      "compliant": "[base64encode(\"user_\")]",
+      "non-compliant": "[base64encode(\"\")]",
       "parent": null
     }
   }

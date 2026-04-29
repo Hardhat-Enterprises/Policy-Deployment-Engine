@@ -5,6 +5,6 @@ resource "google_bigtable_authorized_view" "nc" {
   table_name    = "t"
 
   subset_view {
-    row_prefixes = [""]
+    row_prefixes = [base64encode("")]
   }
 }

@@ -3,19 +3,19 @@
   "subcategory": "Cloud Bigtable",
   "arguments": {
     "name": {
-      "description": "Configuration for name on this Cloud Bigtable resource.",
+      "description": "The name of the table. Must be 1-50 characters and must only contain hyphens, underscores, periods, letters and numbers.",
       "required": true,
       "security_impact": false,
-      "rationale": "Terraform table name within the instance.",
+      "rationale": "Terraform table name within the instance. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "instance_name": {
-      "description": "Configuration for instance_name on this Cloud Bigtable resource.",
+      "description": "The name of the Bigtable instance.",
       "required": true,
       "security_impact": false,
-      "rationale": "Which Bigtable instance hosts this table.",
+      "rationale": "Which Bigtable instance hosts this table. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -24,40 +24,40 @@
       "description": "!> **Warning:** Modifying the `split_keys` of an existing table will cause Terraform to delete/recreate the entire `google_bigtable_table` resource.",
       "required": false,
       "security_impact": false,
-      "rationale": "Initial row-key splits for table creation; affects layout and recreate risk, not IAM.",
+      "rationale": "Initial row-key splits for table creation; affects layout and recreate risk, not IAM. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "column_family": {
-      "description": "Configuration for column_family on this Cloud Bigtable resource.",
-      "required": true,
+      "description": "A group of columns within a table which share a common configuration. This can be specified multiple times. Structure is documented below.",
+      "required": false,
       "security_impact": false,
-      "rationale": "Declares column families on the table schema.",
+      "rationale": "Declares column families on the table schema. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "project": {
-      "description": "is not provided, the provider project is used.",
-      "required": true,
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
       "security_impact": false,
-      "rationale": "GCP project ID where the table resource is managed.",
+      "rationale": "GCP project ID where the table resource is managed. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "deletion_protection": {
-      "description": "Configuration for deletion_protection on this Cloud Bigtable resource.",
+      "description": "When set to PROTECTED, deleting the table, column families in the table, and the instance containing the table would be prohibited (API backend deletion protection). If not provided, defaults to UNPROTECTED.",
       "required": false,
       "security_impact": false,
-      "rationale": "Terraform-side guard against accidental destroy of the table resource.",
+      "rationale": "Backend deletion protection can reduce accidental removal of the table and related resources; it does not directly grant access or expose secrets by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "change_stream_retention": {
-      "description": "Configuration for change_stream_retention on this Cloud Bigtable resource.",
+      "description": "Duration to retain change stream data for the table. Set to 0 to disable. Must be between 1 and 7 days.",
       "required": false,
       "security_impact": true,
       "rationale": "Setting this to \"0\" disables change history visibility used for monitoring and audit investigations.",
@@ -66,7 +66,7 @@
       "parent": null
     },
     "automated_backup_policy": {
-      "description": "----- `column_family` supports the following arguments:",
+      "description": "Defines an automated backup policy for a table (retention period and frequency). Omit or set both values to \"0\" to disable backups.",
       "required": false,
       "security_impact": true,
       "rationale": "Automated backups support recoverability and incident response for table data.",
@@ -75,19 +75,19 @@
       "parent": null
     },
     "family": {
-      "description": "Configuration for family on this Cloud Bigtable resource.",
-      "required": true,
+      "description": "The name of the column family.",
+      "required": false,
       "security_impact": false,
-      "rationale": "Nested column family configuration under `column_family`.",
+      "rationale": "Nested column family configuration under `column_family`. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "type": {
-      "description": "Configuration for type on this Cloud Bigtable resource.",
+      "description": "The type of the column family.",
       "required": false,
       "security_impact": false,
-      "rationale": "Table type variant when supported by the provider.",
+      "rationale": "Column family type when supported by the provider. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null

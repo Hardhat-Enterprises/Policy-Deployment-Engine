@@ -3,29 +3,29 @@
   "subcategory": "Cloud Bigtable",
   "arguments": {
     "project": {
-      "description": "is not provided, Terraform will use the provider default.",
-      "required": true,
+      "description": "The project in which the instance belongs. If it is not provided, Terraform will use the provider default.",
+      "required": false,
       "security_impact": false,
-      "rationale": "GCP project for the IAM binding resource.",
+      "rationale": "GCP project for the IAM binding resource. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "instance": {
       "description": "For `google_bigtable_instance_iam_member` or `google_bigtable_instance_iam_binding`:",
-      "required": false,
+      "required": true,
       "security_impact": false,
-      "rationale": "Bigtable instance ID this IAM applies to.",
+      "rationale": "Bigtable instance ID this IAM applies to. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "member/members": {
       "description": "Each entry can have one of the following values: * **allUsers**: A special identifier that represents anyone who is on the internet; with or without a Google account. * **allAuthenticatedUsers**: A special identifier that represents anyone who is authenticated with a Google account or a service account. * **user:{emailid}**: An email address that represents a specific Google account. For example, alice@gmail.com or joe@example.com. * **serviceAccount:{emailid}**: An email address that represents a service account. For example, my-other-app@appspot.gserviceaccount.com. * **group:{emailid}**: An email address that represents a Google group. For example, admins@example.com. * **domain:{domain}**: A G Suite domain (primary, instead of alias) name that represents all the users of that domain. For example, google.com or example.com.",
-      "required": false,
+      "required": true,
       "security_impact": true,
       "rationale": "Public principals expose data-plane permissions broadly and violate least privilege.",
-      "compliant": "\"serviceAccount:bt-reader@pde.iam.gserviceaccount.com\"",
+      "compliant": "\"serviceAccount:test-sa@test-project.iam.gserviceaccount.com\"",
       "non-compliant": "\"allUsers\" or \"allAuthenticatedUsers\"",
       "parent": null
     },
@@ -33,7 +33,7 @@
       "description": "`google_bigtable_instance_iam_binding` can be used per role. Note that custom roles must be of the format `[projects|organizations]/{parent-name}/roles/{role-name}`. Read more about roles [here](https://cloud.google.com/bigtable/docs/access-control#roles).",
       "required": true,
       "security_impact": false,
-      "rationale": "IAM role granted (controls capability, not which principal).",
+      "rationale": "IAM role granted (controls capability, not which principal). It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -42,25 +42,25 @@
       "description": "Configuration for condition on this Cloud Bigtable resource.",
       "required": false,
       "security_impact": false,
-      "rationale": "Optional IAM condition that scopes when the binding applies.",
+      "rationale": "Optional IAM condition that scopes when the binding applies. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
       "arguments": {
         "expression": {
           "description": "Configuration for expression on this Cloud Bigtable resource.",
-          "required": false,
+          "required": true,
           "security_impact": false,
-          "rationale": "CEL expression evaluated for conditional bindings.",
+          "rationale": "CEL expression evaluated for conditional bindings. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
           "compliant": null,
           "non-compliant": null,
           "parent": "condition"
         },
         "title": {
           "description": "Configuration for title on this Cloud Bigtable resource.",
-          "required": false,
+          "required": true,
           "security_impact": false,
-          "rationale": "Short title shown for the IAM condition.",
+          "rationale": "Short title shown for the IAM condition. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
           "compliant": null,
           "non-compliant": null,
           "parent": "condition"
@@ -69,16 +69,16 @@
           "description": "For `google_bigtable_instance_iam_policy` only:",
           "required": false,
           "security_impact": false,
-          "rationale": "Longer explanation of the IAM condition.",
+          "rationale": "Longer explanation of the IAM condition. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
           "compliant": null,
           "non-compliant": null,
           "parent": "condition"
         },
         "policy_data": {
           "description": "Configuration for policy_data on this Cloud Bigtable resource.",
-          "required": false,
+          "required": true,
           "security_impact": false,
-          "rationale": "Used with `google_bigtable_instance_iam_policy` import flows.",
+          "rationale": "Used with `google_bigtable_instance_iam_policy` import flows. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
           "compliant": null,
           "non-compliant": null,
           "parent": "condition"
