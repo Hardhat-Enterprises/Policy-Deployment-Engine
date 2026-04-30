@@ -1,4 +1,5 @@
 resource "google_iam_organizations_policy_binding" "nc" {
+  name    = "nc"
   organization      = "org-123abc"
   location          = "global"
   display_name      = "Non Compliant Org Policy Binding"

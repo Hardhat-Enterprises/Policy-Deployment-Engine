@@ -1,5 +1,7 @@
 resource "google_iam_organizations_policy_binding" "c" {
+  name    = "c"
   organization      = "123456789"
+  location          = "global"
   display_name      = "Compliant Org Policy Binding"
   policy_kind       = "PRINCIPAL_ACCESS_BOUNDARY"
   policy_binding_id = "org-binding-c"
