@@ -3,12 +3,12 @@
   "subcategory": "Network Security",
   "arguments": {
     "type": {
-      "description": "The type of the Address Group. Possible values are \"IPV4\" or \"IPV6\". Possible values are: `IPV4`, `IPV6`.",
+      "description": "The type of the Address Group. Possible values are \"IPV4\" or \"IPV6\".",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "This policy only permits the value \"IPV4\" for the type attribute. The compliant configuration uses \"IPV4\", while the non-compliant configuration uses \"IPV6\". Enforcing IPV4 ensures the address group matches the approved security requirement.",
+      "compliant": ["\"IPV4\""],
+      "non-compliant": ["\"IPV6\""],
       "parent": null
     },
     "capacity": {
@@ -57,21 +57,21 @@
       "parent": null
     },
     "items": {
-      "description": "List of items.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "List of IP addresses or CIDR ranges allowed in the address group.",
+      "required": null,
+      "security_impact": true,
+      "rationale": "Only the specific CIDR block 10.10.0.1/30 is permitted to enforce strict network access control and minimize attack surface.",
+      "compliant": ["10.10.0.1/30"],
+      "non-compliant": ["8.8.8.8"],
       "parent": null
     },
     "purpose": {
-      "description": ", [Beta](https://terraform.io/docs/providers/google/guides/provider_versions.html)) List of supported purposes of the Address Group. Each value may be one of: `DEFAULT`, `CLOUD_ARMOR`.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "List of supported purposes of the Address Group. Each value may be one of: `DEFAULT`, `CLOUD_ARMOR`.",
+      "required": null,
+      "security_impact": true,
+      "rationale": "Restricting purpose to CLOUD_ARMOR enforces consistent security usage and prevents misconfiguration of address groups in non-secure or unintended contexts.",
+      "compliant": ["\"CLOUD_ARMOR\""],
+      "non-compliant": ["\"DEFAULT\""],
       "parent": null
     },
     "parent": {
