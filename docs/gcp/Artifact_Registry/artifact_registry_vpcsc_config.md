@@ -12,4 +12,4 @@ Reference: [Terraform Registry – artifact_registry_vpcsc_config](https://regis
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `vpcsc_policy` | The VPC SC policy for project and location. Possible values are: `DENY`, `ALLOW`. | false | true | VPC SC policy requires the value DENY. | DENY | ALLOW |
 | `location` | The name of the location this config is located in. | false | true | VPC SC location policy whitelists only australia-southeast1-a/b/c and australia-southeast2-a/b/c. | australia-southeast1-a | us-central1 |
-| `project` | If it is not provided, the provider project is used. | true | false | None | None | None |
+| `project` | If it is not provided, the provider project is used. | true | false | This identifies the parent project/provider context only; the security behaviour is controlled by the specific IAM, location, encryption, and policy attributes. | None | None |

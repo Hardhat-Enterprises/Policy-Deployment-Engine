@@ -8,9 +8,15 @@ conditions := [
         {
             "situation_description": "Artifact Registry repositories that use CMEK should reference only approved Cloud KMS keys from authorized projects, regions, key rings, and crypto keys.",
             "remedies": [
-                "Set kms_key to a valid CMEK path: projects/my-project/locations/us-central1/keyRings/kr/cryptoKeys/key",
+                "Set kms_key_name to a valid CMEK path: projects/my-project/locations/australia-southeast1/keyRings/kr/cryptoKeys/key",
                 "Use format: projects/{project}/locations/{location}/keyRings/{keyring}/cryptoKeys/{key}"
             ]
+        },
+        {
+            "condition": "kms_key_name must not be empty or invalid",
+            "attribute_path": ["kms_key_name"],
+            "values": [null, "", "invalid-kms-key"],
+            "policy_type": "blacklist"
         },
         {
             "condition": "kms_key_name must follow approved CMEK key pattern",
@@ -19,7 +25,7 @@ conditions := [
                 "projects/*/locations/*/keyRings/*/cryptoKeys/*",
                 [
                     ["project-1", "project-2"],
-                    ["us-central1", "australia-southeast1"],
+                    ["australia-southeast1", "australia-southeast2"],
                     ["artifact-ring", "platform-ring"],
                     ["artifact-key", "repo-key"]
                 ]

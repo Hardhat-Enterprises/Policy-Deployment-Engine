@@ -10,7 +10,7 @@ conditions := [
     {
         "condition": "Location should be in approved secure regions",
         "attribute_path" : ["location"],
-        "values" : ["australia-southeast1-a", "australia-southeast1-b", "australia-southeast1-c", "australia-southeast2-a", "australia-southeast2-b", "australia-southeast2-c"],
+        "values" : ["australia-southeast1", "australia-southeast2"],
         "policy_type" : "whitelist"
     }
     ]

@@ -5,17 +5,17 @@
     "format": {
       "description": "The format of packages that are stored in the repository. Supported formats can be found [here](https://cloud.google.com/artifact-registry/docs/supported-formats). Can only create alpha formats if a member of the [alpha user group](https://cloud.google.com/artifact-registry/docs/supported-formats#alpha-access).",
       "required": true,
-      "security_impact":true,
-      "rationale": "The approved_formats policy whitelists DOCKER, MAVEN, NPM, and PYTHON only.",
-      "compliant": ["DOCKER", "MAVEN", "NPM", "PYTHON"],
-      "non-compliant": ["APT", "GO", "KFP"],
+      "security_impact": false,
+      "rationale": "This only defines the package type stored in the repository; security controls such as encryption, IAM, scanning, and upstream validation are handled by separate attributes.",
+      "compliant": null,
+      "non-compliant": null,
       "parent": null
     },
     "repository_id": {
       "description": "The last part of the repository name, for example: \"repo1\"",
       "required": true,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is only the repository identifier/name segment and does not grant access, change encryption, or alter artifact handling by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -24,7 +24,7 @@
       "description": "The user-provided description of the repository.",
       "required": false,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is descriptive metadata only and does not affect access control, encryption, scanning, retention, or upstream trust.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -33,7 +33,7 @@
       "description": "Labels with user-defined metadata. This field may contain up to 64 entries. Label keys and values may be no longer than 63 characters. Label keys must begin with a lowercase letter and may only contain lowercase letters, numeric characters, underscores, and dashes. **Note**: This field is non-authoritative, and will only manage the labels present in configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
       "required": false,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "Labels are user-defined metadata for organization and filtering; they do not directly change repository permissions or security behaviour.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -42,16 +42,21 @@
       "description": "The Cloud KMS resource name of the customer managed encryption key that\u2019s used to encrypt the contents of the Repository. Has the form: `projects/my-project/locations/my-region/keyRings/my-kr/cryptoKeys/my-key`. This value may not be changed after the Repository has been created.",
       "required": false,
       "security_impact": true,
-      "rationale": "Two policies apply: cmek_required requires kms_key_name to be set, and approved_cmek_keys restricts it to approved CMEK path patterns and approved project/location/key identifiers.",
+      "rationale": "This restricts kms_key_name to approved CMEK path patterns and approved project/location/key identifiers.",
       "compliant": "projects/project-2/locations/australia-southeast1/keyRings/platform-ring/cryptoKeys/repo-key",
-      "non-compliant": ["null", "", "kms-key", "projects/other-project/locations/europe-west1/keyRings/test/cryptoKeys/key1"],
+      "non-compliant": [
+        "null",
+        "",
+        "kms-key",
+        "projects/other-project/locations/europe-west1/keyRings/test/cryptoKeys/key1"
+      ],
       "parent": null
     },
     "docker_config": {
       "description": "Docker repository config contains repository level configuration for the repositories of docker type. Structure is [documented below](#nested_docker_config).",
       "required": false,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is a parent configuration block only; any security impact is captured by its nested attributes rather than the block itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -71,7 +76,7 @@
       "description": "MavenRepositoryConfig is maven related repository details. Provides additional configuration details for repositories of the maven format type. Structure is [documented below](#nested_maven_config).",
       "required": false,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is a parent configuration block only; any security impact is captured by its nested attributes rather than the block itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -89,7 +94,7 @@
           "description": "Version policy defines the versions that the registry will accept. Default value is `VERSION_POLICY_UNSPECIFIED`. Possible values are: `VERSION_POLICY_UNSPECIFIED`, `RELEASE`, `SNAPSHOT`.",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This only controls accepted Maven version categories and does not directly affect access control, encryption, scanning, or cleanup guardrails.",
           "compliant": null,
           "non-compliant": null,
           "parent": "maven_config"
@@ -99,17 +104,17 @@
     "mode": {
       "description": "The mode configures the repository to serve artifacts from different sources. Default value is `STANDARD_REPOSITORY`. Possible values are: `STANDARD_REPOSITORY`, `VIRTUAL_REPOSITORY`, `REMOTE_REPOSITORY`.",
       "required": false,
-      "security_impact": true,
-      "rationale": "The approved_modes policy whitelists STANDARD_REPOSITORY, REMOTE_REPOSITORY, and VIRTUAL_REPOSITORY only.",
-      "compliant": ["STANDARD_REPOSITORY", "REMOTE_REPOSITORY", "VIRTUAL_REPOSITORY"],
-      "non-compliant": [ "UNKNOWN_MODE", "PROXY_REPOSITORY" ],
+      "security_impact": false,
+      "rationale": "This controls the source of artifacts for the repository, but security controls such as encryption, IAM, scanning, and upstream validation are handled by separate attributes.",
+      "compliant": null,
+      "non-compliant": null,
       "parent": null
     },
     "virtual_repository_config": {
       "description": "Configuration specific for a Virtual Repository. Structure is [documented below](#nested_virtual_repository_config).",
       "required": false,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is a parent configuration block only; any security impact is captured by its nested attributes rather than the block itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -119,8 +124,15 @@
           "required": false,
           "security_impact": true,
           "rationale": "The virtual_upstream_priority_range policy requires upstream_policies.priority to stay within 1 to 100 when mode is VIRTUAL_REPOSITORY.",
-          "compliant": [ "1", "50", "100" ],
-          "non-compliant": [ "0", "101" ],
+          "compliant": [
+            "1",
+            "50",
+            "100"
+          ],
+          "non-compliant": [
+            "0",
+            "101"
+          ],
           "parent": "virtual_repository_config"
         }
       }
@@ -129,7 +141,7 @@
       "description": "Cleanup policies for this repository. Cleanup policies indicate when certain package versions can be automatically deleted. Map keys are policy IDs supplied by users during policy creation. They must unique within a repository and be under 128 characters in length. Structure is [documented below](#nested_cleanup_policies).",
       "required": false,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is a parent configuration block only; any security impact is captured by its nested attributes rather than the block itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -138,7 +150,7 @@
           "description": "",
           "required": true,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This is only a user-defined identifier for the block and does not directly change access, encryption, scanning, or retention behaviour.",
           "compliant": null,
           "non-compliant": null,
           "parent": "cleanup_policies"
@@ -166,8 +178,14 @@
           "required": false,
           "security_impact": true,
           "rationale": "Guardrail policy requires KEEP policies to retain at least 3 recent versions via most_recent_versions.keep_count.",
-          "compliant": [ "3", "10" ],
-          "non-compliant": [ "1", "2" ],
+          "compliant": [
+            "3",
+            "10"
+          ],
+          "non-compliant": [
+            "1",
+            "2"
+          ],
           "parent": "cleanup_policies"
         }
       }
@@ -176,7 +194,7 @@
       "description": "Configuration specific for a Remote Repository. Structure is [documented below](#nested_remote_repository_config).",
       "required": false,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is a parent configuration block only; any security impact is captured by its nested attributes rather than the block itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -185,7 +203,7 @@
           "description": "The description of the remote source.",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This is descriptive metadata only and does not affect access control, encryption, scanning, retention, or upstream trust.",
           "compliant": null,
           "non-compliant": null,
           "parent": "remote_repository_config"
@@ -194,7 +212,7 @@
           "description": "Specific settings for an Apt remote repository. Structure is [documented below](#nested_remote_repository_config_apt_repository).",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This attribute is informational or structural and does not directly affect access control, encryption, scanning, retention, or upstream trust in the current policy scope.",
           "compliant": null,
           "non-compliant": null,
           "parent": "remote_repository_config"
@@ -203,7 +221,7 @@
           "description": "Specific settings for a Docker remote repository. Structure is [documented below](#nested_remote_repository_config_docker_repository).",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This attribute is informational or structural and does not directly affect access control, encryption, scanning, retention, or upstream trust in the current policy scope.",
           "compliant": null,
           "non-compliant": null,
           "parent": "remote_repository_config"
@@ -212,7 +230,7 @@
           "description": "Specific settings for a Maven remote repository. Structure is [documented below](#nested_remote_repository_config_maven_repository).",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This attribute is informational or structural and does not directly affect access control, encryption, scanning, retention, or upstream trust in the current policy scope.",
           "compliant": null,
           "non-compliant": null,
           "parent": "remote_repository_config"
@@ -221,7 +239,7 @@
           "description": "Specific settings for an Npm remote repository. Structure is [documented below](#nested_remote_repository_config_npm_repository).",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This attribute is informational or structural and does not directly affect access control, encryption, scanning, retention, or upstream trust in the current policy scope.",
           "compliant": null,
           "non-compliant": null,
           "parent": "remote_repository_config"
@@ -230,7 +248,7 @@
           "description": "Specific settings for a Python remote repository. Structure is [documented below](#nested_remote_repository_config_python_repository).",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This attribute is informational or structural and does not directly affect access control, encryption, scanning, retention, or upstream trust in the current policy scope.",
           "compliant": null,
           "non-compliant": null,
           "parent": "remote_repository_config"
@@ -239,7 +257,7 @@
           "description": "Specific settings for an Yum remote repository. Structure is [documented below](#nested_remote_repository_config_yum_repository).",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This attribute is informational or structural and does not directly affect access control, encryption, scanning, retention, or upstream trust in the current policy scope.",
           "compliant": null,
           "non-compliant": null,
           "parent": "remote_repository_config"
@@ -249,15 +267,21 @@
           "required": false,
           "security_impact": true,
           "rationale": "The approved_remote_upstreams policy allows only approved upstream Artifact Registry URIs for REMOTE_REPOSITORY mode.",
-          "compliant": [ "https://us-central1-docker.pkg.dev/trusted-project/base-images", "https://australia-southeast1-docker.pkg.dev/shared-artifacts/approved-upstream" ],
-          "non-compliant": [ "https://docker.io/library", "https://europe-west1-docker.pkg.dev/unknown-project/test" ],
+          "compliant": [
+            "https://us-central1-docker.pkg.dev/trusted-project/base-images",
+            "https://australia-southeast1-docker.pkg.dev/shared-artifacts/approved-upstream"
+          ],
+          "non-compliant": [
+            "https://docker.io/library",
+            "https://europe-west1-docker.pkg.dev/unknown-project/test"
+          ],
           "parent": "remote_repository_config"
         },
         "upstream_credentials": {
           "description": "The credentials used to access the remote repository. Structure is [documented below](#nested_remote_repository_config_upstream_credentials).",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This is only a credentials container; any security-sensitive credential details are represented in the nested credential fields.",
           "compliant": null,
           "non-compliant": null,
           "parent": "remote_repository_config"
@@ -286,7 +310,7 @@
       "description": "Configuration for vulnerability scanning of artifacts stored in this repository. Structure is [documented below](#nested_vulnerability_scanning_config).",
       "required": false,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is a parent configuration block only; any security impact is captured by its nested attributes rather than the block itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -304,7 +328,7 @@
           "description": "(Output) This field returns whether scanning is active for this repository.",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This is an output-only status field and cannot be configured to change vulnerability scanning behaviour.",
           "compliant": null,
           "non-compliant": null,
           "parent": "vulnerability_scanning_config"
@@ -313,7 +337,7 @@
           "description": "(Output) This provides an explanation for the state of scanning on this repository.",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This is an output-only explanation field and cannot be configured to change vulnerability scanning behaviour.",
           "compliant": null,
           "non-compliant": null,
           "parent": "vulnerability_scanning_config"
@@ -325,15 +349,22 @@
       "required": false,
       "security_impact": true,
       "rationale": "The approved_locations policy whitelists only australia-southeast1-a/b/c and australia-southeast2-a/b/c.",
-      "compliant": [ "australia-southeast1-a", "australia-southeast2-b" ],
-      "non-compliant": ["us-central1", "europe-west1", "asia" ],
+      "compliant": [
+        "australia-southeast1-a",
+        "australia-southeast2-b"
+      ],
+      "non-compliant": [
+        "us-central1",
+        "europe-west1",
+        "asia"
+      ],
       "parent": null
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
       "required": true,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This identifies the parent project/provider context only; the security behaviour is controlled by the specific IAM, location, encryption, and policy attributes.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -342,7 +373,7 @@
       "description": "",
       "required": null,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is a structural grouping entry used to document nested attributes and does not directly configure security behaviour by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -351,7 +382,7 @@
           "description": "The user-provided ID of the upstream policy.",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This is only a user-defined identifier for the block and does not directly change access, encryption, scanning, or retention behaviour.",
           "compliant": null,
           "non-compliant": null,
           "parent": "upstream_policies"
@@ -360,7 +391,7 @@
           "description": "A reference to the repository resource, for example: \"projects/p1/locations/us-central1/repository/repo1\".",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This identifies the target repository for the IAM binding and does not itself grant permissions without the member and role configuration.",
           "compliant": null,
           "non-compliant": null,
           "parent": "upstream_policies"
@@ -370,8 +401,15 @@
           "required": false,
           "security_impact": true,
           "rationale": "The virtual_upstream_priority_range policy requires priority to stay within 1 to 100.",
-          "compliant": [ 1, 50, 100 ],
-          "non-compliant": [ 0, 101 ],
+          "compliant": [
+            1,
+            50,
+            100
+          ],
+          "non-compliant": [
+            0,
+            101
+          ],
           "parent": "upstream_policies"
         }
       }
@@ -380,7 +418,7 @@
       "description": "",
       "required": null,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is a structural grouping entry used to document nested attributes and does not directly configure security behaviour by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -390,7 +428,10 @@
           "required": false,
           "security_impact": true,
           "rationale": "The cleanup_policy_guardrails policy blocks DELETE cleanup rules from using tag_state = TAGGED.",
-          "compliant": [ "UNTAGGED", "ANY" ],
+          "compliant": [
+            "UNTAGGED",
+            "ANY"
+          ],
           "non-compliant": "TAGGED",
           "parent": "condition"
         },
@@ -398,7 +439,7 @@
           "description": "Match versions by tag prefix. Applied on any prefix match.",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This is only a cleanup matching selector; by itself it does not delete, retain, or expose artifacts without the cleanup action and guardrail settings.",
           "compliant": null,
           "non-compliant": null,
           "parent": "condition"
@@ -407,7 +448,7 @@
           "description": "Match versions by version name prefix. Applied on any prefix match.",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This is only a cleanup matching selector and does not directly change access, encryption, scanning, or retention by itself.",
           "compliant": null,
           "non-compliant": null,
           "parent": "condition"
@@ -416,7 +457,7 @@
           "description": "Match versions by package prefix. Applied on any prefix match.",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This is only a matching selector for cleanup or retention scope and has no direct security effect without the associated action or keep-count rule.",
           "compliant": null,
           "non-compliant": null,
           "parent": "condition"
@@ -425,7 +466,7 @@
           "description": "Match versions older than a duration.",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This is only an age-based cleanup selector and does not directly remove artifacts unless combined with a cleanup action.",
           "compliant": null,
           "non-compliant": null,
           "parent": "condition"
@@ -434,7 +475,7 @@
           "description": "Match versions newer than a duration.",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This is only an age-based cleanup selector and does not directly remove artifacts unless combined with a cleanup action.",
           "compliant": null,
           "non-compliant": null,
           "parent": "condition"
@@ -445,7 +486,7 @@
       "description": "",
       "required": null,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is a structural grouping entry used to document nested attributes and does not directly configure security behaviour by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -454,7 +495,7 @@
           "description": "Match versions by package prefix. Applied on any prefix match.",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This is only a matching selector for cleanup or retention scope and has no direct security effect without the associated action or keep-count rule.",
           "compliant": null,
           "non-compliant": null,
           "parent": "most_recent_versions"
@@ -464,8 +505,16 @@
           "required": false,
           "security_impact": true,
           "rationale": "The cleanup_policy_guardrails policy enforces a keep_count range of 3 to 100 for the checked KEEP policy.",
-          "compliant": ["3","5","100"],
-          "non-compliant": ["1","2","101"],
+          "compliant": [
+            "3",
+            "5",
+            "100"
+          ],
+          "non-compliant": [
+            "1",
+            "2",
+            "101"
+          ],
           "parent": "most_recent_versions"
         }
       }
@@ -474,7 +523,7 @@
       "description": "",
       "required": null,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is a structural grouping entry used to document nested attributes and does not directly configure security behaviour by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -483,7 +532,7 @@
           "description": "One of the publicly available Apt repositories supported by Artifact Registry. Structure is [documented below](#nested_remote_repository_config_apt_repository_public_repository).",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This selects a provider-supported public upstream preset; current security checks focus on approved custom/common upstream URIs and validation controls.",
           "compliant": null,
           "non-compliant": null,
           "parent": "apt_repository"
@@ -494,7 +543,7 @@
       "description": "",
       "required": null,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is a structural grouping entry used to document nested attributes and does not directly configure security behaviour by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -503,7 +552,7 @@
           "description": "A common public repository base for Yum. Possible values are: `CENTOS`, `CENTOS_DEBUG`, `CENTOS_VAULT`, `CENTOS_STREAM`, `ROCKY`, `EPEL`.",
           "required": true,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This selects the base of a provider-supported public package repository and does not directly affect IAM, encryption, scanning, or validation settings.",
           "compliant": null,
           "non-compliant": null,
           "parent": "public_repository"
@@ -512,7 +561,7 @@
           "description": "Specific repository from the base, e.g. `\"pub/rocky/9/BaseOS/x86_64/os\"`",
           "required": true,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This narrows the provider-supported public repository path and does not directly affect IAM, encryption, scanning, or validation settings.",
           "compliant": null,
           "non-compliant": null,
           "parent": "public_repository"
@@ -523,7 +572,7 @@
       "description": "",
       "required": null,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is a structural grouping entry used to document nested attributes and does not directly configure security behaviour by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -532,7 +581,7 @@
           "description": "Address of the remote repository. Default value is `DOCKER_HUB`. Possible values are: `DOCKER_HUB`.",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This selects a provider-supported public upstream preset; current security checks focus on approved custom/common upstream URIs and validation controls.",
           "compliant": null,
           "non-compliant": null,
           "parent": "docker_repository"
@@ -541,7 +590,7 @@
           "description": "[Deprecated, please use commonRepository instead] Settings for a remote repository with a custom uri. Structure is [documented below](#nested_remote_repository_config_docker_repository_custom_repository).",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This is a deprecated remote upstream configuration block; current upstream security validation is represented through common_repository controls.",
           "compliant": null,
           "non-compliant": null,
           "parent": "docker_repository"
@@ -552,7 +601,7 @@
       "description": "",
       "required": null,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is a structural grouping entry used to document nested attributes and does not directly configure security behaviour by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -561,7 +610,7 @@
           "description": "Specific uri to the registry, e.g. `\"https://pypi.io\"`",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This URI belongs to a deprecated custom_repository block, while the current approved upstream policy is applied to common_repository.uri.",
           "compliant": null,
           "non-compliant": null,
           "parent": "custom_repository"
@@ -572,7 +621,7 @@
       "description": "",
       "required": null,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is a structural grouping entry used to document nested attributes and does not directly configure security behaviour by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -581,7 +630,7 @@
           "description": "Address of the remote repository. Default value is `MAVEN_CENTRAL`. Possible values are: `MAVEN_CENTRAL`.",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This selects a provider-supported public upstream preset; current security checks focus on approved custom/common upstream URIs and validation controls.",
           "compliant": null,
           "non-compliant": null,
           "parent": "maven_repository"
@@ -590,7 +639,7 @@
           "description": "[Deprecated, please use commonRepository instead] Settings for a remote repository with a custom uri. Structure is [documented below](#nested_remote_repository_config_maven_repository_custom_repository).",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This is a deprecated remote upstream configuration block; current upstream security validation is represented through common_repository controls.",
           "compliant": null,
           "non-compliant": null,
           "parent": "maven_repository"
@@ -601,7 +650,7 @@
       "description": "",
       "required": null,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is a structural grouping entry used to document nested attributes and does not directly configure security behaviour by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -610,7 +659,7 @@
           "description": "Address of the remote repository. Default value is `NPMJS`. Possible values are: `NPMJS`.",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This selects a provider-supported public upstream preset; current security checks focus on approved custom/common upstream URIs and validation controls.",
           "compliant": null,
           "non-compliant": null,
           "parent": "npm_repository"
@@ -619,7 +668,7 @@
           "description": "[Deprecated, please use commonRepository instead] Settings for a remote repository with a custom uri. Structure is [documented below](#nested_remote_repository_config_npm_repository_custom_repository).",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This is a deprecated remote upstream configuration block; current upstream security validation is represented through common_repository controls.",
           "compliant": null,
           "non-compliant": null,
           "parent": "npm_repository"
@@ -630,7 +679,7 @@
       "description": "",
       "required": null,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is a structural grouping entry used to document nested attributes and does not directly configure security behaviour by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -639,7 +688,7 @@
           "description": "Address of the remote repository. Default value is `PYPI`. Possible values are: `PYPI`.",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This selects a provider-supported public upstream preset; current security checks focus on approved custom/common upstream URIs and validation controls.",
           "compliant": null,
           "non-compliant": null,
           "parent": "python_repository"
@@ -648,7 +697,7 @@
           "description": "[Deprecated, please use commonRepository instead] Settings for a remote repository with a custom uri. Structure is [documented below](#nested_remote_repository_config_python_repository_custom_repository).",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This is a deprecated remote upstream configuration block; current upstream security validation is represented through common_repository controls.",
           "compliant": null,
           "non-compliant": null,
           "parent": "python_repository"
@@ -659,7 +708,7 @@
       "description": "",
       "required": null,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is a structural grouping entry used to document nested attributes and does not directly configure security behaviour by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -668,7 +717,7 @@
           "description": "One of the publicly available Yum repositories supported by Artifact Registry. Structure is [documented below](#nested_remote_repository_config_yum_repository_public_repository).",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This selects a provider-supported public upstream preset; current security checks focus on approved custom/common upstream URIs and validation controls.",
           "compliant": null,
           "non-compliant": null,
           "parent": "yum_repository"
@@ -679,7 +728,7 @@
       "description": "",
       "required": null,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is a structural grouping entry used to document nested attributes and does not directly configure security behaviour by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -689,8 +738,14 @@
           "required": true,
           "security_impact": true,
           "rationale": "The approved_remote_upstreams policy allows only approved URI patterns and approved region/project/repository combinations.",
-          "compliant": ["https://us-central1-docker.pkg.dev/trusted-project/base-images", "https://australia-southeast1-docker.pkg.dev/shared-artifacts/approved-upstream"],
-          "non-compliant": ["https://registry-1.docker.io\"", "https://europe-west1-docker.pkg.dev/random/repo"],
+          "compliant": [
+            "https://us-central1-docker.pkg.dev/trusted-project/base-images",
+            "https://australia-southeast1-docker.pkg.dev/shared-artifacts/approved-upstream"
+          ],
+          "non-compliant": [
+            "https://registry-1.docker.io\"",
+            "https://europe-west1-docker.pkg.dev/random/repo"
+          ],
           "parent": "common_repository"
         }
       }
@@ -699,7 +754,7 @@
       "description": "",
       "required": null,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is a structural grouping entry used to document nested attributes and does not directly configure security behaviour by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -708,7 +763,7 @@
           "description": "Use username and password to access the remote repository. Structure is [documented below](#nested_remote_repository_config_upstream_credentials_username_password_credentials).",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This is only a credentials container and does not expose or validate credentials by itself.",
           "compliant": null,
           "non-compliant": null,
           "parent": "upstream_credentials"
@@ -719,7 +774,7 @@
       "description": "",
       "required": null,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is a structural grouping entry used to document nested attributes and does not directly configure security behaviour by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -728,7 +783,7 @@
           "description": "The username to access the remote repository.",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This is only the username component for remote authentication and does not provide secret material or change repository access policy by itself.",
           "compliant": null,
           "non-compliant": null,
           "parent": "username_password_credentials"
@@ -737,7 +792,7 @@
           "description": "The Secret Manager key version that holds the password to access the remote repository. Must be in the format of `projects/{project}/secrets/{secret}/versions/{version}`.",
           "required": false,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This references a Secret Manager version rather than storing a plaintext password; no current policy validates this reference directly.",
           "compliant": null,
           "non-compliant": null,
           "parent": "username_password_credentials"
