@@ -1,0 +1,163 @@
+{
+    "resource_name": "apigee_organization",
+    "subcategory": "Apigee",
+    "arguments": {
+      "project_id": {
+        "description": "The project ID associated with the Apigee organization.",
+        "required": true,
+        "security_impact": false,
+        "rationale": "It sets the project association and does not have any direct security impact.",
+        "compliant": null,
+        "non-compliant": null,
+        "parent": null
+      },
+      "display_name": {
+        "description": "The display name of the Apigee organization.",
+        "required": false,
+        "security_impact": false,
+        "rationale": "It sets the display name only and does not have any security impact.",
+        "compliant": null,
+        "non-compliant": null,
+        "parent": null
+      },
+      "description": {
+        "description": "Description of the Apigee organization.",
+        "required": false,
+        "security_impact": false,
+        "rationale": "It sets the description only and does not have any security impact.",
+        "compliant": null,
+        "non-compliant": null,
+        "parent": null
+      },
+      "analytics_region": {
+        "description": "Primary GCP region for analytics data storage.",
+        "required": false,
+        "security_impact": true,
+        "rationale": "Storing analytics data in unapproved regions may violate data residency and compliance requirements. Only approved regions should be used.",
+        "compliant": "us-central1",
+        "non-compliant": "us-east1",
+        "parent": null
+      },
+      "api_consumer_data_location": {
+        "description": "This field is needed only for customers using non-default data residency regions. Apigee stores some control plane data only in single region.",
+        "required": false,
+        "security_impact": false,
+        "rationale": "It sets the data residency location and does not have any direct security impact.",
+        "compliant": null,
+        "non-compliant": null,
+        "parent": null
+      },
+      "api_consumer_data_encryption_key_name": {
+        "description": "Cloud KMS key name used for encrypting API consumer data.",
+        "required": false,
+        "security_impact": true,
+        "rationale": "Without a Customer Managed Encryption Key (CMEK), API consumer data is encrypted using Google-managed keys which may not satisfy compliance requirements. CMEK ensures full control over encryption keys.",
+        "compliant": "projects/pde-proj/locations/us-central1/keyRings/pde-keyring/cryptoKeys/pde-key",
+        "non-compliant": null,
+        "parent": null
+      },
+      "control_plane_encryption_key_name": {
+        "description": "Cloud KMS key name used for encrypting control plane data that is stored in a multi region. Only used for the data residency region US or EU.",
+        "required": false,
+        "security_impact": true,
+        "rationale": "Without a Customer Managed Encryption Key (CMEK), control plane data is encrypted using Google-managed keys which may not satisfy compliance requirements. CMEK ensures full control over encryption keys for multi-region data.",
+        "compliant": "projects/pde-proj/locations/us-central1/keyRings/pde-keyring/cryptoKeys/pde-key",
+        "non-compliant": null,
+        "parent": null
+      },
+      "authorized_network": {
+        "description": "Compute Engine network used for Service Networking to be peered with Apigee runtime instances.",
+        "required": false,
+        "security_impact": false,
+        "rationale": "It sets the network peering configuration and does not have any direct security impact.",
+        "compliant": null,
+        "non-compliant": null,
+        "parent": null
+      },
+      "disable_vpc_peering": {
+        "description": "Flag that specifies whether the VPC Peering through Private Google Access should be disabled between the consumer network and Apigee.",
+        "required": false,
+        "security_impact": false,
+        "rationale": "It sets the VPC peering configuration and does not have any direct security impact.",
+        "compliant": null,
+        "non-compliant": null,
+        "parent": null
+      },
+      "runtime_type": {
+        "description": "Runtime type of the Apigee organization based on the Apigee subscription purchased. Possible values are: CLOUD, HYBRID.",
+        "required": false,
+        "security_impact": true,
+        "rationale": "Setting runtime_type to HYBRID runs Apigee on customer-managed infrastructure which increases operational complexity and security risk. CLOUD uses Google-managed infrastructure with built-in security controls.",
+        "compliant": "CLOUD",
+        "non-compliant": "HYBRID",
+        "parent": null
+      },
+      "billing_type": {
+        "description": "Billing type of the Apigee organization.",
+        "required": false,
+        "security_impact": false,
+        "rationale": "It sets the billing type only and does not have any security impact.",
+        "compliant": null,
+        "non-compliant": null,
+        "parent": null
+      },
+      "runtime_database_encryption_key_name": {
+        "description": "Cloud KMS key name used for encrypting the data that is stored and replicated across runtime instances. Update is not allowed after the organization is created.",
+        "required": false,
+        "security_impact": true,
+        "rationale": "Without a Customer Managed Encryption Key (CMEK), runtime database data is encrypted using Google-managed keys which may not satisfy compliance requirements. CMEK ensures full control over encryption of data replicated across runtime instances.",
+        "compliant": "projects/pde-proj/locations/us-central1/keyRings/pde-keyring/cryptoKeys/pde-key",
+        "non-compliant": null,
+        "parent": null
+      },
+      "retention": {
+        "description": "Controls how long Organization data will be retained after the initial delete operation completes. Possible values are: DELETION_RETENTION_UNSPECIFIED, MINIMUM.",
+        "required": false,
+        "security_impact": true,
+        "rationale": "Setting retention to DELETION_RETENTION_UNSPECIFIED does not guarantee minimum data retention after deletion, preventing recovery of accidentally deleted organizations. MINIMUM ensures data is retained for the minimum period.",
+        "compliant": "MINIMUM",
+        "non-compliant": "DELETION_RETENTION_UNSPECIFIED",
+        "parent": null
+      },
+      "properties": {
+        "description": "Properties defined in the Apigee organization profile.",
+        "required": false,
+        "security_impact": false,
+        "rationale": "It sets custom key-value properties and does not have any direct security impact.",
+        "compliant": "Refer to child argument",
+        "non-compliant": "Refer to child argument",
+        "parent": null,
+        "arguments": {
+          "property": {
+            "description": "List of all properties in the object.",
+            "required": false,
+            "security_impact": false,
+            "rationale": "It sets custom properties and does not have any security impact.",
+            "compliant": "Refer to child argument",
+            "non-compliant": "Refer to child argument",
+            "parent": "properties",
+            "arguments": {
+              "name": {
+                "description": "Name of the property.",
+                "required": false,
+                "security_impact": false,
+                "rationale": "It sets the property key name and does not have any security impact.",
+                "compliant": null,
+                "non-compliant": null,
+                "parent": "properties.property"
+              },
+              "value": {
+                "description": "Value of the property.",
+                "required": false,
+                "security_impact": false,
+                "rationale": "It sets the property value and does not have any security impact.",
+                "compliant": null,
+                "non-compliant": null,
+                "parent": "properties.property"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
