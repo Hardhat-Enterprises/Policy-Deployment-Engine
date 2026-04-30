@@ -1,5 +1,4 @@
 resource "google_iam_organizations_policy_binding" "c" {
-  name    = "c"
   organization      = "123456789"
   location          = "global"
   display_name      = "Compliant Org Policy Binding"
