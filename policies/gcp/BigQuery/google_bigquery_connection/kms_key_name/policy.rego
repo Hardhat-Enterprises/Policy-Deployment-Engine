@@ -8,8 +8,8 @@ conditions := [
         {
             "condition": "Check if kms_key_name is configured",
             "attribute_path": ["kms_key_name"],
-            "values": [""],
-            "policy_type": "blacklist"
+            "values": ["google_kms_crypto_key.crypto_key.id"],
+            "policy_type": "whitelist"
         }
     ]
 ]
