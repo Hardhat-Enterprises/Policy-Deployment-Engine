@@ -32,19 +32,19 @@
         "issuer_url": {
           "description": "A JSON Web Token (JWT) issuer URI. `issuer` must start with `https://`",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Restricting OIDC issuer URLs to approved identity providers prevents unauthorized authentication into the Kubernetes cluster. Using unapproved providers or non-HTTPS URIs could allow attackers to spoof identities and gain access to cluster resources.",
+          "compliant": "https://oidc.issuer.url",
+          "non-compliant": "http://oidc.issuer.url",
           "parent": "oidc_config"
         },
         "jwks": {
           "description": "OIDC verification keys in JWKS format (RFC 7517).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "A valid, Base64-encoded JSON Web Key Set (JWKS) is essential for the cluster to securely validate identity tokens. If the JWKS is missing, empty, or improperly formatted, the cluster cannot verify signatures on incoming JWTs, which breaks the secure authentication chain for system workloads.",
+          "compliant": "eyJrZXlzIjpbeyJrdHkiOiJSU0EiLCJub20iOiIifV19",
+          "non-compliant": "",
           "parent": "oidc_config"
         }
       }
@@ -52,19 +52,19 @@
     "platform_version": {
       "description": "The platform version for the cluster (e.g. `1.23.0-gke.1`).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Using outdated or unsupported platform versions exposes the cluster to known security vulnerabilities and potential integration failures with GCP services. Maintaining a modern platform version ensures that the latest security patches and performance improvements are applied.",
+      "compliant": "1.29.1-gke.1",
+      "non-compliant": "1.29.0-gke.1",
       "parent": null
     },
     "distribution": {
       "description": "The Kubernetes distribution of the underlying attached cluster. Supported values: \"eks\", \"aks\", \"generic\". The generic distribution provides the ability to register or migrate any CNCF conformant cluster.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Restricting distributions to 'eks' or 'aks' ensures that the cluster benefits from cloud-specific security optimizations and maintained compatibility with GCP's management layer. Using 'generic' distributions for production can lead to a lack of automated security features and potential integration failures.",
+      "compliant": "aks",
+      "non-compliant": "generic",
       "parent": null
     },
     "fleet": {
@@ -137,10 +137,10 @@
     "authorization": {
       "description": "Configuration related to the cluster RBAC settings. Structure is [documented below](#nested_authorization).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Restricting cluster admin groups to verified corporate domains (e.g., '@company.com') ensures that only authorized internal entities can exercise full control over the cluster. Allowing personal accounts or unapproved domains bypasses centralized identity management and increases the risk of unauthorized access or data exfiltration.",
+      "compliant": "abc@company.com",
+      "non-compliant": "xyz@random.com",
       "parent": null,
       "arguments": {
         "admin_users": {
@@ -186,10 +186,10 @@
     "binary_authorization": {
       "description": "Binary Authorization configuration. Structure is [documented below](#nested_binary_authorization).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Enabling Binary Authorization enforcement ensures that only verified, signed images are allowed to run on the cluster. Disabling this feature or leaving it unset allows unverified or potentially malicious container images to be deployed, significantly increasing the risk of a security breach.",
+      "compliant": "PROJECT_SINGLETON_POLICY_ENFORCE",
+      "non-compliant": "DISABLED",
       "parent": null,
       "arguments": {
         "evaluation_mode": {
@@ -253,12 +253,12 @@
       "parent": null
     },
     "deletion_policy": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "Policy of the resource deletion.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Setting the deletion policy to 'DELETE' ensures that the GCP control plane properly cleans up all associated metadata and memberships when the resource is destroyed. Using 'DELETE_IGNORE_ERRORS' can result in orphaned resources and an inconsistent state, making it difficult to re-register clusters or audit the infrastructure accurately.",
+      "compliant": "DELETE",
+      "non-compliant": "DELETE_IGNORE_ERRORS",
       "parent": null
     },
     "component_config": {
@@ -273,16 +273,16 @@
         "enable_components": {
           "description": "The components to be enabled. Each value may be one of: `SYSTEM_COMPONENTS`, `WORKLOADS`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Configuring specific logging components ensures that critical system-level data is streamed to Google Cloud Logging for long-term retention and analysis.",
+          "compliant": "SYSTEM_COMPONENTS",
+          "non-compliant": "WORKLOADS",
           "parent": "component_config"
         }
       }
     },
     "managed_prometheus_config": {
-      "description": "",
+      "description": "Enable Google Cloud Managed Service for Prometheus in the cluster.",
       "required": null,
       "security_impact": null,
       "rationale": null,
@@ -293,10 +293,10 @@
         "enabled": {
           "description": "Enable Managed Collection.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Managed Prometheus provides a scalable, secure way to collect metrics from the cluster. Disabling it creates a blind spot in the infrastructure's security posture.",
+          "compliant": true,
+          "non-compliant": false,
           "parent": "managed_prometheus_config"
         }
       }
@@ -322,10 +322,10 @@
         "namespace": {
           "description": "Namespace of the kubernetes secret containing the proxy config.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Restricting the namespace to 'kube-system' or 'gatekeeper-system' ensures that only administrative users with high-level permissions can manage the proxy lifecycle, maintaining the integrity of the cluster's network egress path.",
+          "compliant": "kube-system",
+          "non-compliant": "dev-team",
           "parent": "kubernetes_secret"
         }
       }
