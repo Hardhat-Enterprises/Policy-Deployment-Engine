@@ -1,4 +1,79 @@
-{
+{"partner_services_billing_account": {
+    "description": "Optional. Input only. Billing account necessary for purchasing services from Sovereign Partners. The format of this string is billingAccounts/AAAAAA-BBBBBB-CCCCCC.",
+    "required": false,
+    "security_impact": false,
+    "rationale": "This field is used for billing purposes only and does not affect the security posture of the workload.",
+    "compliant": null,
+    "non-compliant": null,
+    "parent": null
+},
+"provisioned_resources_parent": {
+    "description": "Input only. The parent resource for the resources managed by this Assured Workload. May be either empty or a folder resource which is a child of the Workload parent. If not specified all resources are created under the parent organization. Format: folders/{folder_id}",
+    "required": false,
+    "security_impact": false,
+    "rationale": "This field specifies the organisational hierarchy for resource placement and does not directly affect security controls.",
+    "compliant": null,
+    "non-compliant": null,
+    "parent": null
+},
+"resource_settings": {
+    "description": "Input only. Resource properties that are used to customize workload resources. These properties (such as custom project id) will be used to create workload resources if possible.",
+    "required": false,
+    "security_impact": false,
+    "rationale": "Resource settings are used to customise project and keyring identifiers and do not directly affect the security posture of the workload.",
+    "compliant": null,
+    "non-compliant": null,
+    "parent": null,
+    "arguments": {
+        "display_name": {
+            "description": "User-assigned resource display name. If not empty it will be used to create a resource with the specified name.",
+            "required": false,
+            "security_impact": false,
+            "rationale": "Display name is for identification only and has no security impact.",
+            "compliant": null,
+            "non-compliant": null,
+            "parent": "resource_settings"
+        },
+        "resource_id": {
+            "description": "Resource identifier. For a project this represents projectId. If the project is already taken, the workload creation will fail.",
+            "required": false,
+            "security_impact": false,
+            "rationale": "Resource ID is used for identification and does not affect the security of the workload.",
+            "compliant": null,
+            "non-compliant": null,
+            "parent": "resource_settings"
+        },
+        "resource_type": {
+            "description": "Indicates the type of resource. Possible values: RESOURCE_TYPE_UNSPECIFIED, CONSUMER_PROJECT, ENCRYPTION_KEYS_PROJECT, KEYRING, CONSUMER_FOLDER",
+            "required": false,
+            "security_impact": false,
+            "rationale": "Resource type specifies how resources are provisioned and does not directly impact security controls.",
+            "compliant": null,
+            "non-compliant": null,
+            "parent": "resource_settings"
+        }
+    }
+},
+"workload_options": {
+    "description": "Optional. Used to specify certain options for a workload during workload creation.",
+    "required": false,
+    "security_impact": false,
+    "rationale": "Workload options configure KAJ enrollment type and do not directly affect the general security posture of the workload.",
+    "compliant": null,
+    "non-compliant": null,
+    "parent": null,
+    "arguments": {
+        "kaj_enrollment_type": {
+            "description": "Indicates type of KAJ enrollment for the workload. Possible values: KAJ_ENROLLMENT_TYPE_UNSPECIFIED, FULL_KAJ, EKM_ONLY, KEY_ACCESS_TRANSPARENCY_OFF",
+            "required": false,
+            "security_impact": false,
+            "rationale": "KAJ enrollment type determines the level of Key Access Justifications transparency for Regional Controls workloads.",
+            "compliant": null,
+            "non-compliant": null,
+            "parent": "workload_options"
+        }
+    }
+},
   "resource_name": "assured_workloads_workload",
   "subcategory": "AssuredWorkloads",
   "arguments": {
