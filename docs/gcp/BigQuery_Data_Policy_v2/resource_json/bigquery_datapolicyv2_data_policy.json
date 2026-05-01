@@ -7,8 +7,8 @@
       "required": true,
       "security_impact": true,
       "rationale": "RAW_DATA_ACCESS_POLICY gives direct access to the data.",
-      "compliant": "Set `data_policy_type` to `DATA_MASKING_POLICY` or `COLUMN_LEVEL_SECURITY_POLICY`.",
-      "non-compliant": "Set `data_policy_type` to `RAW_DATA_ACCESS_POLICY`.",
+      "compliant": "DATA_MASKING_POLICY",
+      "non-compliant": "RAW_DATA_ACCESS_POLICY",
       "parent": null
     },
     "data_policy_id": {
@@ -25,8 +25,8 @@
       "required": true,
       "security_impact": true,
       "rationale": "Location can be restricted to approved regions.",
-      "compliant": "Set `location` to an approved AU region such as `australia-southeast1`.",
-      "non-compliant": "Set `location` to an unapproved region such as `europe-west1`.",
+      "compliant": "australia-southeast1",
+      "non-compliant": "europe-west1",
       "parent": null
     },
     "data_masking_policy": {
@@ -34,8 +34,8 @@
       "required": false,
       "security_impact": true,
       "rationale": "Masking rules affect how data is shown.",
-      "compliant": "Set `data_masking_policy` with an approved predefined expression or approved routine.",
-      "non-compliant": "Use a weak masking expression or an unapproved routine.",
+      "compliant": "{ predefined_expression = \"SHA256\" }",
+      "non-compliant": "{ predefined_expression = \"FIRST_FOUR_CHARACTERS\" }",
       "parent": null,
       "arguments": {
         "predefined_expression": {
@@ -43,8 +43,8 @@
           "required": false,
           "security_impact": true,
           "rationale": "The masking expression controls how much data is revealed.",
-          "compliant": "Set `predefined_expression` to `SHA256`, `RANDOM_HASH`, `ALWAYS_NULL`, `DEFAULT_MASKING_VALUE`, `EMAIL_MASK`, or `DATE_YEAR_MASK`.",
-          "non-compliant": "Set `predefined_expression` to a partial reveal value such as `FIRST_FOUR_CHARACTERS`.",
+          "compliant": "SHA256",
+          "non-compliant": "FIRST_FOUR_CHARACTERS",
           "parent": "data_masking_policy"
         },
         "routine": {
@@ -63,8 +63,8 @@
       "required": false,
       "security_impact": true,
       "rationale": "grantees controls who can access the data.",
-      "compliant": "Set `grantees` to approved principals only.",
-      "non-compliant": "Leave `grantees` empty, include `principalSet://goog/public:all`, include `principalSet://goog/cloudIdentityCustomerId/...`, or include direct user principals.",
+      "compliant": "[\"principal://iam.googleapis.com/projects/-/serviceAccounts/data-reader@pde.iam.gserviceaccount.com\"]",
+      "non-compliant": "[\"principalSet://goog/public:all\"], [], [\"principalSet://goog/cloudIdentityCustomerId/C0123456789\"], [\"principal://iam.googleapis.com/users/alice@example.com\"]",
       "parent": null
     },
     "project": {

@@ -12,8 +12,8 @@ conditions := [
         {
             "condition": "grantees must not contain domain-wide principals",
             "attribute_path": ["grantees"],
-            "values": ["principalSet://goog/cloudIdentityCustomerId/"],
-            "policy_type": "element blacklist"
+            "values": ["principalSet://goog/cloudIdentityCustomerId/C0123456789"],
+            "policy_type": "blacklist"
         }
     ]
 ]
