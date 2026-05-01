@@ -5,8 +5,8 @@
     "amount": {
       "description": "The budgeted amount for each usage period. Structure is [documented below](#nested_amount).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "Defines the monetary budget limit for a billing period. Enforcing a specified amount ensures cost control and prevents uncapped spending.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -14,17 +14,46 @@
         "specified_amount": {
           "description": "A specified amount to use as the budget. currencyCode is optional. If specified, it must match the currency of the billing account. The currencyCode is provided on output. Structure is [documented below](#nested_amount_specified_amount).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Specifies a fixed budget value. Using a specified amount rather than last_period_amount enforces a defined spending ceiling, treating any breach as a violation.",
           "compliant": null,
           "non-compliant": null,
-          "parent": "amount"
+          "parent": "amount",
+          "arguments": {
+            "currency_code": {
+              "description": "The 3-letter currency code defined in ISO 4217.",
+              "required": false,
+              "security_impact": false,
+              "rationale": "Defines the currency used for the specified budget amount. This supports financial accuracy and reporting but does not impact security.",
+              "compliant": "AUD",
+              "non-compliant": "USD",
+              "parent": "specified_amount"
+            },
+            "units": {
+              "description": "The whole units of the budget amount.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "The budget amount must be explicitly set and within an approved range of 1 to 1000000 units. A null value means no fixed budget is defined, and values exceeding 1000000 represent unreasonably large or uncapped spending, both of which are treated as violations.",
+              "compliant": "500",
+              "non-compliant": "2000000",
+              "parent": "specified_amount"
+            },
+            "nanos": {
+              "description": "Number of nano (10^-9) units of the amount. The value must be between -999,999,999 and +999,999,999 inclusive.",
+              "required": false,
+              "security_impact": false,
+              "rationale": "Represents the fractional portion of the budget amount. This improves precision in financial configuration but does not affect security controls.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "specified_amount"
+            }
+          }
         },
         "last_period_amount": {
           "description": "Configures a budget amount that is automatically set to 100% of last period's spend. Boolean. Set value to true to use. Do not set to false, instead use the `specified_amount` block.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Automatically adjusts the budget based on previous usage. This is a financial convenience feature and has no direct security implications.",
           "compliant": null,
           "non-compliant": null,
           "parent": "amount"
@@ -34,17 +63,17 @@
     "billing_account": {
       "description": "ID of the billing account to set a budget on.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": false,
+      "rationale": "Identifies the billing account associated with the budget. While required for correct configuration, it does not enforce or influence security controls.",
+      "compliant": "000000-0000000-0000000-000000",
+      "non-compliant": "Empty or null",
       "parent": null
     },
     "display_name": {
       "description": "User data for display name in UI. Must be <= 60 chars.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Used only for identification and display purposes in the user interface. It has no effect on security or system behavior.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -52,8 +81,8 @@
     "budget_filter": {
       "description": "Filters that define which resources are used to compute the actual spend against the budget. Structure is [documented below](#nested_budget_filter).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Defines the scope of resources included in budget calculations. This supports cost tracking and reporting but does not enforce or influence security controls.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -61,8 +90,8 @@
         "projects": {
           "description": "A set of projects of the form projects/{project_number}, specifying that usage from only this set of projects should be included in the budget. If omitted, the report will include all usage for the billing account, regardless of which project the usage occurred on.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Limits budget calculation to specific projects. This improves cost visibility but does not impact security enforcement.",
           "compliant": null,
           "non-compliant": null,
           "parent": "budget_filter"
@@ -70,8 +99,8 @@
         "resource_ancestors": {
           "description": "A set of folder and organization names of the form folders/{folderId} or organizations/{organizationId}, specifying that usage from only this set of folders and organizations should be included in the budget. If omitted, the budget includes all usage that the billing account pays for. If the folder or organization contains projects that are paid for by a different Cloud Billing account, the budget doesn't apply to those projects.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Scopes budget calculation to organizational structure. This is a governance and reporting feature rather than a security control.",
           "compliant": null,
           "non-compliant": null,
           "parent": "budget_filter"
@@ -79,8 +108,8 @@
         "credit_types_treatment": {
           "description": "Specifies how credits should be treated when determining spend for threshold calculations. Default value is `INCLUDE_ALL_CREDITS`. Possible values are: `INCLUDE_ALL_CREDITS`, `EXCLUDE_ALL_CREDITS`, `INCLUDE_SPECIFIED_CREDITS`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Controls how billing credits are applied in cost calculations. This affects financial reporting but has no direct security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "budget_filter"
@@ -88,8 +117,8 @@
         "services": {
           "description": "A set of services of the form services/{service_id}, specifying that usage from only this set of services should be included in the budget. If omitted, the report will include usage for all the services. The service names are available through the Catalog API: https://cloud.google.com/billing/v1/how-tos/catalog-api.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Filters budget calculations by service usage. This improves cost attribution but does not influence system security.",
           "compliant": null,
           "non-compliant": null,
           "parent": "budget_filter"
@@ -97,8 +126,8 @@
         "credit_types": {
           "description": "Optional. If creditTypesTreatment is INCLUDE_SPECIFIED_CREDITS, this is a list of credit types to be subtracted from gross cost to determine the spend for threshold calculations. See a list of acceptable credit type values. If creditTypesTreatment is not INCLUDE_SPECIFIED_CREDITS, this field must be empty. **Note:** If the field has a value in the config and needs to be removed, the field has to be an empty array in the config.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Controls how billing credits are applied in cost calculations. This affects financial reporting but has no direct security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "budget_filter"
@@ -106,8 +135,8 @@
         "subaccounts": {
           "description": "A set of subaccounts of the form billingAccounts/{account_id}, specifying that usage from only this set of subaccounts should be included in the budget. If a subaccount is set to the name of the parent account, usage from the parent account will be included. If the field is omitted, the report will include usage from the parent account and all subaccounts, if they exist. **Note:** If the field has a value in the config and needs to be removed, the field has to be an empty array in the config.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Scopes budget tracking to specific subaccounts. This is used for cost management and does not enforce security controls.",
           "compliant": null,
           "non-compliant": null,
           "parent": "budget_filter"
@@ -115,8 +144,8 @@
         "labels": {
           "description": "A single label and value pair specifying that usage from only this set of labeled resources should be included in the budget.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Filters resources based on labels for cost tracking purposes. This supports organization but does not impact security.",
           "compliant": null,
           "non-compliant": null,
           "parent": "budget_filter"
@@ -124,8 +153,8 @@
         "calendar_period": {
           "description": "A CalendarPeriod represents the abstract concept of a recurring time period that has a canonical start. Grammatically, \"the start of the current CalendarPeriod\". All calendar times begin at 12 AM US and Canadian Pacific Time (UTC-8). Exactly one of `calendar_period`, `custom_period` must be provided. Possible values are: `MONTH`, `QUARTER`, `YEAR`, `CALENDAR_PERIOD_UNSPECIFIED`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Determines the time interval for budget tracking. This is a scheduling and reporting feature, not a security control.",
           "compliant": null,
           "non-compliant": null,
           "parent": "budget_filter"
@@ -133,8 +162,8 @@
         "custom_period": {
           "description": "Specifies to track usage from any start date (required) to any end date (optional). This time period is static, it does not recur. Exactly one of `calendar_period`, `custom_period` must be provided. Structure is [documented below](#nested_budget_filter_custom_period).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Allows flexible time range configuration for budget tracking. This impacts budget reporting only and has no security relevance.",
           "compliant": null,
           "non-compliant": null,
           "parent": "budget_filter"
@@ -144,8 +173,8 @@
     "threshold_rules": {
       "description": "Rules that trigger alerts (notifications of thresholds being crossed) when spend exceeds the specified percentages of the budget. Structure is [documented below](#nested_threshold_rules).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "Threshold rules ensure that alerts are triggered before spending exceeds the budget. Without them, overspending goes undetected.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -153,17 +182,17 @@
         "threshold_percent": {
           "description": "Send an alert when this threshold is exceeded. This is a 1.0-based percentage, so 0.5 = 50%. Must be >= 0.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Defines the percentage threshold for triggering alerts. A null or missing value means no alert threshold is set, allowing spend to exceed the budget silently.",
+          "compliant": "1",
+          "non-compliant": "Empty or null",
           "parent": "threshold_rules"
         },
         "spend_basis": {
           "description": "The type of basis used to determine if spend has passed the threshold. Default value is `CURRENT_SPEND`. Possible values are: `CURRENT_SPEND`, `FORECASTED_SPEND`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Specifies whether alerts are based on current or forecasted spend. This affects reporting behaviour but does not enforce security controls.",
           "compliant": null,
           "non-compliant": null,
           "parent": "threshold_rules"
@@ -173,8 +202,8 @@
     "all_updates_rule": {
       "description": "Defines notifications that are sent on every update to the billing account's spend, regardless of the thresholds defined using threshold rules. Structure is [documented below](#nested_all_updates_rule).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Defines how budget update notifications are delivered. This supports billing visibility and operational awareness, but does not directly enforce or influence security controls.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -182,8 +211,8 @@
         "pubsub_topic": {
           "description": "The name of the Cloud Pub/Sub topic where budget related messages will be published, in the form projects/{project_id}/topics/{topic_id}. Updates are sent at regular intervals to the topic.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Specifies the Pub/Sub destination for budget update messages. This controls notification delivery only and does not itself enforce security.",
           "compliant": null,
           "non-compliant": null,
           "parent": "all_updates_rule"
@@ -191,8 +220,8 @@
         "schema_version": {
           "description": "The schema version of the notification. Only \"1.0\" is accepted. It represents the JSON schema as defined in https://cloud.google.com/billing/docs/how-to/budgets#notification_format.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Defines the format version of the notification payload. This affects message structure and compatibility rather than security behaviour.",
           "compliant": null,
           "non-compliant": null,
           "parent": "all_updates_rule"
@@ -200,8 +229,8 @@
         "monitoring_notification_channels": {
           "description": "The full resource name of a monitoring notification channel in the form projects/{project_id}/notificationChannels/{channel_id}. A maximum of 5 channels are allowed.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Specifies the monitoring channels used to receive budget notifications. This supports alert delivery and operational monitoring, but does not directly enforce security controls.",
           "compliant": null,
           "non-compliant": null,
           "parent": "all_updates_rule"
@@ -209,17 +238,17 @@
         "disable_default_iam_recipients": {
           "description": "Boolean. When set to true, disables default notifications sent when a threshold is exceeded. Default recipients are those with Billing Account Administrators and Billing Account Users IAM roles for the target account.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Setting this to true silences billing admins from receiving budget alerts, which can mask runaway spending. It must be set to false to ensure the right people are always notified.",
+          "compliant": "False",
+          "non-compliant": "True",
           "parent": "all_updates_rule"
         },
         "enable_project_level_recipients": {
           "description": "When set to true, and when the budget has a single project configured, notifications will be sent to project level recipients of that project. This field will be ignored if the budget has multiple or no project configured. Currently, project level recipients are the users with Owner role on a cloud project.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Controls whether project-level recipients receive budget notifications for a single configured project. This is a notification routing feature and does not impact security.",
           "compliant": null,
           "non-compliant": null,
           "parent": "all_updates_rule"
@@ -229,55 +258,17 @@
     "ownership_scope": {
       "description": "The ownership scope of the budget. The ownership scope and users' IAM permissions determine who has full access to the budget's data. Possible values are: `OWNERSHIP_SCOPE_UNSPECIFIED`, `ALL_USERS`, `BILLING_ACCOUNT`.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Determines who can access budget data in combination with IAM permissions. This has security impact because it affects visibility of billing information and helps limit access to financial data.",
+      "compliant": "BILLING_ACCOUNT",
+      "non-compliant": "ALL_USERS",
       "parent": null
     },
-    "specified_amount": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "currency_code": {
-          "description": "The 3-letter currency code defined in ISO 4217.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "specified_amount"
-        },
-        "units": {
-          "description": "The whole units of the amount. For example if currencyCode is \"USD\", then 1 unit is one US dollar.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "specified_amount"
-        },
-        "nanos": {
-          "description": "Number of nano (10^-9) units of the amount. The value must be between -999,999,999 and +999,999,999 inclusive. If units is positive, nanos must be positive or zero. If units is zero, nanos can be positive, zero, or negative. If units is negative, nanos must be negative or zero. For example $-1.75 is represented as units=-1 and nanos=-750,000,000.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "specified_amount"
-        }
-      }
-    },
     "custom_period": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "Specifies a custom time period for tracking budget spend.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Defines a fixed time range for budget monitoring. This supports billing and reporting configuration but does not enforce or influence security controls.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -285,96 +276,78 @@
         "start_date": {
           "description": "A start date is required. The start date must be after January 1, 2017. Structure is [documented below](#nested_budget_filter_custom_period_start_date).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Defines when the custom budget tracking period begins. This is a reporting and budgeting setting with no direct security impact.",
           "compliant": null,
           "non-compliant": null,
-          "parent": "custom_period"
+          "parent": "custom_period",
+          "arguments": {
+            "year": {
+              "description": "Year of the date. Must be from 1 to 9999.",
+              "required": true,
+              "security_impact": false,
+              "rationale": "Specifies the year component of the start date. This is part of date formatting and does not affect security.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "start_date"
+            },
+            "month": {
+              "description": "Month of a year. Must be from 1 to 12.",
+              "required": true,
+              "security_impact": false,
+              "rationale": "Specifies the month component of the start date. This is part of date configuration and has no direct security impact",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "start_date"
+            },
+            "day": {
+              "description": "Day of a month. Must be from 1 to 31 and valid for the year and month.",
+              "required": true,
+              "security_impact": false,
+              "rationale": "Specifies the day component of the start date. This supports valid date definition and does not influence security controls.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "start_date"
+            }
+          }
         },
         "end_date": {
           "description": "Optional. The end date of the time period. Budgets with elapsed end date won't be processed. If unset, specifies to track all usage incurred since the startDate. Structure is [documented below](#nested_budget_filter_custom_period_end_date).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Defines when the custom budget tracking period ends. This affects the duration of budget monitoring but does not influence security controls.",
           "compliant": null,
           "non-compliant": null,
-          "parent": "custom_period"
-        }
-      }
-    },
-    "start_date": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "year": {
-          "description": "Year of the date. Must be from 1 to 9999.",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "start_date"
-        },
-        "month": {
-          "description": "Month of a year. Must be from 1 to 12.",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "start_date"
-        },
-        "day": {
-          "description": "Day of a month. Must be from 1 to 31 and valid for the year and month.",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "start_date"
-        }
-      }
-    },
-    "end_date": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null,
-      "arguments": {
-        "year": {
-          "description": "Year of the date. Must be from 1 to 9999.",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "end_date"
-        },
-        "month": {
-          "description": "Month of a year. Must be from 1 to 12.",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "end_date"
-        },
-        "day": {
-          "description": "Day of a month. Must be from 1 to 31 and valid for the year and month.",
-          "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "end_date"
+          "parent": "custom_period",
+          "arguments": {
+            "year": {
+              "description": "Year of the date. Must be from 1 to 9999.",
+              "required": true,
+              "security_impact": false,
+              "rationale": "Defines when the custom budget tracking period ends. This affects reporting duration but does not influence security controls.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "end_date"
+            },
+            "month": {
+              "description": "Month of a year. Must be from 1 to 12.",
+              "required": true,
+              "security_impact": false,
+              "rationale": "Specifies the month component of the end date. This is part of date configuration and does not affect security.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "end_date"
+            },
+            "day": {
+              "description": "Day of a month. Must be from 1 to 31 and valid for the year and month.",
+              "required": true,
+              "security_impact": false,
+              "rationale": "Specifies the day component of the end date. This supports valid date definition and does not influence security controls.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "end_date"
+            }
+          }
         }
       }
     }
