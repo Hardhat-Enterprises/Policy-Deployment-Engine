@@ -31,8 +31,8 @@ def extract_affected_services(changed_files: List[str]) -> Set[str]:
     services = set()
     
     for file_path in changed_files:
-        # Match inputs/gcp/<service>/* or policies/gcp/<service>/*
-        if "inputs/gcp/" in file_path or "policies/gcp/" in file_path:
+        # Match inputs/gcp/<service>/* or policies/gcp/<service>/* or docs/gcp/<service>/*
+        if "inputs/gcp/" in file_path or "policies/gcp/" in file_path or "docs/gcp/" in file_path:
             parts = file_path.split("/")
             try:
                 idx = parts.index("gcp")
@@ -44,6 +44,92 @@ def extract_affected_services(changed_files: List[str]) -> Set[str]:
                 continue
     
     return services
+
+
+def categorize_services_by_changes(changed_files: List[str]) -> Tuple[Set[str], Set[str], Set[str]]:
+    """
+    Categorize services by type of changes made.
+    
+    Returns:
+        Tuple of (docs_services, inputs_services, policies_services)
+    """
+    docs_services = set()
+    inputs_services = set()
+    policies_services = set()
+    
+    for file_path in changed_files:
+        parts = file_path.split("/")
+        try:
+            if "docs/gcp/" in file_path:
+                idx = parts.index("gcp")
+                if idx + 1 < len(parts):
+                    service = parts[idx + 1]
+                    if service:
+                        docs_services.add(service)
+            elif "inputs/gcp/" in file_path:
+                idx = parts.index("gcp")
+                if idx + 1 < len(parts):
+                    service = parts[idx + 1]
+                    if service:
+                        inputs_services.add(service)
+            elif "policies/gcp/" in file_path:
+                idx = parts.index("gcp")
+                if idx + 1 < len(parts):
+                    service = parts[idx + 1]
+                    if service:
+                        policies_services.add(service)
+        except (ValueError, IndexError):
+            continue
+    
+    return docs_services, inputs_services, policies_services
+
+
+def determine_required_label(changed_files: List[str]) -> str:
+    """
+    Determine if PR should get 'CI-Approved' or 'CI-Review-Required' label.
+    
+    CI-Approved: All affected services have changes in /docs, /inputs, AND /policies
+    CI-Review-Required: Otherwise
+    """
+    # Get affected services
+    affected_services = extract_affected_services(changed_files)
+    
+    if not affected_services:
+        return "CI-Review-Required"
+    
+    # Categorize changes
+    docs_services, inputs_services, policies_services = categorize_services_by_changes(changed_files)
+    
+    # Check if all affected services have all three types of changes
+    all_complete = all(
+        service in docs_services and 
+        service in inputs_services and 
+        service in policies_services
+        for service in affected_services
+    )
+    
+    return "CI-Approved" if all_complete else "CI-Review-Required"
+
+
+def add_pr_label(label: str) -> int:
+    """Add label to the PR."""
+    pr_number = os.getenv("PR_NUMBER")
+    if not pr_number:
+        print("PR_NUMBER environment variable not set, skipping label assignment")
+        return 0
+    
+    result = subprocess.run(
+        ["gh", "pr", "edit", pr_number, "--add-label", label],
+        capture_output=True,
+        text=True
+    )
+    
+    if result.returncode != 0:
+        print(f"Error adding label '{label}': {result.stderr}")
+        return 1
+    
+    print(f"Label '{label}' added to PR {pr_number}")
+    return 0
 
 
 def run_policy_checks(services: Set[str]) -> Tuple[str, int, str]:
@@ -197,6 +283,11 @@ def main():
     
     # Write GitHub summary
     write_github_summary(overall_status, test_output)
+    
+    # Determine and add label
+    required_label = determine_required_label(changed_files)
+    print(f"Assigning label: {required_label}")
+    label_result = add_pr_label(required_label)
     
     # Create and post PR comment
     if os.getenv("PR_NUMBER"):
