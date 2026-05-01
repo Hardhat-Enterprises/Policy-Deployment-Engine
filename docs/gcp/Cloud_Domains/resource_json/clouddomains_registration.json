@@ -14,10 +14,10 @@
         "currency_code": {
           "description": "The three-letter currency code defined in ISO 4217.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Restricting the payment currency to USD ensures predictable billing and avoids exchange rate fluctuations or unauthorized regional cost variations.",
+          "compliant": "USD",
+          "non-compliant": "EUR",
           "parent": "yearly_price"
         },
         "units": {
@@ -43,10 +43,10 @@
         "privacy": {
           "description": "Required. Privacy setting for the contacts associated with the Registration. Values are PUBLIC_CONTACT_DATA, PRIVATE_CONTACT_DATA, and REDACTED_CONTACT_DATA",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Contact privacy (WHOIS protection) is essential to prevent personal data exposure and reduce the risk of spear-phishing and social engineering attacks against domain owners.",
+          "compliant": "PRIVATE_CONTACT_DATA",
+          "non-compliant": "PUBLIC_CONTACT_DATA",
           "parent": "contact_settings"
         },
         "registrant_contact": {
@@ -99,19 +99,19 @@
     "labels": {
       "description": "Set of labels associated with the Registration. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Mandatory labels are used for resource governance, cost tracking, and environment classification (e.g., 'env', 'owner').",
+      "compliant": "{ \"env\": \"production\", \"owner\": \"it-team\" }",
+      "non-compliant": "{}",
       "parent": null
     },
     "domain_notices": {
       "description": "The list of domain notices that you acknowledge. Possible value is HSTS_PRELOADED",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Acknowledging HSTS preloading ensures that the domain is included in the HSTS preload list, which forces browsers to always use HTTPS, preventing SSL stripping and man-in-the-middle attacks.",
+      "compliant": "[\"HSTS_PRELOADED\"]",
+      "non-compliant": "[]",
       "parent": null
     },
     "contact_notices": {
@@ -133,9 +133,9 @@
       "parent": null,
       "arguments": {
         "renewal_method": {
-          "description": "(Output) Output only. The actual renewal method for this Registration. When preferredRenewalMethod is set to AUTOMATIC_RENEWAL, the actual renewalMethod can be equal to RENEWAL_DISABLED\u2014for example, when there are problems with the billing account or reported domain abuse. In such cases, check the issues field on the Registration. After the problem is resolved, the renewalMethod is automatically updated to preferredRenewalMethod in a few hours.",
+          "description": "(Output) Output only. The actual renewal method for this Registration. When preferredRenewalMethod is set to AUTOMATIC_RENEWAL, the actual renewalMethod can be equal to RENEWAL_DISABLED—for example, when there are problems with the billing account or reported domain abuse. In such cases, check the issues field on the Registration. After the problem is resolved, the renewalMethod is automatically updated to preferredRenewalMethod in a few hours.",
           "required": null,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -144,19 +144,19 @@
         "preferred_renewal_method": {
           "description": "The desired renewal method for this Registration. The actual renewalMethod is automatically updated to reflect this choice. If unset or equal to RENEWAL_METHOD_UNSPECIFIED, the actual renewalMethod is treated as if it were set to AUTOMATIC_RENEWAL. You cannot use RENEWAL_DISABLED during resource creation, and you can update the renewal status only when the Registration resource has state ACTIVE or SUSPENDED. When preferredRenewalMethod is set to AUTOMATIC_RENEWAL, the actual renewalMethod can be set to RENEWAL_DISABLED in case of problems with the billing account or reported domain abuse. In such cases, check the issues field on the Registration. After the problem is resolved, the renewalMethod is automatically updated to preferredRenewalMethod in a few hours.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Automatic renewal ensures the domain remains active and owned by the organization, preventing service downtime or competitive domain acquisition due to expiration.",
+          "compliant": "AUTOMATIC_RENEWAL",
+          "non-compliant": "RENEWAL_DISABLED",
           "parent": "management_settings"
         },
         "transfer_lock_state": {
           "description": "Controls whether the domain can be transferred to another registrar. Values are UNLOCKED or LOCKED.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Enabling transfer lock prevents unauthorized domain transfers, protecting the organization's online presence from domain hijacking.",
+          "compliant": "TRANSFER_LOCK_ENABLED",
+          "non-compliant": "TRANSFER_LOCK_DISABLED",
           "parent": "management_settings"
         }
       }
@@ -211,10 +211,10 @@
         "email": {
           "description": "Required. Email address of the contact.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Restricting contact emails to official organizational domains ensures that critical domain management communications and password resets are controlled by the organization rather than personal accounts.",
+          "compliant": "user@example.com",
+          "non-compliant": "user@gmail.com",
           "parent": "registrant_contact"
         },
         "phone_number": {
@@ -258,10 +258,10 @@
         "region_code": {
           "description": "Required. CLDR region code of the country/region of the address. This is never inferred and it is up to the user to ensure the value is correct. See https://cldr.unicode.org/ and https://www.unicode.org/cldr/charts/30/supplemental/territory_information.html for details. Example: \"CH\" for Switzerland.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Restricting the registration region code (e.g., to AU) ensures compliance with local data residency regulations and organizational geographic governance policies.",
+          "compliant": "AU",
+          "non-compliant": "US",
           "parent": "postal_address"
         },
         "postal_code": {
@@ -294,10 +294,10 @@
         "organization": {
           "description": "The name of the organization at the address.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Enforcing the corporate organization name in contact details ensures legal consistency and prevents domain registration under unauthorized entities.",
+          "compliant": "Example Corp",
+          "non-compliant": "Hacker Inc",
           "parent": "postal_address"
         },
         "address_lines": {
@@ -426,19 +426,19 @@
         "name_servers": {
           "description": "Required. A list of name servers that store the DNS zone for this domain. Each name server is a domain name, with Unicode domain names expressed in Punycode format.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Using authorized name servers (e.g., Google Cloud DNS) is critical to prevent DNS hijacking and ensure high availability of domain resolution.",
+          "compliant": "[\"ns-cloud-c*.googledomains.com.\"]",
+          "non-compliant": "[\"ns1.unauthorized.com.\"]",
           "parent": "custom_dns"
         },
         "ds_records": {
           "description": "The list of DS records for this domain, which are used to enable DNSSEC. The domain's DNS provider can provide the values to set here. If this field is empty, DNSSEC is disabled. Structure is [documented below](#nested_dns_settings_custom_dns_ds_records).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "DNSSEC signs DNS records with digital signatures, ensuring that the DNS response received by a client has not been tampered with or forged, thus preventing DNS hijacking and cache poisoning.",
+          "compliant": "ds_records { ... } (non-empty)",
+          "non-compliant": "(empty list)",
           "parent": "custom_dns"
         }
       }
