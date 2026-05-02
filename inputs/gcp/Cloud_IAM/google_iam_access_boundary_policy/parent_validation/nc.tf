@@ -1,14 +1,14 @@
 resource "google_iam_access_boundary_policy" "nc" {
   parent = "invalid-parent-format"
 
-  name   = "pde-my-ab-policy" 
+  name   = "allmost" 
 
-  display_name = "Invalid Access Boundary Policy"
+  display_name = "safsdd"
 
   rules {
     access_boundary_rule {
-      available_resource    = "//storage.googleapis.com/projects/_/buckets/my-bucket"
-      available_permissions = ["inRole:roles/storage.objectViewer"]
+      available_resource    = "//storagsde.googleapis.com/projects/_/buckets/my-bucket"
+      available_permissions = ["inRole:rsdaoles/storage.objectViewer"]
     }
   }
 }
