@@ -1,6 +1,6 @@
 resource "google_iam_oauth_client" "nc" {
   oauth_client_id   = "example-client-id"
-  display_name      = ""  
+  display_name      = "23424asd"
   description       = "Invalid OAuth Client"
   location          = "global"
   disabled          = false
