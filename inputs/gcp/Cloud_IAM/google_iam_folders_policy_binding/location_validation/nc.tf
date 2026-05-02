@@ -1,4 +1,5 @@
 resource "google_iam_folders_policy_binding" "nc" {
+  name = "nc"
   folder            = "123456789"
   location          = "australia-southeast1"
   policy_binding_id = "binding-nc"

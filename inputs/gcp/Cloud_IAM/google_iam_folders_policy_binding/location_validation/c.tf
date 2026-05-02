@@ -1,4 +1,5 @@
 resource "google_iam_folders_policy_binding" "c" {
+  name = "c"
   folder            = "123456789"
   location          = "global"
   policy_binding_id = "binding-c"
