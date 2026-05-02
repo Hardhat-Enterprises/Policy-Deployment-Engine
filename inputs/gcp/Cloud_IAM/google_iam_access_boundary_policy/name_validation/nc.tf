@@ -1,7 +1,7 @@
 resource "google_iam_access_boundary_policy" "nc" {
   parent       = urlencode("cloudresourcemanager.googleapis.com/projects/my-project")
   name         = "pde-test-policy"
-  display_name = "Bad Policy"
+  display_name = "nc"
 
   rules {
     description = "Weak rule"
