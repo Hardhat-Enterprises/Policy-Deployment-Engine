@@ -1,7 +1,9 @@
 resource "google_iam_access_boundary_policy" "nc" {
-  parent       = ""
-  name         = "restricted-ab-policy"
-  display_name = "Restricted Access Boundary Policy"
+  parent = "invalid-parent-format"
+
+  name   = "pde-my-ab-policy" 
+
+  display_name = "Invalid Access Boundary Policy"
 
   rules {
     access_boundary_rule {
