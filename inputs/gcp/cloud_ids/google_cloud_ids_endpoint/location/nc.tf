@@ -1,7 +1,7 @@
 resource "google_cloud_ids_endpoint" "nc" {
   project  = "test-project"
 
-  name     = "ids-test"
+  name     = "nc"
   location = "europe-west1"  
 
   network  = "projects/test-project/global/networks/private-vpc"
