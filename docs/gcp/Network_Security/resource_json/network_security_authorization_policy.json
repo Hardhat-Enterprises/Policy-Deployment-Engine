@@ -3,12 +3,12 @@
   "subcategory": "Network Security",
   "arguments": {
     "action": {
-      "description": "The action to take when a rule match is found. Possible values are \"ALLOW\" or \"DENY\". Possible values are: `ALLOW`, `DENY`.",
+      "description": "The action to take when a rule match is found. Possible values are \"ALLOW\" or \"DENY\".",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Only allow action value `ALLOW`.",
+      "compliant": ["\"ALLOW\""],
+      "non-compliant": ["\"DENY\""],
       "parent": null
     },
     "name": {
@@ -124,30 +124,30 @@
       "parent": null,
       "arguments": {
         "hosts": {
-          "description": "List of host names to match. Matched against the \":authority\" header in http requests. At least one host should match. Each host can be an exact match, or a prefix match (example \"mydomain.*\") or a suffix match (example \"*.myorg.com\") or a presence (any) match \"*\".",
+          "description": "List of destination hosts to match in the authorization policy rule.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Only allow example.com",
+          "compliant": ["example.com"],
+          "non-compliant": ["name.com"],
           "parent": "destinations"
         },
         "ports": {
-          "description": "List of destination ports to match. At least one port should match.",
+          "description": "List of destination ports to match. This policy only allows HTTPS traffic on port 443.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "The policy.rego uses a whitelist check on the attribute path [\"rules\", 0, \"destinations\", 0, \"ports\"] and only permits the value 443. The non-compliant configuration sets ports = [80], which violates the policy.",
+          "compliant": [443],
+          "non-compliant": [80],
           "parent": "destinations"
         },
         "methods": {
-          "description": "A list of HTTP methods to match. At least one method should match. Should not be set for gRPC services.",
+          "description": "List of HTTP methods to match.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Restricts authorization policy destination methods to GET only.",
+          "compliant": ["GET"],
+          "non-compliant": ["DELETE"],
           "parent": "destinations"
         },
         "http_header_match": {
