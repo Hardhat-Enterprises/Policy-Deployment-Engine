@@ -1,6 +1,6 @@
 resource "google_iam_access_boundary_policy" "nc" {
   name   = ""          
-  parent = "cloudresourcemanager.googleapis.com/projects/my-project-id"
+  parent = "invalid-parent"
   display_name = "My AB policy"
   rules {
     description = "AB rule"

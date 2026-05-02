@@ -1,5 +1,5 @@
 resource "google_iam_access_boundary_policy" "nc" {
-  name         = "also-valid-name"  
+  name         = ""  
   parent       = "invalid-parent"    
   display_name = "Invalid parent policy"
 
