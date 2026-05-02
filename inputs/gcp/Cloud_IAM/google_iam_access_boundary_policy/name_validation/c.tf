@@ -3,7 +3,7 @@ resource "google_iam_access_boundary_policy" "c" {
 
   parent       = urlencode("cloudresourcemanager.googleapis.com/projects/my-project")
   name         = "pde-secure-boundary-01"
-  display_name = "c"
+  display_name = "Production Access Boundary Policy"
 
   rules {
     description = "Secure rule"
