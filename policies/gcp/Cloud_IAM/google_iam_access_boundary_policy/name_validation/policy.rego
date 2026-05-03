@@ -3,7 +3,10 @@ package terraform.gcp.security.Cloud_IAM.google_iam_access_boundary_policy.name_
 import data.terraform.helpers
 import data.terraform.gcp.security.Cloud_IAM.google_iam_access_boundary_policy.vars
 
+# STEP 2: CREATE SCENARIOS
 conditions := [
+
+  # ✅ Scenario 1: Naming convention
   [
     {
       "situation_description": "Policy name must follow secure naming convention",
@@ -21,6 +24,8 @@ conditions := [
       "policy_type": "pattern whitelist"
     }
   ],
+
+  # ✅ Scenario 2: Weak keyword detection (FIXED)
   [
     {
       "situation_description": "Policy name must not contain weak keywords",
@@ -31,12 +36,18 @@ conditions := [
     {
       "condition": "Disallow weak keywords",
       "attribute_path": ["name"],
-      "values": ["test", "temp", "demo"],
-      "policy_type": "blacklist"
+      "values": [".*(test|temp|demo).*"],
+      "policy_type": "pattern blacklist"
     }
   ]
 ]
 
+# ✅ IMPORTANT FIX: ensure resources are always mentioned
 result := helpers.get_multi_summary(conditions, vars.variables)
-message := result.message
+
+message := sprintf(
+  "%s | Checked Resources: %v",
+  [result.message, helpers.get_all_resource_names(vars.variables)]
+)
+
 details := result.details

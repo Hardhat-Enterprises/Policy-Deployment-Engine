@@ -1,7 +1,7 @@
 resource "google_iam_access_boundary_policy" "c" {
   parent = urlencode("cloudresourcemanager.googleapis.com/projects/my-project")
 
-  name   = "c" 
+  name   = "pde-my-ab-policy" 
 
   display_name = "Valid Access Boundary Policy"
 
