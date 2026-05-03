@@ -1,6 +1,6 @@
 resource "google_iam_access_boundary_policy" "nc" {
   parent = "projects/my-valid-project"   
-  name   = "nc-policy-1"
+  name   = "nc"
 
   rules {
     description = "NC rule"

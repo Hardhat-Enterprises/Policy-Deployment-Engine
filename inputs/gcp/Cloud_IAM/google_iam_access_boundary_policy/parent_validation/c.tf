@@ -1,6 +1,6 @@
 resource "google_iam_access_boundary_policy" "c" {
   parent = "cloudresourcemanager.googleapis.com/projects/my-valid-project"
-  name   = "example-policy"
+  name   = "c"
 
   rules {
     description = "Allow access to storage"
