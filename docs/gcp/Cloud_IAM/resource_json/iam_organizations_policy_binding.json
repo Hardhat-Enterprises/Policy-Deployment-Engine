@@ -2,59 +2,132 @@
   "resource_name": "iam_organizations_policy_binding",
   "subcategory": "Cloud IAM",
   "arguments": {
-    "organization": {
-      "description": "Numeric organization ID for binding.",
+    "target": {
+      "description": "Target is the full resource name of the resource to which the policy will be bound. Immutable once set.",
       "required": true,
       "security_impact": true,
-      "rationale": "Ensures policy is attached to correct organization boundary.",
-      "compliant": "123456789",
-      "non-compliant": "org-name",
+      "rationale": "Defines the exact principal scope for IAM binding enforcement, preventing unauthorized identity expansion.",
+      "compliant": "//cloudresourcemanager.googleapis.com/organizations/123456789",
+      "non-compliant": "//cloudresourcemanager.googleapis.com/projects/untrusted-project",
+      "parent": null,
+      "arguments": {
+        "principal_set": {
+          "description": "Full Resource Name of the principal set used for principal access boundary policy bindings.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Ensures only approved identity domains (org/workforce/workspace) are used.",
+          "compliant": "//cloudresourcemanager.googleapis.com/organizations/123456789",
+          "non-compliant": "//cloudresourcemanager.googleapis.com/organizations/000000000",
+          "parent": "target"
+        }
+      }
+    },
+
+    "policy": {
+      "description": "Required. Immutable. The resource name of the policy to be bound.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Ensures binding only approved Principal Access Boundary policies within the organization.",
+      "compliant": "organizations/123456789/locations/global/principalAccessBoundaryPolicies/pde-policy-1",
+      "non-compliant": "organizations/123456789/locations/global/principalAccessBoundaryPolicies/unknown-policy",
       "parent": null
     },
-    "location": {
-      "description": "Must always be global.",
+
+    "organization": {
+      "description": "Parent organization of the Policy Binding.",
       "required": true,
       "security_impact": true,
-      "rationale": "IAM bindings must be globally consistent.",
+      "rationale": "Ensures IAM governance is enforced at the correct organizational boundary.",
+      "compliant": "123456789",
+      "non-compliant": "999999999",
+      "parent": null
+    },
+
+    "location": {
+      "description": "The location of the Policy Binding",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Enforces centralized IAM policy binding control.",
       "compliant": "global",
       "non-compliant": "us-central1",
       "parent": null
     },
+
     "policy_binding_id": {
-      "description": "Unique identifier for policy binding.",
+      "description": "The Policy Binding ID.",
       "required": true,
       "security_impact": true,
-      "rationale": "Ensures unique tracking of bindings.",
-      "compliant": "binding-001",
-      "non-compliant": "binding#1",
+      "rationale": "Ensures unique identification of IAM policy bindings.",
+      "compliant": "org-binding-001",
+      "non-compliant": "invalid binding id!!",
       "parent": null
     },
+
     "display_name": {
-      "description": "Human readable name for policy binding.",
+      "description": "Optional description of the policy binding.",
       "required": false,
       "security_impact": false,
-      "rationale": "No security impact.",
-      "compliant": "Org Binding",
-      "non-compliant": "",
+      "rationale": "Improves readability and auditability.",
+      "compliant": "Org Access Boundary Binding",
+      "non-compliant": "x",
       "parent": null
     },
+
     "annotations": {
-      "description": "User-defined metadata annotations.",
+      "description": "User-defined annotations for metadata tagging.",
       "required": false,
       "security_impact": false,
-      "rationale": "Used for tagging only.",
-      "compliant": {},
-      "non-compliant": {},
+      "rationale": "Used for governance and tracking only.",
+      "compliant": { "env": "prod" },
+      "non-compliant": { "env": "test" },
       "parent": null
     },
+
     "policy_kind": {
-      "description": "Type of policy: PRINCIPAL_ACCESS_BOUNDARY or ACCESS.",
+      "description": "Type of policy attached in this binding.",
       "required": false,
       "security_impact": true,
-      "rationale": "Controls IAM enforcement behavior.",
-      "compliant": "ACCESS",
-      "non-compliant": "UNKNOWN",
+      "rationale": "Restricts IAM binding to secure boundary enforcement policies.",
+      "compliant": "PRINCIPAL_ACCESS_BOUNDARY",
+      "non-compliant": "ACCESS",
       "parent": null
+    },
+
+    "condition": {
+      "description": "CEL condition for fine-grained policy enforcement.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Allows conditional IAM enforcement based on attributes.",
+      "arguments": {
+        "expression": {
+          "description": "CEL expression controlling IAM access.",
+          "required": false,
+          "compliant": "request.time < timestamp('2026-12-31T00:00:00Z')",
+          "non-compliant": "true",
+          "parent": "condition"
+        },
+        "title": {
+          "description": "Short title of the condition.",
+          "required": false,
+          "compliant": "Time Restricted Access",
+          "non-compliant": "",
+          "parent": "condition"
+        },
+        "description": {
+          "description": "Description of the condition logic.",
+          "required": false,
+          "compliant": "Restricts access based on time window",
+          "non-compliant": "",
+          "parent": "condition"
+        },
+        "location": {
+          "description": "Error reporting location metadata.",
+          "required": false,
+          "compliant": "global",
+          "non-compliant": "unknown",
+          "parent": "condition"
+        }
+      }
     }
   }
 }

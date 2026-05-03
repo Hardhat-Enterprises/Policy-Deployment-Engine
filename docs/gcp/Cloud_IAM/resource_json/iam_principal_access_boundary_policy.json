@@ -3,49 +3,118 @@
   "subcategory": "Cloud IAM",
   "arguments": {
     "organization": {
-      "description": "Numeric organization ID.",
+      "description": "The parent organization of the principal access boundary policy.",
       "required": true,
       "security_impact": true,
-      "rationale": "Defines IAM boundary scope at organization level.",
-      "compliant": "123456789",
-      "non-compliant": "org-name",
+      "rationale": "Restricting policies to approved organizations ensures IAM governance boundaries and prevents cross-tenant privilege escalation.",
+      "compliant": "PDE1, PDE2, PDE3",
+      "non-compliant": "random-org-123",
       "parent": null
     },
     "location": {
-      "description": "Must always be global.",
+      "description": "The location the principal access boundary policy is in.",
       "required": true,
       "security_impact": true,
-      "rationale": "Ensures centralized IAM enforcement.",
+      "rationale": "Enforcing global location ensures consistent IAM policy enforcement and avoids regional misconfiguration risks.",
       "compliant": "global",
       "non-compliant": "us-central1",
       "parent": null
     },
     "principal_access_boundary_policy_id": {
-      "description": "Policy ID (2–62 chars, lowercase, numbers, hyphen, dot allowed).",
+      "description": "The ID to use to create the principal access boundary policy. This value must start with a lowercase letter followed by up to 62 lowercase letters, numbers, hyphens, or dots.",
       "required": true,
-      "security_impact": true,
-      "rationale": "Ensures valid IAM naming standard.",
+      "security_impact": false,
+      "rationale": "Ensures consistent naming conventions for policy identification and avoids invalid resource creation.",
       "compliant": "pab-policy-01",
-      "non-compliant": "INVALID_ID",
+      "non-compliant": "PAB_POLICY_01",
       "parent": null
     },
     "display_name": {
-      "description": "Display name of policy.",
+      "description": "The description of the principal access boundary policy. Must be less than or equal to 63 characters.",
       "required": false,
       "security_impact": false,
-      "rationale": "No security impact.",
-      "compliant": "PAB Policy",
-      "non-compliant": "",
+      "rationale": null,
+      "compliant": "Standard Access Boundary Policy",
+      "non-compliant": "Very long or unclear name exceeding limits",
       "parent": null
     },
     "annotations": {
-      "description": "Metadata tags for policy.",
+      "description": "User defined annotations for metadata tagging and governance tracking.",
       "required": false,
       "security_impact": false,
-      "rationale": "Only metadata.",
-      "compliant": {},
-      "non-compliant": {},
+      "rationale": "Used for auditability and classification of IAM policies.",
+      "compliant": "env=prod, owner=security-team",
+      "non-compliant": "free-form or unstructured metadata",
       "parent": null
+    },
+    "details": {
+      "description": "Principal access boundary policy details.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Defines enforcement rules that restrict principal access to approved resources.",
+      "parent": null,
+      "arguments": {
+        "rules": {
+          "description": "A list of principal access boundary policy rules.",
+          "required": true,
+          "security_impact": true,
+          "rationale": "Rules define which resources principals can access under the boundary policy.",
+          "compliant": "ALLOW only approved organizations/projects/folders",
+          "non-compliant": "ALLOW all or overly broad resources",
+          "parent": "details"
+        },
+        "enforcement_version": {
+          "description": "Version of enforcement for Google Cloud services included in policy.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Ensures controlled rollout of enforcement changes across services.",
+          "compliant": "latest or pinned version",
+          "non-compliant": "empty or unmanaged versioning",
+          "parent": "details"
+        }
+      }
+    },
+    "rules": {
+      "description": "Policy rules defining access boundaries for principals.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Rules define the actual enforcement of access boundaries across resources.",
+      "parent": null,
+      "arguments": {
+        "description": {
+          "description": "The description of the principal access boundary policy rule.",
+          "required": false,
+          "security_impact": false,
+          "rationale": null,
+          "compliant": "Allow access to approved project set only",
+          "non-compliant": "Unrestricted or vague rule description",
+          "parent": "rules"
+        },
+        "resources": {
+          "description": "Cloud Resource Manager resources included in this rule.",
+          "required": true,
+          "security_impact": true,
+          "rationale": "Restricts access to approved organizations, folders, or projects only.",
+          "compliant": [
+            "//cloudresourcemanager.googleapis.com/organizations/123",
+            "//cloudresourcemanager.googleapis.com/folders/123",
+            "//cloudresourcemanager.googleapis.com/projects/approved-project"
+          ],
+          "non-compliant": [
+            "//cloudresourcemanager.googleapis.com/projects/*"
+          ],
+          "parent": "rules"
+        },
+        "effect": {
+          "description": "The access relationship of principals to resources.",
+          "required": true,
+          "security_impact": true,
+          "rationale": "Defines whether access is allowed under the boundary policy.",
+          "compliant": "ALLOW",
+          "non-compliant": "DENY or undefined behavior",
+          "parent": "rules"
+        }
+      }
     }
   }
 }

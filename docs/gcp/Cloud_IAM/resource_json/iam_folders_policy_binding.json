@@ -1,147 +1,82 @@
 {
   "resource_name": "iam_folders_policy_binding",
   "subcategory": "Cloud IAM",
-  "arguments": {
-    "folder": {
-      "description": "The parent folder for the IAM policy binding. Must be a valid numeric GCP folder ID.",
-      "required": true,
-      "security_impact": true,
-      "rationale": "Ensures IAM policy is applied only at a valid folder scope.",
-      "compliant": "224774388",
-      "non-compliant": "my-folder",
-      "parent": null
-    },
 
+  "arguments": {
     "location": {
-      "description": "The location of the policy binding. Must always be global for folder IAM bindings.",
+      "description": "The location of the PolicyBinding.",
       "required": true,
-      "security_impact": true,
-      "rationale": "IAM folder bindings are global to ensure consistent access control.",
+      "security_impact": "Restricting location prevents cross-region policy sprawl and enforces governance boundaries.",
+      "rationale": "IAM folder policy bindings must be deployed only in a controlled location to ensure consistent enforcement.",
       "compliant": "global",
       "non-compliant": "us-central1",
       "parent": null
     },
 
-    "policy_binding_id": {
-      "description": "Unique identifier for the policy binding.",
-      "required": true,
-      "security_impact": true,
-      "rationale": "Ensures each binding is uniquely identifiable.",
-      "compliant": "folder-binding-01",
-      "non-compliant": "Folder Binding 01",
-      "parent": null
-    },
-
-    "display_name": {
-      "description": "Optional human-readable name for the policy binding (max 63 characters).",
-      "required": false,
-      "security_impact": false,
-      "rationale": "Used only for display purposes.",
-      "compliant": "Folder IAM Binding",
-      "non-compliant": "This name is way too long and not valid for IAM folder binding display name usage",
-      "parent": null
-    },
-
-    "annotations": {
-      "description": "Optional metadata used for tagging and classification.",
-      "required": false,
-      "security_impact": false,
-      "rationale": "Does not affect IAM security enforcement.",
-      "compliant": {
-        "environment": "dev",
-        "team": "security"
-      },
-      "non-compliant": {
-        "notes": "this is an invalid overly long annotation example used for testing purposes and should not be used in production environments because it violates expected size constraints"
-      },
-      "parent": null
-    },
-
     "policy_kind": {
-      "description": "Type of IAM policy being applied (e.g., ACCESS or PRINCIPAL_ACCESS_BOUNDARY).",
+      "description": "The kind of the policy to attach in this binding.",
       "required": false,
-      "security_impact": true,
-      "rationale": "Defines how IAM policy is enforced.",
-      "compliant": "ACCESS",
-      "non-compliant": "INVALID_TYPE",
+      "security_impact": "Restricting policy kind prevents misuse of non-boundary IAM policies and reduces privilege escalation risk.",
+      "rationale": "Only Principal Access Boundary policies are allowed in folder-level bindings to enforce least privilege.",
+      "compliant": "PRINCIPAL_ACCESS_BOUNDARY",
+      "non-compliant": "ACCESS",
+      "parent": null
+    },
+
+    "policy": {
+      "description": "The resource name of the policy to be bound.",
+      "required": true,
+      "security_impact": "Ensures only approved enterprise IAM boundary policies are enforced at folder level.",
+      "rationale": "Binding must reference only approved Principal Access Boundary policies created by the organization security team.",
+      "compliant": [
+        "organizations/123456789/locations/global/principalAccessBoundaryPolicies/pde-policy-1",
+        "organizations/123456789/locations/global/principalAccessBoundaryPolicies/pde-policy-2"
+      ],
+      "non-compliant": [
+        "organizations/999999999/locations/global/principalAccessBoundaryPolicies/unapproved-policy"
+      ],
       "parent": null
     },
 
     "target": {
-      "description": "Full resource name of the target folder where the policy is applied.",
+      "description": "Target is the full resource name of the resource to which the policy will be bound.",
       "required": true,
-      "security_impact": true,
-      "rationale": "Defines the exact scope of IAM enforcement.",
-      "compliant": "//cloudresourcemanager.googleapis.com/folders/224774388",
-      "non-compliant": "//invalid/resource",
+      "security_impact": "Restricts IAM enforcement scope to approved folder-level principals only.",
+      "rationale": "Ensures policy bindings apply only to controlled folder-level resources.",
+      "compliant": "//cloudresourcemanager.googleapis.com/folders/123456789",
+      "non-compliant": "//cloudresourcemanager.googleapis.com/folders/external-folder",
       "parent": null,
 
       "arguments": {
         "principal_set": {
-          "description": "Principal set used for access boundary enforcement within the folder.",
+          "description": "Full Resource Name of the principal set used for policy bindings.",
           "required": false,
-          "security_impact": true,
-          "rationale": "Restricts access to approved identities within folder boundary.",
-          "compliant": "//cloudresourcemanager.googleapis.com/folders/224774388",
-          "non-compliant": "//cloudresourcemanager.googleapis.com/projects/123",
+          "security_impact": "Prevents unauthorized principal escalation by restricting access scope.",
+          "rationale": "Only folder-level principal sets should be allowed for IAM folder policy bindings.",
+          "compliant": "//cloudresourcemanager.googleapis.com/folders/123456789",
+          "non-compliant": "//cloudresourcemanager.googleapis.com/folders/999999999",
           "parent": "target"
         }
       }
     },
 
-    "condition": {
-      "description": "Optional CEL condition for conditional IAM access control.",
-      "required": false,
-      "security_impact": true,
-      "rationale": "Enables fine-grained access control rules.",
-      "compliant": {
-        "expression": "resource.name.startsWith('folders/')",
-        "title": "Folder access rule",
-        "description": "Allows access only to folder resources"
-      },
-      "non-compliant": {
-        "expression": "true"
-      },
-      "parent": null,
+    "policy_binding_id": {
+      "description": "The Policy Binding ID.",
+      "required": true,
+      "security_impact": "Ensures traceability and prevents duplicate or rogue bindings.",
+      "rationale": "Each binding must have a unique controlled identifier.",
+      "compliant": "pde-folder-binding-1",
+      "non-compliant": "test-binding",
+      "parent": null
+    },
 
-      "arguments": {
-        "expression": {
-          "description": "CEL expression defining IAM condition logic.",
-          "required": false,
-          "security_impact": true,
-          "rationale": "Controls conditional access behavior.",
-          "compliant": "resource.name.startsWith('folders/')",
-          "non-compliant": "true",
-          "parent": "condition"
-        },
-        "title": {
-          "description": "Short title for the condition.",
-          "required": false,
-          "security_impact": false,
-          "rationale": "For readability only.",
-          "compliant": "Folder Condition",
-          "non-compliant": "",
-          "parent": "condition"
-        },
-        "description": {
-          "description": "Detailed explanation of the condition.",
-          "required": false,
-          "security_impact": false,
-          "rationale": "Documentation purpose only.",
-          "compliant": "Restricts access to folder-level resources",
-          "non-compliant": "",
-          "parent": "condition"
-        },
-        "location": {
-          "description": "Debug location for condition evaluation.",
-          "required": false,
-          "security_impact": false,
-          "rationale": "Used for error tracing.",
-          "compliant": "global",
-          "non-compliant": "",
-          "parent": "condition"
-        }
-      }
+    "display_name": {
+      "description": "Optional description of the policy binding.",
+      "required": false,
+      "security_impact": "Helps identify IAM bindings for auditing and governance.",
+      "rationale": "Standard naming improves traceability in enterprise IAM systems.",
+      "compliant": "pde-secure-folder-binding",
+      "non-compliant": "test"
     }
   }
 }

@@ -10,11 +10,33 @@ Reference: [Terraform Registry – iam_access_boundary_policy](https://registry.
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `name` | The name of the policy. | true | false | We enforce a simple naming rule (pde-*) so all policies follow the same pattern and are easy to identify. | pde-access-boundary-prod | myPolicy123 |
-| `parent` | The resource where this policy is attached. | true | false | Parent must always be a valid GCP project or organization path so the policy applies correctly. | cloudresourcemanager.googleapis.com/projects/123456789 | projects/test-project |
-| `rules` | Rules that define what resources and permissions are allowed. | true | false | We use rules to enforce least privilege and limit access only to required resources. | None | None |
-| `display_name` | A simple name shown in the console. | false | false | Used for readability and easier management. | Production Access Boundary Policy | test |
-| `access_boundary_rule` | Defines which resources and permissions are allowed. | false | false | We use this to enforce least privilege access in GCP. | None | None |
-| `available_resource` | The GCP resource that is allowed. | false | false | Avoids access to wrong or sensitive projects. | //cloudresourcemanager.googleapis.com/projects/123456789 | //cloudresourcemanager.googleapis.com/projects/random-project |
-| `available_permissions` | Permissions allowed for the resource. | false | false | We only allow required permissions instead of full access. | ['resourcemanager.projects.get'] | ['*'] |
-| `availability_condition` | Extra condition to control when access is allowed. | false | false | Used to restrict access under specific conditions only. | {'expression': "request.time < timestamp('2026-12-31T00:00:00Z')", 'title': 'Time limit', 'description': 'Access allowed only before expiry date', 'location': 'global'} | {'expression': 'true'} |
+| `name` | The name of the policy. | true | false | None | None | None |
+| `parent` | The attachment point is identified by its URL-encoded full resource name. | true | false | None | None | None |
+| `rules` | Rules to be applied. Structure is [documented below](#nested_rules). | true | false | None | None | None |
+| `display_name` | The display name of the rule. | false | false | None | None | None |
+| `access_boundary_rule` |  | false | false | None | None | None |
+| `availability_condition` |  | false | false | None | None | None |
+
+### rules Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `description` | The description of the rule. | false | false | None | None | None |
+| `access_boundary_rule` | An access boundary rule in an IAM policy. Structure is [documented below](#nested_rules_rules_access_boundary_rule). | false | false | None | None | None |
+
+### access_boundary_rule Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `available_resource` | The full resource name of a Google Cloud resource entity. | false | false | None | None | None |
+| `available_permissions` | A list of permissions that may be allowed for use on the specified resource. | false | false | None | None | None |
+| `availability_condition` | The availability condition further constrains the access allowed by the access boundary rule. Structure is [documented below](#nested_rules_rules_access_boundary_rule_availability_condition). | false | false | None | None | None |
+
+### availability_condition Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `expression` | Textual representation of an expression in Common Expression Language syntax. | true | false | None | None | None |
+| `title` | Title for the expression, i.e. a short string describing its purpose. This can be used e.g. in UIs which allow to enter the expression. | false | false | None | None | None |
+| `description` | Description of the expression. This is a longer text which describes the expression, e.g. when hovered over it in a UI. | false | false | None | None | None |
+| `location` | String indicating the location of the expression for error reporting, e.g. a file name and a position in the file. | false | false | None | None | None |

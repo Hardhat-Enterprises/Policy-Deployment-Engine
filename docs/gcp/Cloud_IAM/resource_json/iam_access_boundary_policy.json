@@ -5,88 +5,143 @@
     "name": {
       "description": "The name of the policy.",
       "required": true,
-      "security_impact": "If naming is not consistent, it becomes hard to manage or track policies in GCP.",
-      "rationale": "We enforce a simple naming rule (pde-*) so all policies follow the same pattern and are easy to identify.",
-      "compliant": "pde-access-boundary-prod",
-      "non-compliant": "myPolicy123",
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
       "parent": null
     },
-
     "parent": {
-      "description": "The resource where this policy is attached.",
+      "description": "The attachment point is identified by its URL-encoded full resource name.",
       "required": true,
-      "security_impact": "If parent is wrong, policy may be applied to the wrong project or not applied at all.",
-      "rationale": "Parent must always be a valid GCP project or organization path so the policy applies correctly.",
-      "compliant": "cloudresourcemanager.googleapis.com/projects/123456789",
-      "non-compliant": "projects/test-project",
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
       "parent": null
     },
-
     "rules": {
-      "description": "Rules that define what resources and permissions are allowed.",
+      "description": "Rules to be applied. Structure is [documented below](#nested_rules).",
       "required": true,
-      "security_impact": "Rules control access. Wrong rules can give too much access or block needed access.",
-      "rationale": "We use rules to enforce least privilege and limit access only to required resources.",
+      "security_impact": null,
+      "rationale": null,
       "compliant": null,
       "non-compliant": null,
-      "parent": null
+      "parent": null,
+      "arguments": {
+        "description": {
+          "description": "The description of the rule.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        },
+        "access_boundary_rule": {
+          "description": "An access boundary rule in an IAM policy. Structure is [documented below](#nested_rules_rules_access_boundary_rule).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "rules"
+        }
+      }
     },
-
     "display_name": {
-      "description": "A simple name shown in the console.",
+      "description": "The display name of the rule.",
       "required": false,
-      "security_impact": "Helps identify policies easily in UI.",
-      "rationale": "Used for readability and easier management.",
-      "compliant": "Production Access Boundary Policy",
-      "non-compliant": "test",
-      "parent": null
-    },
-
-    "access_boundary_rule": {
-      "description": "Defines which resources and permissions are allowed.",
-      "required": false,
-      "security_impact": "Prevents users from accessing unauthorized resources.",
-      "rationale": "We use this to enforce least privilege access in GCP.",
+      "security_impact": null,
+      "rationale": null,
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
-
-    "available_resource": {
-      "description": "The GCP resource that is allowed.",
-      "required": false,
-      "security_impact": "Restricts access to only approved projects or resources.",
-      "rationale": "Avoids access to wrong or sensitive projects.",
-      "compliant": "//cloudresourcemanager.googleapis.com/projects/123456789",
-      "non-compliant": "//cloudresourcemanager.googleapis.com/projects/random-project",
-      "parent": "access_boundary_rule"
+    "access_boundary_rule": {
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "available_resource": {
+          "description": "The full resource name of a Google Cloud resource entity.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "access_boundary_rule"
+        },
+        "available_permissions": {
+          "description": "A list of permissions that may be allowed for use on the specified resource.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "access_boundary_rule"
+        },
+        "availability_condition": {
+          "description": "The availability condition further constrains the access allowed by the access boundary rule. Structure is [documented below](#nested_rules_rules_access_boundary_rule_availability_condition).",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "access_boundary_rule"
+        }
+      }
     },
-
-    "available_permissions": {
-      "description": "Permissions allowed for the resource.",
-      "required": false,
-      "security_impact": "Prevents giving full admin access accidentally.",
-      "rationale": "We only allow required permissions instead of full access.",
-      "compliant": ["resourcemanager.projects.get"],
-      "non-compliant": ["*"],
-      "parent": "access_boundary_rule"
-    },
-
     "availability_condition": {
-      "description": "Extra condition to control when access is allowed.",
-      "required": false,
-      "security_impact": "Adds extra safety like time-based or condition-based access control.",
-      "rationale": "Used to restrict access under specific conditions only.",
-      "compliant": {
-        "expression": "request.time < timestamp('2026-12-31T00:00:00Z')",
-        "title": "Time limit",
-        "description": "Access allowed only before expiry date",
-        "location": "global"
-      },
-      "non-compliant": {
-        "expression": "true"
-      },
-      "parent": "access_boundary_rule"
+      "description": "",
+      "required": null,
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "expression": {
+          "description": "Textual representation of an expression in Common Expression Language syntax.",
+          "required": true,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "availability_condition"
+        },
+        "title": {
+          "description": "Title for the expression, i.e. a short string describing its purpose. This can be used e.g. in UIs which allow to enter the expression.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "availability_condition"
+        },
+        "description": {
+          "description": "Description of the expression. This is a longer text which describes the expression, e.g. when hovered over it in a UI.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "availability_condition"
+        },
+        "location": {
+          "description": "String indicating the location of the expression for error reporting, e.g. a file name and a position in the file.",
+          "required": false,
+          "security_impact": null,
+          "rationale": null,
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "availability_condition"
+        }
+      }
     }
   }
 }

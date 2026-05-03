@@ -10,26 +10,15 @@ Reference: [Terraform Registry – iam_folders_policy_binding](https://registry.
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `folder` | The parent folder for the IAM policy binding. Must be a valid numeric GCP folder ID. | true | true | Ensures IAM policy is applied only at a valid folder scope. | 224774388 | my-folder |
-| `location` | The location of the policy binding. Must always be global for folder IAM bindings. | true | true | IAM folder bindings are global to ensure consistent access control. | global | us-central1 |
-| `policy_binding_id` | Unique identifier for the policy binding. | true | true | Ensures each binding is uniquely identifiable. | folder-binding-01 | Folder Binding 01 |
-| `display_name` | Optional human-readable name for the policy binding (max 63 characters). | false | false | Used only for display purposes. | Folder IAM Binding | This name is way too long and not valid for IAM folder binding display name usage |
-| `annotations` | Optional metadata used for tagging and classification. | false | false | Does not affect IAM security enforcement. | {'environment': 'dev', 'team': 'security'} | {'notes': 'this is an invalid overly long annotation example used for testing purposes and should not be used in production environments because it violates expected size constraints'} |
-| `policy_kind` | Type of IAM policy being applied (e.g., ACCESS or PRINCIPAL_ACCESS_BOUNDARY). | false | true | Defines how IAM policy is enforced. | ACCESS | INVALID_TYPE |
-| `target` | Full resource name of the target folder where the policy is applied. | true | true | Defines the exact scope of IAM enforcement. | //cloudresourcemanager.googleapis.com/folders/224774388 | //invalid/resource |
-| `condition` | Optional CEL condition for conditional IAM access control. | false | true | Enables fine-grained access control rules. | {'expression': "resource.name.startsWith('folders/')", 'title': 'Folder access rule', 'description': 'Allows access only to folder resources'} | {'expression': 'true'} |
+| `location` | The location of the PolicyBinding. | true | false | IAM folder policy bindings must be deployed only in a controlled location to ensure consistent enforcement. | global | us-central1 |
+| `policy_kind` | The kind of the policy to attach in this binding. | false | false | Only Principal Access Boundary policies are allowed in folder-level bindings to enforce least privilege. | PRINCIPAL_ACCESS_BOUNDARY | ACCESS |
+| `policy` | The resource name of the policy to be bound. | true | false | Binding must reference only approved Principal Access Boundary policies created by the organization security team. | ['organizations/123456789/locations/global/principalAccessBoundaryPolicies/pde-policy-1', 'organizations/123456789/locations/global/principalAccessBoundaryPolicies/pde-policy-2'] | ['organizations/999999999/locations/global/principalAccessBoundaryPolicies/unapproved-policy'] |
+| `target` | Target is the full resource name of the resource to which the policy will be bound. | true | false | Ensures policy bindings apply only to controlled folder-level resources. | //cloudresourcemanager.googleapis.com/folders/123456789 | //cloudresourcemanager.googleapis.com/folders/external-folder |
+| `policy_binding_id` | The Policy Binding ID. | true | false | Each binding must have a unique controlled identifier. | pde-folder-binding-1 | test-binding |
+| `display_name` | Optional description of the policy binding. | false | false | Standard naming improves traceability in enterprise IAM systems. | pde-secure-folder-binding | test |
 
 ### target Block
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `principal_set` | Principal set used for access boundary enforcement within the folder. | false | true | Restricts access to approved identities within folder boundary. | //cloudresourcemanager.googleapis.com/folders/224774388 | //cloudresourcemanager.googleapis.com/projects/123 |
-
-### condition Block
-
-| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
-|----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `expression` | CEL expression defining IAM condition logic. | false | true | Controls conditional access behavior. | resource.name.startsWith('folders/') | true |
-| `title` | Short title for the condition. | false | false | For readability only. | Folder Condition |  |
-| `description` | Detailed explanation of the condition. | false | false | Documentation purpose only. | Restricts access to folder-level resources |  |
-| `location` | Debug location for condition evaluation. | false | false | Used for error tracing. | global |  |
+| `principal_set` | Full Resource Name of the principal set used for policy bindings. | false | false | Only folder-level principal sets should be allowed for IAM folder policy bindings. | //cloudresourcemanager.googleapis.com/folders/123456789 | //cloudresourcemanager.googleapis.com/folders/999999999 |

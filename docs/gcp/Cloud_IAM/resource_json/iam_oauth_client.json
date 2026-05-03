@@ -2,101 +2,101 @@
   "resource_name": "iam_oauth_client",
   "subcategory": "Cloud IAM",
   "arguments": {
-    "location": {
-      "description": "Location where the OAuth client is deployed. Must always be global.",
+    "allowed_scopes": {
+      "description": "Required. The list of scopes that the OauthClient is allowed to request during OAuth flows.",
       "required": true,
       "security_impact": true,
-      "rationale": "Ensures OAuth configuration consistency across GCP IAM services.",
+      "rationale": "Restricting scopes enforces least privilege OAuth access and prevents over-permissioned identity delegation.",
+      "compliant": ["openid", "email", "groups"],
+      "non-compliant": ["https://www.googleapis.com/auth/cloud-platform"],
+      "parent": null
+    },
+
+    "allowed_grant_types": {
+      "description": "Required. The list of OAuth grant types is allowed for the OauthClient.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Ensures only approved OAuth flows are used to prevent insecure authentication mechanisms.",
+      "compliant": ["AUTHORIZATION_CODE_GRANT"],
+      "non-compliant": ["IMPLICIT_GRANT"],
+      "parent": null
+    },
+
+    "allowed_redirect_uris": {
+      "description": "Required. The list of redirect URIs allowed after OAuth authentication.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Prevents open redirect attacks and ensures tokens are only sent to trusted endpoints.",
+      "compliant": ["https://www.example.com/callback"],
+      "non-compliant": ["http://evil.com"],
+      "parent": null
+    },
+
+    "location": {
+      "description": "Resource ID segment making up resource name.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "OAuth clients must be deployed in global scope to ensure consistent IAM enforcement.",
       "compliant": "global",
       "non-compliant": "us-central1",
       "parent": null
     },
 
     "oauth_client_id": {
-      "description": "Unique OAuth client ID. Must be 6–63 characters, lowercase letters, digits, or hyphens. Cannot start or end with hyphen and cannot use 'gcp-' prefix.",
+      "description": "Required. The ID used for the OauthClient resource.",
       "required": true,
       "security_impact": true,
-      "rationale": "Prevents insecure or invalid OAuth client identifiers.",
+      "rationale": "Ensures predictable naming and avoids reserved prefix misuse.",
       "compliant": "example-client-01",
-      "non-compliant": "gcp-client-01-",
-      "parent": null
-    },
-
-    "client_type": {
-      "description": "Type of OAuth client. Only PUBLIC_CLIENT or CONFIDENTIAL_CLIENT are allowed.",
-      "required": false,
-      "security_impact": true,
-      "rationale": "Restricts OAuth client types to approved security models.",
-      "compliant": "CONFIDENTIAL_CLIENT",
-      "non-compliant": "UNKNOWN_CLIENT",
-      "parent": null
-    },
-
-    "allowed_scopes": {
-      "description": "List of OAuth scopes allowed for authentication flows.",
-      "required": true,
-      "security_impact": true,
-      "rationale": "Restricting scopes reduces access exposure and privilege escalation risk.",
-      "compliant": ["openid", "email"],
-      "non-compliant": ["*"],
-      "parent": null
-    },
-
-    "allowed_grant_types": {
-      "description": "OAuth grant types allowed for the client.",
-      "required": true,
-      "security_impact": true,
-      "rationale": "Controls authentication flow security.",
-      "compliant": ["AUTHORIZATION_CODE_GRANT"],
-      "non-compliant": [],
-      "parent": null
-    },
-
-    "allowed_redirect_uris": {
-      "description": "List of allowed redirect URIs after authentication.",
-      "required": true,
-      "security_impact": true,
-      "rationale": "Prevents redirect attacks and phishing risks.",
-      "compliant": ["https://example.com"],
-      "non-compliant": ["http://evil.com"],
+      "non-compliant": "gcp-client-01",
       "parent": null
     },
 
     "disabled": {
-      "description": "Indicates whether the OAuth client is disabled.",
+      "description": "Whether the OauthClient is disabled.",
       "required": false,
       "security_impact": true,
-      "rationale": "Disabled clients cannot be used for authentication.",
+      "rationale": "Disabled clients cannot be used, reducing attack surface when not in use.",
       "compliant": false,
       "non-compliant": true,
       "parent": null
     },
 
     "display_name": {
-      "description": "Human-readable name for the OAuth client.",
+      "description": "Human-readable name of the OAuth client.",
       "required": false,
       "security_impact": false,
-      "rationale": null,
-      "compliant": "Valid OAuth Client",
-      "non-compliant": "Invalid Client",
+      "rationale": "Used only for identification purposes.",
+      "compliant": "Enterprise OAuth Client",
+      "non-compliant": "Very Long Invalid Name That Exceeds Limits",
       "parent": null
     },
 
     "description": {
-      "description": "Optional description of the OAuth client.",
+      "description": "Description of the OAuth client.",
       "required": false,
       "security_impact": false,
-      "rationale": null,
-      "compliant": "OAuth client for production app",
-      "non-compliant": "",
+      "rationale": "Provides documentation for audit and governance.",
+      "compliant": "OAuth client for enterprise login",
+      "non-compliant": "test",
+      "parent": null
+    },
+
+    "client_type": {
+      "description": "Type of OAuth client.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Restricts OAuth clients to approved secure types only.",
+      "compliant": ["PUBLIC_CLIENT", "CONFIDENTIAL_CLIENT"],
+      "non-compliant": ["INTERNAL_CLIENT"],
       "parent": null
     },
 
     "project": {
-      "description": "GCP project where the OAuth client is created.",
+      "description": "Project where the resource is created.",
       "required": false,
       "security_impact": true,
-      "rationale": "Ensures correct project-level isolation.",
+      "rationale": "Ensures correct project-level IAM isolation.",
       "compliant": "smooth-verve-467716-v1",
       "non-compliant": "",
       "parent": null

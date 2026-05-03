@@ -2,146 +2,144 @@
   "resource_name": "iam_projects_policy_binding",
   "subcategory": "Cloud IAM",
   "arguments": {
-    "project": {
-      "description": "GCP project ID where the policy binding is applied. Must follow valid project naming rules (lowercase letters, numbers, and hyphens).",
-      "required": false,
+    "target": {
+      "description": "Target is the full resource name of the resource to which the policy will be bound. Immutable once set.",
+      "required": true,
       "security_impact": true,
-      "rationale": "Ensures IAM policy is attached to a valid and controlled project scope.",
-      "compliant": "my-project-123",
-      "non-compliant": "Invalid_Project",
+      "rationale": "Restricts policy binding scope to approved project principals only, preventing unauthorized identity binding.",
+      "compliant": [
+        "//cloudresourcemanager.googleapis.com/projects/approved-project-1",
+        "//cloudresourcemanager.googleapis.com/projects/approved-project-2"
+      ],
+      "non-compliant": [
+        "//cloudresourcemanager.googleapis.com/projects/*",
+        "//cloudresourcemanager.googleapis.com/projects/external-project"
+      ],
+      "parent": null,
+      "arguments": {
+        "principal_set": {
+          "description": "Full resource name of the principal set used for IAM policy binding.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Ensures only approved project-level principals can be assigned IAM boundaries.",
+          "compliant": [
+            "//cloudresourcemanager.googleapis.com/projects/approved-project-1",
+            "//cloudresourcemanager.googleapis.com/projects/approved-project-2"
+          ],
+          "non-compliant": [
+            "//cloudresourcemanager.googleapis.com/projects/*",
+            "//cloudresourcemanager.googleapis.com/projects/external-*"
+          ],
+          "parent": "target"
+        }
+      }
+    },
+
+    "policy": {
+      "description": "The resource name of the policy to be bound.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Ensures only approved IAM boundary policies are attached to projects.",
+      "compliant": "organizations/123456789/locations/global/principalAccessBoundaryPolicies/approved-policy",
+      "non-compliant": "organizations/123456789/locations/global/principalAccessBoundaryPolicies/unapproved-policy",
       "parent": null
     },
 
     "location": {
-      "description": "Location of the policy binding. Must always be global for IAM project policy bindings.",
+      "description": "The location of the Policy Binding.",
       "required": true,
       "security_impact": true,
-      "rationale": "IAM bindings must be globally consistent for proper access control enforcement.",
+      "rationale": "Enforcing global location ensures consistent IAM policy application across projects and prevents regional drift.",
       "compliant": "global",
       "non-compliant": "us-central1",
       "parent": null
     },
 
     "policy_binding_id": {
-      "description": "Unique identifier for the policy binding within the project.",
+      "description": "The Policy Binding ID.",
       "required": true,
-      "security_impact": true,
-      "rationale": "Ensures each IAM binding can be uniquely tracked and managed.",
+      "security_impact": false,
+      "rationale": "Ensures consistent naming and traceability of policy bindings.",
       "compliant": "project-binding-01",
-      "non-compliant": "Project Binding #1",
+      "non-compliant": "INVALID_BINDING",
       "parent": null
     },
 
     "display_name": {
-      "description": "Optional human-readable name for the policy binding (maximum 63 characters).",
+      "description": "Optional description of the policy binding.",
       "required": false,
       "security_impact": false,
-      "rationale": "Used only for identification and has no security impact.",
-      "compliant": "Project IAM Binding",
-      "non-compliant": "This is an extremely long invalid display name that exceeds allowed character limits for IAM resources",
+      "rationale": "Used for human-readable identification only.",
+      "compliant": "Project IAM Binding Policy",
+      "non-compliant": "Very long or unclear name exceeding limits",
       "parent": null
     },
 
     "annotations": {
-      "description": "Optional metadata used to tag and classify the policy binding.",
+      "description": "User-defined metadata annotations.",
       "required": false,
       "security_impact": false,
-      "rationale": "Annotations are informational only and do not affect IAM enforcement.",
-      "compliant": {
-        "environment": "prod",
-        "team": "security"
-      },
-      "non-compliant": {
-        "note": "This annotation contains excessive invalid metadata that should not be used in production IAM configurations because it violates expected structure and readability standards"
-      },
+      "rationale": "Used for tagging, auditing, and governance tracking.",
+      "compliant": "env=prod, team=security",
+      "non-compliant": "random unstructured metadata",
       "parent": null
     },
 
     "policy_kind": {
-      "description": "Type of policy being applied. Possible values include ACCESS or PRINCIPAL_ACCESS_BOUNDARY.",
+      "description": "The kind of policy to attach in this binding.",
       "required": false,
       "security_impact": true,
-      "rationale": "Determines IAM enforcement behavior and access model.",
-      "compliant": "ACCESS",
-      "non-compliant": "UNKNOWN_TYPE",
+      "rationale": "Ensures only Principal Access Boundary policies are enforced for security isolation.",
+      "compliant": "PRINCIPAL_ACCESS_BOUNDARY",
+      "non-compliant": "ACCESS, POLICY_KIND_UNSPECIFIED",
       "parent": null
     },
 
-    "target": {
-      "description": "Full resource name of the target project where the policy binding is applied.",
-      "required": true,
+    "condition": {
+      "description": "CEL expression controlling conditional policy binding.",
+      "required": false,
       "security_impact": true,
-      "rationale": "Defines exact IAM enforcement scope at project level.",
-      "compliant": "//cloudresourcemanager.googleapis.com/projects/my-project-123",
-      "non-compliant": "//invalid/resource/name",
+      "rationale": "Allows fine-grained IAM control based on runtime conditions.",
+      "compliant": "document.type != 'internal'",
+      "non-compliant": "true (unrestricted access)",
       "parent": null,
-
       "arguments": {
-        "principal_set": {
-          "description": "Principal set defining which identities are allowed within the project scope.",
+        "expression": {
+          "description": "CEL expression for conditional logic.",
           "required": false,
           "security_impact": true,
-          "rationale": "Restricts access to approved identities within project boundary.",
-          "compliant": "//cloudresourcemanager.googleapis.com/projects/123456789",
-          "non-compliant": "//cloudresourcemanager.googleapis.com/folders/123",
-          "parent": "target"
+          "rationale": "Controls conditional IAM enforcement.",
+          "parent": "condition"
+        },
+        "title": {
+          "description": "Title of the condition.",
+          "required": false,
+          "security_impact": false,
+          "parent": "condition"
+        },
+        "description": {
+          "description": "Description of the condition.",
+          "required": false,
+          "security_impact": false,
+          "parent": "condition"
+        },
+        "location": {
+          "description": "Location of expression for debugging.",
+          "required": false,
+          "security_impact": false,
+          "parent": "condition"
         }
       }
     },
 
-    "condition": {
-      "description": "Optional IAM condition using Common Expression Language (CEL) for conditional access control.",
+    "project": {
+      "description": "The project where the policy binding is applied.",
       "required": false,
       "security_impact": true,
-      "rationale": "Allows fine-grained access control based on logical conditions.",
-      "compliant": {
-        "expression": "resource.name.startsWith('projects/')",
-        "title": "Project access rule",
-        "description": "Allows access only to project resources"
-      },
-      "non-compliant": {
-        "expression": "true"
-      },
-      "parent": null,
-
-      "arguments": {
-        "expression": {
-          "description": "CEL expression used to define IAM conditional logic.",
-          "required": false,
-          "security_impact": true,
-          "rationale": "Controls when IAM policy is applied.",
-          "compliant": "resource.name.startsWith('projects/')",
-          "non-compliant": "true",
-          "parent": "condition"
-        },
-        "title": {
-          "description": "Short title describing the IAM condition.",
-          "required": false,
-          "security_impact": false,
-          "rationale": "Used for readability only.",
-          "compliant": "Project Condition",
-          "non-compliant": "",
-          "parent": "condition"
-        },
-        "description": {
-          "description": "Detailed explanation of the IAM condition.",
-          "required": false,
-          "security_impact": false,
-          "rationale": "Documentation purpose only.",
-          "compliant": "Restricts access to project-level resources only",
-          "non-compliant": "",
-          "parent": "condition"
-        },
-        "location": {
-          "description": "Debugging reference for IAM condition evaluation.",
-          "required": false,
-          "security_impact": false,
-          "rationale": "Used for error tracing and debugging.",
-          "compliant": "global",
-          "non-compliant": "",
-          "parent": "condition"
-        }
-      }
+      "rationale": "Ensures correct project-level IAM isolation and prevents cross-project misconfiguration.",
+      "compliant": "approved-project-id",
+      "non-compliant": "external-project-id",
+      "parent": null
     }
   }
 }
