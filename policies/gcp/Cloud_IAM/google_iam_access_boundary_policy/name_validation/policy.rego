@@ -4,8 +4,6 @@ import data.terraform.helpers
 import data.terraform.gcp.security.Cloud_IAM.google_iam_access_boundary_policy.vars
 
 conditions := [
-
-  #format validation
   [
     {
       "situation_description": "Policy name must follow secure naming convention",
@@ -23,14 +21,11 @@ conditions := [
       "policy_type": "pattern whitelist"
     }
   ],
-
-  #Block weak names
   [
     {
-      "situation_description": "Policy name must not contain weak or temporary keywords",
+      "situation_description": "Policy name must not contain weak keywords",
       "remedies": [
-        "Avoid using words like test, temp, demo",
-        "Use meaningful production-ready names"
+        "Avoid using words like test, temp, demo"
       ]
     },
     {
@@ -40,9 +35,8 @@ conditions := [
       "policy_type": "blacklist"
     }
   ]
-
 ]
 
-result  := helpers.get_multi_summary(conditions, vars.variables)
+result := helpers.get_multi_summary(conditions, vars.variables)
 message := result.message
 details := result.details
