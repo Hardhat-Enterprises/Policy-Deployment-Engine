@@ -5,16 +5,22 @@ import data.terraform.gcp.security.Cloud_IAM.google_iam_principal_access_boundar
 
 conditions := [
     [
-    {"situation_description" : "must use an approved organization",
-    "remedies":[ "Use only approved organization IDs (e.g., 123456789)"]},
-    {
-        "condition": "Validate organization field",
-        "attribute_path" : ["organization"],
-        "values" : ["123456789"], 
-        "policy_type" : "whitelist" 
-    }
+        {
+            "situation_description": "Organization must start with PDE and contain only letters or numbers after it.",
+            "remedies": [
+                "Use organization IDs like PDE123 or PDE-A1 (must start with PDE)"
+            ]
+        },
+        {
+            "condition": "Validate organization format",
+            "attribute_path": ["organization"],
+            "values": ["^PDE[a-zA-Z0-9-]*$"],
+            "policy_type": "pattern whitelist"
+        }
     ]
 ]
+
+
 result := helpers.get_multi_summary(conditions, vars.variables)
 message := result.message
 details := result.details
