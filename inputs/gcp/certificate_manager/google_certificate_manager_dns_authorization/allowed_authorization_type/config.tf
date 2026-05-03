@@ -1,0 +1,12 @@
+terraform {
+  required_providers {
+    google = {
+      source = "hashicorp/google"
+    }
+  }
+}
+
+provider "google" {
+  project = "test-project"
+  region  = "us-central1"
+}
