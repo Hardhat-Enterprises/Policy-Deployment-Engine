@@ -10,7 +10,7 @@ conditions := [
     {
         "condition": "Validate organization field",
         "attribute_path" : ["organization"],
-        "values": ["PDE1"],
+        "values": ["PDE1", "PDE2", "PDE3"],
         "policy_type" : "whitelist" 
     }
     ]
