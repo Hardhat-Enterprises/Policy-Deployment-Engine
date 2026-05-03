@@ -3,112 +3,116 @@
   "subcategory": "Cloud Bigtable",
   "arguments": {
     "name": {
-      "description": "Configuration for name on this Cloud Bigtable resource.",
+      "description": "The name of this authorized view.",
       "required": true,
       "security_impact": false,
-      "rationale": "Terraform name for the authorized view. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "A resource name/identifier in config; it is not a service account key or password and does not, by itself, add principals to IAM.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "project": {
-      "description": "is not provided, the provider project is used.",
-      "required": true,
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
       "security_impact": false,
-      "rationale": "GCP project ID managing this view. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Project IDs are non-secret scope metadata; they do not replace authentication or table IAM when reading data.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "instance_name": {
-      "description": "Configuration for instance_name on this Cloud Bigtable resource.",
+      "description": "The name of the Bigtable instance containing the table.",
       "required": true,
       "security_impact": false,
-      "rationale": "Bigtable instance hosting the backing table. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Points at an instance by name only; names are not credentials and access still depends on IAM and client identity.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "table_name": {
-      "description": "Configuration for table_name on this Cloud Bigtable resource.",
+      "description": "The name of the table to create the authorized view on.",
       "required": true,
       "security_impact": false,
-      "rationale": "Backing table for the authorized view. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Identifies which table backs the view; it does not list who may read rows—that remains IAM plus the effective subset_view filters.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "column_family": {
-      "description": "Configuration for column_family on this Cloud Bigtable resource.",
+      "description": "The name of the column family that the authorized view can access.",
       "required": true,
       "security_impact": false,
-      "rationale": "Column family exposed or constrained by the view. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "A schema label for which family the view applies to; it is not an IAM role string and does not grant anonymous access.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "deletion_protection": {
-      "description": "If not provided, currently deletion protection will be set to UNPROTECTED as it is the API default value. Note this field configs the deletion protection provided by the API in the backend, and should not be confused with Terraform-side deletion protection.",
+      "description": "The deletion protection state of the authorized view. `PROTECTED` or `UNPROTECTED` (API default for new resources is `UNPROTECTED` if unset).",
       "required": false,
       "security_impact": true,
-      "rationale": "Backend deletion protection reduces accidental or unauthorized removal of authorized view access boundaries.",
+      "rationale": "Backend deletion protection reduces accidental or malicious removal of the view configuration that enforces least-privilege data access.",
       "compliant": "\"PROTECTED\"",
       "non-compliant": "\"UNPROTECTED\"",
       "parent": null
     },
     "subset_view": {
-      "description": "----- `subset_view` supports the following arguments:",
+      "description": "Optional block that limits which rows and column qualifiers the authorized view can read. Omitted means no authorized view is defined in this resource (see provider docs for full behavior).",
       "required": false,
       "security_impact": false,
-      "rationale": "Wrapper for subset filters such as row prefixes. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Terraform grouping only: the block header carries no secret values. Whether data is over-exposed is determined by nested `row_prefixes` and `family_subsets`, which are evaluated separately where policies apply.",
       "compliant": null,
       "non-compliant": null,
-      "parent": null
-    },
-    "row_prefixes": {
-      "description": "Configuration for row_prefixes on this Cloud Bigtable resource.",
-      "required": false,
-      "security_impact": true,
-      "rationale": "Empty row prefix grants full-row access; scoped prefixes enforce least privilege.",
-      "compliant": "[base64encode(\"user_\")]",
-      "non-compliant": "[base64encode(\"\")]",
-      "parent": null
-    },
-    "family_subsets": {
-      "description": "----- `family_subsets` supports the following arguments:",
-      "required": false,
-      "security_impact": false,
-      "rationale": "Per-family qualifier subsets for fine-grained column access. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "family_name": {
-      "description": "Configuration for family_name on this Cloud Bigtable resource.",
-      "required": false,
-      "security_impact": false,
-      "rationale": "Column family targeted by an adjacent subset block. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "qualifiers": {
-      "description": "Configuration for qualifiers on this Cloud Bigtable resource.",
-      "required": false,
-      "security_impact": false,
-      "rationale": "Explicit base64-encoded qualifiers allowed in the view. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "qualifier_prefixes": {
-      "description": "Every qualifier starting with one of these prefixes is included in the authorized view. To provide access to all qualifiers, include the empty string as a prefix (\"\").",
-      "required": false,
-      "security_impact": true,
-      "rationale": "Empty qualifier prefix grants full qualifier access within a family and increases data exposure.",
-      "compliant": "[base64encode(\"user_\")]",
-      "non-compliant": "[base64encode(\"\")]",
-      "parent": null
+      "parent": null,
+      "arguments": {
+        "row_prefixes": {
+          "description": "List of base64-encoded row key prefixes included in the view. Including an empty prefix exposes all rows for the authorized columns.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "An empty string prefix matches every row key for that family subset path and defeats row-level least privilege—your policies evaluate `subset_view.row_prefixes`.",
+          "compliant": "[base64encode(\"user_\")]",
+          "non-compliant": "[base64encode(\"\")]",
+          "parent": "subset_view"
+        },
+        "family_subsets": {
+          "description": "Repeated block restricting visibility to one column family with optional qualifier lists or prefixes.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Structural block for per-family qualifier rules; the block itself does not grant IAM—actual exposure comes from `qualifier_prefixes`, `qualifiers`, and row prefixes, which may be security-relevant when overly broad.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "subset_view",
+          "arguments": {
+            "family_name": {
+              "description": "The column family name for this subset.",
+              "required": true,
+              "security_impact": false,
+              "rationale": "Non-secret schema identifier; narrowing which family is included does not by itself authenticate callers.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "family_subsets"
+            },
+            "qualifiers": {
+              "description": "Exact base64-encoded qualifiers allowed in this subset.",
+              "required": false,
+              "security_impact": false,
+              "rationale": "Declares which column qualifiers may appear in the view configuration; it shapes column visibility but does not add IAM members or expose stored row payloads without authorized reads.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "family_subsets"
+            },
+            "qualifier_prefixes": {
+              "description": "Base64-encoded prefixes; any qualifier starting with one of these prefixes is included. Including the empty string matches all qualifiers in the family.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "An empty-string prefix matches every qualifier in the family and increases column exposure—your policies evaluate `subset_view.family_subsets.qualifier_prefixes`.",
+              "compliant": "[base64encode(\"user_\")]",
+              "non-compliant": "[base64encode(\"\")]",
+              "parent": "family_subsets"
+            }
+          }
+        }
+      }
     }
   }
 }

@@ -6,7 +6,7 @@
       "description": "The name of the table. Must be 1-50 characters and must only contain hyphens, underscores, periods, letters and numbers.",
       "required": true,
       "security_impact": false,
-      "rationale": "Terraform table name within the instance. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Table name string in configuration; it is not a key or token and does not by itself authorize reads or writes.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -15,81 +15,83 @@
       "description": "The name of the Bigtable instance.",
       "required": true,
       "security_impact": false,
-      "rationale": "Which Bigtable instance hosts this table. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "References an instance by name; names are not secrets and do not prove caller identity.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "split_keys": {
-      "description": "!> **Warning:** Modifying the `split_keys` of an existing table will cause Terraform to delete/recreate the entire `google_bigtable_table` resource.",
+      "description": "Warning: modifying `split_keys` on an existing table forces Terraform to replace the entire table resource.",
       "required": false,
       "security_impact": false,
-      "rationale": "Initial row-key splits for table creation; affects layout and recreate risk, not IAM. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Sharding hints for row distribution at creation time; they tune layout/operations and do not list principals allowed on the table.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "column_family": {
-      "description": "A group of columns within a table which share a common configuration. This can be specified multiple times. Structure is documented below.",
+      "description": "Defines a column family (repeatable). Structure is documented in nested arguments.",
       "required": false,
       "security_impact": false,
-      "rationale": "Declares column families on the table schema. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Declares schema families for the table; schema blocks alone do not attach IAM members.",
       "compliant": null,
       "non-compliant": null,
-      "parent": null
+      "parent": null,
+      "arguments": {
+        "family": {
+          "description": "The name of the column family.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Identifier for a column family in schema; not an IAM binding.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "column_family"
+        },
+        "type": {
+          "description": "The type of the column family when supported by the provider.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Selects encoding/storage characteristics where applicable; unrelated to authenticating API callers.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "column_family"
+        }
+      }
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "security_impact": false,
-      "rationale": "GCP project ID where the table resource is managed. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Non-secret project id for API ownership; does not embed credentials.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "deletion_protection": {
-      "description": "When set to PROTECTED, deleting the table, column families in the table, and the instance containing the table would be prohibited (API backend deletion protection). If not provided, defaults to UNPROTECTED.",
+      "description": "`PROTECTED` prohibits deleting the table, column families, or the instance containing the table via the API. Defaults to `UNPROTECTED` if unset.",
       "required": false,
       "security_impact": false,
-      "rationale": "Backend deletion protection can reduce accidental removal of the table and related resources; it does not directly grant access or expose secrets by itself.",
+      "rationale": "API-side safeguard against destructive deletes; it does not publish rows publicly—availability/governance oriented rather than client authentication.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "change_stream_retention": {
-      "description": "Duration to retain change stream data for the table. Set to 0 to disable. Must be between 1 and 7 days.",
+      "description": "Duration to retain change stream data. Set to 0 to disable. Typically between 1 and 7 days per provider/API limits.",
       "required": false,
       "security_impact": true,
-      "rationale": "Setting this to \"0\" disables change history visibility used for monitoring and audit investigations.",
+      "rationale": "Disabling (`0`) removes change history used for monitoring, recovery, and audit investigations.",
       "compliant": "\"24h\"",
       "non-compliant": "\"0\"",
       "parent": null
     },
     "automated_backup_policy": {
-      "description": "Defines an automated backup policy for a table (retention period and frequency). Omit or set both values to \"0\" to disable backups.",
+      "description": "Automated backup retention and frequency. Omit or set periods/frequency to zero to disable backups.",
       "required": false,
       "security_impact": true,
-      "rationale": "Automated backups support recoverability and incident response for table data.",
+      "rationale": "Scheduled backups support recovery and incident response for table data.",
       "compliant": "{ retention_period = \"72h\", frequency = \"24h\" }",
       "non-compliant": "missing block, or retention_period = \"0\", or frequency = \"0\"",
-      "parent": null
-    },
-    "family": {
-      "description": "The name of the column family.",
-      "required": false,
-      "security_impact": false,
-      "rationale": "Nested column family configuration under `column_family`. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "type": {
-      "description": "The type of the column family.",
-      "required": false,
-      "security_impact": false,
-      "rationale": "Column family type when supported by the provider. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
-      "compliant": null,
-      "non-compliant": null,
       "parent": null
     }
   }

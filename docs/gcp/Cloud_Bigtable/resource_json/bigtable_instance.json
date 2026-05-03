@@ -3,199 +3,203 @@
   "subcategory": "Cloud Bigtable",
   "arguments": {
     "name": {
-      "description": "Configuration for name on this Cloud Bigtable resource.",
+      "description": "The name of the Cloud Bigtable instance.",
       "required": true,
       "security_impact": false,
-      "rationale": "Terraform name of the Bigtable instance. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Human-chosen resource name for Terraform/API; it is not a cryptographic material and does not enumerate who may access data.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "cluster": {
-      "description": "to as many as possible within 8 cloud regions. Removing the field entirely from the config will cause the provider to default to the backend value. See [structure below](#nested_cluster). -----",
+      "description": "A cluster for the instance. At least one cluster must exist when the instance is created; you can add up to 8 clusters within 8 regions. Removing this block makes the provider default to backend values.",
       "required": true,
       "security_impact": false,
-      "rationale": "Introduces cluster-level settings (zones, scaling, storage). It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "A structural block in HCL, not a secret. Security-sensitive values (for example `kms_key_name` or `zone`) live on nested attributes and are assessed there, not on the fact that a `cluster` block exists.",
       "compliant": null,
       "non-compliant": null,
-      "parent": null
+      "parent": null,
+      "arguments": {
+        "cluster_id": {
+          "description": "The unique identifier for the cluster within the instance.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Distinguishes one cluster from another in config; the string is not a principal identifier and does not open network access by itself.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cluster"
+        },
+        "zone": {
+          "description": "The zone to serve this cluster in. If unspecified, the provider zone is used. Each cluster must use a different zone in the same region.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Zone determines physical location and data residency; policies may whitelist approved regions/zones (`cluster.zone`).",
+          "compliant": "\"australia-southeast1-a\"",
+          "non-compliant": "\"us-central1-b\"",
+          "parent": "cluster"
+        },
+        "num_nodes": {
+          "description": "The number of nodes in the cluster. If unset and autoscaling is not configured, Bigtable sizes nodes from data footprint.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Performance/capacity tuning only; node count does not list IAM members or contain keys.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cluster"
+        },
+        "autoscaling_config": {
+          "description": "Optional autoscaling configuration for the cluster. Only one of `autoscaling_config` or `num_nodes` should be set.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Container for autoscaling parameters; the block label is not sensitive—only the nested min/max and targets affect operations, not identity or encryption root of trust.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cluster",
+          "arguments": {
+            "min_nodes": {
+              "description": "Minimum number of nodes for autoscaling.",
+              "required": true,
+              "security_impact": false,
+              "rationale": "Sets a capacity floor for autoscaling; it does not define who can read or write Bigtable data.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "autoscaling_config"
+            },
+            "max_nodes": {
+              "description": "Maximum number of nodes for autoscaling.",
+              "required": true,
+              "security_impact": false,
+              "rationale": "Sets a capacity ceiling; unrelated to IAM bindings and not a secret.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "autoscaling_config"
+            },
+            "cpu_target": {
+              "description": "CPU utilization target for autoscaling (percent).",
+              "required": true,
+              "security_impact": false,
+              "rationale": "Operational tuning target for scaling behavior only; does not authenticate clients.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "autoscaling_config"
+            },
+            "storage_target": {
+              "description": "Storage utilization target for autoscaling (percent).",
+              "required": false,
+              "security_impact": false,
+              "rationale": "Another scaling signal for capacity planning; not an authorization mechanism.",
+              "compliant": null,
+              "non-compliant": null,
+              "parent": "autoscaling_config"
+            }
+          }
+        },
+        "storage_type": {
+          "description": "The storage type for the cluster: `SSD` (default) or `HDD`.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Chooses media class for performance/cost; both options still rely on platform-managed encryption at rest and do not control IAM.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cluster"
+        },
+        "kms_key_name": {
+          "description": "Fully qualified name of the Cloud KMS key for CMEK (customer-managed encryption) for this cluster.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "CMEK ties encryption at rest to your KMS key; policies often require a non-empty key in an approved project/region (`cluster.kms_key_name`).",
+          "compliant": "\"projects/PDE/locations/australia-southeast1/keyRings/bt-kr/cryptoKeys/bt-cmek\"",
+          "non-compliant": "null, \"\", or a key outside approved projects/regions",
+          "parent": "cluster"
+        },
+        "node_scaling_factor": {
+          "description": "Optional scaling factor for node granularity for this cluster.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Provider-internal sizing hint; unrelated to secrets, principals, or encryption keys.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "cluster"
+        }
+      }
     },
     "project": {
-      "description": "is not provided, the provider project is used.",
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "security_impact": false,
-      "rationale": "GCP project ID that owns this instance. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Public, non-secret project identifier used for API routing; it does not prove caller identity.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "instance_type": {
-      "description": "It is recommended to leave this field unspecified since the distinction between `\"DEVELOPMENT\"` and `\"PRODUCTION\"` instances is going away, and all instances will become `\"PRODUCTION\"` instances. This means that new and existing `\"DEVELOPMENT\"` instances will be converted to `\"PRODUCTION\"` instances. It is recommended for users to use `\"PRODUCTION\"` instances in any case, since a 1-node `\"PRODUCTION\"` instance is functionally identical to a `\"DEVELOPMENT\"` instance, but without the accompanying restrictions.",
+      "description": "DEVELOPMENT or PRODUCTION (Google is unifying these; prefer PRODUCTION for new instances).",
       "required": false,
       "security_impact": false,
-      "rationale": "Development vs production sizing behavior (being unified by Google). It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Changes sizing/quota characteristics only; it neither publishes data nor adds IAM grants.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "display_name": {
-      "description": "Configuration for display_name on this Cloud Bigtable resource.",
+      "description": "Human-readable display name for the instance in consoles.",
       "required": false,
       "security_impact": false,
-      "rationale": "Human-readable label in consoles. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Console label only; does not alter IAM, keys, or network ACLs.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "force_destroy": {
-      "description": "Configuration for force_destroy on this Cloud Bigtable resource.",
+      "description": "When true, Terraform can destroy the instance even when that would normally be blocked.",
       "required": false,
       "security_impact": false,
-      "rationale": "Allows Terraform destroy even when constraints would normally block it. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "IaC-only destroy behavior; not a data-exposure toggle, though enabling careless destroys can harm availability—still distinct from granting anonymous reads.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "deletion_protection": {
-      "description": "When the field is set to true or unset in Terraform state, a `terraform apply` or `terraform destroy` that would delete the instance will fail. When the field is set to false, deleting the instance is allowed.",
+      "description": "When true (or unset in state per provider behavior), Terraform apply/destroy that would delete the instance fails.",
       "required": false,
       "security_impact": true,
-      "rationale": "Deletion protection blocks accidental destructive operations on production instances.",
+      "rationale": "Blocks accidental destructive changes to the instance and its data plane availability.",
       "compliant": "true",
       "non-compliant": "false",
       "parent": null
     },
     "labels": {
-      "description": "**Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "description": "Non-authoritative labels applied via Terraform; see `effective_labels` for the full set in GCP.",
       "required": false,
       "security_impact": false,
-      "rationale": "Resource labels you manage via Terraform. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Key/value tags for governance and billing; label pairs are not secrets and labeling alone does not authenticate requests.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "tags": {
-      "description": "A set of key/value label pairs to assign to the resource. Tags must follow GCP tag requirements.",
+      "description": "Resource tags (key/value) per GCP tag requirements.",
       "required": false,
       "security_impact": false,
-      "rationale": "Resource tags used for organization and policy targeting. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Organizational tags for policy/cost tracking; not credential material.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "terraform_labels": {
-      "description": "The combination of labels configured directly on the resource and default labels configured on the provider.",
+      "description": "Labels from Terraform configuration merged with provider default labels.",
       "required": false,
       "security_impact": false,
-      "rationale": "Merged labels including provider defaults. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Derived labels for state/plan output; read-only convenience field, not an access grant.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "effective_labels": {
-      "description": "All of labels (key/value pairs) present on the resource in GCP, including the labels configured through Terraform, other clients and services. ----- The `cluster` block supports the following arguments:",
+      "description": "All labels present on the resource in GCP, including Terraform, API, and service-managed labels.",
       "required": false,
       "security_impact": false,
-      "rationale": "Authoritative union of labels from Terraform and GCP. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "cluster_id": {
-      "description": "Configuration for cluster_id on this Cloud Bigtable resource.",
-      "required": true,
-      "security_impact": false,
-      "rationale": "Identifier for this cluster row when multiple clusters exist. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "zone": {
-      "description": "specified, the provider zone is used. Each cluster must have a different zone in the same region. Zones that support Bigtable instances are noted on the [Cloud Bigtable locations page](https://cloud.google.com/bigtable/docs/locations).",
-      "required": false,
-      "security_impact": true,
-      "rationale": "Approved-zone enforcement supports data residency and compliance boundaries.",
-      "compliant": "\"australia-southeast1-a\"",
-      "non-compliant": "\"us-central1-b\"",
-      "parent": null
-    },
-    "num_nodes": {
-      "description": "If no value is set, Cloud Bigtable automatically allocates nodes based on your data footprint and optimized for 50% storage utilization.",
-      "required": false,
-      "security_impact": false,
-      "rationale": "Manual node count when not using autoscaling. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "autoscaling_config": {
-      "description": "Configuration for autoscaling_config on this Cloud Bigtable resource.",
-      "required": false,
-      "security_impact": false,
-      "rationale": "Automatic node scaling bounds and signals. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "min_nodes": {
-      "description": "Configuration for min_nodes on this Cloud Bigtable resource.",
-      "required": true,
-      "security_impact": false,
-      "rationale": "Autoscaling minimum node count. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "max_nodes": {
-      "description": "Configuration for max_nodes on this Cloud Bigtable resource.",
-      "required": true,
-      "security_impact": false,
-      "rationale": "Autoscaling maximum node count. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "cpu_target": {
-      "description": "Configuration for cpu_target on this Cloud Bigtable resource.",
-      "required": true,
-      "security_impact": false,
-      "rationale": "CPU target signal for autoscaling. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "storage_target": {
-      "description": "!> **Warning**: Only one of `autoscaling_config` or `num_nodes` should be set for a cluster. If both are set, `num_nodes` is ignored. If none is set, autoscaling will be disabled and sized to the current node count.",
-      "required": false,
-      "security_impact": false,
-      "rationale": "Storage target signal for autoscaling. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "storage_type": {
-      "description": "`\"HDD\"`. Defaults to `\"SSD\"`.",
-      "required": false,
-      "security_impact": false,
-      "rationale": "SSD vs HDD storage class for the cluster. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "kms_key_name": {
-      "description": "Configuration for kms_key_name on this Cloud Bigtable resource.",
-      "required": false,
-      "security_impact": true,
-      "rationale": "CMEK is required, and key path must match approved project/location/keyring/key constraints.",
-      "compliant": "\"projects/PDE/locations/australia-southeast1/keyRings/bt-kr/cryptoKeys/bt-cmek\"",
-      "non-compliant": "null, \"\", or \"projects/PDE/locations/us-central1/keyRings/bt-kr/cryptoKeys/bt-cmek\"",
-      "parent": null
-    },
-    "node_scaling_factor": {
-      "description": "-> **Note**: Removing the field entirely from the config will cause the provider to default to the backend value. !> **Warning:** Modifying the `storage_type`, `zone` or `kms_key_name` of an existing cluster (by `cluster_id`) will cause Terraform to delete/recreate the entire `google_bigtable_instance` resource. If these values are changing, use a new `cluster_id`.",
-      "required": false,
-      "security_impact": false,
-      "rationale": "Provider-specific scaling granularity for nodes. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Aggregated label snapshot from GCP; informational only and does not replace IAM decisions.",
       "compliant": null,
       "non-compliant": null,
       "parent": null

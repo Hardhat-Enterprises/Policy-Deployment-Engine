@@ -3,120 +3,124 @@
   "subcategory": "Cloud Bigtable",
   "arguments": {
     "table": {
-      "description": "Configuration for table on this Cloud Bigtable resource.",
+      "description": "The name of the table the GC policy applies to.",
       "required": true,
       "security_impact": false,
-      "rationale": "Table whose column family GC rules apply to. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Table name only identifies where GC rules apply; it does not expose credentials, grant IAM, or change who can read data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "instance_name": {
-      "description": "Configuration for instance_name on this Cloud Bigtable resource.",
+      "description": "The name of the Bigtable instance containing the table.",
       "required": true,
       "security_impact": false,
-      "rationale": "Bigtable instance that contains the table. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Instance identifier for routing the policy to the right cluster; not a secret and does not by itself widen access or weaken encryption.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "column_family": {
-      "description": "Configuration for column_family on this Cloud Bigtable resource.",
+      "description": "The column family this GC policy is attached to.",
       "required": true,
       "security_impact": false,
-      "rationale": "Column family name this GC policy attaches to. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Schema/column-family label only; it scopes which cells the GC policy affects but does not grant principals access or leak key material.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "project": {
-      "description": "Configuration for project on this Cloud Bigtable resource.",
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "security_impact": false,
-      "rationale": "GCP project ID for the GC policy resource. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Project ID is non-secret scope metadata for API calls; it does not replace IAM checks or expose table contents.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "mode": {
-      "description": "Configuration for mode on this Cloud Bigtable resource.",
+      "description": "How multiple GC rules combine: `intersection` or `union`.",
       "required": false,
       "security_impact": false,
-      "rationale": "How multiple GC rules combine (`intersection` or `union`). It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Controls how rule predicates are combined mathematically; it does not name principals or secrets and is not an access-control mechanism by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "max_age": {
-      "description": "Configuration for max_age on this Cloud Bigtable resource.",
+      "description": "Age-based retention block for the GC rule (evaluated as `max_age.days` or duration fields per provider).",
       "required": false,
       "security_impact": false,
-      "rationale": "Block for age-based retention in the GC rule. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "The block is only a container in Terraform; it holds no secret values. Retention risk is expressed in nested fields such as `days`, which are evaluated separately for security impact.",
       "compliant": null,
       "non-compliant": null,
-      "parent": null
+      "parent": null,
+      "arguments": {
+        "days": {
+          "description": "Maximum age of cells to retain, in days.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Longer retention increases how long stale or sensitive cell history may remain recoverable (`max_age.days`).",
+          "compliant": "30",
+          "non-compliant": "180",
+          "parent": "max_age"
+        },
+        "duration": {
+          "description": "Alternative duration representation for max age when used instead of `days`.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Another encoding for the same retention length as `days`; whichever field is used, the sensitive governance question is the retention value, not the fact that this alternate attribute exists.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "max_age"
+        }
+      }
     },
     "max_version": {
-      "description": "Configuration for max_version on this Cloud Bigtable resource.",
+      "description": "Version-based retention block for the GC rule.",
       "required": false,
       "security_impact": false,
-      "rationale": "Block for version-based retention in the GC rule. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Structural wrapper only; it does not expose credentials. Version-count limits that affect data lifetime are in nested `number`, which is assessed separately.",
       "compliant": null,
       "non-compliant": null,
-      "parent": null
+      "parent": null,
+      "arguments": {
+        "number": {
+          "description": "Maximum number of versions of a cell to retain.",
+          "required": true,
+          "security_impact": true,
+          "rationale": "Higher values keep more historical versions and can extend recoverable data lifetime (`max_version.number`).",
+          "compliant": "3",
+          "non-compliant": "10",
+          "parent": "max_version"
+        }
+      }
     },
     "gc_rules": {
-      "description": "Configuration for gc_rules on this Cloud Bigtable resource.",
+      "description": "Alternative JSON representation of GC rules when not using separate max_age/max_version blocks.",
       "required": false,
       "security_impact": false,
-      "rationale": "Alternative JSON representation of GC rules. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Alternate syntax for the same GC semantics; the attribute name does not carry secrets. Risk depends on the JSON content you place here, not on choosing this field instead of blocks.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "deletion_policy": {
-      "description": "Setting ABANDON allows the resource to be abandoned rather than deleted. This is useful for GC policy as it cannot be deleted in a replicated instance. Possible values are: `ABANDON`.",
+      "description": "Behavior when deleting the GC policy resource (for example `ABANDON` for replicated instances).",
       "required": false,
       "security_impact": false,
-      "rationale": "Behavior when deleting the GC policy resource (e.g. `ABANDON`). It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Controls how Terraform abandons vs deletes the GC policy resource object; it does not grant IAM on tables or expose cell data by itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "ignore_warnings": {
-      "description": "Setting this to `true` allows relaxing the gc policy for replicated clusters by up to 90 days, but keep in mind this may increase how long clusters are inconsistent. Make sure you understand the risks listed at https://cloud.google.com/bigtable/docs/garbage-collection#increasing before setting this option. ----- `max_age` supports the following arguments:",
+      "description": "If true, allows relaxing GC rules for replicated clusters within documented limits; increases inconsistency risk between replicas.",
       "required": false,
       "security_impact": false,
-      "rationale": "Allows relaxing retention on replicated clusters; increases inconsistency risk. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Not a confidentiality or IAM control: it relaxes GC consistency warnings for replicated clusters and may affect operational consistency, but it does not publish data publicly or add principals by itself.",
       "compliant": null,
       "non-compliant": null,
-      "parent": null
-    },
-    "days": {
-      "description": "Configuration for days on this Cloud Bigtable resource.",
-      "required": false,
-      "security_impact": true,
-      "rationale": "Retention longer than policy allows increases lifetime of stale/sensitive data.",
-      "compliant": "30",
-      "non-compliant": "180",
-      "parent": null
-    },
-    "duration": {
-      "description": "----- `max_version` supports the following arguments:",
-      "required": false,
-      "security_impact": false,
-      "rationale": "Alternative max-age duration format within `max_age`. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "number": {
-      "description": "----- `gc_rules` include 2 fields: - `mode`: optional, either `intersection` or `union`. - `rules`: an array of GC policy rule, can be specified as JSON object: `{\"max_age\": \"16h\"}` or `{\"max_version\": 2}` - If `mode` is not specified, `rules` can only contains one GC policy. If `mode` is specified, `rules` must have at least 2 policies.",
-      "required": true,
-      "security_impact": true,
-      "rationale": "Keeping too many versions increases recoverable historical data beyond approved retention posture.",
-      "compliant": "3",
-      "non-compliant": "10",
       "parent": null
     }
   }

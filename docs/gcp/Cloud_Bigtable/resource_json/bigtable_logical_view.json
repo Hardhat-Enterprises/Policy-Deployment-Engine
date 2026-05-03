@@ -6,7 +6,7 @@
       "description": "The logical view's select query.",
       "required": true,
       "security_impact": false,
-      "rationale": "SQL-like query defining the logical view over Bigtable data. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Defines how rows/columns are projected for the logical view; it is query logic in configuration, not an IAM binding and not a substitute for authentication—access is still enforced by IAM and client identity.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -15,7 +15,7 @@
       "description": "The unique name of the logical view in the form `[_a-zA-Z0-9][-_.a-zA-Z0-9]*`.",
       "required": true,
       "security_impact": false,
-      "rationale": "Terraform identifier for the logical view. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Terraform/API identifier only; like a resource name it does not carry secrets and does not by itself authorize callers.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -24,7 +24,7 @@
       "description": "Set to true to make the logical view protected against deletion.",
       "required": false,
       "security_impact": false,
-      "rationale": "Protects against accidental deletion of the logical view. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Guards against accidental deletion of the view definition in Terraform/API workflows; it does not publish data publicly or add IAM principals.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -33,7 +33,7 @@
       "description": "The name of the instance to create the logical view within.",
       "required": false,
       "security_impact": false,
-      "rationale": "Hosting Bigtable instance. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Selects the hosting instance by name; names are non-secret references and do not grant wide access without proper IAM on projects/instances.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -42,7 +42,7 @@
       "description": "If it is not provided, the provider project is used.",
       "required": false,
       "security_impact": false,
-      "rationale": "GCP project ID. It is metadata/configuration and does not directly grant access, enforce encryption, or expose sensitive data by itself.",
+      "rationale": "Project ID scopes API calls; it is public metadata and not equivalent to credentials or row-level access.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
