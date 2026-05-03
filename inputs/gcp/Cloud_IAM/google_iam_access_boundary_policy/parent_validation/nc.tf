@@ -3,7 +3,7 @@ resource "google_iam_access_boundary_policy" "nc" {
 
   name   = "my-ab-policy" 
 
-  display_name = "Invalid Access Boundary Policy"
+  display_name = "nc"
 
   rules {
     access_boundary_rule {
