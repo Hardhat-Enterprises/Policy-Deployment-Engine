@@ -3,7 +3,7 @@ resource "google_iam_folders_policy_binding" "c" {
   location          = "global"
   display_name      = "valid binding"
   policy_kind       = "PRINCIPAL_ACCESS_BOUNDARY"
-  policy_binding_id = "c"
+  policy_binding_id = "binding-for-all-folder-principals"
 
   policy = "organizations/123456789/locations/global/principalAccessBoundaryPolicies/policy-1"
 
