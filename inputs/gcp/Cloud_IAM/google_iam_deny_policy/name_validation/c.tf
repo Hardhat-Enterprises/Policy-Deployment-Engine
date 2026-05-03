@@ -1,4 +1,4 @@
-resource "google_iam_deny_policy" "c1" {
+resource "google_iam_deny_policy" "c" {
   name   = "pde-secure-policy1"
   parent = "cloudresourcemanager.googleapis.com/projects/my-project"
 

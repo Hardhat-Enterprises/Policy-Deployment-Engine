@@ -1,4 +1,4 @@
-resource "google_iam_folders_policy_binding" "c1" {
+resource "google_iam_folders_policy_binding" "c" {
   folder            = "folders/123456789"
   location          = "global"
   display_name      = "valid binding"

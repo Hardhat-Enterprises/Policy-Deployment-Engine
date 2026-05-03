@@ -1,5 +1,5 @@
-resource "google_iam_deny_policy" "nc1" {
-  name   = "nc1"
+resource "google_iam_deny_policy" "nc" {
+  name   = "Invalid-Policy!"
   parent = "cloudresourcemanager.googleapis.com/projects/my-project"
 
   rules {
