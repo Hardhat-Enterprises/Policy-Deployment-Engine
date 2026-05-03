@@ -14,7 +14,7 @@ cconditions := [
         {
             "condition": "Validate organization against whitelist",
             "attribute_path": ["organization"],
-            "values": ["PDE1", "PDE2", "PDE3"],
+            "values": ["123"],
             "policy_type": "whitelist"
         }
     ]
