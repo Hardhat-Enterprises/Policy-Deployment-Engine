@@ -1,4 +1,4 @@
-package terraform.gcp.security.bigquery_data_policy_v2.google_bigquery_datapolicyv2_data_policy_iam_binding.no_raw_data_reader_role
+package terraform.gcp.security.bigquery_data_policy_v2.google_bigquery_datapolicyv2_data_policy_iam_binding.role
 
 import data.terraform.helpers
 import data.terraform.gcp.security.bigquery_data_policy_v2.google_bigquery_datapolicyv2_data_policy_iam_binding.vars

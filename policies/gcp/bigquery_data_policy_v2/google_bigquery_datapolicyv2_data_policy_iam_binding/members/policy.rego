@@ -1,4 +1,4 @@
-package terraform.gcp.security.bigquery_data_policy_v2.google_bigquery_datapolicyv2_data_policy_iam_binding.no_public_members
+package terraform.gcp.security.bigquery_data_policy_v2.google_bigquery_datapolicyv2_data_policy_iam_binding.members
 
 import data.terraform.helpers
 import data.terraform.gcp.security.bigquery_data_policy_v2.google_bigquery_datapolicyv2_data_policy_iam_binding.vars

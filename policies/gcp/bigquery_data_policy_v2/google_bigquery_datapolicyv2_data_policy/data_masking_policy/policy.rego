@@ -1,4 +1,4 @@
-package terraform.gcp.security.bigquery_data_policy_v2.google_bigquery_datapolicyv2_data_policy.approved_masking_expression
+package terraform.gcp.security.bigquery_data_policy_v2.google_bigquery_datapolicyv2_data_policy.data_masking_policy
 
 import data.terraform.helpers
 import data.terraform.gcp.security.bigquery_data_policy_v2.google_bigquery_datapolicyv2_data_policy.vars
