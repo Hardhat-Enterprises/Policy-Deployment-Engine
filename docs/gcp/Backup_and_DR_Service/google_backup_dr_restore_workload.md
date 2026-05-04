@@ -60,11 +60,11 @@ Reference: [Terraform Registry – google_backup_dr_restore_workload](https://re
 | `display_device` | Optional. Enables display device for the instance. | false | false | Display enablement is not usually treated as a generic explicit security control in this context. | None | None |
 | `guest_accelerators` | Optional. A list of accelerator cards attached to this instance. | false | false | Performance/hardware configuration rather than a generic explicit security control. | None | None |
 | `hostname` | Optional. Specifies the hostname of the instance. | false | false | Identifier/operational field, not a generic explicit security control. | None | None |
-| `instance_encryption_key` | Optional. Encrypts suspended data for an instance with a customer-managed encryption key. | false | true | Encryption key configuration is a clear explicit security control, though the exact field values are better validated with custom rules. | None | None |
+| `instance_encryption_key` | Optional. Encrypts suspended data for an instance with a customer-managed encryption key. | false | false | This is a container block. Security controls apply to the specific encryption fields inside it rather than to the block itself. | None | None |
 | `key_revocation_action_type` | Optional. KeyRevocationActionType of the instance. | false | false | This is conditional key-management behavior rather than a generic explicit security control. | None | None |
 | `labels` | Optional. Labels to apply to this instance. | false | false | Labels are metadata rather than a generic explicit security control. | None | None |
 | `machine_type` | Optional. Full or partial URL of the machine type resource. | false | false | Sizing/performance field, not a generic explicit security control. | None | None |
-| `metadata` | Optional. Includes custom metadata and predefined keys. | false | true | Instance metadata can affect security posture and is a common explicit control point, though the allowed keys usually require custom validation. | None | None |
+| `metadata` | Optional. Includes custom metadata and predefined keys. | false | false | Instance metadata can affect security posture, but the security relevance usually depends on specific metadata keys and values. It is therefore better handled through custom validation rather than as a generic explicit security control. | None | None |
 | `min_cpu_platform` | Optional. Minimum CPU platform to use for this instance. | false | false | Hardware preference field, not a generic explicit security control. | None | None |
 | `network_interfaces` | Optional. An array of network configurations for this instance. | false | false | This is a container block. Security controls apply to specific fields inside it. | None | None |
 | `network_performance_config` | Optional. Configure network performance. | false | false | Performance configuration rather than a generic explicit security control. | None | None |
@@ -73,7 +73,7 @@ Reference: [Terraform Registry – google_backup_dr_restore_workload](https://re
 | `allocation_affinity` | Optional. Specifies the reservations that this instance can consume from. | false | false | Reservation consumption policy is operational rather than a generic explicit security control. | None | None |
 | `resource_policies` | Optional. Resource policies applied to this instance. | false | false | This is a resource reference list rather than a generic explicit security control. | None | None |
 | `scheduling` | Optional. Sets the scheduling options for this instance. | false | false | Container block for scheduling behavior, not itself a generic explicit security control. | None | None |
-| `service_accounts` | Optional. A list of service accounts with scopes. | false | true | Service account assignment is a clear explicit security control because it governs workload identity and permissions. | None | None |
+| `service_accounts` | Optional. A list of service accounts with scopes. | false | false | This is a container block. Security controls apply to the specific service account and scope values inside it rather than to the block itself. | None | None |
 | `shielded_instance_config` | Optional. Controls Shielded compute options on the instance. | false | false | Container block. Security controls apply to fields inside it. | None | None |
 | `tags` | Optional. Tags to apply to this instance. | false | false | Tags are metadata rather than a generic explicit security control. | None | None |
 
@@ -98,39 +98,46 @@ Reference: [Terraform Registry – google_backup_dr_restore_workload](https://re
   |----------|-------------|----------|-----------------|-----------|-----------|---------------|
   | `raw_key` | Optional. | false | false | Raw key presence is sensitive but better handled through custom validation than a generic explicit control. | None | None |
   | `rsa_encrypted_key` | Optional. | false | false | Key material field better handled through custom validation. | None | None |
-  | `kms_key_name` | Optional. | false | false | KMS selection is security-relevant but usually needs custom organizational validation. | None | None |
+  | `kms_key_name` | Optional. The resource name of the Cloud KMS key to use for encryption. | false | true | KMS-based encryption is security-relevant because it controls whether the restored instance uses customer-managed encryption keys for protected data but not writing a policy in T1/2026. | ['projects/my-project-4418-1743628379470/locations/australia-southeast1/keyRings/ring1/cryptoKeys/key1'] | ['projects/my-project-4418-1743628379470/locations/us-central1/keyRings/ring1/cryptoKeys/key1'] |
   | `kms_key_service_account` | Optional. | false | false | Service account selection needs custom validation rather than a simple generic control. | None | None |
 
 ###   network_interfaces Block
 
   | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
   |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-  | `network` | Optional. URL of the VPC network resource. | false | false | Network attachment is a clear security control because it can be restricted to approved networks. | None | None |
-  | `subnetwork` | Optional. URL of the subnetwork resource. | false | true | Subnetwork attachment is a clear security control because it can be restricted to approved subnetworks. | None | None |
+  | `network` | Optional. URL of the VPC network resource. | false | true | Network attachment is a clear security control because it can be restricted to approved networks, but not writing a policy in T1/2026. | ['projects/my-project-4418-1743628379470/global/networks/approved-network'] | ['projects/my-project-4418-1743628379470/global/networks/default'] |
+  | `subnetwork` | Optional. URL of the subnetwork resource. | false | true | Subnetwork attachment is a clear security control because it can be restricted to approved subnetworks, but not writing a policy in T1/2026. | ['projects/my-project-4418-1743628379470/regions/australia-southeast1/subnetworks/approved-subnet'] | ['projects/my-project-4418-1743628379470/regions/australia-southeast1/subnetworks/default'] |
   | `ip_address` | Optional. An IPv4 internal IP address. | false | false | Address selection is operational and better handled through custom validation. | None | None |
   | `ipv6_address` | Optional. An IPv6 internal network address. | false | false | Address selection is operational and better handled through custom validation. | None | None |
   | `internal_ipv6_prefix_length` | Optional. The prefix length of the primary internal IPv6 range. | false | false | Network sizing field, not a generic explicit security control. | None | None |
-  | `access_configs` | Optional. | false | true | Public access configuration is a clear generic security control because it can expose the instance externally. | None | None |
-  | `ipv6_access_configs` | Optional. | false | true | IPv6 public access configuration is a clear generic security control because it can expose the instance externally. | None | None |
+  | `access_configs` | Optional. | false | false | This is a container block. Security controls apply to the specific fields inside it. | None | None |
+  | `ipv6_access_configs` | Optional. | false | true | IPv6 public access configuration is a clear generic security control because it can expose the instance externally, but not writing a policy in T1/2026. | ['Not set'] | ['EXTERNAL'] |
   | `alias_ip_ranges` | Optional. | false | false | Network address allocation logic is operational and better handled through custom validation. | None | None |
   | `stack_type` | Optional. | false | false | Protocol stack choice is generally operational rather than a generic explicit security control. | None | None |
   | `ipv6_access_type` | Optional. | false | false | Addressing mode is better handled through custom validation than a simple generic control. | None | None |
   | `queue_count` | Optional. | false | false | Performance tuning field, not a generic explicit security control. | None | None |
   | `nic_type` | Optional. | false | false | Hardware/network performance field, not a generic explicit security control. | None | None |
-  | `network_attachment` | Optional. | false | true | Network attachment is a clear security control because it determines connectivity scope. | None | None |
+  | `network_attachment` | Optional. | false | true | Network attachment is a clear security control because it determines connectivity scope, but not writing a policy in T1/2026. | ['projects/my-project-4418-1743628379470/regions/australia-southeast1/networkAttachments/approved-attachment'] | ['projects/my-project-4418-1743628379470/regions/australia-southeast1/networkAttachments/unapproved-attachment'] |
 
 ###     access_configs Block
 
     | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
     |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-    | `type` | Optional. The type of configuration. | false | true | Access config type is a clear explicit security control because it governs external connectivity. | None | None |
+    | `type` | Optional. The type of configuration. | false | true | Access config type is a clear explicit security control because it governs external connectivity, but not writing a policy in T1/2026. | ['Not set'] | ['ONE_TO_ONE_NAT'] |
     | `name` | Optional. The name of this access configuration. | false | false | Identifier only. | None | None |
-    | `external_ip` | Optional. | false | true | Assigning an external IP is a clear explicit security control because it exposes the instance publicly. | None | None |
-    | `external_ipv6` | Optional. | false | true | Assigning an external IPv6 address is a clear explicit security control because it exposes the instance publicly. | None | None |
+    | `external_ip` | Optional. | false | true | Assigning an external IP is a clear explicit security control because it exposes the instance publicly, but not writing a policy in T1/2026. | ['Not set'] | ['34.0.0.1'] |
+    | `external_ipv6` | Optional. | false | true | Assigning an external IPv6 address is a clear explicit security control because it exposes the instance publicly, but not writing a policy in T1/2026. | ['Not set'] | ['2001:db8::1'] |
     | `external_ipv6_prefix_length` | Optional. | false | false | Address sizing field, not a generic explicit security control. | None | None |
     | `set_public_ptr` | Optional. | false | false | DNS pointer behavior is not usually enforced as a generic explicit security control here. | None | None |
     | `public_ptr_domain_name` | Optional. | false | false | DNS naming field, not a generic explicit security control. | None | None |
     | `network_tier` | Optional. | false | false | Networking service tier selection is operational rather than a generic explicit security control. | None | None |
+
+###   service_accounts Block
+
+  | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+  |----------|-------------|----------|-----------------|-----------|-----------|---------------|
+  | `email` | Optional. The service account email attached to the instance. | false | true | The service account email is security-relevant because it determines the workload identity used by the restored instance, but not writing a policy in T1/2026. | ['approved-sa@tamim-shahriar.iam.gserviceaccount.com'] | ['default-compute@developer.gserviceaccount.com'] |
+  | `scopes` | Optional. The OAuth scopes assigned to the service account. | false | true | OAuth scopes are security-relevant because they affect the level of API access available to the attached service account, but not writing a policy in T1/2026. | ['https://www.googleapis.com/auth/logging.write', 'https://www.googleapis.com/auth/monitoring.write'] | ['https://www.googleapis.com/auth/cloud-platform'] |
 
 ###   shielded_instance_config Block
 

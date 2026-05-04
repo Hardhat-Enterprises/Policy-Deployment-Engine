@@ -12,11 +12,6 @@ resource "google_backup_dr_backup_plan" "nc" {
     standard_schedule {
       recurrence_type = "DAILY"
       time_zone       = "Australia/Melbourne"
-
-      backup_window {
-        start_hour_of_day = 1
-        end_hour_of_day   = 3
-      }
     }
   }
 }

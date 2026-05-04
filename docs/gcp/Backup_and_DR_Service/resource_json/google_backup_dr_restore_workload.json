@@ -325,8 +325,8 @@
         "instance_encryption_key": {
           "description": "Optional. Encrypts suspended data for an instance with a customer-managed encryption key.",
           "required": false,
-          "security_impact": true,
-          "rationale": "Encryption key configuration is a clear explicit security control, though the exact field values are better validated with custom rules.",
+          "security_impact": false,
+          "rationale": "This is a container block. Security controls apply to the specific encryption fields inside it rather than to the block itself.",
           "compliant": null,
           "non-compliant": null,
           "parent": "compute_instance_restore_properties",
@@ -350,12 +350,12 @@
               "parent": "instance_encryption_key"
             },
             "kms_key_name": {
-              "description": "Optional.",
+              "description": "Optional. The resource name of the Cloud KMS key to use for encryption.",
               "required": false,
-              "security_impact": false,
-              "rationale": "KMS selection is security-relevant but usually needs custom organizational validation.",
-              "compliant": null,
-              "non-compliant": null,
+              "security_impact": true,
+              "rationale": "KMS-based encryption is security-relevant because it controls whether the restored instance uses customer-managed encryption keys for protected data but not writing a policy in T1/2026.",
+              "compliant": ["projects/my-project-4418-1743628379470/locations/australia-southeast1/keyRings/ring1/cryptoKeys/key1"],
+              "non-compliant": ["projects/my-project-4418-1743628379470/locations/us-central1/keyRings/ring1/cryptoKeys/key1"],
               "parent": "instance_encryption_key"
             },
             "kms_key_service_account": {
@@ -399,8 +399,8 @@
         "metadata": {
           "description": "Optional. Includes custom metadata and predefined keys.",
           "required": false,
-          "security_impact": true,
-          "rationale": "Instance metadata can affect security posture and is a common explicit control point, though the allowed keys usually require custom validation.",
+          "security_impact": false,
+          "rationale": "Instance metadata can affect security posture, but the security relevance usually depends on specific metadata keys and values. It is therefore better handled through custom validation rather than as a generic explicit security control.",
           "compliant": null,
           "non-compliant": null,
           "parent": "compute_instance_restore_properties"
@@ -426,19 +426,19 @@
             "network": {
               "description": "Optional. URL of the VPC network resource.",
               "required": false,
-              "security_impact": false,
-              "rationale": "Network attachment is a clear security control because it can be restricted to approved networks.",
-              "compliant": null,
-              "non-compliant": null,
+              "security_impact": true,
+              "rationale": "Network attachment is a clear security control because it can be restricted to approved networks, but not writing a policy in T1/2026.",
+              "compliant": ["projects/my-project-4418-1743628379470/global/networks/approved-network"],
+              "non-compliant": ["projects/my-project-4418-1743628379470/global/networks/default"],
               "parent": "network_interfaces"
             },
             "subnetwork": {
               "description": "Optional. URL of the subnetwork resource.",
               "required": false,
               "security_impact": true,
-              "rationale": "Subnetwork attachment is a clear security control because it can be restricted to approved subnetworks.",
-              "compliant": null,
-              "non-compliant": null,
+              "rationale": "Subnetwork attachment is a clear security control because it can be restricted to approved subnetworks, but not writing a policy in T1/2026.",
+              "compliant": ["projects/my-project-4418-1743628379470/regions/australia-southeast1/subnetworks/approved-subnet"],
+              "non-compliant": ["projects/my-project-4418-1743628379470/regions/australia-southeast1/subnetworks/default"],
               "parent": "network_interfaces"
             },
             "ip_address": {
@@ -471,8 +471,8 @@
             "access_configs": {
               "description": "Optional.",
               "required": false,
-              "security_impact": true,
-              "rationale": "Public access configuration is a clear generic security control because it can expose the instance externally.",
+              "security_impact": false,
+              "rationale": "This is a container block. Security controls apply to the specific fields inside it.",
               "compliant": null,
               "non-compliant": null,
               "parent": "network_interfaces",
@@ -481,9 +481,9 @@
                   "description": "Optional. The type of configuration.",
                   "required": false,
                   "security_impact": true,
-                  "rationale": "Access config type is a clear explicit security control because it governs external connectivity.",
-                  "compliant": null,
-                  "non-compliant": null,
+                  "rationale": "Access config type is a clear explicit security control because it governs external connectivity, but not writing a policy in T1/2026.",
+                  "compliant": ["Not set"],
+                  "non-compliant": ["ONE_TO_ONE_NAT"],
                   "parent": "access_configs"
                 },
                 "name": {
@@ -499,18 +499,18 @@
                   "description": "Optional.",
                   "required": false,
                   "security_impact": true,
-                  "rationale": "Assigning an external IP is a clear explicit security control because it exposes the instance publicly.",
-                  "compliant": null,
-                  "non-compliant": null,
+                  "rationale": "Assigning an external IP is a clear explicit security control because it exposes the instance publicly, but not writing a policy in T1/2026.",
+                  "compliant": ["Not set"],
+                  "non-compliant": ["34.0.0.1"],
                   "parent": "access_configs"
                 },
                 "external_ipv6": {
                   "description": "Optional.",
                   "required": false,
                   "security_impact": true,
-                  "rationale": "Assigning an external IPv6 address is a clear explicit security control because it exposes the instance publicly.",
-                  "compliant": null,
-                  "non-compliant": null,
+                  "rationale": "Assigning an external IPv6 address is a clear explicit security control because it exposes the instance publicly, but not writing a policy in T1/2026.",
+                  "compliant": ["Not set"],
+                  "non-compliant": ["2001:db8::1"],
                   "parent": "access_configs"
                 },
                 "external_ipv6_prefix_length": {
@@ -555,9 +555,9 @@
               "description": "Optional.",
               "required": false,
               "security_impact": true,
-              "rationale": "IPv6 public access configuration is a clear generic security control because it can expose the instance externally.",
-              "compliant": null,
-              "non-compliant": null,
+              "rationale": "IPv6 public access configuration is a clear generic security control because it can expose the instance externally, but not writing a policy in T1/2026.",
+              "compliant": ["Not set"],
+              "non-compliant": ["EXTERNAL"],
               "parent": "network_interfaces"
             },
             "alias_ip_ranges": {
@@ -609,9 +609,9 @@
               "description": "Optional.",
               "required": false,
               "security_impact": true,
-              "rationale": "Network attachment is a clear security control because it determines connectivity scope.",
-              "compliant": null,
-              "non-compliant": null,
+              "rationale": "Network attachment is a clear security control because it determines connectivity scope, but not writing a policy in T1/2026.",
+              "compliant": ["projects/my-project-4418-1743628379470/regions/australia-southeast1/networkAttachments/approved-attachment"],
+              "non-compliant": ["projects/my-project-4418-1743628379470/regions/australia-southeast1/networkAttachments/unapproved-attachment"],
               "parent": "network_interfaces"
             }
           }
@@ -673,11 +673,31 @@
         "service_accounts": {
           "description": "Optional. A list of service accounts with scopes.",
           "required": false,
-          "security_impact": true,
-          "rationale": "Service account assignment is a clear explicit security control because it governs workload identity and permissions.",
+          "security_impact": false,
+          "rationale": "This is a container block. Security controls apply to the specific service account and scope values inside it rather than to the block itself.",
           "compliant": null,
           "non-compliant": null,
-          "parent": "compute_instance_restore_properties"
+          "parent": "compute_instance_restore_properties",
+          "arguments": {
+            "email": {
+              "description": "Optional. The service account email attached to the instance.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "The service account email is security-relevant because it determines the workload identity used by the restored instance, but not writing a policy in T1/2026.",
+              "compliant": ["approved-sa@tamim-shahriar.iam.gserviceaccount.com"],
+              "non-compliant": ["default-compute@developer.gserviceaccount.com"],
+              "parent": "service_accounts"
+            },
+            "scopes": {
+              "description": "Optional. The OAuth scopes assigned to the service account.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "OAuth scopes are security-relevant because they affect the level of API access available to the attached service account, but not writing a policy in T1/2026.",
+              "compliant": ["https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring.write"],
+              "non-compliant": ["https://www.googleapis.com/auth/cloud-platform"],
+              "parent": "service_accounts"
+            }
+          }
         },
         "shielded_instance_config": {
           "description": "Optional. Controls Shielded compute options on the instance.",

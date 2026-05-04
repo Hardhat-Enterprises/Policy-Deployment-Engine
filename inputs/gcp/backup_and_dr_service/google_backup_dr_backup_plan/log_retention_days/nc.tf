@@ -5,13 +5,5 @@ resource "google_backup_dr_backup_plan" "nc" {
   resource_type  = "compute.googleapis.com/Instance"
   backup_vault   = "nc2"
 
-  backup_rules {
-    rule_id               = "daily-rule"
-    backup_retention_days = 30
-
-    standard_schedule {
-      recurrence_type = "YEARLY"
-      time_zone       = "Australia/Melbourne"
-    }
-  }
+  log_retention_days = 10
 }
