@@ -59,9 +59,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ "${{ steps.policy-checks.outcome }}" == "failure" ]; then
-            echo "Policy checks failed - Adding CI-Review-Required label"
+            echo "Policy checks failed - Adding CI-Review-Required label and removing CI-Approved"
+            gh pr edit ${{ github.event.pull_request.number }} --remove-label "CI-Approved" 2>/dev/null || true
             gh pr edit ${{ github.event.pull_request.number }} --add-label "CI-Review-Required"
           else
-            echo "Policy checks passed - Adding CI-Approved label"
+            echo "Policy checks passed - Adding CI-Approved label and removing CI-Review-Required"
+            gh pr edit ${{ github.event.pull_request.number }} --remove-label "CI-Review-Required" 2>/dev/null || true
             gh pr edit ${{ github.event.pull_request.number }} --add-label "CI-Approved"
           fi
