@@ -26,6 +26,30 @@ def print_changed_files(changed_files: List[str]) -> None:
             print(f"{file} was changed")
 
 
+def validate_allowed_folders(changed_files: List[str]) -> Tuple[bool, str]:
+    """
+    Validate that only allowed folders are changed.
+    Service PRs can only modify: inputs/gcp/, policies/gcp/, and docs/gcp/
+    
+    Returns:
+        Tuple of (is_valid, message)
+    """
+    allowed_prefixes = ("inputs/gcp/", "policies/gcp/", "docs/gcp/")
+    invalid_files = []
+    
+    for file_path in changed_files:
+        if not any(file_path.startswith(prefix) for prefix in allowed_prefixes):
+            invalid_files.append(file_path)
+    
+    if invalid_files:
+        invalid_list = "\n  - ".join(invalid_files)
+        message = f"❌ Service PRs can only modify files in: inputs/gcp/, policies/gcp/, and docs/gcp/\nInvalid changes found:\n  - {invalid_list}"
+        return False, message
+    
+    message = "✅ All changes are in allowed folders"
+    return True, message
+
+
 def extract_affected_services(changed_files: List[str]) -> Set[str]:
     """Extract unique GCP service names from changed file paths."""
     services = set()
@@ -210,6 +234,32 @@ def main():
     
     # Print all changed files
     print_changed_files(changed_files)
+    
+    # Validate only allowed folders are changed
+    is_valid, validation_message = validate_allowed_folders(changed_files)
+    print(validation_message)
+    
+    if not is_valid:
+        # Write GitHub summary with validation failure
+        write_github_summary("❌ VALIDATION FAILED", validation_message)
+        
+        # Create and post PR comment about invalid changes
+        if os.getenv("PR_NUMBER"):
+            comment = f"""## 🔍 File Validation Failed
+
+**Status**: ❌ VALIDATION FAILED
+
+⚠️ **Your PR contains changes outside of allowed folders:**
+
+{validation_message}
+
+Service PRs can only modify files in:
+- `inputs/` - Service input configurations
+- `policies/` - OPA/Rego policy files
+- `docs/` - Service documentation"""
+            post_pr_comment(comment)
+        
+        return 1
     
     # Check if documentation exists
     has_docs, docs_message = check_documentation_exists(changed_files)
