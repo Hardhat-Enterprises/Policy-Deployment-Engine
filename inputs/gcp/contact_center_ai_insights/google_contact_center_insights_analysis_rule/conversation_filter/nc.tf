@@ -4,7 +4,4 @@ resource "google_contact_center_insights_analysis_rule" "nc" {
 
   conversation_filter = ""
 
-  annotator_selector {
-    run_sentiment_annotator = true
-  }
 }

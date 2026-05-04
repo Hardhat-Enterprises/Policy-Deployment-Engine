@@ -6,7 +6,7 @@ import data.terraform.gcp.security.contact_center_ai_insights.contact_center_ins
 conditions := [
     [
         {
-            "situation_description": "Contact Center Insights Assessment Rule is using an empty or overly broad conversation filter.",
+            "situation_description": "Contact Center Insights Assessment Rule is using an empty sample rule conversation filter.",
             "remedies": ["Set a specific sample rule conversation filter to limit assessment to approved conversation types."]
         },
         {

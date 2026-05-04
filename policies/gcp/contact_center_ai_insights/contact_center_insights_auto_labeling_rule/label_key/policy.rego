@@ -7,7 +7,7 @@ conditions := [
     [
         {
             "situation_description": "Contact Center Insights Auto Labeling Rule does not have a label key configured.",
-            "remedies": ["Set label_key to an approved label key so conversations are classified correctly."]
+            "remedies": ["Set label_key to a meaningful label key so conversations are classified correctly."]
         },
         {
             "condition": "Check if label key is not empty",

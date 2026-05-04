@@ -7,7 +7,7 @@ conditions := [
     [
         {
             "situation_description": "Contact Center Insights Assessment Rule has invalid sample percentage.",
-            "remedies": ["Set sample_percentage to an approved value greater than 0."]
+            "remedies": ["Set sample_percentage to an approved value such as 10, 25, or 50."]
         },
         {
             "condition": "Check if sample percentage uses an approved value",
