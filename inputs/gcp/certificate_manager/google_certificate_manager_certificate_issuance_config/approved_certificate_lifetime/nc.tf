@@ -1,5 +1,5 @@
-resource "google_certificate_manager_certificate_issuance_config" "nc_certificate_issuance_config_lifetime" {
-  name        = "nc-certificate-issuance-config-lifetime"
+resource "google_certificate_manager_certificate_issuance_config" "nc" {
+  name        = "nc"
   description = "Non-compliant certificate issuance config lifetime"
   location    = "us-central1"
 

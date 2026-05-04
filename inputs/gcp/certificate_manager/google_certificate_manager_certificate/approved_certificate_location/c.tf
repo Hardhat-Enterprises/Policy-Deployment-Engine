@@ -1,5 +1,5 @@
-resource "google_certificate_manager_certificate" "c_certificate_location" {
-  name        = "c-certificate-location"
+resource "google_certificate_manager_certificate" "c" {
+  name        = "c"
   description = "Compliant certificate using the approved global location."
   location    = "global"
 

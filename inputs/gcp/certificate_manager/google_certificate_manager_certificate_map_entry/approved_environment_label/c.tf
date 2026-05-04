@@ -1,10 +1,10 @@
 resource "google_certificate_manager_certificate_map" "c_map" {
-  name        = "c-entry-env-map"
+  name        = "c-map"
   description = "Compliant certificate map for approved environment label entry test."
 }
 
 resource "google_certificate_manager_certificate" "c_certificate" {
-  name        = "c-entry-env-certificate"
+  name        = "c"
   description = "Compliant certificate for approved environment label entry test."
 
   managed {
@@ -12,7 +12,7 @@ resource "google_certificate_manager_certificate" "c_certificate" {
   }
 }
 
-resource "google_certificate_manager_certificate_map_entry" "c_certificate_map_entry" {
+resource "google_certificate_manager_certificate_map_entry" "c" {
   name        = "c-certificate-map-entry-env"
   description = "Compliant certificate map entry with approved environment label."
   map         = google_certificate_manager_certificate_map.c_map.name

@@ -1,5 +1,5 @@
 resource "google_certificate_manager_certificate" "c" {
-  name        = "c-certificate-scope"
+  name        = "c"
   description = "Compliant certificate using the approved certificate scope."
   project     = "test-project"
   location    = "global"

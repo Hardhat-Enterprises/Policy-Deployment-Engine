@@ -1,5 +1,5 @@
-resource "google_certificate_manager_certificate_issuance_config" "c_certificate_issuance_config_lifetime" {
-  name        = "c-certificate-issuance-config-lifetime"
+resource "google_certificate_manager_certificate_issuance_config" "c" {
+  name        = "c"
   description = "Compliant certificate issuance config lifetime"
   location    = "us-central1"
 

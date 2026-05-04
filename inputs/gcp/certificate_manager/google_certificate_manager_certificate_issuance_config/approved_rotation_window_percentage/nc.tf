@@ -1,5 +1,5 @@
-resource "google_certificate_manager_certificate_issuance_config" "nc_certificate_issuance_config_rotation" {
-  name        = "nc-certificate-issuance-config-rotation"
+resource "google_certificate_manager_certificate_issuance_config" "nc" {
+  name        = "nc"
   description = "Non-compliant certificate issuance config rotation window"
   location    = "us-central1"
 

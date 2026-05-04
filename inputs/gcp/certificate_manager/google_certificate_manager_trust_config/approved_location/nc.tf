@@ -1,5 +1,5 @@
-resource "google_certificate_manager_trust_config" "nc_trust_config" {
-  name     = "nc-trust-config-location"
+resource "google_certificate_manager_trust_config" "nc" {
+  name     = "nc"
   location = "us-central1"
 
   trust_stores {

@@ -1,5 +1,5 @@
-resource "google_certificate_manager_certificate_issuance_config" "nc_certificate_issuance_config_ca_pool" {
-  name        = "nc-certificate-issuance-config-ca-pool"
+resource "google_certificate_manager_certificate_issuance_config" "nc" {
+  name        = "nc"
   description = "Non-compliant certificate issuance config using unapproved CA pool"
   location    = "global"
 

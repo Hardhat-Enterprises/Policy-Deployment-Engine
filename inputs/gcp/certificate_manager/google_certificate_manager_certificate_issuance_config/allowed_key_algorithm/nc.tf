@@ -1,5 +1,5 @@
-resource "google_certificate_manager_certificate_issuance_config" "nc_certificate_issuance_config" {
-  name        = "nc-certificate-issuance-config"
+resource "google_certificate_manager_certificate_issuance_config" "nc" {
+  name        = "nc"
   description = "Non-compliant certificate issuance config"
   location    = "us-central1"
 

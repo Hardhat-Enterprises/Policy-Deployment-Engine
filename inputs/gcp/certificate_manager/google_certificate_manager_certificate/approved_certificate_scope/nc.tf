@@ -1,5 +1,5 @@
 resource "google_certificate_manager_certificate" "nc" {
-  name        = "nc-certificate-scope"
+  name        = "nc"
   description = "Non-compliant certificate using a non-approved certificate scope."
   project     = "test-project"
   location    = "global"

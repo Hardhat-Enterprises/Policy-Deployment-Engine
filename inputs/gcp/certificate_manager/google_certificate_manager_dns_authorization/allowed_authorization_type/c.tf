@@ -1,5 +1,5 @@
-resource "google_certificate_manager_dns_authorization" "c_dns_authorization" {
-  name        = "c-dns-authorization"
+resource "google_certificate_manager_dns_authorization" "c" {
+  name        = "c"
   description = "Compliant DNS authorization"
   domain      = "example.com"
   location    = "us-central1"

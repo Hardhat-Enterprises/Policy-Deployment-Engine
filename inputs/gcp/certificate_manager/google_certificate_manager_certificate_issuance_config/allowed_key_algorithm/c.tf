@@ -1,5 +1,5 @@
-resource "google_certificate_manager_certificate_issuance_config" "c_certificate_issuance_config" {
-  name        = "c-certificate-issuance-config"
+resource "google_certificate_manager_certificate_issuance_config" "c" {
+  name        = "c"
   description = "Compliant certificate issuance config"
   location    = "us-central1"
 

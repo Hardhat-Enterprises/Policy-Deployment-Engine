@@ -1,5 +1,5 @@
 resource "google_certificate_manager_certificate" "c" {
-  name = "c-certificate"
+  name = "c"
 
   managed {
     domains = ["example.com"]
