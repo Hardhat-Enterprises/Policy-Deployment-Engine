@@ -10,25 +10,25 @@ Reference: [Terraform Registry – container_attached_cluster](https://registry.
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `location` | The location for the resource | true | false | None | None | None |
-| `name` | The name of this resource. | true | false | None | None | None |
-| `oidc_config` | OIDC discovery information of the target cluster. Kubernetes Service Account (KSA) tokens are JWT tokens signed by the cluster API server. This fields indicates how GCP services validate KSA tokens in order to allow system workloads (such as GKE Connect and telemetry agents) to authenticate back to GCP. Both clusters with public and private issuer URLs are supported. Clusters with public issuers only need to specify the `issuer_url` field while clusters with private issuers need to provide both `issuer_url` and `jwks`. Structure is [documented below](#nested_oidc_config). | true | false | None | None | None |
+| `location` | The location for the resource | true | false | The location does not directly impact security, but choosing appropriate regions can support compliance and data residency requirements. | None | None |
+| `name` | The name of this resource. | true | false | The name is primarily an identifier and does not influence security unless it exposes sensitive information through naming conventions. | None | None |
+| `oidc_config` | OIDC discovery information of the target cluster. Kubernetes Service Account (KSA) tokens are JWT tokens signed by the cluster API server. This fields indicates how GCP services validate KSA tokens in order to allow system workloads (such as GKE Connect and telemetry agents) to authenticate back to GCP. Both clusters with public and private issuer URLs are supported. Clusters with public issuers only need to specify the `issuer_url` field while clusters with private issuers need to provide both `issuer_url` and `jwks`. Structure is [documented below](#nested_oidc_config). | true | false | OIDC configuration governs how identities are validated for workloads interacting with GCP. Misconfiguration can allow unauthorized identities to authenticate and access cluster resources. | None | None |
 | `platform_version` | The platform version for the cluster (e.g. `1.23.0-gke.1`). | true | true | Using outdated or unsupported platform versions exposes the cluster to known security vulnerabilities and potential integration failures with GCP services. Maintaining a modern platform version ensures that the latest security patches and performance improvements are applied. | 1.29.1-gke.1 | 1.29.0-gke.1 |
 | `distribution` | The Kubernetes distribution of the underlying attached cluster. Supported values: "eks", "aks", "generic". The generic distribution provides the ability to register or migrate any CNCF conformant cluster. | true | true | Restricting distributions to 'eks' or 'aks' ensures that the cluster benefits from cloud-specific security optimizations and maintained compatibility with GCP's management layer. Using 'generic' distributions for production can lead to a lack of automated security features and potential integration failures. | aks | generic |
-| `fleet` | Fleet configuration. Structure is [documented below](#nested_fleet). | true | false | None | None | None |
-| `description` | A human readable description of this attached cluster. Cannot be longer than 255 UTF-8 encoded bytes. | false | false | None | None | None |
-| `annotations` | Optional. Annotations on the cluster. This field has the same restrictions as Kubernetes annotations. The total size of all keys and values combined is limited to 256k. Key can have 2 segments: prefix (optional) and name (required), separated by a slash (/). Prefix must be a DNS subdomain. Name must be 63 characters or less, begin and end with alphanumerics, with dashes (-), underscores (_), dots (.), and alphanumerics between. **Note**: This field is non-authoritative, and will only manage the annotations present in your configuration. Please refer to the field `effective_annotations` for all of the annotations present on the resource. | false | false | None | None | None |
-| `logging_config` | Logging configuration. Structure is [documented below](#nested_logging_config). | false | false | None | None | None |
+| `fleet` | Fleet configuration. Structure is [documented below](#nested_fleet). | true | false | Specifying the correct Fleet host project ensures proper governance, access control, and policy enforcement across clusters. Misconfiguration may expose the cluster to unauthorized administrative domains. | None | None |
+| `description` | A human readable description of this attached cluster. Cannot be longer than 255 UTF-8 encoded bytes. | false | false | This field is informational only and does not affect system behavior or access control. However, sensitive information should not be included in descriptions. | None | None |
+| `annotations` | Optional. Annotations on the cluster. This field has the same restrictions as Kubernetes annotations. The total size of all keys and values combined is limited to 256k. Key can have 2 segments: prefix (optional) and name (required), separated by a slash (/). Prefix must be a DNS subdomain. Name must be 63 characters or less, begin and end with alphanumerics, with dashes (-), underscores (_), dots (.), and alphanumerics between. **Note**: This field is non-authoritative, and will only manage the annotations present in your configuration. Please refer to the field `effective_annotations` for all of the annotations present on the resource. | false | false | Annotations are metadata and do not directly impact security, but improper use could expose sensitive information if secrets or internal details are included. | None | None |
+| `logging_config` | Logging configuration. Structure is [documented below](#nested_logging_config). | false | false | Proper logging configuration ensures visibility into cluster activities. Without logging, security incidents may go undetected, reducing the ability to audit and respond to threats. | None | None |
 | `authorization` | Configuration related to the cluster RBAC settings. Structure is [documented below](#nested_authorization). | false | true | Restricting cluster admin groups to verified corporate domains (e.g., '@company.com') ensures that only authorized internal entities can exercise full control over the cluster. Allowing personal accounts or unapproved domains bypasses centralized identity management and increases the risk of unauthorized access or data exfiltration. | abc@company.com | xyz@random.com |
-| `monitoring_config` | Monitoring configuration. Structure is [documented below](#nested_monitoring_config). | false | false | None | None | None |
+| `monitoring_config` | Monitoring configuration. Structure is [documented below](#nested_monitoring_config). | false | false | Ensures visibility into cluster performance and security events, enabling timely detection and response to anomalies. | None | None |
 | `binary_authorization` | Binary Authorization configuration. Structure is [documented below](#nested_binary_authorization). | false | true | Enabling Binary Authorization enforcement ensures that only verified, signed images are allowed to run on the cluster. Disabling this feature or leaving it unset allows unverified or potentially malicious container images to be deployed, significantly increasing the risk of a security breach. | PROJECT_SINGLETON_POLICY_ENFORCE | DISABLED |
-| `proxy_config` | Support for proxy configuration. Structure is [documented below](#nested_proxy_config). | false | false | None | None | None |
-| `security_posture_config` | , Deprecated) Enable/Disable Security Posture API features for the cluster. Structure is [documented below](#nested_security_posture_config). ~> **Warning:** `security_posture_config` is deprecated and will be removed in a future major release. | false | false | None | None | None |
-| `project` | If it is not provided, the provider project is used. | false | false | None | None | None |
+| `proxy_config` | Support for proxy configuration. Structure is [documented below](#nested_proxy_config). | false | false | Enforces controlled network egress through approved proxies, reducing the risk of unauthorized external communication. | None | None |
+| `security_posture_config` | , Deprecated) Enable/Disable Security Posture API features for the cluster. Structure is [documented below](#nested_security_posture_config). ~> **Warning:** `security_posture_config` is deprecated and will be removed in a future major release. | false | false | Provides workload vulnerability insights to identify and remediate security risks across the cluster. | None | None |
+| `project` | If it is not provided, the provider project is used. | true | false | Ensures resources are deployed within the intended project boundary for proper governance and access control. | None | None |
 | `deletion_policy` | Policy of the resource deletion. | true | true | Setting the deletion policy to 'DELETE' ensures that the GCP control plane properly cleans up all associated metadata and memberships when the resource is destroyed. Using 'DELETE_IGNORE_ERRORS' can result in orphaned resources and an inconsistent state, making it difficult to re-register clusters or audit the infrastructure accurately. | DELETE | DELETE_IGNORE_ERRORS |
-| `component_config` |  | false | false | None | None | None |
-| `managed_prometheus_config` | Enable Google Cloud Managed Service for Prometheus in the cluster. | false | false | None | None | None |
-| `kubernetes_secret` |  | false | false | None | None | None |
+| `component_config` | Configuration for enabling and managing logging components within the cluster. | false | false | Defines the scope of logging and monitoring components enabled in the cluster, ensuring critical system-level telemetry is captured for auditing, threat detection, and operational visibility. | None | None |
+| `managed_prometheus_config` | Enable Google Cloud Managed Service for Prometheus in the cluster. | false | false | Provides centralized and secure metrics collection for the cluster, improving observability, performance monitoring, and early detection of security or operational issues. | None | None |
+| `kubernetes_secret` | Kubernetes Secret resource used to securely store and reference proxy configuration details. | true | false | Ensures sensitive proxy configuration data is stored securely within Kubernetes secrets, reducing the risk of credential exposure and unauthorized access. | None | None |
 
 ### oidc_config Block
 
@@ -41,45 +41,45 @@ Reference: [Terraform Registry – container_attached_cluster](https://registry.
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `membership` | (Output) The name of the managed Hub Membership resource associated to this cluster. Membership names are formatted as projects/<project-number>/locations/global/membership/<cluster-id>. | false | false | None | None | None |
-| `project` | The number of the Fleet host project where this cluster will be registered. | true | false | None | None | None |
+| `membership` | (Output) The name of the managed Hub Membership resource associated to this cluster. Membership names are formatted as projects/<project-number>/locations/global/membership/<cluster-id>. | false | false | Descriptions are metadata and do not directly impact security, though they should avoid including sensitive information. | None | None |
+| `project` | The number of the Fleet host project where this cluster will be registered. | true | false | The Fleet host project defines the administrative and governance boundary for the cluster. Assigning the cluster to an incorrect or unauthorized project can lead to improper access controls, policy misalignment, and potential exposure to unauthorized administrators. | None | None |
 
 ### logging_config Block
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `component_config` | The configuration of the logging components Structure is [documented below](#nested_logging_config_component_config). | false | false | None | None | None |
+| `component_config` | The configuration of the logging components Structure is [documented below](#nested_logging_config_component_config). | false | false | Defining logging components ensures that critical system and workload logs are captured. Missing configuration may result in incomplete observability and hinder incident response. | None | None |
 
 ### authorization Block
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `admin_users` | Users that can perform operations as a cluster admin. A managed ClusterRoleBinding will be created to grant the `cluster-admin` ClusterRole to the users. Up to ten admin users can be provided. For more info on RBAC, see https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles | false | false | None | None | None |
-| `admin_groups` | Groups that can perform operations as a cluster admin. A managed ClusterRoleBinding will be created to grant the `cluster-admin` ClusterRole to the groups. Up to ten admin groups can be provided. For more info on RBAC, see https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles | false | false | None | None | None |
+| `admin_users` | Users that can perform operations as a cluster admin. A managed ClusterRoleBinding will be created to grant the `cluster-admin` ClusterRole to the users. Up to ten admin users can be provided. For more info on RBAC, see https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles | false | false | Granting cluster-admin privileges to individual users introduces significant security risk if not tightly controlled. Using personal accounts instead of centralized identity groups can lead to poor access governance, lack of auditability, and difficulty in revoking access when users leave or change roles. | None | None |
+| `admin_groups` | Groups that can perform operations as a cluster admin. A managed ClusterRoleBinding will be created to grant the `cluster-admin` ClusterRole to the groups. Up to ten admin groups can be provided. For more info on RBAC, see https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles | false | false | Ensures cluster-admin access is granted only to approved groups, enabling centralized control, reducing privilege sprawl, improving auditability, and limiting exposure of highly privileged access. | None | None |
 
 ### monitoring_config Block
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `managed_prometheus_config` | Enable Google Cloud Managed Service for Prometheus in the cluster. Structure is [documented below](#nested_monitoring_config_managed_prometheus_config). | false | false | None | None | None |
+| `managed_prometheus_config` | Enable Google Cloud Managed Service for Prometheus in the cluster. Structure is [documented below](#nested_monitoring_config_managed_prometheus_config). | false | false | Enables standardized, secure metrics collection to improve observability and detect potential security or performance issues. | None | None |
 
 ### binary_authorization Block
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `evaluation_mode` | Configure Binary Authorization evaluation mode. Possible values are: `DISABLED`, `PROJECT_SINGLETON_POLICY_ENFORCE`. | false | false | None | None | None |
+| `evaluation_mode` | Configure Binary Authorization evaluation mode. Possible values are: `DISABLED`, `PROJECT_SINGLETON_POLICY_ENFORCE`. | false | false | Enforces verification of container image signatures to ensure only trusted and authorized images are deployed in the cluster. | None | None |
 
 ### proxy_config Block
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `kubernetes_secret` | The Kubernetes Secret resource that contains the HTTP(S) proxy configuration. Structure is [documented below](#nested_proxy_config_kubernetes_secret). | false | false | None | None | None |
+| `kubernetes_secret` | The Kubernetes Secret resource that contains the HTTP(S) proxy configuration. Structure is [documented below](#nested_proxy_config_kubernetes_secret). | false | false | Secures proxy configuration data using Kubernetes secrets, preventing exposure of sensitive connection details. | None | None |
 
 ### security_posture_config Block
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `vulnerability_mode` | Sets the mode of the Kubernetes security posture API's workload vulnerability scanning. Possible values are: `VULNERABILITY_DISABLED`, `VULNERABILITY_ENTERPRISE`. | true | false | None | None | None |
+| `vulnerability_mode` | Sets the mode of the Kubernetes security posture API's workload vulnerability scanning. Possible values are: `VULNERABILITY_DISABLED`, `VULNERABILITY_ENTERPRISE`. | true | false | Enables continuous vulnerability scanning to detect known security issues in workloads and dependencies. | None | None |
 
 ### component_config Block
 
@@ -97,5 +97,5 @@ Reference: [Terraform Registry – container_attached_cluster](https://registry.
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `name` | Name of the kubernetes secret containing the proxy config. | true | false | None | None | None |
+| `name` | Name of the kubernetes secret containing the proxy config. | true | false | Correctly identifying the secret ensures the intended secure proxy configuration is applied, preventing misconfiguration or accidental exposure of sensitive network settings. | None | None |
 | `namespace` | Namespace of the kubernetes secret containing the proxy config. | true | true | Restricting the namespace to 'kube-system' or 'gatekeeper-system' ensures that only administrative users with high-level permissions can manage the proxy lifecycle, maintaining the integrity of the cluster's network egress path. | kube-system | dev-team |
