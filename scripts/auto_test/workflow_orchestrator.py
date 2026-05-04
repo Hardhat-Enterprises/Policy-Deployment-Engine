@@ -53,8 +53,14 @@ def check_documentation_exists(changed_files: List[str]) -> Tuple[bool, str]:
     Returns:
         Tuple of (has_docs, message)
     """
+
+    print("===========changed files============")
+    print(changed_files)
+
     docs_changes = [f for f in changed_files if "docs/gcp/" in f]
-    
+    print("===========docs changes===========")
+    print(docs_changes)
+
     if docs_changes:
         message = f"✅ Documentation changes found: {len(docs_changes)} file(s) updated"
         return True, message
