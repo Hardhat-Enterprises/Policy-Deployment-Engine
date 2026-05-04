@@ -46,6 +46,23 @@ def extract_affected_services(changed_files: List[str]) -> Set[str]:
     return services
 
 
+def check_documentation_exists(changed_files: List[str]) -> Tuple[bool, str]:
+    """
+    Check if documentation exists for changed services.
+    
+    Returns:
+        Tuple of (has_docs, message)
+    """
+    docs_changes = [f for f in changed_files if "docs/gcp/" in f]
+    
+    if docs_changes:
+        message = f"✅ Documentation changes found: {len(docs_changes)} file(s) updated"
+        return True, message
+    else:
+        message = "❌ No documentation changes found - please update docs for your assigned service"
+        return False, message
+
+
 def run_policy_checks(services: Set[str]) -> Tuple[str, int, str]:
     """
     Run policy checks for affected services.
@@ -187,6 +204,30 @@ def main():
     
     # Print all changed files
     print_changed_files(changed_files)
+    
+    # Check if documentation exists
+    has_docs, docs_message = check_documentation_exists(changed_files)
+    print(docs_message)
+    
+    if not has_docs:
+        # Write GitHub summary with docs failure
+        write_github_summary("❌ DOCS CHECK FAILED", docs_message)
+        
+        # Create and post PR comment about missing docs
+        if os.getenv("PR_NUMBER"):
+            comment = f"""## 🔍 Documentation Check Failed
+
+**Status**: ❌ CHECKS FAILED
+
+⚠️ **Your PR does not include documentation updates:**
+
+{docs_message}
+
+Please add or update documentation in the `docs/gcp/` folder for your changes before this PR can be reviewed."""
+            post_pr_comment(comment)
+        
+        print(docs_message)
+        return 1
     
     # Extract affected services
     services = extract_affected_services(changed_files)
