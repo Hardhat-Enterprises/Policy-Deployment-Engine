@@ -5,35 +5,35 @@
     "location": {
       "description": "Location of the resource.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "The location of the resource is critical for compliance and security purposes.",
+      "compliant": "australia-southeast1",
+      "non-compliant": "us-central1",
       "parent": null
     },
     "display_name": {
       "description": "Display Name of the analysis rule.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "required": true,
+      "security_impact": false,
+      "rationale": "No direct security impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "conversation_filter": {
       "description": "Filter for the conversations that should apply this analysis rule. An empty filter means this analysis rule applies to all conversations. Refer to https://cloud.google.com/contact-center/insights/docs/filtering for details.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "required": true,
+      "security_impact": true,
+      "rationale": "The conversation filter is critical for ensuring that the analysis rule is applied to the correct set of conversations, which can have security implications.",
+      "compliant": "medium=\"PHONE_CALL\"",
+      "non-compliant": "",
       "parent": null
     },
     "annotator_selector": {
-      "description": "Selector of all available annotators and phrase matchers to run. Structure is [documented below](#nested_annotator_selector).",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "description": "Defines the annotator settings used by the Contact Center Insights analysis rule.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "No direct security impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -68,8 +68,8 @@
         "issue_models": {
           "description": "The issue model to run. If not provided, the most recently deployed topic model will be used. The provided issue model will only be used for inference if the issue model is deployed and if run_issue_model_annotator is set to true. If more than one issue model is provided, only the first provided issue model will be used for inference.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "No direct security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "annotator_selector"
@@ -77,8 +77,8 @@
         "run_qa_annotator": {
           "description": "Whether to run the QA annotator.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "No direct security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "annotator_selector"
@@ -86,8 +86,8 @@
         "run_silence_annotator": {
           "description": "Whether to run the silence annotator.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "No direct security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "annotator_selector"
@@ -95,26 +95,26 @@
         "run_phrase_matcher_annotator": {
           "description": "Whether to run the active phrase matcher annotator(s).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "No direct security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "annotator_selector"
         },
         "run_sentiment_annotator": {
           "description": "Whether to run the sentiment annotator.",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "required": true,
+          "security_impact": false,
+          "rationale": "No direct security impact.",
+          "compliant": true,
+          "non-compliant": false,
           "parent": "annotator_selector"
         },
         "run_intent_annotator": {
           "description": "Whether to run the intent annotator.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale":  "No direct security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "annotator_selector"
@@ -122,8 +122,8 @@
         "run_issue_model_annotator": {
           "description": "Whether to run the issue model annotator. A model should have already been deployed for this to take effect.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "No direct security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "annotator_selector"
@@ -131,17 +131,17 @@
         "run_summarization_annotator": {
           "description": "Whether to run the summarization annotator.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": false,
+          "rationale": "No direct security impact.",
+          "compliant": true,
+          "non-compliant": false,
           "parent": "annotator_selector"
         },
         "summarization_config": {
           "description": "Configuration for summarization. Structure is [documented below](#nested_annotator_selector_summarization_config).",
-          "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "required": true,
+          "security_impact": false,
+          "rationale": "No direct security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "annotator_selector"
@@ -149,8 +149,8 @@
         "qa_config": {
           "description": "Configuration for the QA feature. Structure is [documented below](#nested_annotator_selector_qa_config).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "No direct security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "annotator_selector"
@@ -159,36 +159,36 @@
     },
     "analysis_percentage": {
       "description": "Percentage of conversations that we should apply this analysis setting automatically, between [0, 1]. For example, 0.1 means 10%. Conversations are sampled in a determenestic way. The original runtime_percentage & upload percentage will be replaced by defining filters on the conversation.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "required": true,
+      "security_impact": false,
+      "rationale": "No direct security impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "active": {
       "description": "If true, apply this rule to conversations. Otherwise, this rule is inactive and saved as a draft.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "required": true,
+      "security_impact": false,
+      "rationale": "No direct security impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": true,
+      "security_impact": false,
+      "rationale": "No direct security impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "summarization_config": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": true,
+      "security_impact": false,
+      "rationale": "No direct security impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -196,8 +196,8 @@
         "conversation_profile": {
           "description": "Resource name of the Dialogflow conversation profile. Format: projects/{project}/locations/{location}/conversationProfiles/{conversation_profile}",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "No direct security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "summarization_config"
@@ -205,8 +205,8 @@
         "summarization_model": {
           "description": "Default summarization model to be used. Possible values: SUMMARIZATION_MODEL_UNSPECIFIED BASELINE_MODEL BASELINE_MODEL_V2_0 Possible values are: `BASELINE_MODEL`, `BASELINE_MODEL_V2_0`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "No direct security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "summarization_config"
@@ -215,9 +215,9 @@
     },
     "qa_config": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": true,
+      "security_impact": false,
+      "rationale": "No direct security impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -225,8 +225,8 @@
         "scorecard_list": {
           "description": "Container for a list of scorecards. Structure is [documented below](#nested_annotator_selector_qa_config_scorecard_list).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "No direct security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "qa_config"
@@ -235,9 +235,9 @@
     },
     "scorecard_list": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": true,
+      "security_impact": false,
+      "rationale": "No direct security impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -245,8 +245,8 @@
         "qa_scorecard_revisions": {
           "description": "List of QaScorecardRevisions.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "No direct security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "scorecard_list"
