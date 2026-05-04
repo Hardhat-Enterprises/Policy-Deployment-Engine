@@ -1,7 +1,7 @@
-package terraform.gcp.security.contact_center_ai_insights.contact_center_insights_auto_labeling_rule.label_key_type
+package terraform.gcp.security.contact_center_ai_insights.google_contact_center_insights_auto_labeling_rule.label_key_type
 
 import data.terraform.helpers
-import data.terraform.gcp.security.contact_center_ai_insights.contact_center_insights_auto_labeling_rule.vars
+import data.terraform.gcp.security.contact_center_ai_insights.google_contact_center_insights_auto_labeling_rule.vars
 
 conditions := [
     [

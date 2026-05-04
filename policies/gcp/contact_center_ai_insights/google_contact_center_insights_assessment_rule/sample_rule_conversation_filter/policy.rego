@@ -1,7 +1,7 @@
-package terraform.gcp.security.contact_center_ai_insights.contact_center_insights_assessment_rule.sample_rule_conversation_filter
+package terraform.gcp.security.contact_center_ai_insights.google_contact_center_insights_assessment_rule.sample_rule_conversation_filter
 
 import data.terraform.helpers
-import data.terraform.gcp.security.contact_center_ai_insights.contact_center_insights_assessment_rule.vars
+import data.terraform.gcp.security.contact_center_ai_insights.google_contact_center_insights_assessment_rule.vars
 
 conditions := [
     [
