@@ -8,6 +8,6 @@ terraform {
 }
 
 provider "google" {
-  project = "YOUR_PROJECT_ID"
+  project = "sit764-policy-project"
   region  = "us-central1"
 }

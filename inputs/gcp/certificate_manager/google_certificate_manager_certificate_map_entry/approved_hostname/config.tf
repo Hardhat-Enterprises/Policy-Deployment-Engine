@@ -7,5 +7,5 @@ terraform {
 }
 
 provider "google" {
-  project = "sit764-cert-mgr-test"
+  project = "sit764-policy-project"
 }
