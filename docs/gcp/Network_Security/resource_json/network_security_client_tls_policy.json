@@ -32,10 +32,10 @@
     "sni": {
       "description": "Server Name Indication string to present to the server during TLS handshake. E.g: \"secure.example.com\".",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Must be secure.com.",
+      "compliant": ["\"secure.com\""],
+      "non-compliant": ["\"insecure.com\""],
       "parent": null
     },
     "client_certificate": {
@@ -57,23 +57,23 @@
           "parent": "client_certificate"
         },
         "certificate_provider_instance": {
-          "description": "The certificate provider instance specification that will be passed to the data plane, which will be used to load necessary credential information. Structure is [documented below](#nested_client_certificate_certificate_provider_instance).",
+          "description": "Certificate provider instance used in the client_certificate block.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Restricting plugin_instance to an approved value helps enforce trusted client certificate configuration.",
+          "compliant": ["\"google_cloud_private_spiffe\""],
+          "non-compliant": ["\"google_cloud_private\""],
           "parent": "client_certificate"
         }
       }
     },
     "server_validation_ca": {
-      "description": "Defines the mechanism to obtain the Certificate Authority certificate to validate the server certificate. If empty, client does not validate the server certificate. Structure is [documented below](#nested_server_validation_ca).",
+      "description": "Defines the mechanism to obtain the Certificate Authority certificate to validate the server certificate. If empty, client does not validate the server certificate.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Ensures the client validates the server certificate by configuring server_validation_ca.",
+      "compliant": ["unix:mypath"],
+      "non-compliant": ["mypath"],
       "parent": null,
       "arguments": {
         "grpc_endpoint": {
