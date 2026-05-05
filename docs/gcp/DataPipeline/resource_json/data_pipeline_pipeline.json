@@ -14,19 +14,19 @@
     "type": {
       "description": "The type of the pipeline. This field affects the scheduling of the pipeline and the type of metrics to show for the pipeline. https://cloud.google.com/dataflow/docs/reference/data-pipelines/rest/v1/projects.locations.pipelines#pipelinetype Possible values are: `PIPELINE_TYPE_UNSPECIFIED`, `PIPELINE_TYPE_BATCH`, `PIPELINE_TYPE_STREAMING`.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Setting the pipeline type correctly is important for ensuring that the pipeline is scheduled and monitored appropriately. For example, a streaming pipeline may require more frequent monitoring and different resource allocation compared to a batch pipeline. Incorrectly setting the pipeline type could lead to inefficient resource usage or missed alerts.",
+      "compliant": "PIPELINE_TYPE_BATCH, PIPELINE_TYPE_STREAMING",
+      "non-compliant": "PIPELINE_TYPE_UNSPECIFIED",
       "parent": null
     },
     "state": {
       "description": "The state of the pipeline. When the pipeline is created, the state is set to 'PIPELINE_STATE_ACTIVE' by default. State changes can be requested by setting the state to stopping, paused, or resuming. State cannot be changed through pipelines.patch requests. https://cloud.google.com/dataflow/docs/reference/data-pipelines/rest/v1/projects.locations.pipelines#state Possible values are: `STATE_UNSPECIFIED`, `STATE_RESUMING`, `STATE_ACTIVE`, `STATE_STOPPING`, `STATE_ARCHIVED`, `STATE_PAUSED`.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Properly managing the state of the pipeline is crucial for ensuring that it operates as intended and that resources are used efficiently. For example, pausing a pipeline can help to temporarily reduce resource usage during periods of low demand, while stopping a pipeline can help to prevent unintended processing and reduce costs. Incorrectly managing the pipeline state could lead to unnecessary resource consumption or missed processing opportunities.",
+      "compliant": "STATE_ACTIVE",
+      "non-compliant": "STATE_UNSPECIFIED, STATE_STOPPING, STATE_ARCHIVED, STATE_PAUSED",
       "parent": null
     },
     "display_name": {
@@ -108,9 +108,9 @@
     "scheduler_service_account_email": {
       "description": "Optional. A service account email to be used with the Cloud Scheduler job. If not specified, the default compute engine service account will be used.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
+      "security_impact": true,
+      "rationale": "Using a dedicated service account for the Cloud Scheduler job allows for better access control and auditing. It reduces the risk of unintended permissions being granted to the default compute engine service account, which may have broader access than necessary.",
+      "compliant": "pipeline-scheduler@project-id.iam.gserviceaccount.com",
       "non-compliant": null,
       "parent": null
     },
@@ -126,10 +126,10 @@
     "region": {
       "description": "A reference to the region",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Setting the region correctly is important for ensuring that the pipeline is located in the intended region, which can help to reduce latency and data transfer costs. Incorrectly setting the region could lead to increased latency and higher costs due to data being processed in a different region than expected.",
+      "compliant": "australia-southeast1, australia-southeast2",
+      "non-compliant": "us-central1, etc.",
       "parent": null
     },
     "project": {
