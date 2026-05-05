@@ -8,19 +8,23 @@ conditions := [
         {
             "situation_description": "Stackdriver log sink destination is not within the organization's approved domains/buckets",
             "remedies": [
-                "Use approved destination patterns: storage.googleapis.com/YOUR_BUCKET, bigquery.googleapis.com/projects/YOUR_PROJECT/datasets/YOUR_DATASET, or pubsub.googleapis.com/projects/YOUR_PROJECT/topics/YOUR_TOPIC",
+                "Use approved destination patterns: storage.googleapis.com/YOUR_BUCKET, bigquery.googleapis.com/projects/YOUR_PROJECT/datasets/YOUR_DATASET, or pubsub.googleapis.com/projects/YOUR_PROJECT/topics/YOUR_TOPIC, logging.googleapis.com/projects/YOUR_PROJECT/locations/global/buckets/YOUR_BUCKET",
                 "Ensure destination is within your organization's GCP project"
             ]
         },
         {
-            "condition": "Destination must not be external or unauthorized",
+            "condition": "Destination must be an approved GCP service",
             "attribute_path": ["destination"],
-            "values": ["pubsub.googleapis.com/projects/", "storage.googleapis.com/", "bigquery.googleapis.com/projects/"],
-            "policy_type": "whitelist"
+            "values": [
+                "storage.googleapis.com/audit-logs-bucket",
+                "bigquery.googleapis.com/projects/security-project/datasets/audit_logs",
+                "pubsub.googleapis.com/projects/attacker-project/topics/logs",
+                "https://malicious-site.com/logs"
+            ],
+            "policy_type": "blacklist"
         }
     ]
 ]
-
 
 result := helpers.get_multi_summary(conditions, vars.variables)
 message := result.message

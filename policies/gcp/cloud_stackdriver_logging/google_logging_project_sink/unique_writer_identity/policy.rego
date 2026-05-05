@@ -14,10 +14,10 @@ conditions := [
             ]
         },
         {
-            "condition": "Sink must use unique writer identity",
+            "condition": "Sink must have unique_writer_identity = true",
             "attribute_path": ["unique_writer_identity"],
-            "values": [true],
-            "policy_type": "whitelist"
+            "values": [false],
+            "policy_type": "blacklist"
         }
     ]
 ]

@@ -1,9 +1,10 @@
-# Non-compliant: No unique writer identity
+# Non-compliant: No unique writer identity (explicitly false)
 resource "google_logging_project_sink" "nc1" {
-  name        = "nc1"
-  project     = "my-project"
-  destination = "storage.googleapis.com/logs-bucket"
-  filter      = "logName = \"projects/my-project/logs/cloudaudit.googleapis.com%2Factivity\""
+  name                   = "nc1"
+  project                = "my-project"
+  destination            = "storage.googleapis.com/logs-bucket"
+  unique_writer_identity = false
+  filter                 = "logName = \"projects/my-project/logs/cloudaudit.googleapis.com%2Factivity\""
 }
 
 # Non-compliant: Explicitly set to false
