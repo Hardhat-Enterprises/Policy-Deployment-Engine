@@ -67,8 +67,7 @@ _get_resources(resource_type, attribute_path, lower_bound, upper_bound) = resour
         resource |
         resource := input.planned_values.root_module.resources[_]
         resource.type == resource_type
-        raw_value := shared.get_attribute_value(resource, attribute_path)
-        attribute_value := to_number(trim_suffix(sprintf("%v", [raw_value]), "s"))
+        attribute_value := to_number(shared.get_attribute_value(resource, attribute_path))
         not _test_value_range(attribute_value, lower_bound, upper_bound)
     }
 }
