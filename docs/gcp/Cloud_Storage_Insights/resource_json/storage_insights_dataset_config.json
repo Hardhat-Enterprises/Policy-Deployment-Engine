@@ -5,10 +5,10 @@
     "retention_period_days": {
       "description": "Number of days of history that must be retained.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Storage Insights history should be retained long enough to support monitoring, compliance review, and incident investigation.",
+      "compliant": "30",
+      "non-compliant": "1",
       "parent": null
     },
     "identity": {
@@ -32,10 +32,10 @@
         "type": {
           "description": "Type of identity to use for the DatasetConfig. Possible values are: `IDENTITY_TYPE_PER_CONFIG`, `IDENTITY_TYPE_PER_PROJECT`.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "A per-config identity supports better isolation and limits the risk of broad permissions being reused across configurations.",
+          "compliant": "IDENTITY_TYPE_PER_CONFIG",
+          "non-compliant": "IDENTITY_TYPE_PER_PROJECT",
           "parent": "identity"
         }
       }
@@ -43,10 +43,10 @@
     "location": {
       "description": "The location of the DatasetConfig.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "DatasetConfig should be created only in approved Australian regions to meet location control requirements.",
+      "compliant": "australia-southeast1",
+      "non-compliant": "europe-west8",
       "parent": null
     },
     "dataset_config_id": {
@@ -69,11 +69,11 @@
     },
     "include_newly_created_buckets": {
       "description": "If set to true, the request includes all the newly created buckets in the dataset that meet the inclusion and exclusion rules.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "required": true,
+      "security_impact": true,
+      "rationale": "New buckets should be manually reviewed before being included in Storage Insights datasets.",
+      "compliant": false,
+      "non-compliant": true,
       "parent": null
     },
     "description": {
@@ -127,11 +127,11 @@
     },
     "organization_scope": {
       "description": "Defines the options for providing a source organization for the DatasetConfig.",
-      "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "required": true,
+      "security_impact": true,
+      "rationale": "Organization scope should be disabled unless there is formal approval for organisation-wide monitoring.",
+      "compliant": false,
+      "non-compliant": true,
       "parent": null
     },
     "include_cloud_storage_locations": {
@@ -146,10 +146,10 @@
         "locations": {
           "description": "The list of cloud storage locations to include in the DatasetConfig.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Only approved Australian Cloud Storage locations should be included in the DatasetConfig.",
+          "compliant": "australia-southeast1",
+          "non-compliant": "europe-west8",
           "parent": "include_cloud_storage_locations"
         }
       }
@@ -225,11 +225,11 @@
     },
     "link_dataset": {
       "description": "Setting this field to true while creation will automatically link the created dataset as an additional functionality. -> **Note** A dataset config resource can only be destroyed once it is unlinked, so users must set this field to false to unlink the dataset and destroy the dataset config resource.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "required": true,
+      "security_impact": true,
+      "rationale": "Dataset linking should be disabled by default and enabled only after approval.",
+      "compliant": false,
+      "non-compliant": true,
       "parent": null
     },
     "cloud_storage_buckets": {
