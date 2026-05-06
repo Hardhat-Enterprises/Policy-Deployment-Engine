@@ -15,7 +15,7 @@ conditions := [
         {
             "condition": "Check if a dedicated service account email is configured",
             "attribute_path": ["service_account", 0, "email"],
-            "values": [""],
+            "values": ["", null],
             "policy_type": "blacklist"
         }
     ]
