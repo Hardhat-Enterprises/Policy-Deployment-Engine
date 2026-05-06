@@ -1,5 +1,7 @@
 package terraform.gcp.security.cloud_tpu.google_tpu_v2_vm.no_external_ips
-import data.terraform.helpers
+
+import future.keywords.if
+import data.terraform.helpers as helpers
 import data.terraform.gcp.security.cloud_tpu.google_tpu_v2_vm.vars
 
 conditions := [
