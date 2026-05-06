@@ -10,7 +10,7 @@ Reference: [Terraform Registry – storage_insights_dataset_config](https://regi
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `retention_period_days` | Number of days of history that must be retained. | true | true | Storage Insights history should be retained long enough to support monitoring, compliance review, and incident investigation. | 30 | 1 |
+| `retention_period_days` | Number of days of history that must be retained. | false | false | None | None | None |
 | `identity` | Identity used by DatasetConfig. Structure is [documented below](#nested_identity). | true | false | None | None | None |
 | `location` | The location of the DatasetConfig. | true | true | DatasetConfig should be created only in approved Australian regions to meet location control requirements. | australia-southeast1 | europe-west8 |
 | `dataset_config_id` | The user-defined ID of the DatasetConfig | true | false | None | None | None |
