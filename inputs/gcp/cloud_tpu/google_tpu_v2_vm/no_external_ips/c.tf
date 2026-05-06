@@ -1,4 +1,5 @@
 resource "google_tpu_v2_vm" "c" {
+  provider         = google-beta
   name             = "c"
   zone             = "us-central1-c"
   project          = "fake-project"
