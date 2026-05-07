@@ -50,10 +50,10 @@
     "network_config": {
       "description": "Network configurations for the TPU node. Structure is [documented below](#nested_network_config).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Enabling external IPs exposes the TPU VM directly to the public internet, increasing the attack surface.",
+      "compliant": "enable_external_ips = false",
+      "non-compliant": "enable_external_ips = true",
       "parent": null,
       "arguments": {
         "network": {
@@ -77,10 +77,10 @@
         "enable_external_ips": {
           "description": "Indicates that external IP addresses would be associated with the TPU workers. If set to false, the specified subnetwork or network should have Private Google Access enabled.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Enabling external IPs exposes the TPU VM directly to the public internet, increasing the attack surface. TPU workloads should use internal IPs with Private Google Access enabled.",
+          "compliant": "enable_external_ips = false",
+          "non-compliant": "enable_external_ips = true",
           "parent": "network_config"
         },
         "can_ip_forward": {
@@ -162,19 +162,19 @@
     "service_account": {
       "description": "The Google Cloud Platform Service Account to be used by the TPU node VMs. If None is specified, the default compute service account will be used. Structure is [documented below](#nested_service_account).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Using the default compute service account violates the principle of least privilege by granting excessive permissions to the TPU VM.",
+      "compliant": "email = dedicated-sa@project.iam.gserviceaccount.com",
+      "non-compliant": "email = \"\"",
       "parent": null,
       "arguments": {
         "email": {
           "description": "Email address of the service account. If empty, default Compute service account will be used.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Using the default compute service account violates the principle of least privilege. A dedicated service account with only the required IAM permissions should always be specified.",
+          "compliant": "email = dedicated-sa@project.iam.gserviceaccount.com",
+          "non-compliant": "email = \"\"",
           "parent": "service_account"
         },
         "scope": {
@@ -258,19 +258,19 @@
     "shielded_instance_config": {
       "description": "Shielded Instance options. Structure is [documented below](#nested_shielded_instance_config).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Secure Boot protects the TPU VM from boot-level malware and rootkits by verifying the integrity of the boot process. Disabling it leaves the VM vulnerable to low-level attacks.",
+      "compliant": "enable_secure_boot = true",
+      "non-compliant": "enable_secure_boot = false",
       "parent": null,
       "arguments": {
         "enable_secure_boot": {
           "description": "Defines whether the instance has Secure Boot enabled.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Secure Boot protects the TPU VM from boot-level malware and rootkits by verifying the integrity of the boot process. Disabling it leaves the VM vulnerable to low-level attacks.",
+          "compliant": "enable_secure_boot = true",
+          "non-compliant": "enable_secure_boot = false",
           "parent": "shielded_instance_config"
         }
       }
