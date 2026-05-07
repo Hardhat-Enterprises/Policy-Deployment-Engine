@@ -1,7 +1,7 @@
 package terraform.gcp.security.dataform.google_dataform_repository.deletion_policy
 
-import data.terraform.gcp.helpers
-import data.terraform.gcp.security.dataform.google_dataform_repository as repo
+import data.terraform.helpers
+import data.terraform.gcp.security.dataform.google_dataform_repository.vars
 
 # Disallow FORCE deletion policy on Dataform repositories.
 # One simple situation: any repo with deletion_policy == "FORCE" is non-compliant.
@@ -24,5 +24,7 @@ conditions := [
   ]
 ]
 
-message := helpers.get_multi_summary(conditions, repo.variables).message
-details := helpers.get_multi_summary(conditions, repo.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details

@@ -1,7 +1,7 @@
 package terraform.gcp.security.dataform.google_dataform_repository.region_allowlist
 
-import data.terraform.gcp.helpers
-import data.terraform.gcp.security.dataform.google_dataform_repository as repo
+import data.terraform.helpers
+import data.terraform.gcp.security.dataform.google_dataform_repository.vars
 
 # Adjust the allowlist as needed
 approved_regions := ["australia-southeast1"]
@@ -23,5 +23,7 @@ conditions := [
   ]
 ]
 
-message := helpers.get_multi_summary(conditions, repo.variables).message
-details := helpers.get_multi_summary(conditions, repo.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details

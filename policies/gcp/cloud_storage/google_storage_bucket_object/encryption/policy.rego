@@ -1,6 +1,6 @@
 package terraform.gcp.security.cloud_storage.google_storage_bucket_object.encryption
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.cloud_storage.google_storage_bucket_object.vars
 
 
@@ -18,7 +18,7 @@ conditions := [
 
         {
             "condition": "Encryption should be done.",
-            "attribute_path": ["customer_encryption",0],
+            "attribute_path": ["customer_encryption"],
             "values": [null],  
             "policy_type": "blacklist"
         }

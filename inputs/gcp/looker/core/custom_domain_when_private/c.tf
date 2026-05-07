@@ -1,4 +1,4 @@
-resource "google_looker_instance" "c" {
+resource "google_looker_instance" "c1" {
   name = "c1"
   project           = var.project
   public_ip_enabled = false

@@ -1,5 +1,5 @@
 package terraform.gcp.security.integration_connectors.google_integration_connectors_connection.ssl_config_use_ssl
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.integration_connectors.google_integration_connectors_connection.vars
 
 conditions := [
@@ -9,7 +9,7 @@ conditions := [
   },
   {
     "condition": "Password must come from Secret Manager",
-    "attribute_path": ["ssl_config","0","use_ssl"],
+    "attribute_path": ["ssl_config",0,"use_ssl"],
     "values": ["true"],
     "policy_type": "whitelist",
   }

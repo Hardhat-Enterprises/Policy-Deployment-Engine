@@ -1,6 +1,6 @@
 package terraform.gcp.security.identity_aware_proxy.google_iap_web_forwarding_rule_service_iam.project
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.identity_aware_proxy.google_iap_web_forwarding_rule_service_iam as vars
 
 # Security goals:

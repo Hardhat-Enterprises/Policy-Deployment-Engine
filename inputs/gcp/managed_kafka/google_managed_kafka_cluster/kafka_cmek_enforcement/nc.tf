@@ -1,6 +1,6 @@
-resource "google_managed_kafka_cluster" "insecure_cluster" {
-  cluster_id = "insecure-cluster"
-  location   = "us-central1"
+resource "google_managed_kafka_cluster" "nc" {
+  cluster_id = "nc"
+  location   = "us-central3"
   project = "123"
 
   capacity_config {

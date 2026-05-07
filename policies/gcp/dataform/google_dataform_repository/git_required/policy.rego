@@ -1,7 +1,7 @@
 package terraform.gcp.security.dataform.google_dataform_repository.git_required
 
-import data.terraform.gcp.helpers
-import data.terraform.gcp.security.dataform.google_dataform_repository as repo
+import data.terraform.helpers
+import data.terraform.gcp.security.dataform.google_dataform_repository.vars
 
 # This policy enforces: if a repo configures git_remote_settings,
 # then BOTH `url` and `default_branch` must be set (non-empty).
@@ -22,7 +22,7 @@ conditions := [
     {
       "condition": "Git remote is configured",
       "attribute_path": ["git_remote_settings"],
-      "policy_type": "whitelist",
+      "policy_type": "blacklist",
       "values": [null, []]
     },
     {
@@ -44,7 +44,7 @@ conditions := [
     {
       "condition": "Git remote is configured",
       "attribute_path": ["git_remote_settings"],
-      "policy_type": "whitelist",
+      "policy_type": "blacklist",
       "values": [null, []]
     },
     {
@@ -56,5 +56,7 @@ conditions := [
   ]
 ]
 
-message := helpers.get_multi_summary(conditions, repo.variables).message
-details := helpers.get_multi_summary(conditions, repo.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details

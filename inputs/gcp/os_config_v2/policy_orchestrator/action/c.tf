@@ -1,7 +1,7 @@
 resource "google_os_config_v2_policy_orchestrator" "c" {
     policy_orchestrator_id = "po"
     project = "121623553414"
-    state = "ACTIVE"
+    state = "STOPPED"
     action = "UPSERT"
 
     orchestrated_resource {

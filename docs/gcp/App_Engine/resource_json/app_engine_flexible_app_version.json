@@ -5,17 +5,17 @@
     "runtime": {
       "description": "Desired runtime. Example python27.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "To ensure the application environment is patched against known vulnerabilities and remains compatible with organizational security tooling.",
+      "compliant": "nodejs",
+      "non-compliant": "python27",
       "parent": null
     },
     "readiness_check": {
       "description": "Configures readiness health checking for instances. Unhealthy instances are not put into the backend traffic rotation. Structure is [documented below](#nested_readiness_check).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "Mandates the configuration of health probes to ensure that the load balancer only routes traffic to fully initialized and healthy instances which prevents errors and ensures correct deployments.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -23,17 +23,17 @@
         "path": {
           "description": "The request path.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "to enforce a specific dedicated health endpoint to ensure the load balancer validates the actual readiness of the application logic rather than just the availability of the web server/static landing page.",
+          "compliant": "/",
+          "non-compliant": "/invalid-path",
           "parent": "readiness_check"
         },
         "host": {
           "description": "Host header to send when performing a HTTP Readiness check. Example: \"myapp.appspot.com\"",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "App Engine routes health checks to the instance's internal IP, defining a host header is unnecessary and can inadvertently bypass internal security controls if misconfigured.",
           "compliant": null,
           "non-compliant": null,
           "parent": "readiness_check"
@@ -41,17 +41,17 @@
         "failure_threshold": {
           "description": "Number of consecutive failed checks required before removing traffic. Default: 2.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Configures the specific tolerance level for failed health probes to prevent flapping.",
+          "compliant": "failure_threshold = 4",
+          "non-compliant": "failure_threshold = 0",
           "parent": "readiness_check"
         },
         "success_threshold": {
           "description": "Number of consecutive successful checks required before receiving traffic. Default: 2.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Google Cloud default is sufficiently conservative to prevent flapping and ensures an instance is stable before it is reintroduced to the load balancer.",
           "compliant": null,
           "non-compliant": null,
           "parent": "readiness_check"
@@ -59,8 +59,8 @@
         "check_interval": {
           "description": "Interval between health checks.  Default: \"5s\".",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "As Google-managed default provides an optimal balance between rapid failure detection and the reduction of unnecessary noise.",
           "compliant": null,
           "non-compliant": null,
           "parent": "readiness_check"
@@ -68,17 +68,17 @@
         "timeout": {
           "description": "Time before the check is considered failed. Default: \"4s\"",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Enforces a strict upper limit on how long a health probe can wait for a response to ensure that stalled requests are terminated quickly to prevent them from clogging the application's request queue.",
+          "compliant": "4s",
+          "non-compliant": "30s",
           "parent": "readiness_check"
         },
         "app_start_timeout": {
           "description": "A maximum time limit on application initialization, measured from moment the application successfully replies to a healthcheck until it is ready to serve traffic. Default: \"300s\"",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Application initialization times vary drastically based on language runtime, dependency loading, and cache warming requirements.",
           "compliant": null,
           "non-compliant": null,
           "parent": "readiness_check"
@@ -88,8 +88,8 @@
     "liveness_check": {
       "description": "Health checking configuration for VM instances. Unhealthy instances are killed and replaced with new instances. Structure is [documented below](#nested_liveness_check).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "Enforces the configuration of liveness probes to detect deadlocked/zombie processes that are running but no longer functional, allowing the platform to automatically restart the instance and restore service health.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -97,17 +97,17 @@
         "path": {
           "description": "The request path.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "To enforce a specific dedicated health endpoint to ensure the load balancer validates the actual readiness of the application logic rather than just the availability of the web server/static landing page.",
+          "compliant": "/",
+          "non-compliant": "/invalid-path",
           "parent": "liveness_check"
         },
         "host": {
-          "description": "Host header to send when performing a HTTP Readiness check. Example: \"myapp.appspot.com\"",
+         "description": "Host header to send when performing a HTTP Readiness check. Example: \"myapp.appspot.com\"",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "App Engine routes health checks to the instance's internal IP, defining a host header is unnecessary and can inadvertently bypass internal security controls if misconfigured.",
           "compliant": null,
           "non-compliant": null,
           "parent": "liveness_check"
@@ -115,17 +115,17 @@
         "failure_threshold": {
           "description": "Number of consecutive failed checks required before considering the VM unhealthy. Default: 4.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Configures the specific tolerance level for failed health probes to prevent flapping.",
+          "compliant": "failure_threshold = 4",
+          "non-compliant": "failure_threshold = 0",
           "parent": "liveness_check"
         },
         "success_threshold": {
           "description": "Number of consecutive successful checks required before considering the VM healthy. Default: 2.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Google Cloud default is sufficiently conservative to prevent flapping and ensures an instance is stable before it is reintroduced to the load balancer.",
           "compliant": null,
           "non-compliant": null,
           "parent": "liveness_check"
@@ -133,8 +133,8 @@
         "check_interval": {
           "description": "Interval between health checks.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "As Google-managed default provides an optimal balance between rapid failure detection and the reduction of unnecessary noise.",
           "compliant": null,
           "non-compliant": null,
           "parent": "liveness_check"
@@ -142,17 +142,17 @@
         "timeout": {
           "description": "Time before the check is considered failed. Default: \"4s\"",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Enforces a strict upper limit on how long a health probe can wait for a response to ensure that stalled requests are terminated quickly to prevent them from clogging the application's request queue.",
+          "compliant": "4s",
+          "non-compliant": "30s",
           "parent": "liveness_check"
         },
         "initial_delay": {
           "description": "The initial delay before starting to execute the checks. Default: \"300s\"",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Enforcing a universal delay could lead to premature restarts of slow-starting but healthy applications.",
           "compliant": null,
           "non-compliant": null,
           "parent": "liveness_check"
@@ -162,17 +162,17 @@
     "service": {
       "description": "AppEngine service resource. Can contain numbers, letters, and hyphens.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Enforces explicit service naming to ensure that application components are logically isolated, preventing accidental resource overwrites.",
+      "compliant": "default",
+      "non-compliant": "unauthorized-app",
       "parent": null
     },
     "version_id": {
       "description": "Relative name of the version within the service. For example, `v1`. Version names can contain only lowercase letters, numbers, or hyphens. Reserved names,\"default\", \"latest\", and any name with the prefix \"ah-\".",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "to allow CI/CD pipelines to dynamically generate unique identifiers, which is essential for maintaining an immutable audit trail and enabling safe rollbacks.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -180,8 +180,8 @@
     "inbound_services": {
       "description": "A list of the types of messages that this application is able to receive. Each value may be one of: `INBOUND_SERVICE_MAIL`, `INBOUND_SERVICE_MAIL_BOUNCE`, `INBOUND_SERVICE_XMPP_ERROR`, `INBOUND_SERVICE_XMPP_MESSAGE`, `INBOUND_SERVICE_XMPP_SUBSCRIBE`, `INBOUND_SERVICE_XMPP_PRESENCE`, `INBOUND_SERVICE_CHANNEL_PRESENCE`, `INBOUND_SERVICE_WARMUP`.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "As primarily used to enable legacy App Engine services which are largely deprecated/irrelevant in the Flexible Environment, security for incoming traffic is instead governed by modern network and firewall policies.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -189,8 +189,8 @@
     "instance_class": {
       "description": "Instance class that is used to run this version. Valid values are AutomaticScaling: F1, F2, F4, F4_1G ManualScaling: B1, B2, B4, B8, B4_1G Defaults to F1 for AutomaticScaling and B1 for ManualScaling.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "It is a legacy parameter exclusive to the App Engine Standard environment.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -198,8 +198,8 @@
     "network": {
       "description": "Extra network settings Structure is [documented below](#nested_network).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "App Engine Flexible automatically defaults to the 'default' VPC with managed settings and primary network security is better governed at the VPC and Firewall levels rather than through individual resource declarations.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -263,8 +263,8 @@
     "resources": {
       "description": "Machine resources for a version. Structure is [documented below](#nested_resources).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The hardware requirements are tied to the specific application's performance profile, imposing constraints would prevent right-sizing and could lead to resource starvation/unnecessary cloud spend.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -310,8 +310,8 @@
     "runtime_channel": {
       "description": "The channel of the runtime to use. Only available for some runtimes.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The platform defaults to the stable channel which ensures that applications run on production-ready environment binaries without requiring manual intervention or the risk of using experimental preview features.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -319,8 +319,8 @@
     "flexible_runtime_settings": {
       "description": "Runtime settings for App Engine flexible environment. Structure is [documented below](#nested_flexible_runtime_settings).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The settings are highly specific to individual language runtimes and typically govern performance tuning/debugging than compliance boundaries.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -348,8 +348,8 @@
     "beta_settings": {
       "description": "Metadata settings that are supplied to this version to enable beta runtime features.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Parameters are intended for temporary experimental features that are not yet part of the stable API.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -357,8 +357,8 @@
     "serving_status": {
       "description": "Current serving status of this version. Only the versions with a SERVING status create instances and can be billed. Default value is `SERVING`. Possible values are: `SERVING`, `STOPPED`.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "As it governs the operational state of a version which must remain dynamic to allow automated deployments, traffic splitting and manual emergency interventions without triggering policy violations.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -366,8 +366,8 @@
     "runtime_api_version": {
       "description": "The version of the API in the given runtime environment. Please see the app.yaml reference for valid values at `https://cloud.google.com/appengine/docs/standard/<language>/config/appref`\\ Substitute `<language>` with `python`, `java`, `php`, `ruby`, `go` or `nodejs`.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "As managed internally by the selected runtime, enforcing a specific API version at the policy level would create unnecessary coupling between infrastructure code and language-specific internals.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -375,8 +375,8 @@
     "handlers": {
       "description": "An ordered list of URL-matching patterns that should be applied to incoming requests. The first matching URL handles the request and other request handlers are not attempted. Structure is [documented below](#nested_handlers).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Flexible Environment is container-based where routing and static file handling are managed internally by the application's web server.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -449,8 +449,8 @@
     "runtime_main_executable_path": {
       "description": "The path or name of the app's main executable.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Within a containerized Flexible environment the execution logic is better governed by the entrypoint or the container's internal configuration and enforcing a path would break standard deployment conventions for multi-language microservices.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -458,8 +458,8 @@
     "service_account": {
       "description": "The identity that the deployed version will run as. Admin API will use the App Engine Appspot service account as default if this field is neither provided in app.yaml file nor through CLI flag.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "To allow developers to assign unique least-privileged identities to each microservice",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -467,8 +467,8 @@
     "api_config": {
       "description": "Serving configuration for Google Cloud Endpoints. Structure is [documented below](#nested_api_config).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Is a legacy configuration for Google Cloud Endpoints Frameworks, this block would not be utilised.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -523,8 +523,8 @@
     "env_variables": {
       "description": "Environment variables available to the application.  As these are not returned in the API request, Terraform will not detect any changes made outside of the Terraform config.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Intrinsic to the application's runtime logic.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -532,8 +532,8 @@
     "default_expiration": {
       "description": "Duration that static files should be cached by web proxies and browsers. Only applicable if the corresponding StaticFilesHandler does not specify its own expiration time.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Cache-control requirements are dictated by the specific nature of the application's static assets.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -541,8 +541,8 @@
     "nobuild_files_regex": {
       "description": "Files that match this pattern will not be built into this version. Only applicable for Go runtimes.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "File exclusion is more effectively managed via standardized version control ignore files and container-specific exclusion files.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -550,8 +550,8 @@
     "deployment": {
       "description": "Code and application artifacts that make up this version. Structure is [documented below](#nested_deployment).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "Is enforced to ensure that every application version is derived from a verified immutable source (such as a specific container image or source code hash).",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -559,8 +559,8 @@
         "zip": {
           "description": "Zip File Structure is [documented below](#nested_deployment_zip).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Ensure that source-based deployments utilize versioned objects stored in Google Cloud Storage",
           "compliant": null,
           "non-compliant": null,
           "parent": "deployment"
@@ -568,8 +568,8 @@
         "files": {
           "description": "Manifest of the files stored in Google Cloud Storage that are included as part of this version. All files must be readable using the credentials supplied with this call. Structure is [documented below](#nested_deployment_files).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "individual file-level declarations are redundant when deploying via comprehensive archives or Container Images",
           "compliant": null,
           "non-compliant": null,
           "parent": "deployment"
@@ -577,8 +577,8 @@
         "container": {
           "description": "The Docker image for the container that runs the version. Structure is [documented below](#nested_deployment_container).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "To prevent configuration overlap, as in workflows where source code is the primary artifact the platform automatically generates the container via Cloud Build.",
           "compliant": null,
           "non-compliant": null,
           "parent": "deployment"
@@ -586,8 +586,8 @@
         "cloud_build_options": {
           "description": "Options for the build operations performed as a part of the version deployment. Only applicable when creating a version using source code directly. Structure is [documented below](#nested_deployment_cloud_build_options).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Build-time configuration is an operational concern distinct from the application's runtime security posture.",
           "compliant": null,
           "non-compliant": null,
           "parent": "deployment"
@@ -597,8 +597,8 @@
     "endpoints_api_service": {
       "description": "Code and application artifacts that make up this version. Structure is [documented below](#nested_endpoints_api_service).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "API management via Cloud Endpoints is a separate service layer with its own lifecycle.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -644,8 +644,8 @@
     "entrypoint": {
       "description": "The entrypoint for the application. Structure is [documented below](#nested_entrypoint).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "Enforced to ensure that the application starts using a predefined command-string that adheres to organizational standards",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -653,10 +653,10 @@
         "shell": {
           "description": "The format should be a shell command that can be fed to bash -c.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Enforced to restrict/standardize the scripts executed during the deployment phase",
+          "compliant": "node ./app.js",
+          "non-compliant": "sudo node ./app.js",
           "parent": "entrypoint"
         }
       }
@@ -664,8 +664,8 @@
     "vpc_access_connector": {
       "description": "Enables VPC connectivity for standard apps. Structure is [documented below](#nested_vpc_access_connector).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "To allow for architectural flexibility, while Serverless VPC Access is required for internal-only communication, as not all workloads require connectivity to VPC-hosted resources.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -684,8 +684,8 @@
     "automatic_scaling": {
       "description": "Automatic scaling is based on request rate, response latencies, and other application metrics. Structure is [documented below](#nested_automatic_scaling).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "Enforced to ensure that every service can respond to traffic fluctuations while maintaining strict guardrails on resource consumption.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -693,8 +693,8 @@
         "cool_down_period": {
           "description": "The time period that the Autoscaler should wait before it starts collecting information from a new instance. This prevents the autoscaler from collecting information when the instance is initializing, during which the collected usage would not be reliable. Default: 120s",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Prevents the App Engine autoscaler from reacting to sudden traffic spikes as new instances are ignored until the period ends.",
           "compliant": null,
           "non-compliant": null,
           "parent": "automatic_scaling"
@@ -702,17 +702,17 @@
         "cpu_utilization": {
           "description": "Target scaling by CPU usage. Structure is [documented below](#nested_automatic_scaling_cpu_utilization).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Enforced to establish a standardized trigger for horizontal scaling, which ensures that the system proactively adds capacity before CPU saturation leads to increased request latency/service instability",
+          "compliant": "target_utilization = 0.5",
+          "non-compliant": "target_utilization = 0.9",
           "parent": "automatic_scaling"
         },
         "max_concurrent_requests": {
           "description": "Number of concurrent requests an automatic scaling instance can accept before the scheduler spawns a new instance. Defaults to a runtime-specific value.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Can lead to under-utilisation and higher costs by triggering the creation of new instances before the existing ones are actually CPU/memory constrained.",
           "compliant": null,
           "non-compliant": null,
           "parent": "automatic_scaling"
@@ -720,8 +720,8 @@
         "max_idle_instances": {
           "description": "Maximum number of idle instances that should be maintained for this version.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Autoscaler manages idle instances automatically by default, also manually capping too low can cause performance degradation during volatile traffic spikes.",
           "compliant": null,
           "non-compliant": null,
           "parent": "automatic_scaling"
@@ -729,8 +729,8 @@
         "max_total_instances": {
           "description": "Maximum number of instances that should be started to handle requests for this version. Default: 20",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Avoid denial-of-service scenarios, as the application cannot scale to meet a legitimate traffic surge and resulting in request timeouts/503 errors.",
           "compliant": null,
           "non-compliant": null,
           "parent": "automatic_scaling"
@@ -738,8 +738,8 @@
         "max_pending_latency": {
           "description": "Maximum amount of time that a request should wait in the pending queue before starting a new instance to handle it.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Forces requests to sit in a queue for too long before the App Engine autoscaler triggers a new instance.",
           "compliant": null,
           "non-compliant": null,
           "parent": "automatic_scaling"
@@ -747,8 +747,8 @@
         "min_idle_instances": {
           "description": "Minimum number of idle instances that should be maintained for this version. Only applicable for the default version of a service.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "To ensure the App Engine autoscaler can ingest performance metrics during traffic surges.",
           "compliant": null,
           "non-compliant": null,
           "parent": "automatic_scaling"
@@ -756,8 +756,8 @@
         "min_total_instances": {
           "description": "Minimum number of running instances that should be maintained for this version. Default: 2",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "To ensure of allowing the environment to fully de-provision resources during periods of zero activity.",
           "compliant": null,
           "non-compliant": null,
           "parent": "automatic_scaling"
@@ -765,8 +765,8 @@
         "min_pending_latency": {
           "description": "Minimum amount of time a request should wait in the pending queue before starting a new instance to handle it.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Optimal wait time before scaling is highly dependent on a specific workload",
           "compliant": null,
           "non-compliant": null,
           "parent": "automatic_scaling"
@@ -774,8 +774,8 @@
         "request_utilization": {
           "description": "Target scaling by request utilization. Structure is [documented below](#nested_automatic_scaling_request_utilization).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Can be unreliable if request processing times vary whereas relying on CPU utilisation provides a more accurate measure of when an instance is actually working at its limit.",
           "compliant": null,
           "non-compliant": null,
           "parent": "automatic_scaling"
@@ -783,8 +783,8 @@
         "disk_utilization": {
           "description": "Target scaling by disk usage. Structure is [documented below](#nested_automatic_scaling_disk_utilization).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Typically bottlenecked by CPU or memory rather than storage.",
           "compliant": null,
           "non-compliant": null,
           "parent": "automatic_scaling"
@@ -792,8 +792,8 @@
         "network_utilization": {
           "description": "Target scaling by network usage. Structure is [documented below](#nested_automatic_scaling_network_utilization).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Scaling based on data throughput can be highly inconsistent while CPU-based scaling provides a more stable and accurate signal for when an instance is reaching its operational capacity.",
           "compliant": null,
           "non-compliant": null,
           "parent": "automatic_scaling"
@@ -803,8 +803,8 @@
     "manual_scaling": {
       "description": "A service with manual scaling runs continuously, allowing you to perform complex initialization and rely on the state of its memory over time. Structure is [documented below](#nested_manual_scaling).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Lacks the ability to adjust to real-time traffic changes, which can lead to unexpected traffic spikes.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -822,27 +822,27 @@
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "To automatically inherit the provider-level project ID",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "noop_on_destroy": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "If set to true, the application version will not be deleted.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Ensure that the Terraform state remains a truthful representation of the cloud environment.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "delete_service_on_destroy": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "If set to true, the service will be deleted if it is the last version.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "To prevent the accidental deletion of an entire service logical grouping when only a specific version is being decommissioned",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -980,10 +980,10 @@
       }
     },
     "zip": {
-      "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "description": "Zip",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Ensure that source-based deployments utilize versioned objects stored in Google Cloud Storage.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -991,10 +991,10 @@
         "source_url": {
           "description": "Source URL",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "To ensure that the application's source code is retrieved from a managed version-controlled repository, using an immutable path.",
+          "compliant": "https://storage.googleapis.com/hardhat-bucket/hello-world.zip",
+          "non-compliant": "invalid.com",
           "parent": "zip"
         },
         "files_count": {

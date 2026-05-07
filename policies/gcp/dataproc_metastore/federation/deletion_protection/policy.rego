@@ -1,6 +1,6 @@
 package terraform.gcp.security.dataproc_metastore.federation.deletion_protection
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.dataproc_metastore.federation.vars
 
 conditions := [
@@ -12,7 +12,7 @@ conditions := [
     {
       "condition": "Checks that deletion_protection is disabled.",
       "attribute_path": ["deletion_protection"],
-      "values": [false],
+      "values": [true],
       "policy_type": "blacklist"
     }
   ]

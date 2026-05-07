@@ -5,8 +5,8 @@
     "dataset_id": {
       "description": "A unique ID for this dataset, without the project name. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "dataset_id defines the dataset to which IAM policies are applied",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -77,11 +77,11 @@
         "user_by_email": {
           "description": "An email address of a user to grant access to. For example: fred@example.com",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
-          "parent": "access"
+          "security_impact": true,
+          "rationale": "group email defines access permissions",
+          "compliant": "example@company.com",
+          "non-compliant": "invalid@example.com",
+          "parent": null
         },
         "view": {
           "description": "A view from a different dataset to grant access to. Queries executed against that view will have read access to tables in this dataset. The role field is not required when this field is set. If that view is updated by any user, access to the view needs to be granted again via an update operation. Structure is [documented below](#nested_access_access_view).",
@@ -198,8 +198,8 @@
     "location": {
       "description": "The geographic location where the dataset should reside. See [official docs](https://cloud.google.com/bigquery/docs/dataset-locations). There are two types of locations, regional or multi-regional. A regional location is a specific geographic place, such as Tokyo, and a multi-regional location is a large geographic area, such as the United States, that contains at least two geographic places. The default value is multi-regional location `US`. Changing this forces a new resource to be created.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "location defines access permissions",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -216,9 +216,9 @@
         "kms_key_name": {
           "description": "Describes the Cloud KMS encryption key that will be used to protect destination BigQuery table. The BigQuery Service Account associated with your project requires access to this encryption key.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
+          "security_impact": true,
+          "rationale": "KMS key is used for encryption of data at rest",
+          "compliant": "google_kms_crypto_key.crypto_key.id",
           "non-compliant": null,
           "parent": "default_encryption_configuration"
         }

@@ -1,5 +1,5 @@
 package terraform.gcp.security.recaptchaenterprise.key.challenge_security_preference
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.recaptchaenterprise.key.vars
 
 conditions := [

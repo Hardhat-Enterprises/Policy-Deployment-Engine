@@ -1,5 +1,5 @@
 package terraform.gcp.security.google_kms.google_kms_crypto_key.scheduled_rotation_period
-import data.terraform.gcp.helpers as helpers
+import data.terraform.helpers as helpers
 import data.terraform.gcp.security.google_kms.google_kms_crypto_key.vars as vars
 
 
@@ -13,8 +13,8 @@ conditions :=[
   {
     "condition": "Purpose check",
     "attribute_path": ["purpose"],
-    "values": ["ENCRYPT_DECRYPT"],
-    "policy_type": "blacklist"
+    "values": ["ENCRYPT_DECRYPT", "ASYMMETRIC_SIGN"],
+    "policy_type": "whitelist"
   },
   {
     "condition": "Rotation period check",
@@ -31,7 +31,7 @@ conditions :=[
   },
   {
     "condition": "Label check",
-    "attribute_path": ["labels", 0, "env"],
+    "attribute_path": ["labels", "env"],
     "values": ["prod"],
     "policy_type": "whitelist"
   },

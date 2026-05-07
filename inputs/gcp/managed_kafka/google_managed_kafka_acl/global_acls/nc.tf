@@ -2,8 +2,8 @@
 # Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
 
 resource "google_managed_kafka_acl" "nc1" {
-  acl_id   = "nc1"
-  cluster  = "projects/my-project/locations/australia-southeast2/clusters/example-cluster"
+  acl_id   = "allTopics"
+  cluster  = "nc1"
   location = "us-central1"
   project  = "123"
 
@@ -16,8 +16,8 @@ resource "google_managed_kafka_acl" "nc1" {
 }
 
 resource "google_managed_kafka_acl" "nc2" {
-  acl_id   = "nc2"
-  cluster  = "projects/my-project/locations/australia-southeast2/clusters/example-cluster"
+  acl_id   = "allConsumerGroups"
+  cluster  = "nc2"
   location = "us-central1"
   project  = "123"
 

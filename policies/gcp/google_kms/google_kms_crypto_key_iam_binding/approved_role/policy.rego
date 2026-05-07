@@ -1,5 +1,5 @@
 package terraform.gcp.security.google_kms.google_kms_crypto_key_iam_binding.approved_role
-import data.terraform.gcp.helpers as helpers
+import data.terraform.helpers as helpers
 import data.terraform.gcp.security.google_kms.google_kms_crypto_key_iam_binding.vars as vars
 
 conditions := [
@@ -23,12 +23,6 @@ conditions := [
     {
       "situation_description": "Admin role assigned to a non-service account",
       "remedies": ["Only service accounts should be granted the admin role"]
-    },
-    {
-      "condition": "Role is admin",
-      "attribute_path": ["role"],
-      "values": ["roles/cloudkms.admin"],
-      "policy_type": "whitelist"
     },
     {
       "condition": "Member must be a service account",

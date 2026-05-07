@@ -51,7 +51,7 @@ resource "google_managed_kafka_connect_cluster" "connect_cluster_c" {
   provider = google-beta
 }
 
-resource "google_managed_kafka_connector" "connector_c" {
+resource "google_managed_kafka_connector" "c" {
   project         = google_project.project_c.project_id
   connector_id    = "compliant-connector"
   connect_cluster = google_managed_kafka_connect_cluster.connect_cluster_c.connect_cluster_id
@@ -61,7 +61,7 @@ resource "google_managed_kafka_connector" "connector_c" {
     "connector.class"  = "com.google.pubsub.kafka.sink.CloudPubSubSinkConnector"
     "name"             = "compliant-connector"
     "tasks.max"        = "1"
-    "topics"           = "compliant-topic"
+    "topics"           = "topics"
     "cps.topic"        = "compliant-pubsub"
     "cps.project"      = google_project.project_c.project_id
     "value.converter"  = "org.apache.kafka.connect.storage.StringConverter"

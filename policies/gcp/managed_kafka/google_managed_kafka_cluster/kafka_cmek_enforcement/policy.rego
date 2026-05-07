@@ -1,6 +1,6 @@
 package terraform.gcp.security.managed_kafka.google_managed_kafka_cluster.kafka_cmek_enforcement
 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.managed_kafka.google_managed_kafka_cluster.vars
 
 conditions := [
@@ -29,7 +29,7 @@ conditions := [
       "condition": "location is a region that requires CMEK alignment",
       "attribute_path": ["location"],
       "values": ["us-central1", "australia-southeast1"],
-      "policy_type": "blacklist"
+      "policy_type": "whitelist"
     },
     {
       "condition": "CMEK key name must follow the regional pattern for matching",
@@ -48,7 +48,5 @@ conditions := [
   ]
 ]
 
-summary := {
-  "message": helpers.get_multi_summary(conditions, vars.variables).message,
-  "details": helpers.get_multi_summary(conditions, vars.variables).details
-}
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

@@ -1,5 +1,5 @@
 package terraform.gcp.security.dataproc_metastore.service.metadata_integration 
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.dataproc_metastore.service.vars
 
 
@@ -9,8 +9,8 @@ conditions := [
     "remedies":[ "Set metadata intergration, data catalog, enabled to true"]},
     {
         "condition": "Data catalog sync enabled",
-        "attribute_path" : ["data_catalog_config", 0, "enabled"], 
-        "values" : ["true"], 
+        "attribute_path" : ["metadata_integration", 0, "data_catalog_config", 0, "enabled"], 
+        "values" : [true], 
         "policy_type" : "whitelist" 
     }
     ]

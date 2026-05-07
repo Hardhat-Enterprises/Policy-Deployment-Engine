@@ -1,5 +1,5 @@
 package terraform.gcp.security.gke_hub.google_gke_hub_membership_rbac_role_binding.approved_roles
-import data.terraform.gcp.helpers
+import data.terraform.helpers
 import data.terraform.gcp.security.gke_hub.google_gke_hub_membership_rbac_role_binding.vars
 
 conditions := [

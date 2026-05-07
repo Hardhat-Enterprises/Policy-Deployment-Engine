@@ -62,7 +62,7 @@ resource "google_os_config_v2_policy_orchestrator_for_folder" "c" {
     folder_id = google_folder.my_folder.folder_id
 
     state = "STOPPED"
-    action = "DELETE"
+    action = "UPSERT"
 
     orchestrated_resource {
         id = "test-orchestrated-resource-folder"

@@ -1,8 +1,8 @@
 # Describe your resource type here
 # Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
 
-resource "google_managed_kafka_cluster" "insecure_tls_cluster" {
-  cluster_id = "insecure-tls-cluster"
+resource "google_managed_kafka_cluster" "nc" {
+  cluster_id = "nc"
   location   = "us-central1"
   project = "123"
 
