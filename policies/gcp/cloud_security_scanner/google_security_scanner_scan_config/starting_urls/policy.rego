@@ -9,10 +9,10 @@ conditions := [[
 		"remedies": ["Use HTTPS URLs in starting_urls."],
 	},
 	{
-		"condition": "starting_urls must use HTTPS",
+		"condition": "starting_urls must not use insecure HTTP",
 		"attribute_path": ["starting_urls", 0],
-		"values": ["https://*"],
-		"policy_type": "pattern whitelist",
+		"values": ["http://example.com"],
+		"policy_type": "blacklist",
 	},
 ]]
 

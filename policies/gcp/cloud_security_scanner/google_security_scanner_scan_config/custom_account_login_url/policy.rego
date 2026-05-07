@@ -9,10 +9,10 @@ conditions := [[
 		"remedies": ["Use an HTTPS login_url inside authentication.custom_account."],
 	},
 	{
-		"condition": "custom_account login_url must use HTTPS",
+		"condition": "custom_account login_url must not use insecure HTTP",
 		"attribute_path": ["authentication", 0, "custom_account", 0, "login_url"],
-		"values": ["https://*"],
-		"policy_type": "pattern whitelist",
+		"values": ["http://example.com/login"],
+		"policy_type": "blacklist",
 	},
 ]]
 
