@@ -3,7 +3,7 @@ resource "google_workflows_workflow" "nc" {
   project       = "pde"
   region        = "us-central1"
   description   = "description"
-  crypto_key_name = "projects/pde/locations/australia-southeast1/keyRings/keyRing/cryptoKeys/cryptoKey"
+  crypto_key_name = "projects/pde/locations/us-central1/keyRings/keyRing/cryptoKeys/cryptoKey"
   labels = {
     env = "test"
   }
