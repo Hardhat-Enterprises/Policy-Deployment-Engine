@@ -4,6 +4,6 @@ resource "google_privateca_ca_pool" "c" {
   tier     = "ENTERPRISE"
   publishing_options {
     publish_ca_cert = true
-    publish_crl     = true
+    publish_crl     = false
   }
 }

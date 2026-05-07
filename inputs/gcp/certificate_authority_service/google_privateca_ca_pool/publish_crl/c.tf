@@ -3,7 +3,7 @@ resource "google_privateca_ca_pool" "c" {
   location = "australia-southeast1"
   tier     = "ENTERPRISE"
   publishing_options {
-    publish_ca_cert = true
+    publish_ca_cert = false
     publish_crl     = true
   }
 }

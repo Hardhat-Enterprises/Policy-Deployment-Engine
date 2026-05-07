@@ -1,12 +1,9 @@
 resource "google_privateca_ca_pool" "c" {
-  name = "c"
+  name     = "c"
   location = "australia-southeast1"
-  tier = "ENTERPRISE"
+  tier     = "ENTERPRISE"
   publishing_options {
     publish_ca_cert = true
-    publish_crl = true
-  }
-  labels = {
-    foo = "bar"
+    publish_crl     = true
   }
 }
