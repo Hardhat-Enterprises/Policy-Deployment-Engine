@@ -1,6 +1,5 @@
 # Healthcare Dataset IAM - role (non-compliant)
 # Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
-# Note: Beta resource — uses google-beta provider per Provider Versions guide
 
 resource "google_healthcare_dataset_iam_member" "nc" {
   provider   = google-beta
