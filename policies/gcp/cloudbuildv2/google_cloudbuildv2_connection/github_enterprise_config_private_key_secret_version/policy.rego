@@ -6,21 +6,26 @@ import data.terraform.gcp.security.cloudbuildv2.google_cloudbuildv2_connection.v
 conditions := [
     [
         {
-            "situation_description": "Prevent Terraform from using unapproved private key secret versions",
-            "remedies": ["Do not use secrets from untrusted projects"]
+            "situation_description": "Ensure GitHub Enterprise private key secret version uses the required Secret Manager format",
+            "remedies": ["Use private_key_secret_version in the format projects/*/secrets/*/versions/*"]
         },
         {
-            "condition": "Do not use secrets from untrusted projects",
+            "condition": "private_key_secret_version must use approved Secret Manager path format",
             "attribute_path": ["github_enterprise_config", 0, "private_key_secret_version"],
             "values": [
-                "projects/my-project-nc/secrets/private-key/versions/1"
+                "projects/*/secrets/*/versions/*",
+                [
+                    [], 
+                    [],  
+                    []   
+                ]
             ],
-            "policy_type": "blacklist"
+            "policy_type": "pattern whitelist"
         }
     ]
 ]
 
 result := helpers.get_multi_summary(conditions, vars.variables)
-  
+
 message := result.message
 details := result.details

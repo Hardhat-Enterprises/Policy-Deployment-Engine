@@ -41,10 +41,10 @@
         "app_installation_id": {
           "description": "GitHub App installation id.",
           "required": false,
-          "security_impact": true,
+          "security_impact": false,
           "rationale":  "The GitHub App installation ID should be restricted to approved values to ensure only authorized GitHub integrations are used, preventing unauthorized repository access or misconfigured connections.",
-          "compliant": "300",
-          "non-compliant": "900",
+          "compliant": null,
+          "non-compliant": null,
           "parent": "github_config"
         }
       }
@@ -79,10 +79,10 @@
         "app_slug": {
           "description": "The URL-friendly name of the GitHub App.",
           "required": false,
-          "security_impact": true,
+          "security_impact": false,
           "rationale": "The app slug should match the approved GitHub Enterprise App identifier to ensure the correct application is integrated.",
-          "compliant": "gcb-app",
-          "non-compliant": "unauthorized-app",
+          "compliant": null,
+          "non-compliant": null,
           "parent": "github_enterprise_config"
         },
         "private_key_secret_version": {
@@ -90,8 +90,8 @@
           "required": false,
           "security_impact": true,
           "rationale": "The private key must be stored in a secure and approved secret version to protect authentication credentials and prevent unauthorized access.",
-          "compliant": "projects/my-project-c/secrets/private-key/versions/1",
-          "non-compliant": "projects/my-project-nc/secrets/private-key/versions/1",
+          "compliant": "projects/c/secrets/private-key/versions/1",
+          "non-compliant": "private-key-version-1",
           "parent": "github_enterprise_config"
         },
         "webhook_secret_secret_version": {
@@ -106,10 +106,10 @@
         "app_installation_id": {
           "description": "ID of the installation of the GitHub App.",
           "required": false,
-          "security_impact": true,
+          "security_impact": false,
           "rationale": "The app installation ID should be restricted to approved values to ensure only authorized GitHub Enterprise installations are used.",
-          "compliant": "300",
-          "non-compliant": "900",
+          "compliant": null,
+          "non-compliant": null,
           "parent": "github_enterprise_config"
         },
         "service_directory_config": {
@@ -245,8 +245,8 @@
         "authorizer_credential": {
           "description": "Required. A http access token with the `REPO_ADMIN` scope access. Structure is [documented below](#nested_bitbucket_data_center_config_authorizer_credential).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "The authorizer credential holds a high-privilege REPO_ADMIN access token stored in Secret Manager. Using unapproved secret versions may expose the connection to unauthorized repository access or credential misuse.",
           "compliant": "projects/my-project-c/secrets/admin-token/versions/1",
           "non-compliant": "projects/my-project-nc/secrets/admin-token/versions/1",
           "parent": "bitbucket_data_center_config"

@@ -6,21 +6,26 @@ import data.terraform.gcp.security.cloudbuildv2.google_cloudbuildv2_connection.v
 conditions := [
     [
         {
-            "situation_description": "Prevent Terraform from using unapproved Bitbucket Cloud webhook secret versions",
-            "remedies": ["Use approved Bitbucket Cloud webhook secret versions only"]
+            "situation_description": "Ensure Bitbucket Cloud webhook secret version uses the required Secret Manager format",
+            "remedies": ["Use webhook_secret_secret_version in the format projects/*/secrets/*/versions/*"]
         },
         {
-            "condition": "Use approved Bitbucket Cloud webhook secret versions only",
+            "condition": "webhook_secret_secret_version must use approved Secret Manager path format",
             "attribute_path": ["bitbucket_cloud_config", 0, "webhook_secret_secret_version"],
             "values": [
-                "projects/my-project-c/secrets/webhook-secret/versions/1"
+                "projects/*/secrets/*/versions/*",
+                [
+                    ["my-project-c"],   # only c allowed - nc fails here
+                    ["webhook-secret"], # allowed secret names
+                    ["1"]               # allowed versions
+                ]
             ],
-            "policy_type": "whitelist"
+            "policy_type": "pattern whitelist"
         }
     ]
 ]
 
 result := helpers.get_multi_summary(conditions, vars.variables)
-  
+
 message := result.message
 details := result.details

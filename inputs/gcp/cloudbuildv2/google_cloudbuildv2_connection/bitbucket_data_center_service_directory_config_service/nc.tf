@@ -16,7 +16,7 @@ resource "google_cloudbuildv2_connection" "nc" {
     }
 
     service_directory_config {
-      service = "wrong-format"
+      service = "projects/my-project-nc/locations/us-central1/namespaces/default/services/bitbucket-service"
     }
   }
 }

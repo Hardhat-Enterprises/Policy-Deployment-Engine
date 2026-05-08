@@ -7,7 +7,7 @@ resource "google_cloudbuildv2_connection" "nc" {
     app_installation_id = 300
 
     authorizer_credential {
-      oauth_token_secret_version = "projects/my-project-nc/secrets/oauth-token/versions/1"
+      oauth_token_secret_version = "projects/my-project-nc/secrets/wrong-secret/versions/1"
     }
   }
 }

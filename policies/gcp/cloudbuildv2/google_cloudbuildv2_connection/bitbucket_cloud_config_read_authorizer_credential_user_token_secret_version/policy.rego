@@ -6,21 +6,26 @@ import data.terraform.gcp.security.cloudbuildv2.google_cloudbuildv2_connection.v
 conditions := [
     [
         {
-            "situation_description": "Prevent Terraform from using unapproved Bitbucket Cloud authorizer credential user token secret versions",
-            "remedies": ["Use approved Bitbucket Cloud authorizer credential user token secret versions only"]
+            "situation_description": "Ensure Bitbucket Cloud read authorizer credential user token secret version uses the required Secret Manager format",
+            "remedies": ["Use user_token_secret_version in the format projects/*/secrets/*/versions/*"]
         },
         {
-            "condition": "Use approved Bitbucket Cloud authorizer credential user token secret versions only",
-            "attribute_path": ["bitbucket_cloud_config", 0, "authorizer_credential", 0, "user_token_secret_version"],
+            "condition": "user_token_secret_version must use approved Secret Manager path format",
+            "attribute_path": ["bitbucket_cloud_config", 0, "read_authorizer_credential", 0, "user_token_secret_version"],
             "values": [
-                "projects/my-project-c/secrets/admin-token/versions/1"
+                "projects/*/secrets/*/versions/*",
+                [
+                    ["my-project-c"],  # only c allowed - nc fails here
+                    ["read-token"],    # allowed secret names
+                    ["1"]              # allowed versions
+                ]
             ],
-            "policy_type": "whitelist"
+            "policy_type": "pattern whitelist"
         }
     ]
 ]
 
 result := helpers.get_multi_summary(conditions, vars.variables)
-  
+
 message := result.message
 details := result.details
