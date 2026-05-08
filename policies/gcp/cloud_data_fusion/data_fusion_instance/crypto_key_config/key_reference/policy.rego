@@ -9,7 +9,7 @@ conditions := [
             "situation_description": "The Data Fusion instance is not using an approved Hardhat KMS encryption key/the resource path is malformed",
             "remedies": [
                 "Please Ensure the key_reference follows the format: projects/{project}/locations/{location}/keyRings/{ring}/cryptoKeys/{key}",
-                "The key must be located in 'hardhat-prod' within 'us-central1' using the 'hardhat-ring'"
+                "The key must be located in 'hardhat-prod' within 'australia-southeast1' using the 'hardhat-ring'"
             ]
         },
         {
