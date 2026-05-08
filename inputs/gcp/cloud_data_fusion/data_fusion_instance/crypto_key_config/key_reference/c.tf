@@ -1,7 +1,7 @@
 resource "google_data_fusion_instance" "c" {
   project = "gcp-project-12345"
   name    = "c"
-  region  = "us-central1"
+  region  = "australia-southeast1"
   type    = "BASIC"
   private_instance = true
 
@@ -11,6 +11,6 @@ resource "google_data_fusion_instance" "c" {
   }
 
   crypto_key_config {
-    key_reference = "projects/hardhat-prod/locations/us-central1/keyRings/hardhat-ring/cryptoKeys/cdf-key"
+    key_reference = "projects/hardhat-prod/locations/australia-southeast1/keyRings/hardhat-ring/cryptoKeys/cdf-key"
   }
 }

@@ -6,16 +6,22 @@ import data.terraform.gcp.security.cloud_data_fusion.data_fusion_instance.vars
 conditions := [
     [
         {
-            "situation_description": "The Data Fusion instance is not using the approved Hardhat encryption key.",
+            "situation_description": "The Data Fusion instance is not using an approved Hardhat KMS encryption key/the resource path is malformed",
             "remedies": [
-                "set 'key_reference' to: projects/hardhat-prod/locations/us-central1/keyRings/hardhat-ring/cryptoKeys/cdf-key"
+                "Please Ensure the key_reference follows the format: projects/{project}/locations/{location}/keyRings/{ring}/cryptoKeys/{key}",
+                "The key must be located in 'hardhat-prod' within 'us-central1' using the 'hardhat-ring'"
             ]
         },
         {
-            "condition": "Match approved KMS key exactly",
-            "attribute_path": ["crypto_key_config", 0, "key_reference"], 
-            "values": ["projects/hardhat-prod/locations/us-central1/keyRings/hardhat-ring/cryptoKeys/cdf-key"],
-            "policy_type": "whitelist" 
+            "condition": "enforce Hardhat KMS Key Pattern",
+            "attribute_path": ["crypto_key_config", 0, "key_reference"],
+            "values": [
+                "projects/*/locations/*/keyRings/*/cryptoKeys/*", 
+                [
+                    ["hardhat-prod"], ["australia-southeast1"], ["hardhat-ring"], ["cdf-key"]
+                ]
+            ],
+            "policy_type": "pattern whitelist" 
         }
     ]
 ]

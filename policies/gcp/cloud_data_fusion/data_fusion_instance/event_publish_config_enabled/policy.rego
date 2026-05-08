@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_data_fusion.data_fusion_instance.enabled
+package terraform.gcp.security.cloud_data_fusion.data_fusion_instance.event_publish_config_enabled
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_data_fusion.data_fusion_instance.vars
