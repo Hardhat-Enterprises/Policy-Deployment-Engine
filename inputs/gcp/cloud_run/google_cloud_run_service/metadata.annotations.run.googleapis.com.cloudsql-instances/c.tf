@@ -4,6 +4,12 @@ resource "google_cloud_run_service" "c" {
   project  = "my-gcp-project"
 
   template {
+    metadata {
+      annotations = {
+        "run.googleapis.com/cloudsql-instances" = "my-gcp-project:australia-southeast1:prod-db"
+      }
+    }
+
     spec {
       containers {
         image = "us-docker.pkg.dev/cloudrun/container/hello"

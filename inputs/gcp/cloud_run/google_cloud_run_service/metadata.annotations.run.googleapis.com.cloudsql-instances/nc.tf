@@ -1,9 +1,15 @@
-resource "google_cloud_run_service" "c" {
+resource "google_cloud_run_service" "nc" {
   name     = "cloudrun-srv"
   location = "australia-southeast1"
   project  = "my-gcp-project"
 
   template {
+    metadata {
+      annotations = {
+        "run.googleapis.com/cloudsql-instances" = "unknown-project:us-central1:test-db"
+      }
+    }
+
     spec {
       containers {
         image = "us-docker.pkg.dev/cloudrun/container/hello"

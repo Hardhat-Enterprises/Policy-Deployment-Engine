@@ -5,6 +5,8 @@ resource "google_cloud_run_service" "c" {
 
   template {
     spec {
+      service_account_name = "secure-sa@my-gcp-project.iam.gserviceaccount.com"
+
       containers {
         image = "us-docker.pkg.dev/cloudrun/container/hello"
       }
@@ -12,7 +14,7 @@ resource "google_cloud_run_service" "c" {
   }
 
   traffic {
-    percent         = 80
+    percent         = 100
     latest_revision = true
   }
 }

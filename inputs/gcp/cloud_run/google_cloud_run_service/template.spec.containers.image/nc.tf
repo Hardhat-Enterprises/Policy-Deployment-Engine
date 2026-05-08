@@ -1,4 +1,4 @@
-resource "google_cloud_run_service" "c" {
+resource "google_cloud_run_service" "nc" {
   name     = "cloudrun-srv"
   location = "australia-southeast1"
   project  = "my-gcp-project"
@@ -6,7 +6,7 @@ resource "google_cloud_run_service" "c" {
   template {
     spec {
       containers {
-        image = "us-docker.pkg.dev/cloudrun/container/hello"
+        image = "docker.io/random/unsafe-image:latest"
       }
     }
   }

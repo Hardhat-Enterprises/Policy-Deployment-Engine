@@ -5,6 +5,8 @@ resource "google_cloud_run_service" "c" {
 
   template {
     spec {
+      timeout_seconds = 300
+
       containers {
         image = "us-docker.pkg.dev/cloudrun/container/hello"
       }

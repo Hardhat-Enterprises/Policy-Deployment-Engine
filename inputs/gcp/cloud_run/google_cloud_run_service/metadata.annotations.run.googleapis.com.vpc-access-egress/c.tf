@@ -4,6 +4,12 @@ resource "google_cloud_run_service" "c" {
   project  = "my-gcp-project"
 
   template {
+    metadata {
+      annotations = {
+        "run.googleapis.com/vpc-access-egress" = "private-ranges-only"
+      }
+    }
+
     spec {
       containers {
         image = "us-docker.pkg.dev/cloudrun/container/hello"

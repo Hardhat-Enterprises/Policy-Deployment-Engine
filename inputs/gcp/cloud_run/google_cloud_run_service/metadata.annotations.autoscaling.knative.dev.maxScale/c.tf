@@ -4,6 +4,12 @@ resource "google_cloud_run_service" "c" {
   project  = "my-gcp-project"
 
   template {
+    metadata {
+      annotations = {
+        "autoscaling.knative.dev/maxScale" = "10"
+      }
+    }
+
     spec {
       containers {
         image = "us-docker.pkg.dev/cloudrun/container/hello"

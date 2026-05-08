@@ -1,10 +1,12 @@
-resource "google_cloud_run_service" "c" {
+resource "google_cloud_run_service" "nc" {
   name     = "cloudrun-srv"
   location = "australia-southeast1"
   project  = "my-gcp-project"
 
   template {
     spec {
+      timeout_seconds = 4000
+
       containers {
         image = "us-docker.pkg.dev/cloudrun/container/hello"
       }

@@ -7,6 +7,12 @@ resource "google_cloud_run_service" "c" {
     spec {
       containers {
         image = "us-docker.pkg.dev/cloudrun/container/hello"
+
+        resources {
+          requests = {
+            cpu = "1"
+          }
+        }
       }
     }
   }

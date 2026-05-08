@@ -15,8 +15,8 @@ conditions := [
     {
       "condition": "Traffic percent must be 100",
       "attribute_path": ["traffic", 0, "percent"],
-      "values": [100],
-      "policy_type": "whitelist"
+      "values": [0,100],
+      "policy_type": "range"
     }
   ]
 ]

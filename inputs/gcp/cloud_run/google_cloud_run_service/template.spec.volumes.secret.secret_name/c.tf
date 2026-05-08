@@ -7,6 +7,19 @@ resource "google_cloud_run_service" "c" {
     spec {
       containers {
         image = "us-docker.pkg.dev/cloudrun/container/hello"
+
+        volume_mounts {
+          name       = "secret-volume"
+          mount_path = "/secrets"
+        }
+      }
+
+      volumes {
+        name = "secret-volume"
+
+        secret {
+          secret_name = "prod-db-secret"
+        }
       }
     }
   }

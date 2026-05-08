@@ -1,10 +1,12 @@
-resource "google_cloud_run_service" "c" {
+resource "google_cloud_run_service" "nc" {
   name     = "cloudrun-srv"
   location = "australia-southeast1"
   project  = "my-gcp-project"
 
   template {
     spec {
+      container_concurrency = 1000
+
       containers {
         image = "us-docker.pkg.dev/cloudrun/container/hello"
       }
@@ -12,7 +14,7 @@ resource "google_cloud_run_service" "c" {
   }
 
   traffic {
-    percent         = 80
+    percent         = 100
     latest_revision = true
   }
 }

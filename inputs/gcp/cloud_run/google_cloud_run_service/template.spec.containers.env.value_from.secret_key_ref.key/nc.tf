@@ -1,4 +1,4 @@
-resource "google_cloud_run_service" "c" {
+resource "google_cloud_run_service" "nc" {
   name     = "cloudrun-srv"
   location = "australia-southeast1"
   project  = "my-gcp-project"
@@ -7,6 +7,17 @@ resource "google_cloud_run_service" "c" {
     spec {
       containers {
         image = "us-docker.pkg.dev/cloudrun/container/hello"
+
+        env {
+          name = "DB_PASSWORD"
+
+          value_from {
+            secret_key_ref {
+              name = "prod-db-secret"
+              key  = "old-version"
+            }
+          }
+        }
       }
     }
   }
