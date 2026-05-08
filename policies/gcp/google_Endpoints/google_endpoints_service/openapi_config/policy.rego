@@ -6,26 +6,21 @@ import data.terraform.gcp.security.google_Endpoints.google_endpoints_service.var
 conditions := [
     [
         {
-            "situation_description": "Google Cloud Endpoints service openapi_config does not enforce HTTPS.",
+            "situation_description": "Google Cloud Endpoints service openapi_config allows insecure HTTP traffic.",
             "remedies": [
-                "Add a schemes section to openapi_config.",
-                "Set the allowed scheme to https."
+                "Remove http from the schemes section.",
+                "Allow only https in openapi_config."
             ]
         },
         {
-            "condition": "Check that openapi_config includes https in the OpenAPI schemes section.",
+            "condition": "Check that openapi_config does not include http in the OpenAPI schemes section.",
             "attribute_path": ["openapi_config"],
-            "values": ["*schemes:*https*", []],
-            "policy_type": "pattern whitelist"
+            "values": ["*schemes:*http*", []],
+            "policy_type": "pattern blacklist"
         }
     ]
 ]
 
-resource_names := [resource.name | resource := input.resource_changes[_]; resource.type == "google_endpoints_service"; resource.name != "c"]
+message := helpers.get_multi_summary(conditions, vars.variables).message
 
-message := sprintf("%s\nResources checked: %s", [
-	helpers.get_multi_summary(conditions, vars.variables).message,
-	concat(", ", resource_names),
-])
-
-details := helpers.get_multi_summary(conditions, vars.variables).details 
+details := helpers.get_multi_summary(conditions, vars.variables).details

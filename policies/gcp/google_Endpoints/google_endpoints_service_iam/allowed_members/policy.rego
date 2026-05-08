@@ -6,26 +6,25 @@ import data.terraform.gcp.security.google_Endpoints.google_endpoints_service_iam
 conditions := [
     [
         {
-            "situation_description": "Google Cloud Endpoints service IAM members includes a principal outside the approved member types.",
+            "situation_description": "Google Cloud Endpoints service IAM members includes a principal outside the approved members list.",
             "remedies": [
-                "Use only approved member types in members.",
-                "Use user:, group:, or serviceAccount: principals."
+                "Use only approved members in members.",
+                "Update the binding to match the allowed members list."
             ]
         },
         {
-            "condition": "Check that members only use approved principal types.",
+            "condition": "Check that members only use approved members.",
             "attribute_path": ["members"],
-            "values": ["*", [["user","group","serviceAccount"]]],
-            "policy_type": "pattern whitelist"
+            "values": [
+                "user:alice@example.com",
+                "group:admins@example.com",
+                "serviceAccount:svc-my-app@my-project-123.iam.gserviceaccount.com"
+            ],
+            "policy_type": "whitelist"
         }
     ]
 ]
 
-resource_names := [resource.name | resource := input.resource_changes[_]; resource.type == "google_endpoints_service_iam_binding"; resource.name != "c"]
+message := helpers.get_multi_summary(conditions, vars.variables).message
 
-message := sprintf("%s\nResources checked: %s", [
-	helpers.get_multi_summary(conditions, vars.variables).message,
-	concat(", ", resource_names),
-])
-
-details := helpers.get_multi_summary(conditions, vars.variables).details 
+details := helpers.get_multi_summary(conditions, vars.variables).details
