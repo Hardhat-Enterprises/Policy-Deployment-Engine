@@ -12,7 +12,7 @@ conditions := [
         {
             "condition": "Region is set to an Australian region",
             "attribute_path": ["region"],
-            "values": ["australia-southeast1"],
+            "values": ["australia-southeast1", "australia-southeast2"],
             "policy_type": "whitelist"
         }
     ]
