@@ -1,6 +1,6 @@
 package terraform.gcp.security.containeraws.container_aws_node_pool.iam_instance_profile
-import data.terraform.gcp.security.containeraws.container_aws_node_pool.vars
 import data.terraform.helpers
+import data.terraform.gcp.security.containeraws.container_aws_node_pool.vars
 
 conditions := [[
 	{
@@ -8,10 +8,10 @@ conditions := [[
 		"remedies": ["Use an approved IAM instance profile for node pools."],
 	},
 	{
-		"condition": "iam_instance_profile must not use unapproved profiles",
+		"condition": "iam_instance_profile must use an approved profile",
 		"attribute_path": ["config", 0, "iam_instance_profile"],
-		"values": ["unapproved-profile"],
-		"policy_type": "blacklist",
+		"values": ["approved-profile"],
+		"policy_type": "whitelist",
 	},
 ]]
 
