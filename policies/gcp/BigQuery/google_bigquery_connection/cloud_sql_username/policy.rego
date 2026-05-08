@@ -7,7 +7,7 @@ conditions := [
         {"situation_description": "cloud_sql username is empty, which may allow unauthorised access to the Cloud SQL database", "remedies": ["Set a non-empty username in the cloud_sql credential block"]},
         {
             "condition": "Check if cloud_sql username is non-empty",
-            "attribute_path": ["cloud_sql", "credential", "username"],
+            "attribute_path": ["cloud_sql", 0, "credential", 0, "username"],
             "values": [""],
             "policy_type": "blacklist"
         }
