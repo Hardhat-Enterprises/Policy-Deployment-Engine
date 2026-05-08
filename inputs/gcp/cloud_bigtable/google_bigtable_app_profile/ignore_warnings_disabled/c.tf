@@ -5,7 +5,7 @@ resource "google_bigtable_app_profile" "c" {
 
   single_cluster_routing {
     cluster_id                 = "c-cluster"
-    allow_transactional_writes = true
+    allow_transactional_writes = false
   }
 
   ignore_warnings = false

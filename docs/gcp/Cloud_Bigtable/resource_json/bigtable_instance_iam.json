@@ -3,7 +3,7 @@
   "subcategory": "Cloud Bigtable",
   "arguments": {
     "project": {
-      "description": "The project in which the instance belongs. If it is not provided, Terraform will use the provider default.",
+      "description": "The project in which the instance belongs. If it is not provided, Terraform will use the provider default. **Terraform:** do not combine `google_bigtable_instance_iam_policy` with `google_bigtable_instance_iam_binding` or `google_bigtable_instance_iam_member` for the same instance (authoritative policy replaces the whole policy). Binding and member may be used together only when they do not grant the same role.",
       "required": false,
       "security_impact": false,
       "rationale": "Non-secret project id for the Terraform resource; actual access grants still come from `member`/`members` + `role`, not from repeating the project id here.",
@@ -25,8 +25,8 @@
       "required": true,
       "security_impact": true,
       "rationale": "Defines who receives the role on the instance; public principals broaden access beyond least privilege.",
-      "compliant": "\"serviceAccount:test-sa@test-project.iam.gserviceaccount.com\"",
-      "non-compliant": "\"allUsers\" or \"allAuthenticatedUsers\"",
+      "compliant": "serviceAccount:test-sa@test-project.iam.gserviceaccount.com",
+      "non-compliant": "allUsers",
       "parent": null
     },
     "role": {

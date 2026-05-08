@@ -1,8 +1,6 @@
 package terraform.gcp.security.cloud_bigtable.google_bigtable_authorized_view.no_full_row_access
-
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_bigtable.google_bigtable_authorized_view.vars
-
 conditions := [
 	[
 		{
@@ -20,8 +18,6 @@ conditions := [
 		},
 	],
 ]
-
 result := helpers.get_multi_summary(conditions, vars.variables)
-
 message := result.message
 details := result.details

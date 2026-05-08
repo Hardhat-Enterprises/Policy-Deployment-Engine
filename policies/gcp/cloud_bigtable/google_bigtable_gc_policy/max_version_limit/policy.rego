@@ -1,8 +1,6 @@
 package terraform.gcp.security.cloud_bigtable.google_bigtable_gc_policy.max_version_limit
-
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_bigtable.google_bigtable_gc_policy.vars
-
 conditions := [
 	[
 		{
@@ -19,8 +17,6 @@ conditions := [
 		},
 	],
 ]
-
 result := helpers.get_multi_summary(conditions, vars.variables)
-
 message := result.message
 details := result.details

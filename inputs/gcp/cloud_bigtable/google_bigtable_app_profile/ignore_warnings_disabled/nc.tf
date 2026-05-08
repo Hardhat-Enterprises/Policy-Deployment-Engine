@@ -5,7 +5,7 @@ resource "google_bigtable_app_profile" "nc" {
 
   single_cluster_routing {
     cluster_id                 = "nc-cluster"
-    allow_transactional_writes = true
+    allow_transactional_writes = false
   }
 
   ignore_warnings = true

@@ -1,8 +1,6 @@
 package terraform.gcp.security.cloud_bigtable.google_bigtable_instance.cmek_required
-
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_bigtable.google_bigtable_instance.vars
-
 conditions := [
 	[
 		{
@@ -20,8 +18,6 @@ conditions := [
 		},
 	],
 ]
-
 result := helpers.get_multi_summary(conditions, vars.variables)
-
 message := result.message
 details := result.details

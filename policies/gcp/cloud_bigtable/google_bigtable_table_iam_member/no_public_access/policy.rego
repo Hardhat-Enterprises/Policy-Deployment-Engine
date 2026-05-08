@@ -1,11 +1,8 @@
 package terraform.gcp.security.cloud_bigtable.google_bigtable_table_iam_member.no_public_access
-
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_bigtable.google_bigtable_table_iam_member.vars
-
 # Table-level IAM can expose row data to the internet or any signed-in Google account.
 # Instance IAM does not subsume table IAM; both must be restricted.
-
 conditions := [
 	[
 		{
@@ -23,8 +20,6 @@ conditions := [
 		},
 	],
 ]
-
 result := helpers.get_multi_summary(conditions, vars.variables)
-
 message := result.message
 details := result.details

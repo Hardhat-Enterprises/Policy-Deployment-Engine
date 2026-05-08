@@ -70,8 +70,8 @@
     "deletion_protection": {
       "description": "`PROTECTED` prohibits deleting the table, column families, or the instance containing the table via the API. Defaults to `UNPROTECTED` if unset.",
       "required": false,
-      "security_impact": false,
-      "rationale": "API-side safeguard against destructive deletes; it does not publish rows publicly—availability/governance oriented rather than client authentication.",
+      "security_impact": true,
+      "rationale": "Without protection, accidental or malicious deletes can cause permanent data loss and sustained outage (availability impact); `PROTECTED` is a guardrail for data retention and service continuity, not only cosmetic governance.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -81,8 +81,8 @@
       "required": false,
       "security_impact": true,
       "rationale": "Disabling (`0`) removes change history used for monitoring, recovery, and audit investigations.",
-      "compliant": "\"24h\"",
-      "non-compliant": "\"0\"",
+      "compliant": "24h",
+      "non-compliant": "0",
       "parent": null
     },
     "automated_backup_policy": {
@@ -90,8 +90,8 @@
       "required": false,
       "security_impact": true,
       "rationale": "Scheduled backups support recovery and incident response for table data.",
-      "compliant": "{ retention_period = \"72h\", frequency = \"24h\" }",
-      "non-compliant": "missing block, or retention_period = \"0\", or frequency = \"0\"",
+      "compliant": "retention_period 72h, frequency 24h",
+      "non-compliant": "retention_period 0",
       "parent": null
     }
   }

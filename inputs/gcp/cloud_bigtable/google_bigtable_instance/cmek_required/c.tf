@@ -8,6 +8,6 @@ resource "google_bigtable_instance" "c" {
     zone         = "australia-southeast1-a"
     num_nodes    = 1
     storage_type = "SSD"
-    kms_key_name = "projects/PDE/locations/australia-southeast1/keyRings/bigtable-kr/cryptoKeys/bigtable-cmek"
+    kms_key_name = "projects/PDE/locations/australia-southeast1/keyRings/bt-kr/cryptoKeys/bt-cmek"
   }
 }
