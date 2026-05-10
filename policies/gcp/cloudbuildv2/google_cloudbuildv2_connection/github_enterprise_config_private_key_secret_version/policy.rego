@@ -15,11 +15,10 @@ conditions := [
             "values": [
                 "projects/*/secrets/*/versions/*",
                 [
-                    ["my-project-c"],  
-                    ["private-key"],   
-                    ["1"]              
+                    ["c"],           
+                    ["private-key"], 
+                    ["1"]            
                 ]
-
             ],
             "policy_type": "pattern whitelist"
         }
@@ -27,5 +26,6 @@ conditions := [
 ]
 
 result := helpers.get_multi_summary(conditions, vars.variables)
+
 message := result.message
 details := result.details
