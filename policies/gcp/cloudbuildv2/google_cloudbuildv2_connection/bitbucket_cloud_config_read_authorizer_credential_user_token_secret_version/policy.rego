@@ -15,9 +15,9 @@ conditions := [
             "values": [
                 "projects/*/secrets/*/versions/*",
                 [
-                    ["my-project-c"],  # only c allowed - nc fails here
-                    ["read-token"],    # allowed secret names
-                    ["1"]              # allowed versions
+                    ["my-project-c"],  
+                    ["read-token"],    
+                    ["1"]              
                 ]
             ],
             "policy_type": "pattern whitelist"
