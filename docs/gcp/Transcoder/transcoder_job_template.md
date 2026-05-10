@@ -31,4 +31,4 @@ The main arguments reviewed for policy creation were:
 **Allowed Value:**
 
 ```text
-us-central1
+australia-southeast1
