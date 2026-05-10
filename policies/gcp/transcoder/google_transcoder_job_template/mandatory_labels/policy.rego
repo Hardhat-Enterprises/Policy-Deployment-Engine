@@ -6,14 +6,14 @@ import data.terraform.gcp.security.transcoder.google_transcoder_job_template.var
 conditions := [
     [
         {
-            "situation_description": "The transcoder job template is missing the required environment label.",
+            "situation_description": "Transcoder job template is missing the required environment label.",
             "remedies": [
-                "Add the required label 'environment' with an approved value such as 'dev'.",
-                "Use labels to support ownership, auditing, and environment tracking."
+                "Add the label 'environment' with the approved value 'dev'.",
+                "Use environment labels to support auditing, ownership tracking, incident response, and dev/test/prod separation."
             ]
         },
         {
-            "condition": "Check if required environment label is missing or not approved",
+            "condition": "Transcoder job template labels.environment must be dev",
             "attribute_path": ["labels", "environment"],
             "values": ["dev"],
             "policy_type": "whitelist"
@@ -21,5 +21,6 @@ conditions := [
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+message := result.message
+details := result.details

@@ -6,14 +6,14 @@ import data.terraform.gcp.security.transcoder.google_transcoder_job_template.var
 conditions := [
     [
         {
-            "situation_description": "The transcoder job template project is not in the allowed list.",
+            "situation_description": "Transcoder job template is created in an unapproved Google Cloud project.",
             "remedies": [
-                "Use an approved project such as 'my-project-name'.",
-                "Avoid creating transcoder job templates in unapproved projects."
+                "Set the transcoder job template project to 'my-project-name'.",
+                "Create transcoder job templates only in approved and managed Google Cloud projects."
             ]
         },
         {
-            "condition": "Check if project is not in the allowed whitelist",
+            "condition": "Transcoder job template project must be my-project-name",
             "attribute_path": ["project"],
             "values": ["my-project-name"],
             "policy_type": "whitelist"
@@ -21,5 +21,6 @@ conditions := [
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+message := result.message
+details := result.details
