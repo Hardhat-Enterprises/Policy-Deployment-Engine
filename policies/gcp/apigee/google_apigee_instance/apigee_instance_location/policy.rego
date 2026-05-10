@@ -6,16 +6,16 @@ import data.terraform.gcp.security.apigee.google_apigee_instance.vars
 conditions := [
     [
         {
-            "situation_description": "Apigee Instance is not deployed in an approved location",
+            "situation_description": "Apigee Instance is not deployed in an approved Australian location",
             "remedies": [
-                "Change the location to an approved region",
-                "Approved regions are defined in the whitelist"
+                "Change the location to an approved Australian region",
+                "Approved regions are: australia-southeast1, australia-southeast2"
             ]
         },
         {
-            "condition": "Check if instance location is in the approved whitelist",
+            "condition": "Check if instance location is in the approved Australian whitelist",
             "attribute_path": ["location"],
-            "values": ["us-central1", "europe-west1", "asia-east1"],
+            "values": ["australia-southeast1", "australia-southeast2"],
             "policy_type": "whitelist"
         }
     ]

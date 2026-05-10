@@ -15,7 +15,7 @@
         "description": "The display name of the Apigee organization.",
         "required": false,
         "security_impact": false,
-        "rationale": "It sets the display name only and does not have any security impact.",
+        "rationale": "display_name is a human-readable label used for identification purposes only in the GCP console. It does not affect access control, encryption, network configuration, or any security mechanism within the Apigee platform.",
         "compliant": null,
         "non-compliant": null,
         "parent": null
@@ -24,7 +24,7 @@
         "description": "Description of the Apigee organization.",
         "required": false,
         "security_impact": false,
-        "rationale": "It sets the description only and does not have any security impact.",
+        "rationale": "description is a free-text documentation field only. It does not affect any security controls, access permissions, encryption, or network configurations within the Apigee platform.",
         "compliant": null,
         "non-compliant": null,
         "parent": null
@@ -34,15 +34,15 @@
         "required": false,
         "security_impact": true,
         "rationale": "Storing analytics data in unapproved regions may violate data residency and compliance requirements. Only approved regions should be used.",
-        "compliant": "us-central1",
-        "non-compliant": "us-east1",
+        "compliant": "australia-southeast1",
+        "non-compliant": "us-central1",
         "parent": null
       },
       "api_consumer_data_location": {
         "description": "This field is needed only for customers using non-default data residency regions. Apigee stores some control plane data only in single region.",
         "required": false,
-        "security_impact": false,
-        "rationale": "It sets the data residency location and does not have any direct security impact.",
+        "security_impact": true,
+        "rationale": "Storing API consumer data in non-approved regions may violate data sovereignty and compliance requirements such as the Australian Privacy Act. Data residency must be explicitly controlled to prevent unauthorized cross-border data transfers and regulatory violations.",
         "compliant": null,
         "non-compliant": null,
         "parent": null
@@ -52,8 +52,8 @@
         "required": false,
         "security_impact": true,
         "rationale": "Without a Customer Managed Encryption Key (CMEK), API consumer data is encrypted using Google-managed keys which may not satisfy compliance requirements. CMEK ensures full control over encryption keys.",
-        "compliant": "projects/pde-proj/locations/us-central1/keyRings/pde-keyring/cryptoKeys/pde-key",
-        "non-compliant": null,
+        "compliant": "projects/pde-proj/locations/australia-southeast1/keyRings/pde-keyring/cryptoKeys/pde-key",
+        "non-compliant": "projects/pde-proj/locations/us-central1/keyRings/pde-keyring/cryptoKeys/pde-key",
         "parent": null
       },
       "control_plane_encryption_key_name": {
@@ -61,15 +61,15 @@
         "required": false,
         "security_impact": true,
         "rationale": "Without a Customer Managed Encryption Key (CMEK), control plane data is encrypted using Google-managed keys which may not satisfy compliance requirements. CMEK ensures full control over encryption keys for multi-region data.",
-        "compliant": "projects/pde-proj/locations/us-central1/keyRings/pde-keyring/cryptoKeys/pde-key",
-        "non-compliant": null,
+        "compliant": "projects/pde-proj/locations/australia-southeast1/keyRings/pde-keyring/cryptoKeys/pde-key",
+        "non-compliant": "projects/pde-proj/locations/us-central1/keyRings/pde-keyring/cryptoKeys/pde-key",
         "parent": null
       },
       "authorized_network": {
         "description": "Compute Engine network used for Service Networking to be peered with Apigee runtime instances.",
         "required": false,
-        "security_impact": false,
-        "rationale": "It sets the network peering configuration and does not have any direct security impact.",
+        "security_impact": true,
+        "rationale": "An overly permissive or misconfigured authorized_network can expose Apigee runtime instances to unauthorized network access. Restricting the authorized network ensures only trusted VPC networks can peer with Apigee, preventing lateral movement and unauthorized traffic.",
         "compliant": null,
         "non-compliant": null,
         "parent": null
@@ -77,8 +77,8 @@
       "disable_vpc_peering": {
         "description": "Flag that specifies whether the VPC Peering through Private Google Access should be disabled between the consumer network and Apigee.",
         "required": false,
-        "security_impact": false,
-        "rationale": "It sets the VPC peering configuration and does not have any direct security impact.",
+        "security_impact": true,
+        "rationale": "Disabling VPC peering removes the private network path between the consumer project and Apigee runtime instances, forcing API traffic over the public internet and significantly increasing exposure to interception, man-in-the-middle attacks, and unauthorized access.",
         "compliant": null,
         "non-compliant": null,
         "parent": null
@@ -86,17 +86,17 @@
       "runtime_type": {
         "description": "Runtime type of the Apigee organization based on the Apigee subscription purchased. Possible values are: CLOUD, HYBRID.",
         "required": false,
-        "security_impact": true,
-        "rationale": "Setting runtime_type to HYBRID runs Apigee on customer-managed infrastructure which increases operational complexity and security risk. CLOUD uses Google-managed infrastructure with built-in security controls.",
-        "compliant": "CLOUD",
-        "non-compliant": "HYBRID",
+        "security_impact": false,
+        "rationale": "runtime_type defines the infrastructure model for the Apigee organization. HYBRID is not inherently insecure as many organizations prefer hybrid infrastructure. It does not directly control access permissions, encryption, or data exposure.",
+        "compliant": null,
+        "non-compliant": null,
         "parent": null
       },
       "billing_type": {
         "description": "Billing type of the Apigee organization.",
         "required": false,
         "security_impact": false,
-        "rationale": "It sets the billing type only and does not have any security impact.",
+        "rationale": "billing_type determines the pricing model for the Apigee organization only. It does not control access permissions, encryption keys, network exposure, or any other security mechanism within the Apigee platform.",
         "compliant": null,
         "non-compliant": null,
         "parent": null
@@ -106,8 +106,8 @@
         "required": false,
         "security_impact": true,
         "rationale": "Without a Customer Managed Encryption Key (CMEK), runtime database data is encrypted using Google-managed keys which may not satisfy compliance requirements. CMEK ensures full control over encryption of data replicated across runtime instances.",
-        "compliant": "projects/pde-proj/locations/us-central1/keyRings/pde-keyring/cryptoKeys/pde-key",
-        "non-compliant": null,
+        "compliant": "projects/pde-proj/locations/australia-southeast1/keyRings/pde-keyring/cryptoKeys/pde-key",
+        "non-compliant": "projects/pde-proj/locations/us-central1/keyRings/pde-keyring/cryptoKeys/pde-key",
         "parent": null
       },
       "retention": {
@@ -132,7 +132,7 @@
             "description": "List of all properties in the object.",
             "required": false,
             "security_impact": false,
-            "rationale": "It sets custom properties and does not have any security impact.",
+            "rationale": "Properties are custom key-value metadata fields used for organizational configuration only. They do not control access permissions, encryption keys, network exposure, or any other security mechanism within the Apigee platform.",
             "compliant": "Refer to child argument",
             "non-compliant": "Refer to child argument",
             "parent": "properties",

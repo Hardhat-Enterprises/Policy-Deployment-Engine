@@ -6,16 +6,16 @@ import data.terraform.gcp.security.apigee.google_apigee_organization.vars
 conditions := [
     [
         {
-            "situation_description": "Apigee Organization analytics_region is not set to an approved region which may violate data residency and compliance requirements",
+            "situation_description": "Apigee Organization analytics_region is not set to an approved Australian region which may violate data residency and compliance requirements",
             "remedies": [
-                "Set analytics_region to an approved region",
-                "Approved regions are: us-central1, europe-west1, asia-east1"
+                "Set analytics_region to an approved Australian region",
+                "Approved regions are: australia-southeast1, australia-southeast2"
             ]
         },
         {
-            "condition": "Check if analytics_region is in the approved whitelist",
+            "condition": "Check if analytics_region is in the approved Australian whitelist",
             "attribute_path": ["analytics_region"],
-            "values": ["us-central1", "europe-west1", "asia-east1"],
+            "values": ["australia-southeast1", "australia-southeast2"],
             "policy_type": "whitelist"
         }
     ]
