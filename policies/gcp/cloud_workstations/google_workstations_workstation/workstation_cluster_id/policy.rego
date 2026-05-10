@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_workstations.google_workstations_workstation.workstation_cluster_id 
+package terraform.gcp.security.cloud_workstations.google_workstations_workstation.workstation_cluster_id
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_workstations.google_workstations_workstation.vars
 

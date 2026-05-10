@@ -13,12 +13,15 @@ conditions := [
         "condition": "c1 : check policy_data does not allow public access",
     
         "attribute_path" :["policy_data"],
-        "values" : ["allUsers", "allAuthenticatedUsers"],
+        "values" : [
+                "{\"bindings\":[{\"members\":[\"allUsers\"],\"role\":\"roles/viewer\"}]}",
+                "{\"bindings\":[{\"members\":[\"allAuthenticatedUsers\"],\"role\":\"roles/viewer\"}]}"
+            ],
         "policy_type" : "blacklist" 
     }
     ]
 ]
-   
+
    
 result := helpers.get_multi_summary(conditions, vars.variables)
   
