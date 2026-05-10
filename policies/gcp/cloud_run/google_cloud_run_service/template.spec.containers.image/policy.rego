@@ -13,14 +13,11 @@ conditions := [
       ]
     },
     {
-      "condition": "Container image must match the approved registry pattern",
-      "attribute_path": ["template", 0, "spec", 0, "containers", 0, "image"],
-      "values": [
-        "*.*.*/*/*/*",
-        [["us-docker"], ["pkg"], ["dev"], ["cloudrun"], ["container"], ["hello"]]
-      ],
-      "policy_type": "pattern whitelist"
-    }
+  "condition": "Container image must use approved Artifact Registry path",
+  "attribute_path": ["template", 0, "spec", 0, "containers", 0, "image"],
+  "values": ["us-docker.pkg.dev/cloudrun/container/hello"],
+  "policy_type": "whitelist"
+}
   ]
 ]
 

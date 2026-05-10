@@ -6,7 +6,7 @@ resource "google_cloud_run_service" "nc" {
   template {
     spec {
       containers {
-        image = "docker.io/random/unsafe-image:latest"
+        image = "docker.io/nginx"
       }
     }
   }

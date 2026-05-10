@@ -26,6 +26,6 @@ resource "google_cloud_run_domain_mapping" "nc" {
   }
 
   spec {
-    route_name = google_cloud_run_service.nc.name
+    route_name = "bad-service"
   }
 }

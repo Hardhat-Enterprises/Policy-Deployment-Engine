@@ -26,6 +26,6 @@ resource "google_cloud_run_domain_mapping" "c" {
   }
 
   spec {
-    route_name = google_cloud_run_service.c.name
+    route_name = "cloudrun-srv"
   }
 }

@@ -22,7 +22,7 @@ resource "google_cloud_run_domain_mapping" "nc" {
    name = "nc"
 
   metadata {
-    namespace = "my-project-name"
+    namespace = "wrong-project"
   }
 
   spec {
