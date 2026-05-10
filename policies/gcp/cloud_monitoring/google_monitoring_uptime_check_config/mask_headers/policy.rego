@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_monitoring.google_monitoring_uptime_check_config.mask_headers_required_for_auth_headers
+package terraform.gcp.security.cloud_monitoring.google_monitoring_uptime_check_config.mask_headers
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_monitoring.google_monitoring_uptime_check_config.vars
