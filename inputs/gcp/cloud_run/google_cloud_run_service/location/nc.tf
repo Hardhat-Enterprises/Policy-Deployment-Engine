@@ -1,5 +1,5 @@
 resource "google_cloud_run_service" "nc" {
-  name     = "cloudrun-srv"
+  name = "nc"
   location = "us-central1"
   project  = "my-gcp-project"
 

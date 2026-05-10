@@ -1,6 +1,7 @@
-resource "google_cloud_run_service" "insecure_service" {
-  name     = "cloudrun-srv"
+resource "google_cloud_run_service" "nc" {
+  name = "nc"
   location = "australia-southeast1"
+  project  = "my-gcp-project"
 
   metadata {
     annotations = {
@@ -11,7 +12,7 @@ resource "google_cloud_run_service" "insecure_service" {
   template {
     spec {
       containers {
-        image = "docker.io/nginx:latest"
+        image = "us-docker.pkg.dev/cloudrun/container/hello"
       }
     }
   }

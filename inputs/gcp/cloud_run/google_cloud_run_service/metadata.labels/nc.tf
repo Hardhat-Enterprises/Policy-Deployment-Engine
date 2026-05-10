@@ -1,10 +1,10 @@
 resource "google_cloud_run_service" "nc" {
-  name     = "cloudrun-srv"
+  name = "nc"
   location = "australia-southeast1"
   project  = "my-gcp-project"
 
   metadata {
-    namespace = "my-gcp-project"
+    namespace = "wrong-project"
 
     labels = {
       env = "random"

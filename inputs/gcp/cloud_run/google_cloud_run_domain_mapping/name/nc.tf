@@ -1,6 +1,6 @@
 resource "google_cloud_run_service" "nc" {
  project = "my-gcp-project"
-  name     = "cloudrun-srv"
+  name = "nc"
   location = "us-central1"
 
   metadata {
@@ -19,7 +19,7 @@ resource "google_cloud_run_service" "nc" {
 resource "google_cloud_run_domain_mapping" "nc" {
    project = "my-gcp-project"
    location = "us-central1"
-   name     = "random-domain.net"###
+   name = "nc"###
 
   metadata {
     namespace = "my-project-name"

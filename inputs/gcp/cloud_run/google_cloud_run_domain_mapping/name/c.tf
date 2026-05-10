@@ -1,6 +1,6 @@
 resource "google_cloud_run_service" "c" {
  project = "my-gcp-project"
-  name     = "cloudrun-srv"
+  name = "c"
   location = "us-central1"
 
   metadata {

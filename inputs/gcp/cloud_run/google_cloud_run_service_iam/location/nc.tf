@@ -11,6 +11,6 @@ data "google_iam_policy" "nc" {
 resource "google_cloud_run_service_iam_policy" "nc" {
   location    = "us-east1"
   project     = "my-gcp-project"
-  service     = "cloudrun-srv"
+  service = "nc"
   policy_data = data.google_iam_policy.c.policy_data
 }
