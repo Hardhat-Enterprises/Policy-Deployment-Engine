@@ -7,7 +7,7 @@ conditions := [
     [
         {
             "situation_description": "Crypto Key Name is not implemented",
-            "remedies": ["Crypto Key Name should be configured and implemented"]
+            "remedies": ["Crypto Key Name should be configured and implemented in the format of projects/{project}/locations/{location}/keyRings/{keyRing}/cryptoKeys/{cryptoKey}"]
         },
         {
             "condition": "Checks if Crypto key is being used",
@@ -18,8 +18,8 @@ conditions := [
     ],
     [
         {
-            "situation_description": "Crypto Key Name is not configured correctly",
-            "remedies": ["Crypto Key Name should be configured correctly with the location set to a region from Australia"]
+            "situation_description": "Crypto Key Name is not configured with an allowed location",
+            "remedies": ["Crypto Key Name should be configured with the location set to a region from Australia"]
         },
         {
             "condition": "Checks that crypto key be formatted correctly with location set to australia",
@@ -27,9 +27,12 @@ conditions := [
             "values": ["locations/*", [["australia-southeast1", "australia-southeast2"]]],
             "policy_type": "pattern whitelist"
         }
-    ]
+    ],
 ]
-summary := helpers.get_multi_summary(conditions, vars.variables)
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details
+
+
