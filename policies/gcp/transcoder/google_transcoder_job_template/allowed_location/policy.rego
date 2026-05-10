@@ -6,20 +6,21 @@ import data.terraform.gcp.security.transcoder.google_transcoder_job_template.var
 conditions := [
     [
         {
-            "situation_description": "The transcoder job template location is not in the allowed list.",
+            "situation_description": "Transcoder job template location is outside the approved Australian region.",
             "remedies": [
-                "Use an approved location such as 'us-central1'.",
-                "Consult Google Transcoder documentation for supported job template locations."
+                "Set the transcoder job template location to 'australia-southeast1'.",
+                "Use approved Australian regions to support data residency and regional governance requirements."
             ]
         },
         {
-            "condition": "Check if location is not in the allowed whitelist",
+            "condition": "Transcoder job template location must be australia-southeast1",
             "attribute_path": ["location"],
-            "values": ["us-central1"],
+            "values": ["australia-southeast1"],
             "policy_type": "whitelist"
         }
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+message := result.message
+details := result.details
