@@ -6,14 +6,21 @@ import data.terraform.gcp.security.cloudbuildv2.google_cloudbuildv2_connection.v
 conditions := [
     [
         {
-            "situation_description": "Prevent Terraform from using unapproved GitHub Enterprise App IDs",
-            "remedies": ["Use approved GitHub Enterprise App IDs only"]
+            "situation_description": "Ensure GitHub Enterprise private key secret version uses the required Secret Manager format",
+            "remedies": ["Use private_key_secret_version in the format projects/*/secrets/*/versions/*"]
         },
         {
-            "condition": "Use approved GitHub Enterprise App IDs only",
-            "attribute_path": ["github_enterprise_config", 0, "app_id"],
-            "values": [200],
-            "policy_type": "whitelist"
+            "condition": "private_key_secret_version must use approved Secret Manager path format",
+            "attribute_path": ["github_enterprise_config", 0, "private_key_secret_version"],
+            "values": [
+                "projects/*/secrets/*/versions/*",
+                [
+                    ["my-project-c"],  # only c allowed - nc fails here
+                    ["private-key"],   # allowed secret names
+                    ["1"]              # allowed versions
+                ]
+            ],
+            "policy_type": "pattern whitelist"
         }
     ]
 ]
