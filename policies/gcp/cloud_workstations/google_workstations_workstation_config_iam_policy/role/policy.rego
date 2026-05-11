@@ -12,9 +12,12 @@ conditions := [
     {
         "condition": "c1 : check iam_policy does not include risky roles",
     
-        "attribute_path" :["role"],
-        "values" :  ["roles/viewer"],
-        "policy_type" : "whitelist" 
+        "attribute_path" :["policy_data"],
+        "values" : [
+                "{\"bindings\":[{\"members\":[\"user:jane@example.com\"],\"role\":\"roles/owner\"}]}",
+                "{\"bindings\":[{\"members\":[\"user:jane@example.com\"],\"role\":\"roles/editor\"}]}"
+            ],
+        "policy_type" : "blacklist" 
     }
     ]
 ]

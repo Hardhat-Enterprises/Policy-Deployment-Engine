@@ -12,6 +12,6 @@ resource "google_workstations_workstation_iam_policy" "nc" {
   location               = "us-central1"
   workstation_cluster_id = "wrong-cluster"
   workstation_config_id  = "workstation-config"
-  workstation_id         = "work-station"
+  workstation_id         = "nc"
   policy_data            = data.google_iam_policy.nc.policy_data
 }

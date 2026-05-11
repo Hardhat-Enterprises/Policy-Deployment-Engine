@@ -1,6 +1,6 @@
 resource "google_workstations_workstation_cluster" "nc" {
   project                = "925810350503"
-  workstation_cluster_id = "workstation-cluster"
+  workstation_cluster_id = "nc"
   network                = "nc"
   subnetwork             = "nc"
   location               = "us-east1"

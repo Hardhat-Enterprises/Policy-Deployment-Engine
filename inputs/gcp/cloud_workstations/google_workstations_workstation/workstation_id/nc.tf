@@ -1,7 +1,7 @@
 
 resource "google_workstations_workstation" "nc" {
   project                = "925810350503"
-  workstation_id         = "work-station1"
+  workstation_id         = "nc"
   workstation_config_id  = "nc"
   workstation_cluster_id = "nc"
   location               = "us-central1"
