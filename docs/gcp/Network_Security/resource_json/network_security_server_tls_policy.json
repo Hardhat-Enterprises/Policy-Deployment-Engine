@@ -30,12 +30,12 @@
       "parent": null
     },
     "allow_open": {
-      "description": "This field applies only for Traffic Director policies. It is must be set to false for external HTTPS load balancer policies. Determines if server allows plaintext connections. If set to true, server allows plain text connections. By default, it is set to false. This setting is not exclusive of other encryption modes. For example, if allowOpen and mtlsPolicy are set, server allows both plain text and mTLS connections. See documentation of other encryption modes to confirm compatibility. Consider using it if you wish to upgrade in place your deployment to TLS while having mixed TLS and non-TLS traffic reaching port :80.",
+      "description": "Determines if plaintext connections are allowed.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Setting allow_open to false ensures only secure TLS connections are allowed.",
+      "compliant": [false],
+      "non-compliant": [true],
       "parent": null
     },
     "server_certificate": {
@@ -68,12 +68,12 @@
       }
     },
     "mtls_policy": {
-      "description": "This field is required if the policy is used with external HTTPS load balancers. This field can be empty for Traffic Director. Defines a mechanism to provision peer validation certificates for peer to peer authentication (Mutual TLS - mTLS). If not specified, client certificate will not be requested. The connection is treated as TLS and not mTLS. If allowOpen and mtlsPolicy are set, server allows both plain text and mTLS connections. Structure is [documented below](#nested_mtls_policy).",
+      "description": "Defines the mTLS policy for the server TLS policy.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Ensures mtls_policy is defined.",
+      "compliant": [{"client_validation_mode": "REJECT_INVALID", "client_validation_trust_config": "projects/123/locations/global/trustConfigs/tc"}],
+      "non-compliant": [null],
       "parent": null,
       "arguments": {
         "client_validation_mode": {
