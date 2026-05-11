@@ -1,0 +1,80 @@
+{
+  "resource_name": "bigquery_datapolicyv2_data_policy",
+  "subcategory": "BigQuery Data Policy V2",
+  "arguments": {
+    "data_policy_type": {
+      "description": "Type of data policy. Possible values: `DATA_MASKING_POLICY`, `RAW_DATA_ACCESS_POLICY`, `COLUMN_LEVEL_SECURITY_POLICY`.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "RAW_DATA_ACCESS_POLICY gives direct access to the data.",
+      "compliant": "DATA_MASKING_POLICY",
+      "non-compliant": "RAW_DATA_ACCESS_POLICY",
+      "parent": null
+    },
+    "data_policy_id": {
+      "description": "User-assigned ID of the data policy that must be unique within the project.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Identifier only.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "location": {
+      "description": "Resource location for the data policy.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Location can be restricted to approved regions.",
+      "compliant": "australia-southeast1",
+      "non-compliant": "europe-west1",
+      "parent": null
+    },
+    "data_masking_policy": {
+      "description": "The policy block used to specify a masking rule.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Masking rules affect how data is shown.",
+      "compliant": "{ predefined_expression = \"SHA256\" }",
+      "non-compliant": "{ predefined_expression = \"FIRST_FOUR_CHARACTERS\" }",
+      "parent": null,
+      "arguments": {
+        "predefined_expression": {
+          "description": "A predefined masking expression. Possible values include `SHA256`, `ALWAYS_NULL`, `DEFAULT_MASKING_VALUE`, `LAST_FOUR_CHARACTERS`, `FIRST_FOUR_CHARACTERS`, `EMAIL_MASK`, `DATE_YEAR_MASK`, `RANDOM_HASH`.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "The masking expression controls how much data is revealed.",
+          "compliant": "SHA256",
+          "non-compliant": "FIRST_FOUR_CHARACTERS",
+          "parent": "data_masking_policy"
+        },
+        "routine": {
+          "description": "Custom masking routine in the format `projects/{project_number}/datasets/{dataset_id}/routines/{routine_id}`.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Custom routine can change masking behavior.",
+          "compliant": "Set `routine` to an approved masking routine reference.",
+          "non-compliant": "Set `routine` to an unapproved masking routine reference.",
+          "parent": "data_masking_policy"
+        }
+      }
+    },
+    "grantees": {
+      "description": "IAM principals with fine-grained access to the underlying data.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "grantees controls who can access the data.",
+      "compliant": "[\"principal://iam.googleapis.com/projects/-/serviceAccounts/data-reader@pde.iam.gserviceaccount.com\"]",
+      "non-compliant": "[\"principalSet://goog/public:all\"], [], [\"principalSet://goog/cloudIdentityCustomerId/C0123456789\"], [\"principal://iam.googleapis.com/users/alice@example.com\"]",
+      "parent": null
+    },
+    "project": {
+      "description": "Project ID for the resource. If omitted, the provider project is used.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Project selector only.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    }
+  }
+}
