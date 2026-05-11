@@ -8,6 +8,6 @@ terraform {
 
 provider "google" {
   project      = "test-project"
-  region       = "us-central1"
+  region       = "australia-southeast1"
   access_token = "test-token"
 }

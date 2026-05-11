@@ -1,0 +1,71 @@
+{
+  "resource_name": "google_backup_dr_management_server",
+  "subcategory": "Backup and DR Service",
+  "arguments": {
+    "location": {
+      "description": "Required. The GCP location for the backup vault should be on approved region.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Location determines physical hosting region and data residency.",
+      "compliant": ["australia-southeast1", "australia-southeast2"],
+      "non-compliant": ["us-central1"],
+      "parent": null
+    },
+    "name": {
+      "description": "Required. The name of management server (management console)",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Name has no impact on the security of the resource or data contained.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "type": {
+      "description": " The type of management server (management console).",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Type has no impact on the security of the resource or data contained.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "networks": {
+      "description": "The correct VPC networks to which the resource is attached.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "This is a container block. Security controls apply to the specific fields inside it rather than to the block itself.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "network": {
+          "description": "Required. Network with format `projects/{{project_id}}/global/networks/{{network_id}}`",
+          "required": true,
+          "security_impact": true,
+          "rationale": "The selected VPC network defines the security boundary and connectivity scope for the management server, but not writing a policy in T1/2026.",
+          "compliant": ["projects/my-project-4418-1743628379470/global/networks/approved-backup-network"],
+          "non-compliant": ["projects/my-project-4418-1743628379470/global/networks/default"],
+          "parent": "networks"
+        },
+        "peering_mode": {
+          "description": "Type of Network peeringMode Default value is `PRIVATE_SERVICE_ACCESS`.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Peering mode controls how the management server connects to Google services and affects the security posture of the network connection, but not writing a policy in T1/2026.",
+          "compliant": ["PRIVATE_SERVICE_ACCESS"],
+          "non-compliant": ["Any value other than PRIVATE_SERVICE_ACCESS"],
+          "parent": "networks"
+        }
+      }
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "even without manual ID configuration ID will be automatically generated.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    }
+  }
+}
