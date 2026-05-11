@@ -1,0 +1,123 @@
+## 🛡️ Policy Deployment Engine: `composer_environment`
+
+This section provides a concise policy evaluation for the `composer_environment` resource in GCP.
+
+Reference: [Terraform Registry – composer_environment](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/composer_environment)
+
+---
+
+## Argument Reference  
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `name` | Name of the environment | true | false | None | None | None |
+| `config` | Configuration parameters for this environment  Structure is [documented below](#nested_config_c1). | false | false | None | None | None |
+| `labels` | User-defined labels for this environment. The labels map can contain no more than 64 entries. Entries of the labels map are UTF8 strings that comply with the following restrictions: Label keys must be between 1 and 63 characters long and must conform to the following regular expression: `[a-z]([-a-z0-9]*[a-z0-9])?`. Label values must be between 0 and 63 characters long and must conform to the regular expression `([a-z]([-a-z0-9]*[a-z0-9])?)?`. No more than 64 labels can be associated with a given environment. Both keys and values must be <= 128 bytes in size. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field 'effective_labels' for all of the labels present on the resource. | false | false | None | None | None |
+| `terraform_labels` | The combination of labels configured directly on the resource and default labels configured on the provider. | false | false | None | None | None |
+| `effective_labels` | All of labels (key/value pairs) present on the resource in GCP, including the labels configured through Terraform, other clients and services. | false | false | None | None | None |
+| `region` | The location or Compute Engine region for the environment. | false | true | Restricting deployment to approved regions ensures compliance with data residency, governance, and organizational security requirements. | australia-southeast1 | any other region not in the approved list |
+| `project` | The ID of the project in which the resource belongs. If it is not provided, the provider project is used. | false | false | None | None | None |
+| `node_config` |  | false | false | None | None | None |
+| `software_config` |  | false | false | None | None | None |
+| `ip_allocation_policy` |  | false | false | None | None | None |
+| `database_config` |  | false | false | None | None | None |
+| `web_server_config` |  | false | false | None | None | None |
+| `encryption_config` | This policy ensures that Cloud Composer environments are configured to use a Customer-Managed Encryption Key (CMEK) via encryption_config.kms_key_name | true | true | Ensuring encryption_config.kms_key_name is set enforces the use of customer-managed encryption keys (CMEK), providing greater control over data security, access, and compliance. | projects/<project-id>/locations/<location>/keyRings/<keyring>/cryptoKeys/<key> |  |
+| `maintenance_window` |  | false | false | None | None | None |
+| `master_authorized_networks_config` |  | false | false | None | None | None |
+
+### config Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `node_count` | , Cloud Composer 1 only) The number of nodes in the Kubernetes Engine cluster of the environment. | false | false | None | None | None |
+| `node_config` | The configuration used for the Kubernetes Engine cluster.  Structure is [documented below](#nested_node_config_c1). | false | false | None | None | None |
+| `software_config` | The configuration settings for software inside the environment.  Structure is [documented below](#nested_software_config_c1). | false | false | None | None | None |
+| `private_environment_config` | The configuration used for the Private IP Cloud Composer environment. Structure is [documented below](#nested_private_environment_config_c1). | false | false | None | None | None |
+| `web_server_network_access_control` | The network-level access control policy for the Airflow web server. If unspecified, no network-level access restrictions are applied. | false | false | None | None | None |
+| `database_config` | , Cloud Composer 1 only) The configuration settings for Cloud SQL instance used internally by Apache Airflow software. | false | false | None | None | None |
+| `web_server_config` | , Cloud Composer 1 only) The configuration settings for the Airflow web server App Engine instance. | false | false | None | None | None |
+| `encryption_config` | The encryption options for the Cloud Composer environment and its dependencies. | false | false | None | None | None |
+| `maintenance_window` | , [Beta](https://terraform.io/docs/providers/google/guides/provider_versions.html)) The configuration settings for Cloud Composer maintenance windows. | false | false | None | None | None |
+| `master_authorized_networks_config` | Configuration options for the master authorized networks feature. Enabled master authorized networks will disallow all external traffic to access Kubernetes master through HTTPS except traffic from the given CIDR blocks, Google Compute Engine Public IPs and Google Prod IPs. Structure is [documented below](#nested_master_authorized_networks_config_c1). | false | false | None | None | None |
+
+### node_config Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `zone` | , Cloud Composer 1 only) The Compute Engine zone in which to deploy the VMs running the Apache Airflow software, specified as the zone name or relative resource name (e.g. "projects/{project}/zones/{zone}"). Must belong to the enclosing environment's project and region. | false | false | None | None | None |
+| `machine_type` | , Cloud Composer 1 only) The Compute Engine machine type used for cluster instances, specified as a name or relative resource name. For example: "projects/{project}/zones/{zone}/machineTypes/{machineType}". Must belong to the enclosing environment's project and region/zone. | false | false | None | None | None |
+| `network` | The Compute Engine network to be used for machine communications, specified as a self-link, relative resource name (for example "projects/{project}/global/networks/{network}"), by name. The network must belong to the environment's project. If unspecified, the "default" network ID in the environment's project is used. If a Custom Subnet Network is provided, subnetwork must also be provided. | false | true | Restricting Composer environments to approved VPC networks reduces exposure to untrusted network boundaries and enforces organizational network governance. | projects/my-project/global/networks/approved-network-1,projects/my-project/global/networks/approved-network-2 | any network not in the approved list |
+| `subnetwork` | The Compute Engine subnetwork to be used for machine communications, specified as a self-link, relative resource name (for example, "projects/{project}/regions/{region}/subnetworks/{subnetwork}"), or by name. If subnetwork is provided, network must also be provided and the subnetwork must belong to the enclosing environment's project and region. | false | false | None | None | None |
+| `disk_size_gb` | , Cloud Composer 1 only) The disk size in GB used for node VMs. Minimum size is 20GB. If unspecified, defaults to 100GB. Cannot be updated. | false | false | None | None | None |
+| `oauth_scopes` | , Cloud Composer 1 only) The set of Google API scopes to be made available on all node VMs. Cannot be updated. If empty, defaults to `["https://www.googleapis.com/auth/cloud-platform"]`. | false | false | None | None | None |
+| `service_account` | The Google Cloud Platform Service Account to be used by the node VMs. If a service account is not specified, the "default" Compute Engine service account is used. Cannot be updated. If given, note that the service account must have `roles/composer.worker` for any GCP resources created under the Cloud Composer Environment. | false | true | Restricting service accounts reduces the risk of privilege escalation and ensures workloads run with only approved and least-privileged identities. | approved-sa@my-project.iam.gserviceaccount.com | unauthorized-sa@my-project.iam.gserviceaccount.com,123456789012-compute@developer.gserviceaccount.com |
+| `tags` | The list of instance tags applied to all node VMs. Tags are used to identify valid sources or targets for network firewalls. Each tag within the list must comply with RFC1035. Cannot be updated. | false | false | None | None | None |
+| `ip_allocation_policy` | Configuration for controlling how IPs are allocated in the GKE cluster. Structure is [documented below](#nested_ip_allocation_policy_c1). Cannot be updated. | false | false | None | None | None |
+| `max_pods_per_node` | , [Beta](https://terraform.io/docs/providers/google/guides/provider_versions.html), Cloud Composer 1 only) The maximum pods per node in the GKE cluster allocated during environment creation. Lowering this value reduces IP address consumption by the Cloud Composer Kubernetes cluster. This value can only be set if the environment is VPC-Native. The range of possible values is 8-110, and the default is 32. Cannot be updated. | false | false | None | None | None |
+| `enable_ip_masq_agent` | Deploys 'ip-masq-agent' daemon set in the GKE cluster and defines nonMasqueradeCIDRs equals to pod IP range so IP masquerading is used for all destination addresses, except between pods traffic. See the [documentation](https://cloud.google.com/composer/docs/enable-ip-masquerade-agent). | false | false | None | None | None |
+
+### software_config Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `airflow_config_overrides` | Apache Airflow configuration properties to override. Property keys contain the section and property names, separated by a hyphen, for example "core-dags_are_paused_at_creation". Section names must not contain hyphens ("-"), opening square brackets ("["), or closing square brackets ("]"). The property name must not be empty and cannot contain "=" or ";". Section and property names cannot contain characters: "." Apache Airflow configuration property names must be written in snake_case. Property values can contain any character, and can be written in any lower/upper case format. Certain Apache Airflow configuration property values are [blacklisted](https://cloud.google.com/composer/docs/concepts/airflow-configurations#airflow_configuration_blacklists), and cannot be overridden. | false | false | None | None | None |
+| `pypi_packages` | Custom Python Package Index (PyPI) packages to be installed in the environment. Keys refer to the lowercase package name (e.g. "numpy"). Values are the lowercase extras and version specifier (e.g. "==1.12.0", "[devel,gcp_api]", "[devel]>=1.8.2, <1.9.2"). To specify a package without pinning it to a version specifier, use the empty string as the value. | false | false | None | None | None |
+| `env_variables` | Additional environment variables to provide to the Apache Airflow scheduler, worker, and webserver processes. Environment variable names must match the regular expression `[a-zA-Z_][a-zA-Z0-9_]*`. They cannot specify Apache Airflow software configuration overrides (they cannot match the regular expression `AIRFLOW__[A-Z0-9_]+__[A-Z0-9_]+`), and they cannot match any of the following reserved names: ``` AIRFLOW_DATABASE_VERSION AIRFLOW_HOME AIRFLOW_SRC_DIR AIRFLOW_WEBSERVER AUTO_GKE CLOUDSDK_METRICS_ENVIRONMENT CLOUD_LOGGING_ONLY COMPOSER_ENVIRONMENT COMPOSER_GKE_LOCATION COMPOSER_GKE_NAME COMPOSER_GKE_ZONE COMPOSER_LOCATION COMPOSER_OPERATION_UUID COMPOSER_PYTHON_VERSION COMPOSER_VERSION CONTAINER_NAME C_FORCE_ROOT DAGS_FOLDER GCP_PROJECT GCP_TENANT_PROJECT GCSFUSE_EXTRACTED GCS_BUCKET GKE_CLUSTER_NAME GKE_IN_TENANT GOOGLE_APPLICATION_CREDENTIALS MAJOR_VERSION MINOR_VERSION PATH PIP_DISABLE_PIP_VERSION_CHECK PORT PROJECT_ID PYTHONPYCACHEPREFIX SQL_DATABASE SQL_HOST SQL_INSTANCE SQL_PASSWORD SQL_PROJECT SQL_REGION SQL_USER ``` | false | true | Preventing sensitive data in environment variables reduces the risk of secret exposure and enforces the use of secure storage mechanisms like Secret Manager. | any variable name except DB_PASSWORD and other restricted keys | DB_PASSWORD |
+| `image_version` | In Composer 1, use a specific Composer 1 version in this parameter. If omitted, the default is the latest version of Composer 2. The version of the software running in the environment. This encapsulates both the version of Cloud Composer functionality and the version of Apache Airflow. It must match the regular expression `composer-([0-9]+(\.[0-9]+\.[0-9]+(-preview\.[0-9]+)?)?|latest)-airflow-([0-9]+(\.[0-9]+(\.[0-9]+)?)?)`. The Cloud Composer portion of the image version is a full semantic version, or an alias in the form of major version number or 'latest'. The Apache Airflow portion of the image version is a full semantic version that points to one of the supported Apache Airflow versions, or an alias in the form of only major or major.minor versions specified. For more information about Cloud Composer images, see [Cloud Composer version list](https://cloud.google.com/composer/docs/concepts/versioning/composer-versions). | true | false | None | None | None |
+| `python_version` | , Cloud Composer 1 only) The major version of Python used to run the Apache Airflow scheduler, worker, and webserver processes. Can be set to '2' or '3'. If not specified, the default is '3'. | false | false | None | None | None |
+| `scheduler_count` | , Cloud Composer 1 with Airflow 2 only) The number of schedulers for Airflow. See [documentation](https://cloud.google.com/composer/docs/how-to/managing/configuring-private-ip) for setting up private environments. <a name="nested_private_environment_config_c1"></a>The `private_environment_config` block supports: | false | false | None | None | None |
+| `enable_private_endpoint` | If true, access to the public endpoint of the GKE cluster is denied. If this field is set to true, the `ip_allocation_policy.use_ip_aliases` field must also be set to true for Cloud Composer 1 environments. | false | false | None | None | None |
+| `master_ipv4_cidr_block` | The IP range in CIDR notation to use for the hosted master network. This range is used for assigning internal IP addresses to the cluster master or set of masters and to the internal load balancer virtual IP. This range must not overlap with any other ranges in use within the cluster's network. If left blank, the default value of is used. See [documentation](https://cloud.google.com/composer/docs/how-to/managing/configuring-private-ip#defaults) for default values per region. | false | false | None | None | None |
+| `cloud_sql_ipv4_cidr_block` | The CIDR block from which IP range in tenant project will be reserved for Cloud SQL. Needs to be disjoint from `web_server_ipv4_cidr_block` | false | false | None | None | None |
+| `web_server_ipv4_cidr_block` | , Cloud Composer 1 only) The CIDR block from which IP range for web server will be reserved. Needs to be disjoint from `master_ipv4_cidr_block` and `cloud_sql_ipv4_cidr_block`. | false | false | None | None | None |
+| `enable_privately_used_public_ips` | When enabled, IPs from public (non-RFC1918) ranges can be used for `ip_allocation_policy.cluster_ipv4_cidr_block` and `ip_allocation_policy.service_ipv4_cidr_block`. The `web_server_network_access_control` supports: | false | false | None | None | None |
+| `allowed_ip_range` | A collection of allowed IP ranges with descriptions. Structure is [documented below](#nested_allowed_ip_range_c1). The `allowed_ip_range` supports: | false | false | None | None | None |
+| `value` | IP address or range, defined using CIDR notation, of requests that this rule applies to. Examples: `192.168.1.1` or `192.168.0.0/16` or `2001:db8::/32` or `2001:0db8:0000:0042:0000:8a2e:0370:7334`. IP range prefixes should be properly truncated. For example, `1.2.3.4/24` should be truncated to `1.2.3.0/24`. Similarly, for IPv6, `2001:db8::1/32` should be truncated to `2001:db8::/32`. | true | false | None | None | None |
+| `description` | A description of this ip range. | false | false | None | None | None |
+
+### ip_allocation_policy Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `use_ip_aliases` | , Cloud Composer 1 only) Whether or not to enable Alias IPs in the GKE cluster. If true, a VPC-native cluster is created. Defaults to true if the `ip_allocation_policy` block is present in config. | false | false | None | None | None |
+| `cluster_secondary_range_name` | The name of the cluster's secondary range used to allocate IP addresses to pods. Specify either `cluster_secondary_range_name` or `cluster_ipv4_cidr_block` but not both. For Cloud Composer 1 environments, this field is applicable only when `use_ip_aliases` is true. | false | false | None | None | None |
+| `services_secondary_range_name` | The name of the services' secondary range used to allocate IP addresses to the cluster. Specify either `services_secondary_range_name` or `services_ipv4_cidr_block` but not both. For Cloud Composer 1 environments, this field is applicable only when `use_ip_aliases` is true. | false | false | None | None | None |
+| `cluster_ipv4_cidr_block` | The IP address range used to allocate IP addresses to pods in the cluster. For Cloud Composer 1 environments, this field is applicable only when `use_ip_aliases` is true. Set to blank to have GKE choose a range with the default size. Set to /netmask (e.g. /14) to have GKE choose a range with a specific netmask. Set to a CIDR notation (e.g. 10.96.0.0/14) from the RFC-1918 private networks (e.g. 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) to pick a specific range to use. Specify either `cluster_secondary_range_name` or `cluster_ipv4_cidr_block` but not both. | false | false | None | None | None |
+| `services_ipv4_cidr_block` | The IP address range used to allocate IP addresses in this cluster. For Cloud Composer 1 environments, this field is applicable only when `use_ip_aliases` is true. Set to blank to have GKE choose a range with the default size. Set to /netmask (e.g. /14) to have GKE choose a range with a specific netmask. Set to a CIDR notation (e.g. 10.96.0.0/14) from the RFC-1918 private networks (e.g. 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) to pick a specific range to use. Specify either `services_secondary_range_name` or `services_ipv4_cidr_block` but not both. | false | false | None | None | None |
+
+### database_config Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `machine_type` | Optional. Cloud SQL machine type used by Airflow database. It has to be one of: db-n1-standard-2, db-n1-standard-4, db-n1-standard-8 or db-n1-standard-16. | false | false | None | None | None |
+| `Zone` | Preferred Cloud SQL database zone. | false | false | None | None | None |
+
+### web_server_config Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `machine_type` | Machine type on which Airflow web server is running. It has to be one of: composer-n1-webserver-2, composer-n1-webserver-4 or composer-n1-webserver-8. Value custom is returned only in response, if Airflow web server parameters were manually changed to a non-standard values. | true | false | None | None | None |
+
+### encryption_config Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `kms_key_name` | Customer-managed Encryption Key available through Google's Key Management Service. It must be the fully qualified resource name, i.e. projects/project-id/locations/location/keyRings/keyring/cryptoKeys/key. Cannot be updated. | true | false | None | None | None |
+
+### maintenance_window Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `start_time` | Start time of the first recurrence of the maintenance window. | true | false | None | None | None |
+| `end_time` | Maintenance window end time. It is used only to calculate the duration of the maintenance window. The value for end-time must be in the future, relative to 'start_time'. | true | false | None | None | None |
+| `recurrence` | Maintenance window recurrence. Format is a subset of RFC-5545 (https://tools.ietf.org/html/rfc5545) 'RRULE'. The only allowed values for 'FREQ' field are 'FREQ=DAILY' and 'FREQ=WEEKLY;BYDAY=...'. Example values: 'FREQ=WEEKLY;BYDAY=TU,WE', 'FREQ=DAILY'. | true | false | None | None | None |
+
+### master_authorized_networks_config Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `enabled` | Whether or not master authorized networks is enabled. | true | false | None | None | None |
+| `cidr_blocks` | `cidr_blocks `define up to 50 external networks that could access Kubernetes master through HTTPS. Structure is [documented below](#nested_cidr_blocks_c1). The `cidr_blocks` supports: | false | false | None | None | None |
+| `display_name` | `display_name` is a field for users to identify CIDR blocks. | false | false | None | None | None |
+| `cidr_block` | `cidr_block` must be specified in CIDR notation. | true | false | None | None | None |
