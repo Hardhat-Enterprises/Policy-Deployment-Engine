@@ -150,8 +150,9 @@ class BaseValidator:
                     if s.startswith("resource "):
                         parts = s.split()
                         if len(parts) >= 3 and parts[1].strip('"') != expected_type:
+                            resource_type_found = parts[1].strip('"')
                             self.logger.log(
-                                f"Resource type '{parts[1].strip('\"')}' in {tf_path} "
+                                f"Resource type '{resource_type_found}' in {tf_path} "
                                 f"does not match directory '{expected_type}'"
                             )
         except OSError as e:
