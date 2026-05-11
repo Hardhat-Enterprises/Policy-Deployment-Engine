@@ -11,7 +11,7 @@ conditions := [
         },
         {
             "condition": "The members list must not contain anonymous identifiers",
-            "attribute_path": ["members"], # This targets the list/array
+            "attribute_path": ["members"],
             "values": ["allUsers", "allAuthenticatedUsers"],
             "policy_type": "blacklist"
         }
