@@ -8,7 +8,6 @@ Reads from docs/gcp resource JSON files and outputs a formatted CSV.
 Usage:
     python completion_checker.py                               # CSV inventory
     python completion_checker.py --output my_inventory.csv     # Custom output filename
-    python completion_checker.py --docs path/to/docs           # Custom docs path
 """
 
 import os
@@ -100,7 +99,6 @@ class ResourceInventoryGenerator:
             for json_file in json_files:
                 try:
                     json_path = resource_json_path / json_file
-                    # Try utf-8-sig first to handle BOM, then fall back to utf-8
                     try:
                         with open(json_path, 'r', encoding='utf-8-sig') as f:
                             json_content = json.load(f)
