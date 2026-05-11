@@ -160,8 +160,14 @@
           "required": false,
           "security_impact": true,
           "rationale": "The cleanup_policy_guardrails policy forbids DELETE rules targeting TAGGED artifacts and expects KEEP policies to retain at least 3 recent versions.",
-          "compliant": "DELETE with condition.tag_state = UNTAGGED or KEEP with most_recent_versions.keep_count >= 3",
-          "non-compliant": "DELETE with condition.tag_state = TAGGED or KEEP with most_recent_versions.keep_count < 3",
+          "compliant": [
+            ["DELETE", "condition.tag_state = UNTAGGED"],
+            ["KEEP", "most_recent_versions.keep_count >= 3"]
+          ],
+          "non-compliant": [
+            ["DELETE", "condition.tag_state = TAGGED"],
+            ["KEEP", "most_recent_versions.keep_count < 3"]
+          ],
           "parent": "cleanup_policies"
         },
         "condition": {
@@ -268,7 +274,7 @@
           "security_impact": true,
           "rationale": "The approved_remote_upstreams policy allows only approved upstream Artifact Registry URIs for REMOTE_REPOSITORY mode.",
           "compliant": [
-            "https://us-central1-docker.pkg.dev/trusted-project/base-images",
+            "https://australia-southeast1-docker.pkg.dev/trusted-project/base-images",
             "https://australia-southeast1-docker.pkg.dev/shared-artifacts/approved-upstream"
           ],
           "non-compliant": [
@@ -388,7 +394,7 @@
           "parent": "upstream_policies"
         },
         "repository": {
-          "description": "A reference to the repository resource, for example: \"projects/p1/locations/us-central1/repository/repo1\".",
+          "description": "A reference to the repository resource, for example: \"projects/p1/locations/australia-southeast1/repository/repo1\".",
           "required": false,
           "security_impact": false,
           "rationale": "This identifies the target repository for the IAM binding and does not itself grant permissions without the member and role configuration.",
@@ -739,7 +745,7 @@
           "security_impact": true,
           "rationale": "The approved_remote_upstreams policy allows only approved URI patterns and approved region/project/repository combinations.",
           "compliant": [
-            "https://us-central1-docker.pkg.dev/trusted-project/base-images",
+            "https://australia-southeast1-docker.pkg.dev/trusted-project/base-images",
             "https://australia-southeast1-docker.pkg.dev/shared-artifacts/approved-upstream"
           ],
           "non-compliant": [
