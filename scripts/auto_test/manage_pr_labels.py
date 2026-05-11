@@ -11,7 +11,7 @@ import subprocess
 
 def manage_pr_labels(check_outcome: str) -> int:
     """
-    Manage PR labels based on policy check outcome and fork status.
+    Manage PR labels based on policy check outcome.
     
     Args:
         check_outcome: 'failure' or 'success'
@@ -20,36 +20,13 @@ def manage_pr_labels(check_outcome: str) -> int:
         Exit code (0 for success, 1 for failure)
     """
     pr_number = os.getenv("PR_NUMBER")
-    is_fork = os.getenv("IS_FORK", "false").lower() == "true"
     
     if not pr_number:
         print("PR_NUMBER environment variable not set, skipping label management")
         return 0
     
     try:
-        # Check if PR is from a fork
-        if is_fork:
-            print("PR opened from a fork - Adding CI-Review-Required label")
-            
-            # Remove CI-Approved label (ignore if not present)
-            subprocess.run(
-                ["gh", "pr", "edit", pr_number, "--remove-label", "CI-Approved"],
-                capture_output=True
-            )
-            
-            # Add CI-Review-Required label
-            result = subprocess.run(
-                ["gh", "pr", "edit", pr_number, "--add-label", "CI-Review-Required"],
-                capture_output=True,
-                text=True
-            )
-            
-            if result.returncode != 0:
-                print(f"Error adding CI-Review-Required label: {result.stderr}")
-                return 1
-        
-        # Handle check outcome for non-fork PRs
-        elif check_outcome == "failure":
+        if check_outcome == "failure":
             print("Policy checks failed - Adding CI-Review-Required label and removing CI-Approved")
             
             # Remove CI-Approved label (ignore if not present)
