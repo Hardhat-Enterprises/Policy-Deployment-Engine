@@ -9,36 +9,47 @@ from github import Github
 def get_review_count(pr):
     reviews = pr.get_reviews()
 
+    seen_users = {}
+    
+    for r in reviews:
+        # count latest review per user
+        seen_users[r.user.login] = r.state
+
     valid_states = {"APPROVED", "CHANGES_REQUESTED"}
 
-    seen_users = set()
-    valid_reviews = []
+    count = 0
+    for state in seen_users.values():
+        if state in valid_states:
+            count += 1
 
-    for r in reviews:
-        if r.state in valid_states and r.user.login not in seen_users:
-            valid_reviews.append(r)
-            seen_users.add(r.user.login)
-
-    return len(valid_reviews)
+    return count
 
 
 def apply_label(pr, count):
     label_map = {
-        1: "first review",
-        2: "second review",
-        3: "third review"
+        1: "1st review",
+        2: "2nd review",
+        3: "3rd review",
+        4: "4th review"
     }
 
-    label = label_map.get(count, f"{count}th review")
+    desired_label = label_map.get(count)
 
+    if not desired_label:
+        return
+
+    existing_labels = [l.name for l in pr.get_labels()]
+
+    if desired_label in existing_labels:
+        print("Label already correct, skipping")
+        return
+    
     # To remove old review labels
-    for l in pr.get_labels():
-        if "review" in l.name:
-            pr.remove_from_labels(l.name)
+    for l in existing_labels:
+        if "review" in l:
+            pr.remove_from_labels(l)
 
-    pr.add_to_labels(label)
-    print(f"Applied label: {label}")
-
+    pr.add_to_labels(desired_label)
 
 def main():
     token = os.getenv("GITHUB_TOKEN")
