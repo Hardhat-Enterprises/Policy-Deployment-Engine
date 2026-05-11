@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Policy Check Workflow Orchestrator
-Handles the complete workflow: extract services, run checks, post results
+Handles the complete workflow: extract services, run policy checks, post results
 """
 
 import os
@@ -26,13 +26,37 @@ def print_changed_files(changed_files: List[str]) -> None:
             print(f"{file} was changed")
 
 
+def validate_allowed_folders(changed_files: List[str]) -> Tuple[bool, str]:
+    """
+    Validate that only allowed folders are changed.
+    Service PRs can only modify: inputs/gcp/, policies/gcp/, and docs/gcp/
+    
+    Returns:
+        Tuple of (is_valid, message)
+    """
+    allowed_prefixes = ("inputs/gcp/", "policies/gcp/", "docs/gcp/")
+    invalid_files = []
+    
+    for file_path in changed_files:
+        if not any(file_path.startswith(prefix) for prefix in allowed_prefixes):
+            invalid_files.append(file_path)
+    
+    if invalid_files:
+        invalid_list = "\n  - ".join(invalid_files)
+        message = f"❌ Service PRs can only modify files in: inputs/gcp/, policies/gcp/, and docs/gcp/\nInvalid changes found:\n  - {invalid_list}"
+        return False, message
+    
+    message = "✅ All changes are in allowed folders"
+    return True, message
+
+
 def extract_affected_services(changed_files: List[str]) -> Set[str]:
     """Extract unique GCP service names from changed file paths."""
     services = set()
     
     for file_path in changed_files:
-        # Match inputs/gcp/<service>/* or policies/gcp/<service>/*
-        if "inputs/gcp/" in file_path or "policies/gcp/" in file_path:
+        # Match inputs/gcp/<service>/* or policies/gcp/<service>/* or docs/gcp/<service>/*
+        if "inputs/gcp/" in file_path or "policies/gcp/" in file_path or "docs/gcp/" in file_path:
             parts = file_path.split("/")
             try:
                 idx = parts.index("gcp")
@@ -44,6 +68,29 @@ def extract_affected_services(changed_files: List[str]) -> Set[str]:
                 continue
     
     return services
+
+
+def check_documentation_exists(changed_files: List[str]) -> Tuple[bool, str]:
+    """
+    Check if documentation exists for changed services.
+    
+    Returns:
+        Tuple of (has_docs, message)
+    """
+
+    print("===========changed files============")
+    print(changed_files)
+
+    docs_changes = [f for f in changed_files if "docs/gcp/" in f]
+    print("===========docs changes===========")
+    print(docs_changes)
+
+    if docs_changes:
+        message = f"✅ Documentation changes found: {len(docs_changes)} file(s) updated"
+        return True, message
+    else:
+        message = "❌ No documentation changes found - please update docs for your assigned service"
+        return False, message
 
 
 def run_policy_checks(services: Set[str]) -> Tuple[str, int, str]:
@@ -187,6 +234,56 @@ def main():
     
     # Print all changed files
     print_changed_files(changed_files)
+    
+    # Validate only allowed folders are changed
+    is_valid, validation_message = validate_allowed_folders(changed_files)
+    print(validation_message)
+    
+    if not is_valid:
+        # Write GitHub summary with validation failure
+        write_github_summary("❌ VALIDATION FAILED", validation_message)
+        
+        # Create and post PR comment about invalid changes
+        if os.getenv("PR_NUMBER"):
+            comment = f"""## 🔍 File Validation Failed
+
+**Status**: ❌ VALIDATION FAILED
+
+⚠️ **Your PR contains changes outside of allowed folders:**
+
+{validation_message}
+
+Service PRs can only modify files in:
+- `inputs/` - Service input configurations
+- `policies/` - OPA/Rego policy files
+- `docs/` - Service documentation"""
+            post_pr_comment(comment)
+        
+        return 1
+    
+    # Check if documentation exists
+    has_docs, docs_message = check_documentation_exists(changed_files)
+    print(docs_message)
+    
+    if not has_docs:
+        # Write GitHub summary with docs failure
+        write_github_summary("❌ DOCS CHECK FAILED", docs_message)
+        
+        # Create and post PR comment about missing docs
+        if os.getenv("PR_NUMBER"):
+            comment = f"""## 🔍 Documentation Check Failed
+
+**Status**: ❌ CHECKS FAILED
+
+⚠️ **Your PR does not include documentation updates:**
+
+{docs_message}
+
+Please add or update documentation in the `docs/gcp/` folder for your changes before this PR can be reviewed."""
+            post_pr_comment(comment)
+        
+        print(docs_message)
+        return 1
     
     # Extract affected services
     services = extract_affected_services(changed_files)
