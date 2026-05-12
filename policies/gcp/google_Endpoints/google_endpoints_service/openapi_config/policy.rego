@@ -13,14 +13,23 @@ conditions := [
             ]
         },
         {
-            "condition": "Check that openapi_config uses the approved HTTPS OpenAPI configuration.",
+            "condition": "Check that openapi_config includes https in the OpenAPI schemes section.",
             "attribute_path": ["openapi_config"],
-            "values": ["swagger: \"2.0\"\r\ninfo:\r\n  title: \"secure-api\"\r\n  version: \"1.0.0\"\r\nhost: \"api.endpoints.my-project-12345.cloud.goog\"\r\nschemes:\r\n  - https\r\npaths:\r\n  /hello:\r\n    get:\r\n      operationId: hello\r\n      responses:\r\n        200:\r\n          description: OK\r\n"],
-            "policy_type": "whitelist"
+            "values": ["*https*", []],
+            "policy_type": "pattern whitelist"
         }
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
+resource_names := [resource.name |
+    resource := input.resource_changes[_]
+    resource.type == "google_endpoints_service"
+    resource.name != "c"
+]
+
+message := sprintf("%s\nResources checked: %s", [
+    helpers.get_multi_summary(conditions, vars.variables).message,
+    concat(", ", resource_names),
+])
 
 details := helpers.get_multi_summary(conditions, vars.variables).details

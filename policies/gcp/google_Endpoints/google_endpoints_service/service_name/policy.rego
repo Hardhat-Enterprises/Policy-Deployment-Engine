@@ -20,5 +20,15 @@ conditions := [
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
+resource_names := [resource.name |
+    resource := input.resource_changes[_]
+    resource.type == "google_endpoints_service"
+    resource.name != "c"
+]
+
+message := sprintf("%s\nResources checked: %s", [
+    helpers.get_multi_summary(conditions, vars.variables).message,
+    concat(", ", resource_names),
+])
+
 details := helpers.get_multi_summary(conditions, vars.variables).details
