@@ -11,15 +11,13 @@ def get_review_count(pr):
 
     valid_states = {"APPROVED", "CHANGES_REQUESTED"}
 
-    latest_reviews = {}
+    count = 0
 
-    for review in reviews:
-        if review.state in valid_states:
-            latest_reviews[review.user.login] = review.state
+    for r in reviews:
+        if r.state in valid_states:
+            count += 1
 
-    print(f"Latest valid reviews: {latest_reviews}")
-
-    return len(latest_reviews)
+    return count
 
 
 def apply_label(pr, count):
