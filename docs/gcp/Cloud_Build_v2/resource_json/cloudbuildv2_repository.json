@@ -5,8 +5,8 @@
     "name": {
       "description": "Name of the repository.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The repository name itself does not directly impact security. However, enforcing naming conventions can help with resource identification, organisation, and management.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,46 +14,46 @@
     "remote_uri": {
       "description": "Required. Git Clone HTTPS URI.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Restricting the remote URI ensures that only trusted and secure repositories are connected. Enforcing HTTPS prevents insecure data transmission, and limiting repositories to approved domains reduces the risk of integrating malicious or unverified source code.",
+      "compliant": "https://github.com/approved-org/secure-repo.git",
+      "non-compliant": "http://github.com/random-user/unknown-repo.git",
       "parent": null
     },
     "parent_connection": {
       "description": "The connection for the resource",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Restricting the parent connection ensures that repositories are linked only to approved and trusted connections. This prevents unauthorized integrations with external systems and reduces the risk of exposing source code or credentials to untrusted services.",
+      "compliant": "secure-connection",
+      "non-compliant": "unknown-connection",
       "parent": null
     },
     "annotations": {
       "description": "Allows clients to store small amounts of arbitrary data. **Note**: This field is non-authoritative, and will only manage the annotations present in your configuration. Please refer to the field `effective_annotations` for all of the annotations present on the resource.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Annotations help enforce governance and security practices by ensuring that resources are properly labelled with environment and data classification. Data classification is critical for identifying sensitive data and applying appropriate security controls, while environment tagging helps manage deployment contexts and reduce operational risks.",
+      "compliant": "annotations = { environment = \"prod\", data_classification = \"confidential\" }",
+      "non-compliant": "annotations = { environment = \"unknown\", data_classification = \"unknown\" }",
       "parent": null
     },
     "location": {
       "description": "The location for the resource",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Restricting the location ensures data residency, compliance with regional regulations, and reduces exposure to unauthorized jurisdictions. Enforcing approved regions (such as Australia) helps meet organisational and legal security requirements.",
+      "compliant": "australia-southeast2",
+      "non-compliant": "us-central1",
       "parent": null
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Restricting the project ensures resources are created only within approved and governed environments. This prevents accidental deployment to unauthorized projects and enforces access control, billing boundaries, and organisational security policies.",
+      "compliant": "approved-project",
+      "non-compliant": "unknown-project",
       "parent": null
     }
   }
