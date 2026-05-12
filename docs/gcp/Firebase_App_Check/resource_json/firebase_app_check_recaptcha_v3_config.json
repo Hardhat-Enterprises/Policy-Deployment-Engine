@@ -14,8 +14,8 @@
     "app_id": {
       "description": "The ID of an [Web App](https://firebase.google.com/docs/reference/firebase-management/rest/v1beta1/projects.webApps#WebApp.FIELDS.app_id).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The app_id is an identifier that scopes the config to a specific app; it does not control access, encryption, or security settings.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -23,17 +23,17 @@
     "token_ttl": {
       "description": "Specifies the duration for which App Check tokens exchanged from reCAPTCHA V3 artifacts will be valid. If unset, a default value of 1 hour is assumed. Must be between 30 minutes and 7 days, inclusive. A duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.5s\".",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "The Token TTL (Time To Live) defines the window of validity for an App Check token. A shorter TTL limits the replay window for intercepted tokens. 24 hours (86400s) is the maximum recommended duration to balance user experience and security.",
+      "compliant": "3600s",
+      "non-compliant": "86401s",
       "parent": null
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Specifies the GCP project context; does not independently control access or security settings.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
