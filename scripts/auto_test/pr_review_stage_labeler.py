@@ -9,17 +9,12 @@ from github import Github
 def get_review_count(pr):
     reviews = pr.get_reviews()
 
-    seen_users = {}
-    
-    for r in reviews:
-        # count latest review per user
-        seen_users[r.user.login] = r.state
-
     valid_states = {"APPROVED", "CHANGES_REQUESTED"}
 
     count = 0
-    for state in seen_users.values():
-        if state in valid_states:
+
+    for r in reviews:
+        if r.state in valid_states:
             count += 1
 
     return count
