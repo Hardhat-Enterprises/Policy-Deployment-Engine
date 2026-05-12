@@ -5,8 +5,8 @@
     "name": {
       "description": "The ID to use for the schema, which will become the final component of the schema's resource name.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Schema names are identifiers only and do not control access, encryption, or other security settings.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,17 +14,17 @@
     "type": {
       "description": "The type of the schema definition Default value is `TYPE_UNSPECIFIED`. Possible values are: `TYPE_UNSPECIFIED`, `PROTOCOL_BUFFER`, `AVRO`.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Leaving the schema type as `TYPE_UNSPECIFIED` disables message structure validation, allowing arbitrarily structured or malformed messages to be published. This can lead to silent data corruption, downstream processing errors, and injection of unexpected payloads. Setting the type to `PROTOCOL_BUFFER` or `AVRO` enforces strict schema validation on all published messages.",
+      "compliant": "PROTOCOL_BUFFER",
+      "non-compliant": "TYPE_UNSPECIFIED",
       "parent": null
     },
     "definition": {
       "description": "The definition of the schema. This should contain a string representing the full definition of the schema that is a valid schema definition of the type specified in type. Changes to the definition commit new [schema revisions](https://cloud.google.com/pubsub/docs/commit-schema-revision). A schema can only have up to 20 revisions, so updates that fail with an error indicating that the limit has been reached require manually [deleting old revisions](https://cloud.google.com/pubsub/docs/delete-schema-revision).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Contains the schema definition in Protobuf or Avro format used to validate message structure; does not control access, authentication, or encryption.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -32,8 +32,8 @@
     "project": {
       "description": "If it is not provided, the provider project is used.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Specifies the GCP project context for the resource; does not independently control access or security settings.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
