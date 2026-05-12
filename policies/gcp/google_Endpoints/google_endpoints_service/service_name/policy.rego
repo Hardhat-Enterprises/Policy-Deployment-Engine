@@ -14,12 +14,11 @@ conditions := [
         {
             "condition": "Check that service_name uses the approved value.",
             "attribute_path": ["service_name"],
-            "values": ["api.endpoints.my-project-12345.cloud.goog"],
+            "values": ["api.endpoints.my-project-123.cloud.goog"],
             "policy_type": "whitelist"
         }
     ]
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
-
 details := helpers.get_multi_summary(conditions, vars.variables).details
