@@ -1,5 +1,5 @@
-resource "google_certificate_manager_trust_config" "nc_trust_config" {
-  name        = "nc-trust-config-allowlist"
+resource "google_certificate_manager_trust_config" "nc" {
+  name        = "nc"
   location    = "global"
   description = "Non-compliant trust config with allowlisted certificate"
 

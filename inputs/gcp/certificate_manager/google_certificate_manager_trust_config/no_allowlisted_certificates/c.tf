@@ -1,5 +1,5 @@
-resource "google_certificate_manager_trust_config" "c_trust_config" {
-  name        = "c-trust-config-no-allowlist"
+resource "google_certificate_manager_trust_config" "c" {
+  name        = "c"
   location    = "global"
   description = "Compliant trust config without allowlisted certificates"
 
