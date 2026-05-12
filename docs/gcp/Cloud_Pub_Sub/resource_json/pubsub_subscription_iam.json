@@ -5,8 +5,8 @@
     "subscription": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Identifies the subscription resource the IAM binding applies to; access is controlled by the role and member fields, not this identifier.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,35 +14,35 @@
     "member/members": {
       "description": "Each entry can have one of the following values: * **allUsers**: A special identifier that represents anyone who is on the internet; with or without a Google account. * **allAuthenticatedUsers**: A special identifier that represents anyone who is authenticated with a Google account or a service account. * **user:{emailid}**: An email address that represents a specific Google account. For example, alice@gmail.com or joe@example.com. * **serviceAccount:{emailid}**: An email address that represents a service account. For example, my-other-app@appspot.gserviceaccount.com. * **group:{emailid}**: An email address that represents a Google group. For example, admins@example.com. * **domain:{domain}**: A G Suite domain (primary, instead of alias) name that represents all the users of that domain. For example, google.com or example.com.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Granting access to `allUsers` or `allAuthenticatedUsers` makes the subscription publicly accessible, exposing message data to anyone on the internet or any authenticated Google account. This can lead to unauthorized message consumption, data exfiltration, and denial-of-service by draining messages before legitimate subscribers can process them.",
+      "compliant": "user:admin@example.com",
+      "non-compliant": "allUsers",
       "parent": null
     },
     "role": {
       "description": "`google_pubsub_subscription_iam_binding` can be used per role. Note that custom roles must be of the format `[projects|organizations]/{parent-name}/roles/{role-name}`.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Defines the permissions granted to the specified members; overly permissive roles such as roles/pubsub.admin or roles/editor grant excessive access to the subscription beyond what is needed for consuming messages.",
+      "compliant": "roles/pubsub.subscriber",
+      "non-compliant": "roles/pubsub.admin",
       "parent": null
     },
     "policy_data": {
       "description": "a `google_iam_policy` data source. - - -",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Contains the complete IAM policy applied to the subscription; directly controls all principals and their permissions, making it the primary access control mechanism for the resource.",
+      "compliant": "A policy granting only roles/pubsub.subscriber to specific service accounts",
+      "non-compliant": "A policy granting roles/pubsub.admin to allUsers",
       "parent": null
     },
     "project": {
       "description": "is not provided, the provider project is used.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Specifies the GCP project context for the IAM binding; does not independently control which principals or roles are granted access.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
