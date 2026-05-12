@@ -3,5 +3,5 @@ package terraform.gcp.security.access_context_manager_vpc_service_controls.googl
 variables := {
     "friendly_resource_name": "service_perimeter_resource",
     "resource_type": "google_access_context_manager_service_perimeter_resource",
-    "resource_value_name": "perimeter_name"
+    "resource_value_name": "name"
 }

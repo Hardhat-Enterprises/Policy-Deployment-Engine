@@ -3,5 +3,5 @@ package terraform.gcp.security.access_context_manager_vpc_service_controls.googl
 variables := {
     "friendly_resource_name": "ingress_policy",
     "resource_type": "google_access_context_manager_ingress_policy",
-    "resource_value_name": "ingress_policy_name"
+    "resource_value_name": "name"
 }
