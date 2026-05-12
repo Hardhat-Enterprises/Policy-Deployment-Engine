@@ -1,4 +1,4 @@
-package terraform.gcp.security.google_Endpoints.google_endpoints_service_iam.role
+package terraform.gcp.security.google_Endpoints.google_endpoints_service_iam.allowed_members
 
 import data.terraform.helpers
 import data.terraform.gcp.security.google_Endpoints.google_endpoints_service_iam.vars
