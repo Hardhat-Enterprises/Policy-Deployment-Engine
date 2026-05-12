@@ -1,7 +1,7 @@
 package terraform.gcp.security.access_context_manager_vpc_service_controls.google_access_context_manager_ingress_policy.resource
 
 import data.terraform.helpers
-import data.terraform.gcp.security.access_context_manager_vpc_service_controls.google_access_context_manager_ingress_policy.resource.vars
+import data.terraform.gcp.security.access_context_manager_vpc_service_controls.google_access_context_manager_ingress_policy.vars
 
 conditions := [
     [
