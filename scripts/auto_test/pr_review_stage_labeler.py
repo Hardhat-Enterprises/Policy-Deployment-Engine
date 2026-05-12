@@ -11,13 +11,15 @@ def get_review_count(pr):
 
     valid_states = {"APPROVED", "CHANGES_REQUESTED"}
 
-    count = 0
+    latest_reviews = {}
 
-    for r in reviews:
-        if r.state in valid_states:
-            count += 1
+    for review in reviews:
+        if review.state in valid_states:
+            latest_reviews[review.user.login] = review.state
 
-    return count
+    print(f"Latest valid reviews: {latest_reviews}")
+
+    return len(latest_reviews)
 
 
 def apply_label(pr, count):
@@ -40,8 +42,10 @@ def apply_label(pr, count):
         return
     
     # To remove old review labels
+    review_labels = set(label_map.values())
+
     for l in existing_labels:
-        if "review" in l:
+        if l in review_labels:
             pr.remove_from_labels(l)
 
     pr.add_to_labels(desired_label)
@@ -49,7 +53,11 @@ def apply_label(pr, count):
 def main():
     token = os.getenv("GITHUB_TOKEN")
     repo_name = os.getenv("REPO")
-    pr_number = int(os.getenv("PR_NUMBER"))
+    pr_number = os.getenv("PR_NUMBER")
+    if not pr_number:
+        print("Missing PR_NUMBER")
+        return
+    pr_number = int(pr_number)
 
     if not token or not repo_name or not pr_number:
         print("Missing environment variables")
