@@ -1,5 +1,5 @@
 resource "google_endpoints_service" "nc" {
-  project      = "my-project-12345"
+  project = "my-project-12345"
   service_name = "api.endpoints.my-project-12345.cloud.goog"
 
   openapi_config = <<EOF
@@ -9,7 +9,7 @@ info:
   version: "1.0.0"
 host: "api.endpoints.my-project-12345.cloud.goog"
 schemes:
-  - https
+  - http
 paths:
   /hello:
     get:

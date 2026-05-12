@@ -8,17 +8,19 @@ conditions := [
         {
             "situation_description": "Google Cloud Endpoints service openapi_config does not enforce HTTPS.",
             "remedies": [
-                "Set openapi_config to use https."
+                "Add https to the schemes section.",
+                "Allow only https in openapi_config."
             ]
         },
         {
-            "condition": "Check that openapi_config uses https.",
+            "condition": "Check that openapi_config includes https in the OpenAPI schemes section.",
             "attribute_path": ["openapi_config"],
-            "values": ["https"],
-            "policy_type": "whitelist"
+            "values": ["*https*", []],
+            "policy_type": "pattern whitelist"
         }
     ]
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
+
 details := helpers.get_multi_summary(conditions, vars.variables).details

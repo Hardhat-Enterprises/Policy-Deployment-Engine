@@ -26,4 +26,5 @@ conditions := [
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
+
 details := helpers.get_multi_summary(conditions, vars.variables).details
