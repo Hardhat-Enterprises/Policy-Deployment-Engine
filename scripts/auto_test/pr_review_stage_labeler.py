@@ -7,20 +7,23 @@ import os
 from github import Github
 
 def get_review_count(pr):
-    reviews = pr.get_reviews()
+    labels = [l.name for l in pr.get_labels()]
 
-    valid_states = {"APPROVED", "CHANGES_REQUESTED"}
+    if "4th review" in labels:
+        return 4
+    if "3rd review" in labels:
+        return 3
+    if "2nd review" in labels:
+        return 2
+    if "1st review" in labels:
+        return 1
 
-    count = 0
-
-    for r in reviews:
-        if r.state in valid_states:
-            count += 1
-
-    return count
+    return 0
 
 
-def apply_label(pr, count):
+def apply_label(pr, current_stage):
+    next_stage = current_stage + 1
+
     label_map = {
         1: "1st review",
         2: "2nd review",
@@ -28,25 +31,24 @@ def apply_label(pr, count):
         4: "4th review"
     }
 
-    desired_label = label_map.get(count)
+    desired_label = label_map.get(next_stage)
 
     if not desired_label:
+        print("Max review stage reached")
         return
 
     existing_labels = [l.name for l in pr.get_labels()]
 
-    if desired_label in existing_labels:
-        print("Label already correct, skipping")
-        return
-    
-    # To remove old review labels
     review_labels = set(label_map.values())
 
+    # To remove old review labels
     for l in existing_labels:
         if l in review_labels:
             pr.remove_from_labels(l)
 
     pr.add_to_labels(desired_label)
+
+    print(f"Moved to: {desired_label}")
 
 def main():
     token = os.getenv("GITHUB_TOKEN")
