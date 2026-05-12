@@ -6,21 +6,19 @@ import data.terraform.gcp.security.google_Endpoints.google_endpoints_service.var
 conditions := [
     [
         {
-            "situation_description": "Google Cloud Endpoints service service_name does not follow the expected Cloud Endpoints domain format.",
+            "situation_description": "Google Cloud Endpoints service service_name does not follow the approved value.",
             "remedies": [
-                "Set service_name to use the Cloud Endpoints domain format.",
-                "Ensure service_name follows the pattern <api>.endpoints.<project>.cloud.goog."
+                "Set service_name to the approved compliant value."
             ]
         },
         {
-            "condition": "Check that service_name uses the Cloud Endpoints domain format.",
+            "condition": "Check that service_name uses the approved value.",
             "attribute_path": ["service_name"],
-            "values": ["*.endpoints.*.cloud.goog", []],
-            "policy_type": "pattern whitelist"
+            "values": ["api.endpoints.my-project-12345.cloud.goog"],
+            "policy_type": "whitelist"
         }
     ]
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
-
 details := helpers.get_multi_summary(conditions, vars.variables).details

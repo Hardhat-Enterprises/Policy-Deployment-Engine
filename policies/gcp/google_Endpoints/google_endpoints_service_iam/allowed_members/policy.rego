@@ -13,12 +13,12 @@ conditions := [
             ]
         },
         {
-            "condition": "Check that members does not include disallowed public or unsupported principals.",
-            "attribute_path": ["members"],
+            "condition": "Check that the first member does not use a disallowed principal.",
+            "attribute_path": ["members", 0],
             "values": [
+                "domain:example.com",
                 "allUsers",
-                "allAuthenticatedUsers",
-                "domain:example.com"
+                "allAuthenticatedUsers"
             ],
             "policy_type": "blacklist"
         }
@@ -26,5 +26,4 @@ conditions := [
 ]
 
 message := helpers.get_multi_summary(conditions, vars.variables).message
-
 details := helpers.get_multi_summary(conditions, vars.variables).details
