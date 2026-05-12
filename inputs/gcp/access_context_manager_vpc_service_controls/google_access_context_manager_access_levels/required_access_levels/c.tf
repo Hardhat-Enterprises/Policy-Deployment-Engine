@@ -5,7 +5,7 @@ resource "google_access_context_manager_access_levels" "c" {
     title = "level_c"
     basic {
       conditions {
-        required_access_levels = ["accessPolicies/123456789/accessLevels/c"]
+        required_access_levels = ["accessPolicies/123456789/accessLevels/base_level"]
       }
     }
   }
