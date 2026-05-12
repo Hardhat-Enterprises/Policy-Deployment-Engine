@@ -13,14 +13,14 @@ conditions := [
             ]
         },
         {
-            "condition": "Check that members only use approved members.",
+            "condition": "Check that members does not include disallowed public or unsupported principals.",
             "attribute_path": ["members"],
             "values": [
-                "user:alice@example.com",
-                "group:admins@example.com",
-                "serviceAccount:svc-my-app@my-project-123.iam.gserviceaccount.com"
+                "allUsers",
+                "allAuthenticatedUsers",
+                "domain:example.com"
             ],
-            "policy_type": "whitelist"
+            "policy_type": "blacklist"
         }
     ]
 ]
