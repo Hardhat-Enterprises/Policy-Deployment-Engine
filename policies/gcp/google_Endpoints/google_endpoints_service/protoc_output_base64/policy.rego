@@ -1,7 +1,7 @@
-package terraform.gcp.security.google_Endpoints.google_endpoints_service.protoc_output_base64
+package terraform.gcp.security.google_endpoints.google_endpoints_service.protoc_output_base64
 
 import data.terraform.helpers
-import data.terraform.gcp.security.google_Endpoints.google_endpoints_service.vars
+import data.terraform.gcp.security.google_endpoints.google_endpoints_service.vars
 
 conditions := [
     [

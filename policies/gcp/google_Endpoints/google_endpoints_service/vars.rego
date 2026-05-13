@@ -1,4 +1,4 @@
-package terraform.gcp.security.google_Endpoints.google_endpoints_service.vars
+package terraform.gcp.security.google_endpoints.google_endpoints_service.vars
 
 variables := {
     "friendly_resource_name": "Google Cloud Endpoints service",
