@@ -12,7 +12,7 @@ conditions := [
         {
             "condition": "Check if the default network is not used",
             "attribute_path": ["network"],
-            "values": ["default"],
+            "values": [null],
             "policy_type": "blacklist"
         }
     ]

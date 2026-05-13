@@ -12,7 +12,7 @@ conditions := [
         {
             "condition": "Check if workers use private IP configuration",
             "attribute_path": ["ip_configuration"],
-            "values": ["WORKER_IP_PRIVATE"],
+            "values": ["WORKER_IP_PRIVATE", "WORKER_IP_PUBLIC"],
             "policy_type": "whitelist"
         }
     ]
