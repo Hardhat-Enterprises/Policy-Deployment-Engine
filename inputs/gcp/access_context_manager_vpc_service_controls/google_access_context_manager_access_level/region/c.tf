@@ -5,7 +5,7 @@ resource "google_access_context_manager_access_level" "c" {
   basic {
     conditions {
       regions = [
-        "australia-southeast1", "australia-southeast2",
+        "australia-southeast1","australia-southeast2",
       ]
     }
   }
