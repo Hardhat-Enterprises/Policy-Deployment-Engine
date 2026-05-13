@@ -6,17 +6,17 @@ import data.terraform.gcp.security.google_endpoints.google_endpoints_service.var
 conditions := [
     [
         {
-            "situation_description": "Google Cloud Endpoints service openapi_config allows HTTP.",
+            "situation_description": "Google Cloud Endpoints service openapi_config does not enforce HTTPS.",
             "remedies": [
-                "Remove http from the OpenAPI schemes section.",
-                "Allow only https in openapi_config."
+                "Set openapi_config to use https.",
+                "Do not allow http in openapi_config."
             ]
         },
         {
-            "condition": "Google Cloud Endpoints service openapi_config must not allow HTTP.",
+            "condition": "Google Cloud Endpoints service openapi_config must use HTTPS.",
             "attribute_path": ["openapi_config"],
-            "values": ["http"],
-            "policy_type": "blacklist"
+            "values": ["https"],
+            "policy_type": "whitelist"
         }
     ]
 ]
