@@ -1,7 +1,7 @@
-package terraform.gcp.security.google_Endpoints.google_endpoints_consumers_iam.members
+package terraform.gcp.security.google_endpoints.google_endpoints_consumers_iam.members
 
 import data.terraform.helpers
-import data.terraform.gcp.security.google_Endpoints.google_endpoints_consumers_iam.vars
+import data.terraform.gcp.security.google_endpoints.google_endpoints_consumers_iam.vars
 
 conditions := [
     [
