@@ -6,29 +6,22 @@ import data.terraform.gcp.security.google_endpoints.google_endpoints_service.var
 conditions := [
     [
         {
-            "situation_description": "Google Cloud Endpoints service service_name does not follow the approved value.",
+            "situation_description": "Google Cloud Endpoints service service_name uses a disallowed value.",
             "remedies": [
-                "Set service_name to the approved compliant value."
+                "Set service_name to an approved compliant value."
             ]
         },
         {
-            "condition": "Check that service_name uses the approved value.",
+            "condition": "Google Cloud Endpoints service service_name must not use a disallowed value.",
             "attribute_path": ["service_name"],
-            "values": ["api.endpoints.my-project-123.cloud.goog"],
-            "policy_type": "whitelist"
+            "values": ["nc"],
+            "policy_type": "blacklist"
         }
     ]
 ]
 
-resource_names := [resource.name |
-    resource := input.resource_changes[_]
-    resource.type == "google_endpoints_service"
-    resource.name != "c"
-]
+result := helpers.get_multi_summary(conditions, vars.variables)
 
-message := sprintf("%s\nResources checked: %s", [
-    helpers.get_multi_summary(conditions, vars.variables).message,
-    concat(", ", resource_names),
-])
+message := result.message
 
-details := helpers.get_multi_summary(conditions, vars.variables).details
+details := result.details

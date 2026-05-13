@@ -3,6 +3,7 @@ package terraform.gcp.security.google_endpoints.google_endpoints_service_iam.var
 variables := {
     "friendly_resource_name": "Google Cloud Endpoints service IAM binding",
     "resource_type": "google_endpoints_service_iam_binding",
+    "resource_value_name": "service_name",
     "arguments": {
         "service_name": "service_name",
         "role": "role",

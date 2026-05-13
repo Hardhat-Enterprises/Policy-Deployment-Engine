@@ -1,6 +1,6 @@
 resource "google_endpoints_service" "c" {
   project = "my-project-123"
-  service_name = "api.endpoints.my-project-123.cloud.goog"
+  service_name = "c"
 
   openapi_config = <<EOF
 swagger: "2.0"

@@ -6,30 +6,22 @@ import data.terraform.gcp.security.google_endpoints.google_endpoints_service.var
 conditions := [
     [
         {
-            "situation_description": "Google Cloud Endpoints service openapi_config does not enforce HTTPS.",
+            "situation_description": "Google Cloud Endpoints service openapi_config allows HTTP.",
             "remedies": [
-                "Add https to the schemes section.",
+                "Remove http from the OpenAPI schemes section.",
                 "Allow only https in openapi_config."
             ]
         },
-        {
-            "condition": "Check that openapi_config includes https in the OpenAPI schemes section.",
-            "attribute_path": ["openapi_config"],
-            "values": ["*https*", []],
-            "policy_type": "pattern whitelist"
-        }
+       {
+                "condition": "Google Cloud Endpoints service openapi_config must not allow http in the OpenAPI schemes section.",
+                "attribute_path": ["openapi_config"],
+                "values": ["swagger: \"2.0\"\r\ninfo:\r\n  title: \"secure-api\"\r\n  version: \"1.0.0\"\r\nhost: \"api.endpoints.my-project-12345.cloud.goog\"\r\nschemes:\r\n  - http\r\npaths:\r\n  /hello:\r\n    get:\r\n      operationId: hello\r\n      responses:\r\n        200:\r\n          description: OK\r\n"],
+                "policy_type": "blacklist"
+       }
     ]
 ]
 
-resource_names := [resource.name |
-    resource := input.resource_changes[_]
-    resource.type == "google_endpoints_service"
-    resource.name != "c"
-]
+result := helpers.get_multi_summary(conditions, vars.variables)
+message := result.message
+details := result.details
 
-message := sprintf("%s\nResources checked: %s", [
-    helpers.get_multi_summary(conditions, vars.variables).message,
-    concat(", ", resource_names),
-])
-
-details := helpers.get_multi_summary(conditions, vars.variables).details

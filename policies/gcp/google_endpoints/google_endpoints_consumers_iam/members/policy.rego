@@ -12,15 +12,22 @@ conditions := [
                 "Allow only user:, group:, or serviceAccount: principals."
             ]
         },
-        {
-            "condition": "Check that members only use approved principal types.",
-            "attribute_path": ["members"],
-            "values": ["*", [["user","group","serviceAccount"]]],
-            "policy_type": "pattern whitelist"
+        
+           {
+                
+                "condition": "Google Cloud Endpoints consumers IAM members must not include public principals.",
+                "attribute_path": ["members", 0],
+                "values": ["allUsers", "allAuthenticatedUsers"],
+                "policy_type": "blacklist"
+
+            
         }
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
+result := helpers.get_multi_summary(conditions, vars.variables)
 
-details := helpers.get_multi_summary(conditions, vars.variables).details
+message := result.message
+
+details := result.details
+
