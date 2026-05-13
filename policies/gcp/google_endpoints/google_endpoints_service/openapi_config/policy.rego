@@ -13,9 +13,9 @@ conditions := [
             ]
         },
         {
-            "condition": "Google Cloud Endpoints service openapi_config must not allow HTTP in the OpenAPI schemes section.",
+            "condition": "Google Cloud Endpoints service openapi_config must not allow HTTP.",
             "attribute_path": ["openapi_config"],
-            "values": ["swagger: \"2.0\"\r\ninfo:\r\n  title: \"secure-api\"\r\n  version: \"1.0.0\"\r\nhost: \"api.endpoints.my-project-12345.cloud.goog\"\r\nschemes:\r\n  - http\r\npaths:\r\n  /hello:\r\n    get:\r\n      operationId: hello\r\n      responses:\r\n        200:\r\n          description: OK\r\n"],
+            "values": ["http"],
             "policy_type": "blacklist"
         }
     ]
