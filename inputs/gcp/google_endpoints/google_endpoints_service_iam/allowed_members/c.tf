@@ -3,8 +3,6 @@ resource "google_endpoints_service_iam_binding" "c" {
   role         = "roles/viewer"
 
   members = [
-    "user:alice@example.com",
-    "group:admins@example.com",
-    "serviceAccount:svc-my-app@my-project-123.iam.gserviceaccount.com"
+    "user:alice@example.com"
   ]
 }

@@ -6,30 +6,25 @@ import data.terraform.gcp.security.google_endpoints.google_endpoints_service_iam
 conditions := [
     [
         {
-            "situation_description": "Google Cloud Endpoints service IAM role uses a forbidden service agent role.",
+            "situation_description": "Google Cloud Endpoints service IAM members includes a principal outside the approved members list.",
             "remedies": [
-                "Remove the service agent role from the IAM binding.",
-                "Use a least-privilege non-service-agent role instead."
+                "Use only approved members in members.",
+                "Update the binding to match the allowed members list."
             ]
         },
         {
-            "condition": "Check that role does not use the Cloud Endpoints service agent role.",
-            "attribute_path": ["role"],
-            "values": ["roles/endpoints.serviceAgent"],
+            "condition": "Check that members do not use a disallowed principal.",
+            "attribute_path": ["members"],
+            "values": [
+                "allUsers",
+                "allAuthenticatedUsers",
+                "domain:example.com"
+            ],
             "policy_type": "blacklist"
         }
     ]
 ]
 
-resource_names := [resource.name |
-    resource := input.resource_changes[_]
-    resource.type == "google_endpoints_service_iam_binding"
-    resource.name != "c"
-]
-
-message := sprintf("%s\nResources checked: %s", [
-    helpers.get_multi_summary(conditions, vars.variables).message,
-    concat(", ", resource_names),
-])
+message := helpers.get_multi_summary(conditions, vars.variables).message
 
 details := helpers.get_multi_summary(conditions, vars.variables).details
