@@ -5,8 +5,8 @@
     "name": {
       "description": "The name of the job.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Is not related to security practices as is only used for naming purposes",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,8 +14,8 @@
     "description": {
       "description": "A human-readable description for the job. This string must not contain more than 500 characters.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Only used to describe the purpose of the job thus does not have security related impact",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -23,8 +23,8 @@
     "schedule": {
       "description": "Describes the schedule on which the job will be executed.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Only used to set the timer for the job which would not affect the data security",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -87,7 +87,7 @@
           "description": "The minimum amount of time to wait before retrying a job after it fails. A duration in seconds with up to nine fractional digits, terminated by 's'.",
           "required": false,
           "security_impact": false,
-          "rationale": "Oly used to dictate the minimum backoff thus not a security related attribute",
+          "rationale": "Only used to dictate the minimum backoff thus not a security related attribute",
           "compliant": null,
           "non-compliant": null,
           "parent": "retry_config"
@@ -124,8 +124,8 @@
         "topic_name": {
           "description": "The full resource name for the Cloud Pub/Sub topic to which messages will be published when a job is delivered. ~>**NOTE:** The topic name must be in the same format as required by PubSub's PublishRequest.name, e.g. `projects/my-project/topics/my-topic`.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Does not impact security as is only used as a naming convention",
           "compliant": null,
           "non-compliant": null,
           "parent": "pubsub_target"
@@ -133,13 +133,8 @@
         "data": {
           "description": "The message payload for PubsubMessage. Pubsub message must contain either non-empty data, or at least one attribute. A base64-encoded string.",
           "required": false,
-<<<<<<< HEAD
-          "security_impact": null,
-          "rationale": null,
-=======
           "security_impact": false,
           "rationale": "Holds the data of the message but does not have direct impact on security attruibutes of the service",
->>>>>>> 8011a025 (Adding in policies and documentation)
           "compliant": null,
           "non-compliant": null,
           "parent": "pubsub_target"
@@ -241,8 +236,8 @@
         "body": {
           "description": "HTTP request body. A request body is allowed only if the HTTP method is POST, PUT, or PATCH. It is an error to set body on a job with an incompatible HttpMethod. A base64-encoded string.",
           "required": false,
-          "security_impact": false,
-          "rationale": "Contains the main payload for http but does not effect the security of service",
+          "security_impact": null,
+          "rationale": "Contains the main data for http but does not effect the security of service",
           "compliant": null,
           "non-compliant": null,
           "parent": "http_target"
@@ -250,13 +245,8 @@
         "headers": {
           "description": "This map contains the header field names and values. Repeated headers are not supported, but a header value can contain commas.",
           "required": false,
-<<<<<<< HEAD
-          "security_impact": null,
-          "rationale": null,
-=======
           "security_impact": false,
           "rationale": "Only used to provide addtional context which has no effect on the security",
->>>>>>> 8011a025 (Adding in policies and documentation)
           "compliant": null,
           "non-compliant": null,
           "parent": "http_target"
@@ -311,13 +301,8 @@
         "service": {
           "description": "App service. By default, the job is sent to the service which is the default service when the job is attempted.",
           "required": false,
-<<<<<<< HEAD
-          "security_impact": null,
-          "rationale": null,
-=======
           "security_impact": false,
           "rationale": "Only used to choose the service to be routed to thus does not directly affect security",
->>>>>>> 8011a025 (Adding in policies and documentation)
           "compliant": null,
           "non-compliant": null,
           "parent": "app_engine_routing"
@@ -347,8 +332,8 @@
       "required": null,
       "security_impact": true,
       "rationale": "Need to be implemented to add a level of authentication when required",
-      "compliant": null,
-      "non-compliant": null,
+      "compliant": "c_scheduler@pde.iam.gserviceaccount.com",
+      "non-compliant": "",
       "parent": null,
       "arguments": {
         "service_account_email": {
@@ -357,7 +342,7 @@
           "security_impact": true,
           "rationale": "Service account email should be correctly configured and not use overly priviledged default service accounts",
           "compliant": "c_scheduler@pde.iam.gserviceaccount.com",
-          "non-compliant": "nc.pde-compute@developer.gserviceaccount.com",
+          "non-compliant": "nc_pde-compute@developer.gserviceaccount.com",
           "parent": "oauth_token"
         },
         "scope": {
@@ -376,8 +361,8 @@
       "required": null,
       "security_impact": true,
       "rationale": "Need to be implemented to add a level of authentication when required",
-      "compliant": null,
-      "non-compliant": null,
+      "compliant": "c_scheduler@pde.iam.gserviceaccount.com",
+      "non-compliant": "",
       "parent": null,
       "arguments": {
         "service_account_email": {
@@ -386,7 +371,7 @@
           "security_impact": true,
           "rationale": "Service account email should be correctly configured and not use overly priviledged default service accounts",
           "compliant": "c_scheduler@pde.iam.gserviceaccount.com",
-          "non-compliant": "nc.pde@appspot.gserviceaccount.com",
+          "non-compliant": "nc_pde-compute@developer.gserviceaccount.com",
           "parent": "oidc_token"
         },
         "audience": {

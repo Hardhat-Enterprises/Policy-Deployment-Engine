@@ -23,8 +23,8 @@ Reference: [Terraform Registry – cloud_scheduler_job](https://registry.terrafo
 | `region` | Region where the scheduler job resides. If it is not provided, Terraform will use the provider default. | false | true | Region must be set to australia to enforce data residency | australia-southeast1 | us-central1 |
 | `project` | If it is not provided, the provider project is used. | false | false | Used for the project idenfication but does not have direct effects on the security of the service | None | None |
 | `app_engine_routing` |  | false | false | Used to route the request to the specified service and does not have any effect on security | None | None |
-| `oauth_token` |  | false | true | Need to be implemented to add a level of authentication when required | None | None |
-| `oidc_token` |  | false | true | Need to be implemented to add a level of authentication when required | None | None |
+| `oauth_token` |  | false | true | Need to be implemented to add a level of authentication when required | c_scheduler@pde.iam.gserviceaccount.com |  |
+| `oidc_token` |  | false | true | Need to be implemented to add a level of authentication when required | c_scheduler@pde.iam.gserviceaccount.com |  |
 
 ### retry_config Block
 
@@ -32,7 +32,7 @@ Reference: [Terraform Registry – cloud_scheduler_job](https://registry.terrafo
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `retry_count` | The number of attempts that the system will make to run a job using the exponential backoff procedure described by maxDoublings. Values greater than 5 and negative values are not allowed. | false | false | Controls the amount of retries but does not affect the authorization or authentication aspects | None | None |
 | `max_retry_duration` | The time limit for retrying a failed job, measured from time when an execution was first attempted. If specified with retryCount, the job will be retried until both limits are reached. A duration in seconds with up to nine fractional digits, terminated by 's'. | false | false | Used to dictate the maxiumum amount of retries thus not a security related attribute | None | None |
-| `min_backoff_duration` | The minimum amount of time to wait before retrying a job after it fails. A duration in seconds with up to nine fractional digits, terminated by 's'. | false | false | Oly used to dictate the minimum backoff thus not a security related attribute | None | None |
+| `min_backoff_duration` | The minimum amount of time to wait before retrying a job after it fails. A duration in seconds with up to nine fractional digits, terminated by 's'. | false | false | Only used to dictate the minimum backoff thus not a security related attribute | None | None |
 | `max_backoff_duration` | The maximum amount of time to wait before retrying a job after it fails. A duration in seconds with up to nine fractional digits, terminated by 's'. | false | false | Only used to dictate the maximum backoff thus not a security related attribute | None | None |
 | `max_doublings` | The time between retries will double maxDoublings times. A job's retry interval starts at minBackoffDuration, then doubles maxDoublings times, then increases linearly, and finally retries retries at intervals of maxBackoffDuration up to retryCount times. | false | false | Used to control the timer of max_doublings and has no impact on the securtiy of the service | None | None |
 
@@ -60,7 +60,7 @@ Reference: [Terraform Registry – cloud_scheduler_job](https://registry.terrafo
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `uri` | The full URI path that the request will be sent to. | true | true | Must use HTTPS in order to improve upon encryption | https://example.com/ | http://example.com/ |
 | `http_method` | Which HTTP method to use for the request. | false | false | Indicates http method but does not impact the security | None | None |
-| `body` | HTTP request body. A request body is allowed only if the HTTP method is POST, PUT, or PATCH. It is an error to set body on a job with an incompatible HttpMethod. A base64-encoded string. | false | false | Contains the main payload for http but does not effect the security of service | None | None |
+| `body` | HTTP request body. A request body is allowed only if the HTTP method is POST, PUT, or PATCH. It is an error to set body on a job with an incompatible HttpMethod. A base64-encoded string. | false | false | Contains the main data for http but does not effect the security of service | None | None |
 | `headers` | This map contains the header field names and values. Repeated headers are not supported, but a header value can contain commas. | false | false | Only used to provide addtional context which has no effect on the security | None | None |
 | `oauth_token` | Contains information needed for generating an OAuth token. This type of authorization should be used when sending requests to a GCP endpoint. Structure is [documented below](#nested_http_target_oauth_token). | false | true | Must be implemented to apply authentication upon the use of this service | c_scheduler@pde.iam.gserviceaccount.com |  |
 | `oidc_token` | Contains information needed for generating an OpenID Connect token. This type of authorization should be used when sending requests to third party endpoints or Cloud Run. Structure is [documented below](#nested_http_target_oidc_token). | false | true | Must be implemented to apply authentication upon the use of this service | c_scheduler@pde.iam.gserviceaccount.com |  |
@@ -77,12 +77,12 @@ Reference: [Terraform Registry – cloud_scheduler_job](https://registry.terrafo
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `service_account_email` | Service account email to be used for generating OAuth token. The service account must be within the same project as the job. | true | true | Service account email should be correctly configured and not use overly priviledged default service accounts | c_scheduler@pde.iam.gserviceaccount.com | nc.pde-compute@developer.gserviceaccount.com |
+| `service_account_email` | Service account email to be used for generating OAuth token. The service account must be within the same project as the job. | true | true | Service account email should be correctly configured and not use overly priviledged default service accounts | c_scheduler@pde.iam.gserviceaccount.com | nc_pde-compute@developer.gserviceaccount.com |
 | `scope` | OAuth scope to be used for generating OAuth access token. If not specified, "https://www.googleapis.com/auth/cloud-platform" will be used. | false | true | Defines the set of Google APIs that the access token is able access, thus to enforce security using the least priviledges, narrower scopes specific to the API should be used. | https://www.googleapis.com/auth/pubsub | https://www.googleapis.com/auth/cloud-platform |
 
 ### oidc_token Block
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `service_account_email` | Service account email to be used for generating OAuth token. The service account must be within the same project as the job. | true | true | Service account email should be correctly configured and not use overly priviledged default service accounts | c_scheduler@pde.iam.gserviceaccount.com | nc.pde@appspot.gserviceaccount.com |
+| `service_account_email` | Service account email to be used for generating OAuth token. The service account must be within the same project as the job. | true | true | Service account email should be correctly configured and not use overly priviledged default service accounts | c_scheduler@pde.iam.gserviceaccount.com | nc_pde-compute@developer.gserviceaccount.com |
 | `audience` | Audience to be used when generating OIDC token. If not specified, the URI specified in target will be used. | false | false | Will not provide addtional security as mismatched and misconfigured uri is automatically rejected thus making it more of a configuration | None | None |
