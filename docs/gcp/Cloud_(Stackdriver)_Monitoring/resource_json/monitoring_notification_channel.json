@@ -5,8 +5,8 @@
     "type": {
       "description": "The type of the notification channel. This field matches the value of the NotificationChannelDescriptor.type field. See https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.notificationChannelDescriptors/list to get the list of valid values such as \"email\", \"slack\", etc...",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Channel type is a functional setting with no direct security impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -23,8 +23,8 @@
     "sensitive_labels": {
       "description": "Different notification type behaviors are configured primarily using the the `labels` field on this resource. This block contains the labels which contain secrets or passwords so that they can be marked sensitive and hidden from plan output. The name of the field, eg: password, will be the key in the `labels` map in the api request. Credentials may not be specified in both locations and will cause an error. Changing from one location to a different credential configuration in the config will require an apply to update state. Structure is [documented below](#nested_sensitive_labels).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Functional or organisational label with no security impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -32,28 +32,28 @@
         "auth_token": {
           "description": "An authorization token for a notification channel. Channel types that support this field include: slack **Note**: This property is sensitive and will not be displayed in the plan.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": false,
+          "rationale": "When placed in sensitive_labels, the value is masked by GCP and not exposed in API responses. This is the correct location for this credential.",
+          "compliant": "sensitive_labels { auth_token = \"token\" }",
+          "non-compliant": "labels = { auth_token = \"token\" }",
           "parent": "sensitive_labels"
         },
         "password": {
           "description": "An password for a notification channel. Channel types that support this field include: webhook_basicauth **Note**: This property is sensitive and will not be displayed in the plan.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": false,
+          "rationale": "When placed in sensitive_labels, the value is masked by GCP. This is the correct location for this credential.",
+          "compliant": "sensitive_labels { password = \"pass\" }",
+          "non-compliant": "labels = { password = \"pass\" }",
           "parent": "sensitive_labels"
         },
         "service_key": {
           "description": "An servicekey token for a notification channel. Channel types that support this field include: pagerduty **Note**: This property is sensitive and will not be displayed in the plan.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": false,
+          "rationale": "When placed in sensitive_labels, the value is masked by GCP. This is the correct location for this credential.",
+          "compliant": "sensitive_labels { service_key = \"key\" }",
+          "non-compliant": "labels = { service_key = \"key\" }",
           "parent": "sensitive_labels"
         }
       }
@@ -61,8 +61,8 @@
     "user_labels": {
       "description": "User-supplied key/value data that does not need to conform to the corresponding NotificationChannelDescriptor's schema, unlike the labels field. This field is intended to be used for organizing and identifying the NotificationChannel objects.The field can contain up to 64 entries. Each key and value is limited to 63 Unicode characters or 128 bytes, whichever is smaller. Labels and values can contain only lowercase letters, numerals, underscores, and dashes. Keys must begin with a letter.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Organisational metadata with no security impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -70,8 +70,8 @@
     "description": {
       "description": "An optional human-readable description of this notification channel. This description may provide additional details, beyond the display name, for the channel. This may not exceed 1024 Unicode characters.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Descriptive field with no security impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -79,8 +79,8 @@
     "display_name": {
       "description": "An optional human-readable name for this notification channel. It is recommended that you specify a non-empty and unique name in order to make it easier to identify the channels in your project, though this is not enforced. The display name is limited to 512 Unicode characters.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Display metadata with no security impact.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -88,8 +88,8 @@
     "enabled": {
       "description": "Whether notifications are forwarded to the described channel. This makes it possible to disable delivery of notifications to a particular channel without removing the channel from all alerting policies that reference the channel. This is a more convenient approach when the change is temporary and you want to receive notifications from the same set of alerting policies on the channel at some point in the future.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Disabling a channel is a legitimate operational choice and does not create a security risk on its own.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -97,8 +97,8 @@
     "project": {
       "description": "If it is not provided, the provider project is used.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Project is an organisational field, not a security control.",
       "compliant": null,
       "non-compliant": null,
       "parent": null

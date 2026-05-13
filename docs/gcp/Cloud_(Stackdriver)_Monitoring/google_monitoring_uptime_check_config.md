@@ -51,7 +51,7 @@ Reference: [Terraform Registry – google_monitoring_uptime_check_config](https:
 | Policy | Type | Attribute | Situation |
 |--------|------|-----------|-----------|
 | `validate_ssl_required` | whitelist | `http_check.validate_ssl` | Enforces SSL certificate validation on HTTPS uptime checks to prevent checks passing against invalid or untrusted certificates |
-| `mask_headers_required_for_auth_headers` | whitelist | `http_check.mask_headers` | Enforces header masking when Authorization headers are present to prevent credential exposure via API responses |
+| `mask_headers` | whitelist | `http_check.mask_headers` | Enforces header masking when Authorization headers are present to prevent credential exposure via API responses |
 
 ## Policies Considered but Not Written
 
