@@ -1,8 +1,8 @@
 resource "google_storage_transfer_agent_pool" "nc" {
-  name = "projects/my-project-123/agentPools/googUnsafePool"
-  display_name = "googUnsafePool"
+  name = "nc"
+  display_name = "unsafe-agent-pool"
 
   bandwidth_limit {
-    limit_mbps = "250"
+    limit_mbps = "5000"
   }
 }

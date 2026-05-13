@@ -15,12 +15,13 @@ conditions := [
         {
             "condition": "Storage Transfer agent pool bandwidth limit must not use unsafe high Mbps values.",
             "attribute_path": ["bandwidth_limit", 0, "limit_mbps"],
-            "values": vars.variables.disallowed_bandwidth_limit_mbps,
-            "policy_type": "blacklist"
+            "values": [null, 1000],
+            "policy_type": "range"
         }
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
+result := helpers.get_multi_summary(conditions, vars.variables)
+message := result.message
+details := result.details
 
-details := helpers.get_multi_summary(conditions, vars.variables).details

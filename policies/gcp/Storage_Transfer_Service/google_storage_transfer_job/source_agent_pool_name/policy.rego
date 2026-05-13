@@ -14,13 +14,15 @@ conditions := [
         },
         {
             "condition": "Storage Transfer job must use an approved source agent pool.",
-            "attribute_path": ["transfer_spec", 0, "source_agent_pool_name"],
-            "values": vars.variables.approved_source_agent_pool_names,
+            "attribute_path": ["transfer_spec", "source_agent_pool_name"],
+            "values": ["projects/my-project-123/agentPools/approved-pool"],
             "policy_type": "whitelist"
         }
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
+result := helpers.get_multi_summary(conditions, vars.variables)
 
-details := helpers.get_multi_summary(conditions, vars.variables).details
+message := result.message
+
+details := result.details

@@ -1,5 +1,5 @@
 resource "google_storage_transfer_job" "nc" {
-  description = "Non-compliant transfer job"
+  description = "nc"
   project = "my-project-123"
   status = "ENABLED"
 
