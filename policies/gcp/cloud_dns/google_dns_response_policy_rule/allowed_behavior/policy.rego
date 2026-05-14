@@ -8,16 +8,16 @@ conditions := [
         {
             "situation_description": "The DNS response policy rule is using a wildcard dns_name. Wildcard rules match all DNS queries and can override all DNS responses, which is a security risk.",
             "remedies": [
-                "Use a specific dns_name instead of a wildcard.",
-                "Avoid using '*.' or '.' as dns_name in response policy rules.",
+                "Use a specific dns_name instead of a wildcard pattern.",
+                "Avoid using wildcard patterns like '*.' in dns_name.",
                 "Consult Google Cloud DNS documentation for response policy rule best practices."
             ]
         },
         {
-            "condition": "Check if dns_name is in the blocked blacklist",
+            "condition": "Check if dns_name contains a wildcard pattern",
             "attribute_path": ["dns_name"],
-            "values": ["*.", "."],
-            "policy_type": "blacklist"
+            "values": ["*.", [["*"]]],
+            "policy_type": "pattern blacklist"
         }
     ]
 ]
