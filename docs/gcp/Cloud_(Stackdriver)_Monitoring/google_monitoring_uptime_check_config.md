@@ -31,7 +31,7 @@ Reference: [Terraform Registry – google_monitoring_uptime_check_config](https:
 | `port` | Port to run the check against. | false | false | Operational setting with no direct security impact. | None | None |
 | `headers` | Headers to send with the check request. | false | false | Functional setting; security is addressed via mask_headers policy. | None | None |
 | `path` | Path to run the check against. | false | false | Functional setting with no security impact. | None | None |
-| `use_ssl` | If true, use HTTPS instead of HTTP. | false | false | SSL usage is enforced indirectly via validate_ssl_required policy. | None | None |
+| `use_ssl` | If true, use HTTPS instead of HTTP. | false | false | SSL usage is enforced indirectly via validate_ssl policy. | None | None |
 | `validate_ssl` | Whether to validate the SSL certificate for HTTPS checks. | false | true | Disabling SSL validation on HTTPS uptime checks allows the check to pass even when the certificate is invalid, expired, or issued by an untrusted authority, undermining transport security assurances. | `validate_ssl = true` | `validate_ssl = false` |
 | `mask_headers` | Whether to encrypt headers when retrieving the check configuration. | false | true | When Authorization or other authentication headers are present, leaving mask_headers false exposes those credentials in plain text via the GCP API on Get/List calls. | `mask_headers = true` | `mask_headers = false` with `Authorization` header |
 | `body` | Request body for POST checks. | false | false | Functional setting with no direct security impact. | None | None |
@@ -50,7 +50,7 @@ Reference: [Terraform Registry – google_monitoring_uptime_check_config](https:
 
 | Policy | Type | Attribute | Situation |
 |--------|------|-----------|-----------|
-| `validate_ssl_required` | whitelist | `http_check.validate_ssl` | Enforces SSL certificate validation on HTTPS uptime checks to prevent checks passing against invalid or untrusted certificates |
+| `validate_ssl` | whitelist | `http_check.validate_ssl` | Enforces SSL certificate validation on HTTPS uptime checks to prevent checks passing against invalid or untrusted certificates |
 | `mask_headers` | whitelist | `http_check.mask_headers` | Enforces header masking when Authorization headers are present to prevent credential exposure via API responses |
 
 ## Policies Considered but Not Written

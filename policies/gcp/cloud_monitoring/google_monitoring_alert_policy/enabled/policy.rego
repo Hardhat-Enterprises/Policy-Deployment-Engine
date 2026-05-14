@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_monitoring.google_monitoring_alert_policy.enabled_required
+package terraform.gcp.security.cloud_monitoring.google_monitoring_alert_policy.enabled
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_monitoring.google_monitoring_alert_policy.vars

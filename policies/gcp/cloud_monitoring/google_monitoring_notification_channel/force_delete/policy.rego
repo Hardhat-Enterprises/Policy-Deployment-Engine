@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_monitoring.google_monitoring_notification_channel.force_delete_false
+package terraform.gcp.security.cloud_monitoring.google_monitoring_notification_channel.force_delete
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_monitoring.google_monitoring_notification_channel.vars
@@ -15,7 +15,7 @@ conditions := [
       "condition": "force_delete must not be true",
       "attribute_path": ["force_delete"],
       "policy_type": "whitelist",
-      "values": [null, false]
+      "values": [false]
     }
   ]
 ]

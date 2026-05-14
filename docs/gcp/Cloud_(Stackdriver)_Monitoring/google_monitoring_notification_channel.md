@@ -23,9 +23,9 @@ Reference: [Terraform Registry – google_monitoring_notification_channel](https
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `auth_token` | Authorization token for Slack channels. | false | false | When placed in sensitive_labels, the value is masked by GCP and not exposed in API responses. This is the correct location for this credential. | `sensitive_labels { auth_token = "token" }` | `labels = { auth_token = "token" }` |
-| `password` | Password for webhook_basicauth channels. | false | false | When placed in sensitive_labels, the value is masked by GCP. This is the correct location for this credential. | `sensitive_labels { password = "pass" }` | `labels = { password = "pass" }` |
-| `service_key` | Service key for PagerDuty channels. | false | false | When placed in sensitive_labels, the value is masked by GCP. This is the correct location for this credential. | `sensitive_labels { service_key = "key" }` | `labels = { service_key = "key" }` |
+| `auth_token` | Authorization token for Slack channels. | false | false | When placed in sensitive_labels, the value is masked by GCP and not exposed in API responses. This is the correct location for this credential. | None | None |
+| `password` | Password for webhook_basicauth channels. | false | false | When placed in sensitive_labels, the value is masked by GCP. This is the correct location for this credential. | None | None |
+| `service_key` | Service key for PagerDuty channels. | false | false | When placed in sensitive_labels, the value is masked by GCP. This is the correct location for this credential. | None | None |
 
 ---
 
@@ -33,8 +33,8 @@ Reference: [Terraform Registry – google_monitoring_notification_channel](https
 
 | Policy | Type | Attribute | Situation |
 |--------|------|-----------|-----------|
-| `sensitive_labels_required` | whitelist | `labels.auth_token`, `labels.password`, `labels.service_key` | Prevents sensitive credentials from being stored in plain-text labels instead of the sensitive_labels block |
-| `force_delete_false` | whitelist | `force_delete` | Prevents unsafe deletion of channels still referenced by active alert policies |
+| `sensitive_labels` | whitelist | `labels.auth_token`, `labels.password`, `labels.service_key` | Prevents sensitive credentials from being stored in plain-text labels instead of the sensitive_labels block |
+| `force_delete` | whitelist | `force_delete` | Prevents unsafe deletion of channels still referenced by active alert policies |
 
 ## Policies Considered but Not Written
 

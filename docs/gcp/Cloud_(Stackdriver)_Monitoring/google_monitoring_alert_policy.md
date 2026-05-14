@@ -26,7 +26,7 @@ Reference: [Terraform Registry – google_monitoring_alert_policy](https://regis
 
 | Policy | Type | Attribute | Situation |
 |--------|------|-----------|-----------|
-| `enabled_required` | whitelist | `enabled` | Prevents alert policies from being silently disabled, which would eliminate all incident detection for that policy |
+| `enabled` | whitelist | `enabled` | Prevents alert policies from being silently disabled, which would eliminate all incident detection for that policy |
 
 ## Policies Considered but Not Written
 

@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_monitoring.google_monitoring_uptime_check_config.validate_ssl_required
+package terraform.gcp.security.cloud_monitoring.google_monitoring_uptime_check_config.validate_ssl
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_monitoring.google_monitoring_uptime_check_config.vars
