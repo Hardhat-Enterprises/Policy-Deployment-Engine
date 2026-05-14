@@ -11,7 +11,7 @@ conditions := [[
 	{
 		"condition": "starting_urls must not use insecure HTTP",
 		"attribute_path": ["starting_urls", 0],
-		"values": ["http://example.com"],
+		"values": ["http://*", [["example.com"]]],
 		"policy_type": "pattern blacklist",
 	},
 ]]
