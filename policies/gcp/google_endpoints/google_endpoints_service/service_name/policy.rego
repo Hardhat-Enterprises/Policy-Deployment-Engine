@@ -6,16 +6,18 @@ import data.terraform.gcp.security.google_endpoints.google_endpoints_service.var
 conditions := [
     [
         {
-            "situation_description": "Google Cloud Endpoints service service_name uses a disallowed value.",
+            "situation_description": "Google Cloud Endpoints service_name does not use an approved Cloud Endpoints domain.",
             "remedies": [
-                "Set service_name to an approved compliant value."
+                "Set service_name to the approved Cloud Endpoints domain for this API.",
+                "Use a Google-managed Cloud Endpoints domain such as api.endpoints.my-project-123.cloud.goog.",
+                "Do not use generic or external domains such as api.example.com for service_name."
             ]
         },
         {
-            "condition": "Google Cloud Endpoints service service_name must not use a disallowed value.",
+            "condition": "Google Cloud Endpoints service_name must match the approved Cloud Endpoints domain.",
             "attribute_path": ["service_name"],
-            "values": ["nc"],
-            "policy_type": "blacklist"
+            "values": ["api.endpoints.my-project-123.cloud.goog"],
+            "policy_type": "whitelist"
         }
     ]
 ]
