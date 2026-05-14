@@ -8,16 +8,21 @@ conditions := [
         {
             "situation_description": "The IAM role assigned is not in the allowed list. Overly permissive roles like owner or editor must not be granted on DNS managed zones.",
             "remedies": [
-                "Use only approved roles such as 'roles/dns.reader' or 'roles/viewer'.",
+                "Use only approved roles that follow the 'roles/dns.*' pattern.",
                 "Remove overly permissive roles like 'roles/owner' or 'roles/editor'.",
                 "Consult Google Cloud DNS IAM documentation for recommended roles."
             ]
         },
         {
-            "condition": "Check if role is not in the allowed whitelist",
+            "condition": "Check if role follows the approved dns role pattern",
             "attribute_path": ["role"],
-            "values": ["roles/viewer", "roles/dns.reader", "roles/dns.peer"],
-            "policy_type": "whitelist"
+            "values": [
+                "roles/*",
+                [
+                    ["dns.admin", "dns.reader", "dns.peer", "viewer"]
+                ]
+            ],
+            "policy_type": "pattern whitelist"
         }
     ]
 ]
