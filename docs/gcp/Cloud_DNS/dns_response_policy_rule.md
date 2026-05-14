@@ -22,5 +22,5 @@ Reference: [Terraform Registry – google_dns_response_policy_rule](https://regi
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `name` | For example, www.example.com. | true | false | Record name has no independent security policy impact. | None | None |
 | `type` | One of valid DNS resource types. Possible values are: A, AAAA, CAA, CNAME, DNSKEY, DS, HTTPS, MX, NS, PTR, SOA, SPF, SRV, TXT. | true | false | Record type alone does not constitute a security risk requiring policy enforcement. | None | None |
-| `ttl` | Number of seconds that this ResourceRecordSet can be cached by resolvers. | false | false | TTL in local data records is not enforced as a standalone policy for response policy rules. | None | None |
+| `ttl` | Number of seconds that this ResourceRecordSet can be cached by resolvers. | false | true | A TTL below 300 seconds increases the risk of DNS cache poisoning attacks. Frequent re-querying allows attackers more opportunities to inject malicious DNS responses. A minimum TTL of 300 seconds must be enforced. | 300–86400 | Below 300 (e.g. 60) |
 | `rrdatas` | As defined in RFC 1035 and RFC 1034. | false | false | Record data values have no independent security policy impact at this level. | None | None |

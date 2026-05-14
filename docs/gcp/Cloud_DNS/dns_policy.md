@@ -21,4 +21,8 @@ Reference: [Terraform Registry – google_dns_policy](https://registry.terraform
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `ipv4_address` | IPv4 address to forward to. | true | false | IP address of name server has no independent security policy impact. | None | None |
-| `forwarding_path` | Forwarding path for this TargetNameServer. Possible values are: `default`, `private`. | false | false | Forwarding path does not independently drive security policy decisions in this implementation. | None | None |
+🎉 Both new policies working perfectly!
+Now update the docs for both resources, then commit everything together.
+Update docs/gcp/Cloud_DNS/dns_policy.md
+Find the forwarding_path row and change from false to true security impact:
+| `forwarding_path` | Forwarding path for this TargetNameServer. Possible values are: `default`, `private`. | false | true | When set to `default`, Cloud DNS may forward queries to the public internet for non-RFC1918 addresses, exposing internal DNS queries to external name servers. Setting to `private` ensures all DNS queries are always routed through the VPC. | private | default |
