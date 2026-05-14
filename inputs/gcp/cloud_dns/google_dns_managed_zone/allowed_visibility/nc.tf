@@ -1,9 +1,5 @@
 resource "google_dns_managed_zone" "nc" {
-  name        = "nc"
-  dns_name    = "nc.example.com."
-  description = "Example DNS zone"
-  labels = {
-    foo = "bar"
-  }
-  # visibility not set = defaults to "public" = POLICY FAIL
+  name       = "nc"
+  dns_name   = "nc.example.com."
+  visibility = "public"
 }
