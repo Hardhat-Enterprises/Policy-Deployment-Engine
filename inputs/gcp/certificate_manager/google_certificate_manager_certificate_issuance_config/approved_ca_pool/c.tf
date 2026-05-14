@@ -1,4 +1,5 @@
 resource "google_certificate_manager_certificate_issuance_config" "c" {
+  project     = "sit764-policy-project"
   name        = "c"
   description = "Compliant certificate issuance config using approved CA pool"
   location    = "global"

@@ -1,12 +1,7 @@
 resource "google_certificate_manager_trust_config" "c" {
   name     = "c"
-  location = "global"
-
-  trust_stores {
-    trust_anchors {
-      pem_certificate = file("${path.module}/ca_cert.pem")
-    }
-  }
+  project  = "sit764-policy-project"
+  location = "australia-southeast1"
 
   labels = {
     environment = "prod"

@@ -1,12 +1,11 @@
+##### DO NOT EDIT ######
+
 terraform {
   required_providers {
     google = {
-      source = "hashicorp/google"
+      source  = "hashicorp/google"
     }
   }
 }
 
-provider "google" {
-  project = "test-project"
-  region  = "us-central1"
-}
+provider "google" {}

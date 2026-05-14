@@ -1,9 +1,11 @@
 resource "google_certificate_manager_certificate_map" "c_map" {
+  project     = "sit764-policy-project"
   name        = "c-map"
   description = "Compliant certificate map for approved environment label entry test."
 }
 
 resource "google_certificate_manager_certificate" "c_certificate" {
+  project     = "sit764-policy-project"
   name        = "c-certificate"
   description = "Compliant certificate for approved environment label entry test."
 
@@ -13,6 +15,7 @@ resource "google_certificate_manager_certificate" "c_certificate" {
 }
 
 resource "google_certificate_manager_certificate_map_entry" "c" {
+  project     = "sit764-policy-project"
   name        = "c"
   description = "Compliant certificate map entry with approved environment label."
   map         = google_certificate_manager_certificate_map.c_map.name

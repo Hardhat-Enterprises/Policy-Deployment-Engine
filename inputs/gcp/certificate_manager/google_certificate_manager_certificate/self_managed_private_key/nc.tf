@@ -1,5 +1,6 @@
 resource "google_certificate_manager_certificate" "nc" {
-  name = "nc"
+  name    = "nc"
+  project = "sit764-policy-project"
 
   self_managed {
     pem_certificate = <<EOT

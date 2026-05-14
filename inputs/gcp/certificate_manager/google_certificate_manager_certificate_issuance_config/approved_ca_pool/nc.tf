@@ -1,4 +1,5 @@
 resource "google_certificate_manager_certificate_issuance_config" "nc" {
+  project     = "sit764-policy-project"
   name        = "nc"
   description = "Non-compliant certificate issuance config using unapproved CA pool"
   location    = "global"

@@ -1,4 +1,5 @@
 resource "google_certificate_manager_certificate_issuance_config" "c" {
+  project     = "test-project"
   name        = "c"
   description = "Compliant certificate issuance config lifetime"
   location    = "us-central1"

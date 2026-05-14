@@ -1,4 +1,5 @@
 resource "google_certificate_manager_certificate" "nc" {
+  project     = "sit764-policy-project"
   name        = "nc"
   description = "Non-compliant certificate using a non-approved certificate issuance config."
   location    = "global"

@@ -1,4 +1,5 @@
 resource "google_certificate_manager_certificate_issuance_config" "nc" {
+  project     = "test-project"
   name        = "nc"
   description = "Non-compliant certificate issuance config rotation window"
   location    = "us-central1"
