@@ -33,8 +33,8 @@ conditions := [
         {
             "condition": "Checks if max_dispatches_per_second exceeds safe threshold",
             "attribute_path": ["rate_limits", "max_dispatches_per_second"],
-            "values": [null, 100],
-            "policy_type": "range"
+            "values": [null, 1000],
+            "policy_type": "blacklist"
         }
     ],
 
@@ -49,8 +49,8 @@ conditions := [
         {
             "condition": "Checks if max_concurrent_dispatches exceeds safe threshold",
             "attribute_path": ["rate_limits", "max_concurrent_dispatches"],
-            "values": [null, 10],
-            "policy_type": "range"
+            "values": [100],
+            "policy_type": "blacklist"
         }
     ]
 
