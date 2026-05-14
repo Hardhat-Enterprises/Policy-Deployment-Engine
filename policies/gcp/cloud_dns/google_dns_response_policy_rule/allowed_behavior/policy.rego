@@ -14,10 +14,10 @@ conditions := [
             ]
         },
         {
-            "condition": "Check if dns_name contains a wildcard pattern",
+            "condition": "Check if dns_name is in the blocked blacklist",
             "attribute_path": ["dns_name"],
-            "values": ["*.", [["*"]]],
-            "policy_type": "pattern blacklist"
+            "values": ["*.", "."],
+            "policy_type": "blacklist"
         }
     ]
 ]
