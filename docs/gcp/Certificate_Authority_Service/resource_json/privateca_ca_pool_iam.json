@@ -5,8 +5,8 @@
     "location": {
       "description": "running `gcloud privateca locations list`. Used to find the parent resource to bind the IAM policy to. If not specified, the value will be parsed from the identifier of the parent resource. If no location is provided in the parent identifier and no location is specified, it is taken from the provider configuration.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Deployment region used to locate the parent resource; no security-enforceable constraint on location choice.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,8 +14,8 @@
     "ca_pool": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Reference to the CA pool resource being bound; does not configure a security-enforceable property.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -23,8 +23,8 @@
     "project": {
       "description": "If it is not provided, the project will be parsed from the identifier of the parent resource. If no project is provided in the parent identifier and no project is specified, the provider project is used.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "GCP project reference; no security-enforceable constraint.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -32,8 +32,8 @@
     "member/members": {
       "description": "Each entry can have one of the following values: * **allUsers**: A special identifier that represents anyone who is on the internet; with or without a Google account. * **allAuthenticatedUsers**: A special identifier that represents anyone who is authenticated with a Google account or a service account. * **user:{emailid}**: An email address that represents a specific Google account. For example, alice@gmail.com or joe@example.com. * **serviceAccount:{emailid}**: An email address that represents a service account. For example, my-other-app@appspot.gserviceaccount.com. * **group:{emailid}**: An email address that represents a Google group. For example, admins@example.com. * **domain:{domain}**: A G Suite domain (primary, instead of alias) name that represents all the users of that domain. For example, google.com or example.com. * **projectOwner:projectid**: Owners of the given project. For example, \"projectOwner:my-example-project\" * **projectEditor:projectid**: Editors of the given project. For example, \"projectEditor:my-example-project\" * **projectViewer:projectid**: Viewers of the given project. For example, \"projectViewer:my-example-project\"",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "IAM principal assignment; the specific member value is deployment-specific and no policy constraint is mandated on the member identity.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -41,8 +41,8 @@
     "role": {
       "description": "`google_privateca_ca_pool_iam_binding` can be used per role. Note that custom roles must be of the format `[projects|organizations]/{parent-name}/roles/{role-name}`.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "IAM role binding; the appropriate role is deployment-specific and no specific role value is mandated by policy.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -50,8 +50,8 @@
     "policy_data": {
       "description": "a `google_iam_policy` data source.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Raw IAM policy data from a data source; evaluated at the IAM policy level rather than the binding level.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -59,8 +59,8 @@
     "condition": {
       "description": "Structure is documented below. ---",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Container block for an optional IAM condition; security evaluation applies to child arguments individually.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -68,8 +68,8 @@
         "expression": {
           "description": "",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "CEL expression scoping the IAM binding; content is deployment-specific and no specific expression is mandated.",
           "compliant": null,
           "non-compliant": null,
           "parent": "condition"
@@ -77,8 +77,8 @@
         "title": {
           "description": "",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Human-readable label for the IAM condition; no security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "condition"
@@ -86,8 +86,8 @@
         "description": {
           "description": "~> **Warning:** Terraform considers the `role` and condition contents (`title`+`description`+`expression`) as the identifier for the binding. This means that if any part of the condition is changed out-of-band, Terraform will consider it to be an entirely different resource and will treat it as such.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Human-readable description of the IAM condition; no security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "condition"
