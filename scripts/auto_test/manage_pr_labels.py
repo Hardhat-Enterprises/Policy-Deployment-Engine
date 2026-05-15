@@ -32,8 +32,7 @@ def manage_pr_labels(check_outcome: str) -> int:
             # Remove CI-Approved label (ignore if not present)
             subprocess.run(
                 ["gh", "pr", "edit", pr_number, "--remove-label", "CI-Approved"],
-                capture_output=True,
-                stderr=subprocess.DEVNULL
+                capture_output=True
             )
             
             # Add CI-Review-Required label
@@ -52,8 +51,7 @@ def manage_pr_labels(check_outcome: str) -> int:
             # Remove CI-Review-Required label (ignore if not present)
             subprocess.run(
                 ["gh", "pr", "edit", pr_number, "--remove-label", "CI-Review-Required"],
-                capture_output=True,
-                stderr=subprocess.DEVNULL
+                capture_output=True
             )
             
             # Add CI-Approved label
