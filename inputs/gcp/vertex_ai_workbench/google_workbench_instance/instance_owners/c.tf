@@ -1,6 +1,6 @@
-resource "google_workbench_instance" "c1" {
+resource "google_workbench_instance" "c" {
   project         = "my-secure-project"
-  name            = "c1"
+  name            = "c"
   location        = "australia-southeast2-a"
   instance_owners = ["user@example.com"]
 }
