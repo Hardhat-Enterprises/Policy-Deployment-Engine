@@ -1,7 +1,7 @@
 package terraform.gcp.security.data_pipeline.google_data_pipeline_pipeline.scheduler_service_account_email
 
-import data.terraform.gcp.security.data_pipeline.google_data_pipeline_pipeline.vars
 import data.terraform.helpers
+import data.terraform.gcp.security.data_pipeline.google_data_pipeline_pipeline.vars
 
 conditions := [[
 	{
