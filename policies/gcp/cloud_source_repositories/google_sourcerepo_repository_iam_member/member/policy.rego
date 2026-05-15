@@ -1,7 +1,7 @@
 package terraform.gcp.security.cloud_source_repositories.google_sourcerepo_repository_iam_member.member
 
-import data.terraform.gcp.security.cloud_source_repositories.google_sourcerepo_repository_iam_member.vars
 import data.terraform.helpers
+import data.terraform.gcp.security.cloud_source_repositories.google_sourcerepo_repository_iam_member.vars
 
 conditions := [[
 	{
