@@ -1,0 +1,5 @@
+resource "google_vmwareengine_subnet" "nc" {
+  name          = "nc"
+  parent        = "projects/599444694846/locations/us-west1-a/privateClouds/nc"
+  ip_cidr_range = "192.100.168.0/24"
+}
