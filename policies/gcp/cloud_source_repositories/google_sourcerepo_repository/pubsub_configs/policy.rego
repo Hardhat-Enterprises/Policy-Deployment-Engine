@@ -1,7 +1,7 @@
 package terraform.gcp.security.cloud_source_repositories.google_sourcerepo_repository.pubsub_configs
 
-import data.terraform.gcp.security.cloud_source_repositories.google_sourcerepo_repository.vars
 import data.terraform.helpers
+import data.terraform.gcp.security.cloud_source_repositories.google_sourcerepo_repository.vars
 
 conditions := [[
 	{
