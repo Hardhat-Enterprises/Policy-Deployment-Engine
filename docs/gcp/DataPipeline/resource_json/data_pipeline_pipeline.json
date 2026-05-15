@@ -4,11 +4,11 @@
   "arguments": {
     "name": {
       "description": "\"The pipeline name. For example': 'projects/PROJECT_ID/locations/LOCATION_ID/pipelines/PIPELINE_ID.\" \"- PROJECT_ID can contain letters ([A-Za-z]), numbers ([0-9]), hyphens (-), colons (:), and periods (.). For more information, see Identifying projects.\" \"LOCATION_ID is the canonical ID for the pipeline's location. The list of available locations can be obtained by calling google.cloud.location.Locations.ListLocations. Note that the Data Pipelines service is not available in all regions. It depends on Cloud Scheduler, an App Engine application, so it's only available in App Engine regions.\" \"PIPELINE_ID is the ID of the pipeline. Must be unique for the selected project and location.\"",
-      "required": true,
-      "security_impact": true,
-      "rationale": "setting the pipeline name correctly is important for ensuring that it is uniquely identifiable within the project and location. This allows for proper management and monitoring of the pipeline, as well as avoiding conflicts with other pipelines. Incorrectly setting the pipeline name could lead to confusion and difficulties in managing the pipeline effectively.",
-      "compliant": "projects/PROJECT_ID/locations/LOCATION_ID/pipelines/PIPELINE_ID",
-      "non-compliant": "invalid_pipeline_name",
+      "required": false,
+      "security_impact": false,
+      "rationale": "the pipeline name is not a security-impact field because it is used for identification purposes only and does not affect the behavior or access control of the pipeline. However, it is important to set the pipeline name correctly to ensure that it can be easily identified and managed within the project and location. Incorrectly setting the pipeline name could lead to confusion and difficulty in managing pipelines, but it would not have a direct impact on security.",
+      "compliant": null,
+      "non-compliant": null,
       "parent": null
     },
     "type": {
@@ -32,8 +32,8 @@
     "display_name": {
       "description": "The display name of the pipeline. It can contain only letters ([A-Za-z]), numbers ([0-9]), hyphens (-), and underscores (_).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "the display name is not a security-impact field because it is used for identification purposes only and does not affect the behavior or access control of the pipeline. However, it is important to set the display name correctly to ensure that it can be easily identified and managed within the project and location. Incorrectly setting the display name could lead to confusion and difficulty in managing pipelines, but it would not have a direct impact on security.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -41,8 +41,8 @@
     "workload": {
       "description": "Workload information for creating new jobs. https://cloud.google.com/dataflow/docs/reference/data-pipelines/rest/v1/projects.locations.pipelines#workload Structure is [documented below](#nested_workload).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "the workload information is not a security-impact field because it is used for job creation purposes only and does not affect the behavior or access control of the pipeline. However, it is important to set the workload information correctly to ensure that jobs are created with the appropriate configuration. Incorrectly setting the workload information could lead to job failures or unexpected behavior, but it would not have a direct impact on security.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -50,8 +50,8 @@
         "dataflow_launch_template_request": {
           "description": "Template information and additional parameters needed to launch a Dataflow job using the standard launch API. https://cloud.google.com/dataflow/docs/reference/data-pipelines/rest/v1/projects.locations.pipelines#launchtemplaterequest Structure is [documented below](#nested_workload_dataflow_launch_template_request).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the dataflow launch template request is not a security-impact field because it is used for job creation purposes only and does not affect the behavior or access control of the pipeline. However, it is important to set the dataflow launch template request correctly to ensure that jobs are created with the appropriate configuration. Incorrectly setting the dataflow launch template request could lead to job failures or unexpected behavior, but it would not have a direct impact on security.",
           "compliant": null,
           "non-compliant": null,
           "parent": "workload"
@@ -59,8 +59,8 @@
         "dataflow_flex_template_request": {
           "description": "Template information and additional parameters needed to launch a Dataflow job using the flex launch API. https://cloud.google.com/dataflow/docs/reference/data-pipelines/rest/v1/projects.locations.pipelines#launchflextemplaterequest Structure is [documented below](#nested_workload_dataflow_flex_template_request).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the dataflow flex template request is not a security-impact field because it is used for job creation purposes only and does not affect the behavior or access control of the pipeline. However, it is important to set the dataflow flex template request correctly to ensure that jobs are created with the appropriate configuration. Incorrectly setting the dataflow flex template request could lead to job failures or unexpected behavior, but it would not have a direct impact on security.",
           "compliant": null,
           "non-compliant": null,
           "parent": "workload"
@@ -70,8 +70,8 @@
     "schedule_info": {
       "description": "Internal scheduling information for a pipeline. If this information is provided, periodic jobs will be created per the schedule. If not, users are responsible for creating jobs externally. https://cloud.google.com/dataflow/docs/reference/data-pipelines/rest/v1/projects.locations.pipelines#schedulespec Structure is [documented below](#nested_schedule_info).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "the schedule information is not a security-impact field because it is used for job scheduling purposes only and does not affect the behavior or access control of the pipeline. However, it is important to set the schedule information correctly to ensure that jobs are created at the appropriate times. Incorrectly setting the schedule information could lead to job failures or unexpected behavior, but it would not have a direct impact on security.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -88,17 +88,17 @@
         "time_zone": {
           "description": "Timezone ID. This matches the timezone IDs used by the Cloud Scheduler API. If empty, UTC time is assumed.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": "false",
+          "rationale": "the time zone is not a security-impact field because it is used for scheduling purposes only and does not affect the behavior or access control of the pipeline. However, it is important to set the time zone correctly to ensure that jobs are created at the appropriate times. Incorrectly setting the time zone could lead to job failures or unexpected behavior, but it would not have a direct impact on security.",
           "compliant": null,
           "non-compliant": null,
           "parent": "schedule_info"
         },
         "next_job_time": {
           "description": "(Output) When the next Scheduler job is going to run. A timestamp in RFC3339 UTC \"Zulu\" format, with nanosecond resolution and up to nine fractional digits. Examples: \"2014-10-02T15:01:23Z\" and \"2014-10-02T15:01:23.045123456Z\".",
-          "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "required": false,
+          "security_impact": false,
+          "rationale": "the next job time is not a security-impact field because it is used for informational purposes only and does not affect the behavior or access control of the pipeline. However, it is important to set the next job time correctly to ensure that users have accurate information about when the next job will run. Incorrectly setting the next job time could lead to confusion and difficulty in managing pipelines, but it would not have a direct impact on security.",
           "compliant": null,
           "non-compliant": null,
           "parent": "schedule_info"
@@ -111,14 +111,14 @@
       "security_impact": true,
       "rationale": "Using a dedicated service account for the Cloud Scheduler job allows for better access control and auditing. It reduces the risk of unintended permissions being granted to the default compute engine service account, which may have broader access than necessary.",
       "compliant": "pipeline-scheduler@project-id.iam.gserviceaccount.com",
-      "non-compliant": null,
+      "non-compliant": "any other service account email, or using the default compute engine service account",
       "parent": null
     },
     "pipeline_sources": {
       "description": "The sources of the pipeline (for example, Dataplex). The keys and values are set by the corresponding sources during pipeline creation. An object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "the pipeline sources are not a security-impact field because they are used for informational purposes only and do not affect the behavior or access control of the pipeline. However, it is important to set the pipeline sources correctly to ensure that the pipeline is configured with the appropriate data sources.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -134,18 +134,18 @@
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "the project field is not a security-impact field because it is used for identification purposes only and does not affect the behavior or access control of the pipeline. However, it is important to set the project correctly to ensure that the pipeline is associated with the correct project and can be easily identified and managed within that project. Incorrectly setting the project could lead to confusion and difficulty in managing pipelines, but it would not have a direct impact on security.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "dataflow_launch_template_request": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "the dataflow launch template request is not a security-impact field because it is used for job creation purposes only and does not affect the behavior or access control of the pipeline. However, it is important to set the dataflow launch template request correctly to ensure that jobs are created with the appropriate configuration. Incorrectly setting the dataflow launch template request could lead to job failures or unexpected behavior, but it would not have a direct impact on security.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -153,8 +153,8 @@
         "project_id": {
           "description": "The ID of the Cloud Platform project that the job belongs to.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the project ID is not a security-impact field because it is used for identification purposes only and does not affect the behavior or access control of the pipeline. However, it is important to set the project ID correctly to ensure that the job is associated with the correct project and can be easily identified and managed within that project. Incorrectly setting the project ID could lead to confusion and difficulty in managing jobs, but it would not have a direct impact on security.",
           "compliant": null,
           "non-compliant": null,
           "parent": "dataflow_launch_template_request"
@@ -162,8 +162,8 @@
         "validate_only": {
           "description": "",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the validate only field is not a security-impact field because it is used for testing purposes only and does not affect the behavior or access control of the pipeline. However, it is important to set the validate only field correctly to ensure that jobs are validated before being launched. Incorrectly setting the validate only field could lead to unexpected behavior, but it would not have a direct impact on security.",
           "compliant": null,
           "non-compliant": null,
           "parent": "dataflow_launch_template_request"
@@ -171,8 +171,8 @@
         "launch_parameters": {
           "description": "The parameters of the template to launch. This should be part of the body of the POST request. https://cloud.google.com/dataflow/docs/reference/data-pipelines/rest/v1/projects.locations.pipelines#launchtemplateparameters Structure is [documented below](#nested_workload_dataflow_launch_template_request_launch_parameters).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the launch parameters field is not a security-impact field because it is used for job configuration purposes only and does not affect the behavior or access control of the pipeline. However, it is important to set the launch parameters correctly to ensure that jobs are created with the appropriate configuration. Incorrectly setting the launch parameters could lead to job failures or unexpected behavior, but it would not have a direct impact on security.",
           "compliant": null,
           "non-compliant": null,
           "parent": "dataflow_launch_template_request"
@@ -180,8 +180,8 @@
         "location": {
           "description": "The regional endpoint to which to direct the request.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the location field is not a security-impact field because it is used for routing purposes only and does not affect the behavior or access control of the pipeline. However, it is important to set the location correctly to ensure that the request is directed to the appropriate regional endpoint. Incorrectly setting the location could lead to request failures or unexpected behavior, but it would not have a direct impact on security.",
           "compliant": null,
           "non-compliant": null,
           "parent": "dataflow_launch_template_request"
@@ -189,8 +189,8 @@
         "gcs_path": {
           "description": "A Cloud Storage path to the template from which to create the job. Must be a valid Cloud Storage URL, beginning with 'gs://'.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the gcs path field is not a security-impact field because it is used for specifying the location of the template and does not affect the behavior or access control of the pipeline. However, it is important to set the gcs path correctly to ensure that the job is created from the intended template. Incorrectly setting the gcs path could lead to job failures or unexpected behavior, but it would not have a direct impact on security.",
           "compliant": null,
           "non-compliant": null,
           "parent": "dataflow_launch_template_request"
@@ -209,8 +209,8 @@
         "job_name": {
           "description": "The job name to use for the created job.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the job name field is not a security-impact field because it is used for identification purposes only and does not affect the behavior or access control of the pipeline. However, it is important to set the job name correctly to ensure that jobs are easily identifiable and can be managed effectively. Incorrectly setting the job name could lead to confusion or difficulty in managing jobs, but it would not have a direct impact on security.",
           "compliant": null,
           "non-compliant": null,
           "parent": "launch_parameters"
@@ -227,8 +227,8 @@
         "environment": {
           "description": "The runtime environment for the job. https://cloud.google.com/dataflow/docs/reference/data-pipelines/rest/v1/projects.locations.pipelines#RuntimeEnvironment Structure is [documented below](#nested_workload_dataflow_launch_template_request_launch_parameters_environment).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the environment field is not a security-impact field because it is used for configuring the runtime environment for the job and does not affect the behavior or access control of the pipeline. However, it is important to set the environment correctly to ensure that the job runs in the intended environment. Incorrectly setting the environment could lead to job failures or unexpected behavior, but it would not have a direct impact on security.",
           "compliant": null,
           "non-compliant": null,
           "parent": "launch_parameters"
@@ -236,8 +236,8 @@
         "update": {
           "description": "If set, replace the existing pipeline with the name specified by jobName with this pipeline, preserving state.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the update field is not a security-impact field because it is used for updating an existing pipeline and does not affect the behavior or access control of the pipeline. However, it is important to use this field correctly to ensure that updates are applied as intended. Incorrectly using this field could lead to unexpected behavior or data loss, but it would not have a direct impact on security.",
           "compliant": null,
           "non-compliant": null,
           "parent": "launch_parameters"
@@ -245,8 +245,8 @@
         "transform_name_mapping": {
           "description": "Map of transform name prefixes of the job to be replaced to the corresponding name prefixes of the new job. Only applicable when updating a pipeline. 'An object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.'",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the transform name mapping field is not a security-impact field because it is used for mapping transform names during pipeline updates and does not affect the behavior or access control of the pipeline. However, it is important to set this field correctly to ensure that transforms are updated as intended. Incorrectly setting this field could lead to unexpected behavior or data loss, but it would not have a direct impact on security.",
           "compliant": null,
           "non-compliant": null,
           "parent": "launch_parameters"
@@ -265,8 +265,8 @@
         "num_workers": {
           "description": "The initial number of Compute Engine instances for the job.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "the num_workers field is a security-impact field because it determines the number of Compute Engine instances running the job, which can affect the job's performance and resource utilization. Properly configuring this field is important for maintaining the job's efficiency and preventing resource exhaustion.",
           "compliant": null,
           "non-compliant": null,
           "parent": "environment"
@@ -274,8 +274,8 @@
         "max_workers": {
           "description": "The maximum number of Compute Engine instances to be made available to your pipeline during execution, from 1 to 1000.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "the max_workers field is a security-impact field because it determines the maximum number of Compute Engine instances that can be used to run the job, which can affect the job's performance and resource utilization. Properly configuring this field is important for maintaining the job's efficiency and preventing resource exhaustion.",
           "compliant": null,
           "non-compliant": null,
           "parent": "environment"
@@ -283,8 +283,8 @@
         "zone": {
           "description": "The Compute Engine availability zone for launching worker instances to run your pipeline. In the future, workerZone will take precedence.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the zone field is not a security-impact field because it only determines the location of the Compute Engine instances and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job runs in the desired location.",
           "compliant": null,
           "non-compliant": null,
           "parent": "environment"
@@ -292,8 +292,8 @@
         "service_account_email": {
           "description": "The email address of the service account to run the job as.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the service_account_email field is not a security-impact field because it only specifies the service account to run the job and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job runs with the appropriate permissions.",
           "compliant": null,
           "non-compliant": null,
           "parent": "environment"
@@ -301,8 +301,8 @@
         "temp_location": {
           "description": "The Cloud Storage path to use for temporary files. Must be a valid Cloud Storage URL, beginning with gs://.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the temp_location field is not a security-impact field because it only specifies the location of temporary files and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job has access to the necessary temporary storage.",
           "compliant": null,
           "non-compliant": null,
           "parent": "environment"
@@ -310,8 +310,8 @@
         "bypass_temp_dir_validation": {
           "description": "Whether to bypass the safety checks for the job's temporary directory. Use with caution.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the bypass_temp_dir_validation field is not a security-impact field because it only determines whether to bypass safety checks for the temporary directory and does not affect the job's behavior or access control. However, it is important to use this field with caution, as bypassing safety checks could lead to unintended consequences if the temporary directory is not properly configured.",
           "compliant": null,
           "non-compliant": null,
           "parent": "environment"
@@ -319,8 +319,8 @@
         "machine_type": {
           "description": "The machine type to use for the job. Defaults to the value from the template if not specified.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the machine_type field is not a security-impact field because it only specifies the type of machine to use for the job and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job has the necessary resources.",
           "compliant": null,
           "non-compliant": null,
           "parent": "environment"
@@ -328,8 +328,8 @@
         "additional_experiments": {
           "description": "Additional experiment flags for the job.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the additional_experiments field is not a security-impact field because it only specifies additional experiment flags for the job and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job runs with the desired experimental features.",
           "compliant": null,
           "non-compliant": null,
           "parent": "environment"
@@ -337,8 +337,8 @@
         "network": {
           "description": "Network to which VMs will be assigned. If empty or unspecified, the service will use the network \"default\".",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the network field is not a security-impact field because it only specifies the network to which VMs will be assigned and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job has the necessary network connectivity.",
           "compliant": null,
           "non-compliant": null,
           "parent": "environment"
@@ -346,8 +346,8 @@
         "subnetwork": {
           "description": "Subnetwork to which VMs will be assigned, if desired. You can specify a subnetwork using either a complete URL or an abbreviated path. Expected to be of the form \"https://www.googleapis.com/compute/v1/projects/HOST_PROJECT_ID/regions/REGION/subnetworks/SUBNETWORK\" or \"regions/REGION/subnetworks/SUBNETWORK\". If the subnetwork is located in a Shared VPC network, you must use the complete URL.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the subnetwork field is not a security-impact field because it only specifies the subnetwork to which VMs will be assigned and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job has the necessary network connectivity.",
           "compliant": null,
           "non-compliant": null,
           "parent": "environment"
@@ -355,8 +355,8 @@
         "additional_user_labels": {
           "description": "Additional user labels to be specified for the job. Keys and values should follow the restrictions specified in the labeling restrictions page. An object containing a list of key/value pairs. 'Example: { \"name\": \"wrench\", \"mass\": \"1kg\", \"count\": \"3\" }.' 'An object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.'",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the additional_user_labels field is not a security-impact field because it only specifies additional user labels for the job and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job has the necessary metadata.",
           "compliant": null,
           "non-compliant": null,
           "parent": "environment"
@@ -364,8 +364,8 @@
         "kms_key_name": {
           "description": "'Name for the Cloud KMS key for the job. The key format is: projects//locations//keyRings//cryptoKeys/'",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the kms_key_name field is not a security-impact field because it only specifies the Cloud KMS key for the job and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job has the necessary encryption.",
           "compliant": null,
           "non-compliant": null,
           "parent": "environment"
@@ -373,8 +373,8 @@
         "ip_configuration": {
           "description": "Configuration for VM IPs. https://cloud.google.com/dataflow/docs/reference/data-pipelines/rest/v1/projects.locations.pipelines#WorkerIPAddressConfiguration Possible values are: `WORKER_IP_UNSPECIFIED`, `WORKER_IP_PUBLIC`, `WORKER_IP_PRIVATE`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the ip_configuration field is not a security-impact field because it only specifies the IP configuration for VMs and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job has the necessary network connectivity.",
           "compliant": null,
           "non-compliant": null,
           "parent": "environment"
@@ -382,8 +382,8 @@
         "worker_region": {
           "description": "The Compute Engine region (https://cloud.google.com/compute/docs/regions-zones/regions-zones) in which worker processing should occur, e.g. \"us-west1\". Mutually exclusive with workerZone. If neither workerRegion nor workerZone is specified, default to the control plane's region.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the worker_region field is not a security-impact field because it only specifies the region in which worker processing should occur and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job has the necessary compute resources.",
           "compliant": null,
           "non-compliant": null,
           "parent": "environment"
@@ -391,8 +391,8 @@
         "worker_zone": {
           "description": "The Compute Engine zone (https://cloud.google.com/compute/docs/regions-zones/regions-zones) in which worker processing should occur, e.g. \"us-west1-a\". Mutually exclusive with workerRegion. If neither workerRegion nor workerZone is specified, a zone in the control plane's region is chosen based on available capacity. If both workerZone and zone are set, workerZone takes precedence.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the worker_zone field is not a security-impact field because it only specifies the zone in which worker processing should occur and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job has the necessary compute resources.",
           "compliant": null,
           "non-compliant": null,
           "parent": "environment"
@@ -400,8 +400,8 @@
         "enable_streaming_engine": {
           "description": "Whether to enable Streaming Engine for the job.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the enable_streaming_engine field is not a security-impact field because it only specifies whether to enable Streaming Engine for the job and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job has the necessary streaming capabilities.",
           "compliant": null,
           "non-compliant": null,
           "parent": "environment"
@@ -409,8 +409,8 @@
         "flexrs_goal": {
           "description": "Set FlexRS goal for the job. https://cloud.google.com/dataflow/docs/guides/flexrs https://cloud.google.com/dataflow/docs/reference/data-pipelines/rest/v1/projects.locations.pipelines#FlexResourceSchedulingGoal Possible values are: `FLEXRS_UNSPECIFIED`, `FLEXRS_SPEED_OPTIMIZED`, `FLEXRS_COST_OPTIMIZED`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the flexrs_goal field is not a security-impact field because it only specifies the FlexRS goal for the job and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job has the necessary resource scheduling.",
           "compliant": null,
           "non-compliant": null,
           "parent": "environment"
@@ -429,8 +429,8 @@
         "project_id": {
           "description": "The ID of the Cloud Platform project that the job belongs to.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the project_id field is not a security-impact field because it only specifies the project to which the job belongs and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job is created in the correct project.",
           "compliant": null,
           "non-compliant": null,
           "parent": "dataflow_flex_template_request"
@@ -438,8 +438,8 @@
         "launch_parameter": {
           "description": "Parameter to launch a job from a Flex Template. https://cloud.google.com/dataflow/docs/reference/data-pipelines/rest/v1/projects.locations.pipelines#launchflextemplateparameter Structure is [documented below](#nested_workload_dataflow_flex_template_request_launch_parameter).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the launch_parameter field is not a security-impact field because it only specifies the parameters for launching the job and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job is launched with the necessary parameters.",
           "compliant": null,
           "non-compliant": null,
           "parent": "dataflow_flex_template_request"
@@ -447,8 +447,8 @@
         "location": {
           "description": "The regional endpoint to which to direct the request. For example, us-central1, us-west1.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the location field is not a security-impact field because it only specifies the location of the regional endpoint and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the request is directed to the appropriate regional endpoint.",
           "compliant": null,
           "non-compliant": null,
           "parent": "dataflow_flex_template_request"
@@ -456,8 +456,8 @@
         "validate_only": {
           "description": "If true, the request is validated but not actually executed. Defaults to false.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the validate_only field is not a security-impact field because it only specifies whether to validate the request without executing it and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the request is validated as expected.",
           "compliant": null,
           "non-compliant": null,
           "parent": "dataflow_flex_template_request"
@@ -476,8 +476,8 @@
         "job_name": {
           "description": "The job name to use for the created job. For an update job request, the job name should be the same as the existing running job.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the job_name field is not a security-impact field because it only specifies the name of the job and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job is created with the desired name.",
           "compliant": null,
           "non-compliant": null,
           "parent": "launch_parameter"
@@ -485,8 +485,8 @@
         "parameters": {
           "description": "'The parameters for the Flex Template. Example: {\"numWorkers\":\"5\"}' 'An object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.'",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the parameters field is not a security-impact field because it only specifies the parameters for the Flex Template and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job is created with the necessary parameters.",
           "compliant": null,
           "non-compliant": null,
           "parent": "launch_parameter"
@@ -494,8 +494,8 @@
         "launch_options": {
           "description": "Launch options for this Flex Template job. This is a common set of options across languages and templates. This should not be used to pass job parameters. 'An object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.'",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the launch_options field is not a security-impact field because it only specifies the options for launching the job and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job is launched with the necessary options.",
           "compliant": null,
           "non-compliant": null,
           "parent": "launch_parameter"
@@ -503,8 +503,8 @@
         "environment": {
           "description": "The runtime environment for the Flex Template job. https://cloud.google.com/dataflow/docs/reference/data-pipelines/rest/v1/projects.locations.pipelines#FlexTemplateRuntimeEnvironment Structure is [documented below](#nested_workload_dataflow_flex_template_request_launch_parameter_environment).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the environment field is not a security-impact field because it only specifies the runtime environment for the job and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job is executed in the desired environment.",
           "compliant": null,
           "non-compliant": null,
           "parent": "launch_parameter"
@@ -512,8 +512,8 @@
         "update": {
           "description": "Set this to true if you are sending a request to update a running streaming job. When set, the job name should be the same as the running job.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the update field is not a security-impact field because it only specifies whether to update a running job and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job is updated as expected.",
           "compliant": null,
           "non-compliant": null,
           "parent": "launch_parameter"
@@ -521,8 +521,8 @@
         "transform_name_mappings": {
           "description": "'Use this to pass transform name mappings for streaming update jobs. Example: {\"oldTransformName\":\"newTransformName\",...}' 'An object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.'",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the transform_name_mappings field is not a security-impact field because it only specifies the mappings for transform names and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job is updated with the necessary transform name mappings.",
           "compliant": null,
           "non-compliant": null,
           "parent": "launch_parameter"
@@ -530,8 +530,8 @@
         "container_spec_gcs_path": {
           "description": "Cloud Storage path to a file with a JSON-serialized ContainerSpec as content.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "the container_spec_gcs_path field is not a security-impact field because it only specifies the path to the container specification file and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job is created with the necessary container specification.",
           "compliant": null,
           "non-compliant": null,
           "parent": "launch_parameter"
