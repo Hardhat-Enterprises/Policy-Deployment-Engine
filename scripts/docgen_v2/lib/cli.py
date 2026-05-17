@@ -153,8 +153,14 @@ Examples:
         '--update-cache',
         dest='update_cache',
         action='store_true',
-        default=False,
-        help='Update cached provider repositories from remote before processing'
+        default=True,
+        help='Update cached provider repository to latest version before processing (DEFAULT)'
+    )
+    parser.add_argument(
+        '--no-update-cache',
+        dest='update_cache',
+        action='store_false',
+        help='Skip fetching latest provider version and use local cache as-is'
     )
     
     parsed_args = parser.parse_args(args)

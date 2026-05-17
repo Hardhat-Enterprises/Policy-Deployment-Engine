@@ -307,28 +307,18 @@ class RepositoryManager:
                 version = result.stdout.strip()
                 logger.info(f"Detected version from current tag: {version}")
                 return version
-            
-            # If not on a tag, get the latest tag
-            result = subprocess.run(
-                ['git', '-C', str(repo_path), 'describe', '--tags', '--abbrev=0'],
-                capture_output=True,
-                text=True
-            )
-            
-            if result.returncode == 0:
-                version = result.stdout.strip()
-                logger.info(f"Detected version from latest tag: {version}")
-                return version
-            
-            # If no tags exist, try to get the most recent tag from all branches
+
+            # Not on a specific tag — find the globally latest tag across all branches.
+            # We intentionally skip `git describe --tags --abbrev=0` here because it
+            # only walks the current branch's ancestors, which misses release tags that
+            # live on release branches (e.g. Terraform provider tagging strategy).
             result = subprocess.run(
                 ['git', '-C', str(repo_path), 'tag', '--sort=-version:refname'],
                 capture_output=True,
                 text=True
             )
-            
+
             if result.returncode == 0 and result.stdout.strip():
-                # Get the first (most recent) tag
                 tags = result.stdout.strip().split('\n')
                 if tags and tags[0]:
                     version = tags[0]
@@ -409,53 +399,81 @@ class RepositoryManager:
             logger.debug(f"Unexpected error checking for updates: {e}")
             return None
     
-    def update_cache(self, repo_path: Path) -> None:
+    def update_cache(self, repo_path: Path) -> Optional[str]:
         """
-        Update cached repository from remote.
-        
-        Performs a full git pull to update the cached repository with
-        the latest documentation from the remote. This ensures the cache
-        has the most recent provider documentation.
-        
+        Update cached repository from remote and checkout the latest released tag.
+
+        Pulls the latest changes from main (which carries new tags), then checks out
+        the most recent version tag so that subsequent reads reflect the latest provider
+        documentation.
+
         Args:
             repo_path: Path to the git repository
-        
+
+        Returns:
+            Optional[str]: The latest version tag checked out (e.g. "v7.35.0"), or None on failure
+
         Raises:
             ConnectionError: If git pull fails
-        
-        Example:
-            >>> repo_mgr = RepositoryManager()
-            >>> repo_path = repo_mgr.clone_provider_repo('aws')
-            >>> repo_mgr.update_cache(repo_path)
-        
+
         Note:
-            - Performs full git pull (updates all files in sparse checkout)
-            - May take 10-30 seconds depending on changes
+            - Pulls main branch then checks out the latest semver tag
             - Only updates files in sparse checkout (website/docs/r/)
-            - Switches to main branch if in detached HEAD state
         """
         try:
             logger.info("Updating cache from remote...")
-            
-            # First, ensure we're on main branch (not detached HEAD)
+
+            # Switch to main branch so we can pull (may be in detached HEAD from previous run)
             subprocess.run(
                 ['git', '-C', str(repo_path), 'checkout', 'main'],
                 check=True,
                 capture_output=True,
                 text=True
             )
-            
-            # Pull latest changes
+
+            # Pull latest changes and tags
             result = subprocess.run(
                 ['git', '-C', str(repo_path), 'pull', 'origin', 'main'],
                 check=True,
                 capture_output=True,
                 text=True
             )
-            
-            logger.info("Cache updated successfully")
             logger.debug(f"Git pull output: {result.stdout}")
-            
+
+            # Fetch all tags (pull may not bring all release-branch tags)
+            subprocess.run(
+                ['git', '-C', str(repo_path), 'fetch', '--tags'],
+                check=True,
+                capture_output=True,
+                text=True
+            )
+
+            # Find the latest semver tag
+            tag_result = subprocess.run(
+                ['git', '-C', str(repo_path), 'tag', '--sort=-version:refname'],
+                capture_output=True,
+                text=True
+            )
+
+            latest_tag = None
+            if tag_result.returncode == 0 and tag_result.stdout.strip():
+                tags = tag_result.stdout.strip().split('\n')
+                if tags and tags[0]:
+                    latest_tag = tags[0]
+
+            if latest_tag:
+                subprocess.run(
+                    ['git', '-C', str(repo_path), 'checkout', latest_tag],
+                    check=True,
+                    capture_output=True,
+                    text=True
+                )
+                logger.info(f"Cache updated — checked out latest version: {latest_tag}")
+            else:
+                logger.warning("No tags found after update; staying on main branch")
+
+            return latest_tag
+
         except subprocess.CalledProcessError as e:
             logger.error(f"Failed to update cache: {e.stderr}")
             raise ConnectionError(
@@ -593,16 +611,17 @@ class RepositoryManager:
         all_resources = self.list_all_resources(repo_path)
         filtered_resources = []
         
-        service_lower = service.lower()
-        
+        # Normalize underscores to spaces so both formats match the Terraform subcategory
+        service_normalized = service.lower().replace('_', ' ')
+
         for resource_name in all_resources:
             try:
                 markdown_path = self.get_resource_markdown_path(repo_path, resource_name)
                 resource = parse_resource_markdown(markdown_path)
-                
+
                 if resource and resource.subcategory:
-                    # Case-insensitive partial match
-                    if service_lower in resource.subcategory.lower():
+                    subcategory_normalized = resource.subcategory.lower().replace('_', ' ')
+                    if service_normalized in subcategory_normalized:
                         filtered_resources.append(resource_name)
                         
             except Exception as e:
