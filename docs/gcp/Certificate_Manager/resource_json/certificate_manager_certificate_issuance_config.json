@@ -5,28 +5,28 @@
     "rotation_window_percentage": {
       "description": "It specifies the percentage of elapsed time of the certificate lifetime to wait before renewing the certificate. Must be a number between 1-99, inclusive. You must set the rotation window percentage in relation to the certificate lifetime so that certificate renewal occurs at least 7 days after the certificate has been issued and at least 7 days before it expires.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "The rotation window controls when renewal starts. An approved rotation window helps renewal occur before expiry and supports predictable certificate lifecycle management.",
+      "compliant": "Use the approved rotation window percentage for the certificate lifecycle.",
+      "non-compliant": "Using a rotation window percentage outside the approved lifecycle setting.",
       "parent": null
     },
     "key_algorithm": {
       "description": "Key algorithm to use when generating the private key. Possible values are: `RSA_2048`, `ECDSA_P256`.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "The key algorithm affects the cryptographic strength and type of private key generated for issued certificates.",
+      "compliant": "Use the approved key algorithm.",
+      "non-compliant": "Using an unapproved key algorithm.",
       "parent": null
     },
     "lifetime": {
       "description": "Lifetime of issued certificates. A duration in seconds with up to nine fractional digits, ending with 's'. Example: \"1814400s\". Valid values are from 21 days (1814400s) to 30 days (2592000s)",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Certificate lifetime affects how long an issued certificate remains valid. A shorter approved lifetime reduces the exposure window if a certificate is misused.",
+      "compliant": "Use the approved short certificate lifetime.",
+      "non-compliant": "Using a longer or unapproved certificate lifetime.",
       "parent": null
     },
     "certificate_authority_config": {
@@ -106,10 +106,10 @@
         "ca_pool": {
           "description": "A CA pool resource used to issue a certificate. The CA pool string has a relative resource path following the form \"projects/{project}/locations/{location}/caPools/{caPool}\".",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "The CA pool determines which Certificate Authority Service pool issues the workload certificate.",
+          "compliant": "Use an approved CA pool.",
+          "non-compliant": "Using an unapproved CA pool.",
           "parent": "certificate_authority_service_config"
         }
       }
