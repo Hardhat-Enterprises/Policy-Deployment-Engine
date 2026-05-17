@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_dns.google_dns_response_policy_rule.allowed_behavior
+package terraform.gcp.security.cloud_dns.google_dns_response_policy_rule.behavior
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_dns.google_dns_response_policy_rule.vars

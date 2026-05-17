@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_dns.google_dns_policy.allowed_forwarding_path
+package terraform.gcp.security.cloud_dns.google_dns_policy.forwarding_path
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_dns.google_dns_policy.vars
