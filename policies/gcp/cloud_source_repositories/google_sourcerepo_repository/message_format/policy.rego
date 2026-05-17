@@ -10,7 +10,7 @@ conditions := [[
 	},
 	{
 		"condition": "Check if the message_format attribute of pubsub_message_format is set to JSON.",
-		"attribute_path": ["message_format"],
+		"attribute_path": ["pubsub_configs", "message_format"],
 		"values": ["JSON"],
 		"policy_type": "whitelist",
 	},

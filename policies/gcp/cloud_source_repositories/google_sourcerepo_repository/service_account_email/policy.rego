@@ -3,7 +3,6 @@ package terraform.gcp.security.cloud_source_repositories.google_sourcerepo_repos
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_source_repositories.google_sourcerepo_repository.vars
 
-
 conditions := [[
 	{
 		"situation_description": "The service_account_email does not have a dedicated service account email provided.",
@@ -11,7 +10,7 @@ conditions := [[
 	},
 	{
 		"condition": "Check if the service_account_email attribute is set to a dedicated service account email.",
-		"attribute_path": ["service_account_email"],
+		"attribute_path": ["pubsub_configs", "service_account_email"],
 		"values": ["service-account@project-id.iam.gserviceaccount.com"],
 		"policy_type": "whitelist",
 	},
