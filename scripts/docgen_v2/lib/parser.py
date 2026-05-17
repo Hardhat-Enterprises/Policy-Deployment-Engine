@@ -210,50 +210,59 @@ def extract_argument_section(content: str) -> Optional[str]:
     return match.group(1) if match else None
 
 
-def parse_argument_line(line: str) -> Optional[Tuple[str, bool, str, bool]]:
+def parse_argument_line(line: str) -> Optional[Tuple[str, Optional[bool], str, bool]]:
     """
     Parse a single argument line from markdown documentation.
-    
-    Extracts argument information from a markdown bullet point line that follows
-    the standard Terraform documentation format.
-    
-    Args:
-        line (str): A single line from the argument documentation
-    
+
+    Handles two formats found in Terraform provider docs:
+
+    Single-line (AWS / Azure / most GCP):
+        * `bucket` - (Optional, **Deprecated**) The bucket name
+
+    Multi-line (some GCP docs split flags onto the next line):
+        * `job_id` -
+          (Required)
+          The ID of the job...
+
+    For the multi-line format the function returns is_required=None as a sentinel
+    meaning "flags not yet seen — caller should read the next line for (flags)".
+
     Returns:
-        Optional[Tuple[str, bool, str, bool]]: A tuple containing:
-            - argument_name: The name of the argument
-            - is_required: True if required, False if optional
-            - description: The argument description text
-            - is_deprecated: True if marked as deprecated
-        Returns None if the line doesn't match the expected format.
-    
-    Supported Formats:
-        - AWS: "* `bucket` - (Optional, **Deprecated**) The bucket name"
-        - Azure: "* `name` - (Required) The resource name"
-        - GCP: "* `zone` - (Optional, Deprecated) The zone name"
-    
-    Example:
-        >>> line = "* `bucket` - (Optional, **Deprecated**) S3 bucket name"
-        >>> result = parse_argument_line(line)
-        >>> print(result)  # ('bucket', False, 'S3 bucket name', True)
+        (arg_name, is_required, description, is_deprecated)
+        is_required is None when flags are on the following line.
+        Returns None if the line is not an argument bullet at all.
     """
-    # Pattern matches: * `argument_name` - (Required|Optional, flags...) Description text
-    # Captures: argument name, flags in parentheses, description
-    pattern = r'^\*\s+`([^`]+)`\s+-\s+\(([^)]+)\)\s+(.+)'
-    match = re.match(pattern, line.strip())
-    
-    if match:
-        arg_name = match.group(1)  # The argument name (without backticks)
-        flags = match.group(2)     # Content inside parentheses
-        description = match.group(3).strip()  # Everything after the parentheses
-        
-        # Parse flags to determine if required and deprecated
-        is_required = 'Required' in flags
-        is_deprecated = 'deprecated' in flags.lower()  # Case-insensitive check
-        
-        return arg_name, is_required, description, is_deprecated
-    
+    stripped = line.strip()
+
+    # Single-line: * `name` - (flags) description
+    m = re.match(r'^\*\s+`([^`]+)`\s+-\s+\(([^)]+)\)\s*(.*)', stripped)
+    if m:
+        arg_name = m.group(1)
+        flags = m.group(2)
+        description = m.group(3).strip()
+        return arg_name, 'Required' in flags, description, 'deprecated' in flags.lower()
+
+    # Multi-line opener: * `name` -   (flags on next line)
+    m = re.match(r'^\*\s+`([^`]+)`\s+-\s*$', stripped)
+    if m:
+        return m.group(1), None, '', False
+
+    return None
+
+
+def parse_flags_line(line: str) -> Optional[Tuple[bool, bool]]:
+    """
+    Parse a standalone flags line like "  (Required)" or "  (Optional, Deprecated)".
+
+    Used when parse_argument_line returns is_required=None (multi-line GCP format).
+
+    Returns:
+        (is_required, is_deprecated) or None if line is not a flags line.
+    """
+    m = re.match(r'^\s*\(([^)]+)\)\s*$', line)
+    if m:
+        flags = m.group(1)
+        return 'Required' in flags, 'deprecated' in flags.lower()
     return None
 
 
@@ -265,28 +274,53 @@ def parse_top_level_arguments(arg_section: str):
     - Plain top-level bullet points: top-level arguments
     - "The `X` block supports:" headers (with optional anchor): inline nested block arguments
 
+    Anchor names encode the hierarchy:
+      <a name="nested_query_connection_properties"></a>The `connection_properties` block supports:
+    means connection_properties is nested under query, giving dot-path "query.connection_properties".
+
     Args:
         arg_section (str): The content of the Argument Reference section
 
     Returns:
         Tuple[Dict[str, Argument], Dict[str, Dict[str, Argument]]]:
             - top_level: top-level argument name → Argument
-            - inline_blocks: block name → {arg name → Argument}
+            - inline_blocks: dot-path key → {arg name → Argument}
+              e.g. {"query": {...}, "query.connection_properties": {...}, "load": {...}}
     """
-    # Matches: [optional anchor] The/An/A `block_name` block ...:
+    # Captures optional anchor suffix (group 1) and block name (group 2).
+    # Handles both:
+    #   <a name="nested_query_connection_properties"></a>The `connection_properties` block supports:
+    #   The `connection_properties` block supports:
     _inline_block_re = re.compile(
-        r'(?:<a[^>]*>\s*)?(?:The|An|A)\s+`([^`]+)`\s+block[^:]*:',
+        r'(?:<a[^>]*name=["\']nested_([^"\']+)["\'][^>]*>(?:</a>)?\s*)?'
+        r'(?:The|An|A)\s+`([^`]+)`\s+block[^:]*:',
         re.IGNORECASE
     )
 
     top_level = {}
     inline_blocks = {}
+    anchor_to_path = {}  # anchor_suffix → dot-path, built as we go
 
     current_arg = None
-    current_required = None
+    current_required = None      # None = "pending flags line"
     current_deprecated = False
     current_desc_lines = []
-    current_context = None  # None → top-level; str → inline block name
+    current_context = None       # None → top-level; dot-path str → current block path
+    awaiting_flags = False       # True when we opened a multi-line arg and need (flags)
+
+    def _path_for(anchor_suffix, block_name):
+        """Resolve the full dot-path for an inline block using its anchor name."""
+        if anchor_suffix is None:
+            return block_name
+        if anchor_suffix == block_name:
+            # Root-level block (anchor matches block name exactly)
+            return block_name
+        suffix = '_' + block_name
+        if anchor_suffix.endswith(suffix):
+            parent_anchor = anchor_suffix[: -len(suffix)]
+            if parent_anchor in anchor_to_path:
+                return anchor_to_path[parent_anchor] + '.' + block_name
+        return block_name  # fallback: treat as root-level
 
     def _flush():
         nonlocal current_arg
@@ -297,23 +331,13 @@ def parse_top_level_arguments(arg_section: str):
             description=description,
             required=current_required,
             deprecated=current_deprecated,
-            parent=current_context
+            parent=current_context,
         )
         if current_context is None:
-            if current_arg in top_level:
-                logger.warning(
-                    f"Duplicate argument name '{current_arg}' found in top-level arguments. "
-                    f"Keeping last occurrence."
-                )
             top_level[current_arg] = arg
         else:
             if current_context not in inline_blocks:
                 inline_blocks[current_context] = {}
-            if current_arg in inline_blocks[current_context]:
-                logger.warning(
-                    f"Duplicate argument name '{current_arg}' found in block '{current_context}'. "
-                    f"Keeping last occurrence."
-                )
             inline_blocks[current_context][current_arg] = arg
         current_arg = None
 
@@ -325,15 +349,28 @@ def parse_top_level_arguments(arg_section: str):
         bm = _inline_block_re.match(line.strip())
         if bm:
             _flush()
-            current_context = bm.group(1)
+            anchor_suffix = bm.group(1)   # e.g. "query_connection_properties" or None
+            block_name = bm.group(2)      # e.g. "connection_properties"
+            path_key = _path_for(anchor_suffix, block_name)
+            if anchor_suffix:
+                anchor_to_path[anchor_suffix] = path_key
+            current_context = path_key
+            awaiting_flags = False
             continue
 
         parsed = parse_argument_line(line)
         if parsed:
             _flush()
             current_arg, current_required, desc, current_deprecated = parsed
-            current_desc_lines = [desc]
-        elif current_arg and line.strip() and not line.startswith('#'):
+            current_desc_lines = [desc] if desc else []
+            awaiting_flags = (current_required is None)
+        elif awaiting_flags and current_arg:
+            flags_parsed = parse_flags_line(line)
+            if flags_parsed:
+                current_required, current_deprecated = flags_parsed
+                awaiting_flags = False
+            # ignore blank lines while waiting for flags
+        elif current_arg and not awaiting_flags and line.strip() and not line.startswith('#'):
             current_desc_lines.append(line.strip())
 
     _flush()
@@ -424,56 +461,40 @@ def parse_block_arguments(block_content: str, parent: str) -> Dict[str, Argument
         >>> print(args['allowed_methods'].parent)  # "cors_rule"
     """
     arguments = {}
-    lines = block_content.split('\n')
-    
     current_arg = None
     current_required = None
     current_deprecated = False
     current_desc_lines = []
-    
-    for line in lines:
-        parsed = parse_argument_line(line)
-        
-        if parsed:
-            # Save previous argument
-            if current_arg:
-                description = ' '.join(current_desc_lines).strip()
-                # Check for duplicate argument names
-                if current_arg in arguments:
-                    logger.warning(
-                        f"Duplicate argument name '{current_arg}' found in block '{parent}'. "
-                        f"Keeping last occurrence."
-                    )
-                arguments[current_arg] = Argument(
-                    description=description,
-                    required=current_required,
-                    deprecated=current_deprecated,
-                    parent=parent
-                )
-            
-            # Start new argument
-            current_arg, current_required, desc, current_deprecated = parsed
-            current_desc_lines = [desc]
-        
-        elif current_arg and line.strip() and not line.startswith('#'):
-            current_desc_lines.append(line.strip())
-    
-    # Save last argument
-    if current_arg:
-        description = ' '.join(current_desc_lines).strip()
-        # Check for duplicate argument names
-        if current_arg in arguments:
-            logger.warning(
-                f"Duplicate argument name '{current_arg}' found in block '{parent}'. "
-                f"Keeping last occurrence."
-            )
+    awaiting_flags = False
+
+    def _flush_block():
+        nonlocal current_arg
+        if not current_arg:
+            return
         arguments[current_arg] = Argument(
-            description=description,
+            description=' '.join(current_desc_lines).strip(),
             required=current_required,
             deprecated=current_deprecated,
-            parent=parent
+            parent=parent,
         )
-    
+        current_arg = None
+
+    for line in block_content.split('\n'):
+        parsed = parse_argument_line(line)
+        if parsed:
+            _flush_block()
+            current_arg, current_required, desc, current_deprecated = parsed
+            current_desc_lines = [desc] if desc else []
+            awaiting_flags = (current_required is None)
+        elif awaiting_flags and current_arg:
+            flags_parsed = parse_flags_line(line)
+            if flags_parsed:
+                current_required, current_deprecated = flags_parsed
+                awaiting_flags = False
+        elif current_arg and not awaiting_flags and line.strip() and not line.startswith('#'):
+            current_desc_lines.append(line.strip())
+
+    _flush_block()
     return arguments
 
 
@@ -482,34 +503,43 @@ def merge_nested_arguments(
     nested_blocks: Dict[str, Dict[str, Argument]]
 ) -> Dict[str, Argument]:
     """
-    Merge nested arguments into their parent arguments.
-    
-    Combines the top-level arguments with their nested argument blocks
-    to create the complete argument hierarchy.
-    
-    Args:
-        top_level (Dict[str, Argument]): Top-level arguments
-        nested_blocks (Dict[str, Dict[str, Argument]]): Nested argument blocks
-            keyed by parent argument name
-    
-    Returns:
-        Dict[str, Argument]: The top-level arguments with nested arguments
-            merged into their parent's 'arguments' field
-    
-    Note:
-        If a top-level argument name matches a nested block name, the nested
-        arguments are added to that argument's 'arguments' field.
-    
-    Example:
-        >>> top_level = {'cors_rule': Argument(...)}
-        >>> nested = {'cors_rule': {'allowed_methods': Argument(...)}}
-        >>> merged = merge_nested_arguments(top_level, nested)
-        >>> print('allowed_methods' in merged['cors_rule'].arguments)  # True
+    Merge nested block arguments into their parent arguments.
+
+    nested_blocks keys are dot-path strings that encode depth:
+      "query"                        → top_level["query"].arguments
+      "query.connection_properties"  → top_level["query"].arguments["connection_properties"].arguments
+      "load.time_partitioning"       → top_level["load"].arguments["time_partitioning"].arguments
+
+    Paths are processed shallowest-first so parents exist before children are attached.
+    If a block name does not exist at its expected parent level a synthetic Argument
+    shell is created so children are never silently dropped.
     """
-    for arg_name, arg in top_level.items():
-        if arg_name in nested_blocks:
-            arg.arguments = nested_blocks[arg_name]
-    
+    for path_key in sorted(nested_blocks, key=lambda p: p.count('.')):
+        block_args = nested_blocks[path_key]
+        parts = path_key.split('.')
+
+        # Walk down the tree to the node that should own these args
+        current_dict = top_level
+        for part in parts:
+            if part not in current_dict:
+                # Create a placeholder so sub-blocks are not lost
+                current_dict[part] = Argument(
+                    description='',
+                    required=False,
+                    deprecated=False,
+                    parent=None,
+                )
+            node = current_dict[part]
+            if node.arguments is None:
+                node.arguments = {}
+            current_dict = node.arguments
+
+        # current_dict is now the .arguments dict of the target node;
+        # populate it with this block's args (don't overwrite existing keys)
+        for arg_name, arg in block_args.items():
+            if arg_name not in current_dict:
+                current_dict[arg_name] = arg
+
     return top_level
 
 
