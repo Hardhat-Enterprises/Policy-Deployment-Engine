@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_dns.google_dns_managed_zone_iam_policy.allowed_role
+package terraform.gcp.security.cloud_dns.google_dns_managed_zone_iam_policy.role
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_dns.google_dns_managed_zone_iam_policy.vars
 
