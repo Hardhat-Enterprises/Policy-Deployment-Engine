@@ -1,6 +1,6 @@
 resource "google_iam_oauth_client" "nc" {
    project           = "smooth-verve-467716-v1"
-  oauth_client_id       = "insecure-client-01"
+  oauth_client_id       = "nc"
   location              = "global"
 
   client_type           = "CONFIDENTIAL_CLIENT"

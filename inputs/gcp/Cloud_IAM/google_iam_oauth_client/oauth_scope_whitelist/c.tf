@@ -1,6 +1,6 @@
 resource "google_iam_oauth_client" "c" {
     project           = "smooth-verve-467716-v1"
-  oauth_client_id       = "example-client-id"
+  oauth_client_id       = "c"
   display_name          = "Secure OAuth Client"
   description           = "Uses least privilege scopes"
   location              = "global"

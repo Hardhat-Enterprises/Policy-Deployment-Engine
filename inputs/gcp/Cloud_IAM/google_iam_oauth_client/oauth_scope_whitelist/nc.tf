@@ -1,6 +1,6 @@
 resource "google_iam_oauth_client" "nc" {
     project           = "smooth-verve-467716-v1"
-  oauth_client_id       = "example-client-id"
+  oauth_client_id       = "nc"
   display_name          = "Unsafe OAuth Client"
   description           = "Uses overly broad scope"
   location              = "global"
