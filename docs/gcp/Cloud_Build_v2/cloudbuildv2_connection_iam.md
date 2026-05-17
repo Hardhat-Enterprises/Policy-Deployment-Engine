@@ -1,0 +1,18 @@
+## 🛡️ Policy Deployment Engine: `cloudbuildv2_connection_iam`
+
+This section provides a concise policy evaluation for the `cloudbuildv2_connection_iam` resource in GCP.
+
+Reference: [Terraform Registry – cloudbuildv2_connection_iam](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloudbuildv2_connection_iam)
+
+---
+
+## Argument Reference  
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `location` | the value will be parsed from the identifier of the parent resource. If no location is provided in the parent identifier and no location is specified, it is taken from the provider configuration. | false | true | Restricting locations ensures data stays within approved jurisdictions such as Australia. | australia-southeast2 | us-central1 |
+| `name` |  | false | false | None | None | None |
+| `project` | If it is not provided, the project will be parsed from the identifier of the parent resource. If no project is provided in the parent identifier and no project is specified, the provider project is used. | false | true | Restricting to approved projects ensures governance and security control. | C | NC |
+| `member/members` | Each entry can have one of the following values: * **allUsers**: A special identifier that represents anyone who is on the internet; with or without a Google account. * **allAuthenticatedUsers**: A special identifier that represents anyone who is authenticated with a Google account or a service account. * **user:{emailid}**: An email address that represents a specific Google account. For example, alice@gmail.com or joe@example.com. * **serviceAccount:{emailid}**: An email address that represents a service account. For example, my-other-app@appspot.gserviceaccount.com. * **group:{emailid}**: An email address that represents a Google group. For example, admins@example.com. * **domain:{domain}**: A G Suite domain (primary, instead of alias) name that represents all the users of that domain. For example, google.com or example.com. * **projectOwner:projectid**: Owners of the given project. For example, "projectOwner:my-example-project" * **projectEditor:projectid**: Editors of the given project. For example, "projectEditor:my-example-project" * **projectViewer:projectid**: Viewers of the given project. For example, "projectViewer:my-example-project" | false | true | Restricting members ensures only trusted users or service accounts can access the resource. | user:jane@example.com | allUsers |
+| `role` | `google_cloudbuildv2_connection_iam_binding` can be used per role. Note that custom roles must be of the format `[projects|organizations]/{parent-name}/roles/{role-name}`. | false | true | Assigning overly permissive roles such as roles/editor grants broad access beyond what is needed for Cloud Build connections. Following least privilege principles, only roles scoped specifically to Cloud Build connection access should be used. | roles/cloudbuild.connectionViewer | roles/editor |
+| `policy_data` | a `google_iam_policy` data source. | false | false | None | None | None |

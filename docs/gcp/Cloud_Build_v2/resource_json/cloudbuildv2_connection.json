@@ -14,10 +14,10 @@
     "location": {
       "description": "The location for the resource",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "The location should be restricted to approved regions to ensure compliance with data residency, latency, and organisational policies.",
+      "compliant": "australia-southeast2",
+      "non-compliant": "us-central1",
       "parent": null
     },
     "github_config": {
@@ -32,17 +32,17 @@
         "authorizer_credential": {
           "description": "OAuth credential of the account that authorized the Cloud Build GitHub App. It is recommended to use a robot account instead of a human user account. The OAuth token must be tied to the Cloud Build GitHub App. Structure is [documented below](#nested_github_config_authorizer_credential).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "The OAuth token used in the authorizer credential must be securely stored in an approved secret version to ensure that only authorized GitHub App integrations can access repositories and prevent exposure of sensitive credentials.",
+          "compliant": "projects/my-project-c/secrets/oauth-token/versions/1",
+          "non-compliant": "projects/my-project-nc/secrets/oauth-token/versions/1",
           "parent": "github_config"
         },
         "app_installation_id": {
           "description": "GitHub App installation id.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale":  "The GitHub App installation ID should be restricted to approved values to ensure only authorized GitHub integrations are used, preventing unauthorized repository access or misconfigured connections.",
           "compliant": null,
           "non-compliant": null,
           "parent": "github_config"
@@ -61,10 +61,10 @@
         "host_uri": {
           "description": "Required. The URI of the GitHub Enterprise host this connection is for.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "The host URI should point to a trusted and approved GitHub Enterprise instance to prevent connections to unauthorized or malicious endpoints.",
+          "compliant": "https://ghe.example.com",
+          "non-compliant": "https://bad.example.com",
           "parent": "github_enterprise_config"
         },
         "app_id": {
@@ -79,8 +79,8 @@
         "app_slug": {
           "description": "The URL-friendly name of the GitHub App.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The app slug should match the approved GitHub Enterprise App identifier to ensure the correct application is integrated.",
           "compliant": null,
           "non-compliant": null,
           "parent": "github_enterprise_config"
@@ -88,26 +88,26 @@
         "private_key_secret_version": {
           "description": "SecretManager resource containing the private key of the GitHub App, formatted as `projects/*/secrets/*/versions/*`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "The private key must be stored in a secure and approved secret version to protect authentication credentials and prevent unauthorized access.",
+          "compliant": "projects/c/secrets/private-key/versions/1",
+          "non-compliant": "private-key-version-1",
           "parent": "github_enterprise_config"
         },
         "webhook_secret_secret_version": {
           "description": "SecretManager resource containing the webhook secret of the GitHub App, formatted as `projects/*/secrets/*/versions/*`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "The webhook secret must be securely stored and validated to ensure webhook events are authenticated and protected from tampering or unauthorized triggers.",
+          "compliant": "projects/my-project-c/secrets/webhook-secret/versions/1",
+          "non-compliant": "projects/my-project-nc/secrets/webhook-secret/versions/1",
           "parent": "github_enterprise_config"
         },
         "app_installation_id": {
           "description": "ID of the installation of the GitHub App.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The app installation ID should be restricted to approved values to ensure only authorized GitHub Enterprise installations are used.",
           "compliant": null,
           "non-compliant": null,
           "parent": "github_enterprise_config"
@@ -124,10 +124,10 @@
         "ssl_ca": {
           "description": "SSL certificate to use for requests to GitHub Enterprise.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": false,
+          "rationale": "The ssl_ca must reference a trusted and approved certificate authority to ensure secure TLS communication with GitHub Enterprise and prevent man-in-the-middle attacks.",
+          "compliant": "approved-ca-cert",
+          "non-compliant": "unapproved-ca-cert",
           "parent": "github_enterprise_config"
         }
       }
@@ -227,46 +227,46 @@
         "webhook_secret_secret_version": {
           "description": "Required. Immutable. SecretManager resource containing the webhook secret used to verify webhook events, formatted as `projects/*/secrets/*/versions/*`.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "The webhook secret must be stored in a secure secret version to ensure that incoming webhook requests are authenticated and protected from tampering or unauthorized triggering of build pipelines.",
+          "compliant": "projects/my-project-c/secrets/webhook-secret/versions/1",
+          "non-compliant": "projects/my-project-nc/secrets/webhook-secret/versions/1",
           "parent": "bitbucket_data_center_config"
         },
         "read_authorizer_credential": {
           "description": "Required. A http access token with the `REPO_READ` access. Structure is [documented below](#nested_bitbucket_data_center_config_read_authorizer_credential).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "This credential must reference an approved secret version to ensure only trusted tokens with REPO_READ permissions are used, preventing unauthorized access to repositories.",
+          "compliant": "projects/my-project-c/secrets/read-token/versions/1",
+          "non-compliant": "projects/my-project-nc/secrets/read-token/versions/1",
           "parent": "bitbucket_data_center_config"
         },
         "authorizer_credential": {
           "description": "Required. A http access token with the `REPO_ADMIN` scope access. Structure is [documented below](#nested_bitbucket_data_center_config_authorizer_credential).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "The authorizer credential holds a high-privilege REPO_ADMIN access token stored in Secret Manager. Using unapproved secret versions may expose the connection to unauthorized repository access or credential misuse.",
+          "compliant": "projects/my-project-c/secrets/admin-token/versions/1",
+          "non-compliant": "projects/my-project-nc/secrets/admin-token/versions/1",
           "parent": "bitbucket_data_center_config"
         },
         "service_directory_config": {
           "description": "Configuration for using Service Directory to privately connect to a Bitbucket Data Center. This should only be set if the Bitbucket Data Center is hosted on-premises and not reachable by public internet. If this field is left empty, calls to the Bitbucket Data Center will be made over the public internet. Structure is [documented below](#nested_bitbucket_data_center_config_service_directory_config).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Using Service Directory ensures private and secure connectivity to Bitbucket Data Center, reducing exposure to public internet traffic and minimizing the risk of unauthorized access or interception.",
+          "compliant": "projects/my-project-c/locations/australia-southeast2/namespaces/default/services/bitbucket-service",
+          "non-compliant": "wrong-format",
           "parent": "bitbucket_data_center_config"
         },
         "ssl_ca": {
           "description": "SSL certificate to use for requests to the Bitbucket Data Center.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "The ssl_ca ensures that connections to Bitbucket Data Center are verified using a trusted certificate authority, preventing man-in-the-middle attacks and ensuring secure communication.",
+          "compliant": "approved-ca-cert",
+          "non-compliant": "unapproved-ca-cert",
           "parent": "bitbucket_data_center_config"
         },
         "server_version": {
@@ -301,19 +301,19 @@
         "webhook_secret_secret_version": {
           "description": "Required. Immutable. SecretManager resource containing the webhook secret used to verify webhook events, formatted as `projects/*/secrets/*/versions/*`.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Webhook secrets must be restricted to approved versions stored securely in Secret Manager to prevent unauthorized access and ensure trusted communication between Bitbucket and Cloud Build.",
+          "compliant": "projects/my-project-c/secrets/webhook-secret/versions/1",
+          "non-compliant":  "projects/my-project-nc/secrets/webhook-secret/versions/1",
           "parent": "bitbucket_cloud_config"
         },
         "read_authorizer_credential": {
           "description": "Required. An access token with the `repository` access. It can be either a workspace, project or repository access token. It's recommended to use a system account to generate the credentials. Structure is [documented below](#nested_bitbucket_cloud_config_read_authorizer_credential).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "This credential must be securely referenced and validated to ensure only authorized tokens with appropriate permissions are used for repository access.",
+          "compliant":  "projects/my-project-c/secrets/read-token/versions/1",
+          "non-compliant":  "projects/my-project-nc/secrets/read-token/versions/1",
           "parent": "bitbucket_cloud_config"
         },
         "authorizer_credential": {
