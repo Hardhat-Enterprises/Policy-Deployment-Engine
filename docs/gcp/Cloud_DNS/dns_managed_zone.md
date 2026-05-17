@@ -25,6 +25,6 @@ Reference: [Terraform Registry – google_dns_managed_zone](https://registry.ter
 ### dnssec_config Block
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `state` | Specifies whether DNSSEC is enabled, and what mode it is in. Possible values are: `off`, `on`, `transfer`. | false | false | DNSSEC state is not enforced as a standalone policy. The primary security control is zone visibility. | None | None |
+| `state` | Specifies whether DNSSEC is enabled. Possible values are: `off`, `on`, `transfer`. | false | true | DNSSEC state must be set to 'on' to cryptographically sign DNS responses and prevent DNS spoofing and cache poisoning attacks. The allowed_dnssec_state policy enforces this. | on | off |
 | `non_existence` | Specifies the mechanism for authenticated denial-of-existence responses. Possible values are: `nsec`, `nsec3`. | false | false | Non-existence type has no independent security policy impact in this implementation. | None | None |
 | `default_key_specs` | Specifies parameters for generating initial DnsKeys for this ManagedZone. Structure is documented below. | false | false | Key specifications have no independent security policy impact in this implementation. | None | None |
