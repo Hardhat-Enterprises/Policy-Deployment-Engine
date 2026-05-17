@@ -33,7 +33,9 @@ Reference: [Terraform Registry – google_monitoring_notification_channel](https
 
 | Policy | Type | Attribute | Situation |
 |--------|------|-----------|-----------|
-| `sensitive_labels` | whitelist | `labels.auth_token`, `labels.password`, `labels.service_key` | Prevents sensitive credentials from being stored in plain-text labels instead of the sensitive_labels block |
+| `auth_token` | whitelist | `labels.auth_token` | Prevents auth_token from being stored in plain-text labels — must be placed in the sensitive_labels block (Slack channels) |
+| `password` | whitelist | `labels.password` | Prevents password from being stored in plain-text labels — must be placed in the sensitive_labels block (webhook_basicauth channels) |
+| `service_key` | whitelist | `labels.service_key` | Prevents service_key from being stored in plain-text labels — must be placed in the sensitive_labels block (PagerDuty channels) |
 | `force_delete` | whitelist | `force_delete` | Prevents unsafe deletion of channels still referenced by active alert policies |
 
 ## Policies Considered but Not Written

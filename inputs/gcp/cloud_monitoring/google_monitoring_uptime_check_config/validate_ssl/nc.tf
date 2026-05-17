@@ -7,7 +7,7 @@ resource "google_monitoring_uptime_check_config" "nc" {
   http_check {
     path         = "/"
     port         = 443
-    use_ssl      = true
+    use_ssl      = false
     validate_ssl = false
   }
 
