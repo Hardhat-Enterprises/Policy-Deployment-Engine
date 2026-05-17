@@ -5,3 +5,4 @@ variables := {
     "resource_type": "google_cloud_run_service",
     "resource_value_name": "name"
 }
+

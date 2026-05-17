@@ -1,7 +1,7 @@
 resource "google_cloud_run_service" "c" {
   project  = "my-gcp-project"
   name = "c"
-  location = "us-central1"
+  location = "australia-southeast1"
 
   metadata {
     namespace = "my-project-name"
