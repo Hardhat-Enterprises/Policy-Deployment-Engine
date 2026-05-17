@@ -204,8 +204,8 @@ def extract_argument_section(content: str) -> Optional[str]:
         >>> section = extract_argument_section(content)
         >>> print("bucket" in section)  # True
     """
-    # Find section starting with "## Argument Reference" or "## Arguments Reference"
-    pattern = r'##\s+Arguments?\s+Reference\s*\n+(.*?)(?=\n##\s+|\Z)'
+    # Find section starting with "## Argument Reference" (with optional trailing text)
+    pattern = r'##\s+Arguments?\s+Reference[^\n]*\n+(.*?)(?=\n##\s+|\Z)'
     match = re.search(pattern, content, re.DOTALL | re.IGNORECASE)
     return match.group(1) if match else None
 
