@@ -12,8 +12,8 @@ conditions := [
     {
       "condition": "Certificate Manager certificates should not use non-approved certificate scopes.",
       "attribute_path": ["scope"],
-      "values": ["EDGE_CACHE", "ALL_REGIONS", "CLIENT_AUTH"],
-      "policy_type": "blacklist"
+      "values": [null, "DEFAULT"],
+      "policy_type": "whitelist"
     }
   ]
 ]

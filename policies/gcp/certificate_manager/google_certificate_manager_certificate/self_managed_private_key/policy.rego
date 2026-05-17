@@ -14,11 +14,14 @@ conditions := [
     {
       "condition": "PEM private key material should not be defined directly in the self-managed certificate block.",
       "attribute_path": ["self_managed", 0, "pem_private_key"],
-      "values": ["-----BEGIN (PRIVATE KEY|RSA PRIVATE KEY|EC PRIVATE KEY|ENCRYPTED PRIVATE KEY)-----", [["PRIVATE KEY", "RSA PRIVATE KEY", "EC PRIVATE KEY", "ENCRYPTED PRIVATE KEY"]]],
-      "policy_type": "pattern blacklist"
+      "values": [null],
+      "policy_type": "whitelist"
     }
   ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+
+details := result.details

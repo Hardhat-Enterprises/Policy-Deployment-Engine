@@ -14,7 +14,7 @@ conditions := [
         {
             "condition": "DNS authorization resources should use the approved authorization type.",
             "attribute_path": ["type"],
-            "values": ["PER_PROJECT_RECORD"],
+            "values": ["PER_PROJECT_RECORD", "FIXED_RECORD"],
             "policy_type": "whitelist"
         }
     ]

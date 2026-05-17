@@ -5,5 +5,5 @@ resource "google_certificate_manager_dns_authorization" "nc" {
   domain      = "example.org"
   location    = "us-central1"
 
-  type = "FIXED_RECORD"
+  type = ""
 }
