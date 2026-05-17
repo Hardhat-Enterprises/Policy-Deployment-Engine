@@ -1,0 +1,51 @@
+{
+  "resource_name": "logging_linked_dataset",
+  "subcategory": "Cloud (Stackdriver) Logging",
+  "arguments": {
+    "link_id": {
+      "description": "The unique identifier for the linked dataset. This ID will become part of the BigQuery dataset name: logging_{link_id}.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "The link ID is used to generate the BigQuery dataset name and has no direct security implications beyond uniqueness.",
+      "compliant": "audit-logs-linked-dataset",
+      "non-compliant": null,
+      "parent": null
+    },
+    "bucket": {
+      "description": "The logging bucket to which the linked dataset is attached. Format: projects/PROJECT_ID/locations/LOCATION/buckets/BUCKET_ID",
+      "required": true,
+      "security_impact": false,
+      "rationale": "This identifies which logging bucket is linked to BigQuery. It determines which logs become queryable in BigQuery but has no direct security impact on access controls or encryption.",
+      "compliant": "projects/my-project/locations/global/buckets/audit-log-bucket",
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "Describes this link. The maximum length of the description is 8000 characters.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Description is metadata only and does not affect any security controls.",
+      "compliant": "Link for compliance audit log analysis in BigQuery",
+      "non-compliant": null,
+      "parent": null
+    },
+    "parent": {
+      "description": "The parent resource of the linked dataset. Format: projects/PROJECT_ID/locations/LOCATION/buckets/BUCKET_ID",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Parent identifies the parent resource hierarchy. Has no direct security impact on the linked dataset.",
+      "compliant": "projects/my-project/locations/global/buckets/audit-log-bucket",
+      "non-compliant": null,
+      "parent": null
+    },
+    "location": {
+      "description": "The location where the linked dataset will be created. Must match the location of the logging bucket. Examples: global, us-central1, eu, asia-southeast1",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Location selection affects data residency requirements and compliance (e.g., GDPR, HIPAA) but does not directly impact security controls like encryption or access management.",
+      "compliant": "australia-southeast1",
+      "non-compliant": null,
+      "parent": null
+    }
+  }
+}
