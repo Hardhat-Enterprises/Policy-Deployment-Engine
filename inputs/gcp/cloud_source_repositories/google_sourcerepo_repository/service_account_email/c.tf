@@ -7,5 +7,4 @@ resource "google_sourcerepo_repository" "c" {
     message_format        = "JSON"
     service_account_email = "service-account@project-id.iam.gserviceaccount.com"
   }
-
 }
