@@ -29,6 +29,7 @@ Author: Terraform JSON Spec Generator Team
 Version: 1.0.0
 """
 
+import re
 import subprocess
 from pathlib import Path
 from typing import List, Optional
@@ -520,15 +521,38 @@ class RepositoryManager:
             filename = resource_name + '.html.markdown'
         
         markdown_path = docs_dir / filename
-        
+
         if not markdown_path.exists():
+            # For IAM resource variants (e.g. google_foo_iam_policy → foo_iam.html.markdown)
+            for iam_suffix in ('_iam_policy', '_iam_binding', '_iam_member'):
+                if resource_name.endswith(iam_suffix):
+                    base = resource_name[:-len(iam_suffix)]  # strip _policy/_binding/_member
+                    iam_stem = base  # already has provider prefix stripped above
+                    # Re-derive iam_stem without provider prefix
+                    for pfx in ('aws_', 'azurerm_', 'google_'):
+                        if base.startswith(pfx):
+                            iam_stem = base[len(pfx):]
+                            break
+                    iam_path = docs_dir / f"{iam_stem}_iam.html.markdown"
+                    if iam_path.exists():
+                        return iam_path
+                    # Some GCP IAM files include the provider prefix in the filename
+                    # (e.g., google_folder_iam.html.markdown instead of folder_iam.html.markdown)
+                    for pfx in ('aws_', 'azurerm_', 'google_'):
+                        if resource_name.startswith(pfx):
+                            iam_path_prefixed = docs_dir / f"{pfx}{iam_stem}_iam.html.markdown"
+                            if iam_path_prefixed.exists():
+                                return iam_path_prefixed
+                            break
+                    break
+
             raise ParsingError(
                 "Markdown file not found",
                 resource_name=resource_name,
                 file_path=str(markdown_path),
                 operation="locate resource documentation"
             )
-        
+
         return markdown_path
     
     def list_all_resources(self, repo_path: Path) -> List[str]:
@@ -571,13 +595,35 @@ class RepositoryManager:
         
         resources = []
         for markdown_file in docs_dir.glob('*.html.markdown'):
-            # Extract resource name from filename
-            resource_name = markdown_file.stem.replace('.html', '')
-            full_resource_name = f"{prefix}{resource_name}"
-            resources.append(full_resource_name)
-        
+            stem = markdown_file.stem.replace('.html', '')
+
+            if stem.endswith('_iam'):
+                # IAM files document 3 resource variants in one file
+                iam_names = self._extract_iam_resource_names(markdown_file, prefix)
+                if iam_names:
+                    resources.extend(iam_names)
+                else:
+                    # Fallback: synthesize the 3 standard names
+                    base = f"{prefix}{stem}"
+                    resources.extend([f"{base}_policy", f"{base}_binding", f"{base}_member"])
+            else:
+                resources.append(f"{prefix}{stem}")
+
         logger.debug(f"Found {len(resources)} resources in {docs_dir}")
         return sorted(resources)
+
+    def _extract_iam_resource_names(self, iam_file: Path, prefix: str) -> List[str]:
+        """Read an IAM markdown file and return the 3 resource names from its ## headers."""
+        try:
+            content = iam_file.read_text(encoding='utf-8')
+            pattern = re.compile(
+                r'^##\s+(' + re.escape(prefix) + r'\S+_iam_(?:policy|binding|member))\s*$',
+                re.MULTILINE
+            )
+            names = list(dict.fromkeys(pattern.findall(content)))  # preserve order, deduplicate
+            return names
+        except Exception:
+            return []
     
     def list_resources_by_service(
         self,
@@ -611,18 +657,21 @@ class RepositoryManager:
         all_resources = self.list_all_resources(repo_path)
         filtered_resources = []
         
-        # Normalize underscores to spaces so both formats match the Terraform subcategory
-        service_normalized = service.lower().replace('_', ' ')
+        # Normalize by stripping all spaces and underscores for robust matching:
+        # "beyond_corp" → "beyondcorp" matches subcategory "BeyondCorp" → "beyondcorp"
+        # "cloud_storage" → "cloudstorage" matches subcategory "Cloud Storage" → "cloudstorage"
+        service_normalized = service.lower().replace('_', '').replace(' ', '')
 
         for resource_name in all_resources:
             try:
                 markdown_path = self.get_resource_markdown_path(repo_path, resource_name)
-                resource = parse_resource_markdown(markdown_path)
+                resource = parse_resource_markdown(markdown_path, resource_name_hint=resource_name)
 
                 if resource and resource.subcategory:
-                    subcategory_normalized = resource.subcategory.lower().replace('_', ' ')
+                    subcategory_normalized = resource.subcategory.lower().replace('_', '').replace(' ', '')
                     if service_normalized in subcategory_normalized:
                         filtered_resources.append(resource_name)
+
                         
             except Exception as e:
                 logger.warning(

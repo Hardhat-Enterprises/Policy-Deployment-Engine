@@ -257,90 +257,92 @@ def parse_argument_line(line: str) -> Optional[Tuple[str, bool, str, bool]]:
     return None
 
 
-def parse_top_level_arguments(arg_section: str) -> Dict[str, Argument]:
+def parse_top_level_arguments(arg_section: str):
     """
-    Parse top-level arguments from the Argument Reference section.
-    
-    Processes the argument section to extract all top-level arguments,
-    handling multi-line descriptions and stopping at nested block sections.
-    
+    Parse top-level arguments and inline block arguments from the Argument Reference section.
+
+    Handles two structural patterns found in Terraform provider docs:
+    - Plain top-level bullet points: top-level arguments
+    - "The `X` block supports:" headers (with optional anchor): inline nested block arguments
+
     Args:
         arg_section (str): The content of the Argument Reference section
-    
+
     Returns:
-        Dict[str, Argument]: Dictionary mapping argument names to Argument objects
-    
-    Note:
-        - Handles multi-line descriptions by accumulating lines until the next bullet point
-        - Stops parsing when it encounters a nested block section (###)
-        - Creates Argument objects with parent=None for top-level arguments
-    
-    Example:
-        >>> section = '''* `bucket` - (Optional) The bucket name
-        ...              Can be up to 63 characters
-        ... * `region` - (Required) The AWS region'''
-        >>> args = parse_top_level_arguments(section)
-        >>> print(len(args))  # 2
-        >>> print(args['bucket'].description)  # "The bucket name Can be up to 63 characters"
+        Tuple[Dict[str, Argument], Dict[str, Dict[str, Argument]]]:
+            - top_level: top-level argument name → Argument
+            - inline_blocks: block name → {arg name → Argument}
     """
-    arguments = {}
-    lines = arg_section.split('\n')
-    
+    # Matches: [optional anchor] The/An/A `block_name` block ...:
+    _inline_block_re = re.compile(
+        r'(?:<a[^>]*>\s*)?(?:The|An|A)\s+`([^`]+)`\s+block[^:]*:',
+        re.IGNORECASE
+    )
+
+    top_level = {}
+    inline_blocks = {}
+
     current_arg = None
     current_required = None
     current_deprecated = False
     current_desc_lines = []
-    
-    for line in lines:
-        # Check if this is a new argument line
-        parsed = parse_argument_line(line)
-        
-        if parsed:
-            # Save previous argument if exists
-            if current_arg:
-                description = ' '.join(current_desc_lines).strip()
-                # Check for duplicate argument names
-                if current_arg in arguments:
-                    logger.warning(
-                        f"Duplicate argument name '{current_arg}' found in top-level arguments. "
-                        f"Keeping last occurrence."
-                    )
-                arguments[current_arg] = Argument(
-                    description=description,
-                    required=current_required,
-                    deprecated=current_deprecated,
-                    parent=None
-                )
-            
-            # Start new argument
-            current_arg, current_required, desc, current_deprecated = parsed
-            current_desc_lines = [desc]
-        
-        elif current_arg and line.strip() and not line.startswith('#'):
-            # Continuation of description
-            current_desc_lines.append(line.strip())
-        
-        elif line.startswith('###'):
-            # Hit a nested block section, stop parsing top-level
-            break
-    
-    # Save last argument
-    if current_arg:
+    current_context = None  # None → top-level; str → inline block name
+
+    def _flush():
+        nonlocal current_arg
+        if not current_arg:
+            return
         description = ' '.join(current_desc_lines).strip()
-        # Check for duplicate argument names
-        if current_arg in arguments:
-            logger.warning(
-                f"Duplicate argument name '{current_arg}' found in top-level arguments. "
-                f"Keeping last occurrence."
-            )
-        arguments[current_arg] = Argument(
+        arg = Argument(
             description=description,
             required=current_required,
             deprecated=current_deprecated,
-            parent=None
+            parent=current_context
         )
-    
-    return arguments
+        if current_context is None:
+            if current_arg in top_level:
+                logger.warning(
+                    f"Duplicate argument name '{current_arg}' found in top-level arguments. "
+                    f"Keeping last occurrence."
+                )
+            top_level[current_arg] = arg
+        else:
+            if current_context not in inline_blocks:
+                inline_blocks[current_context] = {}
+            if current_arg in inline_blocks[current_context]:
+                logger.warning(
+                    f"Duplicate argument name '{current_arg}' found in block '{current_context}'. "
+                    f"Keeping last occurrence."
+                )
+            inline_blocks[current_context][current_arg] = arg
+        current_arg = None
+
+    for line in lines_of(arg_section):
+        if line.startswith('###'):
+            _flush()
+            break
+
+        bm = _inline_block_re.match(line.strip())
+        if bm:
+            _flush()
+            current_context = bm.group(1)
+            continue
+
+        parsed = parse_argument_line(line)
+        if parsed:
+            _flush()
+            current_arg, current_required, desc, current_deprecated = parsed
+            current_desc_lines = [desc]
+        elif current_arg and line.strip() and not line.startswith('#'):
+            current_desc_lines.append(line.strip())
+
+    _flush()
+    return top_level, inline_blocks
+
+
+def lines_of(text: str):
+    """Yield lines from text without holding the full split list."""
+    yield from text.split('\n')
 
 
 def extract_nested_blocks(content: str) -> Dict[str, Dict[str, Argument]]:
@@ -548,7 +550,10 @@ def mark_all_arguments_deprecated(arguments: Dict[str, Argument], deprecation_me
             mark_all_arguments_deprecated(arg.arguments, deprecation_message)
 
 
-def parse_resource_markdown(file_path: Path) -> Optional[Resource]:
+def parse_resource_markdown(
+    file_path: Path,
+    resource_name_hint: Optional[str] = None
+) -> Optional[Resource]:
     """
     Parse a Terraform resource markdown file.
     
@@ -606,8 +611,12 @@ def parse_resource_markdown(file_path: Path) -> Optional[Resource]:
     # Step 3: Extract resource name
     resource_name = extract_resource_name(remaining_content)
     if not resource_name:
-        logger.error(f"Could not extract resource name from {file_path}")
-        return None
+        if resource_name_hint:
+            # IAM files document multiple resources with no single header — use the caller's hint
+            resource_name = resource_name_hint
+        else:
+            logger.error(f"Could not extract resource name from {file_path}")
+            return None
     
     # Step 4: Extract Argument Reference section
     arg_section = extract_argument_section(remaining_content)
@@ -615,14 +624,19 @@ def parse_resource_markdown(file_path: Path) -> Optional[Resource]:
         logger.error(f"Could not find Argument Reference section in {file_path}")
         return None
     
-    # Step 5: Parse top-level arguments
-    top_level_args = parse_top_level_arguments(arg_section)
+    # Step 5: Parse top-level arguments (also collects inline block args)
+    top_level_args, inline_block_args = parse_top_level_arguments(arg_section)
     logger.debug(f"Parsed {len(top_level_args)} top-level arguments from {resource_name}")
-    
-    # Step 6: Extract nested blocks
+
+    # Step 6: Extract ### nested blocks
     nested_blocks = extract_nested_blocks(remaining_content)
     logger.debug(f"Found {len(nested_blocks)} nested blocks in {resource_name}")
-    
+
+    # Merge inline blocks into nested_blocks (### sections win on name collision)
+    for block_name, block_args in inline_block_args.items():
+        if block_name not in nested_blocks:
+            nested_blocks[block_name] = block_args
+
     # Step 7: Merge nested arguments into parents
     all_arguments = merge_nested_arguments(top_level_args, nested_blocks)
     

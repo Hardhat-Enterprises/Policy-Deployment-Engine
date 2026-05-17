@@ -108,8 +108,8 @@ class SchemaExtractor:
                 resource_name
             )
             
-            # Parse the markdown file
-            resource = parse_resource_markdown(markdown_path)
+            # Parse the markdown file (pass name as hint for IAM multi-resource files)
+            resource = parse_resource_markdown(markdown_path, resource_name_hint=resource_name)
             
             if resource is None:
                 logger.error(f"Failed to parse resource {resource_name}")
