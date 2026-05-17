@@ -1,7 +1,7 @@
 resource "google_iam_folders_policy_binding" "c" {
   folder            = "folders/123456789"
   location          = "global"
-  policy_binding_id = "pde-binding-03"
+  policy_binding_id = "c"
   display_name      = "Valid binding"
   policy_kind       = "PRINCIPAL_ACCESS_BOUNDARY"
 

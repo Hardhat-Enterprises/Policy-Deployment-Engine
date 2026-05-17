@@ -2,7 +2,7 @@ resource "google_iam_folders_policy_binding" "nc" {
   
   folder            = "123456789"
   location          = "australia-southeast1"
-  policy_binding_id = "binding-nc"
+  policy_binding_id = "nc"
 
   policy = "organizations/123456789/locations/global/principalAccessBoundaryPolicies/pab-policy"
 

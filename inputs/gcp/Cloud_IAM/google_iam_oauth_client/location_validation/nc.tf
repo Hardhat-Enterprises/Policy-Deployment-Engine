@@ -1,5 +1,5 @@
 resource "google_iam_oauth_client" "nc" {
-  oauth_client_id       = "example-client-id"
+  oauth_client_id       = "nc"
   display_name          = "Invalid OAuth Client"
   description           = "Non-compliant OAuth client"
   location              = "australia-southeast1"
