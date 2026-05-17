@@ -1,0 +1,51 @@
+{
+  "resource_name": "logging_project_exclusion",
+  "subcategory": "Cloud (Stackdriver) Logging",
+  "arguments": {
+    "filter": {
+  "description": "An advanced logs filter that matches the log entries to be excluded. See [Advanced Log Filters](https://cloud.google.com/logging/docs/view/advanced-filters) for information on how to write a filter.",
+  "required": true,
+  "security_impact": true,
+  "rationale": "The filter determines which logs are excluded. Excluding security-relevant logs (audit logs, high severity logs, IAM changes) creates critical security blind spots and violates CIS GCP Benchmark requirements. Filters should be restricted to non-security logs only.",
+  "compliant": "resource.labels.namespace_name = \"dev\" AND severity = \"DEBUG\"",
+  "non-compliant": "severity >= ERROR",
+  "parent": null
+    },
+    "name": {
+      "description": "The name of the logging exclusion. Must be unique within the project.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Name is a unique identifier for the exclusion filter. It has no security implications beyond being a reference name.",
+      "compliant": "health-check-exclusion",
+      "non-compliant": null,
+      "parent": null
+    },
+    "description": {
+      "description": "A user-provided description of the exclusion filter. Maximum length of 800 characters.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Description is metadata only and does not affect any security controls.",
+      "compliant": "Exclude health check logs from development namespace",
+      "non-compliant": null,
+      "parent": null
+    },
+    "disabled": {
+  "description": "Whether the exclusion is disabled. If set to true, the exclusion will not be applied to logs. Default: false.",
+  "required": false,
+  "security_impact": true,
+  "rationale": "When disabled = false (default), the exclusion actively filters logs. Disabled exclusions (true) do not filter logs, which may indicate misconfiguration or incomplete security controls. Exclusions should be either active or removed entirely.",
+  "compliant": "false (or omit the attribute)",
+  "non-compliant": "true",
+  "parent": null
+    },
+    "project": {
+      "description": "The project that will own the exclusion filter. Format: projects/PROJECT_ID. If not provided, the provider project is used.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "This identifies which project owns the exclusion filter. It has no direct security impact on the exclusion's behavior.",
+      "compliant": "projects/my-project",
+      "non-compliant": null,
+      "parent": null
+    }
+  }
+}
