@@ -3,7 +3,7 @@ resource "google_iam_projects_policy_binding" "c" {
   location           = "global"
   display_name       = "secure-pab-binding"
   policy_kind        = "PRINCIPAL_ACCESS_BOUNDARY"
-  policy_binding_id  = "pde-secure-binding"
+  policy_binding_id  = "c"
 
   policy = "organizations/123456789/locations/global/principalAccessBoundaryPolicies/pab-policy"
 
