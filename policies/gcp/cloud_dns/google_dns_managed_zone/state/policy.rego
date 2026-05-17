@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_dns.google_dns_managed_zone.allowed_dnssec_state
+package terraform.gcp.security.cloud_dns.google_dns_managed_zone.state
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_dns.google_dns_managed_zone.vars
