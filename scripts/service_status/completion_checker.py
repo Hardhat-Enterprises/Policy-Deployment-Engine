@@ -8,6 +8,7 @@ Reads from docs/gcp resource JSON files and outputs a formatted CSV.
 Usage:
     python completion_checker.py                               # CSV inventory
     python completion_checker.py --output my_inventory.csv     # Custom output filename
+    python build_tracker.py                                    # CSV + HTML dashboard (APT)
 """
 
 import os
@@ -161,7 +162,7 @@ class ResourceInventoryGenerator:
                     # Empty row for spacing
                     writer.writerow([])
             
-            print(f"✓ CSV inventory saved to: {output_file}")
+            print(f"[OK] CSV inventory saved to: {output_file}")
             return True
             
         except IOError as e:
@@ -211,7 +212,7 @@ Examples:
         sys.exit(1)
     
     if generator.generate_csv(inventory_data, args.output):
-        print(f"✓ Generation complete!")
+        print("[OK] Generation complete!")
     else:
         print("[ERROR] Failed to generate CSV")
         sys.exit(1)
