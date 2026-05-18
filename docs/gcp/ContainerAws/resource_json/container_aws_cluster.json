@@ -5,19 +5,19 @@
     "authorization": {
       "description": "Configuration related to the cluster RBAC settings.",
       "required": true,
-      "security_impact": true,
-      "rationale": "This block controls cluster RBAC configuration and can grant privileged cluster-admin access to users or groups.",
-      "compliant": "Only approved organisation-managed admin groups and users are configured.",
-      "non-compliant": "External or unapproved admin groups or users are granted cluster-admin access.",
+      "security_impact": false,
+      "rationale": "This block groups related settings. Security impact is assessed on specific child attributes.",
+      "compliant": null,
+      "non-compliant": null,
       "parent": null,
       "arguments": {
         "admin_groups": {
-          "description": "Groups of users that can perform operations as a cluster admin. A managed ClusterRoleBinding will be created to grant the `cluster-admin` ClusterRole to the groups. Up to ten admin groups can be provided. For more info on RBAC, see https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles",
+          "description": "Groups of users that can perform operations as a cluster admin.",
           "required": false,
-          "security_impact": true,
-          "rationale": "Admin groups control privileged cluster access. Only approved organisation-managed groups should be granted cluster-admin permissions.",
-          "compliant": "group@deakin.edu.au",
-          "non-compliant": "group@domain.com",
+          "security_impact": false,
+          "rationale": "This block groups related settings. Security impact is assessed on specific child attributes.",
+          "compliant": null,
+          "non-compliant": null,
           "parent": "authorization",
           "arguments": {
             "group": {
@@ -32,12 +32,12 @@
           }
         },
         "admin_users": {
-          "description": "Users to perform operations as a cluster admin. A managed ClusterRoleBinding will be created to grant the `cluster-admin` ClusterRole to the users. Up to ten admin users can be provided. For more info on RBAC, see https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles",
+          "description": "Users to perform operations as a cluster admin.",
           "required": true,
-          "security_impact": true,
-          "rationale": "Admin users receive privileged cluster-admin access and should be restricted to approved organisation-managed identities.",
-          "compliant": "user@deakin.edu.au",
-          "non-compliant": "user@gmail.com",
+          "security_impact": false,
+          "rationale": "This block groups related settings. Security impact is assessed on specific child attributes.",
+          "compliant": null,
+          "non-compliant": null,
           "parent": "authorization",
           "arguments": {
             "username": {
@@ -54,30 +54,30 @@
       }
     },
     "aws_region": {
-      "description": "The AWS region where the cluster runs. Each Google Cloud region supports a subset of nearby AWS regions. You can call to list all supported AWS regions within a given Google Cloud region.",
+      "description": "The AWS region where the cluster runs.",
       "required": true,
-      "security_impact": false,
-      "rationale": "This field defines where the AWS cluster runs. It affects deployment location but does not directly control access, encryption, network exposure, or privileged permissions.",
-      "compliant": "us-west-2",
-      "non-compliant": "unsupported-region",
+      "security_impact": true,
+      "rationale": "The AWS region determines where cluster workloads run and is a data residency control. It should be restricted to approved Australia AWS regions to meet data residency and sovereignty requirements.",
+      "compliant": "ap-southeast-2",
+      "non-compliant": "us-west-2",
       "parent": null
     },
     "control_plane": {
       "description": "Configuration related to the cluster control plane.",
       "required": true,
-      "security_impact": true,
-      "rationale": "The control plane manages the cluster and includes security-sensitive settings such as encryption, IAM profiles, security groups, SSH access, and subnet placement.",
-      "compliant": "Control plane uses approved IAM profiles, encryption keys, security groups, and access settings.",
-      "non-compliant": "Control plane uses unapproved IAM profiles, missing encryption, overly permissive security groups, or unmanaged SSH access.",
+      "security_impact": false,
+      "rationale": "This block groups related settings. Security impact is assessed on specific child attributes.",
+      "compliant": null,
+      "non-compliant": null,
       "parent": null,
       "arguments": {
         "aws_services_authentication": {
           "description": "Authentication configuration for management of AWS resources.",
           "required": true,
-          "security_impact": true,
-          "rationale": "This block defines the AWS role assumed by the Anthos Multi-Cloud API and can affect the permissions used to manage AWS resources.",
-          "compliant": "Uses an approved AWS service role ARN.",
-          "non-compliant": "Uses an unapproved or overly privileged AWS service role ARN.",
+          "security_impact": false,
+          "rationale": "This block groups related settings. Security impact is assessed on specific child attributes.",
+          "compliant": null,
+          "non-compliant": null,
           "parent": "control_plane",
           "arguments": {
             "role_arn": {
@@ -90,12 +90,12 @@
               "parent": "aws_services_authentication"
             },
             "role_session_name": {
-              "description": "Optional. An identifier for the assumed role session. When unspecified, it defaults to `multicloud-service-agent`.",
+              "description": "Optional. An identifier for the assumed role session.",
               "required": false,
               "security_impact": false,
               "rationale": "This value identifies the assumed role session for logging and traceability but does not directly grant permissions.",
-              "compliant": "multicloud-service-agent",
-              "non-compliant": "unclear-session-name",
+              "compliant": null,
+              "non-compliant": null,
               "parent": "aws_services_authentication"
             }
           }
@@ -103,10 +103,10 @@
         "config_encryption": {
           "description": "The ARN of the AWS KMS key used to encrypt cluster configuration.",
           "required": true,
-          "security_impact": true,
-          "rationale": "Cluster configuration can contain sensitive operational data and should be encrypted using an approved AWS KMS key.",
-          "compliant": "Uses an approved customer-managed KMS key ARN.",
-          "non-compliant": "Uses an unapproved KMS key ARN or lacks required encryption configuration.",
+          "security_impact": false,
+          "rationale": "This block groups related settings. Security impact is assessed on specific child attributes.",
+          "compliant": null,
+          "non-compliant": null,
           "parent": "control_plane",
           "arguments": {
             "kms_key_arn": {
@@ -114,8 +114,8 @@
               "required": true,
               "security_impact": true,
               "rationale": "The KMS key ARN controls which key protects cluster configuration and should be restricted to approved keys.",
-              "compliant": "arn:aws:kms:us-west-2:012345678910:key/approved-key-id",
-              "non-compliant": "arn:aws:kms:us-west-2:012345678910:key/unapproved-key-id",
+              "compliant": "arn:aws:kms:ap-southeast-2:012345678910:key/approved-key-id",
+              "non-compliant": "arn:aws:kms:ap-southeast-2:012345678910:key/unapproved-key-id",
               "parent": "config_encryption"
             }
           }
@@ -123,10 +123,10 @@
         "database_encryption": {
           "description": "The ARN of the AWS KMS key used to encrypt cluster secrets.",
           "required": true,
-          "security_impact": true,
-          "rationale": "Cluster secrets are highly sensitive and must be encrypted using an approved AWS KMS key.",
-          "compliant": "Uses an approved customer-managed KMS key ARN.",
-          "non-compliant": "Uses an unapproved KMS key ARN or lacks required secret encryption configuration.",
+          "security_impact": false,
+          "rationale": "This block groups related settings. Security impact is assessed on specific child attributes.",
+          "compliant": null,
+          "non-compliant": null,
           "parent": "control_plane",
           "arguments": {
             "kms_key_arn": {
@@ -134,8 +134,8 @@
               "required": true,
               "security_impact": true,
               "rationale": "The KMS key ARN controls which key protects cluster secrets and should be restricted to approved keys.",
-              "compliant": "arn:aws:kms:us-west-2:012345678910:key/approved-key-id",
-              "non-compliant": "arn:aws:kms:us-west-2:012345678910:key/unapproved-key-id",
+              "compliant": "arn:aws:kms:ap-southeast-2:012345678910:key/approved-key-id",
+              "non-compliant": "arn:aws:kms:ap-southeast-2:012345678910:key/unapproved-key-id",
               "parent": "database_encryption"
             }
           }
@@ -150,12 +150,12 @@
           "parent": "control_plane"
         },
         "instance_placement": {
-          "description": "(Beta only) Details of placement information for an instance.",
+          "description": "Optional. Details of placement information for an instance.",
           "required": false,
           "security_impact": false,
-          "rationale": "This setting controls instance placement tenancy but does not directly define access, encryption, or network exposure in the current policy scope.",
-          "compliant": "DEFAULT",
-          "non-compliant": "Unsupported or unnecessary dedicated placement setting.",
+          "rationale": "This block groups related settings. Security impact is assessed on specific child attributes.",
+          "compliant": null,
+          "non-compliant": null,
           "parent": "control_plane",
           "arguments": {
             "tenancy": {
@@ -163,8 +163,8 @@
               "required": false,
               "security_impact": false,
               "rationale": "Tenancy affects instance placement but does not directly grant access or permissions.",
-              "compliant": "DEFAULT",
-              "non-compliant": "TENANCY_UNSPECIFIED",
+              "compliant": null,
+              "non-compliant": null,
               "parent": "instance_placement"
             }
           }
@@ -174,17 +174,17 @@
           "required": false,
           "security_impact": false,
           "rationale": "The instance type affects capacity and cost but does not directly control access, encryption, network exposure, or privileged permissions.",
-          "compliant": "m5.large",
-          "non-compliant": "Unsupported or oversized instance type.",
+          "compliant": null,
+          "non-compliant": null,
           "parent": "control_plane"
         },
         "main_volume": {
-          "description": "Optional. Configuration related to the main volume provisioned for each control plane replica. The main volume is in charge of storing all of the cluster's etcd state. Volumes will be provisioned in the availability zone associated with the corresponding subnet. When unspecified, it defaults to 8 GiB with the GP2 volume type.",
+          "description": "Optional. Configuration related to the main volume provisioned for each control plane replica.",
           "required": false,
-          "security_impact": true,
-          "rationale": "The main volume stores etcd state and may contain sensitive cluster data, so encryption and approved storage settings are security-relevant.",
-          "compliant": "Main volume uses approved encryption and storage settings.",
-          "non-compliant": "Main volume uses unapproved encryption or storage settings.",
+          "security_impact": false,
+          "rationale": "This block groups related settings. Security impact is assessed on specific child attributes.",
+          "compliant": null,
+          "non-compliant": null,
           "parent": "control_plane",
           "arguments": {
             "iops": {
@@ -192,44 +192,44 @@
               "required": false,
               "security_impact": false,
               "rationale": "IOPS affects performance and cost but does not directly control access, encryption, network exposure, or privileged permissions.",
-              "compliant": 3000,
-              "non-compliant": "Excessive or unsupported IOPS value.",
+              "compliant": null,
+              "non-compliant": null,
               "parent": "main_volume"
             },
             "kms_key_arn": {
-              "description": "Optional. The Amazon Resource Name (ARN) of the Customer Managed Key (CMK) used to encrypt AWS EBS volumes. If not specified, the default Amazon managed key associated to the AWS region where this cluster runs will be used.",
+              "description": "Optional. The Amazon Resource Name (ARN) of the Customer Managed Key (CMK) used to encrypt AWS EBS volumes.",
               "required": false,
               "security_impact": true,
               "rationale": "The KMS key controls encryption for the main EBS volume and should use an approved customer-managed key where required.",
-              "compliant": "arn:aws:kms:us-west-2:012345678910:key/approved-key-id",
-              "non-compliant": "arn:aws:kms:us-west-2:012345678910:key/unapproved-key-id",
+              "compliant": "arn:aws:kms:ap-southeast-2:012345678910:key/approved-key-id",
+              "non-compliant": "arn:aws:kms:ap-southeast-2:012345678910:key/unapproved-key-id",
               "parent": "main_volume"
             },
             "size_gib": {
-              "description": "Optional. The size of the volume, in GiBs. When unspecified, a default value is provided. See the specific reference in the parent resource.",
+              "description": "Optional. The size of the volume, in GiBs.",
               "required": false,
               "security_impact": false,
               "rationale": "Volume size affects capacity and cost but does not directly control access, encryption, network exposure, or privileged permissions.",
-              "compliant": 10,
-              "non-compliant": "Unsupported or excessive volume size.",
+              "compliant": null,
+              "non-compliant": null,
               "parent": "main_volume"
             },
             "throughput": {
-              "description": "Optional. The throughput to provision for the volume, in MiB/s. Only valid if the volume type is GP3. If volume type is gp3 and throughput is not specified, the throughput will defaults to 125.",
+              "description": "Optional. The throughput to provision for the volume, in MiB/s.",
               "required": false,
               "security_impact": false,
               "rationale": "Throughput affects performance and cost but does not directly control access, encryption, network exposure, or privileged permissions.",
-              "compliant": 125,
-              "non-compliant": "Unsupported or excessive throughput value.",
+              "compliant": null,
+              "non-compliant": null,
               "parent": "main_volume"
             },
             "volume_type": {
-              "description": "Optional. Type of the EBS volume. When unspecified, it defaults to GP2 volume. Possible values: VOLUME_TYPE_UNSPECIFIED, GP2, GP3",
+              "description": "Optional. Type of the EBS volume.",
               "required": false,
               "security_impact": false,
               "rationale": "Volume type affects performance and cost but does not directly control access, encryption, network exposure, or privileged permissions.",
-              "compliant": "GP3",
-              "non-compliant": "VOLUME_TYPE_UNSPECIFIED",
+              "compliant": null,
+              "non-compliant": null,
               "parent": "main_volume"
             }
           }
@@ -237,10 +237,10 @@
         "proxy_config": {
           "description": "Proxy configuration for outbound HTTP(S) traffic.",
           "required": false,
-          "security_impact": true,
-          "rationale": "Proxy configuration can affect outbound connectivity and may reference sensitive AWS Secrets Manager values.",
-          "compliant": "Uses an approved proxy secret ARN and version.",
-          "non-compliant": "Uses an unapproved proxy secret or exposes traffic through an unapproved proxy.",
+          "security_impact": false,
+          "rationale": "This block groups related settings. Security impact is assessed on specific child attributes.",
+          "compliant": null,
+          "non-compliant": null,
           "parent": "control_plane",
           "arguments": {
             "secret_arn": {
@@ -248,8 +248,8 @@
               "required": true,
               "security_impact": true,
               "rationale": "The secret ARN references proxy configuration stored in AWS Secrets Manager and should be restricted to approved secrets.",
-              "compliant": "arn:aws:secretsmanager:us-west-2:012345678910:secret:approved-proxy-secret",
-              "non-compliant": "arn:aws:secretsmanager:us-west-2:012345678910:secret:unapproved-proxy-secret",
+              "compliant": "arn:aws:secretsmanager:ap-southeast-2:012345678910:secret:approved-proxy-secret",
+              "non-compliant": "arn:aws:secretsmanager:ap-southeast-2:012345678910:secret:unapproved-proxy-secret",
               "parent": "proxy_config"
             },
             "secret_version": {
@@ -257,19 +257,19 @@
               "required": true,
               "security_impact": false,
               "rationale": "The secret version selects a version of an approved proxy secret but does not independently grant access or permissions.",
-              "compliant": "approved-secret-version",
-              "non-compliant": "unknown-secret-version",
+              "compliant": null,
+              "non-compliant": null,
               "parent": "proxy_config"
             }
           }
         },
         "root_volume": {
-          "description": "Optional. Configuration related to the root volume provisioned for each control plane replica. Volumes will be provisioned in the availability zone associated with the corresponding subnet. When unspecified, it defaults to 32 GiB with the GP2 volume type.",
+          "description": "Optional. Configuration related to the root volume provisioned for each control plane replica.",
           "required": false,
-          "security_impact": true,
-          "rationale": "The root volume may contain operating system and configuration data, so encryption and approved storage settings are security-relevant.",
-          "compliant": "Root volume uses approved encryption and storage settings.",
-          "non-compliant": "Root volume uses unapproved encryption or storage settings.",
+          "security_impact": false,
+          "rationale": "This block groups related settings. Security impact is assessed on specific child attributes.",
+          "compliant": null,
+          "non-compliant": null,
           "parent": "control_plane",
           "arguments": {
             "iops": {
@@ -277,50 +277,50 @@
               "required": false,
               "security_impact": false,
               "rationale": "IOPS affects performance and cost but does not directly control access, encryption, network exposure, or privileged permissions.",
-              "compliant": 3000,
-              "non-compliant": "Excessive or unsupported IOPS value.",
+              "compliant": null,
+              "non-compliant": null,
               "parent": "root_volume"
             },
             "kms_key_arn": {
-              "description": "Optional. The Amazon Resource Name (ARN) of the Customer Managed Key (CMK) used to encrypt AWS EBS volumes. If not specified, the default Amazon managed key associated to the AWS region where this cluster runs will be used.",
+              "description": "Optional. The Amazon Resource Name (ARN) of the Customer Managed Key (CMK) used to encrypt AWS EBS volumes.",
               "required": false,
               "security_impact": true,
               "rationale": "The KMS key controls encryption for the root EBS volume and should use an approved customer-managed key where required.",
-              "compliant": "arn:aws:kms:us-west-2:012345678910:key/approved-key-id",
-              "non-compliant": "arn:aws:kms:us-west-2:012345678910:key/unapproved-key-id",
+              "compliant": "arn:aws:kms:ap-southeast-2:012345678910:key/approved-key-id",
+              "non-compliant": "arn:aws:kms:ap-southeast-2:012345678910:key/unapproved-key-id",
               "parent": "root_volume"
             },
             "size_gib": {
-              "description": "Optional. The size of the volume, in GiBs. When unspecified, a default value is provided. See the specific reference in the parent resource.",
+              "description": "Optional. The size of the volume, in GiBs.",
               "required": false,
               "security_impact": false,
               "rationale": "Volume size affects capacity and cost but does not directly control access, encryption, network exposure, or privileged permissions.",
-              "compliant": 32,
-              "non-compliant": "Unsupported or excessive volume size.",
+              "compliant": null,
+              "non-compliant": null,
               "parent": "root_volume"
             },
             "throughput": {
-              "description": "Optional. The throughput to provision for the volume, in MiB/s. Only valid if the volume type is GP3. If volume type is gp3 and throughput is not specified, the throughput will defaults to 125.",
+              "description": "Optional. The throughput to provision for the volume, in MiB/s.",
               "required": false,
               "security_impact": false,
               "rationale": "Throughput affects performance and cost but does not directly control access, encryption, network exposure, or privileged permissions.",
-              "compliant": 125,
-              "non-compliant": "Unsupported or excessive throughput value.",
+              "compliant": null,
+              "non-compliant": null,
               "parent": "root_volume"
             },
             "volume_type": {
-              "description": "Optional. Type of the EBS volume. When unspecified, it defaults to GP2 volume. Possible values: VOLUME_TYPE_UNSPECIFIED, GP2, GP3",
+              "description": "Optional. Type of the EBS volume.",
               "required": false,
               "security_impact": false,
               "rationale": "Volume type affects performance and cost but does not directly control access, encryption, network exposure, or privileged permissions.",
-              "compliant": "GP3",
-              "non-compliant": "VOLUME_TYPE_UNSPECIFIED",
+              "compliant": null,
+              "non-compliant": null,
               "parent": "root_volume"
             }
           }
         },
         "security_group_ids": {
-          "description": "Optional. The IDs of additional security groups to add to control plane replicas. The Anthos Multi-Cloud API will automatically create and manage security groups with the minimum rules needed for a functioning cluster.",
+          "description": "Optional. The IDs of additional security groups to add to control plane replicas.",
           "required": false,
           "security_impact": true,
           "rationale": "Security groups control network access to control plane replicas and should be restricted to approved groups.",
@@ -331,10 +331,10 @@
         "ssh_config": {
           "description": "Optional. SSH configuration for how to access the underlying control plane machines.",
           "required": false,
-          "security_impact": true,
-          "rationale": "SSH access can provide direct access to underlying control plane machines and should be restricted to approved key pairs.",
-          "compliant": "Uses an approved EC2 key pair.",
-          "non-compliant": "Uses an unapproved or personal EC2 key pair.",
+          "security_impact": false,
+          "rationale": "This block groups related settings. Security impact is assessed on specific child attributes.",
+          "compliant": null,
+          "non-compliant": null,
           "parent": "control_plane",
           "arguments": {
             "ec2_key_pair": {
@@ -349,29 +349,30 @@
           }
         },
         "subnet_ids": {
-          "description": "The list of subnets where control plane replicas will run. A replica will be provisioned on each subnet and up to three values can be provided. Each subnet must be in a different AWS Availability Zone (AZ).",
+          "description": "The list of subnets where control plane replicas will run.",
           "required": true,
           "security_impact": true,
           "rationale": "Subnets determine network placement for control plane replicas and should be restricted to approved private subnets.",
-          "compliant": ["subnet-approved-private-a", "subnet-approved-private-b"],
-          "non-compliant": ["subnet-public-unapproved"],
+          "compliant": [
+            "subnet-approved-private-a",
+            "subnet-approved-private-b"
+          ],
+          "non-compliant": [
+            "subnet-public-unapproved"
+          ],
           "parent": "control_plane"
         },
         "tags": {
-          "description": "Optional. A set of AWS resource tags to propagate to all underlying managed AWS resources. Specify at most 50 pairs containing alphanumerics, spaces, and symbols (.+-=_:@/). Keys can be up to 127 Unicode characters. Values can be up to 255 Unicode characters.",
+          "description": "Optional. A set of AWS resource tags to propagate to all underlying managed AWS resources.",
           "required": false,
           "security_impact": false,
           "rationale": "Tags support resource identification, ownership, and cost allocation but do not directly grant access or permissions.",
-          "compliant": {
-            "owner": "team@example.com"
-          },
-          "non-compliant": {
-            "owner": "unknown"
-          },
+          "compliant": null,
+          "non-compliant": null,
           "parent": "control_plane"
         },
         "version": {
-          "description": "The Kubernetes version to run on control plane replicas (e.g. `1.19.10-gke.1000`). You can list all supported versions on a given Google Cloud region by calling .",
+          "description": "The Kubernetes version to run on control plane replicas.",
           "required": true,
           "security_impact": true,
           "rationale": "The Kubernetes version can affect exposure to known vulnerabilities and should be kept within approved supported versions.",
@@ -385,18 +386,18 @@
       "description": "Fleet configuration.",
       "required": true,
       "security_impact": false,
-      "rationale": "Fleet configuration registers the cluster with a Fleet host project but does not directly control cluster access, encryption, or network exposure.",
-      "compliant": "Cluster is registered to the approved Fleet project.",
-      "non-compliant": "Cluster is registered to an unknown or unapproved Fleet project.",
+      "rationale": "This block groups related settings. Security impact is assessed on specific child attributes.",
+      "compliant": null,
+      "non-compliant": null,
       "parent": null,
       "arguments": {
         "membership": {
-          "description": "The name of the managed Hub Membership resource associated to this cluster. Membership names are formatted as projects/<project-number>/locations/global/membership/<cluster-id>.",
+          "description": "The name of the managed Hub Membership resource associated to this cluster.",
           "required": false,
           "security_impact": false,
           "rationale": "Membership identifies the Fleet association for the cluster but does not directly grant access or permissions.",
-          "compliant": "projects/123456789/locations/global/membership/cluster-id",
-          "non-compliant": "projects/unknown/locations/global/membership/cluster-id",
+          "compliant": null,
+          "non-compliant": null,
           "parent": "fleet"
         },
         "project": {
@@ -404,8 +405,8 @@
           "required": false,
           "security_impact": false,
           "rationale": "The Fleet host project determines registration location but does not directly control cluster access, encryption, or network exposure.",
-          "compliant": "approved-fleet-project-number",
-          "non-compliant": "unknown-project-number",
+          "compliant": null,
+          "non-compliant": null,
           "parent": "fleet"
         }
       }
@@ -413,10 +414,10 @@
     "location": {
       "description": "The location for the resource",
       "required": true,
-      "security_impact": false,
-      "rationale": "This field defines the Google Cloud location for the resource but does not directly control access, encryption, network exposure, or privileged permissions.",
-      "compliant": "us-west1",
-      "non-compliant": "unsupported-location",
+      "security_impact": true,
+      "rationale": "The Google Cloud location determines where cluster metadata is stored and is a data residency control. It should be restricted to approved Australia regions.",
+      "compliant": "australia-southeast1",
+      "non-compliant": "us-west1",
       "parent": null
     },
     "name": {
@@ -424,21 +425,21 @@
       "required": true,
       "security_impact": false,
       "rationale": "The resource name identifies the cluster but does not directly control access, encryption, network exposure, or privileged permissions.",
-      "compliant": "approved-cluster-name",
-      "non-compliant": "unclear-or-nonstandard-cluster-name",
+      "compliant": null,
+      "non-compliant": null,
       "parent": null
     },
     "networking": {
       "description": "Cluster-wide networking configuration.",
       "required": true,
-      "security_impact": true,
-      "rationale": "Networking configuration controls cluster network placement, pod and service ranges, and VPC association, which can affect isolation and exposure.",
-      "compliant": "Uses approved VPC and private address ranges.",
-      "non-compliant": "Uses unapproved VPC or address ranges.",
+      "security_impact": false,
+      "rationale": "This block groups related settings. Security impact is assessed on specific child attributes.",
+      "compliant": null,
+      "non-compliant": null,
       "parent": null,
       "arguments": {
         "per_node_pool_sg_rules_disabled": {
-          "description": "Disable the per node pool subnet security group rules on the control plane security group. When set to true, you must also provide one or more security groups that ensure node pools are able to send requests to the control plane on TCP/443 and TCP/8132. Failure to do so may result in unavailable node pools.",
+          "description": "Disable the per node pool subnet security group rules on the control plane security group.",
           "required": false,
           "security_impact": true,
           "rationale": "Disabling managed per-node-pool security group rules can affect control plane connectivity and may require carefully approved replacement security groups.",
@@ -447,25 +448,25 @@
           "parent": "networking"
         },
         "pod_address_cidr_blocks": {
-          "description": "All pods in the cluster are assigned an RFC1918 IPv4 address from these ranges. Only a single range is supported. This field cannot be changed after creation.",
+          "description": "All pods in the cluster are assigned an RFC1918 IPv4 address from these ranges.",
           "required": true,
           "security_impact": false,
           "rationale": "Pod CIDR ranges define internal pod addressing. They should be planned to avoid overlap, but they do not directly grant permissions.",
-          "compliant": ["10.2.0.0/16"],
-          "non-compliant": ["0.0.0.0/0"],
+          "compliant": null,
+          "non-compliant": null,
           "parent": "networking"
         },
         "service_address_cidr_blocks": {
-          "description": "All services in the cluster are assigned an RFC1918 IPv4 address from these ranges. Only a single range is supported. This field cannot be changed after creation.",
+          "description": "All services in the cluster are assigned an RFC1918 IPv4 address from these ranges.",
           "required": true,
           "security_impact": false,
           "rationale": "Service CIDR ranges define internal service addressing. They should be planned to avoid overlap, but they do not directly grant permissions.",
-          "compliant": ["10.1.0.0/16"],
-          "non-compliant": ["0.0.0.0/0"],
+          "compliant": null,
+          "non-compliant": null,
           "parent": "networking"
         },
         "vpc_id": {
-          "description": "The VPC associated with the cluster. All component clusters (i.e. control plane and node pools) run on a single VPC. This field cannot be changed after creation. - - -",
+          "description": "The VPC associated with the cluster.",
           "required": true,
           "security_impact": true,
           "rationale": "The VPC controls the network boundary for the cluster and should be restricted to approved VPCs.",
@@ -476,25 +477,21 @@
       }
     },
     "annotations": {
-      "description": "Optional. Annotations on the cluster. This field has the same restrictions as Kubernetes annotations. The total size of all keys and values combined is limited to 256k. Key can have 2 segments: prefix (optional) and name (required), separated by a slash (/). Prefix must be a DNS subdomain. Name must be 63 characters or less, begin and end with alphanumerics, with dashes (-), underscores (_), dots (.), and alphanumerics between. **Note**: This field is non-authoritative, and will only manage the annotations present in your configuration. Please refer to the field `effective_annotations` for all of the annotations present on the resource.",
+      "description": "Optional. Annotations on the cluster.",
       "required": false,
       "security_impact": false,
       "rationale": "Annotations provide metadata for the cluster and do not directly control access, encryption, network exposure, or privileged permissions.",
-      "compliant": {
-        "label-one": "value-one"
-      },
-      "non-compliant": {
-        "unknown": "unapproved"
-      },
+      "compliant": null,
+      "non-compliant": null,
       "parent": null
     },
     "binary_authorization": {
       "description": "Configuration options for the Binary Authorization feature.",
       "required": false,
-      "security_impact": true,
-      "rationale": "Binary Authorization controls whether workload admission policies are enforced and can prevent untrusted images from running.",
-      "compliant": "PROJECT_SINGLETON_POLICY_ENFORCE",
-      "non-compliant": "DISABLED",
+      "security_impact": false,
+      "rationale": "This block groups related settings. Security impact is assessed on specific child attributes.",
+      "compliant": null,
+      "non-compliant": null,
       "parent": null,
       "arguments": {
         "evaluation_mode": {
@@ -509,30 +506,30 @@
       }
     },
     "description": {
-      "description": "Optional. A human readable description of this cluster. Cannot be longer than 255 UTF-8 encoded bytes.",
+      "description": "Optional. A human readable description of this cluster.",
       "required": false,
       "security_impact": false,
       "rationale": "The description is metadata for humans and does not directly control access, encryption, network exposure, or privileged permissions.",
-      "compliant": "A sample AWS cluster",
-      "non-compliant": "Description containing sensitive secrets or credentials.",
+      "compliant": null,
+      "non-compliant": null,
       "parent": null
     },
     "logging_config": {
-      "description": "(Beta only) Logging configuration.",
+      "description": "Optional. Logging configuration.",
       "required": false,
-      "security_impact": true,
-      "rationale": "Logging configuration affects observability and auditability of cluster components and should enable approved logging components.",
-      "compliant": "Approved cluster logging components are enabled.",
-      "non-compliant": "Logging is disabled or required audit components are not enabled.",
+      "security_impact": false,
+      "rationale": "This block groups related settings. Security impact is assessed on specific child attributes.",
+      "compliant": null,
+      "non-compliant": null,
       "parent": null,
       "arguments": {
         "component_config": {
           "description": "Configuration of the logging components.",
           "required": false,
-          "security_impact": true,
-          "rationale": "Component logging configuration determines which cluster components produce logs for monitoring and audit review.",
-          "compliant": "Required logging components are enabled.",
-          "non-compliant": "Required logging components are missing.",
+          "security_impact": false,
+          "rationale": "This block groups related settings. Security impact is assessed on specific child attributes.",
+          "compliant": null,
+          "non-compliant": null,
           "parent": "logging_config",
           "arguments": {
             "enable_components": {
@@ -540,8 +537,13 @@
               "required": false,
               "security_impact": true,
               "rationale": "Enabled logging components determine which cluster logs are collected and should include approved audit-relevant components.",
-              "compliant": ["SYSTEM_COMPONENTS", "WORKLOADS"],
-              "non-compliant": [],
+              "compliant": [
+                "SYSTEM_COMPONENTS",
+                "WORKLOADS"
+              ],
+              "non-compliant": [
+                "APISERVER"
+              ],
               "parent": "component_config"
             }
           }
@@ -553,8 +555,8 @@
       "required": false,
       "security_impact": false,
       "rationale": "The project identifies where the resource is created. It affects placement and ownership but does not directly define access, encryption, network exposure, or privileged permissions.",
-      "compliant": "approved-project-id",
-      "non-compliant": "unknown-project-id",
+      "compliant": null,
+      "non-compliant": null,
       "parent": null
     }
   }
