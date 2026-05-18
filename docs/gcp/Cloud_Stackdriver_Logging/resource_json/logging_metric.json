@@ -1,0 +1,306 @@
+{
+  "resource_name": "logging_metric",
+  "subcategory": "Cloud (Stackdriver) Logging",
+  "arguments": {
+    "name": {
+      "description": "The client-assigned metric identifier. Examples: 'error_count', 'nginx/requests'. Metric identifiers are limited to 100 characters and can include: A-Z, a-z, 0-9, and _-.,+!*',()%/. The forward-slash (/) denotes hierarchy. Must start with a letter or underscore.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Name is an identifier for the metric. Has no security implications beyond uniqueness and clarity.",
+      "compliant": "security_iam_role_changes",
+      "non-compliant": null,
+      "parent": null
+    },
+    "filter": {
+      "description": "An advanced logs filter which is used to match log entries for this metric. See [Advanced Log Filters](https://cloud.google.com/logging/docs/view/advanced-filters) for syntax.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Filter determines which log entries are counted by this metric. For security monitoring, filters must include critical audit events (IAM changes, firewall changes, VPC changes). Excluding security events creates monitoring blind spots.",
+      "compliant": "logName = \"projects/my-project/logs/cloudaudit.googleapis.com%2Factivity\" AND protoPayload.methodName = \"SetIamPolicy\"",
+      "non-compliant": "severity < ERROR AND logName != \"cloudaudit.googleapis.com%2Factivity\"",
+      "parent": null
+    },
+    "description": {
+      "description": "A description of this metric, used in documentation. Maximum length: 8000 characters.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Description is metadata only and does not affect security controls.",
+      "compliant": "Counts IAM role changes for security monitoring",
+      "non-compliant": null,
+      "parent": null
+    },
+    "bucket_name": {
+      "description": "The resource name of the Log Bucket that owns the Log Metric. Only Log Buckets in projects are supported. The bucket must be in the same project as the metric.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Bucket name identifies which log bucket contains the metric. Has no direct security impact.",
+      "compliant": "_Default",
+      "non-compliant": null,
+      "parent": null
+    },
+    "disabled": {
+  "description": "If set to True, this metric is disabled and does not generate any data points.",
+  "required": false,
+  "security_impact": true,
+  "rationale": "Security metrics must always be active to monitor critical events. Disabling metrics creates blind spots for IAM changes, firewall changes, and other security-critical events. CIS GCP Benchmark requires active alerting.",
+  "compliant": "false (or omit the attribute entirely)",
+  "non-compliant": "true",
+  "parent": null
+    },
+    "metric_descriptor": {
+      "description": "The metric descriptor associated with the logs-based metric. If unspecified, uses default DELTA metric kind, INT64 value type, with no labels and unit of '1' (counts log entries).",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Metric descriptor defines how data is measured and stored. Has no direct security impact on log content or access.",
+      "compliant": "Refer to child arguments",
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "unit": {
+          "description": "The unit in which the metric value is reported. Applicable only if valueType is INT64, DOUBLE, or DISTRIBUTION. Uses UCUM (Unified Code for Units of Measure) standard.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Unit defines measurement scale. Has no security implications.",
+          "compliant": "1",
+          "non-compliant": null,
+          "parent": "metric_descriptor"
+        },
+        "value_type": {
+          "description": "Whether the measurement is integer, floating-point, etc. Some combinations with metricKind might not be supported. For counter metrics, use INT64. Possible values: BOOL, INT64, DOUBLE, STRING, DISTRIBUTION, MONEY.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Value type defines data format. Has no security implications.",
+          "compliant": "INT64",
+          "non-compliant": null,
+          "parent": "metric_descriptor"
+        },
+        "metric_kind": {
+          "description": "Whether the metric records instantaneous values, changes to a value, etc. For counter metrics, use DELTA. Possible values: DELTA, GAUGE, CUMULATIVE.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Metric kind defines measurement behavior. Has no security implications.",
+          "compliant": "DELTA",
+          "non-compliant": null,
+          "parent": "metric_descriptor"
+        },
+        "labels": {
+          "description": "The set of labels that can be used to describe a specific instance of this metric type. For example, response_code label for HTTP latencies.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Labels add dimensions to metrics. Has no direct security impact.",
+          "compliant": "Refer to child arguments",
+          "non-compliant": null,
+          "parent": "metric_descriptor"
+        },
+        "display_name": {
+          "description": "A concise name for the metric, displayed in user interfaces. Use sentence case without ending period. Recommended for user-visible metrics.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Display name is for UI presentation. Has no security implications.",
+          "compliant": "IAM Role Change Count",
+          "non-compliant": null,
+          "parent": "metric_descriptor"
+        }
+      }
+    },
+    "label_extractors": {
+      "description": "A map from a label key string to an extractor expression used to extract data from a log entry field as the label value. Each label key in LabelDescriptor must have an associated extractor expression. Syntax same as valueExtractor field.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Label extractors define how label values are derived from log entries. No direct security impact.",
+      "compliant": "{\"method\": \"EXTRACT(protoPayload.methodName)\"}",
+      "non-compliant": null,
+      "parent": null
+    },
+    "value_extractor": {
+      "description": "Required for distribution logs-based metrics to extract values from log entries. Supports EXTRACT(field) or REGEXP_EXTRACT(field, regex). The regex must have exactly one capture group.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Value extractor defines how metric values are derived. No direct security impact.",
+      "compliant": "EXTRACT(protoPayload.response.status)",
+      "non-compliant": null,
+      "parent": null
+    },
+    "bucket_options": {
+      "description": "Required when using DISTRIBUTION value type. Describes bucket boundaries for histogram of extracted values.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Bucket options define histogram bins for distribution metrics. No security impact.",
+      "compliant": "Refer to child arguments",
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "linear_buckets": {
+          "description": "Specifies linear sequence of buckets with equal width (except overflow/underflow).",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Linear buckets define histogram bins. No security implications.",
+          "compliant": "Refer to child arguments",
+          "non-compliant": null,
+          "parent": "bucket_options"
+        },
+        "exponential_buckets": {
+          "description": "Specifies exponential sequence of buckets with width proportional to lower bound value.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Exponential buckets define histogram bins. No security implications.",
+          "compliant": "Refer to child arguments",
+          "non-compliant": null,
+          "parent": "bucket_options"
+        },
+        "explicit_buckets": {
+          "description": "Specifies a set of buckets with arbitrary widths.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Explicit buckets define histogram bins. No security implications.",
+          "compliant": "Refer to child arguments",
+          "non-compliant": null,
+          "parent": "bucket_options"
+        }
+      }
+    },
+    "project": {
+      "description": "The project ID where the metric will be created. If not provided, the provider project is used.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Project identifies where the metric is created. No direct security impact.",
+      "compliant": "my-project",
+      "non-compliant": null,
+      "parent": null
+    },
+    "labels": {
+      "description": "Deprecated: Use metric_descriptor.labels instead.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Deprecated field. No security impact.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "key": {
+          "description": "The label key.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Label key identifier. No security impact.",
+          "compliant": "response_code",
+          "non-compliant": null,
+          "parent": "labels"
+        },
+        "description": {
+          "description": "A human-readable description for the label.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Description is metadata only.",
+          "compliant": "HTTP response status code",
+          "non-compliant": null,
+          "parent": "labels"
+        },
+        "value_type": {
+          "description": "The type of data that can be assigned to the label. Default: STRING. Possible values: BOOL, INT64, STRING.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Value type defines label data format. No security impact.",
+          "compliant": "INT64",
+          "non-compliant": null,
+          "parent": "labels"
+        }
+      }
+    },
+    "linear_buckets": {
+      "description": "Deprecated: Use bucket_options.linear_buckets instead.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Deprecated field. No security impact.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "num_finite_buckets": {
+          "description": "Number of finite buckets. Must be greater than 0.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Defines histogram bin count. No security impact.",
+          "compliant": "10",
+          "non-compliant": null,
+          "parent": "linear_buckets"
+        },
+        "width": {
+          "description": "Width of each bucket. Must be greater than 0.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Defines bucket width. No security impact.",
+          "compliant": "5",
+          "non-compliant": null,
+          "parent": "linear_buckets"
+        },
+        "offset": {
+          "description": "Lower bound of the first bucket.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Defines bucket starting point. No security impact.",
+          "compliant": "0",
+          "non-compliant": null,
+          "parent": "linear_buckets"
+        }
+      }
+    },
+    "exponential_buckets": {
+      "description": "Deprecated: Use bucket_options.exponential_buckets instead.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Deprecated field. No security impact.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "num_finite_buckets": {
+          "description": "Number of finite buckets. Must be greater than 0.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Defines histogram bin count. No security impact.",
+          "compliant": "10",
+          "non-compliant": null,
+          "parent": "exponential_buckets"
+        },
+        "growth_factor": {
+          "description": "Growth factor for bucket sizes. Must be greater than 1.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Defines bucket growth rate. No security impact.",
+          "compliant": "2",
+          "non-compliant": null,
+          "parent": "exponential_buckets"
+        },
+        "scale": {
+          "description": "Scale factor for buckets. Must be greater than 0.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Defines bucket scaling. No security impact.",
+          "compliant": "1",
+          "non-compliant": null,
+          "parent": "exponential_buckets"
+        }
+      }
+    },
+    "explicit_buckets": {
+      "description": "Deprecated: Use bucket_options.explicit_buckets instead.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Deprecated field. No security impact.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "bounds": {
+          "description": "Bucket boundary values. Must be monotonically increasing.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Defines bucket boundaries. No security impact.",
+          "compliant": "[0, 10, 50, 100]",
+          "non-compliant": null,
+          "parent": "explicit_buckets"
+        }
+      }
+    }
+  }
+}
