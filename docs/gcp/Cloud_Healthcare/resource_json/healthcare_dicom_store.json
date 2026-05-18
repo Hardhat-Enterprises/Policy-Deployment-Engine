@@ -5,8 +5,8 @@
     "name": {
       "description": "The resource name for the DicomStore. ** Changing this property may recreate the Dicom store (removing all data) **",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The name is a resource identifier only and does not affect security posture.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,8 +14,8 @@
     "dataset": {
       "description": "Identifies the dataset addressed by this request. Must be in the format 'projects/{project}/locations/{location}/datasets/{dataset}'",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The dataset field is a required reference to the parent dataset and does not directly affect security posture.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -23,35 +23,35 @@
     "labels": {
       "description": "User-supplied key-value pairs used to organize DICOM stores. Label keys must be between 1 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, and must conform to the following PCRE regular expression: [\\p{Ll}\\p{Lo}][\\p{Ll}\\p{Lo}\\p{N}_-]{0,62} Label values are optional, must be between 1 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, and must conform to the following PCRE regular expression: [\\p{Ll}\\p{Lo}\\p{N}_-]{0,63} No more than 64 labels can be associated with a given store. An object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Labels are essential for resource governance, cost attribution, and access control enforcement. Missing or unapproved labels make it impossible to identify resource ownership, classify medical imaging data sensitivity, and apply organisation-wide security policies consistently.",
+      "compliant": "labels = { environment = \"prod\", owner = \"healthcare-team\" }",
+      "non-compliant": "labels not set (null) or missing required keys environment and owner",
       "parent": null
     },
     "notification_config": {
       "description": "A nested object resource. Structure is [documented below](#nested_notification_config).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Without a Pub/Sub notification configuration, DICOM store operations such as create, update, and delete are not published to any audit stream. This makes it impossible to detect unauthorised access or modifications to medical imaging data in real time.",
+      "compliant": "notification_config block present with a valid pubsub_topic",
+      "non-compliant": "notification_config block not set (null) — no audit stream for DICOM store operations",
       "parent": null,
       "arguments": {
         "pubsub_topic": {
           "description": "The Cloud Pub/Sub topic that notifications of changes are published on. Supplied by the client. PubsubMessage.Data will contain the resource name. PubsubMessage.MessageId is the ID of this message. It is guaranteed to be unique within the topic. PubsubMessage.PublishTime is the time at which the message was published. Notifications are only sent if the topic is non-empty. Topic names must be scoped to a project. service-PROJECT_NUMBER@gcp-sa-healthcare.iam.gserviceaccount.com must have publisher permissions on the given Cloud Pub/Sub topic. Not having adequate permissions will cause the calls that send notifications to fail.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "A Pub/Sub topic is required to stream DICOM store events for real-time audit and monitoring. Without it, there is no mechanism to detect or alert on unauthorised creation, modification, or deletion of medical imaging data.",
+          "compliant": "pubsub_topic = \"projects/PROJECT/topics/TOPIC\"",
+          "non-compliant": "pubsub_topic not set (null or empty) — no audit notifications published",
           "parent": "notification_config"
         },
         "send_for_bulk_import": {
           "description": "Indicates whether or not to send Pub/Sub notifications on bulk import. Only supported for DICOM imports.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "This field only controls whether bulk import events trigger notifications. The primary security control is the presence of the pubsub_topic itself.",
           "compliant": null,
           "non-compliant": null,
           "parent": "notification_config"
@@ -61,8 +61,8 @@
     "stream_configs": {
       "description": ", [Beta](https://terraform.io/docs/providers/google/guides/provider_versions.html)) To enable streaming to BigQuery, configure the streamConfigs object in your DICOM store. streamConfigs is an array, so you can specify multiple BigQuery destinations. You can stream metadata from a single DICOM store to up to five BigQuery tables in a BigQuery dataset. Structure is [documented below](#nested_stream_configs).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Stream configs define BigQuery export destinations and do not directly affect the security posture of the DICOM store itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -70,8 +70,8 @@
         "bigquery_destination": {
           "description": "BigQueryDestination to include a fully qualified BigQuery table URI where DICOM instance metadata will be streamed. Structure is [documented below](#nested_stream_configs_stream_configs_bigquery_destination).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The BigQuery destination is a required field within stream_configs and defines the export target. Security of the destination is managed at the BigQuery dataset level.",
           "compliant": null,
           "non-compliant": null,
           "parent": "stream_configs"
@@ -80,9 +80,9 @@
     },
     "bigquery_destination": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "The BigQuery destination block defines where DICOM metadata is exported. Security of the exported data is governed by BigQuery IAM controls, not this field directly.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -90,8 +90,8 @@
         "table_uri": {
           "description": "a fully qualified BigQuery table URI where DICOM instance metadata will be streamed.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The table_uri is a destination reference only. Security of the target BigQuery table is managed through BigQuery IAM policies.",
           "compliant": null,
           "non-compliant": null,
           "parent": "bigquery_destination"

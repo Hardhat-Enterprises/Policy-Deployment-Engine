@@ -5,8 +5,8 @@
     "name": {
       "description": "Specifies the name of the pipeline job. This field is user-assigned.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The name is a resource identifier only and does not affect security posture.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,8 +14,8 @@
     "location": {
       "description": "Location where the Pipeline Job is to run",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The location field defines where the pipeline runs and does not directly affect the security posture of the pipeline job itself.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -23,8 +23,8 @@
     "dataset": {
       "description": "Healthcare Dataset under which the Pipeline Job is to run",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The dataset field is a required reference to the parent dataset and does not directly affect security posture.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -32,26 +32,26 @@
     "disable_lineage": {
       "description": "If true, disables writing lineage for the pipeline.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Lineage tracking records data provenance across pipeline transformations, enabling organisations to trace how PHI was processed and transformed. Disabling lineage removes this audit capability, making it impossible to investigate data quality issues or demonstrate compliance with HIPAA data stewardship requirements.",
+      "compliant": "disable_lineage = false",
+      "non-compliant": "disable_lineage = true",
       "parent": null
     },
     "labels": {
       "description": "User-supplied key-value pairs used to organize Pipeline Jobs. Label keys must be between 1 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, and must conform to the following PCRE regular expression: [\\p{Ll}\\p{Lo}][\\p{Ll}\\p{Lo}\\p{N}_-]{0,62} Label values are optional, must be between 1 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, and must conform to the following PCRE regular expression: [\\p{Ll}\\p{Lo}\\p{N}_-]{0,63} No more than 64 labels can be associated with a given pipeline. An object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Labels are essential for resource governance, cost attribution, and access control enforcement. Missing or unapproved labels make it impossible to identify pipeline ownership, classify PHI processing jobs, and apply organisation-wide security policies consistently.",
+      "compliant": "labels = { environment = \"prod\", owner = \"healthcare-team\" }",
+      "non-compliant": "labels not set (null) or missing required keys environment and owner",
       "parent": null
     },
     "mapping_pipeline_job": {
       "description": "Specifies mapping configuration. Structure is [documented below](#nested_mapping_pipeline_job).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The mapping_pipeline_job block defines the mapping configuration and does not directly affect security posture.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -59,8 +59,8 @@
         "mapping_config": {
           "description": "The location of the mapping configuration. Structure is [documented below](#nested_mapping_pipeline_job_mapping_config).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The mapping_config is a required reference to mapping logic and does not directly affect security posture.",
           "compliant": null,
           "non-compliant": null,
           "parent": "mapping_pipeline_job"
@@ -68,8 +68,8 @@
         "fhir_streaming_source": {
           "description": "A streaming FHIR data source. Structure is [documented below](#nested_mapping_pipeline_job_fhir_streaming_source).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The fhir_streaming_source defines the input data source and does not directly affect security posture.",
           "compliant": null,
           "non-compliant": null,
           "parent": "mapping_pipeline_job"
@@ -77,8 +77,8 @@
         "fhir_store_destination": {
           "description": "If set, the mapping pipeline will write snapshots to this FHIR store without assigning stable IDs. You must grant your pipeline project's Cloud Healthcare Service Agent serviceaccount healthcare.fhirResources.executeBundle and healthcare.fhirResources.create permissions on the destination store. The destination store must set [disableReferentialIntegrity][FhirStore.disable_referential_integrity] to true. The destination store must use FHIR version R4. Format: project/{projectID}/locations/{locationID}/datasets/{datasetName}/fhirStores/{fhirStoreID}.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The fhir_store_destination is a destination reference only. Security of the target FHIR store is managed through its own IAM policies.",
           "compliant": null,
           "non-compliant": null,
           "parent": "mapping_pipeline_job"
@@ -86,8 +86,8 @@
         "reconciliation_destination": {
           "description": "If set to true, a mapping pipeline will send output snapshots to the reconciliation pipeline in its dataset. A reconciliation pipeline must exist in this dataset before a mapping pipeline with a reconciliation destination can be created.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "This field controls pipeline routing behaviour and does not directly affect security posture.",
           "compliant": null,
           "non-compliant": null,
           "parent": "mapping_pipeline_job"
@@ -97,8 +97,8 @@
     "reconciliation_pipeline_job": {
       "description": "Specifies reconciliation configuration. Structure is [documented below](#nested_reconciliation_pipeline_job).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The reconciliation_pipeline_job block defines reconciliation configuration and does not directly affect security posture.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -106,8 +106,8 @@
         "merge_config": {
           "description": "Specifies the location of the reconciliation configuration. Structure is [documented below](#nested_reconciliation_pipeline_job_merge_config).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The merge_config is a required reference to reconciliation logic and does not directly affect security posture.",
           "compliant": null,
           "non-compliant": null,
           "parent": "reconciliation_pipeline_job"
@@ -115,8 +115,8 @@
         "matching_uri_prefix": {
           "description": "Specifies the top level directory of the matching configs used in all mapping pipelines, which extract properties for resources to be matched on. Example: gs://{bucket-id}/{path/to/matching/configs}",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The matching_uri_prefix is a configuration path reference and does not directly affect security posture.",
           "compliant": null,
           "non-compliant": null,
           "parent": "reconciliation_pipeline_job"
@@ -124,8 +124,8 @@
         "fhir_store_destination": {
           "description": "The harmonized FHIR store to write harmonized FHIR resources to, in the format of: project/{projectID}/locations/{locationID}/datasets/{datasetName}/fhirStores/{id}",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The fhir_store_destination is a destination reference only. Security of the target FHIR store is managed through its own IAM policies.",
           "compliant": null,
           "non-compliant": null,
           "parent": "reconciliation_pipeline_job"
@@ -135,8 +135,8 @@
     "backfill_pipeline_job": {
       "description": "Specifies the backfill configuration. Structure is [documented below](#nested_backfill_pipeline_job).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The backfill_pipeline_job block defines backfill configuration and does not directly affect security posture.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -144,8 +144,8 @@
         "mapping_pipeline_job": {
           "description": "Specifies the mapping pipeline job to backfill, the name format should follow: projects/{projectId}/locations/{locationId}/datasets/{datasetId}/pipelineJobs/{pipelineJobId}.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The mapping_pipeline_job reference is an identifier for the job to backfill and does not directly affect security posture.",
           "compliant": null,
           "non-compliant": null,
           "parent": "backfill_pipeline_job"
@@ -154,9 +154,9 @@
     },
     "mapping_config": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "The mapping_config block defines the mapping logic configuration and does not directly affect security posture.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -164,8 +164,8 @@
         "description": {
           "description": "Describes the mapping configuration.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "A descriptive text field only, no security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "mapping_config"
@@ -173,8 +173,8 @@
         "whistle_config_source": {
           "description": "Specifies the path to the mapping configuration for harmonization pipeline. Structure is [documented below](#nested_mapping_pipeline_job_mapping_config_whistle_config_source).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The whistle_config_source is a path reference to mapping logic and does not directly affect security posture.",
           "compliant": null,
           "non-compliant": null,
           "parent": "mapping_config"
@@ -183,9 +183,9 @@
     },
     "whistle_config_source": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "The whistle_config_source block defines GCS paths for Whistle mapping files and does not directly affect security posture.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -193,8 +193,8 @@
         "uri": {
           "description": "Main configuration file which has the entrypoint or the root function. Example: gs://{bucket-id}/{path/to/import-root/dir}/entrypoint-file-name.wstl.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The uri is a GCS path reference to the Whistle entrypoint file and does not directly affect security posture.",
           "compliant": null,
           "non-compliant": null,
           "parent": "whistle_config_source"
@@ -202,8 +202,8 @@
         "import_uri_prefix": {
           "description": "Directory path where all the Whistle files are located. Example: gs://{bucket-id}/{path/to/import-root/dir}",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The import_uri_prefix is a GCS directory reference and does not directly affect security posture.",
           "compliant": null,
           "non-compliant": null,
           "parent": "whistle_config_source"
@@ -212,9 +212,9 @@
     },
     "fhir_streaming_source": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "The fhir_streaming_source block defines the streaming input source and does not directly affect security posture.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -222,8 +222,8 @@
         "fhir_store": {
           "description": "The path to the FHIR store in the format projects/{projectId}/locations/{locationId}/datasets/{datasetId}/fhirStores/{fhirStoreId}.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The fhir_store is a source reference only. Security of the source FHIR store is managed through its own IAM policies.",
           "compliant": null,
           "non-compliant": null,
           "parent": "fhir_streaming_source"
@@ -231,8 +231,8 @@
         "description": {
           "description": "Describes the streaming FHIR data source.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "A descriptive text field only, no security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "fhir_streaming_source"
@@ -241,9 +241,9 @@
     },
     "merge_config": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "The merge_config block defines reconciliation merge logic and does not directly affect security posture.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -251,8 +251,8 @@
         "description": {
           "description": "Describes the mapping configuration.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "A descriptive text field only, no security impact.",
           "compliant": null,
           "non-compliant": null,
           "parent": "merge_config"
@@ -260,8 +260,8 @@
         "whistle_config_source": {
           "description": "Specifies the path to the mapping configuration for harmonization pipeline. Structure is [documented below](#nested_reconciliation_pipeline_job_merge_config_whistle_config_source).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The whistle_config_source is a path reference to reconciliation logic and does not directly affect security posture.",
           "compliant": null,
           "non-compliant": null,
           "parent": "merge_config"
