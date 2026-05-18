@@ -2,7 +2,6 @@ import argparse
 import subprocess
 import sys
 from pathlib import Path
-import json
 
 
 POLICIES_ROOT = Path("policies")
@@ -18,35 +17,34 @@ def run_command(command: list[str]) -> subprocess.CompletedProcess:
     )
 
 
-def get_current_git_branch() -> str:
-    result = run_command(["git", "branch", "--show-current"])
+def run_existing_branch_linter() -> None:
+    result = run_command(["python", "scripts/linters/check_branch_name.py"])
+
+    if result.stdout:
+        print(result.stdout)
+
+    if result.stderr:
+        print(result.stderr, file=sys.stderr)
 
     if result.returncode != 0:
-        print("Error: could not detect current git branch.", file=sys.stderr)
-        if result.stderr:
-            print(result.stderr, file=sys.stderr)
-        sys.exit(1)
-
-    branch = result.stdout.strip()
-
-    if not branch:
-        print("Error: current git branch is empty or detached HEAD state.", file=sys.stderr)
-        sys.exit(1)
-
-    return branch
+        print("Local scan stopped because the branch name does not follow the naming convention.")
+        sys.exit(result.returncode)
 
 
-def validate_branch_matches(expected_branch: str) -> None:
-    current_branch = get_current_git_branch()
+def run_existing_service_linter(provider: str, service: str) -> None:
+    if provider != "gcp":
+        print(f"Skipping linter: current linter only supports GCP, but provider is '{provider}'.")
+        return
 
-    if current_branch != expected_branch:
-        print("Error: branch mismatch.", file=sys.stderr)
-        print(f"Current branch : {current_branch}", file=sys.stderr)
-        print(f"Expected branch   : {expected_branch}", file=sys.stderr)
-        print("Please switch to the correct branch or open a branch with the correct name.", file=sys.stderr)
-        sys.exit(1)
+    result = subprocess.run(
+        ["python", "scripts/linters/linter.py", "--gcp", service],
+        text=True,
+    )
 
-    print(f"Branch validation passed: {current_branch}")
+    if result.returncode != 0:
+        print("Local scan stopped because the linter found issues.")
+        print("Please fix the linter errors before running the policy scan.")
+        sys.exit(result.returncode)
 
 
 def parse_service_path(service_path: str) -> tuple[str, str]:
@@ -67,10 +65,6 @@ def parse_service_path(service_path: str) -> tuple[str, str]:
         sys.exit(1)
 
     return provider, service
-
-
-def build_expected_branch_name(provider: str, service: str) -> str:
-    return f"{provider}/service/{service}"
 
 
 def build_opa_query(provider: str, service: str, resource: str, policy: str, output_type: str) -> str:
@@ -158,65 +152,6 @@ def run_opa_eval(
     return result.returncode
 
 
-def validate_plan_resource_addresses(plan_path: Path, resource: str) -> bool:
-    expected_compliant_address = f"{resource}.c"
-    expected_non_compliant_address = f"{resource}.nc"
-
-    try:
-        with plan_path.open("r", encoding="utf-16") as file:
-            plan_data = json.load(file)
-    except UnicodeDecodeError as error:
-        print(f"Skipping: could not read plan.json using utf-16 encoding at {plan_path}")
-        print(f"Encoding error: {error}")
-        print("Remedy: regenerate plan.json using UTF-16 encoding or update the script encoding to match the file.")
-        return False
-    except json.JSONDecodeError as error:
-        print(f"Skipping: invalid JSON in plan.json at {plan_path}")
-        print(f"JSON error: {error}")
-        print('Remedy: regenerate plan.json using "terraform show -json plan > plan.json" and ensure the file contains valid JSON.')
-        return False
-
-    resources = (
-        plan_data
-        .get("planned_values", {})
-        .get("root_module", {})
-        .get("resources", [])
-    )
-
-    if len(resources) < 2:
-        print("Skipping: plan.json must contain at least two resources.")
-        print(f"Expected first resource  : {expected_compliant_address}")
-        print(f"Expected second resource : {expected_non_compliant_address}")
-        print("Remedy: add both compliant and non-compliant Terraform resources, then regenerate plan.json.")
-        return False
-
-    compliant_address = resources[0].get("address")
-    non_compliant_address = resources[1].get("address")
-
-    missing_or_invalid = False
-
-    if compliant_address != expected_compliant_address:
-        print("Skipping: compliant resource name is incorrect.")
-        print(f"Expected: {expected_compliant_address}")
-        print(f"Found   : {compliant_address}")
-        print(f"Remedy  : rename the compliant Terraform resource block to: {resource}.c")
-        missing_or_invalid = True
-
-    if non_compliant_address != expected_non_compliant_address:
-        print("Skipping: non-compliant resource name is incorrect.")
-        print(f"Expected: {expected_non_compliant_address}")
-        print(f"Found   : {non_compliant_address}")
-        print(f"Remedy  : rename the non-compliant Terraform resource block to: {resource}.nc")
-        missing_or_invalid = True
-
-    if missing_or_invalid:
-        print("After fixing the Terraform resource names, regenerate plan.json and run the scan again.")
-        return False
-
-    print("Resource name validation passed.")
-    return True
-
-
 def scan_policy(
     provider: str,
     service: str,
@@ -241,12 +176,7 @@ def scan_policy(
 
     if not plan_path.exists():
         print(f"Skipping: plan.json not found at {plan_path}")
-        return 0, False
-    
-    if not validate_plan_resource_addresses(plan_path, resource):
-        return 0, False
-
-    # print(f"\n----- {output_type.upper()} -----")
+        return 0, False  
 
     query = build_opa_query(
         provider=provider,
@@ -316,10 +246,6 @@ def main() -> None:
 
     provider, service = parse_service_path(args.service_path)
 
-    expected_branch = build_expected_branch_name(provider, service)
-    
-    validate_branch_matches(expected_branch)
-
     if args.policy and not args.resource:
         print(
             "Error: --policy cannot be used without --resource because policies are inside resource folders.",
@@ -332,6 +258,9 @@ def main() -> None:
     else:
         output_type = "message"
 
+    run_existing_branch_linter()
+    run_existing_service_linter(provider, service)
+    
     resource_dirs = get_resource_dirs(
         provider=provider,
         service=service,
