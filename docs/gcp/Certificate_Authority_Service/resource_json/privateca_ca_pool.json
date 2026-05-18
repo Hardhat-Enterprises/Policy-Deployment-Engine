@@ -14,19 +14,19 @@
     "tier": {
       "description": "The Tier of this CaPool. Possible values are: `ENTERPRISE`, `DEVOPS`.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "CA Pool must use the ENTERPRISE tier to enforce admin approval controls and audit logging for all certificate operations. The DEVOPS tier lacks HSM-backed keys and granular audit logging required by organisational policy.",
+      "compliant": "Set tier to 'ENTERPRISE'.",
+      "non-compliant": "Set tier to 'DEVOPS'.",
       "parent": null
     },
     "location": {
       "description": "Location of the CaPool. A full list of valid locations can be found by running `gcloud privateca locations list`.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "CA Pool must be deployed in an approved geographic region to enforce data residency and organisational compliance.",
+      "compliant": "Set location to 'australia-southeast1' or 'australia-southeast2'.",
+      "non-compliant": "Any location outside the approved whitelist, e.g. 'us-central1'.",
       "parent": null
     },
     "issuance_policy": {
@@ -41,10 +41,10 @@
         "allowed_key_types": {
           "description": "If any AllowedKeyType is specified, then the certificate request's public key must match one of the key types listed here. Otherwise, any key may be used. Structure is [documented below](#nested_issuance_policy_allowed_key_types).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "CA Pool issuance policy must restrict elliptic curve signing algorithms to approved types only to enforce cryptographic compliance.",
+          "compliant": "Set elliptic_curve.signature_algorithm to 'ECDSA_P256' or 'ECDSA_P384'.",
+          "non-compliant": "Using 'EDDSA_25519' or leaving allowed_key_types unrestricted.",
           "parent": "issuance_policy"
         },
         "backdate_duration": {
@@ -59,10 +59,10 @@
         "maximum_lifetime": {
           "description": "The maximum lifetime allowed for issued Certificates. Note that if the issuing CertificateAuthority expires before a Certificate's requested maximumLifetime, the effective lifetime will be explicitly truncated to match it.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "CA Pool maximum certificate lifetime must not exceed 87600h (10 years / 315360000s) to limit the exposure window if a certificate is compromised. Long-lived certificates increase the risk of undetected key compromise.",
+          "compliant": "Set maximum_lifetime to '315360000s' (87600h) or less.",
+          "non-compliant": "Set maximum_lifetime to a value exceeding '315360000s', e.g. '315360001s'.",
           "parent": "issuance_policy"
         },
         "allowed_issuance_modes": {
@@ -106,19 +106,19 @@
         "publish_ca_cert": {
           "description": "When true, publishes each CertificateAuthority's CA certificate and includes its URL in the \"Authority Information Access\" X.509 extension in all issued Certificates. If this is false, the CA certificate will not be published and the corresponding X.509 extension will not be written in issued certificates.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "CA Pool must publish CA certificates so that clients can establish trust with the CA hierarchy. Without this, relying parties cannot validate the chain of trust for issued certificates.",
+          "compliant": "Set publish_ca_cert to true.",
+          "non-compliant": "Set publish_ca_cert to false.",
           "parent": "publishing_options"
         },
         "publish_crl": {
           "description": "When true, publishes each CertificateAuthority's CRL and includes its URL in the \"CRL Distribution Points\" X.509 extension in all issued Certificates. If this is false, CRLs will not be published and the corresponding X.509 extension will not be written in issued certificates. CRLs will expire 7 days from their creation. However, we will rebuild daily. CRLs are also rebuilt shortly after a certificate is revoked.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "CA Pool must publish Certificate Revocation Lists so that relying parties can detect and reject revoked certificates. Without CRL publishing, compromised certificates remain trusted.",
+          "compliant": "Set publish_crl to true.",
+          "non-compliant": "Set publish_crl to false.",
           "parent": "publishing_options"
         },
         "encoding_format": {
@@ -220,10 +220,10 @@
         "signature_algorithm": {
           "description": "The algorithm used. Possible values are: `ECDSA_P256`, `ECDSA_P384`, `EDDSA_25519`.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Elliptic curve signature algorithm must be restricted to OS-approved types to enforce cryptographic compliance across all certificates issued by the pool.",
+          "compliant": "Set signature_algorithm to 'ECDSA_P256' or 'ECDSA_P384'.",
+          "non-compliant": "Set signature_algorithm to 'EDDSA_25519'.",
           "parent": "elliptic_curve"
         }
       }
@@ -240,10 +240,10 @@
         "allow_csr_based_issuance": {
           "description": "When true, allows callers to create Certificates by specifying a CSR.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "CA Pool must allow CSR-based issuance so that certificate requestors retain control of their private keys. Config-based issuance alone requires the CA to generate keys on behalf of requestors, violating the principle that private keys must never leave the requesting system.",
+          "compliant": "Set allow_csr_based_issuance to true.",
+          "non-compliant": "Set allow_csr_based_issuance to false.",
           "parent": "allowed_issuance_modes"
         },
         "allow_config_based_issuance": {

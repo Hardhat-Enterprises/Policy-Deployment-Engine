@@ -14,10 +14,10 @@
     "location": {
       "description": "The trust config location.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "The trust config location controls where the trust configuration is created and managed.",
+      "compliant": "Use an approved trust config location.",
+      "non-compliant": "Using an unapproved trust config location.",
       "parent": null
     },
     "labels": {
@@ -70,19 +70,19 @@
     "allowlisted_certificates": {
       "description": "Allowlisted PEM-encoded certificates. A certificate matching an allowlisted certificate is always considered valid as long as the certificate is parseable, proof of private key possession is established, and constraints on the certificate's SAN field are met. Structure is [documented below](#nested_allowlisted_certificates).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Allowlisted certificates are trust exceptions and should not be configured directly without an approved exception.",
+      "compliant": "Do not define allowlisted certificates in the trust config.",
+      "non-compliant": "Defining allowlisted certificates directly in the trust config.",
       "parent": null,
       "arguments": {
         "pem_certificate": {
           "description": "PEM certificate that is allowlisted. The certificate can be up to 5k bytes, and must be a parseable X.509 certificate.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "An allowlisted PEM certificate can be treated as a trusted exception during certificate validation.",
+          "compliant": "Do not define an allowlisted PEM certificate in Terraform.",
+          "non-compliant": "Defining an allowlisted PEM certificate directly in Terraform.",
           "parent": "allowlisted_certificates"
         }
       }

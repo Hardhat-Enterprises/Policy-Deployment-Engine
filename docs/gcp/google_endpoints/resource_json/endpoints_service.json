@@ -1,0 +1,51 @@
+{
+  "resource_name": "endpoints_service",
+  "subcategory": "Cloud Endpoints",
+  "arguments": {
+    "service_name": {
+      "description": "The name of the Cloud Endpoints service, usually in the format api-name.endpoints.project-id.cloud.goog.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "The service_name defines the Cloud Endpoints service identity. Using an approved Cloud Endpoints domain helps ensure the API is registered under the intended Google-managed endpoint domain and avoids exposing the service through unapproved or unrelated domains.",
+      "compliant": "api.endpoints.my-project-123.cloud.goog",
+      "non-compliant": "api.example.com",
+      "parent": null
+    },
+    "openapi_config": {
+      "description": "The OpenAPI specification used to configure the Cloud Endpoints service.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "The OpenAPI configuration controls how the API is exposed. Requiring HTTPS helps protect API traffic from interception, downgrade risks, and insecure transport.",
+      "compliant": "OpenAPI configuration uses HTTPS only.",
+      "non-compliant": "OpenAPI configuration allows HTTP.",
+      "parent": null
+    },
+    "grpc_config": {
+      "description": "The gRPC service configuration used to configure the Cloud Endpoints service.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "The gRPC configuration defines how the service is exposed. It should be reviewed to ensure only approved APIs, methods, and service definitions are published.",
+      "compliant": "Approved gRPC service configuration file.",
+      "non-compliant": "Unreviewed or unauthorized gRPC service configuration file.",
+      "parent": null
+    },
+    "protoc_output_base64": {
+      "description": "Base64 encoded descriptor output generated from the protocol buffer definition for the gRPC service.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "The protoc_output_base64 value defines the compiled service descriptor for gRPC endpoints. Using an approved descriptor helps ensure only intended services and methods are exposed.",
+      "compliant": "Base64 descriptor generated from an approved protobuf definition.",
+      "non-compliant": "Base64 descriptor generated from an unapproved or modified protobuf definition.",
+      "parent": null
+    },
+    "project": {
+      "description": "The Google Cloud project where the Cloud Endpoints service is created.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "The project controls where the Cloud Endpoints service is deployed. Using the correct approved project helps prevent APIs from being created in unauthorized environments.",
+      "compliant": "my-project-123",
+      "non-compliant": "unapproved-project",
+      "parent": null
+    }
+  }
+}
