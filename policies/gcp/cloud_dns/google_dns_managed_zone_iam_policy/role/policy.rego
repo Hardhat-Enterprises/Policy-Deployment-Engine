@@ -16,12 +16,7 @@ conditions := [
         {
             "condition": "Check if role follows the approved dns role pattern",
             "attribute_path": ["role"],
-            "values": [
-                "roles/*",
-                [
-                    ["dns.admin", "dns.reader", "dns.peer", "viewer"]
-                ]
-            ],
+            "values": ["roles/*",[["dns.admin", "dns.reader", "dns.peer", "viewer"]]],
             "policy_type": "pattern whitelist"
         }
     ]
