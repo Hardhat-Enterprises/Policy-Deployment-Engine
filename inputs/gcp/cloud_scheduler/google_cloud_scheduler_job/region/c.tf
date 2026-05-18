@@ -11,7 +11,6 @@ resource "google_cloud_scheduler_job" "c" {
   region      = "australia-southeast1"
 
   pubsub_target {
-    # topic.id is the topic's full resource name.
     topic_name = google_pubsub_topic.c_pubsub.id
     data       = base64encode("test")
   }

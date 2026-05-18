@@ -12,7 +12,6 @@ resource "google_cloud_scheduler_job" "nc" {
   time_zone   = "America/New_York"
 
   pubsub_target {
-    # topic.id is the topic's full resource name.
     topic_name = google_pubsub_topic.nc_pubsub.id
     data       = base64encode("test")
   }

@@ -1,3 +1,4 @@
+
 resource "google_cloud_scheduler_job" "nc" {
   name        = "nc"
   project     = "PDE"
@@ -5,15 +6,12 @@ resource "google_cloud_scheduler_job" "nc" {
   schedule    = "*/2 * * * *"
   region      = "australia-southeast1"
 
-  
-  http_target {
+   http_target {
     http_method = "GET"
-    uri         = "https://cloudscheduler.googleapis.com/v1/projects/my-project-name/locations/australia-southeast1/jobs"
-   
-    oauth_token {
-      service_account_email = ""
+    uri         = "https://example.com/ping"
+    body        = base64encode("{\"foo\":\"bar\"}")
+    headers = {
+      "Content-Type" = "application/json"
     }
-    }
-  
-  
+   }
 }

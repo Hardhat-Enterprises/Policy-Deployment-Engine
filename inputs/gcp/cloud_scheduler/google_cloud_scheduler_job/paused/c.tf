@@ -9,7 +9,7 @@ resource "google_cloud_scheduler_job" "c" {
   description = "test job"
   schedule    = "*/2 * * * *"
   region      = "australia-southeast1"
-  time_zone   = "Australia/Melbourne"
+  paused      = "true"
 
   pubsub_target {
     topic_name = google_pubsub_topic.c_pubsub.id

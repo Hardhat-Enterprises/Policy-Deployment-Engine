@@ -9,6 +9,11 @@ resource "google_cloud_scheduler_job" "nc" {
   description = "test job"
   schedule    = "*/2 * * * *"
   region      = "us-central1"
+  paused      = null
+
+  retry_config {
+    retry_count = 10
+  }
 
   pubsub_target {
     topic_name = google_pubsub_topic.nc_pubsub.id

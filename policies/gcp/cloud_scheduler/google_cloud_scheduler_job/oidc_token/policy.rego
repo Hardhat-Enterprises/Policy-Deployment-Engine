@@ -12,10 +12,10 @@ conditions := [
         {
             "condition": "Oidc_token must be configured and used",
             "attribute_path": ["http_target", 0, "oidc_token", 0, "service_account_email"],
-            "values": [null],
+            "values": [null, ""],
             "policy_type": "blacklist"
         }
-    ],
+    ]
 ]
 result := helpers.get_multi_summary(conditions, vars.variables)
 

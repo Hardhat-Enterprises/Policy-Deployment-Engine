@@ -1,3 +1,4 @@
+
 resource "google_cloud_scheduler_job" "nc" {
   name        = "nc"
   project     = "PDE"
@@ -7,13 +8,8 @@ resource "google_cloud_scheduler_job" "nc" {
 
   
   http_target {
-    http_method = "GET"
-    uri         = "https://my-service.australia-southeast1.run.app/process"
+    http_method = "DELETE"
+    uri         = "https://pubsub.googleapis.com/v1/projects/my-project-name/locations/australia-southeast1/jobs"
+  }
 
-    oidc_token {
-      service_account_email = ""
-    }
-    }
 }
-  
-
