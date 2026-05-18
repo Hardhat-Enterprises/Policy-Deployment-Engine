@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_quotas.google_cloud_quotas_quota_adjuster_settings.parent_restriction
+package terraform.gcp.security.cloud_quotas.google_cloud_quotas_quota_adjuster_settings.parent
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_quotas.google_cloud_quotas_quota_adjuster_settings.vars
