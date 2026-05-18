@@ -1,0 +1,4 @@
+resource "google_transcoder_job_template" "c" {
+  job_template_id = "example-job-template-c"
+  location        = "australia-southeast1"
+}

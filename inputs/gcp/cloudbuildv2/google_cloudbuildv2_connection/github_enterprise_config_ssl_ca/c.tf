@@ -1,0 +1,14 @@
+resource "google_cloudbuildv2_connection" "c" {
+  project  = "c"
+  location = "australia-southeast2"
+  name     = "my-connection"
+
+  github_enterprise_config {
+    host_uri                   = "https://ghe.example.com"
+    ssl_ca                     = "approved-ca-cert"
+    private_key_secret_version = "projects/my-project-c/secrets/private-key/versions/1"
+    app_id                     = 200
+    app_slug                   = "gcb-app"
+    app_installation_id        = 300
+  }
+}
