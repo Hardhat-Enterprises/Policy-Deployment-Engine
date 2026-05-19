@@ -5,44 +5,44 @@
     "edge_services_cidr": {
       "description": "IP address range in CIDR notation used to create internet access and external IP access. An RFC 1918 CIDR block, with a \"/26\" prefix, is required. The range cannot overlap with any prefixes either in the consumer VPC network or in use by the private clouds attached to that VPC network.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "The edge services CIDR controls the address range used for internet access and external IP access. An approved non-overlapping CIDR range helps prevent routing conflicts and unintended exposure.",
+      "compliant": "192.168.30.0/26",
+      "non-compliant": "10.0.0.0/24",
       "parent": null
     },
     "vmware_engine_network": {
       "description": "The relative resource name of the VMware Engine network. Specify the name in the following form: projects/{project}/locations/{location}/vmwareEngineNetworks/{vmwareEngineNetworkId} where {project} can either be a project number or a project ID.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale":  "The VMware Engine network determines which network the policy applies to. Using an approved network ensures the policy is attached only to trusted VMware Engine network resources.",
+      "compliant": "projects/599444694846/locations/global/vmwareEngineNetworks/c",
+      "non-compliant":  "projects/599444694846/locations/global/vmwareEngineNetworks/nc",
       "parent": null
     },
     "location": {
       "description": "The resource name of the location (region) to create the new network policy in. Resource names are schemeless URIs that follow the conventions in https://cloud.google.com/apis/design/resource_names. For example: projects/my-project/locations/us-central1",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "The location controls where the network policy is created.",
+      "compliant":  "australia-southeast1",
+      "non-compliant": "us-east1",
       "parent": null
     },
     "name": {
       "description": "The ID of the Network Policy.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale":  "Network policy names should follow an approved naming standard so that policies can be clearly identified, audited, and managed consistently.",
+      "compliant": "c",
+      "non-compliant": "nc",
       "parent": null
     },
     "description": {
       "description": "User-provided description for this network policy.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale":  "The description is used for documentation and does not directly change the security behaviour",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -50,8 +50,8 @@
     "internet_access": {
       "description": "Network service that allows VMware workloads to access the internet. Structure is [documented below](#nested_internet_access).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale":  "Internet access can allow VMware workloads to communicate with external internet services. This should be disabled unless explicitly approved.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -59,17 +59,17 @@
         "enabled": {
           "description": "True if the service is enabled; false otherwise.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Enabling internet access may expose workloads to external network communication. It should be disabled unless the organisation has approved the requirement.",
+          "compliant": false,
+          "non-compliant": true,
           "parent": "internet_access"
         },
         "state": {
           "description": "(Output) State of the service. New values may be added to this enum when appropriate.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "This is an output-only state field and is not directly configured by the policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "internet_access"
@@ -79,8 +79,8 @@
     "external_ip": {
       "description": "Network service that allows External IP addresses to be assigned to VMware workloads. This service can only be enabled when internetAccess is also enabled. Structure is [documented below](#nested_external_ip).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "External IP access can expose VMware workloads to external network access. It should be disabled unless explicitly approved.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -88,17 +88,17 @@
         "enabled": {
           "description": "True if the service is enabled; false otherwise.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale":  "Enabling external IP access may expose workloads externally. It should be disabled to reduce unnecessary public exposure.",
+          "compliant": false,
+          "non-compliant": true,
           "parent": "external_ip"
         },
         "state": {
           "description": "(Output) State of the service. New values may be added to this enum when appropriate.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale":  "This is an output-only state field and is not directly configured by the policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "external_ip"
@@ -107,11 +107,11 @@
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "required": false,
+      "security_impact": true,
+      "rationale":  "The project determines where the network policy is created. Using an approved project keeps the policy within the correct governance, access control, and billing boundary.",
+      "compliant":  "project-d7f19645-ccba-48ef-bce",
+      "non-compliant": "unapproved-project",
       "parent": null
     }
   }
