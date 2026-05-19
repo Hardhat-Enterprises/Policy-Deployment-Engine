@@ -7,7 +7,7 @@ import data.terraform.gcp.security.cloud_vmware_engine.google_vmwareengine_exter
 conditions := [
     [
     {"situation_description" :"is created under an unapproved private cloud parent",
-    "remedies":["change the parent to projects/599444694846/locations/us-west1-a/privateClouds/c"]},
+    "remedies":["change the parent to an approved private cloud parent"]},
    
     {
         "condition":"c1:  check the cloud vmware engine external address parent",
