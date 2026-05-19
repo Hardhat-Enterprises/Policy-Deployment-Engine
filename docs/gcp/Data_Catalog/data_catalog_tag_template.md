@@ -15,7 +15,7 @@ Reference: [Terraform Registry – data_catalog_tag_template](https://registry.t
 | `display_name` | The display name for this template. | false | false |  | None | None |
 | `region` | Template location region. | false | true | Tag templates should be created only in approved regions to meet data residency and governance requirements. | australia-southeast1 | us-east1 |
 | `force_delete` | This confirms the deletion of any possible tags using this template. Must be set to true in order to delete the tag template. | false | true | Force delete can remove templates that are still used by tags, which may cause metadata loss. | false | true |
-| `project` | If it is not provided, the provider project is used. | false | true | Tag templates should be created only in approved projects to keep metadata governance in the correct boundary. | gcp-project-12345 | unapproved-project |
+| `project` | If it is not provided, the provider project is used. | false | false | None | None | None |
 | `type` | The type of value this tag field can contain. Structure is documented below. | true | false |  | None | None |
 | `enum_type` | Represents an enum type. Exactly one of `primitive_type` or `enum_type` must be set Structure is [documented below](#nested_fields_field_type_enum_type). | false | false |  | None | None |
 | `allowed_values` | The set of allowed values for this enum. The display names of the values must be case-insensitively unique within this set. Currently, enum values can only be added to the list of allowed values. Deletion and renaming of enum values are not supported. Can have up to 500 allowed values. Structure is [documented below](#nested_fields_field_type_enum_type_allowed_values). | true | false |  | None | None |
