@@ -5,8 +5,8 @@
     "name": {
       "description": "The resource name for the Hl7V2Store. ** Changing this property may recreate the Hl7v2 store (removing all data) **",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The name is a resource identifier only and does not affect security posture.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,8 +14,8 @@
     "dataset": {
       "description": "Identifies the dataset addressed by this request. Must be in the format 'projects/{project}/locations/{location}/datasets/{dataset}'",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The dataset field is a required reference to the parent dataset and does not directly affect security posture.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -23,17 +23,17 @@
     "reject_duplicate_message": {
       "description": "Determines whether duplicate messages are allowed.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Allowing duplicate HL7 V2 messages can lead to duplicate clinical events such as medication orders or lab results being processed multiple times. This creates data integrity issues that may result in incorrect patient care decisions and makes audit trails unreliable.",
+      "compliant": "reject_duplicate_message = true",
+      "non-compliant": "reject_duplicate_message = false",
       "parent": null
     },
     "parser_config": {
       "description": "A nested object resource. Structure is [documented below](#nested_parser_config).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The parser_config block controls HL7 V2 message parsing behaviour and does not directly affect the security posture of the store.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -41,8 +41,8 @@
         "allow_null_header": {
           "description": "Determines whether messages with no header are allowed.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "This field controls whether headerless messages are accepted and does not directly affect security posture.",
           "compliant": null,
           "non-compliant": null,
           "parent": "parser_config"
@@ -50,8 +50,8 @@
         "segment_terminator": {
           "description": "Byte(s) to be used as the segment terminator. If this is unset, '\\r' will be used as segment terminator. A base64-encoded string.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The segment terminator is a parsing configuration and does not directly affect security posture.",
           "compliant": null,
           "non-compliant": null,
           "parent": "parser_config"
@@ -59,8 +59,8 @@
         "schema": {
           "description": "JSON encoded string for schemas used to parse messages in this store if schematized parsing is desired.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The schema field controls message structure validation and does not directly affect security posture.",
           "compliant": null,
           "non-compliant": null,
           "parent": "parser_config"
@@ -68,8 +68,8 @@
         "version": {
           "description": "The version of the unschematized parser to be used when a custom `schema` is not set. Default value is `V1`. Possible values are: `V1`, `V2`, `V3`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The parser version controls message parsing behaviour and does not directly affect security posture.",
           "compliant": null,
           "non-compliant": null,
           "parent": "parser_config"
@@ -79,35 +79,35 @@
     "labels": {
       "description": "User-supplied key-value pairs used to organize HL7v2 stores. Label keys must be between 1 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, and must conform to the following PCRE regular expression: [\\p{Ll}\\p{Lo}][\\p{Ll}\\p{Lo}\\p{N}_-]{0,62} Label values are optional, must be between 1 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, and must conform to the following PCRE regular expression: [\\p{Ll}\\p{Lo}\\p{N}_-]{0,63} No more than 64 labels can be associated with a given store. An object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Labels are essential for resource governance, cost attribution, and access control enforcement. Missing or unapproved labels make it impossible to identify resource ownership, classify PHI data sensitivity, and apply organisation-wide security policies consistently.",
+      "compliant": "labels = { environment = \"prod\", owner = \"healthcare-team\" }",
+      "non-compliant": "labels not set (null) or missing required keys environment and owner",
       "parent": null
     },
     "notification_configs": {
       "description": "A list of notification configs. Each configuration uses a filter to determine whether to publish a message (both Ingest & Create) on the corresponding notification destination. Only the message name is sent as part of the notification. Supplied by the client. Structure is [documented below](#nested_notification_configs).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Without a Pub/Sub notification configuration, HL7 V2 store operations such as message ingest and create are not published to any audit stream. This makes it impossible to detect unauthorised access or modifications to clinical messaging data in real time.",
+      "compliant": "notification_configs block present with a valid pubsub_topic",
+      "non-compliant": "notification_configs block not set (null) — no audit stream for HL7 V2 store operations",
       "parent": null,
       "arguments": {
         "pubsub_topic": {
           "description": "The Cloud Pub/Sub topic that notifications of changes are published on. Supplied by the client. PubsubMessage.Data will contain the resource name. PubsubMessage.MessageId is the ID of this message. It is guaranteed to be unique within the topic. PubsubMessage.PublishTime is the time at which the message was published. Notifications are only sent if the topic is non-empty. Topic names must be scoped to a project. service-PROJECT_NUMBER@gcp-sa-healthcare.iam.gserviceaccount.com must have publisher permissions on the given Cloud Pub/Sub topic. Not having adequate permissions will cause the calls that send notifications to fail. If a notification cannot be published to Cloud Pub/Sub, errors will be logged to Stackdriver",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "A Pub/Sub topic is required to stream HL7 V2 store events for real-time audit and monitoring. Without it, there is no mechanism to detect or alert on unauthorised ingestion or modification of clinical messaging data.",
+          "compliant": "pubsub_topic = \"projects/PROJECT/topics/TOPIC\"",
+          "non-compliant": "pubsub_topic not set (null or empty) — no audit notifications published",
           "parent": "notification_configs"
         },
         "filter": {
           "description": "Restricts notifications sent for messages matching a filter. If this is empty, all messages are matched. Syntax: https://cloud.google.com/appengine/docs/standard/python/search/query_strings Fields/functions available for filtering are: * messageType, from the MSH-9.1 field. For example, NOT messageType = \"ADT\". * send_date or sendDate, the YYYY-MM-DD date the message was sent in the dataset's timeZone, from the MSH-7 segment. For example, send_date < \"2017-01-02\". * sendTime, the timestamp when the message was sent, using the RFC3339 time format for comparisons, from the MSH-7 segment. For example, sendTime < \"2017-01-02T00:00:00-05:00\". * sendFacility, the care center that the message came from, from the MSH-4 segment. For example, sendFacility = \"ABC\". * PatientId(value, type), which matches if the message lists a patient having an ID of the given value and type in the PID-2, PID-3, or PID-4 segments. For example, PatientId(\"123456\", \"MRN\"). * labels.x, a string value of the label with key x as set using the Message.labels map. For example, labels.\"priority\"=\"high\". The operator :* can be used to assert the existence of a label. For example, labels.\"priority\":*.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The filter field restricts which messages trigger notifications. Leaving it empty ensures all messages are captured, which is the safest default for audit completeness.",
           "compliant": null,
           "non-compliant": null,
           "parent": "notification_configs"
@@ -117,8 +117,8 @@
     "notification_config": {
       "description": ", Deprecated) A nested object resource. Structure is [documented below](#nested_notification_config). ~> **Warning:** `notification_config` is deprecated and will be removed in a future major release. Use `notification_configs` instead.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "This field is deprecated. Use notification_configs instead for Pub/Sub audit streaming.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -126,8 +126,8 @@
         "pubsub_topic": {
           "description": "The Cloud Pub/Sub topic that notifications of changes are published on. Supplied by the client. PubsubMessage.Data will contain the resource name. PubsubMessage.MessageId is the ID of this message. It is guaranteed to be unique within the topic. PubsubMessage.PublishTime is the time at which the message was published. Notifications are only sent if the topic is non-empty. Topic names must be scoped to a project. service-PROJECT_NUMBER@gcp-sa-healthcare.iam.gserviceaccount.com must have publisher permissions on the given Cloud Pub/Sub topic. Not having adequate permissions will cause the calls that send notifications to fail.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "This field is part of the deprecated notification_config block. Use notification_configs.pubsub_topic instead.",
           "compliant": null,
           "non-compliant": null,
           "parent": "notification_config"

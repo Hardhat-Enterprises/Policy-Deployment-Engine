@@ -5,8 +5,8 @@
     "name": {
       "description": "The name of the workspace, in the format 'projects/{projectId}/locations/{location}/datasets/{datasetId}/dataMapperWorkspaces/{workspaceId}'",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The name is a resource identifier only and does not affect security posture.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,8 +14,8 @@
     "settings": {
       "description": "Settings associated with this workspace. Structure is [documented below](#nested_settings).",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The settings block is a required container for workspace configuration and does not directly affect security posture.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -23,8 +23,8 @@
         "data_project_ids": {
           "description": "Project IDs for data projects hosted in a workspace.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The data_project_ids field defines which projects are associated with the workspace. Access control for those projects is governed by their own IAM policies, not this field directly.",
           "compliant": null,
           "non-compliant": null,
           "parent": "settings"
@@ -34,8 +34,8 @@
     "dataset": {
       "description": "Identifies the dataset addressed by this request. Must be in the format 'projects/{project}/locations/{location}/datasets/{dataset}'",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The dataset field is a required reference to the parent dataset and does not directly affect security posture.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -43,10 +43,10 @@
     "labels": {
       "description": "The user labels. An object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" } **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Labels are essential for resource governance, cost attribution, and access control enforcement. Missing or unapproved labels make it impossible to identify workspace ownership, classify PHI mapping workloads, and apply organisation-wide security policies consistently.",
+      "compliant": "labels = { environment = \"prod\", owner = \"healthcare-team\" }",
+      "non-compliant": "labels not set (null) or missing required keys environment and owner",
       "parent": null
     }
   }
