@@ -1,4 +1,4 @@
-resource "google_security_scanner_scan_config" "c" {
+resource "google_security_scanner_scan_config" "compliant_blacklist_patterns" {
   provider     = google-beta
   display_name = "compliant-security-scanner"
 

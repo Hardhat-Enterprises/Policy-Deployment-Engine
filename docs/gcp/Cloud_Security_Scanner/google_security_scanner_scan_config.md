@@ -1,108 +1,74 @@
-\# Google Cloud Security Scanner Scan Config Policy Documentation
+# Google Cloud Security Scanner Scan Config Policy Documentation
 
+## Resource
 
-
-\## Resource
-
-
-
-Terraform resource: `google\_security\_scanner\_scan\_config`
-
-
+Terraform resource: `google_security_scanner_scan_config`
 
 This resource defines a Google Cloud Security Scanner scan configuration. It controls scan entry points, scan rate, authentication settings, excluded URL patterns, target platform, and export of scan findings.
 
+The resource is implemented using the `google-beta` provider because the Terraform provider documentation marks `google_security_scanner_scan_config` as a beta resource.
 
-
-The resource is implemented using the `google-beta` provider because the Terraform provider documentation marks `google\_security\_scanner\_scan\_config` as a beta resource.
-
-
-
-\## Implemented Policies
-
-
+## Implemented Policies
 
 | Policy | Terraform argument | Included / Excluded | Justification |
-
 |---|---|---|---|
+| `starting_urls` | `starting_urls` | Included | This argument defines the URLs where the scanner begins scanning. A policy was added to require HTTPS URLs so that scanner entry points use encrypted transport instead of insecure HTTP. |
+| `max_qps` | `max_qps` | Included | This argument controls the maximum scan requests per second. A policy was added to prevent overly aggressive scanning that may affect application availability. Terraform allows values from 5 to 20, but the policy applies a safer project limit. |
+| `export_to_security_command_center` | `export_to_security_command_center` | Included | This argument controls whether scan configuration and scan results are exported to Security Command Center. A policy was added to require `ENABLED` so findings remain visible for central security monitoring. |
+| `custom_account_login_url` | `authentication.custom_account.login_url` | Included | This argument is required when custom account authentication is used. A policy was added to require HTTPS for the login URL so authentication traffic is not sent to an insecure HTTP endpoint. |
+| `blacklist_patterns` | `blacklist_patterns` | Included | This argument defines URL patterns excluded from scanning. A policy was added to require exclusions for sensitive or risky paths such as admin, logout, delete, account, or payment pages. |
 
-| `starting\_urls` | `starting\_urls` | Included | This argument defines the URLs where the scanner begins scanning. A policy was added to require HTTPS URLs so that scanner entry points use encrypted transport instead of insecure HTTP. |
-
-| `max\_qps` | `max\_qps` | Included | This argument controls the maximum scan requests per second. A policy was added to prevent overly aggressive scanning that may affect application availability. Terraform allows values from 5 to 20, but the policy applies a safer project limit. |
-
-| `export\_to\_security\_command\_center` | `export\_to\_security\_command\_center` | Included | This argument controls whether scan configuration and scan results are exported to Security Command Center. A policy was added to require `ENABLED` so findings remain visible for central security monitoring. |
-
-| `custom\_account\_login\_url` | `authentication.custom\_account.login\_url` | Included | This argument is required when custom account authentication is used. A policy was added to require HTTPS for the login URL so authentication traffic is not sent to an insecure HTTP endpoint. |
-
-| `blacklist\_patterns` | `blacklist\_patterns` | Included | This argument defines URL patterns excluded from scanning. A policy was added to require exclusions for sensitive or risky paths such as admin, logout, delete, account, or payment pages. |
-
-
-
-\## Excluded Arguments
-
-
+## Excluded Arguments
 
 | Terraform argument | Included / Excluded | Reason for exclusion |
-
 |---|---|---|
-
-| `display\_name` | Excluded | This is a required display or identifier field. It does not directly create a security risk suitable for this policy set. |
-
+| `display_name` | Excluded | This is a required display or identifier field. It does not directly create a security risk suitable for this policy set. |
 | `project` | Excluded | This is environment-specific. Enforcing a fixed project value would make the policy less reusable across projects. |
-
-| `target\_platforms` | Excluded | Valid values are environment-dependent, such as `APP\_ENGINE` or `COMPUTE`. There was no clear security requirement to restrict one platform over another. |
-
-| `user\_agent` | Excluded | The provider already restricts this to predefined allowed values. It is mainly scan-behaviour configuration rather than a strong security control. |
-
+| `target_platforms` | Excluded | Valid values are environment-dependent, such as `APP_ENGINE` or `COMPUTE`. There was no clear security requirement to restrict one platform over another. |
+| `user_agent` | Excluded | The provider already restricts this to predefined allowed values. It is mainly scan-behaviour configuration rather than a strong security control. |
 | `schedule` | Excluded | This controls operational scan timing. No security requirement was provided to enforce a specific schedule or frequency. |
-
-| `authentication.google\_account.username` | Excluded | Username format alone is not a strong security control, and authentication method choice depends on the target application. |
-
-| `authentication.google\_account.password` | Excluded | Password values are sensitive and should not be validated directly in policy output. |
-
-| `authentication.custom\_account.username` | Excluded | Username value is application-specific and does not provide a general reusable security rule. |
-
-| `authentication.custom\_account.password` | Excluded | Password values are sensitive and should not be validated directly in policy output. |
-
+| `authentication.google_account.username` | Excluded | Username format alone is not a strong security control, and authentication method choice depends on the target application. |
+| `authentication.google_account.password` | Excluded | Password values are sensitive and should not be validated directly in policy output. |
+| `authentication.custom_account.username` | Excluded | Username value is application-specific and does not provide a general reusable security rule. |
+| `authentication.custom_account.password` | Excluded | Password values are sensitive and should not be validated directly in policy output. |
 | `timeouts` | Excluded | Timeout settings are operational Terraform behaviour and do not directly affect the security posture of the scanner configuration. |
-
 | `id` / `name` | Excluded | These are computed attributes generated by Google Cloud after resource creation, so they are not suitable for input policy validation. |
 
-
-
-\## Testing Evidence
-
-
+## Testing Evidence
 
 Each policy was tested using:
 
+1. A compliant Terraform example: `compliant_<policy_name>.tf`
+2. A non-compliant Terraform example: `non_compliant_<policy_name>.tf`
+3. Terraform plan output converted to JSON using `terraform show -json`
+4. OPA evaluation against the generated `plan.json`
 
+## Terraform Plan JSON
 
-1\. A compliant Terraform example: `c.tf`
+Each policy input folder includes a generated `plan.json` file. This file is created from the Terraform plan and is used by the OPA policy to evaluate compliant and non-compliant `google_security_scanner_scan_config` resources.
 
-2\. A non-compliant Terraform example: `nc.tf`
+The `plan.json` file can be generated using:
 
-3\. Terraform plan output converted to JSON using `terraform show -json`
+```bash
+terraform plan -out=tfplan
+terraform show -json tfplan > plan.json
+```
 
-4\. OPA evaluation against the generated `plan.json`
+Example path:
 
+```text
+inputs/gcp/cloud_security_scanner/google_security_scanner_scan_config/blacklist_patterns/plan.json
+```
 
+The `plan.json` file contains the planned Terraform resource values that are checked by the policy rules. It helps confirm that both compliant and non-compliant Terraform resources are present in the input data used for OPA testing.
 
-Expected result:
+## Expected Result
 
+- The compliant Terraform file should pass the policy.
+- The non-compliant Terraform file should produce a policy violation message.
+- OPA output should show the violation only for the non-compliant resource.
+- The generated `plan.json` should include both compliant and non-compliant resources for the tested policy.
 
-
-\- `c.tf` should pass the policy.
-
-\- `nc.tf` should produce a policy violation message.
-
-\- OPA output should show the violation only for the non-compliant resource.
-
-
-
-\## Summary
-
-
+## Summary
 
 The selected policies focus on arguments that directly affect security posture, scan safety, encrypted communication, centralised finding visibility, and protection of sensitive application paths. Arguments that are operational, environment-specific, sensitive, or already provider-controlled were excluded to avoid unnecessary or unreliable policy checks.
-
