@@ -46,7 +46,7 @@ package terraform.gcp.security.cloud_functions.google_cloudfunctions_function.va
 <div align="center">
 
 [⬅️ Previous: Terraform inputs](terraform-inputs.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
-[📘 Back to Contents](policy-writing-totourial.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
+[📘 Back to Contents](policy-writing-tutorial.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
 [Next: policy.rego ➡️](policy-rego.md#top) 
 </div>
 

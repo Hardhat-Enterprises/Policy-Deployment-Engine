@@ -77,7 +77,7 @@ resource "google_cloudfunctions_function" "nc" {
 <div align="center"> 
 
 [⬅️ Previous: Policy writing](policy-writing.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
-[📘 Back to Contents](policy-writing-totourial.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
+[📘 Back to Contents](policy-writing-tutorial.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
 [Next: Terraform inputs ➡️](terraform-inputs.md#top) 
 
 </div>

@@ -233,7 +233,7 @@ Blocks values that match a defined pattern.
 <div align="center">
 
 [⬅️ Previous: vars.rego](vars-rego.md) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
-[📘 Back to Contents](policy-writing-totourial.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
+[📘 Back to Contents](policy-writing-tutorial.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
 [Next: Testing your policies ➡️](testing-policies.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
 [Next: Testing your policies Beta ➡️](testing-policies-beta.md#top) 
 

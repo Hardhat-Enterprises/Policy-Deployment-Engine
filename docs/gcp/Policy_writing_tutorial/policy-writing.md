@@ -79,7 +79,7 @@ and a  `policy.rego` into:
 <div align="center">
 
 [⬅️ Previous: Researching and Documentation](researching-and-documentation.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
-[📘 Back to Contents](policy-writing-totourial.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
+[📘 Back to Contents](policy-writing-tutorial.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
 [Next: c.tf & nc.tf ➡️](c-tf-and-nc-tf.md#top)
 
 </div>

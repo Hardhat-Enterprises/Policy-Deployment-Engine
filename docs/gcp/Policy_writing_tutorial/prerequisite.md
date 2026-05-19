@@ -71,7 +71,7 @@ If the push is successful, you have the correct permissions and can continue you
 <div align="center">
 
 [⬅️ Previous:](policy-writing-totourial.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
-[📘 Back to Contents](policy-writing-totourial.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
+[📘 Back to Contents](policy-writing-tutorial.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
 [Next: Researching and Documentation ➡️](researching-and-documentation.md#top)
 
 </div>

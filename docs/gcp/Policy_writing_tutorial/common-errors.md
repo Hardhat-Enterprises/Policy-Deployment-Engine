@@ -35,6 +35,6 @@ Request repository access from a maintainer or supervisor and ensure your GitHub
 
 <div align="center">
 
-[📘 Back to Contents](policy-writing-totourial.md#top) &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;
+[📘 Back to Contents](policy-writing-tutorial.md#top) &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;
 
 </div>
