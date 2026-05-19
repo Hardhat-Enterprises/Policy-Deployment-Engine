@@ -12,7 +12,7 @@ conditions := [
         {
             "condition": "Paused is not set or set to null",
             "attribute_path": ["paused"],
-            "values": [null],
+            "values": [null, ""],
             "policy_type": "blacklist"
         }
     ]

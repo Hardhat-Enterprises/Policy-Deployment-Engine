@@ -14,6 +14,6 @@ resource "google_cloud_scheduler_job" "nc" {
       version  = ""                        
     }
 
-    relative_uri = "/api/v1/resource"        
+    relative_uri = "/password/fakeuri/api"        
   }
 }

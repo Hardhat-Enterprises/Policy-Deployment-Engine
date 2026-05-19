@@ -6,20 +6,26 @@ import data.terraform.gcp.security.cloud_scheduler.google_cloud_scheduler_job.va
 conditions := [
     [
         {
-            "situation_description": "http_method is being configured to a method that is only allowed with the body",
-            "remedies": ["Set http_method to a method POST, PUT, PATCH when body is in use"]
+            "situation_description": "app_engine_http_target is using a http_method that can be exploited, and or not configred service and or is using relative uri with sensitive information",
+            "remedies": ["Configure app_engine_http_target correctly with allowed http_method, configured service and relative uri without senstiive information"]
         },
         {
-            "condition": "Checks if http_method is using an allowed method",
-            "attribute_path": ["http_target", 0, "http_method"],
-            "values": ["POST", "PUT", "PATCH"],
-            "policy_type": "whitelist"
+            "condition": "Http_method is using an banned method",
+            "attribute_path": ["app_engine_http_target", 0, "http_method"],
+            "values": ["DELETE", "PUT", "PATCH"],
+            "policy_type": "blacklist"
         },
         {
-            "condition": "Checks if body is being used",
-            "attribute_path": ["http_target", 0, "body"],
+            "condition": "Service is not designated",
+            "attribute_path": ["app_engine_http_target", 0, "app_engine_routing", "service"],
             "values": [null, ""],
             "policy_type": "blacklist"
+        },
+        {
+            "condition": "Relative uri is using banned sensitive information",
+            "attribute_path": ["app_engine_http_target", 0, "relative_uri"],
+            "values": ["/*", [["password", "token", "api-key"]]],
+            "policy_type": "pattern blacklist"
         }
     ]
 ]
