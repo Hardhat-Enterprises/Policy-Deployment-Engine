@@ -30,7 +30,7 @@ Reference: [Terraform Registry – iam_projects_policy_binding](https://registry
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `expression` | CEL expression for conditional logic. | false | true | Controls conditional IAM enforcement. |  |  |
-| `title` | Title of the condition. | false | false |  |  |  |
-| `description` | Description of the condition. | false | false |  |  |  |
-| `location` | Location of expression for debugging. | false | false |  |  |  |
+| `expression` | CEL expression for conditional logic. | false | true | Controls conditional IAM enforcement. | None | None |
+| `title` | Title of the condition. | false | false | None | None | None |
+| `description` | Description of the condition. | false | false | None | None | None |
+| `location` | Location of expression for debugging. | false | false | None | None | None |
