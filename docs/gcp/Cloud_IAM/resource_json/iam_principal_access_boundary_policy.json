@@ -21,7 +21,7 @@
       "parent": null
     },
     "principal_access_boundary_policy_id": {
-      "description": "The ID to use to create the principal access boundary policy. This value must start with a lowercase letter followed by up to 62 lowercase letters, numbers, hyphens, or dots.",
+      "description": "The ID to use to create the principal access boundary policy. This value must start with a lowercase letter followed by up to 62 lowercase letters, numbers, hyphens, or dots. Pattern, /a-z{2,62}/.",
       "required": true,
       "security_impact": false,
       "rationale": "Ensures consistent naming conventions for policy identification and avoids invalid resource creation.",
@@ -39,7 +39,7 @@
       "parent": null
     },
     "annotations": {
-      "description": "User defined annotations for metadata tagging and governance tracking.",
+      "description": "User defined annotations. See https://google.aip.dev/148#annotations for more details such as format and size limitations **Note**: This field is non-authoritative, and will only manage the annotations present in your configuration. Please refer to the field `effective_annotations` for all of the annotations present on the resource.",
       "required": false,
       "security_impact": false,
       "rationale": "Used for auditability and classification of IAM policies.",
@@ -48,14 +48,16 @@
       "parent": null
     },
     "details": {
-      "description": "Principal access boundary policy details.",
+      "description": "Principal access boundary policy details Structure is [documented below](#nested_details).",
       "required": false,
       "security_impact": true,
       "rationale": "Defines enforcement rules that restrict principal access to approved resources.",
+      "compliant": null,
+      "non-compliant": null,
       "parent": null,
       "arguments": {
         "rules": {
-          "description": "A list of principal access boundary policy rules.",
+          "description": "A list of principal access boundary policy rules. The number of rules in a policy is limited to 500. Structure is [documented below](#nested_details_rules).",
           "required": true,
           "security_impact": true,
           "rationale": "Rules define which resources principals can access under the boundary policy.",
@@ -64,7 +66,7 @@
           "parent": "details"
         },
         "enforcement_version": {
-          "description": "Version of enforcement for Google Cloud services included in policy.",
+          "description": "The version number that indicates which Google Cloud services are included in the enforcement (e.g. \\\"latest\\\", \\\"1\\\", ...). If empty, the PAB policy version will be set to the current latest version, and this version won't get updated when new versions are released.",
           "required": false,
           "security_impact": false,
           "rationale": "Ensures controlled rollout of enforcement changes across services.",
@@ -75,14 +77,16 @@
       }
     },
     "rules": {
-      "description": "Policy rules defining access boundaries for principals.",
+      "description": "",
       "required": true,
       "security_impact": true,
       "rationale": "Rules define the actual enforcement of access boundaries across resources.",
+      "compliant": null,
+      "non-compliant": null,
       "parent": null,
       "arguments": {
         "description": {
-          "description": "The description of the principal access boundary policy rule.",
+          "description": "The description of the principal access boundary policy rule. Must be less than or equal to 256 characters.",
           "required": false,
           "security_impact": false,
           "rationale": null,
@@ -91,7 +95,7 @@
           "parent": "rules"
         },
         "resources": {
-          "description": "Cloud Resource Manager resources included in this rule.",
+          "description": "A list of Cloud Resource Manager resources. The resource and all the descendants are included. The number of resources in a policy is limited to 500 across all rules. The following resource types are supported: * Organizations, such as `//cloudresourcemanager.googleapis.com/organizations/123`. * Folders, such as `//cloudresourcemanager.googleapis.com/folders/123`. * Projects, such as `//cloudresourcemanager.googleapis.com/projects/123` or `//cloudresourcemanager.googleapis.com/projects/my-project-id`.",
           "required": true,
           "security_impact": true,
           "rationale": "Restricts access to approved organizations, folders, or projects only.",
@@ -106,7 +110,7 @@
           "parent": "rules"
         },
         "effect": {
-          "description": "The access relationship of principals to resources.",
+          "description": "The access relationship of principals to the resources in this rule. Possible values: ALLOW",
           "required": true,
           "security_impact": true,
           "rationale": "Defines whether access is allowed under the boundary policy.",
