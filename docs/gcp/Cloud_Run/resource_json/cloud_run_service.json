@@ -5,8 +5,8 @@
     "name": {
       "description": "Name must be unique within a Google Cloud project and region. Is required when creating resources. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The service name is mainly used for identification and does not directly control access, networking, encryption, or runtime security.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,26 +14,26 @@
     "location": {
       "description": "The location of the cloud run instance. eg us-central1",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Location affects data residency, compliance, and whether the service is deployed in an approved region.",
+      "compliant": "australia-southeast1",
+      "non-compliant": "us-central1",
       "parent": null
     },
     "traffic": {
       "description": "Traffic specifies how to distribute traffic over a collection of Knative Revisions and Configurations Structure is [documented below](#nested_spec_traffic).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Traffic settings control how requests are routed between revisions and can affect whether users reach approved or unapproved versions.",
+      "compliant": "Refer to child argument",
+      "non-compliant": "Refer to child argument",
       "parent": null,
       "arguments": {
         "revision_name": {
           "description": "RevisionName of a specific revision to which to send this portion of traffic.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Revision name is mainly operational unless a separate approved revision naming standard is enforced.",
           "compliant": null,
           "non-compliant": null,
           "parent": "traffic"
@@ -41,17 +41,17 @@
         "percent": {
           "description": "Percent specifies percent of the traffic to this Revision or Configuration.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Traffic percentage must stay within a valid approved range to avoid invalid or unintended traffic routing.",
+          "compliant": "80",
+          "non-compliant": "150",
           "parent": "traffic"
         },
         "tag": {
           "description": "Tag is optionally used to expose a dedicated url for referencing this target exclusively.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Traffic tags are mainly used for routing and testing and do not directly control core security settings.",
           "compliant": null,
           "non-compliant": null,
           "parent": "traffic"
@@ -59,17 +59,17 @@
         "latest_revision": {
           "description": "LatestRevision may be optionally provided to indicate that the latest ready Revision of the Configuration should be used for this traffic target. When provided LatestRevision must be true if RevisionName is empty; it must be false when RevisionName is non-empty.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Routing traffic to the latest approved revision helps avoid sending users to outdated or unapproved revisions.",
+          "compliant": "true",
+          "non-compliant": "false",
           "parent": "traffic"
         },
         "url": {
           "description": "(Output) URL displays the URL for accessing tagged traffic targets. URL is displayed in status, and is disallowed on spec. URL must contain a scheme (e.g. http://) and a hostname, but may not contain anything else (e.g. basic auth, url path, etc.)",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "URL is an output-only status value and is not configured directly in the Terraform spec.",
           "compliant": null,
           "non-compliant": null,
           "parent": "traffic"
@@ -79,28 +79,28 @@
     "template": {
       "description": "template holds the latest specification for the Revision to be stamped out. The template references the container image, and may also include labels and annotations that should be attached to the Revision. To correlate a Revision, and/or to force a Revision to be created when the spec doesn't otherwise change, a nonce label may be provided in the template metadata. For more details, see: https://github.com/knative/serving/blob/main/docs/client-conventions.md#associate-modifications-with-revisions Cloud Run does not currently support referencing a build that is responsible for materializing the container image from source. Structure is [documented below](#nested_spec_template).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "The template defines the revision configuration, including runtime identity, container image, resources, secrets, and annotations.",
+      "compliant": "Refer to child argument",
+      "non-compliant": "Refer to child argument",
       "parent": null,
       "arguments": {
         "metadata": {
           "description": "Optional metadata for this Revision, including labels and annotations. Name will be generated by the Configuration. To set minimum instances for this revision, use the \"autoscaling.knative.dev/minScale\" annotation key. To set maximum instances for this revision, use the \"autoscaling.knative.dev/maxScale\" annotation key. To set Cloud SQL connections for the revision, use the \"run.googleapis.com/cloudsql-instances\" annotation key. Structure is [documented below](#nested_spec_template_metadata).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Template metadata can include revision-level annotations for scaling, Cloud SQL, VPC access, Binary Authorization, encryption, and custom audiences.",
+          "compliant": "{\"autoscaling.knative.dev/maxScale\":\"10\", \"run.googleapis.com/binary-authorization\":\"default\"}",
+          "non-compliant": "{\"autoscaling.knative.dev/maxScale\":\"1000\", \"run.googleapis.com/binary-authorization-breakglass\":\"emergency-bypass\"}",
           "parent": "template"
         },
         "spec": {
           "description": "RevisionSpec holds the desired state of the Revision (from the client). Structure is [documented below](#nested_spec_template_spec).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "The revision spec controls runtime identity, timeout, concurrency, containers, resources, ports, and secret volumes.",
+          "compliant": "Refer to child argument",
+          "non-compliant": "Refer to child argument",
           "parent": "template"
         }
       }
@@ -108,26 +108,26 @@
     "metadata": {
       "description": "Metadata associated with this Service, including name, namespace, labels, and annotations. Structure is [documented below](#nested_metadata).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Metadata can include restricted annotations that affect ingress, Binary Authorization, custom audiences, encryption, networking, and scaling.",
+      "compliant": "Refer to child argument",
+      "non-compliant": "Refer to child argument",
       "parent": null,
       "arguments": {
         "labels": {
           "description": "Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and routes. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Approved labels support ownership tracking, environment separation, and governance.",
+          "compliant": "{\"env\":\"prod\"}",
+          "non-compliant": "{\"env\":\"unknown\"}",
           "parent": "metadata"
         },
         "generation": {
           "description": "(Output) A sequence number representing a specific generation of the desired state.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Generation is an output value used for state tracking and is not a user-controlled security setting.",
           "compliant": null,
           "non-compliant": null,
           "parent": "metadata"
@@ -135,8 +135,8 @@
         "resource_version": {
           "description": "(Output) An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. They may only be valid for a particular resource or set of resources.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Resource version is an output value used for change detection and is not a user-controlled security setting.",
           "compliant": null,
           "non-compliant": null,
           "parent": "metadata"
@@ -144,8 +144,8 @@
         "self_link": {
           "description": "(Output) SelfLink is a URL representing this object.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Self link is an output value representing the resource path and is not a user-controlled security setting.",
           "compliant": null,
           "non-compliant": null,
           "parent": "metadata"
@@ -153,8 +153,8 @@
         "uid": {
           "description": "(Output) UID is a unique id generated by the server on successful creation of a resource and is not allowed to change on PUT operations.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "UID is generated by the platform and does not directly affect the configured security posture.",
           "compliant": null,
           "non-compliant": null,
           "parent": "metadata"
@@ -162,26 +162,26 @@
         "namespace": {
           "description": "In Cloud Run the namespace must be equal to either the project ID or project number.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Namespace should match the approved project ID or project number to keep the service inside the expected project boundary.",
+          "compliant": "my-gcp-project",
+          "non-compliant": "wrong-project-id",
           "parent": "metadata"
         },
         "annotations": {
           "description": "Annotations is a key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations **Note**: The Cloud Run API may add additional annotations that were not provided in your config. If terraform plan shows a diff where a server-side annotation is added, you can add it to your config or apply the lifecycle.ignore_changes rule to the metadata.0.annotations field. Annotations with `run.googleapis.com/` and `autoscaling.knative.dev` are restricted. Use the following annotation keys to configure features on a Service: - `run.googleapis.com/binary-authorization-breakglass` sets the [Binary Authorization breakglass](https://cloud.google.com/sdk/gcloud/reference/run/deploy#--breakglass). - `run.googleapis.com/binary-authorization` sets the [Binary Authorization](https://cloud.google.com/sdk/gcloud/reference/run/deploy#--binary-authorization). - `run.googleapis.com/client-name` sets the client name calling the Cloud Run API. - `run.googleapis.com/custom-audiences` sets the [custom audiences](https://cloud.google.com/sdk/gcloud/reference/alpha/run/deploy#--add-custom-audiences) that can be used in the audience field of ID token for authenticated requests. - `run.googleapis.com/description` sets a user defined description for the Service. - `run.googleapis.com/ingress` sets the [ingress settings](https://cloud.google.com/sdk/gcloud/reference/run/deploy#--ingress) for the Service. For example, `\"run.googleapis.com/ingress\" = \"all\"`. - `run.googleapis.com/launch-stage` sets the [launch stage](https://cloud.google.com/run/docs/troubleshooting#launch-stage-validation) when a preview feature is used. For example, `\"run.googleapis.com/launch-stage\": \"BETA\"` - `run.googleapis.com/minScale` sets the [minimum number of container instances](https://cloud.google.com/sdk/gcloud/reference/run/deploy#--min) of the Service. - `run.googleapis.com/scalingMode` sets the type of scaling mode for the service. The supported values for scaling mode are \"manual\" and \"automatic\". If not provided, it defaults to \"automatic\". - `run.googleapis.com/manualInstanceCount` sets the total instance count for the service in manual scaling mode. This number of instances is divided among all revisions with specified traffic based on the percent of traffic they are receiving. **Note**: This field is non-authoritative, and will only manage the annotations present in your configuration. Please refer to the field `effective_annotations` for all of the annotations present on the resource.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Annotations can control ingress, Binary Authorization, custom audiences, VPC access, Cloud SQL, encryption, and scaling.",
+          "compliant": "{\"run.googleapis.com/ingress\":\"internal\", \"run.googleapis.com/binary-authorization\":\"default\", \"run.googleapis.com/custom-audiences\":\"trusted-client\", \"run.googleapis.com/vpc-access-egress\":\"private-ranges-only\"}",
+          "non-compliant": "{\"run.googleapis.com/ingress\":\"all\", \"run.googleapis.com/binary-authorization-breakglass\":\"emergency-bypass\", \"run.googleapis.com/custom-audiences\":\"*\", \"run.googleapis.com/vpc-access-egress\":\"all-traffic\"}",
           "parent": "metadata"
         },
         "name": {
           "description": "Name must be unique within a Google Cloud project and region. Is required when creating resources. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Metadata name is mainly used for identification and does not directly control access, encryption, or network exposure.",
           "compliant": null,
           "non-compliant": null,
           "parent": "metadata"
@@ -189,8 +189,8 @@
         "terraform_labels": {
           "description": "(Output) The combination of labels configured directly on the resource and default labels configured on the provider.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Terraform labels are output-derived label data and are not directly enforced as a security control in this policy set.",
           "compliant": null,
           "non-compliant": null,
           "parent": "metadata"
@@ -198,8 +198,8 @@
         "effective_labels": {
           "description": "(Output) All of labels (key/value pairs) present on the resource in GCP, including the labels configured through Terraform, other clients and services.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Effective labels are output data showing all labels present on the resource and are not directly configured as a security control.",
           "compliant": null,
           "non-compliant": null,
           "parent": "metadata"
@@ -207,8 +207,8 @@
         "effective_annotations": {
           "description": "(Output) All of annotations (key/value pairs) present on the resource in GCP, including the annotations configured through Terraform, other clients and services.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Effective annotations are output data showing all annotations present on the resource and are not directly configured as a security control.",
           "compliant": null,
           "non-compliant": null,
           "parent": "metadata"
@@ -217,45 +217,45 @@
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "required": false,
+      "security_impact": true,
+      "rationale": "Using approved projects helps maintain IAM boundaries, environment separation, billing control, and governance.",
+      "compliant": "my-gcp-project",
+      "non-compliant": "wrong-project-id",
       "parent": null
     },
     "autogenerate_revision_name": {
       "description": "autogenerated by Cloud Run. This cannot be set to `true` while `template.metadata.name` is also set. (For legacy support, if `template.metadata.name` is unset in state while this field is set to false, the revision name will still autogenerate.)",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "Revision name generation is operational and does not directly affect access, networking, encryption, or secret handling.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "spec": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "required": true,
+      "security_impact": true,
+      "rationale": "The spec defines the runtime security posture of the Cloud Run revision.",
+      "compliant": "Refer to child argument",
+      "non-compliant": "Refer to child argument",
       "parent": null,
       "arguments": {
         "containers": {
           "description": "Containers defines the unit of execution for this Revision. Structure is [documented below](#nested_spec_template_spec_containers).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Containers define the runtime image, environment variables, ports, resources, and mounted volumes.",
+          "compliant": "Refer to child argument",
+          "non-compliant": "Refer to child argument",
           "parent": "spec"
         },
         "node_selector": {
           "description": "Node Selector describes the hardware requirements of the resources. Use the following node selector keys to configure features on a Revision: - `run.googleapis.com/accelerator` sets the [type of GPU](https://cloud.google.com/run/docs/configuring/services/gpu) required by the Revision to run.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Node selector is mainly used for hardware selection and was not treated as a core Cloud Run security control in this policy set.",
           "compliant": null,
           "non-compliant": null,
           "parent": "spec"
@@ -263,44 +263,44 @@
         "container_concurrency": {
           "description": "ContainerConcurrency specifies the maximum allowed in-flight (concurrent) requests per container of the Revision. If not specified or 0, defaults to 80 when requested CPU >= 1 and defaults to 1 when requested CPU < 1.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Excessive concurrency can affect service stability, resource use, and availability.",
+          "compliant": "80",
+          "non-compliant": "1000",
           "parent": "spec"
         },
         "timeout_seconds": {
           "description": "TimeoutSeconds holds the max duration the instance is allowed for responding to a request.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Excessive timeout values can tie up resources for too long and increase cost or abuse risk.",
+          "compliant": "300",
+          "non-compliant": "4000",
           "parent": "spec"
         },
         "service_account_name": {
           "description": "Email address of the IAM service account associated with the revision of the service. The service account represents the identity of the running revision, and determines what permissions the revision has. If not provided, the revision will use the project's default service account.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "The service account controls the permissions available to the running service. A dedicated least-privilege account should be used.",
+          "compliant": "secure-sa@my-gcp-project.iam.gserviceaccount.com",
+          "non-compliant": "default",
           "parent": "spec"
         },
         "volumes": {
           "description": "Volume represents a named volume in a container. Structure is [documented below](#nested_spec_template_spec_volumes).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Volumes can expose secrets or external storage to the container and should use approved sources and permissions.",
+          "compliant": "Refer to child argument",
+          "non-compliant": "Refer to child argument",
           "parent": "spec"
         },
         "serving_state": {
           "description": "(Output, Deprecated) ServingState holds a value describing the state the resources are in for this Revision. It is expected that the system will manipulate this based on routability and load. ~> **Warning:** `serving_state` is deprecated and will be removed in a future major release. This field is not supported by the Cloud Run API.",
           "required": null,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Serving state is output and deprecated. It is not a supported user-controlled security setting.",
           "compliant": null,
           "non-compliant": null,
           "parent": "spec"
@@ -309,18 +309,18 @@
     },
     "containers": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "required": true,
+      "security_impact": true,
+      "rationale": "Container configuration affects image trust, secrets handling, exposed ports, compute limits, and mounted volumes.",
+      "compliant": "Refer to child argument",
+      "non-compliant": "Refer to child argument",
       "parent": null,
       "arguments": {
         "name": {
           "description": "Name of the container",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Container name is mainly an identifier and does not directly affect security posture.",
           "compliant": null,
           "non-compliant": null,
           "parent": "containers"
@@ -328,8 +328,8 @@
         "working_dir": {
           "description": ", Deprecated) Container's working directory. If not specified, the container runtime's default will be used, which might be configured in the container image. ~> **Warning:** `working_dir` is deprecated and will be removed in a future major release. This field is not supported by the Cloud Run API.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Working directory is deprecated and not supported by the Cloud Run API.",
           "compliant": null,
           "non-compliant": null,
           "parent": "containers"
@@ -337,8 +337,8 @@
         "args": {
           "description": "Arguments to the entrypoint. The docker image's CMD is used if this is not provided.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Container arguments are application-specific and were not treated as a general security policy in this scope.",
           "compliant": null,
           "non-compliant": null,
           "parent": "containers"
@@ -346,26 +346,26 @@
         "env_from": {
           "description": ", Deprecated) List of sources to populate environment variables in the container. All invalid keys will be reported as an event when the container is starting. When a key exists in multiple sources, the value associated with the last source will take precedence. Values defined by an Env with a duplicate key will take precedence. Structure is [documented below](#nested_spec_template_spec_containers_containers_env_from). ~> **Warning:** `env_from` is deprecated and will be removed in a future major release. This field is not supported by the Cloud Run API.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Environment sources can affect how configuration and secrets are loaded into the container.",
+          "compliant": "Refer to child argument",
+          "non-compliant": "Refer to child argument",
           "parent": "containers"
         },
         "image": {
           "description": "Docker image name. This is most often a reference to a container located in the container registry, such as gcr.io/cloudrun/hello",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Only approved image registries should be used to reduce the risk of deploying untrusted or malicious images.",
+          "compliant": "us-docker.pkg.dev/cloudrun/container/hello",
+          "non-compliant": "docker.io/random/unsafe-image:latest",
           "parent": "containers"
         },
         "command": {
           "description": "Entrypoint array. Not executed within a shell. The docker image's ENTRYPOINT is used if this is not provided.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Entrypoint command is application-specific and was not treated as a general Cloud Run security baseline policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "containers"
@@ -373,44 +373,44 @@
         "env": {
           "description": "List of environment variables to set in the container. Structure is [documented below](#nested_spec_template_spec_containers_containers_env).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Environment variables can expose sensitive values if secrets are hardcoded in plaintext.",
+          "compliant": "Refer to child argument",
+          "non-compliant": "Refer to child argument",
           "parent": "containers"
         },
         "ports": {
           "description": "List of open ports in the container. Structure is [documented below](#nested_spec_template_spec_containers_containers_ports).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Only approved container ports should be exposed to reduce unintended service exposure.",
+          "compliant": "Refer to child argument",
+          "non-compliant": "Refer to child argument",
           "parent": "containers"
         },
         "resources": {
           "description": "Compute Resources required by this container. Used to set values such as max memory Structure is [documented below](#nested_spec_template_spec_containers_containers_resources).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Resource settings help control cost, capacity, abuse risk, and service stability.",
+          "compliant": "Refer to child argument",
+          "non-compliant": "Refer to child argument",
           "parent": "containers"
         },
         "volume_mounts": {
           "description": "Volume to mount into the container's filesystem. Only supports SecretVolumeSources. Structure is [documented below](#nested_spec_template_spec_containers_containers_volume_mounts).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Volume mounts can expose secrets or storage paths to the container and should be limited to approved mounts.",
+          "compliant": "name = secret-volume, mount_path = /secrets",
+          "non-compliant": "/tmp/random",
           "parent": "containers"
         },
         "startup_probe": {
           "description": "Startup probe of application within the container. All other probes are disabled if a startup probe is provided, until it succeeds. Container will not be added to service endpoints if the probe fails. Structure is [documented below](#nested_spec_template_spec_containers_containers_startup_probe).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Startup probes are mainly availability controls and do not directly control access, encryption, secrets, or network exposure.",
           "compliant": null,
           "non-compliant": null,
           "parent": "containers"
@@ -418,8 +418,8 @@
         "liveness_probe": {
           "description": "Periodic probe of container liveness. Container will be restarted if the probe fails. Structure is [documented below](#nested_spec_template_spec_containers_containers_liveness_probe).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Liveness probes are mainly availability controls and do not directly control access, encryption, secrets, or network exposure.",
           "compliant": null,
           "non-compliant": null,
           "parent": "containers"
@@ -428,18 +428,18 @@
     },
     "env_from": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "required": false,
+      "security_impact": true,
+      "rationale": "Environment sources can load configuration or secrets into the container and should be reviewed when used.",
+      "compliant": "Refer to child argument",
+      "non-compliant": "Refer to child argument",
       "parent": null,
       "arguments": {
         "prefix": {
           "description": "An optional identifier to prepend to each key in the ConfigMap.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Prefix is mainly a naming convenience and does not directly control access or secret exposure.",
           "compliant": null,
           "non-compliant": null,
           "parent": "env_from"
@@ -447,8 +447,8 @@
         "config_map_ref": {
           "description": "The ConfigMap to select from. Structure is [documented below](#nested_spec_template_spec_containers_containers_env_from_env_from_config_map_ref).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Config map references are deprecated and not supported by the Cloud Run API.",
           "compliant": null,
           "non-compliant": null,
           "parent": "env_from"
@@ -456,19 +456,19 @@
         "secret_ref": {
           "description": "The Secret to select from. Structure is [documented below](#nested_spec_template_spec_containers_containers_env_from_env_from_secret_ref).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Secret references can expose secrets to the container and should point only to approved secrets.",
+          "compliant": "Refer to child argument",
+          "non-compliant": "Refer to child argument",
           "parent": "env_from"
         }
       }
     },
     "config_map_ref": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "Config map references are deprecated and not supported by the Cloud Run API.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -476,8 +476,8 @@
         "optional": {
           "description": "Specify whether the ConfigMap must be defined",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "This setting is related to deprecated config map behaviour and was not included as a security policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "config_map_ref"
@@ -485,8 +485,8 @@
         "local_object_reference": {
           "description": "The ConfigMap to select from. Structure is [documented below](#nested_spec_template_spec_containers_containers_env_from_env_from_config_map_ref_local_object_reference).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "This setting belongs to deprecated config map behaviour and was not included as a security policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "config_map_ref"
@@ -496,8 +496,8 @@
     "local_object_reference": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Local object reference is mainly an identifier within deprecated config map or secret reference structures.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -505,8 +505,8 @@
         "name": {
           "description": "Name of the referent.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Name is only an identifier in this context and was not treated as a direct security control.",
           "compliant": null,
           "non-compliant": null,
           "parent": "local_object_reference"
@@ -516,26 +516,26 @@
     "secret_ref": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Secret references can expose sensitive values to the container and should use approved secrets only.",
+      "compliant": "Refer to child argument",
+      "non-compliant": "Refer to child argument",
       "parent": null,
       "arguments": {
         "local_object_reference": {
           "description": "The Secret to select from. Structure is [documented below](#nested_spec_template_spec_containers_containers_env_from_env_from_secret_ref_local_object_reference).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "The referenced secret object should be approved before being exposed to the container.",
+          "compliant": "approved-secret",
+          "non-compliant": "unknown-secret",
           "parent": "secret_ref"
         },
         "optional": {
           "description": "Specify whether the Secret must be defined",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Optional controls whether the secret must exist. It is operational and was not treated as a core security control.",
           "compliant": null,
           "non-compliant": null,
           "parent": "secret_ref"
@@ -544,18 +544,18 @@
     },
     "env": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "required": false,
+      "security_impact": true,
+      "rationale": "Environment variables may contain sensitive values and should use Secret Manager references where appropriate.",
+      "compliant": "Refer to child argument",
+      "non-compliant": "Refer to child argument",
       "parent": null,
       "arguments": {
         "name": {
           "description": "Name of the environment variable.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Environment variable names are usually identifiers and are not directly sensitive unless they disclose application design.",
           "compliant": null,
           "non-compliant": null,
           "parent": "env"
@@ -563,19 +563,19 @@
         "value": {
           "description": "Defaults to \"\".",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Plaintext environment variable values can expose passwords, tokens, keys, and other secrets.",
+          "compliant": "production",
+          "non-compliant": "password",
           "parent": "env"
         },
         "value_from": {
           "description": "Source for the environment variable's value. Only supports secret_key_ref. Structure is [documented below](#nested_spec_template_spec_containers_containers_env_env_value_from).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Using Secret Manager references is safer than hardcoding plaintext values when approved secrets and versions are used.",
+          "compliant": "Refer to child argument",
+          "non-compliant": "Refer to child argument",
           "parent": "env"
         }
       }
@@ -583,19 +583,19 @@
     "value_from": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Value sources can retrieve sensitive values and should use approved Secret Manager references.",
+      "compliant": "Refer to child argument",
+      "non-compliant": "Refer to child argument",
       "parent": null,
       "arguments": {
         "secret_key_ref": {
           "description": "Selects a key (version) of a secret in Secret Manager. Structure is [documented below](#nested_spec_template_spec_containers_containers_env_env_value_from_secret_key_ref).",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Secret key references must point to approved secrets and approved secret versions.",
+          "compliant": "Refer to child argument",
+          "non-compliant": "Refer to child argument",
           "parent": "value_from"
         }
       }
@@ -603,28 +603,28 @@
     "secret_key_ref": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Secret references must point to approved secrets and approved versions.",
+      "compliant": "Refer to child argument",
+      "non-compliant": "Refer to child argument",
       "parent": null,
       "arguments": {
         "key": {
           "description": "A Cloud Secret Manager secret version. Must be 'latest' for the latest version or an integer for a specific version.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Only approved secret versions should be used to avoid referencing old or unmanaged versions.",
+          "compliant": "latest",
+          "non-compliant": "old-version",
           "parent": "secret_key_ref"
         },
         "name": {
           "description": "The name of the secret in Cloud Secret Manager. By default, the secret is assumed to be in the same project. If the secret is in another project, you must define an alias. An alias definition has the form: {alias}:projects/{project-id|project-number}/secrets/{secret-name}. If multiple alias definitions are needed, they must be separated by commas. The alias definitions must be set on the run.googleapis.com/secrets annotation.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Only approved Secret Manager secret names should be referenced by Cloud Run services.",
+          "compliant": "prod-db-secret",
+          "non-compliant": "random-secret",
           "parent": "secret_key_ref"
         }
       }
@@ -632,17 +632,17 @@
     "ports": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Port settings affect how the container receives traffic.",
+      "compliant": "Refer to child argument",
+      "non-compliant": "Refer to child argument",
       "parent": null,
       "arguments": {
         "name": {
           "description": "If specified, used to specify which protocol to use. Allowed values are \"http1\" (HTTP/1) and \"h2c\" (HTTP/2 end-to-end). Defaults to \"http1\".",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The protocol name is mainly operational and was not treated as a core security policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "ports"
@@ -650,19 +650,19 @@
         "protocol": {
           "description": "Protocol for port. Must be \"TCP\". Defaults to \"TCP\".",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
+          "security_impact": false,
+          "rationale": "Cloud Run requires TCP, so this was not treated as a custom security policy in this scope.",
+          "compliant": "TCP",
           "non-compliant": null,
           "parent": "ports"
         },
         "container_port": {
           "description": "Port number the container listens on. This must be a valid port number (between 1 and 65535). Defaults to \"8080\".",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Only approved ports should be exposed to reduce unintended service exposure.",
+          "compliant": "8080",
+          "non-compliant": "22",
           "parent": "ports"
         }
       }
@@ -670,28 +670,28 @@
     "resources": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "CPU and memory settings help control cost, capacity, stability, and abuse risk.",
+      "compliant": "Refer to child argument",
+      "non-compliant": "Refer to child argument",
       "parent": null,
       "arguments": {
         "limits": {
           "description": "Limits describes the maximum amount of compute resources allowed. The values of the map is string form of the 'quantity' k8s type: https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/apimachinery/pkg/api/resource/quantity.go",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Excessive limits can increase cost and resource abuse risk.",
+          "compliant": "{\"cpu\":\"1\"}",
+          "non-compliant": "{\"cpu\":\"8\"}",
           "parent": "resources"
         },
         "requests": {
           "description": "Requests describes the minimum amount of compute resources required. If Requests is omitted for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined value. The values of the map is string form of the 'quantity' k8s type: https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/apimachinery/pkg/api/resource/quantity.go",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Excessive requests can reduce scheduling efficiency and increase reserved resource usage.",
+          "compliant": "{\"cpu\":\"1\"}",
+          "non-compliant": "{\"cpu\":\"8\"}",
           "parent": "resources"
         }
       }
@@ -699,26 +699,26 @@
     "volume_mounts": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Volume mounts expose files or secrets inside the container and should be limited to approved paths.",
+      "compliant": "Refer to child argument",
+      "non-compliant": "Refer to child argument",
       "parent": null,
       "arguments": {
         "mount_path": {
           "description": "Path within the container at which the volume should be mounted.  Must not contain ':'.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Mount paths should be controlled so secrets are exposed only at expected locations.",
+          "compliant": "/secrets",
+          "non-compliant": "/tmp/random",
           "parent": "volume_mounts"
         },
         "name": {
           "description": "This must match the Name of a Volume.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The volume mount name is mainly used to match a declared volume and is not directly security-sensitive.",
           "compliant": null,
           "non-compliant": null,
           "parent": "volume_mounts"
@@ -728,8 +728,8 @@
     "startup_probe": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Startup probe configuration mainly affects availability and startup behaviour, not core security posture.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -737,8 +737,8 @@
         "initial_delay_seconds": {
           "description": "Number of seconds after the container has started before the probe is initiated. Defaults to 0 seconds. Minimum value is 0. Maximum value is 240.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Initial Delay Seconds is an availability or health-check setting and was not treated as a core security policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "startup_probe"
@@ -746,8 +746,8 @@
         "timeout_seconds": {
           "description": "Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1. Maximum value is 3600. Must be smaller than periodSeconds.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Timeout Seconds is an availability or health-check setting and was not treated as a core security policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "startup_probe"
@@ -755,8 +755,8 @@
         "period_seconds": {
           "description": "How often (in seconds) to perform the probe. Default to 10 seconds. Minimum value is 1. Maximum value is 240.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Period Seconds is an availability or health-check setting and was not treated as a core security policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "startup_probe"
@@ -764,8 +764,8 @@
         "failure_threshold": {
           "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded. Defaults to 3. Minimum value is 1.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Failure Threshold is an availability or health-check setting and was not treated as a core security policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "startup_probe"
@@ -773,8 +773,8 @@
         "tcp_socket": {
           "description": "TcpSocket specifies an action involving a TCP port. Structure is [documented below](#nested_spec_template_spec_containers_containers_startup_probe_tcp_socket).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Tcp Socket is an availability or health-check setting and was not treated as a core security policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "startup_probe"
@@ -782,8 +782,8 @@
         "http_get": {
           "description": "HttpGet specifies the http request to perform. Structure is [documented below](#nested_spec_template_spec_containers_containers_startup_probe_http_get).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Http Get is an availability or health-check setting and was not treated as a core security policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "startup_probe"
@@ -791,8 +791,8 @@
         "grpc": {
           "description": "GRPC specifies an action involving a GRPC port. Structure is [documented below](#nested_spec_template_spec_containers_containers_startup_probe_grpc).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Grpc is an availability or health-check setting and was not treated as a core security policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "startup_probe"
@@ -802,8 +802,8 @@
     "tcp_socket": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "TCP socket is used for health checking and was not treated as a core Cloud Run security policy.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -811,8 +811,8 @@
         "port": {
           "description": "Port number to access on the container. Number must be in the range 1 to 65535. If not specified, defaults to the same value as container.ports[0].containerPort.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Probe port is part of health checking. Container port exposure is handled separately by the container_port policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "tcp_socket"
@@ -822,8 +822,8 @@
     "http_get": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "HTTP probe settings are used for health checking and were not treated as core security policies.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -831,8 +831,8 @@
         "path": {
           "description": "Path to access on the HTTP server. If set, it should not be empty string.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Health check path is operational and application-specific.",
           "compliant": null,
           "non-compliant": null,
           "parent": "http_get"
@@ -840,8 +840,8 @@
         "port": {
           "description": "Port number to access on the container. Number must be in the range 1 to 65535. If not specified, defaults to the same value as container.ports[0].containerPort.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Health check port is operational. Container port exposure is handled separately.",
           "compliant": null,
           "non-compliant": null,
           "parent": "http_get"
@@ -849,8 +849,8 @@
         "http_headers": {
           "description": "Custom headers to set in the request. HTTP allows repeated headers. Structure is [documented below](#nested_spec_template_spec_containers_containers_liveness_probe_http_get_http_headers).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Health check headers are application-specific and were not treated as a general Cloud Run security policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "http_get"
@@ -860,8 +860,8 @@
     "http_headers": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "HTTP headers here are used for probes and are application-specific.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -869,8 +869,8 @@
         "name": {
           "description": "The header field name.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Probe header name is application-specific and not a core Cloud Run security control.",
           "compliant": null,
           "non-compliant": null,
           "parent": "http_headers"
@@ -878,10 +878,10 @@
         "value": {
           "description": "The header field value.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Header values can contain sensitive data, but probe headers were not included in the implemented policy scope.",
           "compliant": null,
-          "non-compliant": null,
+          "non-compliant": "password",
           "parent": "http_headers"
         }
       }
@@ -889,8 +889,8 @@
     "grpc": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "gRPC probe settings are health check related and were not treated as core security policies.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -898,8 +898,8 @@
         "port": {
           "description": "Port number to access on the container. Number must be in the range 1 to 65535. If not specified, defaults to the same value as container.ports[0].containerPort.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Probe port is operational. Container port exposure is handled separately.",
           "compliant": null,
           "non-compliant": null,
           "parent": "grpc"
@@ -907,8 +907,8 @@
         "service": {
           "description": "The name of the service to place in the gRPC HealthCheckRequest (see https://github.com/grpc/grpc/blob/master/doc/health-checking.md). If this is not specified, the default behavior is defined by gRPC.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "gRPC probe service name is operational and application-specific.",
           "compliant": null,
           "non-compliant": null,
           "parent": "grpc"
@@ -918,8 +918,8 @@
     "liveness_probe": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Liveness probe configuration mainly affects availability and restart behaviour, not core security posture.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -927,8 +927,8 @@
         "initial_delay_seconds": {
           "description": "Number of seconds after the container has started before the probe is initiated. Defaults to 0 seconds. Minimum value is 0. Maximum value is 3600.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Initial Delay Seconds is an availability or health-check setting and was not treated as a core security policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "liveness_probe"
@@ -936,8 +936,8 @@
         "timeout_seconds": {
           "description": "Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1. Maximum value is 3600. Must be smaller than period_seconds.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Timeout Seconds is an availability or health-check setting and was not treated as a core security policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "liveness_probe"
@@ -945,8 +945,8 @@
         "period_seconds": {
           "description": "How often (in seconds) to perform the probe. Default to 10 seconds. Minimum value is 1. Maximum value is 3600.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Period Seconds is an availability or health-check setting and was not treated as a core security policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "liveness_probe"
@@ -954,8 +954,8 @@
         "failure_threshold": {
           "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded. Defaults to 3. Minimum value is 1.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Failure Threshold is an availability or health-check setting and was not treated as a core security policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "liveness_probe"
@@ -963,8 +963,8 @@
         "http_get": {
           "description": "HttpGet specifies the http request to perform. Structure is [documented below](#nested_spec_template_spec_containers_containers_liveness_probe_http_get).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Http Get is an availability or health-check setting and was not treated as a core security policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "liveness_probe"
@@ -972,8 +972,8 @@
         "grpc": {
           "description": "GRPC specifies an action involving a GRPC port. Structure is [documented below](#nested_spec_template_spec_containers_containers_liveness_probe_grpc).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Grpc is an availability or health-check setting and was not treated as a core security policy.",
           "compliant": null,
           "non-compliant": null,
           "parent": "liveness_probe"
@@ -983,17 +983,17 @@
     "volumes": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Volumes can expose secrets or external file systems to the container.",
+      "compliant": "Refer to child argument",
+      "non-compliant": "Refer to child argument",
       "parent": null,
       "arguments": {
         "name": {
           "description": "Volume's name.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Volume name is mainly used to match the volume with the related mount.",
           "compliant": null,
           "non-compliant": null,
           "parent": "volumes"
@@ -1001,17 +1001,17 @@
         "secret": {
           "description": "The secret's value will be presented as the content of a file whose name is defined in the item path. If no items are defined, the name of the file is the secret_name. Structure is [documented below](#nested_spec_template_spec_volumes_volumes_secret).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Secret volumes must use approved secrets, restrictive file permissions, and safe item paths.",
+          "compliant": "Refer to child argument",
+          "non-compliant": "Refer to child argument",
           "parent": "volumes"
         },
         "empty_dir": {
           "description": "Ephemeral storage which can be backed by real disks (HD, SSD), network storage or memory (i.e. tmpfs). For now only in memory (tmpfs) is supported. It is ephemeral in the sense that when the sandbox is taken down, the data is destroyed with it (it does not persist across sandbox runs). Structure is [documented below](#nested_spec_template_spec_volumes_volumes_empty_dir).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "EmptyDir is ephemeral storage and was not included in the implemented high-impact Cloud Run security policy set.",
           "compliant": null,
           "non-compliant": null,
           "parent": "volumes"
@@ -1019,8 +1019,8 @@
         "csi": {
           "description": "A filesystem specified by the Container Storage Interface (CSI). Structure is [documented below](#nested_spec_template_spec_volumes_volumes_csi).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "CSI volumes can expose external storage to the service. They were considered optional advanced controls because they depend on workload storage design.",
           "compliant": null,
           "non-compliant": null,
           "parent": "volumes"
@@ -1028,8 +1028,8 @@
         "nfs": {
           "description": "A filesystem backed by a Network File System share. This filesystem requires the run.googleapis.com/execution-environment annotation to be unset or set to \"gen2\" Structure is [documented below](#nested_spec_template_spec_volumes_volumes_nfs).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "NFS volumes can expose external file systems to the service. They were considered optional advanced controls because they depend on workload storage design.",
           "compliant": null,
           "non-compliant": null,
           "parent": "volumes"
@@ -1039,37 +1039,37 @@
     "secret": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Secret volume settings affect which secrets are mounted and how readable the mounted files are.",
+      "compliant": "Refer to child argument",
+      "non-compliant": "Refer to child argument",
       "parent": null,
       "arguments": {
         "secret_name": {
           "description": "The name of the secret in Cloud Secret Manager. By default, the secret is assumed to be in the same project. If the secret is in another project, you must define an alias. An alias definition has the form: {alias}:projects/{project-id|project-number}/secrets/{secret-name}. If multiple alias definitions are needed, they must be separated by commas. The alias definitions must be set on the run.googleapis.com/secrets annotation.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Only approved secrets should be mounted into Cloud Run services.",
+          "compliant": "prod-db-secret",
+          "non-compliant": "random-secret",
           "parent": "secret"
         },
         "default_mode": {
           "description": "Mode bits to use on created files by default. Must be a value between 0000 and 0777. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Mounted secrets should use restrictive file permissions to reduce accidental exposure.",
+          "compliant": "256",
+          "non-compliant": "511",
           "parent": "secret"
         },
         "items": {
           "description": "If unspecified, the volume will expose a file whose name is the secret_name. If specified, the key will be used as the version to fetch from Cloud Secret Manager and the path will be the name of the file exposed in the volume. When items are defined, they must specify a key and a path. Structure is [documented below](#nested_spec_template_spec_volumes_volumes_secret_items).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Secret items should use approved versions, safe file paths, and restrictive permissions.",
+          "compliant": "Refer to child argument",
+          "non-compliant": "Refer to child argument",
           "parent": "secret"
         }
       }
@@ -1077,37 +1077,37 @@
     "items": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Secret item configuration affects the secret version, mounted file path, and file permissions.",
+      "compliant": "Refer to child argument",
+      "non-compliant": "Refer to child argument",
       "parent": null,
       "arguments": {
         "key": {
           "description": "The Cloud Secret Manager secret version. Can be 'latest' for the latest value or an integer for a specific version.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Only approved secret versions should be mounted.",
+          "compliant": "latest",
+          "non-compliant": "old-version",
           "parent": "items"
         },
         "path": {
           "description": "The relative path of the file to map the key to. May not be an absolute path. May not contain the path element '..'. May not start with the string '..'.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Secret item paths should be approved and should not use unsafe or unexpected file names.",
+          "compliant": "db-password",
+          "non-compliant": "random-path",
           "parent": "items"
         },
         "mode": {
           "description": "Mode bits to use on this file, must be a value between 0000 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Secret item files should use restrictive permissions to prevent unnecessary access.",
+          "compliant": "256",
+          "non-compliant": "511",
           "parent": "items"
         }
       }
@@ -1115,8 +1115,8 @@
     "empty_dir": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "EmptyDir is ephemeral storage and was not included in the implemented security policy scope.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -1124,8 +1124,8 @@
         "medium": {
           "description": "The medium on which the data is stored. The default is \"\" which means to use the node's default medium. Must be an empty string (default) or Memory.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "Storage medium is operational and workload-specific.",
           "compliant": null,
           "non-compliant": null,
           "parent": "empty_dir"
@@ -1133,8 +1133,8 @@
         "size_limit": {
           "description": "Limit on the storage usable by this EmptyDir volume. The size limit is also applicable for memory medium. The maximum usage on memory medium EmptyDir would be the minimum value between the SizeLimit specified here and the sum of memory limits of all containers in a pod. This field's values are of the 'Quantity' k8s type: https://kubernetes.io/docs/reference/kubernetes-api/common-definitions/quantity/. The default is nil which means that the limit is undefined. More info: https://kubernetes.io/docs/concepts/storage/volumes/#emptydir.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "Size limits can help control resource use, but this was not included in the implemented high-impact policy set.",
           "compliant": null,
           "non-compliant": null,
           "parent": "empty_dir"
@@ -1144,8 +1144,8 @@
     "csi": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "CSI volumes can expose external storage to the service and should be reviewed when used.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -1153,28 +1153,28 @@
         "driver": {
           "description": "Unique name representing the type of file system to be created. Cloud Run supports the following values: * gcsfuse.run.googleapis.com: Mount a Google Cloud Storage bucket using GCSFuse. This driver requires the run.googleapis.com/execution-environment annotation to be unset or set to \"gen2\"",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Only approved CSI drivers should be used when CSI volumes are enabled.",
+          "compliant": "gcsfuse.run.googleapis.com",
+          "non-compliant": "unknown-driver",
           "parent": "csi"
         },
         "read_only": {
           "description": "If true, all mounts created from this volume will be read-only.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Read-only mounts reduce write risk to mounted storage.",
+          "compliant": "true",
+          "non-compliant": "false",
           "parent": "csi"
         },
         "volume_attributes": {
           "description": "Driver-specific attributes. The following options are supported for available drivers: * gcsfuse.run.googleapis.com * bucketName: The name of the Cloud Storage Bucket that backs this volume. The Cloud Run Service identity must have access to this bucket.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Volume attributes can identify external storage such as bucket names and should reference approved storage only.",
+          "compliant": "{\"bucketName\":\"approved-bucket\"}",
+          "non-compliant": "{\"bucketName\":\"unknown-bucket\"}",
           "parent": "csi"
         }
       }
@@ -1182,8 +1182,8 @@
     "nfs": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "NFS volumes can expose external file systems to the service and should be reviewed when used.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -1191,28 +1191,28 @@
         "server": {
           "description": "IP address or hostname of the NFS server",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Only approved internal NFS servers should be mounted.",
+          "compliant": "10.0.0.5",
+          "non-compliant": "203.0.113.10",
           "parent": "nfs"
         },
         "path": {
           "description": "Path exported by the NFS server",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Only approved exported NFS paths should be mounted.",
+          "compliant": "/exports/app",
+          "non-compliant": "/",
           "parent": "nfs"
         },
         "read_only": {
           "description": "If true, mount the NFS volume as read only in all mounts. Defaults to false.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Read-only NFS mounts reduce the risk of unwanted writes to shared storage.",
+          "compliant": "true",
+          "non-compliant": "false",
           "parent": "nfs"
         }
       }
