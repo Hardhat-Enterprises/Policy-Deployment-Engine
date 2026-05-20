@@ -1,0 +1,42 @@
+{
+  "resource_name": "logging_folder_settings",
+  "subcategory": "Cloud (Stackdriver) Logging",
+  "arguments": {
+    "folder": {
+      "description": "The folder for which to configure logging settings. Format: folders/FOLDER_ID",
+      "required": true,
+      "security_impact": false,
+      "rationale": "This identifies which folder's logging settings are being configured. It has no direct security impact on the settings themselves.",
+      "compliant": "folders/1234567890",
+      "non-compliant": null,
+      "parent": null
+    },
+    "kms_key_name": {
+      "description": "The resource name for the configured Cloud KMS key used to encrypt log data at rest. Format: projects/KEY_PROJECT_ID/locations/LOCATION/keyRings/KEYRING_NAME/cryptoKeys/KEY_NAME",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Customer-managed encryption keys (CMEK) provide control over encryption of log data. Without CMEK, Google-managed encryption is used which may not meet compliance requirements for HIPAA, SOC2, or PCI DSS. CMEK allows key rotation, revocation, and audit trail of key usage.",
+      "compliant": "projects/my-project/locations/global/keyRings/logging-keyring/cryptoKeys/logging-key",
+      "non-compliant": null,
+      "parent": null
+    },
+    "storage_location": {
+      "description": "The storage location that Cloud Logging will use to create new resources when a location is needed but not explicitly provided. Examples: global, us-central1, eu, asia-southeast1",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Storage location affects data residency requirements and compliance (e.g., GDPR, HIPAA) but does not directly impact security controls like encryption or access management.",
+      "compliant": "australia-southeast1",
+      "non-compliant": null,
+      "parent": null
+    },
+    "disable_default_sink": {
+      "description": "If set to true, the _Default sink in newly created projects and folders will be created in a disabled state. This can be used to automatically disable log storage if there is already an aggregated sink configured in the hierarchy. The _Default sink can be re-enabled manually if needed.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Disabling the _Default sink prevents logs from being stored in the default logging bucket. If not replaced with an alternative aggregated sink, critical logs may be lost, creating security blind spots and violating compliance requirements for log retention.",
+      "compliant": "false",
+      "non-compliant": "true",
+      "parent": null
+    }
+  }
+}

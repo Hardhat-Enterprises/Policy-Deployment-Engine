@@ -45,31 +45,31 @@ def sanitize_subcategory_for_path(subcategory: str) -> str:
 def get_resource_filename(resource_name: str) -> str:
     """
     Generate filename for resource JSON file by removing CSP prefix.
-    
+
     Removes the CSP prefix (aws_, azurerm_, google_) from resource names
     to create cleaner filenames.
-    
+
     Args:
         resource_name: Full resource name (e.g., "aws_s3_bucket")
-    
+
     Returns:
-        Filename without CSP prefix (e.g., "s3_bucket.template.json")
-    
+        Filename without CSP prefix (e.g., "s3_bucket.json")
+
     Example:
         >>> get_resource_filename("aws_s3_bucket")
-        's3_bucket.template.json'
+        's3_bucket.json'
         >>> get_resource_filename("azurerm_storage_account")
-        'storage_account.template.json'
+        'storage_account.json'
         >>> get_resource_filename("google_storage_bucket")
-        'storage_bucket.template.json'
+        'storage_bucket.json'
     """
     # Remove known CSP prefixes
     for prefix in ['aws_', 'azurerm_', 'google_']:
         if resource_name.startswith(prefix):
-            return f"{resource_name[len(prefix):]}.template.json"
-    
+            return f"{resource_name[len(prefix):]}.json"
+
     # If no known prefix, use full name
-    return f"{resource_name}.template.json"
+    return f"{resource_name}.json"
 
 
 class ResourceFileManager:
@@ -221,7 +221,16 @@ class ResourceFileManager:
         try:
             # Serialize resource to JSON dictionary
             json_dict = resource.to_json_dict()
-            
+
+            # Merge with existing file to preserve user-filled fields
+            if file_path.exists():
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        existing_json = json.load(f)
+                    json_dict = self._merge_resource_json(json_dict, existing_json)
+                except Exception as e:
+                    logger.warning(f"Could not read existing file for merge, overwriting: {file_path} - {e}")
+
             # Write JSON file with proper formatting
             with open(file_path, 'w', encoding='utf-8') as f:
                 json.dump(json_dict, f, indent=2, ensure_ascii=False)
@@ -395,6 +404,40 @@ class ResourceFileManager:
         
         return result
     
+    # Fields filled by contributors — never overwritten by auto-generation
+    _PRESERVED_FIELDS = frozenset({'security_impact', 'rationale', 'compliant', 'non_compliant'})
+
+    def _merge_resource_json(self, new_json: dict, existing_json: dict) -> dict:
+        """Merge new resource JSON with existing, preserving contributor-filled fields."""
+        result = new_json.copy()
+        if 'arguments' in new_json and 'arguments' in existing_json:
+            result['arguments'] = self._merge_arguments(
+                new_json['arguments'], existing_json['arguments']
+            )
+        return result
+
+    def _merge_arguments(self, new_args: dict, existing_args: dict) -> dict:
+        """Recursively merge argument dicts, preserving user fields and dropping stale args."""
+        result = {}
+        for arg_name, new_arg in new_args.items():
+            if arg_name in existing_args:
+                existing_arg = existing_args[arg_name]
+                merged = new_arg.copy()
+                # Restore contributor-filled fields if they were set
+                for field in self._PRESERVED_FIELDS:
+                    if existing_arg.get(field) is not None:
+                        merged[field] = existing_arg[field]
+                # Recurse into nested arguments
+                if new_arg.get('arguments'):
+                    merged['arguments'] = self._merge_arguments(
+                        new_arg['arguments'], existing_arg.get('arguments') or {}
+                    )
+                result[arg_name] = merged
+            else:
+                result[arg_name] = new_arg  # new argument from provider
+        # Arguments only in existing are intentionally omitted (removed from provider)
+        return result
+
     def _extract_csp_from_resource_name(self, resource_name: str) -> str:
         """
         Extract CSP identifier from resource name.

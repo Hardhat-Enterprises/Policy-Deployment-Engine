@@ -29,6 +29,7 @@ Author: Terraform JSON Spec Generator Team
 Version: 1.0.0
 """
 
+import re
 import subprocess
 from pathlib import Path
 from typing import List, Optional
@@ -307,28 +308,18 @@ class RepositoryManager:
                 version = result.stdout.strip()
                 logger.info(f"Detected version from current tag: {version}")
                 return version
-            
-            # If not on a tag, get the latest tag
-            result = subprocess.run(
-                ['git', '-C', str(repo_path), 'describe', '--tags', '--abbrev=0'],
-                capture_output=True,
-                text=True
-            )
-            
-            if result.returncode == 0:
-                version = result.stdout.strip()
-                logger.info(f"Detected version from latest tag: {version}")
-                return version
-            
-            # If no tags exist, try to get the most recent tag from all branches
+
+            # Not on a specific tag — find the globally latest tag across all branches.
+            # We intentionally skip `git describe --tags --abbrev=0` here because it
+            # only walks the current branch's ancestors, which misses release tags that
+            # live on release branches (e.g. Terraform provider tagging strategy).
             result = subprocess.run(
                 ['git', '-C', str(repo_path), 'tag', '--sort=-version:refname'],
                 capture_output=True,
                 text=True
             )
-            
+
             if result.returncode == 0 and result.stdout.strip():
-                # Get the first (most recent) tag
                 tags = result.stdout.strip().split('\n')
                 if tags and tags[0]:
                     version = tags[0]
@@ -409,53 +400,81 @@ class RepositoryManager:
             logger.debug(f"Unexpected error checking for updates: {e}")
             return None
     
-    def update_cache(self, repo_path: Path) -> None:
+    def update_cache(self, repo_path: Path) -> Optional[str]:
         """
-        Update cached repository from remote.
-        
-        Performs a full git pull to update the cached repository with
-        the latest documentation from the remote. This ensures the cache
-        has the most recent provider documentation.
-        
+        Update cached repository from remote and checkout the latest released tag.
+
+        Pulls the latest changes from main (which carries new tags), then checks out
+        the most recent version tag so that subsequent reads reflect the latest provider
+        documentation.
+
         Args:
             repo_path: Path to the git repository
-        
+
+        Returns:
+            Optional[str]: The latest version tag checked out (e.g. "v7.35.0"), or None on failure
+
         Raises:
             ConnectionError: If git pull fails
-        
-        Example:
-            >>> repo_mgr = RepositoryManager()
-            >>> repo_path = repo_mgr.clone_provider_repo('aws')
-            >>> repo_mgr.update_cache(repo_path)
-        
+
         Note:
-            - Performs full git pull (updates all files in sparse checkout)
-            - May take 10-30 seconds depending on changes
+            - Pulls main branch then checks out the latest semver tag
             - Only updates files in sparse checkout (website/docs/r/)
-            - Switches to main branch if in detached HEAD state
         """
         try:
             logger.info("Updating cache from remote...")
-            
-            # First, ensure we're on main branch (not detached HEAD)
+
+            # Switch to main branch so we can pull (may be in detached HEAD from previous run)
             subprocess.run(
                 ['git', '-C', str(repo_path), 'checkout', 'main'],
                 check=True,
                 capture_output=True,
                 text=True
             )
-            
-            # Pull latest changes
+
+            # Pull latest changes and tags
             result = subprocess.run(
                 ['git', '-C', str(repo_path), 'pull', 'origin', 'main'],
                 check=True,
                 capture_output=True,
                 text=True
             )
-            
-            logger.info("Cache updated successfully")
             logger.debug(f"Git pull output: {result.stdout}")
-            
+
+            # Fetch all tags (pull may not bring all release-branch tags)
+            subprocess.run(
+                ['git', '-C', str(repo_path), 'fetch', '--tags'],
+                check=True,
+                capture_output=True,
+                text=True
+            )
+
+            # Find the latest semver tag
+            tag_result = subprocess.run(
+                ['git', '-C', str(repo_path), 'tag', '--sort=-version:refname'],
+                capture_output=True,
+                text=True
+            )
+
+            latest_tag = None
+            if tag_result.returncode == 0 and tag_result.stdout.strip():
+                tags = tag_result.stdout.strip().split('\n')
+                if tags and tags[0]:
+                    latest_tag = tags[0]
+
+            if latest_tag:
+                subprocess.run(
+                    ['git', '-C', str(repo_path), 'checkout', latest_tag],
+                    check=True,
+                    capture_output=True,
+                    text=True
+                )
+                logger.info(f"Cache updated — checked out latest version: {latest_tag}")
+            else:
+                logger.warning("No tags found after update; staying on main branch")
+
+            return latest_tag
+
         except subprocess.CalledProcessError as e:
             logger.error(f"Failed to update cache: {e.stderr}")
             raise ConnectionError(
@@ -502,15 +521,38 @@ class RepositoryManager:
             filename = resource_name + '.html.markdown'
         
         markdown_path = docs_dir / filename
-        
+
         if not markdown_path.exists():
+            # For IAM resource variants (e.g. google_foo_iam_policy → foo_iam.html.markdown)
+            for iam_suffix in ('_iam_policy', '_iam_binding', '_iam_member'):
+                if resource_name.endswith(iam_suffix):
+                    base = resource_name[:-len(iam_suffix)]  # strip _policy/_binding/_member
+                    iam_stem = base  # already has provider prefix stripped above
+                    # Re-derive iam_stem without provider prefix
+                    for pfx in ('aws_', 'azurerm_', 'google_'):
+                        if base.startswith(pfx):
+                            iam_stem = base[len(pfx):]
+                            break
+                    iam_path = docs_dir / f"{iam_stem}_iam.html.markdown"
+                    if iam_path.exists():
+                        return iam_path
+                    # Some GCP IAM files include the provider prefix in the filename
+                    # (e.g., google_folder_iam.html.markdown instead of folder_iam.html.markdown)
+                    for pfx in ('aws_', 'azurerm_', 'google_'):
+                        if resource_name.startswith(pfx):
+                            iam_path_prefixed = docs_dir / f"{pfx}{iam_stem}_iam.html.markdown"
+                            if iam_path_prefixed.exists():
+                                return iam_path_prefixed
+                            break
+                    break
+
             raise ParsingError(
                 "Markdown file not found",
                 resource_name=resource_name,
                 file_path=str(markdown_path),
                 operation="locate resource documentation"
             )
-        
+
         return markdown_path
     
     def list_all_resources(self, repo_path: Path) -> List[str]:
@@ -553,13 +595,35 @@ class RepositoryManager:
         
         resources = []
         for markdown_file in docs_dir.glob('*.html.markdown'):
-            # Extract resource name from filename
-            resource_name = markdown_file.stem.replace('.html', '')
-            full_resource_name = f"{prefix}{resource_name}"
-            resources.append(full_resource_name)
-        
+            stem = markdown_file.stem.replace('.html', '')
+
+            if stem.endswith('_iam'):
+                # IAM files document 3 resource variants in one file
+                iam_names = self._extract_iam_resource_names(markdown_file, prefix)
+                if iam_names:
+                    resources.extend(iam_names)
+                else:
+                    # Fallback: synthesize the 3 standard names
+                    base = f"{prefix}{stem}"
+                    resources.extend([f"{base}_policy", f"{base}_binding", f"{base}_member"])
+            else:
+                resources.append(f"{prefix}{stem}")
+
         logger.debug(f"Found {len(resources)} resources in {docs_dir}")
         return sorted(resources)
+
+    def _extract_iam_resource_names(self, iam_file: Path, prefix: str) -> List[str]:
+        """Read an IAM markdown file and return the 3 resource names from its ## headers."""
+        try:
+            content = iam_file.read_text(encoding='utf-8')
+            pattern = re.compile(
+                r'^##\s+(' + re.escape(prefix) + r'\S+_iam_(?:policy|binding|member))\s*$',
+                re.MULTILINE
+            )
+            names = list(dict.fromkeys(pattern.findall(content)))  # preserve order, deduplicate
+            return names
+        except Exception:
+            return []
     
     def list_resources_by_service(
         self,
@@ -593,17 +657,21 @@ class RepositoryManager:
         all_resources = self.list_all_resources(repo_path)
         filtered_resources = []
         
-        service_lower = service.lower()
-        
+        # Normalize by stripping all spaces and underscores for robust matching:
+        # "beyond_corp" → "beyondcorp" matches subcategory "BeyondCorp" → "beyondcorp"
+        # "cloud_storage" → "cloudstorage" matches subcategory "Cloud Storage" → "cloudstorage"
+        service_normalized = service.lower().replace('_', '').replace(' ', '')
+
         for resource_name in all_resources:
             try:
                 markdown_path = self.get_resource_markdown_path(repo_path, resource_name)
-                resource = parse_resource_markdown(markdown_path)
-                
+                resource = parse_resource_markdown(markdown_path, resource_name_hint=resource_name)
+
                 if resource and resource.subcategory:
-                    # Case-insensitive partial match
-                    if service_lower in resource.subcategory.lower():
+                    subcategory_normalized = resource.subcategory.lower().replace('_', '').replace(' ', '')
+                    if service_normalized in subcategory_normalized:
                         filtered_resources.append(resource_name)
+
                         
             except Exception as e:
                 logger.warning(

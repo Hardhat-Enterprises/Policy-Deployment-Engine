@@ -5,8 +5,8 @@
     "location": {
       "description": "Used to find the parent resource to bind the IAM policy to. If not specified, the value will be parsed from the identifier of the parent resource. If no location is provided in the parent identifier and no location is specified, it is taken from the provider configuration.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Location is used to identify the parent workstation config for IAM binding, but this policy set does not validate approved IAM locations.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,8 +14,8 @@
     "workstation_cluster_id": {
       "description": "Used to find the parent resource to bind the IAM policy to",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale":  "The workstation cluster ID helps identify the parent resource for IAM binding, but this policy set does not validate approved cluster IDs for workstation config IAM resources.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -23,8 +23,8 @@
     "workstation_config_id": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The workstation config ID identifies the target resource for IAM policy assignment, but this policy set does not validate approved workstation config IDs for IAM resources.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -32,8 +32,8 @@
     "project": {
       "description": "If it is not provided, the project will be parsed from the identifier of the parent resource. If no project is provided in the parent identifier and no project is specified, the provider project is used.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Project identifies where the IAM policy is applied, but this policy set does not validate approved project IDs for workstation config IAM resources.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -41,28 +41,28 @@
     "member/members": {
       "description": "Each entry can have one of the following values: * **allUsers**: A special identifier that represents anyone who is on the internet; with or without a Google account. * **allAuthenticatedUsers**: A special identifier that represents anyone who is authenticated with a Google account or a service account. * **user:{emailid}**: An email address that represents a specific Google account. For example, alice@gmail.com or joe@example.com. * **serviceAccount:{emailid}**: An email address that represents a service account. For example, my-other-app@appspot.gserviceaccount.com. * **group:{emailid}**: An email address that represents a Google group. For example, admins@example.com. * **domain:{domain}**: A G Suite domain (primary, instead of alias) name that represents all the users of that domain. For example, google.com or example.com. * **projectOwner:projectid**: Owners of the given project. For example, \"projectOwner:my-example-project\" * **projectEditor:projectid**: Editors of the given project. For example, \"projectEditor:my-example-project\" * **projectViewer:projectid**: Viewers of the given project. For example, \"projectViewer:my-example-project\"",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "IAM members should not include broad public principals because they can grant workstation config access to anyone on the internet or anyone with a Google account.",
+      "compliant": "The IAM member or members list uses specific approved identities, such as user:jane@example.com.",
+      "non-compliant": "The IAM member or members list includes broad principals, such as allUsers or allAuthenticatedUsers.",
       "parent": null
     },
     "role": {
       "description": "`google_workstations_workstation_config_iam_binding` can be used per role. Note that custom roles must be of the format `[projects|organizations]/{parent-name}/roles/{role-name}`.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "IAM roles should follow least privilege. Overly broad roles can grant more access than required to workstation config resources.",
+      "compliant": "The IAM policy uses an approved least-privilege role, such as roles/viewer.",
+      "non-compliant": "The IAM policy uses an overly broad role, such as roles/owner or roles/editor.",
       "parent": null
     },
     "policy_data": {
       "description": "a `google_iam_policy` data source.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "IAM policy data can define who has access to the workstation config. It should not grant access to broad public principals or unsafe identities.",
+      "compliant":  "The policy_data grants access only to approved identities, such as user:jane@example.com.",
+      "non-compliant": "The policy_data grants access to broad principals, such as allUsers or allAuthenticatedUsers.",
       "parent": null
     }
   }
