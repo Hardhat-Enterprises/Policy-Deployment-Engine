@@ -11,7 +11,7 @@ conditions := [
     {
       "condition": "Validate location",
       "attribute_path": ["location"],
-      "values": ["global"],
+      "values": ["australia-southeast1", "australia-southeast2"],
       "policy_type": "whitelist"
     }
   ]
