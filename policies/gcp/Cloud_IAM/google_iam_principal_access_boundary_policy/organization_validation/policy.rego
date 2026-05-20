@@ -5,7 +5,7 @@ import data.terraform.gcp.security.Cloud_IAM.google_iam_principal_access_boundar
 
 conditions := [
     [
-    {"situation_description" : "must use an approved organization",
+    {"situation_description" : "Principal Access Boundary policies must use only approved organization IDs to ensure proper IAM governance and organizational compliance.",
     "remedies":[ "Use only approved organization IDs"]},
     {
         "condition": "Validate organization field",
