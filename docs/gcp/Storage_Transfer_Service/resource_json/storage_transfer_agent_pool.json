@@ -3,50 +3,50 @@
   "subcategory": "Storage Transfer Service",
   "arguments": {
     "name": {
-      "description": "The ID of the agent pool to create. The agentPoolId must meet the following requirements: * Length of 128 characters or less. * Not start with the string goog. * Start with a lowercase ASCII character, followed by: * Zero or more: lowercase Latin alphabet characters, numerals, hyphens (-), periods (.), underscores (_), or tildes (~). * One or more numerals or lowercase ASCII characters. As expressed by the regular expression: ^(?!goog)[a-z]([a-z0-9-._~]*[a-z0-9])?$.",
+      "description": "The ID of the agent pool to create. The agent pool name identifies the pool used by transfer agents.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
+      "security_impact": false,
+      "rationale": "The name itself does not provide or restrict security controls, but it should still be set clearly for administration and auditability.",
+      "compliant": "agent-pool-example",
       "non-compliant": null,
       "parent": null
     },
     "display_name": {
-      "description": "Specifies the client-specified AgentPool description.",
+      "description": "Specifies the client-defined AgentPool display name.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
+      "security_impact": false,
+      "rationale": "The display name is informational only and does not change the security posture of the resource.",
+      "compliant": "Production transfer agent pool",
       "non-compliant": null,
       "parent": null
     },
     "bandwidth_limit": {
-      "description": "Specifies the bandwidth limit details. If this field is unspecified, the default value is set as 'No Limit'. Structure is [documented below](#nested_bandwidth_limit).",
+      "description": "Specifies the bandwidth limit details for the agent pool.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Bandwidth controls can reduce the risk of excessive transfer throughput, network saturation, and unintended large-scale data movement.",
+      "compliant": "Refer to child argument.",
+      "non-compliant": "Refer to child argument.",
       "parent": null,
       "arguments": {
         "limit_mbps": {
           "description": "Bandwidth rate in megabytes per second, distributed across all the agents in the pool.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "A defined bandwidth limit helps constrain transfer throughput and supports controlled data movement.",
+          "compliant": "120",
+          "non-compliant": "Unlimited or an out-of-policy value.",
           "parent": "bandwidth_limit"
         }
       }
     },
     "project": {
-      "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "description": "The project in which the resource belongs. If omitted, the provider project is used.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Using the correct project is security-relevant because resources created in the wrong project may bypass intended access controls, monitoring, or governance boundaries.",
+      "compliant": "my-project-123",
+      "non-compliant": "An unintended or unauthorized project ID.",
       "parent": null
     }
   }
