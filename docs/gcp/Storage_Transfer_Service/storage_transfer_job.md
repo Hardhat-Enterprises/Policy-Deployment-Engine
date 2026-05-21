@@ -10,18 +10,184 @@ Reference: [Terraform Registry – storage_transfer_job](https://registry.terraf
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `transfer_spec` | Defines the source, sink, and transfer behavior for the Storage Transfer job. | true | true | The transfer specification controls what data is moved, from where, and under what restrictions. | A transfer_spec with an approved source, sink, and restricted transfer conditions. | A transfer_spec that omits restrictions or uses an unapproved source definition. |
+| `name` |  | false | false | None | None | None |
+| `description` |  | false | false | None | None | None |
+| `transfer_spec` |  | false | false | None | None | None |
+| `replication_spec` | - - - | false | false | None | None | None |
+| `schedule` |  | false | false | None | None | None |
+| `event_stream` |  | false | false | None | None | None |
+| `project` | is not provided, the provider project is used. | false | false | None | None | None |
+| `status` |  | false | false | None | None | None |
+| `notification_config` |  | false | false | None | None | None |
+| `logging_config` |  | false | false | None | None | None |
+| `object_conditions` |  | false | false | None | None | None |
+| `transfer_options` |  | false | false | None | None | None |
+| `gcs_data_sink` |  | false | false | None | None | None |
+| `gcs_data_source` |  | false | false | None | None | None |
+| `posix_data_sink` |  | false | false | None | None | None |
+| `posix_data_source` |  | false | false | None | None | None |
+| `hdfs_data_source` |  | false | false | None | None | None |
+| `aws_s3_data_source` |  | false | false | None | None | None |
+| `aws_access_key` |  | false | false | None | None | None |
+| `http_data_source` |  | false | false | None | None | None |
+| `azure_blob_storage_data_source` |  | false | false | None | None | None |
+| `azure_credentials` |  | false | false | None | None | None |
+| `loggin_config` |  | false | false | None | None | None |
 
 ### transfer_spec Block
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `gcs_data_source` | Specifies a Google Cloud Storage bucket as the source for the transfer job. | false | true | The source bucket determines what data enters the transfer pipeline. It should reference only approved source locations. | gcs_data_source { bucket_name = "approved-source-bucket" } | gcs_data_source { bucket_name = "unapproved-public-bucket" } |
-| `aws_s3_data_source` | Specifies an Amazon S3 bucket as the source for the transfer job. | false | true | Using an S3 source introduces external data into the transfer job and should be restricted to approved buckets and credentials. | aws_s3_data_source using an approved bucket and credential configuration. | aws_s3_data_source using an unapproved bucket or unmanaged credentials. |
-| `azure_blob_storage_data_source` | Specifies an Azure Blob Storage container as the source for the transfer job. | false | true | Azure Blob source definitions should be limited to approved storage accounts and controlled credentials. | azure_blob_storage_data_source using an approved storage account and container. | azure_blob_storage_data_source using an unknown or unapproved storage account. |
-| `http_data_source` | Specifies a list of HTTP or HTTPS URLs as the source for the transfer job. | false | true | HTTP-based sources can introduce integrity and confidentiality risks if insecure or untrusted endpoints are used. | http_data_source referencing approved HTTPS endpoints. | http_data_source referencing HTTP endpoints or untrusted URLs. |
-| `posix_data_source` | Specifies a POSIX filesystem path as the source for the transfer job. | false | true | POSIX sources can expose local or attached filesystem data and should be limited to approved paths and agents. | posix_data_source { root_directory = "/approved/source/path" } | posix_data_source { root_directory = "/" } |
-| `hdfs_data_source` | Specifies an HDFS path as the source for the transfer job. | false | true | HDFS sources should be controlled to prevent broad or unintended data extraction from distributed storage. | hdfs_data_source using an approved cluster and restricted root path. | hdfs_data_source using an unrestricted or unknown path. |
-| `aws_s3_compatible_data_source` | Specifies an S3-compatible storage system as the source for the transfer job. | false | true | S3-compatible endpoints should be approved because they may point to third-party or self-hosted object storage. | aws_s3_compatible_data_source using an approved endpoint and bucket. | aws_s3_compatible_data_source using an unknown or untrusted endpoint. |
-| `source_agent_pool_name` | Specifies the agent pool used for agent-based source transfers. | false | true | Agent pools control where transfer agents run and should reference approved managed pools only. | source_agent_pool_name = "transferJobs/agentPools/approved-pool" | source_agent_pool_name = "transferJobs/agentPools/unapproved-pool" |
-| `include_prefixes_required` | Ensures the Storage Transfer job restricts transfer scope by defining object_conditions.include_prefixes. | false | true | Requiring include_prefixes reduces the risk of unintentionally transferring more objects than intended by limiting the transfer to approved object path prefixes. | object_conditions { include_prefixes = ["secure-data/"] } | No object_conditions.include_prefixes configured. |
+| `source_agent_pool_name` |  | false | false | None | None | None |
+| `sink_agent_pool_name` |  | false | false | None | None | None |
+| `gcs_data_sink` |  | false | false | None | None | None |
+| `posix_data_sink` |  | false | false | None | None | None |
+| `object_conditions` |  | false | false | None | None | None |
+| `transfer_options` |  | false | false | None | None | None |
+| `gcs_data_source` |  | false | false | None | None | None |
+| `posix_data_source` |  | false | false | None | None | None |
+| `aws_s3_data_source` |  | false | false | None | None | None |
+| `http_data_source` |  | false | false | None | None | None |
+| `azure_blob_storage_data_source` |  | false | false | None | None | None |
+| `hdfs_data_source` |  | false | false | None | None | None |
+
+### replication_spec Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `gcs_data_sink` |  | false | false | None | None | None |
+| `gcs_data_source` |  | false | false | None | None | None |
+| `object_conditions` |  | false | false | None | None | None |
+| `transfer_options` |  | false | false | None | None | None |
+
+### schedule Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `schedule_start_date` |  | false | false | None | None | None |
+| `schedule_end_date` |  | false | false | None | None | None |
+| `start_time_of_day` |  | false | false | None | None | None |
+| `repeat_interval` |  | false | false | None | None | None |
+
+### event_stream Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `name` |  | false | false | None | None | None |
+| `event_stream_start_time` |  | false | false | None | None | None |
+| `event_stream_expiration_time` |  | false | false | None | None | None |
+
+### notification_config Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `pubsub_topic` |  | false | false | None | None | None |
+| `event_types` |  | false | false | None | None | None |
+| `payload_format` |  | false | false | None | None | None |
+
+### object_conditions Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `max_time_elapsed_since_last_modification` |  | false | false | None | None | None |
+| `min_time_elapsed_since_last_modification` | A duration in seconds with up to nine fractional digits, terminated by 's'. Example: "3.5s". | false | false | None | None | None |
+| `include_prefixes` |  | false | false | None | None | None |
+| `exclude_prefixes` |  | false | false | None | None | None |
+| `last_modified_since` |  | false | false | None | None | None |
+| `last_modified_before` |  | false | false | None | None | None |
+
+### transfer_options Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `overwrite_objects_already_existing_in_sink` |  | false | false | None | None | None |
+| `delete_objects_unique_in_sink` | `delete_objects_from_source_after_transfer` are mutually exclusive. | false | false | None | None | None |
+| `delete_objects_from_source_after_transfer` |  | false | false | None | None | None |
+| `overwrite_when` |  | false | false | None | None | None |
+
+### gcs_data_sink Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `bucket_name` |  | false | false | None | None | None |
+| `path` |  | false | false | None | None | None |
+
+### gcs_data_source Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `bucket_name` |  | false | false | None | None | None |
+| `path` |  | false | false | None | None | None |
+
+### posix_data_sink Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `root_directory` |  | false | false | None | None | None |
+
+### posix_data_source Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `root_directory` |  | false | false | None | None | None |
+
+### hdfs_data_source Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `path` |  | false | false | None | None | None |
+
+### aws_s3_data_source Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `bucket_name` |  | false | false | None | None | None |
+| `path` |  | false | false | None | None | None |
+| `aws_access_key` |  | false | false | None | None | None |
+| `role_arn` |  | false | false | None | None | None |
+| `managed_private_network` |  | false | false | None | None | None |
+| `cloudfront_domain` |  | false | false | None | None | None |
+
+### aws_access_key Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `access_key_id` |  | false | false | None | None | None |
+| `secret_access_key` |  | false | false | None | None | None |
+
+### http_data_source Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `list_url` |  | false | false | None | None | None |
+
+### azure_blob_storage_data_source Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `storage_account` |  | false | false | None | None | None |
+| `container` |  | false | false | None | None | None |
+| `path` |  | false | false | None | None | None |
+| `credentials_secret` |  | false | false | None | None | None |
+| `azure_credentials` |  | false | false | None | None | None |
+
+### azure_credentials Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `sas_token` | The `schedule_start_date` and `schedule_end_date` blocks support: | false | false | None | None | None |
+| `year` |  | false | false | None | None | None |
+| `month` |  | false | false | None | None | None |
+| `day` | The `start_time_of_day` blocks support: | false | false | None | None | None |
+| `hours` |  | false | false | None | None | None |
+| `minutes` |  | false | false | None | None | None |
+| `seconds` |  | false | false | None | None | None |
+| `nanos` |  | false | false | None | None | None |
+
+### loggin_config Block
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `log_actions` | Each action may be one of `FIND`, `DELETE`, and `COPY`. | false | false | None | None | None |
+| `log_action_states` | Each action state may be one of `SUCCEEDED`, and `FAILED`. | false | false | None | None | None |
+| `enable_on_prem_gcs_transfer` | Defaults to false. | false | false | None | None | None |
