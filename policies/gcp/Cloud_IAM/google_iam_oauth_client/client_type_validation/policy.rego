@@ -6,8 +6,11 @@ import data.terraform.gcp.security.Cloud_IAM.google_iam_oauth_client.vars
 conditions := [
   [
     {
-      "situation_description": "Only approved OAuth client types are allowed",
-      "remedies": ["Use PUBLIC_CLIENT or CONFIDENTIAL_CLIENT"]
+      "situation_description": "OAuth clients must use approved secure client types",
+      "remedies": [
+        "Use PUBLIC_CLIENT or CONFIDENTIAL_CLIENT",
+        "Do not use CLIENT_TYPE_UNSPECIFIED"
+      ]
     },
     {
       "condition": "Validate client_type",

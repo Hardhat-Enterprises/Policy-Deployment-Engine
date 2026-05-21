@@ -1,19 +1,20 @@
 package terraform.gcp.security.Cloud_IAM.google_iam_principal_access_boundary_policy.location_validation
+
 import data.terraform.helpers
 import data.terraform.gcp.security.Cloud_IAM.google_iam_principal_access_boundary_policy.vars
 
 conditions := [
   [
     {
-      "situation_description": "Location must always be global for PAB policy",
+      "situation_description": "Principal access boundary policy location must be restricted to approved Australia regions",
       "remedies": [
-        "Set location = global"
+        "Set location to australia-southeast1 or australia-southeast2"
       ]
     },
     {
       "condition": "Validate location whitelist",
       "attribute_path": ["location"],
-      "values": ["global"],
+      "values": ["australia-southeast1", "australia-southeast2"],
       "policy_type": "whitelist"
     }
   ]

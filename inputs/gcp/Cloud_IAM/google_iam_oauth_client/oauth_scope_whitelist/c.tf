@@ -3,7 +3,7 @@ resource "google_iam_oauth_client" "c" {
   oauth_client_id       = "c"
   display_name          = "Secure OAuth Client"
   description           = "Uses least privilege scopes"
-  location              = "global"
+  location              = "australia-southeast2"
   disabled              = false
 
   allowed_grant_types   = ["AUTHORIZATION_CODE_GRANT"]

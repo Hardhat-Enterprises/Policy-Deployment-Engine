@@ -1,6 +1,6 @@
 resource "google_iam_projects_policy_binding" "nc" {
   project            = "smooth-verve-467716-v1"
-  location           = "us-central1"   
+  location           = "global"   
   display_name       = "Invalid Project Policy Binding"
   policy_kind        = "PRINCIPAL_ACCESS_BOUNDARY"
   policy_binding_id  = "nc"

@@ -6,15 +6,15 @@ import data.terraform.gcp.security.Cloud_IAM.google_iam_folders_policy_binding.v
 conditions := [
   [
     {
-      "situation_description": "Location must strictly be global for IAM folder policy bindings",
+      "situation_description": "ocation must be restricted to approved Australia regions for IAM folder policy bindings",
       "remedies": [
-        "Set location = global"
+        "Set location to an approved Australia region such as australia-southeast1 or australia-southeast2"
       ]
     },
     {
       "condition": "Validate allowed location",
       "attribute_path": ["location"],
-      "values": ["global"],
+      "values": ["australia-southeast1", "australia-southeast2"],
       "policy_type": "whitelist"
     }
   ]

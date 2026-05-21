@@ -1,12 +1,15 @@
 package terraform.gcp.security.Cloud_IAM.google_iam_oauth_client.location_validation
+
 import data.terraform.helpers
 import data.terraform.gcp.security.Cloud_IAM.google_iam_oauth_client.vars
 
 conditions := [
   [
     {
-      "situation_description": "OAuth client must only be deployed in global location",
-      "remedies": ["Set location to global"]
+      "situation_description": "OAuth client location must be restricted to approved Australia regions",
+      "remedies": [
+        "Set location to australia-southeast1 or australia-southeast2"
+      ]
     },
     {
       "condition": "Validate location",

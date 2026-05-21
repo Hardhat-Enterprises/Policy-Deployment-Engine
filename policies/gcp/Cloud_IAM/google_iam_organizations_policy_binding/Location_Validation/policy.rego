@@ -6,15 +6,15 @@ import data.terraform.gcp.security.Cloud_IAM.google_iam_organizations_policy_bin
 conditions := [
   [
     {
-      "situation_description": "Organization policy binding must use global location",
+      "situation_description": "Organization policy binding location must be restricted to approved Australia regions",
       "remedies": [
-        "Set location = global"
+        "Set location to australia-southeast1 or australia-southeast2"
       ]
     },
     {
       "condition": "Validate location whitelist",
       "attribute_path": ["location"],
-      "values": ["global"],
+      "values": ["australia-southeast1", "australia-southeast2"],
       "policy_type": "whitelist"
     }
   ]

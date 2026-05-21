@@ -2,7 +2,7 @@ resource "google_iam_oauth_client" "c" {
   oauth_client_id       = "c"
   display_name          = "Valid OAuth Client"
   description           = "Compliant OAuth client configuration"
-  location              = "global"
+  location              = "australia-southeast2"
   disabled              = false
   allowed_grant_types   = ["AUTHORIZATION_CODE_GRANT"]
   allowed_redirect_uris = ["https://www.example.com"]

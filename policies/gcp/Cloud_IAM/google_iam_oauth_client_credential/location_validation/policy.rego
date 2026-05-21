@@ -6,13 +6,15 @@ import data.terraform.gcp.security.Cloud_IAM.google_iam_oauth_client_credential.
 conditions := [
   [
     {
-      "situation_description": "OAuth client credential must use global location only",
-      "remedies": ["Set location = global"]
+      "situation_description": "OAuth client credential location must be restricted to approved Australia regions",
+      "remedies": [
+        "Set location to australia-southeast1 or australia-southeast2"
+      ]
     },
     {
       "condition": "Validate location whitelist",
       "attribute_path": ["location"],
-      "values": ["global"],
+      "values": ["australia-southeast1", "australia-southeast2"],
       "policy_type": "whitelist"
     }
   ]

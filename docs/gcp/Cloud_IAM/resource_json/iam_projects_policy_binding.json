@@ -7,29 +7,17 @@
       "required": true,
       "security_impact": true,
       "rationale": "Restricts policy binding scope to approved project principals only, preventing unauthorized identity binding.",
-      "compliant": [
-        "//cloudresourcemanager.googleapis.com/projects/approved-project-1",
-        "//cloudresourcemanager.googleapis.com/projects/approved-project-2"
-      ],
-      "non-compliant": [
-        "//cloudresourcemanager.googleapis.com/projects/*",
-        "//cloudresourcemanager.googleapis.com/projects/external-project"
-      ],
+      "compliant": "//cloudresourcemanager.googleapis.com/projects/approved-project-1",
+      "non-compliant": "//cloudresourcemanager.googleapis.com/projects/random-external-project",
       "parent": null,
       "arguments": {
         "principal_set": {
-          "description": "Required. Immutable. Full Resource Name of the principal set used for principal access boundary policy bindings. Examples for each one of the following supported principal set types: * Project: * `//cloudresourcemanager.googleapis.com/projects/PROJECT_NUMBER` * `//cloudresourcemanager.googleapis.com/projects/PROJECT_ID` * Workload Identity Pool: `//iam.googleapis.com/projects/PROJECT_NUMBER/locations/LOCATION/workloadIdentityPools/WORKLOAD_POOL_ID` It must be parent by the policy binding's parent (the project).",
+          "description": "Required. Immutable. Full Resource Name of the principal set used for principal access boundary policy bindings.",
           "required": false,
           "security_impact": true,
-          "rationale": "Ensures only approved project-level principals can be assigned IAM boundaries.",
-          "compliant": [
-            "//cloudresourcemanager.googleapis.com/projects/approved-project-1",
-            "//cloudresourcemanager.googleapis.com/projects/approved-project-2"
-          ],
-          "non-compliant": [
-            "//cloudresourcemanager.googleapis.com/projects/*",
-            "//cloudresourcemanager.googleapis.com/projects/external-*"
-          ],
+          "rationale": "Project policy binding must only allow approved project-level principals to reduce unauthorized access exposure.",
+          "compliant": "//cloudresourcemanager.googleapis.com/projects/approved-project-1",
+          "non-compliant": "//cloudresourcemanager.googleapis.com/projects/random-external-project",
           "parent": "target"
         }
       }
@@ -37,46 +25,48 @@
     "policy": {
       "description": "Required. Immutable. The resource name of the policy to be bound. The binding parent and policy must belong to the same Organization (or Project).",
       "required": true,
-      "security_impact": true,
-      "rationale": "Ensures only approved IAM boundary policies are attached to projects.",
-      "compliant": "organizations/123456789/locations/global/principalAccessBoundaryPolicies/approved-policy",
-      "non-compliant": "organizations/123456789/locations/global/principalAccessBoundaryPolicies/unapproved-policy",
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
       "parent": null
     },
     "location": {
       "description": "The location of the Policy Binding",
       "required": true,
       "security_impact": true,
-      "rationale": "Enforcing global location ensures consistent IAM policy application across projects and prevents regional drift.",
-      "compliant": "global",
-      "non-compliant": "us-central1",
+      "rationale": "Project policy binding location must be restricted to approved Australia regions to meet organizational residency and compliance requirements.",
+      "compliant": [
+        "australia-southeast1",
+        "australia-southeast2"],
+      "non-compliant": "global",
       "parent": null
     },
     "policy_binding_id": {
       "description": "The Policy Binding ID.",
       "required": true,
-      "security_impact": false,
-      "rationale": "Ensures consistent naming and traceability of policy bindings.",
-      "compliant": "project-binding-01",
-      "non-compliant": "INVALID_BINDING",
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
       "parent": null
     },
     "display_name": {
       "description": "Optional. The description of the policy binding. Must be less than or equal to 63 characters.",
       "required": false,
-      "security_impact": false,
-      "rationale": "Used for human-readable identification only.",
-      "compliant": "Project IAM Binding Policy",
-      "non-compliant": "Very long or unclear name exceeding limits",
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
       "parent": null
     },
     "annotations": {
       "description": "Optional. User defined annotations. See https://google.aip.dev/148#annotations for more details such as format and size limitations **Note**: This field is non-authoritative, and will only manage the annotations present in your configuration. Please refer to the field `effective_annotations` for all of the annotations present on the resource.",
       "required": false,
-      "security_impact": false,
-      "rationale": "Used for tagging, auditing, and governance tracking.",
-      "compliant": "env=prod, team=security",
-      "non-compliant": "random unstructured metadata",
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
       "parent": null
     },
     "policy_kind": {
@@ -85,23 +75,26 @@
       "security_impact": true,
       "rationale": "Ensures only Principal Access Boundary policies are enforced for security isolation.",
       "compliant": "PRINCIPAL_ACCESS_BOUNDARY",
-      "non-compliant": "ACCESS, POLICY_KIND_UNSPECIFIED",
+      "non-compliant": [
+        "ACCESS",
+        "POLICY_KIND_UNSPECIFIED"
+      ],
       "parent": null
     },
     "condition": {
       "description": "Represents a textual expression in the Common Expression Language (CEL) syntax. CEL is a C-like expression language. The syntax and semantics of CEL are documented at https://github.com/google/cel-spec. Example (Comparison): title: \\\"Summary size limit\\\" description: \\\"Determines if a summary is less than 100 chars\\\" expression: \\\"document.summary.size() < 100\\\" Example (Equality): title: \\\"Requestor is owner\\\" description: \\\"Determines if requestor is the document owner\\\" expression: \\\"document.owner == request.auth.claims.email\\\"  Example (Logic): title: \\\"Public documents\\\" description: \\\"Determine whether the document should be publicly visible\\\" expression: \\\"document.type != 'private' && document.type != 'internal'\\\" Example (Data Manipulation): title: \\\"Notification string\\\" description: \\\"Create a notification string with a timestamp.\\\" expression: \\\"'New message received at ' + string(document.create_time)\\\" The exact variables and functions that may be referenced within an expression are determined by the service that evaluates it. See the service documentation for additional information. Structure is [documented below](#nested_condition).",
       "required": false,
-      "security_impact": true,
-      "rationale": "Allows fine-grained IAM control based on runtime conditions.",
-      "compliant": "document.type != 'internal'",
-      "non-compliant": "true (unrestricted access)",
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
       "parent": null,
       "arguments": {
         "expression": {
           "description": "Textual representation of an expression in Common Expression Language syntax.",
           "required": false,
-          "security_impact": true,
-          "rationale": "Controls conditional IAM enforcement.",
+          "security_impact": null,
+          "rationale": null,
           "compliant": null,
           "non-compliant": null,
           "parent": "condition"
@@ -138,10 +131,10 @@
     "project": {
       "description": "If it is not provided, the provider project is used.",
       "required": null,
-      "security_impact": true,
-      "rationale": "Ensures correct project-level IAM isolation and prevents cross-project misconfiguration.",
-      "compliant": "approved-project-id",
-      "non-compliant": "external-project-id",
+      "security_impact": null,
+      "rationale": null,
+      "compliant": null,
+      "non-compliant": null,
       "parent": null
     }
   }

@@ -1,7 +1,7 @@
 resource "google_iam_organizations_policy_binding" "nc" {
   
   organization      = "123456789"
-  location          = "australia-southeast1"  
+  location          = "global"  
   display_name      = "nc"
   policy_kind       = "PRINCIPAL_ACCESS_BOUNDARY"
   policy_binding_id = "org-binding-nc"

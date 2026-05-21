@@ -3,7 +3,7 @@ resource "google_iam_oauth_client" "nc" {
   oauth_client_id       = "nc"
   display_name          = "Unsafe OAuth Client"
   description           = "Uses overly broad scope"
-  location              = "global"
+  location              = "australia-southeast2"
   disabled              = false
 
   allowed_grant_types   = ["AUTHORIZATION_CODE_GRANT"]
