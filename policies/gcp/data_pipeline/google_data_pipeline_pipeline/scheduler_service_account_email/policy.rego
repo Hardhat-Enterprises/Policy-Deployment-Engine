@@ -5,14 +5,14 @@ import data.terraform.gcp.security.data_pipeline.google_data_pipeline_pipeline.v
 
 conditions := [[
 	{
-		"situation_description": "If the scheduler_service_account_email attribute does not have a dedicated email address, security risks my arise from using a default account",
-		"remedies": ["Assign a dedicated service account email to the scheduler_service_account_email attribute"],
+		"situation_description": "If the scheduler_service_account_email attribute does not use an approved email format, security risks may arise from using unauthorised service accounts",
+		"remedies": ["Assign an approved service account email to the scheduler_service_account_email attribute"],
 	},
 	{
-		"condition": "check if the scheduler_service_account_email attribute has a dedicated email address",
+		"condition": "check if the scheduler_service_account_email attribute uses an approved email format",
 		"attribute_path": ["scheduler_service_account_email"],
-		"values": ["pipeline-scheduler@project-id.iam.gserviceaccount.com"],
-		"policy_type": "whitelist",
+		"values": ["*@companyname.com", [["Employee"]]],
+		"policy_type": "pattern whitelist",
 	},
 ]]
 

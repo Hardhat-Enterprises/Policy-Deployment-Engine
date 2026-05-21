@@ -6,14 +6,14 @@
       "description": "\"The pipeline name. For example': 'projects/PROJECT_ID/locations/LOCATION_ID/pipelines/PIPELINE_ID.\" \"- PROJECT_ID can contain letters ([A-Za-z]), numbers ([0-9]), hyphens (-), colons (:), and periods (.). For more information, see Identifying projects.\" \"LOCATION_ID is the canonical ID for the pipeline's location. The list of available locations can be obtained by calling google.cloud.location.Locations.ListLocations. Note that the Data Pipelines service is not available in all regions. It depends on Cloud Scheduler, an App Engine application, so it's only available in App Engine regions.\" \"PIPELINE_ID is the ID of the pipeline. Must be unique for the selected project and location.\"",
       "required": false,
       "security_impact": false,
-      "rationale": "the pipeline name is not a security-impact field because it is used for identification purposes only and does not affect the behavior or access control of the pipeline. However, it is important to set the pipeline name correctly to ensure that it can be easily identified and managed within the project and location. Incorrectly setting the pipeline name could lead to confusion and difficulty in managing pipelines, but it would not have a direct impact on security.",
-      "compliant": null,
+      "rationale": "the pipeline name is not a security-impact field because it is used for identification purposes only and does not affect the behavior or access control of the pipeline. However, it is important to set the pipeline name correctly to ensure that it can be easily identified and managed within the project and location. Incorrectly setting the pipeline name could lead to confusion and difficulty in managing pipelines, but it would not have a direct impact on security.",      "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "type": {
       "description": "The type of the pipeline. This field affects the scheduling of the pipeline and the type of metrics to show for the pipeline. https://cloud.google.com/dataflow/docs/reference/data-pipelines/rest/v1/projects.locations.pipelines#pipelinetype Possible values are: `PIPELINE_TYPE_UNSPECIFIED`, `PIPELINE_TYPE_BATCH`, `PIPELINE_TYPE_STREAMING`.",
       "required": true,
+      "security_impact": null,
       "security_impact": true,
       "rationale": "Setting the pipeline type correctly is important for ensuring that the pipeline is scheduled and monitored appropriately. For example, a streaming pipeline may require more frequent monitoring and different resource allocation compared to a batch pipeline. Incorrectly setting the pipeline type could lead to inefficient resource usage or missed alerts.",
       "compliant": "PIPELINE_TYPE_BATCH, PIPELINE_TYPE_STREAMING",
@@ -88,7 +88,7 @@
         "time_zone": {
           "description": "Timezone ID. This matches the timezone IDs used by the Cloud Scheduler API. If empty, UTC time is assumed.",
           "required": false,
-          "security_impact": "false",
+          "security_impact": false,
           "rationale": "the time zone is not a security-impact field because it is used for scheduling purposes only and does not affect the behavior or access control of the pipeline. However, it is important to set the time zone correctly to ensure that jobs are created at the appropriate times. Incorrectly setting the time zone could lead to job failures or unexpected behavior, but it would not have a direct impact on security.",
           "compliant": null,
           "non-compliant": null,
@@ -199,9 +199,9 @@
     },
     "launch_parameters": {
       "description": "",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "launch Parameters is not a security_impact as c it only controls runtime execution configuration and does not directly affect authentication, authorization, encryption, or access control.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -283,19 +283,19 @@
         "zone": {
           "description": "The Compute Engine availability zone for launching worker instances to run your pipeline. In the future, workerZone will take precedence.",
           "required": false,
-          "security_impact": false,
-          "rationale": "the zone field is not a security-impact field because it only determines the location of the Compute Engine instances and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job runs in the desired location.",
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "The zone field is security-impacting because it determines the physical location where pipeline worker resources are deployed and data may be processed. Restricting zones to approved locations helps support data sovereignty, compliance, and organizational governance requirements.",
+          "compliant": "australia-southeast1-a, australia-southeast2-a",
+          "non-compliant": "us-central1-a, europe-west1-b",
           "parent": "environment"
         },
         "service_account_email": {
           "description": "The email address of the service account to run the job as.",
           "required": false,
-          "security_impact": false,
+          "security_impact": true,
           "rationale": "the service_account_email field is not a security-impact field because it only specifies the service account to run the job and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job runs with the appropriate permissions.",
-          "compliant": null,
-          "non-compliant": null,
+          "compliant": "*@project-id.iam.gserviceaccount.com",
+          "non-compliant": "external or unapproved service account domains",
           "parent": "environment"
         },
         "temp_location": {
@@ -310,8 +310,8 @@
         "bypass_temp_dir_validation": {
           "description": "Whether to bypass the safety checks for the job's temporary directory. Use with caution.",
           "required": false,
-          "security_impact": false,
-          "rationale": "the bypass_temp_dir_validation field is not a security-impact field because it only determines whether to bypass safety checks for the temporary directory and does not affect the job's behavior or access control. However, it is important to use this field with caution, as bypassing safety checks could lead to unintended consequences if the temporary directory is not properly configured.",
+          "security_impact": true,
+          "rationale": "bypass_temp_dir_validation is a security_impact as disabling temporary directory validation may allow the use of insecure, misconfigured, or unauthorised storage locations, potentially exposing sensitive pipeline data or weakening integrity and access control protections.",
           "compliant": null,
           "non-compliant": null,
           "parent": "environment"
@@ -364,37 +364,37 @@
         "kms_key_name": {
           "description": "'Name for the Cloud KMS key for the job. The key format is: projects//locations//keyRings//cryptoKeys/'",
           "required": false,
-          "security_impact": false,
-          "rationale": "the kms_key_name field is not a security-impact field because it only specifies the Cloud KMS key for the job and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job has the necessary encryption.",
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "kms_key_name is a security_impact field because it controls the customer-managed encryption key used to protect pipeline resources and data. Enforcing the use of approved KMS keys helps support encryption requirements, compliance, and organizational security policies.",
+          "compliant": "projects/example-project/locations/australia-southeast1/keyRings/example-ring/cryptoKeys/example-key",
+          "non-compliant": "null, empty string, or unapproved KMS keys",
           "parent": "environment"
         },
         "ip_configuration": {
           "description": "Configuration for VM IPs. https://cloud.google.com/dataflow/docs/reference/data-pipelines/rest/v1/projects.locations.pipelines#WorkerIPAddressConfiguration Possible values are: `WORKER_IP_UNSPECIFIED`, `WORKER_IP_PUBLIC`, `WORKER_IP_PRIVATE`.",
           "required": false,
-          "security_impact": false,
-          "rationale": "the ip_configuration field is not a security-impact field because it only specifies the IP configuration for VMs and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job has the necessary network connectivity.",
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "ip_configuration is a security_impact as configuring worker VMs with public IP addresses may expose pipeline infrastructure to external networks, increasing the risk of unauthorised access, data exposure, or network-based attacks. Using private IP configurations helps strengthen network isolation and reduce external attack surfaces.",
+          "compliant": "WORKER_IP_PRIVATE",
+          "non-compliant": "WORKER_IP_PUBLIC, WORKER_IP_UNSPECIFIED",
           "parent": "environment"
         },
         "worker_region": {
           "description": "The Compute Engine region (https://cloud.google.com/compute/docs/regions-zones/regions-zones) in which worker processing should occur, e.g. \"us-west1\". Mutually exclusive with workerZone. If neither workerRegion nor workerZone is specified, default to the control plane's region.",
           "required": false,
-          "security_impact": false,
-          "rationale": "the worker_region field is not a security-impact field because it only specifies the region in which worker processing should occur and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job has the necessary compute resources.",
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "worker_region is a security_impact as explicitly defining the worker processing region helps enforce data residency, regulatory compliance, and geographic access control requirements. Using unapproved or unspecified regions may result in workloads and sensitive data being processed in unintended locations.",
+          "compliant": "Approved worker regions such as us-central1 or australia-southeast1",
+          "non-compliant": "Unapproved, restricted, or unspecified worker regions",
           "parent": "environment"
         },
         "worker_zone": {
           "description": "The Compute Engine zone (https://cloud.google.com/compute/docs/regions-zones/regions-zones) in which worker processing should occur, e.g. \"us-west1-a\". Mutually exclusive with workerRegion. If neither workerRegion nor workerZone is specified, a zone in the control plane's region is chosen based on available capacity. If both workerZone and zone are set, workerZone takes precedence.",
           "required": false,
-          "security_impact": false,
-          "rationale": "the worker_zone field is not a security-impact field because it only specifies the zone in which worker processing should occur and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job has the necessary compute resources.",
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "worker_zone is a security_impact as explicitly defining the worker processing zone helps enforce geographic control, workload isolation, and regulatory compliance requirements. Using unapproved or unspecified zones may result in workloads being deployed in unintended infrastructure locations, potentially weakening data residency and operational governance controls.",
+          "compliant": "Approved worker zones such as australia-southeast1-a or us-central1-a",
+          "non-compliant": "Unapproved, restricted, or unspecified worker zones",
           "parent": "environment"
         },
         "enable_streaming_engine": {
@@ -409,10 +409,10 @@
         "flexrs_goal": {
           "description": "Set FlexRS goal for the job. https://cloud.google.com/dataflow/docs/guides/flexrs https://cloud.google.com/dataflow/docs/reference/data-pipelines/rest/v1/projects.locations.pipelines#FlexResourceSchedulingGoal Possible values are: `FLEXRS_UNSPECIFIED`, `FLEXRS_SPEED_OPTIMIZED`, `FLEXRS_COST_OPTIMIZED`.",
           "required": false,
-          "security_impact": false,
-          "rationale": "the flexrs_goal field is not a security-impact field because it only specifies the FlexRS goal for the job and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job has the necessary resource scheduling.",
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "flexrs_goal is a security_impact as relying on unspecified scheduling behaviour may result in inconsistent or unintended workload execution characteristics. Explicitly configuring FlexRS behaviour improves operational governance, configuration clarity, and reduces ambiguity in resource scheduling decisions.",
+          "compliant": "FLEXRS_SPEED_OPTIMIZED, FLEXRS_COST_OPTIMIZED",
+          "non-compliant": "FLEXRS_UNSPECIFIED, null",
           "parent": "environment"
         }
       }
@@ -467,8 +467,8 @@
     "launch_parameter": {
       "description": "",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "the launch_parameter field is not a security-impact field because it only specifies the parameters for launching the job and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job is launched with the necessary parameters.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
