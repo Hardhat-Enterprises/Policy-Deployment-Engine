@@ -100,9 +100,13 @@ class Orchestrator:
         self.total_processed = 0
         self.total_failed = 0
         self.failed_resources: List[str] = []
-        
+
         # Track change reports for summary generation
         self.change_reports: List = []  # List[ChangeReport]
+
+        # Track files written and service dirs touched for stale-resource cleanup
+        self.processed_files: set = set()
+        self.touched_service_dirs: set = set()
         
         logger.info(f"Orchestrator initialized for CSP: {args.csp}")
         if args.dry_run:
@@ -173,7 +177,10 @@ class Orchestrator:
             for resource in extracted_resources:
                 self._process_single_resource(resource, old_version)
             
-            # Step 4.5: Generate summary report if there were any changes
+            # Step 4.5: Remove JSON files for resource types no longer in the provider
+            self._cleanup_stale_resources()
+
+            # Step 4.6: Generate summary report if there were any changes
             if self.change_reports:
                 self._generate_summary_report()
             
@@ -374,6 +381,10 @@ class Orchestrator:
                 if not resource.version:
                     logger.debug(f"No resource.version - skipping change detection for {resource.resource_name}")
             
+            # Track for stale-resource cleanup
+            self.processed_files.add(file_path)
+            self.touched_service_dirs.add(file_path.parent)
+
             # Write resource JSON file (or log in dry-run mode)
             if self.args.dry_run:
                 logger.info(f"DRY-RUN: Would write {file_path}")
@@ -486,6 +497,19 @@ class Orchestrator:
         except Exception as e:
             logger.error(f"Failed to generate metadata file: {e}")
     
+    def _cleanup_stale_resources(self) -> None:
+        """Delete JSON files for resource types that no longer exist in the provider."""
+        for service_dir in self.touched_service_dirs:
+            if not service_dir.exists():
+                continue
+            for json_file in service_dir.glob('*.json'):
+                if json_file not in self.processed_files:
+                    if self.args.dry_run:
+                        logger.info(f"DRY-RUN: Would delete stale resource file: {json_file}")
+                    else:
+                        json_file.unlink()
+                        logger.info(f"Deleted stale resource file: {json_file}")
+
     def _report_summary(self) -> None:
         """
         Report summary statistics for the processing run.

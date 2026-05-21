@@ -5,35 +5,35 @@
     "workstation_config_id": {
       "description": "The ID to be assigned to the workstation cluster config.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Workstation configuration IDs should follow an approved naming standard so that configurations can be clearly identified, audited, and managed consistently.",
+      "compliant": "The workstation config uses an approved workstation_config_id, such as workstation-config.",
+      "non-compliant": "The workstation config uses an unapproved workstation_config_id, such as wrong-config.",
       "parent": null
     },
     "workstation_cluster_id": {
       "description": "The ID of the parent workstation cluster.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Workstation configs should only be linked to approved workstation clusters so that they remain under trusted infrastructure and approved network boundaries.",
+      "compliant":"The workstation config is linked to an approved workstation_cluster_id, such as workstation-cluster.",
+      "non-compliant":"The workstation config is linked to an unapproved workstation_cluster_id, such as wrong-cluster.",
       "parent": null
     },
     "location": {
       "description": "The location where the workstation cluster config should reside.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale":"Workstation configs should be created only in approved regions to meet organisational, compliance, and data governance requirements.",
+      "compliant": "The workstation config is deployed in an approved location, such as us-central1.",
+      "non-compliant": "The workstation config is deployed in an unapproved location, such as us-east1.",
       "parent": null
     },
     "display_name": {
       "description": "Human-readable name for this resource.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Display name is mainly used as a human-readable identifier and does not directly control workstation config security settings.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -41,8 +41,8 @@
     "labels": {
       "description": "Client-specified labels that are applied to the resource and that are also propagated to the underlying Compute Engine resources. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Labels are mainly used for organisation, ownership, and cost tracking. This policy set does not validate workstation config label values.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -50,8 +50,8 @@
     "annotations": {
       "description": "Client-specified annotations. This is distinct from labels. **Note**: This field is non-authoritative, and will only manage the annotations present in your configuration. Please refer to the field `effective_annotations` for all of the annotations present on the resource.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Annotations provide extra metadata about the resource, but this policy set does not use annotations to enforce security controls.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -59,8 +59,8 @@
     "idle_timeout": {
       "description": "How long to wait before automatically stopping an instance that hasn't recently received any user traffic. A value of 0 indicates that this instance should never time out from idleness. Defaults to 20 minutes. A duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.5s\".",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Idle timeout can affect resource usage and session duration, but this policy set does not validate idle timeout values.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -68,8 +68,8 @@
     "running_timeout": {
       "description": "How long to wait before automatically stopping a workstation after it was started. A value of 0 indicates that workstations using this configuration should never time out from running duration. Must be greater than 0 and less than 24 hours if `encryption_key` is set. Defaults to 12 hours. A duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.5s\".",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Running timeout can affect workstation lifetime and resource usage, but this policy set does not validate running timeout values.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -77,8 +77,8 @@
     "replica_zones": {
       "description": "Specifies the zones used to replicate the VM and disk resources within the region. If set, exactly two zones within the workstation cluster's region must be specified\u2014for example, `['us-central1-a', 'us-central1-f']`. If this field is empty, two default zones within the region are used. Immutable after the workstation configuration is created.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale":"Replica zones affect availability and placement, but this policy set does not validate approved replica zones.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -86,8 +86,8 @@
     "enable_audit_agent": {
       "description": "Whether to enable Linux `auditd` logging on the workstation. When enabled, a service account must also be specified that has `logging.buckets.write` permission on the project. Operating system audit logging is distinct from Cloud Audit Logs.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Audit logging can improve visibility, but this policy set does not validate audit agent configuration.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -95,19 +95,19 @@
     "host": {
       "description": "Runtime host for a workstation. Structure is [documented below](#nested_host).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "The host block controls the runtime environment for workstations, including Compute Engine settings that can affect exposure and resource configuration.",
+      "compliant": "The host configuration uses approved GCE instance settings.",
+      "non-compliant": "The host configuration uses unapproved GCE instance settings.",
       "parent": null,
       "arguments": {
         "gce_instance": {
           "description": "A runtime using a Compute Engine instance. Structure is [documented below](#nested_host_gce_instance).",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "GCE instance settings define the machine type and network exposure of the workstation runtime.",
+          "compliant": "The GCE instance uses approved settings, such as machine_type e2-standard-4 and disable_public_ip_addresses set to true.",
+          "non-compliant":"The GCE instance uses unapproved settings, such as an unapproved machine type or public IP addresses enabled.",
           "parent": "host"
         }
       }
@@ -115,7 +115,7 @@
     "persistent_directories": {
       "description": "Directories to persist across workstation sessions. Structure is [documented below](#nested_persistent_directories).",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -144,7 +144,7 @@
     "ephemeral_directories": {
       "description": "Ephemeral directories which won't persist across workstation sessions. Structure is [documented below](#nested_ephemeral_directories).",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -173,7 +173,7 @@
     "container": {
       "description": "Container that will be run for each workstation using this configuration when that workstation is started. Structure is [documented below](#nested_container).",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -238,8 +238,8 @@
     "encryption_key": {
       "description": "Encrypts resources of this workstation configuration using a customer-managed encryption key. If specified, the boot disk of the Compute Engine instance and the persistent disk are encrypted using this encryption key. If this field is not set, the disks are encrypted using a generated key. Customer-managed encryption keys do not protect disk metadata. If the customer-managed encryption key is rotated, when the workstation instance is stopped, the system attempts to recreate the persistent disk with the new version of the key. Be sure to keep older versions of the key until the persistent disk is recreated. Otherwise, data on the persistent disk will be lost. If the encryption key is revoked, the workstation session will automatically be stopped within 7 hours. Structure is [documented below](#nested_encryption_key).",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Customer-managed encryption can improve control over disk encryption, but this policy set does not validate encryption key configuration.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -267,7 +267,7 @@
     "readiness_checks": {
       "description": "Readiness checks to be performed on a workstation. Structure is [documented below](#nested_readiness_checks).",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -296,7 +296,7 @@
     "disable_tcp_connections": {
       "description": "Disables support for plain TCP connections in the workstation. By default the service supports TCP connections via a websocket relay. Setting this option to true disables that relay, which prevents the usage of services that require plain tcp connections, such as ssh. When enabled, all communication must occur over https or wss.",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -305,7 +305,7 @@
     "max_usable_workstations": {
       "description": "Maximum number of workstations under this configuration a user can have workstations.workstation.use permission on. Only enforced on CreateWorkstation API calls on the user issuing the API request.",
       "required": false,
-      "security_impact": null,
+      "security_impact": false,
       "rationale": null,
       "compliant": null,
       "non-compliant": null,
@@ -415,16 +415,16 @@
         "disable_public_ip_addresses": {
           "description": "Whether instances have no public IP address.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Public IP addresses can expose workstation instances to external networks. Disabling public IP addresses helps keep workstation instances within approved private network access paths.",
+          "compliant":  "disable_public_ip_addresses is set to true.",
+          "non-compliant":  "disable_public_ip_addresses is set to false.",
           "parent": "gce_instance"
         },
         "disable_ssh": {
           "description": "Whether to disable SSH access to the VM.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -433,7 +433,7 @@
         "enable_nested_virtualization": {
           "description": "Whether to enable nested virtualization on the Compute Engine VMs backing the Workstations. See https://cloud.google.com/workstations/docs/reference/rest/v1beta/projects.locations.workstationClusters.workstationConfigs#GceInstance.FIELDS.enable_nested_virtualization",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -442,7 +442,7 @@
         "shielded_instance_config": {
           "description": "A set of Compute Engine Shielded instance options. Structure is [documented below](#nested_host_gce_instance_shielded_instance_config).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -451,7 +451,7 @@
         "confidential_instance_config": {
           "description": "A set of Compute Engine Confidential VM instance options. Structure is [documented below](#nested_host_gce_instance_confidential_instance_config).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -460,7 +460,7 @@
         "accelerators": {
           "description": "An accelerator card attached to the instance. Structure is [documented below](#nested_host_gce_instance_accelerators).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -469,7 +469,7 @@
         "boost_configs": {
           "description": "A list of the boost configurations that workstations created using this workstation configuration are allowed to use. Structure is [documented below](#nested_host_gce_instance_boost_configs).",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,
@@ -478,7 +478,7 @@
         "vm_tags": {
           "description": "Resource manager tags to be bound to the VM instances backing the Workstations. Tag keys and values have the same definition as https://cloud.google.com/resource-manager/docs/tags/tags-overview Keys must be in the format `tagKeys/{tag_key_id}`, and values are in the format `tagValues/456`.",
           "required": false,
-          "security_impact": null,
+          "security_impact": false,
           "rationale": null,
           "compliant": null,
           "non-compliant": null,

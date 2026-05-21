@@ -88,10 +88,10 @@
         "algorithm": {
           "description": "The algorithm to use for creating a managed Cloud KMS key for a for a simplified experience. All managed keys will be have their ProtectionLevel as HSM. Possible values are: `SIGN_HASH_ALGORITHM_UNSPECIFIED`, `RSA_PSS_2048_SHA256`, `RSA_PSS_3072_SHA256`, `RSA_PSS_4096_SHA256`, `RSA_PKCS1_2048_SHA256`, `RSA_PKCS1_3072_SHA256`, `RSA_PKCS1_4096_SHA256`, `EC_P256_SHA256`, `EC_P384_SHA384`.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": true,
+          "rationale": "Certificate Authority key algorithm must use an approved cryptographic standard to enforce encryption compliance. Weaker algorithms such as 2048-bit RSA do not meet organisational security requirements.",
+          "compliant": "Set algorithm to 'EC_P384_SHA384', 'RSA_PSS_4096_SHA256', or 'RSA_PKCS1_4096_SHA256'.",
+          "non-compliant": "Set algorithm to a weaker value such as 'RSA_PSS_2048_SHA256' or 'RSA_PKCS1_2048_SHA256'.",
           "parent": "key_spec"
         }
       }
@@ -229,10 +229,10 @@
     "deletion_protection": {
       "description": "When the field is set to true or unset in Terraform state, a `terraform apply` or `terraform destroy` that would delete the CertificateAuthority will fail. When the field is set to false, deleting the CertificateAuthority is allowed.",
       "required": null,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": true,
+      "rationale": "Certificate Authority deletion protection must be enabled to prevent accidental or malicious deletion of a CA. Deleting a CA invalidates all certificates it has issued and cannot be undone.",
+      "compliant": "Set deletion_protection to true.",
+      "non-compliant": "Set deletion_protection to false.",
       "parent": null
     },
     "desired_state": {
