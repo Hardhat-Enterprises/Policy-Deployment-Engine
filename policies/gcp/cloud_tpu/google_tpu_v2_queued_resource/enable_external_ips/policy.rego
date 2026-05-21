@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_tpu.google_tpu_v2_queued_resource.no_external_ips
+package terraform.gcp.security.cloud_tpu.google_tpu_v2_queued_resource.enable_external_ips
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_tpu.google_tpu_v2_queued_resource.vars
 

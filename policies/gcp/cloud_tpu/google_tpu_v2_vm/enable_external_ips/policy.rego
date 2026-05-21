@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_tpu.google_tpu_v2_vm.no_external_ips
+package terraform.gcp.security.cloud_tpu.google_tpu_v2_vm.enable_external_ips
 
 import future.keywords.if
 import data.terraform.helpers as helpers

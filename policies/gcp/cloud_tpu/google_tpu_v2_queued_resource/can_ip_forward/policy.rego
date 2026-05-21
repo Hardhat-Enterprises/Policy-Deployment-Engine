@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_tpu.google_tpu_v2_queued_resource.no_ip_forwarding
+package terraform.gcp.security.cloud_tpu.google_tpu_v2_queued_resource.can_ip_forward
 
 import future.keywords.if
 import data.terraform.helpers as helpers
