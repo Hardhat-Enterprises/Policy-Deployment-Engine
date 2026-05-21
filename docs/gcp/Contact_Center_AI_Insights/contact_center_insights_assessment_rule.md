@@ -10,7 +10,7 @@ Reference: [Terraform Registry – google_contact_center_insights_assessment_rul
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `location` | Location of the resource. | true | true | The location of the resource is critical for compliance and security purposes. | australia-southeast1 |  |
+| `location` | Location of the resource. | true | false | The location of the resource is critical for compliance and security purposes. | australia-southeast1 |  |
 | `active` | If true, apply this rule to conversations. Otherwise, this rule is inactive. | true | true | The active status of the rule determines whether it is applied to conversations, which can have security implications. | True |  |
 | `display_name` | Display Name of the assessment rule. | true | false | Used for identification purposes only. No direct security impact. | None |  |
 | `sample_rule` | Message for sampling conversations. Structure is [documented below](#nested_sample_rule). | true | false | Sampling rules determine which conversations are evaluated by this assessment rule. While critical for functionality, they do not have direct security implications. | None |  |
@@ -23,8 +23,8 @@ Reference: [Terraform Registry – google_contact_center_insights_assessment_rul
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
 | `conversation_filter` | To specify the filter for the conversions that should apply this sample rule. An empty filter means this sample rule applies to all conversations. | true | true | The conversation filter is critical for ensuring that the sample rule is applied to the correct set of conversations, which can have security implications. | medium="PHONE_CALL" |  |
-| `dimension` | Group by dimension to sample the conversation. If no dimension is provided, the sampling will be applied to the project level. Current supported dimensions is 'quality_metadata.agent_info.agent_id'. | true | false | TDefines conversation sampling grouping only. No direct security impact. | quality_metadata.agent_info.agent_id |  |
-| `sample_percentage` | Percentage of conversations that we should sample  based on the dimension between [0, 100]. | true | true | The sample percentage determines the extent to which conversations are sampled, which can have security implications for data privacy and compliance. | None |  |
+| `dimension` | Group by dimension to sample the conversation. If no dimension is provided, the sampling will be applied to the project level. Current supported dimensions is 'quality_metadata.agent_info.agent_id'. | true | false | Defines conversation sampling grouping only. No direct security impact. | None |  |
+| `sample_percentage` | Percentage of conversations that we should sample  based on the dimension between [0, 100]. | true | true | The sample percentage determines the extent to which conversations are sampled, which can have security implications for data privacy and compliance. | 10 |  |
 | `sample_row` | Number of the conversations that we should sample based on the dimension. | true | false | Defines sample data representation only. No direct security impact. | None |  |
 
 ### schedule_info Block
