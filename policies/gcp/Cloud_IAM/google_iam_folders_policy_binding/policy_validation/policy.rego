@@ -16,8 +16,8 @@ conditions := [
       "condition": "Validate policy field",
       "attribute_path": ["policy"],
       "values": [
-        "organizations/123456789/locations/global/principalAccessBoundaryPolicies/pde-policy-1",
-        "organizations/123456789/locations/global/principalAccessBoundaryPolicies/pde-policy-2"
+        "organizations/123456789/locations/australia-southeast2/principalAccessBoundaryPolicies/pde-policy-1",
+        "organizations/123456789/locations/australia-southeast2/principalAccessBoundaryPolicies/pde-policy-1"
       ],
       "policy_type": "whitelist"
     }
