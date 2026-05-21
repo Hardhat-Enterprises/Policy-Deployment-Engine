@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_tpu.google_tpu_v2_vm.service_account_configured
+package terraform.gcp.security.cloud_tpu.google_tpu_v2_vm.email
 
 import future.keywords.if
 import data.terraform.helpers as helpers
