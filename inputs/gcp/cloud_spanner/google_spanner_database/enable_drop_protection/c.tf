@@ -1,13 +1,13 @@
-resource "google_spanner_database" "database" {
-  instance = google_spanner_instance.instance.name
-  name     = "database"
+resource "google_spanner_database" "c1" {
+  instance = google_spanner_instance.c1_instance.name
+  name     = "c1"
 
   enable_drop_protection = true
 }
 
-resource "google_spanner_instance" "instance" {
-  name         = "test-instance"
+resource "google_spanner_instance" "c1_instance" {
+  name         = "test-instance-c1"
   config       = "regional-australia-southeast1"
-  display_name = "Test Instance"
+  display_name = "Test Instance C1"
   num_nodes    = 1
 }
