@@ -13,6 +13,7 @@
 <a href="prerequisite.md">Prerequisites</a><br>
 <a href="researching-and-documentation.md">Researching and Documentation</a><br>
 <a href="policy-writing.md">Policy Writing</a><br>
+<a href="iam-and-location-templates.md">IAM & Location Policy Templates</a><br>
 <a href="c-tf-and-nc-tf.md">c.tf and nc.tf</a><br>
 <a href="terraform-inputs.md">Terraform inputs</a><br>
 <a href="common-errors.md">Common Errors</a><br>
