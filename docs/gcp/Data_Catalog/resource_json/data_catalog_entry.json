@@ -6,7 +6,7 @@
       "description": "The name of the entry group this entry is in.",
       "required": true,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is a user-defined resource reference and does not by itself control access to the underlying resource or data.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -15,7 +15,7 @@
       "description": "The id of the entry to create.",
       "required": true,
       "security_impact": false,
-      "rationale": "",
+      "rationale": "This is a user-defined identifier and does not control access to the resource or data.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -24,7 +24,7 @@
       "description": "The resource this metadata entry refers to. For Google Cloud Platform resources, linkedResource is the full name of the resource. For example, the linkedResource for a table resource from BigQuery is: //bigquery.googleapis.com/projects/projectId/datasets/datasetId/tables/tableId Output only when Entry is of type in the EntryType enum. For entries with userSpecifiedType, this field is optional and defaults to an empty string.",
       "required": false,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is a metadata reference to another resource and does not control access to the underlying resource or data.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -33,7 +33,7 @@
       "description": "Display information such as title and description. A short name to identify the entry, for example, \"Analytics Data - Jan 2011\".",
       "required": false,
       "security_impact": false,
-      "rationale": "",
+      "rationale": "This is only a human-readable display name and does not control access to the resource or data.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -42,7 +42,7 @@
       "description": "Entry description, which can consist of several sentences or paragraphs that describe entry contents.",
       "required": false,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is only descriptive metadata and does not control access to the resource or data.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -51,7 +51,7 @@
       "description": "Schema of the entry (e.g. BigQuery, GoogleSQL, Avro schema), as a json string. An entry might not have any schema attached to it. See https://cloud.google.com/data-catalog/docs/reference/rest/v1/projects.locations.entryGroups.entries#schema for what fields this schema can contain.",
       "required": false,
       "security_impact": false,
-      "rationale": "",
+      "rationale": "This describes the data structure for catalog metadata and does not enforce access control or data protection.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -60,7 +60,7 @@
       "description": "The type of the entry. Only used for Entries with types in the EntryType enum. Currently, only FILESET enum value is allowed. All other entries created through Data Catalog must use userSpecifiedType. Possible values are: `FILESET`.",
       "required": false,
       "security_impact": false,
-      "rationale": "",
+      "rationale": "This is user-defined metadata for classifying the entry and does not control access to the resource or data.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -69,7 +69,7 @@
       "description": "Entry type if it does not fit any of the input-allowed values listed in EntryType enum above. When creating an entry, users should check the enum values first, if nothing matches the entry to be created, then provide a custom value, for example \"my_special_type\". userSpecifiedType strings must begin with a letter or underscore and can only contain letters, numbers, and underscores; are case insensitive; must be at least 1 character and at most 64 characters long.",
       "required": false,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is user-defined metadata for classifying the entry and does not control access to the resource or data.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -78,7 +78,7 @@
       "description": "This field indicates the entry's source system that Data Catalog does not integrate with. userSpecifiedSystem strings must begin with a letter or underscore and can only contain letters, numbers, and underscores; are case insensitive; must be at least 1 character and at most 64 characters long.",
       "required": false,
       "security_impact": false,
-      "rationale": null,
+      "rationale": "This is user-defined metadata for classifying the entry and does not control access to the resource or data.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -87,7 +87,7 @@
       "description": "Specification that applies to a Cloud Storage fileset. This is only valid on entries of type FILESET. Structure is [documented below](#nested_gcs_fileset_spec).",
       "required": false,
       "security_impact": false,
-      "rationale": "",
+      "rationale": "This block describes GCS fileset metadata and does not control access to the underlying GCS data.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
@@ -96,7 +96,7 @@
           "description": "Patterns to identify a set of files in Google Cloud Storage. See [Cloud Storage documentation](https://cloud.google.com/storage/docs/gsutil/addlhelp/WildcardNames) for more information. Note that bucket wildcards are currently not supported. Examples of valid filePatterns: * gs://bucket_name/dir/*: matches all files within bucket_name/dir directory. * gs://bucket_name/dir/**: matches all files in bucket_name/dir spanning all subdirectories. * gs://bucket_name/file*: matches files prefixed by file in bucket_name * gs://bucket_name/??.txt: matches files with two characters followed by .txt in bucket_name * gs://bucket_name/[aeiou].txt: matches files that contain a single vowel character followed by .txt in bucket_name * gs://bucket_name/[a-m].txt: matches files that contain a, b, ... or m followed by .txt in bucket_name * gs://bucket_name/a/*/b: matches all files in bucket_name that match a/*/b pattern, such as a/c/b, a/d/b * gs://another_bucket/a.txt: matches gs://another_bucket/a.txt",
           "required": true,
           "security_impact": false,
-          "rationale": null,
+          "rationale": "This is a user-defined metadata path reference and does not control access to the underlying GCS data.",
           "compliant": null,
           "non-compliant": null,
           "parent": "gcs_fileset_spec"
@@ -105,7 +105,7 @@
           "description": "(Output) Sample files contained in this fileset, not all files contained in this fileset are represented here. Structure is [documented below](#nested_gcs_fileset_spec_sample_gcs_file_specs). The `sample_gcs_file_specs` block contains:",
           "required": false,
           "security_impact": false,
-          "rationale": "",
+          "rationale": "This is output or metadata information from the provider and is not a configurable security control.",
           "compliant": null,
           "non-compliant": null,
           "parent": "gcs_fileset_spec"
@@ -114,7 +114,7 @@
           "description": "(Output) The full file path",
           "required": false,
           "security_impact": false,
-          "rationale": "",
+          "rationale": "This is output or metadata information from the provider and is not a configurable security control.",
           "compliant": null,
           "non-compliant": null,
           "parent": "gcs_fileset_spec"
@@ -123,7 +123,7 @@
           "description": "(Output) The size of the file, in bytes.",
           "required": false,
           "security_impact": false,
-          "rationale": "",
+          "rationale": "This is output or metadata information from the provider and is not a configurable security control.",
           "compliant": null,
           "non-compliant": null,
           "parent": "gcs_fileset_spec"
