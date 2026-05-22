@@ -10,7 +10,7 @@ Reference: [Terraform Registry – google_contact_center_insights_qa_scorecard](
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `location` | The location of the resource is critical for compliance and security purposes. | true | false | The location of the resource is critical for compliance and security purposes. This attribute is already covered by an implemented policy in another relevant resource. Therefore, a separate policy was not created for this resource. | australia-southeast1 |  |
+| `location` | The location of the resource is critical for compliance and security purposes. | true | false | The location of the resource is critical for compliance and security purposes. This attribute is already covered by an implemented policy in another relevant resource. Therefore, a separate policy was not created for this resource. | None |  |
 | `qa_scorecard_id` | A unique ID for the new QaScorecard. This ID will become the final component of the QaScorecard's resource name. If no ID is specified, a server-generated ID will be used. This value should be 4-64 characters and must match the regular expression `^[a-z0-9-]{4,64}$`. Valid characters are `a-z-`. | true | false | Defines the unique ID for the QaScorecard only. No direct security impact. | None |  |
 | `description` | A text description explaining the intent of the scorecard. | true | false | Provides context for the scorecard's purpose. No direct security impact. | None |  |
 | `display_name` | The user-specified display name of the scorecard. | true | false | Provides a user-friendly name for the scorecard. No direct security impact. | None |  |
