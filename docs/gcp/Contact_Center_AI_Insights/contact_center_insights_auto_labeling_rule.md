@@ -10,7 +10,7 @@ Reference: [Terraform Registry – google_contact_center_insights_auto_labeling_
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `location` | Location of the resource. | true | true | The location of the resource is critical for compliance and security purposes. | australia-southeast1 |  |
+| `location` | Location of the resource. | true | true | The location of the resource is critical for compliance and security purposes. This attribute is already covered by an implemented policy in another relevant resource. Therefore, a separate policy was not created for this resource. | australia-southeast1 |  |
 | `active` | Whether the rule is active. | true | false | The active status of the rule determines whether it is applied to conversations, which can have security implications. However, this attribute does not currently have a policy implementation in this resource. Therefore, security_impact is marked as true to reflect the potential implications. | True |  |
 | `display_name` | Display Name of the auto labeling rule. | true | false | Used for identification purposes only. No direct security impact. | None |  |
 | `description` | The description of the rule. | true | false | Used for identification purposes only. No direct security impact. | None |  |
