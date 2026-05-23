@@ -7,11 +7,7 @@ conditions := [
     [
         {
             "situation_description": "If the scheduler_service_account_email attribute does not use an approved email format, security risks may arise from using unauthorised service accounts.",
-            "remedies": [
-                "Use only approved scheduler service account email formats.",
-                "Remove unauthorised scheduler service account email addresses.",
-                "Consult Google Cloud Data Pipeline documentation for approved service account configurations."
-            ]
+            "remedies": ["Use only approved scheduler service account email formats."]
         },
         {
             "condition": "Check if scheduler_service_account_email follows the approved email pattern",

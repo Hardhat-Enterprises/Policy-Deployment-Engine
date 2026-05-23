@@ -267,8 +267,8 @@
           "required": false,
           "security_impact": true,
           "rationale": "the num_workers field is a security-impact field because it determines the number of Compute Engine instances running the job, which can affect the job's performance and resource utilization. Properly configuring this field is important for maintaining the job's efficiency and preventing resource exhaustion.",
-          "compliant": null,
-          "non-compliant": null,
+          "compliant": 5,
+          "non-compliant": 100,
           "parent": "environment"
         },
         "max_workers": {
@@ -276,8 +276,8 @@
           "required": false,
           "security_impact": true,
           "rationale": "the max_workers field is a security-impact field because it determines the maximum number of Compute Engine instances that can be used to run the job, which can affect the job's performance and resource utilization. Properly configuring this field is important for maintaining the job's efficiency and preventing resource exhaustion.",
-          "compliant": null,
-          "non-compliant": null,
+          "compliant": 20,
+          "non-compliant": 100,
           "parent": "environment"
         },
         "zone": {
@@ -285,7 +285,7 @@
           "required": false,
           "security_impact": true,
           "rationale": "The zone field is security-impacting because it determines the physical location where pipeline worker resources are deployed and data may be processed. Restricting zones to approved locations helps support data sovereignty, compliance, and organizational governance requirements.",
-          "compliant": "australia-southeast1-a, australia-southeast2-a",
+          "compliant": "australia-southeast1-a",
           "non-compliant": "us-central1-a, europe-west1-b",
           "parent": "environment"
         },
@@ -293,8 +293,8 @@
           "description": "The email address of the service account to run the job as.",
           "required": false,
           "security_impact": true,
-          "rationale": "the service_account_email field is not a security-impact field because it only specifies the service account to run the job and does not affect the job's behavior or access control. However, it is important to set this field correctly to ensure that the job runs with the appropriate permissions.",
-          "compliant": "*@project-id.iam.gserviceaccount.com",
+          "rationale": "the service_account_email field is a security-impact field because it determines which identity and permissions the pipeline job will run with. Using unapproved or externally managed service accounts may grant excessive privileges, bypass organisational access controls, or expose pipeline operations to unauthorised access.",
+          "compliant": "*@orginisationemail.com",
           "non-compliant": "external or unapproved service account domains",
           "parent": "environment"
         },
@@ -312,8 +312,8 @@
           "required": false,
           "security_impact": true,
           "rationale": "bypass_temp_dir_validation is a security_impact as disabling temporary directory validation may allow the use of insecure, misconfigured, or unauthorised storage locations, potentially exposing sensitive pipeline data or weakening integrity and access control protections.",
-          "compliant": null,
-          "non-compliant": null,
+          "compliant": false,
+          "non-compliant": true,
           "parent": "environment"
         },
         "machine_type": {
@@ -412,7 +412,7 @@
           "security_impact": true,
           "rationale": "flexrs_goal is a security_impact as relying on unspecified scheduling behaviour may result in inconsistent or unintended workload execution characteristics. Explicitly configuring FlexRS behaviour improves operational governance, configuration clarity, and reduces ambiguity in resource scheduling decisions.",
           "compliant": "FLEXRS_SPEED_OPTIMIZED, FLEXRS_COST_OPTIMIZED",
-          "non-compliant": "FLEXRS_UNSPECIFIED, null",
+          "non-compliant": "FLEXRS_UNSPECIFIED",
           "parent": "environment"
         }
       }

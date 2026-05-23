@@ -6,9 +6,7 @@ import data.terraform.gcp.security.data_pipeline.google_data_pipeline_pipeline.v
 conditions := [[
     {
         "situation_description": "If the kms_key_name attribute is not configured, pipeline encryption protections may be weakened or absent",
-        "remedies": [
-            "Configure the kms_key_name attribute with an approved Cloud KMS key"
-        ],
+        "remedies": ["Configure the kms_key_name attribute with an approved Cloud KMS key"],
     },
     {
     "condition": "check if the kms_key_name attribute is configured",
