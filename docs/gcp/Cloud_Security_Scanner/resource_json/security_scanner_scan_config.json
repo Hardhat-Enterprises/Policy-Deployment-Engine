@@ -14,19 +14,19 @@
     "starting_urls": {
       "description": "The starting URLs from which the scanner finds site pages.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Using insecure HTTP starting URLs can expose scan traffic to interception or manipulation.",
+      "rationale": "Scanner entry points should use HTTPS so the scanner communicates with encrypted endpoints.",
+      "compliant": "https://example.com",
+      "non-compliant": "http://example.com",
       "parent": null
     },
     "max_qps": {
       "description": "The maximum QPS during scanning. A valid value ranges from 5 to 20 inclusively. Defaults to 15.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "A high scan request rate can affect application availability or performance.",
+      "rationale": "The policy limits scan rate to an approved safer value to reduce operational impact.",
+      "compliant": 10,
+      "non-compliant": 20,
       "parent": null
     },
     "authentication": {
@@ -70,10 +70,16 @@
     "blacklist_patterns": {
       "description": "The blacklist URL patterns as described in https://cloud.google.com/security-scanner/docs/excluded-urls",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "If sensitive paths are not excluded, scans may interact with risky areas such as admin, logout, delete, payment, or account pages.",
+      "rationale": "Sensitive URL patterns should be excluded to reduce the risk of unsafe scanner behaviour.",
+      "compliant": [
+        ".*admin.*",
+        ".*logout.*",
+        ".*delete.*",
+        ".*payment.*",
+        ".*account.*"
+      ],
+      "non-compliant": [],
       "parent": null
     },
     "schedule": {
@@ -117,10 +123,10 @@
     "export_to_security_command_center": {
       "description": "Controls export of scan configurations and results to Cloud Security Command Center. Default value is `ENABLED`. Possible values are: `ENABLED`, `DISABLED`.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "Disabling export can reduce central visibility of scanner findings.",
+      "rationale": "Security scanner findings should be exported to Security Command Center for centralised monitoring and response.",
+      "compliant": "ENABLED",
+      "non-compliant": "DISABLED",
       "parent": null
     },
     "project": {
@@ -191,10 +197,10 @@
         "login_url": {
           "description": "The login form URL of the website.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "Using an HTTP login URL may expose authentication traffic and credentials.",
+          "rationale": "Custom account login URLs should use HTTPS to protect login data.",
+          "compliant": "https://example.com/login",
+          "non-compliant": "http://example.com/login",
           "parent": "custom_account"
         }
       }
