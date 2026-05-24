@@ -1,8 +1,8 @@
-## 🛡️ Policy Deployment Engine: `iam_workforce_pool_provider_key`
+## 🛡️ Policy Deployment Engine: `iam_workforce_pool_provider_key - WILL NOT BE COMPLETED IN ONE TRIMESTER`
 
-This section provides a concise policy evaluation for the `iam_workforce_pool_provider_key` resource in GCP.
+This section provides a concise policy evaluation for the `iam_workforce_pool_provider_key - WILL NOT BE COMPLETED IN ONE TRIMESTER` resource in GCP.
 
-Reference: [Terraform Registry – iam_workforce_pool_provider_key](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/iam_workforce_pool_provider_key)
+Reference: [Terraform Registry – iam_workforce_pool_provider_key - WILL NOT BE COMPLETED IN ONE TRIMESTER](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/iam_workforce_pool_provider_key - WILL NOT BE COMPLETED IN ONE TRIMESTER)
 
 ---
 

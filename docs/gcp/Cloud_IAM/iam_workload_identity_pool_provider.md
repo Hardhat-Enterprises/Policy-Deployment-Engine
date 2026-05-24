@@ -1,8 +1,8 @@
-## 🛡️ Policy Deployment Engine: `iam_workload_identity_pool_provider`
+## 🛡️ Policy Deployment Engine: `iam_workload_identity_pool_provider - WILL NOT BE COMPLETED IN ONE TRIMESTER`
 
-This section provides a concise policy evaluation for the `iam_workload_identity_pool_provider` resource in GCP.
+This section provides a concise policy evaluation for the `iam_workload_identity_pool_provider - WILL NOT BE COMPLETED IN ONE TRIMESTER` resource in GCP.
 
-Reference: [Terraform Registry – iam_workload_identity_pool_provider](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/iam_workload_identity_pool_provider)
+Reference: [Terraform Registry – iam_workload_identity_pool_provider - WILL NOT BE COMPLETED IN ONE TRIMESTER](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/iam_workload_identity_pool_provider - WILL NOT BE COMPLETED IN ONE TRIMESTER)
 
 ---
 

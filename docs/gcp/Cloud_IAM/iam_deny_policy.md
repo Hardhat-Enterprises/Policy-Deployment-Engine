@@ -1,8 +1,8 @@
-## 🛡️ Policy Deployment Engine: `iam_deny_policy`
+## 🛡️ Policy Deployment Engine: `iam_deny_policy - WILL NOT BE COMPLETED IN ONE TRIMESTER`
 
-This section provides a concise policy evaluation for the `iam_deny_policy` resource in GCP.
+This section provides a concise policy evaluation for the `iam_deny_policy - WILL NOT BE COMPLETED IN ONE TRIMESTER` resource in GCP.
 
-Reference: [Terraform Registry – iam_deny_policy](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/iam_deny_policy)
+Reference: [Terraform Registry – iam_deny_policy - WILL NOT BE COMPLETED IN ONE TRIMESTER](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/iam_deny_policy - WILL NOT BE COMPLETED IN ONE TRIMESTER)
 
 ---
 

@@ -1,8 +1,8 @@
-## 🛡️ Policy Deployment Engine: `iam_workforce_pool`
+## 🛡️ Policy Deployment Engine: `iam_workforce_pool - WILL NOT BE COMPLETED IN ONE TRIMESTER`
 
-This section provides a concise policy evaluation for the `iam_workforce_pool` resource in GCP.
+This section provides a concise policy evaluation for the `iam_workforce_pool - WILL NOT BE COMPLETED IN ONE TRIMESTER` resource in GCP.
 
-Reference: [Terraform Registry – iam_workforce_pool](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/iam_workforce_pool)
+Reference: [Terraform Registry – iam_workforce_pool - WILL NOT BE COMPLETED IN ONE TRIMESTER](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/iam_workforce_pool - WILL NOT BE COMPLETED IN ONE TRIMESTER)
 
 ---
 
