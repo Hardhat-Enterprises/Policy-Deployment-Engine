@@ -2,78 +2,42 @@
   "resource_name": "storage_transfer_job",
   "subcategory": "Storage Transfer Service",
   "arguments": {
+    "description": {
+      "description": "A description for the Storage Transfer job.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "The description is informational and does not directly affect the security posture of the transfer job.",
+      "compliant": "daily-secure-transfer-job",
+      "non-compliant": null,
+      "parent": null
+    },
+    "status": {
+      "description": "The status of the transfer job.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Transfer jobs should be intentionally enabled or disabled to match operational and governance requirements.",
+      "compliant": "ENABLED",
+      "non-compliant": "Unexpectedly disabled or unmanaged status.",
+      "parent": null
+    },
+    "schedule": {
+      "description": "Defines when the Storage Transfer job runs.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "A defined schedule supports controlled and expected execution of data transfers.",
+      "compliant": "A schedule with an approved start date and run time.",
+      "non-compliant": "No defined schedule where one is required by policy.",
+      "parent": null
+    },
     "transfer_spec": {
       "description": "Defines the source, sink, and transfer behavior for the Storage Transfer job.",
       "required": true,
       "security_impact": true,
       "rationale": "The transfer specification controls what data is moved, from where, and under what restrictions.",
-      "compliant": "A transfer_spec with an approved source, sink, and restricted transfer conditions.",
-      "non-compliant": "A transfer_spec that omits restrictions or uses an unapproved source definition.",
+      "compliant": "A transfer_spec with approved source settings, approved agent pool usage, and safe transfer options.",
+      "non-compliant": "A transfer_spec that omits required restrictions or uses unsafe transfer options.",
       "parent": null,
       "arguments": {
-        "gcs_data_source": {
-          "description": "Specifies a Google Cloud Storage bucket as the source for the transfer job.",
-          "required": false,
-          "security_impact": true,
-          "rationale": "The source bucket determines what data enters the transfer pipeline. It should reference only approved source locations.",
-          "compliant": "gcs_data_source { bucket_name = \"approved-source-bucket\" }",
-          "non-compliant": "gcs_data_source { bucket_name = \"unapproved-public-bucket\" }",
-          "parent": "transfer_spec"
-        },
-        "aws_s3_data_source": {
-          "description": "Specifies an Amazon S3 bucket as the source for the transfer job.",
-          "required": false,
-          "security_impact": true,
-          "rationale": "Using an S3 source introduces external data into the transfer job and should be restricted to approved buckets and credentials.",
-          "compliant": "aws_s3_data_source using an approved bucket and credential configuration.",
-          "non-compliant": "aws_s3_data_source using an unapproved bucket or unmanaged credentials.",
-          "parent": "transfer_spec"
-        },
-        "azure_blob_storage_data_source": {
-          "description": "Specifies an Azure Blob Storage container as the source for the transfer job.",
-          "required": false,
-          "security_impact": true,
-          "rationale": "Azure Blob source definitions should be limited to approved storage accounts and controlled credentials.",
-          "compliant": "azure_blob_storage_data_source using an approved storage account and container.",
-          "non-compliant": "azure_blob_storage_data_source using an unknown or unapproved storage account.",
-          "parent": "transfer_spec"
-        },
-        "http_data_source": {
-          "description": "Specifies a list of HTTP or HTTPS URLs as the source for the transfer job.",
-          "required": false,
-          "security_impact": true,
-          "rationale": "HTTP-based sources can introduce integrity and confidentiality risks if insecure or untrusted endpoints are used.",
-          "compliant": "http_data_source referencing approved HTTPS endpoints.",
-          "non-compliant": "http_data_source referencing HTTP endpoints or untrusted URLs.",
-          "parent": "transfer_spec"
-        },
-        "posix_data_source": {
-          "description": "Specifies a POSIX filesystem path as the source for the transfer job.",
-          "required": false,
-          "security_impact": true,
-          "rationale": "POSIX sources can expose local or attached filesystem data and should be limited to approved paths and agents.",
-          "compliant": "posix_data_source { root_directory = \"/approved/source/path\" }",
-          "non-compliant": "posix_data_source { root_directory = \"/\" }",
-          "parent": "transfer_spec"
-        },
-        "hdfs_data_source": {
-          "description": "Specifies an HDFS path as the source for the transfer job.",
-          "required": false,
-          "security_impact": true,
-          "rationale": "HDFS sources should be controlled to prevent broad or unintended data extraction from distributed storage.",
-          "compliant": "hdfs_data_source using an approved cluster and restricted root path.",
-          "non-compliant": "hdfs_data_source using an unrestricted or unknown path.",
-          "parent": "transfer_spec"
-        },
-        "aws_s3_compatible_data_source": {
-          "description": "Specifies an S3-compatible storage system as the source for the transfer job.",
-          "required": false,
-          "security_impact": true,
-          "rationale": "S3-compatible endpoints should be approved because they may point to third-party or self-hosted object storage.",
-          "compliant": "aws_s3_compatible_data_source using an approved endpoint and bucket.",
-          "non-compliant": "aws_s3_compatible_data_source using an unknown or untrusted endpoint.",
-          "parent": "transfer_spec"
-        },
         "source_agent_pool_name": {
           "description": "Specifies the agent pool used for agent-based source transfers.",
           "required": false,
@@ -83,14 +47,54 @@
           "non-compliant": "source_agent_pool_name = \"transferJobs/agentPools/unapproved-pool\"",
           "parent": "transfer_spec"
         },
-        "include_prefixes_required": {
-          "description": "Ensures the Storage Transfer job restricts transfer scope by defining object_conditions.include_prefixes.",
+        "aws_s3_data_source": {
+          "description": "Specifies an Amazon S3 bucket as the source for the transfer job.",
           "required": false,
           "security_impact": true,
-          "rationale": "Requiring include_prefixes reduces the risk of unintentionally transferring more objects than intended by limiting the transfer to approved object path prefixes.",
-          "compliant": "object_conditions { include_prefixes = [\"secure-data/\"] }",
-          "non-compliant": "No object_conditions.include_prefixes configured.",
-          "parent": "transfer_spec"
+          "rationale": "Using an S3 source introduces external data into the transfer job and should be restricted to approved buckets and approved AWS access settings.",
+          "compliant": "aws_s3_data_source using an approved bucket and approved role ARN.",
+          "non-compliant": "aws_s3_data_source using an unapproved bucket or missing/unapproved role ARN.",
+          "parent": "transfer_spec",
+          "arguments": {
+            "role_arn": {
+              "description": "The AWS IAM role ARN used to access the Amazon S3 source.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "The role ARN controls what AWS permissions are used to read from the source bucket. Using the wrong role can grant excessive access or allow use of an unapproved source identity.",
+              "compliant": "arn:aws:iam::123456789012:role/approved-storage-transfer-role",
+              "non-compliant": "arn:aws:iam::123456789012:role/admin or a missing/unapproved role ARN.",
+              "parent": "aws_s3_data_source"
+            }
+          }
+        },
+        "transfer_options": {
+          "description": "Defines transfer behavior options such as overwrite and deletion behavior.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Transfer options can directly affect data integrity and source data preservation during transfers.",
+          "compliant": "transfer_options with safe overwrite behavior and without destructive source deletion.",
+          "non-compliant": "transfer_options that overwrite unsafely or delete source objects after transfer.",
+          "parent": "transfer_spec",
+          "arguments": {
+            "delete_objects_from_source_after_transfer": {
+              "description": "Whether objects are deleted from the source after they are transferred.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "Deleting source objects after transfer is destructive and can create data loss or recovery risks if used inappropriately.",
+              "compliant": "delete_objects_from_source_after_transfer = false",
+              "non-compliant": "delete_objects_from_source_after_transfer = true",
+              "parent": "transfer_options"
+            },
+            "overwrite_when": {
+              "description": "Specifies when objects at the destination may be overwritten during transfer.",
+              "required": false,
+              "security_impact": true,
+              "rationale": "Overwrite behavior affects destination data integrity and should be limited to approved settings to prevent unintended replacement of data.",
+              "compliant": "overwrite_when set to the approved policy value.",
+              "non-compliant": "overwrite_when set to an unapproved or overly permissive value.",
+              "parent": "transfer_options"
+            }
+          }
         }
       }
     }
