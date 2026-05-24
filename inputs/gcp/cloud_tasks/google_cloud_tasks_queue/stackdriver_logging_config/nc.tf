@@ -1,7 +1,7 @@
 # Non-compliant stackdriver logging configuration
 
 resource "google_cloud_tasks_queue" "nc" {
-  name     = "logging-disabled-queue"
+  name     = "nc"
   location = "us-central1"
 
   stackdriver_logging_config {

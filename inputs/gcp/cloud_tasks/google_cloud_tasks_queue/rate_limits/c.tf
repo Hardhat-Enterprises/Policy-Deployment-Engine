@@ -1,9 +1,9 @@
 # Compliant rate_limits
 
 resource "google_cloud_tasks_queue" "c" {
-  name     = "good-rate-queue"
+  name     = "c"
   location = "us-central1"
-   project  = "pde-project-vindya"
+  project  = "pde-project-vindya"
 
   rate_limits {
     max_dispatches_per_second = 50

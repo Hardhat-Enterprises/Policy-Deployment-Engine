@@ -1,7 +1,7 @@
 # Compliant http_target
 
 resource "google_cloud_tasks_queue" "c" {
-  name     = "secure-http-queue"
+  name     = "c"
   location = "us-central1"
 
   http_target {

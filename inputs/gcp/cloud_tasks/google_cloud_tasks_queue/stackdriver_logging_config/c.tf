@@ -1,7 +1,7 @@
 # Compliant stackdriver logging configuration
 
 resource "google_cloud_tasks_queue" "c" {
-  name     = "logging-enabled-queue"
+  name     = "c"
   location = "us-central1"
 
   stackdriver_logging_config {

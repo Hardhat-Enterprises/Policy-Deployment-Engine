@@ -1,9 +1,9 @@
 # Compliant retry configuration
 
 resource "google_cloud_tasks_queue" "c" {
-  name     = "secure-retry-queue"
+  name     = "c"
   location = "us-central1"
-  project = "pde-project-vindya"
+  project  = "pde-project-vindya"
 
   retry_config {
     max_attempts       = 5
