@@ -1,0 +1,16 @@
+## 🛡️ Policy Deployment Engine: `contact_center_insights_view`
+
+This section provides a concise policy evaluation for the `contact_center_insights_view` resource in GCP.
+
+Reference: [Terraform Registry – contact_center_insights_view](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/contact_center_insights_view)
+
+---
+
+## Argument Reference  
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `location` | Location of the resource. | true | false | The location of the resource is critical for compliance and security purposes. This attribute is already covered by an implemented policy in another relevant resource. Therefore, a separate policy was not created for this resource. | None | None |
+| `display_name` | The human-readable display name of the view. | true | false | Used for identification purposes only. No direct security impact. | None | None |
+| `value` | A filter to reduce conversation results to a specific subset. Refer to https://cloud.google.com/contact-center/insights/docs/filtering for details. | true | false | Defines conversation filtering behaviour only. No direct security impact. | None | None |
+| `project` | If it is not provided, the provider project is used. | true | false | Defines the project context only. No direct security impact. | None | None |
