@@ -1,6 +1,6 @@
-resource "google_spanner_database_iam_binding" "nc1" {
-  instance = google_spanner_instance.nc1_instance.name
-  database = google_spanner_database.nc1_database.name
+resource "google_spanner_database_iam_binding" "nc" {
+  instance = google_spanner_instance.nc_instance.name
+  database = google_spanner_database.nc_database.name
   role     = "roles/spanner.databaseReader"
 
   members = [
@@ -8,14 +8,14 @@ resource "google_spanner_database_iam_binding" "nc1" {
   ]
 }
 
-resource "google_spanner_instance" "nc1_instance" {
-  name         = "test-instance-nc1"
+resource "google_spanner_instance" "nc_instance" {
+  name         = "test-instance-nc"
   config       = "regional-australia-southeast1"
-  display_name = "Test Instance NC1"
+  display_name = "Test Instance NC"
   num_nodes    = 1
 }
 
-resource "google_spanner_database" "nc1_database" {
-  instance = google_spanner_instance.nc1_instance.name
-  name     = "nc1-database"
+resource "google_spanner_database" "nc_database" {
+  instance = google_spanner_instance.nc_instance.name
+  name     = "nc-database"
 }
