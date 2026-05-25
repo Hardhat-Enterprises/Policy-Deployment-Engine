@@ -31,10 +31,10 @@ def run_existing_branch_linter() -> None:
         sys.exit(result.returncode)
 
 
-def run_existing_service_linter(provider: str, service: str) -> None:
+def run_existing_service_linter(provider: str, service: str) -> tuple[bool, str | None]:
     if provider != "gcp":
         print(f"Skipping linter: current linter only supports GCP, but provider is '{provider}'.")
-        return
+        return True, None
 
     result = subprocess.run(
         ["python", "scripts/linters/linter.py", "--gcp", service],
@@ -42,29 +42,11 @@ def run_existing_service_linter(provider: str, service: str) -> None:
     )
 
     if result.returncode != 0:
-        print("Local scan stopped because the linter found issues.")
-        print("Please fix the linter errors before running the policy scan.")
-        sys.exit(result.returncode)
+        reason = f"Service linter failed for {provider}/{service}"
+        print(reason)
+        return False, reason
 
-
-def parse_service_path(service_path: str) -> tuple[str, str]:
-    parts = service_path.strip("/").split("/")
-
-    if len(parts) != 2:
-        print(
-            "Error: service path must follow this format: <provider>/<service_name>",
-            file=sys.stderr,
-        )
-        print("Example: gcp/artifact_registry", file=sys.stderr)
-        sys.exit(1)
-
-    provider, service = parts
-
-    if not provider or not service:
-        print("Error: provider or service name is missing from service path.", file=sys.stderr)
-        sys.exit(1)
-
-    return provider, service
+    return True, None
 
 
 def build_opa_query(provider: str, service: str, resource: str, policy: str, output_type: str) -> str:
@@ -80,6 +62,25 @@ def build_plan_path(provider: str, service: str, resource: str, policy: str) -> 
 
 def build_policy_file_path(provider: str, service: str, resource: str, policy: str) -> Path:
     return POLICIES_ROOT / provider / service / resource / policy / "policy.rego"
+
+
+def get_service_dirs(provider: str, service: str | None = None) -> list[Path]:
+    provider_input_dir = INPUTS_ROOT / provider
+
+    if not provider_input_dir.exists():
+        print(f"Error: provider input directory not found: {provider_input_dir}", file=sys.stderr)
+        sys.exit(1)
+
+    if service:
+        service_dir = provider_input_dir / service
+
+        if not service_dir.exists():
+            print(f"Error: service input directory not found: {service_dir}", file=sys.stderr)
+            sys.exit(1)
+
+        return [service_dir]
+
+    return sorted(path for path in provider_input_dir.iterdir() if path.is_dir())
 
 
 def get_resource_dirs(provider: str, service: str, resource: str | None = None) -> list[Path]:
@@ -159,7 +160,7 @@ def scan_policy(
     policy: str,
     output_type: str,
     output_format: str,
-) -> tuple[int, bool]:
+) -> tuple[int, bool, str | None]:
     plan_path = build_plan_path(provider, service, resource, policy)
     policy_file_path = build_policy_file_path(provider, service, resource, policy)
 
@@ -171,12 +172,14 @@ def scan_policy(
     print("=" * 90)
 
     if not policy_file_path.exists():
-        print(f"Skipping: policy.rego not found at {policy_file_path}")
-        return 0, False
+        reason = f"policy.rego not found at {policy_file_path}"
+        print(f"Skipping: {reason}")
+        return 0, False, reason
 
     if not plan_path.exists():
-        print(f"Skipping: plan.json not found at {plan_path}")
-        return 0, False  
+        reason = f"plan.json not found at {plan_path}"
+        print(f"Skipping: {reason}")
+        return 0, False, reason
 
     query = build_opa_query(
         provider=provider,
@@ -193,29 +196,40 @@ def scan_policy(
         output_format=output_format,
     )
 
+    if exit_code != 0:
+        return exit_code, True, f"OPA evaluation failed for {provider}/{service}/{resource}/{policy}"
 
-    return exit_code, True
+    return exit_code, True, None
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Run local OPA policy scans from a provider/service name."
+        description="Run local OPA policy scans by provider, service, resource, or policy."
     )
 
     parser.add_argument(
-        "service_path",
-        help="Service path in format: <provider>/<service_name>. Example: gcp/artifact_registry",
+        "-p",
+        "--provider",
+        required=True,
+        help="Cloud provider to scan. Example: gcp",
     )
 
     parser.add_argument(
+        "-s",
+        "--service",
+        required=False,
+        help="Optional service name. Example: artifact_registry",
+    )
+
+    parser.add_argument(
+        "-r",
         "--resource",
-        "--resourse",
-        dest="resource",
         required=False,
         help="Optional Terraform resource name. Example: google_artifact_registry_repository",
     )
 
     parser.add_argument(
+        "-po",
         "--policy",
         required=False,
         help="Optional policy folder name. Example: approved_formats",
@@ -224,18 +238,21 @@ def main() -> None:
     output_group = parser.add_mutually_exclusive_group(required=False)
 
     output_group.add_argument(
+        "-m",
         "--message",
         action="store_true",
-        help="Show policy message output",
+        help="Show policy message output. This is the default option.",
     )
 
     output_group.add_argument(
+        "-d",
         "--details",
         action="store_true",
-        help="Show policy details output",
+        help="Show policy details output.",
     )
 
     parser.add_argument(
+        "-f",
         "--format",
         default="pretty",
         choices=["pretty", "json", "raw"],
@@ -244,7 +261,15 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    provider, service = parse_service_path(args.service_path)
+    provider = args.provider
+    service = args.service
+
+    if args.resource and not service:
+        print(
+            "Error: --resource cannot be used without --service because resources are inside service folders.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
     if args.policy and not args.resource:
         print(
@@ -259,50 +284,76 @@ def main() -> None:
         output_type = "message"
 
     run_existing_branch_linter()
-    run_existing_service_linter(provider, service)
-    
-    resource_dirs = get_resource_dirs(
+
+    service_dirs = get_service_dirs(
         provider=provider,
         service=service,
-        resource=args.resource,
     )
 
     final_exit_code = 0
-    scanned_count = 0
-    skipped_count = 0
+    successful_policies = []
+    failed_checks = []
 
-    for resource_dir in resource_dirs:
-        resource_name = resource_dir.name
+    for service_dir in service_dirs:
+        service_name = service_dir.name
 
-        policy_dirs = get_policy_dirs(
-            resource_dir=resource_dir,
-            policy=args.policy,
+        linter_ok, linter_problem = run_existing_service_linter(provider, service_name)
+
+        if not linter_ok:
+            failed_checks.append((f"{provider}/{service_name}", linter_problem or "Service linter failed"))
+            final_exit_code = 1
+            continue
+
+        resource_dirs = get_resource_dirs(
+            provider=provider,
+            service=service_name,
+            resource=args.resource,
         )
 
-        for policy_dir in policy_dirs:
-            policy_name = policy_dir.name
+        for resource_dir in resource_dirs:
+            resource_name = resource_dir.name
 
-            exit_code, scanned = scan_policy(
-                provider=provider,
-                service=service,
-                resource=resource_name,
-                policy=policy_name,
-                output_type=output_type,
-                output_format=args.format,
+            policy_dirs = get_policy_dirs(
+                resource_dir=resource_dir,
+                policy=args.policy,
             )
 
-            if scanned:
-                scanned_count += 1
-            else:
-                skipped_count += 1
+            for policy_dir in policy_dirs:
+                policy_name = policy_dir.name
 
-            if exit_code != 0:
-                final_exit_code = exit_code
+                policy_ref = f"{provider}/{service_name}/{resource_name}/{policy_name}"
+
+                exit_code, scanned, problem = scan_policy(
+                    provider=provider,
+                    service=service_name,
+                    resource=resource_name,
+                    policy=policy_name,
+                    output_type=output_type,
+                    output_format=args.format,
+                )
+
+                if scanned and exit_code == 0:
+                    successful_policies.append(policy_ref)
+                else:
+                    reason = problem or "OPA evaluation failed"
+                    failed_checks.append((policy_ref, reason))
+                    final_exit_code = 1
 
     print("\n" + "=" * 90)
-    print("Local policy scan completed")
-    print(f"Scanned policies : {scanned_count}")
-    print(f"Skipped policies : {skipped_count}")
+    print(f"Successful policies : {len(successful_policies)}")
+    print(f"Failed checks       : {len(failed_checks)}")
+
+    # if successful_policies:
+    #     print("\nSuccessful policies:")
+    #     for policy_ref in successful_policies:
+    #         print(f" - {policy_ref}")
+
+    if failed_checks:
+        print("\nFailed check details:")
+        for check_ref, reason in failed_checks:
+            print(f" - {check_ref}")
+            print(f"   Reason: {reason}")
+
     print("=" * 90)
 
     sys.exit(final_exit_code)
