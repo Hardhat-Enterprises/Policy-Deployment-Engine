@@ -1,10 +1,6 @@
 <a id="top"></a>
 <h1 align="center">IAM & Location Policy Templates</h1>
 
-These templates exist so that IAM and location policies are written the same way across every service in the PDE library. Authors copy the relevant template, make the minimum required changes, and the policy is complete.
-
----
-
 ## When to Use These Templates
 
 ### 1. IAM Templates
@@ -17,7 +13,7 @@ Use an IAM template whenever a GCP resource exposes one of the following resourc
 
 #### The Three IAM Resource Types
 
-Each GCP service that supports IAM exposes three separate Terraform resources. You must write a separate policy for each one.
+Each GCP service that supports IAM exposes three separate Terraform resource types. You must write a separate policy for each one.
 
 | Resource Type | Behaviour |
 |---|---|
@@ -25,12 +21,13 @@ Each GCP service that supports IAM exposes three separate Terraform resources. Y
 | `google_*_iam_binding` | **Authoritative for a given role.** Updates the IAM policy to grant a role to a list of members. Other roles are preserved. |
 | `google_*_iam_member` | **Non-authoritative.** Updates the IAM policy to grant a role to a single new member. Other members for the role are preserved. |
 
-> **Example:** For API Gateway Gateway, the three resources are:
-> - `google_api_gateway_gateway_iam_policy`
-> - `google_api_gateway_gateway_iam_binding`
-> - `google_api_gateway_gateway_iam_member`
+### Example: `For API Gateway Gateway` 
 
-![argument-reference-policy](images/argument-reference_policy.png)
+- `inputs/gcp/service name/google_*_iam_binding`
+- `inputs/gcp/service name/google_*_iam_member`
+- `inputs/gcp/service name/google_*_iam_policy`
+
+
 
 #### Attributes to Cover
 
@@ -54,7 +51,6 @@ Each GCP service that supports IAM exposes three separate Terraform resources. Y
 | `projectEditor:projectid` | Editors of the given project. |
 | `projectViewer:projectid` | Viewers of the given project. |
 
----
 
 ### 2. Location Templates
 
@@ -66,20 +62,19 @@ Use a location template whenever a GCP resource has a geographic placement field
 | `region` | `google_sql_database_instance` |
 | `zone` | zone-level resources |
 
-```hcl
-# Example: location
+### For example: location and region
+```rego
 resource "google_alloydb_backup" "default" {
   location = "australia-southeast1"
 }
+```
 
-# Example: region
+```gcp
 resource "google_sql_database_instance" "instance" {
   name   = "cloudrun-sql"
   region = "australia-southeast1"
 }
 ```
-
----
 
 ## Folder Structure
 
@@ -119,7 +114,6 @@ Make sure values and attribute paths align with your resource.
 
 > **Note:** For IAM resources you need **3 separate `vars.rego` files** — one for each IAM resource type (`_iam_binding`, `_iam_member`, `_iam_policy`).
 
----
 
 ## Author Checklist
 
@@ -138,7 +132,6 @@ Complete every item before raising a PR:
 - [ ] `_iam_policy` values updated to full JSON string patterns matching your resource's valid roles
 - [ ] `opa eval` tested against a `plan.json` fixture — policy produces expected pass/fail output
 
----
 
 <div align="center">
 
