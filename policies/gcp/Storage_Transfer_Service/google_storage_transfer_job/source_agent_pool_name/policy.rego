@@ -14,7 +14,7 @@ conditions := [
         },
         {
             "condition": "Storage Transfer job must use an approved source agent pool.",
-            "attribute_path": ["transfer_spec", "source_agent_pool_name"],
+            "attribute_path": ["transfer_spec", 0, "source_agent_pool_name"],
             "values": ["projects/my-project-123/agentPools/approved-pool"],
             "policy_type": "whitelist"
         }

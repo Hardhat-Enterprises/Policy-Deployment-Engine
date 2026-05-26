@@ -10,8 +10,9 @@ Reference: [Terraform Registry – storage_transfer_agent_pool](https://registry
 
 | Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
 |----------|-------------|----------|-----------------|-----------|-----------|---------------|
-| `name` | The ID of the agent pool to create. The agent pool name identifies the pool used by transfer agents. | true | false | The name itself does not provide or restrict security controls, but it should still be set clearly for administration and auditability. | agent-pool-example | None |
-| `bandwidth_limit` | Specifies the bandwidth limit details for the agent pool. | false | true | Bandwidth controls can reduce the risk of excessive transfer throughput, network saturation, and unintended large-scale data movement. | Refer to child argument. | Refer to child argument. |
+| `name` | The ID of the agent pool to create. The agentPoolId must meet the following requirements: * Length of 128 characters or less. * Not start with the string goog. * Start with a lowercase ASCII character, followed by: * Zero or more: lowercase Latin alphabet characters, numerals, hyphens (-), periods (.), underscores (_), or tildes (~). * One or more numerals or lowercase ASCII characters. As expressed by the regular expression: ^(?!goog)[a-z]([a-z0-9-._~]*[a-z0-9])?$. | true | true | The agent pool name is security relevant because a policy has been implemented to enforce approved naming requirements and prevent reserved or unapproved agent pool identifiers. | agent-pool-example | goog-agent-pool |
+| `display_name` | Specifies the client-specified AgentPool description. | false | false | The display name is descriptive metadata only and does not enforce access control, encryption, networking, or transfer behavior. | Example transfer agent pool | None |
+| `bandwidth_limit` | Specifies the bandwidth limit details. If this field is unspecified, the default value is set as 'No Limit'. Structure is documented below (#nested_bandwidth_limit). | false | true | Bandwidth controls can reduce the risk of excessive transfer throughput, network saturation, and unintentional resource impact. | Refer to child argument. | Refer to child argument. |
 
 ### bandwidth_limit Block
 

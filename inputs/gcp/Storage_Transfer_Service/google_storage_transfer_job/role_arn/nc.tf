@@ -6,7 +6,7 @@ resource "google_storage_transfer_job" "nc" {
   transfer_spec {
     aws_s3_data_source {
       bucket_name = "my-source-bucket"
-      role_arn    = "arn:aws:iam::123456789012:role/unsafe-role"
+      role_arn = "arn:aws:iam::123456789012:role/unsafe-role"
     }
 
     gcs_data_sink {
