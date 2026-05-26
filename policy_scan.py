@@ -205,6 +205,27 @@ def generate_plan_json(input_dir: Path, logs: list[str]) -> tuple[bool, str | No
     return True, None
 
 
+def prepare_plan_json(
+    provider: str,
+    service: str,
+    resource: str,
+    policy: str,
+) -> tuple[bool, str | None, str]:
+    logs = []
+    plan_path = build_plan_path(provider, service, resource, policy)
+
+    if plan_path.exists():
+        logs.append(f"plan.json already exists: {plan_path}")
+        return True, None, "\n".join(logs)
+
+    generated, reason = generate_plan_json(plan_path.parent, logs)
+
+    if not generated:
+        return False, reason or f"plan.json could not be generated at {plan_path}", "\n".join(logs)
+
+    return True, None, "\n".join(logs)
+
+
 def scan_policy(
     provider: str,
     service: str,
@@ -231,12 +252,9 @@ def scan_policy(
         return 0, False, reason, "\n".join(logs)
 
     if not plan_path.exists():
-        input_dir = plan_path.parent
-
-        generated, reason = generate_plan_json(input_dir, logs)
-
-        if not generated:
-            return 0, False, reason or f"plan.json could not be generated at {plan_path}", "\n".join(logs)
+        reason = f"plan.json not found at {plan_path}. Terraform generation stage did not create it."
+        logs.append(f"Skipping: {reason}")
+        return 0, False, reason, "\n".join(logs)
 
     query = build_opa_query(
         provider=provider,
@@ -318,17 +336,27 @@ def main() -> None:
     )
 
     parser.add_argument(
-        "-w",
-        "--workers",
+        "--terraform-workers",
+        type=int,
+        default=2,
+        help="Number of concurrent Terraform plan generations to run. Default: 2",
+    )
+
+    parser.add_argument(
+        "--opa-workers",
         type=int,
         default=4,
-        help="Number of concurrent policy scans to run. Default: 4",
+        help="Number of concurrent OPA policy scans to run. Default: 4",
     )
 
     args = parser.parse_args()
 
-    if args.workers < 1:
-        print("Error: --workers must be at least 1.", file=sys.stderr)
+    if args.terraform_workers < 1:
+        print("Error: --terraform-workers must be at least 1.", file=sys.stderr)
+        sys.exit(1)
+
+    if args.opa_workers < 1:
+        print("Error: --opa-workers must be at least 1.", file=sys.stderr)
         sys.exit(1)
 
     provider = args.provider
@@ -404,9 +432,66 @@ def main() -> None:
                     }
                 )
 
-    print(f"\nFound {len(scan_targets)} policies to scan. Starting scans with {args.workers} workers...\n")
-    
-    with ThreadPoolExecutor(max_workers=args.workers) as executor:
+    print(f"\n\nFound {len(scan_targets)} policies to scan.\n")
+
+    targets_needing_plan = [
+        target
+        for target in scan_targets
+        if not build_plan_path(
+            target["provider"],
+            target["service"],
+            target["resource"],
+            target["policy"],
+        ).exists()
+    ]
+
+    if len(targets_needing_plan) > 0:
+        print(
+            f"Found {len(targets_needing_plan)} missing plan.json files. "
+            f"Starting Terraform generation with {args.terraform_workers} workers...\n"
+        )
+    else:
+        print("All plan.json files already exist. Skipping Terraform generation.\n")
+
+    with ThreadPoolExecutor(max_workers=args.terraform_workers) as executor:
+        future_to_policy = {
+            executor.submit(
+                prepare_plan_json,
+                target["provider"],
+                target["service"],
+                target["resource"],
+                target["policy"],
+            ): target["policy_ref"]
+            for target in targets_needing_plan
+        }
+
+        for future in as_completed(future_to_policy):
+            policy_ref = future_to_policy[future]
+
+            try:
+                plan_ready, problem, log_output = future.result()
+                print(log_output)
+            except Exception as error:
+                failed_checks.append((policy_ref, f"Unexpected Terraform generation error: {error}"))
+                final_exit_code = 1
+                continue
+
+            if not plan_ready:
+                failed_checks.append((policy_ref, problem or "Terraform plan generation failed"))
+                final_exit_code = 1
+
+    plan_failed_refs = {check_ref for check_ref, _ in failed_checks}
+    scan_ready_targets = [
+        target
+        for target in scan_targets
+        if target["policy_ref"] not in plan_failed_refs
+    ]
+
+    print(
+        f"\nStarting OPA scans for {len(scan_ready_targets)} policies.\n"
+    )
+
+    with ThreadPoolExecutor(max_workers=args.opa_workers) as executor:
         future_to_policy = {
             executor.submit(
                 scan_policy,
@@ -417,7 +502,7 @@ def main() -> None:
                 output_type,
                 args.format,
             ): target["policy_ref"]
-            for target in scan_targets
+            for target in scan_ready_targets
         }
 
         for future in as_completed(future_to_policy):
@@ -427,7 +512,7 @@ def main() -> None:
                 exit_code, scanned, problem, log_output = future.result()
                 print(log_output)
             except Exception as error:
-                failed_checks.append((policy_ref, f"Unexpected error: {error}"))
+                failed_checks.append((policy_ref, f"Unexpected OPA scan error: {error}"))
                 final_exit_code = 1
                 continue
 
