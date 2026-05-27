@@ -3,10 +3,10 @@
   "subcategory": "Cloud Spanner",
   "arguments": {
     "name": {
-      "description": "A unique identifier for the instance partition, which cannot be changed after the instance partition is created. The name must be between 2 and 64 characters and match the regular expression [a-z][a-z0-9\\\\-]{0,61}[a-z0-9].",
+      "description": "A unique identifier for the instance partition, which cannot be changed after the instance partition is created.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The instance partition name is a required identifier that cannot be changed after creation. It does not directly introduce a security risk but should follow naming conventions to avoid confusion.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -14,17 +14,17 @@
     "display_name": {
       "description": "The descriptive name for this instance partition as it appears in UIs. Must be unique per project and between 4 and 30 characters in length.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The display name is a required identifier for the instance partition. It does not directly introduce a security risk but should follow naming conventions for clarity.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "config": {
-      "description": "The name of the instance partition's configuration (similar to a region) which defines the geographic placement and replication of data in this instance partition.",
+      "description": "The name of the instance partition's configuration which defines the geographic placement and replication of data in this instance partition.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "The config determines where data is physically stored. It should be set to a region that complies with data residency and sovereignty requirements.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -32,8 +32,8 @@
     "instance": {
       "description": "The instance to create the instance partition in.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "This is a required reference to the parent Spanner instance. It does not directly introduce a security risk but must be correctly configured to ensure the partition is created in the intended instance.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -41,8 +41,8 @@
     "node_count": {
       "description": "The number of nodes allocated to this instance partition. One node equals 1000 processing units. Exactly one of either node_count or processing_units must be present.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Node count affects availability and performance but does not directly introduce a security risk.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
@@ -50,17 +50,17 @@
     "processing_units": {
       "description": "The number of processing units allocated to this instance partition. Exactly one of either node_count or processing_units must be present.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Processing units affect availability and performance but do not directly introduce a security risk.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "The project field is optional and defaults to the provider project. It does not directly introduce a security risk but should be explicitly set to avoid deploying resources to unintended projects.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
