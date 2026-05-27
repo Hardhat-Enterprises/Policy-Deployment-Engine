@@ -12,9 +12,9 @@ conditions := [
       ]
     },
     {
-      "condition": "member must not be allUsers",
+      "condition": "member must not be allUsers or allAuthenticatedUsers",
       "attribute_path": ["member"],
-      "values": ["allUsers"],
+      "values": ["allUsers", "allAuthenticatedUsers"],
       "policy_type": "blacklist"
     }
   ]

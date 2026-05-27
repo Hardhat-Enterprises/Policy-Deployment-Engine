@@ -12,9 +12,9 @@ conditions := [
       ]
     },
     {
-      "condition": "policy_data must not grant access to allUsers",
-      "attribute_path": ["policy_data"],
-      "values": ["allUsers"],
+      "condition": "members must not include allUsers or allAuthenticatedUsers",
+      "attribute_path": ["members"],
+      "values": ["allUsers", "allAuthenticatedUsers"],
       "policy_type": "blacklist"
     }
   ]
