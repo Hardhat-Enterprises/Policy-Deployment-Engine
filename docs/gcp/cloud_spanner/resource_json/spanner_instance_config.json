@@ -5,35 +5,35 @@
     "display_name": {
       "description": "The name of this instance configuration as it appears in UIs.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The display name is a required identifier for the instance configuration. It does not directly introduce a security risk but should follow naming conventions for clarity.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "replicas": {
-      "description": "The geographic placement of nodes in this instance configuration and their replication properties. Structure is [documented below](#nested_replicas).",
+      "description": "The geographic placement of nodes in this instance configuration and their replication properties.",
       "required": true,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": true,
+      "rationale": "Replica placement determines where data is physically stored. Misconfigured replicas can result in data being stored in regions that do not comply with data residency or sovereignty requirements.",
       "compliant": null,
       "non-compliant": null,
       "parent": null,
       "arguments": {
         "location": {
-          "description": "The location of the serving resources, e.g. \"us-central1\".",
+          "description": "The location of the serving resources, e.g. us-central1.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": true,
+          "rationale": "The replica location determines the physical region where data is stored. It should be set to a region that complies with data residency and sovereignty requirements.",
           "compliant": null,
           "non-compliant": null,
           "parent": "replicas"
         },
         "type": {
-          "description": "Indicates the type of replica.  See the [replica types documentation](https://cloud.google.com/spanner/docs/replication#replica_types) for more details. Possible values are: `READ_WRITE`, `READ_ONLY`, `WITNESS`.",
+          "description": "Indicates the type of replica. Possible values are: READ_WRITE, READ_ONLY, WITNESS.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The replica type affects availability and performance but does not directly introduce a security risk.",
           "compliant": null,
           "non-compliant": null,
           "parent": "replicas"
@@ -41,8 +41,8 @@
         "default_leader_location": {
           "description": "If true, this location is designated as the default leader location where leader replicas are placed.",
           "required": false,
-          "security_impact": null,
-          "rationale": null,
+          "security_impact": false,
+          "rationale": "The default leader location affects performance and latency but does not directly introduce a security risk.",
           "compliant": null,
           "non-compliant": null,
           "parent": "replicas"
@@ -50,37 +50,37 @@
       }
     },
     "name": {
-      "description": "A unique identifier for the instance configuration. Values are of the form projects/<project>/instanceConfigs/[a-z][-a-z0-9]*",
+      "description": "A unique identifier for the instance configuration.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The instance configuration name is an optional identifier. It does not directly introduce a security risk but should follow naming conventions to avoid confusion.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "base_config": {
-      "description": "Base configuration name, e.g. nam3, based on which this configuration is created. Only set for user managed configurations. baseConfig must refer to a configuration of type GOOGLE_MANAGED in the same project as this configuration.",
+      "description": "Base configuration name, e.g. nam3, based on which this configuration is created. Only set for user managed configurations.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "The base configuration determines the foundation for the custom instance configuration. It does not directly introduce a security risk but should reference a trusted Google-managed configuration.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "labels": {
-      "description": "An object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource.",
+      "description": "An object containing a list of key-value pairs for labelling the instance configuration.",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
+      "security_impact": false,
+      "rationale": "Labels are used for organisation and cost allocation. They do not directly introduce a security risk but can be used to enforce governance policies.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
     },
     "project": {
       "description": "If it is not provided, the provider project is used.",
-      "required": null,
-      "security_impact": null,
-      "rationale": null,
+      "required": false,
+      "security_impact": false,
+      "rationale": "The project field is optional and defaults to the provider project. It does not directly introduce a security risk but should be explicitly set to avoid deploying resources to unintended projects.",
       "compliant": null,
       "non-compliant": null,
       "parent": null
