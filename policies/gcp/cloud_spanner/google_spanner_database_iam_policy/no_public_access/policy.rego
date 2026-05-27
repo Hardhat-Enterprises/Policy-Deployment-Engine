@@ -13,7 +13,7 @@ conditions := [
     },
     {
       "condition": "members must not include allUsers or allAuthenticatedUsers",
-      "attribute_path": ["members"],
+      "attribute_path": ["binding", "members"],
       "values": ["allUsers", "allAuthenticatedUsers"],
       "policy_type": "blacklist"
     }
