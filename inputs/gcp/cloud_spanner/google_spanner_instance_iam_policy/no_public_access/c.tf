@@ -6,6 +6,6 @@ data "google_iam_policy" "c1" {
 }
 
 resource "google_spanner_instance_iam_policy" "c1" {
-  instance    = "c1-instance"
+  instance    = "c1"
   policy_data = data.google_iam_policy.c1.policy_data
 }

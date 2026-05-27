@@ -3,5 +3,5 @@ package terraform.gcp.security.cloud_spanner.google_spanner_instance_iam_member.
 variables := {
   "friendly_resource_name": "Cloud Spanner Instance IAM Member",
   "resource_type": "google_spanner_instance_iam_member",
-  "resource_value_name": "instance"
+  "resource_value_name": "role"
 }

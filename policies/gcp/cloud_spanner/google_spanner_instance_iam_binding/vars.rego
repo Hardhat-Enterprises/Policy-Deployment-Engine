@@ -3,5 +3,5 @@ package terraform.gcp.security.cloud_spanner.google_spanner_instance_iam_binding
 variables := {
   "friendly_resource_name": "Cloud Spanner Instance IAM Binding",
   "resource_type": "google_spanner_instance_iam_binding",
-  "resource_value_name": "instance"
+  "resource_value_name": "role"
 }
