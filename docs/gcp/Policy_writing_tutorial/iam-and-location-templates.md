@@ -21,13 +21,11 @@ Each GCP service that supports IAM exposes three separate Terraform resource typ
 | `google_*_iam_binding` | **Authoritative for a given role.** Updates the IAM policy to grant a role to a list of members. Other roles are preserved. |
 | `google_*_iam_member` | **Non-authoritative.** Updates the IAM policy to grant a role to a single new member. Other members for the role are preserved. |
 
-### Example: `For API Gateway Gateway` 
+### Example: `For API Gateway Gateway`
 
 - `inputs/gcp/service name/google_*_iam_binding`
 - `inputs/gcp/service name/google_*_iam_member`
 - `inputs/gcp/service name/google_*_iam_policy`
-
-
 
 #### Attributes to Cover
 
@@ -51,7 +49,6 @@ Each GCP service that supports IAM exposes three separate Terraform resource typ
 | `projectEditor:projectid` | Editors of the given project. |
 | `projectViewer:projectid` | Viewers of the given project. |
 
-
 ### 2. Location Templates
 
 Use a location template whenever a GCP resource has a geographic placement field. Use only the template that matches your resource's attribute name:
@@ -63,13 +60,14 @@ Use a location template whenever a GCP resource has a geographic placement field
 | `zone` | zone-level resources |
 
 ### For example: location and region
-```rego
+
+```hcl
 resource "google_alloydb_backup" "default" {
   location = "australia-southeast1"
 }
 ```
 
-```gcp
+```hcl
 resource "google_sql_database_instance" "instance" {
   name   = "cloudrun-sql"
   region = "australia-southeast1"
@@ -78,13 +76,25 @@ resource "google_sql_database_instance" "instance" {
 
 ## Folder Structure
 
-### 1. Copy the correct template into your service directory
+### 1. Copy required files
 
-```
-policies/<service>/<resource_type>/no_primitive_or_public/
-  policy.rego
-  vars.rego
-```
+Copy the following files from `templates/gcp`:
+
+- `c.tf`
+- `nc.tf`
+- `config.tf`
+
+Into:
+
+`inputs/gcp/service name/IAM resource type/argument reference(policy)`
+
+**one** `vars.rego` into:
+
+`policies/gcp/service name/IAM resource type`
+
+and a `policy.rego` into:
+
+`policies/gcp/service name/IAM resource type/argument reference(policy)`
 
 ### 2. Rename the folder to match the exact Terraform resource type
 
@@ -114,7 +124,6 @@ Make sure values and attribute paths align with your resource.
 
 > **Note:** For IAM resources you need **3 separate `vars.rego` files** — one for each IAM resource type (`_iam_binding`, `_iam_member`, `_iam_policy`).
 
-
 ## Author Checklist
 
 Complete every item before raising a PR:
@@ -131,7 +140,6 @@ Complete every item before raising a PR:
 - [ ] Valid roles confirmed from resource documentation — pattern whitelist values updated
 - [ ] `_iam_policy` values updated to full JSON string patterns matching your resource's valid roles
 - [ ] `opa eval` tested against a `plan.json` fixture — policy produces expected pass/fail output
-
 
 <div align="center">
 
