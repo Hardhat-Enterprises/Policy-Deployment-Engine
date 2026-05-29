@@ -2,86 +2,116 @@
 
 ## Overview
 
-`local_scan.py` is a helper script for running OPA policy checks locally before raising a pull request.
+`policy_scan.py` is a helper script for running local Terraform plan generation and OPA/Rego policy checks before raising a pull request.
 
-Instead of manually writing long `opa eval` commands, students can use one simple command format to scan policies for a selected cloud provider and service.
+Instead of manually running long Terraform and `opa eval` commands, students can use one script to:
 
-The script also runs the existing branch name checker and service linter before scanning policies. This helps reduce common mistakes such as wrong branch naming, incorrect resource naming, missing files, or policy structure issues.
+- check the branch name
+- run the service linter
+- generate or refresh `plan.json`
+- scan policies with OPA
+- show a clear success and failure summary
+
+The script now runs Terraform plan generation for every selected policy, even when a `plan.json` file already exists. This helps make sure the scan uses the latest Terraform configuration.
 
 ---
 
 ## Basic Command Format
 
 ```bash
-python scripts\policy_scan\local_scan.py <provider>/<service>
+python policy_scan.py --provider <provider>
 ```
 
 Example:
 
 ```bash
-python scripts\policy_scan\local_scan.py gcp/artifact_registry
+python policy_scan.py --provider gcp
 ```
+
+This scans all services under the selected provider.
 
 ---
 
 ## Example Commands
 
-### 1. Scan a Full Service
+### 1. Scan All Services for a Provider
 
 ```bash
-python scripts\policy_scan\local_scan.py <provider>/<service>
+python policy_scan.py --provider <provider>
 ```
 
-This scans all resources and policies inside the service.
+Example:
+
+```bash
+python policy_scan.py --provider gcp
+```
+
+This scans all services, resources, and policies under the selected provider.
 
 ---
 
-### 2. Scan One Resource Only
+### 2. Scan One Service
 
 ```bash
-python scripts\policy_scan\local_scan.py <provider>/<service> --resource <resource>
+python policy_scan.py --provider <provider> --service <service>
+```
+
+Example:
+
+```bash
+python policy_scan.py --provider gcp --service artifact_registry
+```
+
+This scans all resources and policies inside the selected service.
+
+---
+
+### 3. Scan One Resource Only
+
+```bash
+python policy_scan.py --provider <provider> --service <service> --resource <resource>
+```
+
+Example:
+
+```bash
+python policy_scan.py --provider gcp --service artifact_registry --resource google_artifact_registry_repository
 ```
 
 This scans only the selected Terraform resource.
 
 ---
 
-### 3. Scan One Specific Policy
+### 4. Scan One Specific Policy
 
 ```bash
-python scripts\policy_scan\local_scan.py <provider>/<service> --resource <resource> --policy <policy>
+python policy_scan.py --provider <provider> --service <service> --resource <resource> --policy <policy>
 ```
 
-This scans only the policy for the selected resource.
-
----
-
-### 4. Show Policy Message Output (Optional)
+Example:
 
 ```bash
-python scripts\policy_scan\local_scan.py <provider>/<service> --message
+python policy_scan.py --provider gcp --service artifact_registry --resource google_artifact_registry_repository --policy approved_formats
 ```
 
-This shows the policy `message` output.
-
-By default, the script shows `message`, so this flag is optional.
+This scans only one policy for the selected resource.
 
 ---
 
 ### 5. Show Policy Details Output
 
 ```bash
-python scripts\policy_scan\local_scan.py <provider>/<service> --details
+python policy_scan.py --provider gcp --service artifact_registry --details
 ```
 
 This shows the policy `details` output instead of the message.
 
 ---
 
-### 6. Change Output Format
+### 6. Change OPA Output Format
 
 ```bash
-python scripts\policy_scan\local_scan.py <provider>/<service> --format json
+python policy_scan.py --provider gcp --service artifact_registry --format json
 ```
 
 Supported formats are:
@@ -100,76 +130,127 @@ pretty
 
 ---
 
-## What Happens When the script is run
+### 7. Change Worker Counts
+
+The script uses concurrent workers to speed up Terraform plan generation and OPA scans.
+
+```bash
+python policy_scan.py --provider gcp --service artifact_registry --terraform-workers 2 --opa-workers 4
+```
+
+Default values:
+
+```text
+Terraform workers : 2
+OPA workers       : 4
+```
+
+Use lower worker counts if your computer becomes slow or if Terraform commands fail because too many tasks are running at the same time.
+
+---
+
+## What Happens When the Script Runs
 
 When the script runs, it follows these steps:
 
 1. Checks whether the branch name follows the project naming rule.
 2. Runs the existing service linter.
-3. Finds the selected service folder inside the `inputs` directory.
-4. Looks for resource folders and policy folders.
-5. Checks whether each policy has:
-   - a `policy.rego` file
-   - a matching `plan.json` file
-6. Runs the OPA policy check.
-7. Shows a final summary of scanned and skipped policies.
+3. Finds the selected provider, service, resource, and policy folders.
+4. Runs Terraform commands for each selected policy folder:
+
+   ```bash
+   terraform init
+   terraform plan --out=plan
+   terraform show -json plan > plan.json
+   ```
+
+5. Regenerates `plan.json` even if it already exists.
+6. Checks whether each policy has a matching `policy.rego` file.
+7. Runs the OPA policy check using the generated `plan.json`.
+8. Shows a final summary of successful policies and failed checks.
 
 ---
 
 ## Important Notes
 
-The service path must follow this format:
-
-```text
-<provider>/<service_name>
-```
-
-Correct example:
-
-```bash
-python scripts\policy_scan\local_scan.py gcp/artifact_registry
-```
-
-Incorrect example:
-
-```bash
-python scripts\policy_scan\local_scan.py artifact_registry
-```
-
-At the moment, the service linter only supports GCP. If another provider is used, the script will skip the service linter.
-
-Also, `--policy` cannot be used alone. A policy belongs inside a resource folder, so `--resource` must be provided first.
+`--provider` is required.
 
 Correct:
 
 ```bash
-python scripts\policy_scan\local_scan.py <provider>/<service> --resource <resource> --policy <policy>
+python policy_scan.py --provider gcp
 ```
 
 Incorrect:
 
 ```bash
-python scripts\policy_scan\local_scan.py <provider>/<service> --policy <policy>
+python policy_scan.py
 ```
+
+`--resource` cannot be used without `--service`, because resources are inside service folders.
+
+Correct:
+
+```bash
+python policy_scan.py --provider gcp --service artifact_registry --resource google_artifact_registry_repository
+```
+
+Incorrect:
+
+```bash
+python policy_scan.py --provider gcp --resource google_artifact_registry_repository
+```
+
+`--policy` cannot be used without `--resource`, because policies are inside resource folders.
+
+Correct:
+
+```bash
+python policy_scan.py --provider gcp --service artifact_registry --resource google_artifact_registry_repository --policy approved_formats
+```
+
+Incorrect:
+
+```bash
+python policy_scan.py --provider gcp --service artifact_registry --policy approved_formats
+```
+
+At the moment, the service linter only supports GCP. If another provider is used, the script skips the service linter.
 
 ---
 
-## Final Output
+## Available Flags
 
-At the end, the script shows a summary like this:
+The script supports both full flag names and short-hand flags. Students can use either format.
 
-```text
-Local policy scan completed
-Scanned policies : 3
-Skipped policies : 1
+| Purpose | Full flag | Short-hand flag | Example value |
+|---|---|---|---|
+| Select provider | `--provider` | `-p` | `gcp` |
+| Select service | `--service` | `-s` | `artifact_registry` |
+| Select resource | `--resource` | `-r` | `google_artifact_registry_repository` |
+| Select policy | `--policy` | `-po` | `approved_formats` |
+| Show message output | `--message` | `-m` | no value needed |
+| Show details output | `--details` | `-d` | no value needed |
+| Change OPA format | `--format` | `-f` | `pretty`, `json`, or `raw` |
+| Set Terraform workers | `--terraform-workers` | no short-hand | `2` |
+| Set OPA workers | `--opa-workers` | no short-hand | `4` |
+
+Example using full flags:
+
+```bash
+python policy_scan.py --provider gcp --service artifact_registry --resource google_artifact_registry_repository --policy approved_formats --details --format pretty
 ```
 
-A policy may be skipped if the script cannot find the required `policy.rego` or `plan.json` file.
+Same command using short-hand flags:
+
+```bash
+python policy_scan.py -p gcp -s artifact_registry -r google_artifact_registry_repository -po approved_formats -d -f pretty
+```
 
 ---
 
 ## Summary
 
-`local_scan.py` makes local policy testing easier and more consistent for students.
+`policy_scan.py` makes local policy testing easier and more consistent for students.
 
-It allows students to scan policies, check branch naming, run the service linter, and prepare their work before raising a pull request.
+It checks the branch name, runs the service linter, regenerates Terraform `plan.json` files, runs OPA scans, and provides a final summary.

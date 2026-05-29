@@ -155,7 +155,7 @@ def generate_plan_json(input_dir: Path, logs: list[str]) -> tuple[bool, str | No
     plan_file = input_dir / "plan"
     plan_json_file = input_dir / "plan.json"
 
-    logs.append(f"plan.json not found. Generating Terraform plan in: {input_dir}")
+    logs.append(f"Generating Terraform plan in: {input_dir}")
 
     commands = [
         ["terraform", "init"],
@@ -213,10 +213,6 @@ def prepare_plan_json(
 ) -> tuple[bool, str | None, str]:
     logs = []
     plan_path = build_plan_path(provider, service, resource, policy)
-
-    if plan_path.exists():
-        logs.append(f"plan.json already exists: {plan_path}")
-        return True, None, "\n".join(logs)
 
     generated, reason = generate_plan_json(plan_path.parent, logs)
 
@@ -434,24 +430,11 @@ def main() -> None:
 
     print(f"\n\nFound {len(scan_targets)} policies to scan.\n")
 
-    targets_needing_plan = [
-        target
-        for target in scan_targets
-        if not build_plan_path(
-            target["provider"],
-            target["service"],
-            target["resource"],
-            target["policy"],
-        ).exists()
-    ]
-
-    if len(targets_needing_plan) > 0:
-        print(
-            f"Found {len(targets_needing_plan)} missing plan.json files. "
-            f"Starting Terraform generation with {args.terraform_workers} workers...\n"
-        )
-    else:
-        print("All plan.json files already exist. Skipping Terraform generation.\n")
+    targets_needing_plan = scan_targets
+    print(
+        f"Starting Terraform generation for {len(targets_needing_plan)} policies "
+        f"with {args.terraform_workers} workers...\n"
+    )
 
     with ThreadPoolExecutor(max_workers=args.terraform_workers) as executor:
         future_to_policy = {
