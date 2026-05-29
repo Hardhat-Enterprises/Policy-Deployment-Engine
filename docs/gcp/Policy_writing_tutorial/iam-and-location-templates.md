@@ -96,7 +96,11 @@ and a `policy.rego` into:
 
 `policies/gcp/service name/IAM resource type/argument reference(policy)`
 
+> **Note:** For IAM resources you need **3 separate `vars.rego` files** — one for each IAM resource type (`_iam_binding`, `_iam_member`, `_iam_policy`).
+
 ### 2. Rename the folder to match the exact Terraform resource type
+
+Rename each IAM resource folder to match the exact Terraform resource type.
 
 **Before:**
 ```
@@ -113,16 +117,6 @@ GKEHub/
   google_gke_hub_scope_iam_member/
   google_gke_hub_scope_iam_policy/
 ```
-
-### 3. Copy the required attributes to your `c.tf` and `nc.tf` and generate the `plan.json`
-
-### 4. Edit the template policy according to your `plan.json`
-
-Make sure values and attribute paths align with your resource.
-
-### 5. Fill in `vars.rego`
-
-> **Note:** For IAM resources you need **3 separate `vars.rego` files** — one for each IAM resource type (`_iam_binding`, `_iam_member`, `_iam_policy`).
 
 ## Author Checklist
 
