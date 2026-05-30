@@ -12,15 +12,14 @@ conditions := [
       ]
     },
     {
-      "condition": "members must not include allUsers",
+      "condition": "members must not include allUsers or allAuthenticatedUsers",
       "attribute_path": ["members"],
-      "values": ["allUsers"],
+      "values": ["allUsers", "allAuthenticatedUsers"],
       "policy_type": "blacklist"
     }
   ]
 ]
 
 summary := helpers.get_multi_summary(conditions, vars.variables)
-
 message := helpers.get_multi_summary(conditions, vars.variables).message
 details := helpers.get_multi_summary(conditions, vars.variables).details

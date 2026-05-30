@@ -90,8 +90,8 @@
           "required": true,
           "security_impact": true,
           "rationale": "Setting encryption_type to CUSTOMER_MANAGED_ENCRYPTION ensures backups are protected using customer-controlled keys, providing greater security and compliance control over backup data.",
-          "compliant": "resource \"google_spanner_backup_schedule\" \"c1\" {\n  instance   = google_spanner_instance.c1.name\n  database   = google_spanner_database.c1.name\n  name       = \"c1\"\n  retention_duration = \"86400s\"\n  encryption_config {\n    encryption_type = \"CUSTOMER_MANAGED_ENCRYPTION\"\n    kms_key_name    = \"projects/my-project/locations/us-central1/keyRings/my-ring/cryptoKeys/my-key\"\n  }\n}",
-          "non-compliant": "resource \"google_spanner_backup_schedule\" \"nc1\" {\n  instance   = google_spanner_instance.nc1.name\n  database   = google_spanner_database.nc1.name\n  name       = \"nc1\"\n  retention_duration = \"86400s\"\n  encryption_config {\n    encryption_type = \"GOOGLE_DEFAULT_ENCRYPTION\"\n  }\n}",
+          "compliant": "resource \"google_spanner_backup_schedule\" \"c\" {\n  instance           = \"c-instance\"\n  database           = \"c-database\"\n  name               = \"c\"\n  retention_duration = \"86400s\"\n  full_backup_spec {}\n  spec {\n    cron_spec {\n      text = \"0 2 * * *\"\n    }\n  }\n  encryption_config {\n    encryption_type = \"CUSTOMER_MANAGED_ENCRYPTION\"\n    kms_key_name    = \"projects/my-project/locations/australia-southeast1/keyRings/my-ring/cryptoKeys/my-key\"\n  }\n}",
+          "non-compliant": "resource \"google_spanner_backup_schedule\" \"nc\" {\n  instance           = \"nc-instance\"\n  database           = \"nc-database\"\n  name               = \"nc\"\n  retention_duration = \"86400s\"\n  full_backup_spec {}\n  spec {\n    cron_spec {\n      text = \"0 2 * * *\"\n    }\n  }\n  encryption_config {\n    encryption_type = \"GOOGLE_DEFAULT_ENCRYPTION\"\n  }\n}",
           "parent": "encryption_config"
         },
         "kms_key_name": {

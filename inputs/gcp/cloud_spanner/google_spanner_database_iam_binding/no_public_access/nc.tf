@@ -1,6 +1,6 @@
-resource "google_spanner_database_iam_binding" "nc1" {
-  instance = "nc1-instance"
-  database = "nc1"
+resource "google_spanner_database_iam_binding" "nc" {
+  instance = "nc-instance"
+  database = "nc"
   role     = "roles/spanner.databaseReader"
   members  = ["allUsers"]
 }

@@ -7,8 +7,8 @@
       "required": true,
       "security_impact": false,
       "rationale": "The config field determines where data is stored geographically. While it does not directly introduce a security risk, it should be set to a region that complies with data residency requirements.",
-      "compliant": null,
-      "non-compliant": null,
+      "compliant": "resource \"google_spanner_instance\" \"c\" {\n  name         = \"c\"\n  config       = \"regional-australia-southeast1\"\n  display_name = \"Test Instance C\"\n  num_nodes    = 1\n}",
+      "non-compliant": "resource \"google_spanner_instance\" \"nc\" {\n  name         = \"nc\"\n  config       = \"regional-us-central1\"\n  display_name = \"Test Instance NC\"\n  num_nodes    = 1\n}",
       "parent": null
     },
     "display_name": {
@@ -117,8 +117,8 @@
       "required": false,
       "security_impact": true,
       "rationale": "Setting a default backup schedule ensures new databases are automatically backed up, reducing the risk of data loss in the event of accidental deletion or corruption.",
-      "compliant": null,
-      "non-compliant": null,
+      "compliant": "resource \"google_spanner_instance\" \"c\" {\n  name                         = \"c\"\n  config                       = \"regional-australia-southeast1\"\n  display_name                 = \"Test Instance C\"\n  num_nodes                    = 1\n  default_backup_schedule_type = \"AUTOMATIC\"\n}",
+      "non-compliant": "resource \"google_spanner_instance\" \"nc\" {\n  name                         = \"nc\"\n  config                       = \"regional-australia-southeast1\"\n  display_name                 = \"Test Instance NC\"\n  num_nodes                    = 1\n  default_backup_schedule_type = \"NONE\"\n}",
       "parent": null
     },
     "project": {
@@ -135,8 +135,8 @@
       "required": false,
       "security_impact": true,
       "rationale": "Enabling force_destroy allows a Cloud Spanner instance to be destroyed even if it contains databases, risking permanent and irreversible data loss.",
-      "compliant": "resource \"google_spanner_instance\" \"c1\" {\n  config       = \"regional-us-central1\"\n  display_name = \"c1\"\n  name         = \"c1\"\n  num_nodes    = 1\n  force_destroy = false\n}",
-      "non-compliant": "resource \"google_spanner_instance\" \"nc1\" {\n  config       = \"regional-us-central1\"\n  display_name = \"nc1\"\n  name         = \"nc1\"\n  num_nodes    = 1\n  force_destroy = true\n}",
+      "compliant": "resource \"google_spanner_instance\" \"c\" {\n  name         = \"c\"\n  config       = \"regional-australia-southeast1\"\n  display_name = \"Test Instance C\"\n  num_nodes    = 1\n  force_destroy = false\n}",
+      "non-compliant": "resource \"google_spanner_instance\" \"nc\" {\n  name         = \"nc\"\n  config       = \"regional-australia-southeast1\"\n  display_name = \"Test Instance NC\"\n  num_nodes    = 1\n  force_destroy = true\n}",
       "parent": null
     },
     "autoscaling_limits": {

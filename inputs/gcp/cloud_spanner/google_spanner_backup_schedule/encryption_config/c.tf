@@ -1,7 +1,7 @@
-resource "google_spanner_backup_schedule" "c1" {
-  instance           = "c1-instance"
-  database           = "c1-database"
-  name               = "c1"
+resource "google_spanner_backup_schedule" "c" {
+  instance           = "c-instance"
+  database           = "c-database"
+  name               = "c"
   retention_duration = "86400s"
   full_backup_spec {}
   spec {
