@@ -2,80 +2,67 @@
   "resource_name": "spanner_backup_schedule",
   "subcategory": "Cloud Spanner",
   "arguments": {
-  "retention_duration": {
-  "description": "At what relative time in the future, compared to its creation time, the backup should be deleted. Example: '3.5s'. You can set this to a value up to 366 days.",
-  "required": true,
-  "security_impact": true,
-  "rationale": "Setting an appropriate retention duration ensures backups are available for recovery within a required window. Too short a retention period may leave the organisation unable to recover from data loss incidents.",
-  "compliant": "30d",
-  "non-compliant": "1d",
-  "parent": null
-}
-}
+    "retention_duration": {
+      "description": "At what relative time in the future, compared to its creation time, the backup should be deleted. Example: '3.5s'. You can set this to a value up to 366 days.",
+      "required": true,
+      "security_impact": true,
+      "rationale": "Setting an appropriate retention duration ensures backups are available for recovery within a required window. Too short a retention period may leave the organisation unable to recover from data loss incidents.",
+      "compliant": "30d",
+      "non-compliant": "1d",
+      "parent": null
     },
-   "instance": {
-  "description": "The instance to create the backup schedule on.",
-  "required": true,
-  "security_impact": false,
-  "parent": null
-}
-    
+
+    "instance": {
+      "description": "The instance to create the backup schedule on.",
+      "required": true,
+      "security_impact": false,
+      "parent": null
+    },
+
     "database": {
       "description": "The database to create the backup schedule on.",
       "required": true,
       "security_impact": false,
-      "rationale": "This is a required reference to the target database. It does not directly introduce a security risk but must be correctly configured to ensure backups are created for the intended database.",
-      "compliant": null,
-      "non-compliant": null,
       "parent": null
     },
+
     "name": {
       "description": "A unique identifier for the backup schedule, which cannot be changed after the backup schedule is created.",
       "required": false,
       "security_impact": false,
-      "rationale": "The backup schedule name is an optional identifier. It does not directly introduce a security risk but should follow naming conventions for clarity.",
-      "compliant": null,
-      "non-compliant": null,
       "parent": null
     },
+
     "spec": {
       "description": "Defines specifications of the backup schedule.",
       "required": false,
       "security_impact": false,
-      "rationale": "The spec defines the backup frequency. It does not directly introduce a security risk but should be configured to meet the organisation's recovery point objectives.",
-      "compliant": null,
-      "non-compliant": null,
       "parent": null,
       "arguments": {
         "cron_spec": {
           "description": "Cron style schedule specification.",
           "required": false,
           "security_impact": false,
-          "rationale": "The cron spec defines backup frequency. It does not directly introduce a security risk but should be set to ensure backups occur regularly.",
-          "compliant": null,
-          "non-compliant": null,
           "parent": "spec"
         }
       }
     },
+
     "full_backup_spec": {
       "description": "The schedule creates only full backups.",
       "required": false,
       "security_impact": false,
-      "rationale": "Full backup spec determines the backup type. It does not directly introduce a security risk.",
-      "compliant": null,
-      "non-compliant": null,
       "parent": null
     },
+
     "incremental_backup_spec": {
       "description": "The schedule creates incremental backup chains.",
       "required": false,
       "security_impact": false,
-      "rationale": "Incremental backup spec determines the backup type. It does not directly introduce a security risk.",
-      "compliant": null,
-      "non-compliant": null,
       "parent": null
     },
+
+    "encryption_config": {
     "encryption_config": {
       "description": "Configuration for the encryption of the backup schedule.",
       "required": false,
