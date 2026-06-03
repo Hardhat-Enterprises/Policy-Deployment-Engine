@@ -1,0 +1,288 @@
+{
+  "resource_name": "spanner_instance",
+  "subcategory": "Cloud Spanner",
+  "arguments": {
+    "config": {
+      "description": "The name of the instance's configuration which defines the geographic placement and replication of your databases in this instance.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "The config field determines where data is stored geographically. While it does not directly introduce a security risk, it should be set to a region that complies with data residency requirements.",
+      "compliant": "resource \"google_spanner_instance\" \"c\" {\n  name         = \"c\"\n  config       = \"regional-australia-southeast1\"\n  display_name = \"Test Instance C\"\n  num_nodes    = 1\n}",
+      "non-compliant": "resource \"google_spanner_instance\" \"nc\" {\n  name         = \"nc\"\n  config       = \"regional-us-central1\"\n  display_name = \"Test Instance NC\"\n  num_nodes    = 1\n}",
+      "parent": null
+    },
+    "display_name": {
+      "description": "The descriptive name for this instance as it appears in UIs. Must be unique per project and between 4 and 30 characters in length.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "The display name is a required identifier for the instance. It does not directly introduce a security risk but should follow naming conventions for clarity.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "name": {
+      "description": "A unique identifier for the instance, which cannot be changed after the instance is created.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "The instance name is an optional identifier. It does not directly introduce a security risk but should follow naming conventions to avoid confusion.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "num_nodes": {
+      "description": "The number of nodes allocated to this instance.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "The number of nodes affects availability and performance but does not directly introduce a security risk.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "processing_units": {
+      "description": "The number of processing units allocated to this instance.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Processing units affect availability and performance but do not directly introduce a security risk.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "labels": {
+      "description": "An object containing a list of key-value pairs for labelling the instance.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Labels are used for organisation and cost allocation. They do not directly introduce a security risk but can be used to enforce governance policies.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "autoscaling_config": {
+      "description": "The autoscaling configuration. Autoscaling is enabled if this field is set.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Autoscaling configuration affects performance and cost but does not directly introduce a security risk.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "autoscaling_limits": {
+          "description": "Defines the minimum and maximum compute capacity allocated to the instance.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Autoscaling limits affect performance and cost but do not directly introduce a security risk.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_config"
+        },
+        "autoscaling_targets": {
+          "description": "Defines target utilization metrics for autoscaling.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Autoscaling targets affect performance and cost but do not directly introduce a security risk.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_config"
+        },
+        "asymmetric_autoscaling_options": {
+          "description": "Asymmetric autoscaling options for specific replicas.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Asymmetric autoscaling options affect performance but do not directly introduce a security risk.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_config"
+        }
+      }
+    },
+    "edition": {
+      "description": "The edition selected for this instance. Possible values are: EDITION_UNSPECIFIED, STANDARD, ENTERPRISE, ENTERPRISE_PLUS.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "The edition affects available features and pricing but does not directly introduce a security risk.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "instance_type": {
+      "description": "The type of this instance. Possible values are: PROVISIONED, FREE_INSTANCE.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "The instance type affects available features and quotas but does not directly introduce a security risk.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "default_backup_schedule_type": {
+      "description": "Controls the default backup behavior for new databases within the instance. Possible values are: NONE, AUTOMATIC.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Setting a default backup schedule ensures new databases are automatically backed up, reducing the risk of data loss in the event of accidental deletion or corruption.",
+      "compliant": "resource \"google_spanner_instance\" \"c\" {\n  name                         = \"c\"\n  config                       = \"regional-australia-southeast1\"\n  display_name                 = \"Test Instance C\"\n  num_nodes                    = 1\n  default_backup_schedule_type = \"AUTOMATIC\"\n}",
+      "non-compliant": "resource \"google_spanner_instance\" \"nc\" {\n  name                         = \"nc\"\n  config                       = \"regional-australia-southeast1\"\n  display_name                 = \"Test Instance NC\"\n  num_nodes                    = 1\n  default_backup_schedule_type = \"NONE\"\n}",
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "The project field is optional and defaults to the provider project. It does not directly introduce a security risk but should be explicitly set to avoid deploying resources to unintended projects.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "force_destroy": {
+      "description": "This must be set to true if you want to delete the instance even if it contains databases.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "Enabling force_destroy allows a Cloud Spanner instance to be destroyed even if it contains databases, risking permanent and irreversible data loss.",
+      "compliant": "resource \"google_spanner_instance\" \"c\" {\n  name         = \"c\"\n  config       = \"regional-australia-southeast1\"\n  display_name = \"Test Instance C\"\n  num_nodes    = 1\n  force_destroy = false\n}",
+      "non-compliant": "resource \"google_spanner_instance\" \"nc\" {\n  name         = \"nc\"\n  config       = \"regional-australia-southeast1\"\n  display_name = \"Test Instance NC\"\n  num_nodes    = 1\n  force_destroy = true\n}",
+      "parent": null
+    },
+    "autoscaling_limits": {
+      "description": "Defines the minimum and maximum compute capacity for autoscaling.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Autoscaling limits affect performance and cost but do not directly introduce a security risk.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "min_processing_units": {
+          "description": "Specifies minimum number of processing units allocated to the instance.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Minimum processing units affect performance but do not directly introduce a security risk.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_limits"
+        },
+        "max_processing_units": {
+          "description": "Specifies maximum number of processing units allocated to the instance.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Maximum processing units affect performance but do not directly introduce a security risk.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_limits"
+        },
+        "min_nodes": {
+          "description": "The minimum number of nodes for this specific replica.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Minimum nodes affect availability but do not directly introduce a security risk.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_limits"
+        },
+        "max_nodes": {
+          "description": "The maximum number of nodes for this specific replica.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Maximum nodes affect availability but do not directly introduce a security risk.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_limits"
+        }
+      }
+    },
+    "autoscaling_targets": {
+      "description": "Defines target utilization metrics for autoscaling.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Autoscaling targets affect performance and cost but do not directly introduce a security risk.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "high_priority_cpu_utilization_percent": {
+          "description": "Specifies the target high priority cpu utilization percentage for autoscaling.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "CPU utilization targets affect performance but do not directly introduce a security risk.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_targets"
+        },
+        "storage_utilization_percent": {
+          "description": "Specifies the target storage utilization percentage for autoscaling.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "Storage utilization targets affect performance but do not directly introduce a security risk.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "autoscaling_targets"
+        }
+      }
+    },
+    "asymmetric_autoscaling_options": {
+      "description": "Asymmetric autoscaling options for specific replicas.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Asymmetric autoscaling options affect performance but do not directly introduce a security risk.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "replica_selection": {
+          "description": "A nested object resource for selecting the replica to apply asymmetric autoscaling options.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Replica selection is required for asymmetric autoscaling but does not directly introduce a security risk.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "asymmetric_autoscaling_options"
+        },
+        "overrides": {
+          "description": "A nested object resource for overriding autoscaling limits for specific replicas.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Overrides affect performance but do not directly introduce a security risk.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "asymmetric_autoscaling_options"
+        }
+      }
+    },
+    "replica_selection": {
+      "description": "Defines which replica to apply asymmetric autoscaling options to.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Replica selection affects performance but does not directly introduce a security risk.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "location": {
+          "description": "The location of the replica to apply asymmetric autoscaling options.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "The replica location affects data residency but does not directly introduce a security risk on its own.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "replica_selection"
+        }
+      }
+    },
+    "overrides": {
+      "description": "Defines autoscaling limit overrides for specific replicas.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Overrides affect performance and cost but do not directly introduce a security risk.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "autoscaling_limits": {
+          "description": "A nested object resource for defining autoscaling limit overrides.",
+          "required": true,
+          "security_impact": false,
+          "rationale": "Autoscaling limit overrides affect performance but do not directly introduce a security risk.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "overrides"
+        }
+      }
+    }
+  }
+}
