@@ -6,92 +6,110 @@
       "description": "A description for the Storage Transfer job.",
       "required": false,
       "security_impact": false,
-      "rationale": "The description is informational and does not directly affect the security posture of the transfer job.",
-      "compliant": "daily-secure-transfer-job",
+      "rationale": "The description is informational metadata and does not directly control access, transfer permissions, overwrite behavior, or source deletion.",
+      "compliant": "approved-storage-transfer-job",
       "non-compliant": null,
+      "parent": null
+    },
+    "project": {
+      "description": "The Google Cloud project where the Storage Transfer job is created.",
+      "required": false,
+      "security_impact": true,
+      "rationale": "The project determines where the transfer job runs and which Google Cloud environment owns the job. Using an approved project helps prevent transfer jobs from being created in unauthorized environments.",
+      "compliant": "my-project-123",
+      "non-compliant": "unapproved-project",
       "parent": null
     },
     "status": {
       "description": "The status of the transfer job.",
       "required": false,
       "security_impact": true,
-      "rationale": "Transfer jobs should be intentionally enabled or disabled to match operational and governance requirements.",
+      "rationale": "The status controls whether a transfer job is enabled, disabled, or deleted. Jobs should be intentionally configured to match operational and governance requirements.",
       "compliant": "ENABLED",
-      "non-compliant": "Unexpectedly disabled or unmanaged status.",
+      "non-compliant": "Unexpectedly enabled, disabled, or unmanaged status.",
       "parent": null
     },
     "schedule": {
       "description": "Defines when the Storage Transfer job runs.",
       "required": false,
       "security_impact": true,
-      "rationale": "A defined schedule supports controlled and expected execution of data transfers.",
-      "compliant": "A schedule with an approved start date and run time.",
-      "non-compliant": "No defined schedule where one is required by policy.",
+      "rationale": "A defined schedule supports controlled and predictable transfer execution. Uncontrolled schedules may cause transfers to run at unintended times.",
+      "compliant": "A schedule with an approved start date and transfer interval.",
+      "non-compliant": "A missing, unexpected, or unapproved schedule where scheduling controls are required.",
       "parent": null
     },
     "transfer_spec": {
-      "description": "Defines the source, sink, and transfer behavior for the Storage Transfer job.",
+      "description": "Defines the source, destination, and behavior of the Storage Transfer job.",
       "required": true,
       "security_impact": true,
-      "rationale": "The transfer specification controls what data is moved, from where, and under what restrictions.",
-      "compliant": "A transfer_spec with approved source settings, approved agent pool usage, and safe transfer options.",
-      "non-compliant": "A transfer_spec that omits required restrictions or uses unsafe transfer options.",
+      "rationale": "The transfer specification controls where data is transferred from, where it is transferred to, which identities are used, and whether potentially destructive transfer options are enabled.",
+      "compliant": "A transfer_spec using approved source settings, approved agent pool usage, approved AWS IAM role ARN, and safe transfer options.",
+      "non-compliant": "A transfer_spec using unapproved source settings, unapproved roles, destructive deletion, or unsafe overwrite behavior.",
       "parent": null,
       "arguments": {
         "source_agent_pool_name": {
-          "description": "Specifies the agent pool used for agent-based source transfers.",
+          "description": "The source agent pool used for agent-based transfer jobs.",
           "required": false,
           "security_impact": true,
-          "rationale": "Agent pools control where transfer agents run and should reference approved managed pools only.",
-          "compliant": "source_agent_pool_name = \"transferJobs/agentPools/approved-pool\"",
-          "non-compliant": "source_agent_pool_name = \"transferJobs/agentPools/unapproved-pool\"",
+          "rationale": "The implemented policy requires transfer_spec.source_agent_pool_name to reference an approved source agent pool. Using an unapproved pool may route transfers through unmanaged or untrusted agents.",
+          "compliant": "projects/my-project-123/agentPools/approved-pool",
+          "non-compliant": "projects/my-project-123/agentPools/unapproved-pool",
           "parent": "transfer_spec"
         },
         "aws_s3_data_source": {
-          "description": "Specifies an Amazon S3 bucket as the source for the transfer job.",
+          "description": "Configuration for using an Amazon S3 bucket as the transfer source.",
           "required": false,
           "security_impact": true,
-          "rationale": "Using an S3 source introduces external data into the transfer job and should be restricted to approved buckets and approved AWS access settings.",
-          "compliant": "aws_s3_data_source using an approved bucket and approved role ARN.",
-          "non-compliant": "aws_s3_data_source using an unapproved bucket or missing/unapproved role ARN.",
+          "rationale": "An AWS S3 data source introduces external cloud data access into the transfer job. It should use approved buckets and approved AWS identity settings.",
+          "compliant": "An aws_s3_data_source using an approved bucket and approved role ARN.",
+          "non-compliant": "An aws_s3_data_source using an unapproved role ARN or unsafe AWS access configuration.",
           "parent": "transfer_spec",
           "arguments": {
             "role_arn": {
-              "description": "The AWS IAM role ARN used to access the Amazon S3 source.",
+              "description": "The AWS IAM role ARN used by Storage Transfer Service to access the Amazon S3 source.",
               "required": false,
               "security_impact": true,
-              "rationale": "The role ARN controls what AWS permissions are used to read from the source bucket. Using the wrong role can grant excessive access or allow use of an unapproved source identity.",
+              "rationale": "The implemented policy requires transfer_spec.aws_s3_data_source.role_arn to use an approved AWS IAM role. Unapproved roles may grant excessive permissions or access unintended S3 resources.",
               "compliant": "arn:aws:iam::123456789012:role/approved-storage-transfer-role",
-              "non-compliant": "arn:aws:iam::123456789012:role/admin or a missing/unapproved role ARN.",
+              "non-compliant": "arn:aws:iam::123456789012:role/unsafe-role",
               "parent": "aws_s3_data_source"
             }
           }
         },
-        "transfer_options": {
-          "description": "Defines transfer behavior options such as overwrite and deletion behavior.",
+        "gcs_data_sink": {
+          "description": "Configuration for using a Google Cloud Storage bucket as the transfer destination.",
           "required": false,
           "security_impact": true,
-          "rationale": "Transfer options can directly affect data integrity and source data preservation during transfers.",
-          "compliant": "transfer_options with safe overwrite behavior and without destructive source deletion.",
-          "non-compliant": "transfer_options that overwrite unsafely or delete source objects after transfer.",
+          "rationale": "The destination bucket receives transferred data. It should point to an approved storage location with appropriate access controls.",
+          "compliant": "gcs_data_sink configured with an approved destination bucket.",
+          "non-compliant": "gcs_data_sink configured with an unapproved or unintended destination bucket.",
+          "parent": "transfer_spec"
+        },
+        "transfer_options": {
+          "description": "Options that control transfer behavior, including source deletion and destination overwrite behavior.",
+          "required": false,
+          "security_impact": true,
+          "rationale": "Transfer options can directly affect data integrity and source data preservation. Unsafe settings may delete source data or overwrite destination data unexpectedly.",
+          "compliant": "transfer_options with safe overwrite behavior and source deletion disabled.",
+          "non-compliant": "transfer_options that delete source objects after transfer or always overwrite destination objects.",
           "parent": "transfer_spec",
           "arguments": {
             "delete_objects_from_source_after_transfer": {
-              "description": "Whether objects are deleted from the source after they are transferred.",
+              "description": "Whether source objects are deleted after they are successfully transferred.",
               "required": false,
               "security_impact": true,
-              "rationale": "Deleting source objects after transfer is destructive and can create data loss or recovery risks if used inappropriately.",
-              "compliant": "delete_objects_from_source_after_transfer = false",
-              "non-compliant": "delete_objects_from_source_after_transfer = true",
+              "rationale": "The implemented policy blocks delete_objects_from_source_after_transfer = true because deleting source objects after transfer is destructive and can create data loss or recovery risks.",
+              "compliant": "false",
+              "non-compliant": "true",
               "parent": "transfer_options"
             },
             "overwrite_when": {
-              "description": "Specifies when objects at the destination may be overwritten during transfer.",
+              "description": "Specifies when objects in the destination may be overwritten during transfer.",
               "required": false,
               "security_impact": true,
-              "rationale": "Overwrite behavior affects destination data integrity and should be limited to approved settings to prevent unintended replacement of data.",
-              "compliant": "overwrite_when set to the approved policy value.",
-              "non-compliant": "overwrite_when set to an unapproved or overly permissive value.",
+              "rationale": "The implemented policy blocks overwrite_when = ALWAYS because unconditional overwriting can replace destination data unexpectedly and affect data integrity.",
+              "compliant": "DIFFERENT",
+              "non-compliant": "ALWAYS",
               "parent": "transfer_options"
             }
           }

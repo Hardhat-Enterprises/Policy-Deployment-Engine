@@ -3,39 +3,39 @@
   "subcategory": "Storage Transfer Service",
   "arguments": {
     "name": {
-      "description": "The ID of the agent pool to create. The agentPoolId must meet the following requirements: * Length of 128 characters or less. * Not start with the string goog. * Start with a lowercase ASCII character, followed by: * Zero or more: lowercase Latin alphabet characters, numerals, hyphens (-), periods (.), underscores (_), or tildes (~). * One or more numerals or lowercase ASCII characters. As expressed by the regular expression: ^(?!goog)[a-z]([a-z0-9-._~]*[a-z0-9])?$.",
+      "description": "The ID of the Storage Transfer agent pool to create. The agent pool ID must be 128 characters or less, must not start with goog, must start with a lowercase ASCII character, and may contain lowercase letters, numbers, hyphens, periods, underscores, or tildes.",
       "required": true,
-      "security_impact": true,
-      "rationale": "The agent pool name is security relevant because a policy has been implemented to enforce approved naming requirements and prevent reserved or unapproved agent pool identifiers.",
+      "security_impact": false,
+      "rationale": "The agent pool name is an identifier for the resource. Since the name policy has been removed, this argument is documented as a required configuration field but is not currently enforced by a security policy.",
       "compliant": "agent-pool-example",
       "non-compliant": "goog-agent-pool",
       "parent": null
     },
     "display_name": {
-      "description": "Specifies the client-specified AgentPool description.",
+      "description": "A client-specified description or display name for the Storage Transfer agent pool.",
       "required": false,
       "security_impact": false,
-      "rationale": "The display name is descriptive metadata only and does not enforce access control, encryption, networking, or transfer behavior.",
-      "compliant": "Example transfer agent pool",
+      "rationale": "The display name is descriptive metadata only and does not control access, transfer behavior, encryption, or network exposure.",
+      "compliant": "Source A to destination Z",
       "non-compliant": null,
       "parent": null
     },
     "bandwidth_limit": {
-      "description": "Specifies the bandwidth limit details. If this field is unspecified, the default value is set as 'No Limit'. Structure is documented below (#nested_bandwidth_limit).",
+      "description": "Bandwidth limit configuration for the Storage Transfer agent pool. If unset, the agent pool may operate without a configured bandwidth limit.",
       "required": false,
       "security_impact": true,
-      "rationale": "Bandwidth controls can reduce the risk of excessive transfer throughput, network saturation, and unintentional resource impact.",
+      "rationale": "Bandwidth limits help prevent excessive transfer throughput, network saturation, and unintended operational impact from transfer agents.",
       "compliant": "Refer to child argument.",
       "non-compliant": "Refer to child argument.",
       "parent": null,
       "arguments": {
         "limit_mbps": {
-          "description": "Bandwidth rate in megabytes per second, distributed across all the agents in the pool.",
+          "description": "The bandwidth rate in megabytes per second distributed across all agents in the pool.",
           "required": true,
           "security_impact": true,
-          "rationale": "A defined bandwidth limit helps constrain transfer throughput and supports controlled data movement.",
-          "compliant": "120",
-          "non-compliant": "Unlimited or an out-of-policy value.",
+          "rationale": "The implemented policy requires bandwidth_limit.limit_mbps to be within the approved maximum range. Excessive values can cause unsafe transfer throughput and network impact.",
+          "compliant": "250",
+          "non-compliant": "5000",
           "parent": "bandwidth_limit"
         }
       }
