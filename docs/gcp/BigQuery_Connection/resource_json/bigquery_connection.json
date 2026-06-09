@@ -41,11 +41,12 @@
     "kms_key_name": {
       "description": "Optional. The Cloud KMS key that is used for encryption. Example: projects/[kms_project_id]/locations/[region]/keyRings/[key_region]/cryptoKeys/[key]",
       "required": false,
-      "security_impact": null,
-      "rationale": null,
-      "compliant": null,
-      "non-compliant": null,
+      "security_impact": "high",
+      "rationale": "Without a customer-managed KMS key (CMEK), BigQuery Connection data is encrypted only with Google-managed keys, reducing customer control over key rotation, access, and revocation.",
+      "compliant": "kms_key_name is set to a valid Cloud KMS key resource (e.g. projects/p/locations/l/keyRings/r/cryptoKeys/k).",
+      "non-compliant": "kms_key_name is missing, empty, or set to an invalid KMS key reference.",
       "parent": null
+    
     },
     "cloud_sql": {
       "description": "Connection properties specific to the Cloud SQL. Structure is [documented below](#nested_cloud_sql).",
@@ -341,19 +342,19 @@
         "username": {
           "description": "Username for database.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "high",
+          "rationale": "An empty or missing username may allow unauthenticated or unauthorised access to the Cloud SQL database backing the connection.",
+          "compliant": "username is set to a non-empty, valid database account.",
+          "non-compliant": "username is empty or omitted.",
           "parent": "credential"
         },
         "password": {
           "description": "Password for database. **Note**: This property is sensitive and will not be displayed in the plan.",
           "required": true,
-          "security_impact": null,
-          "rationale": null,
-          "compliant": null,
-          "non-compliant": null,
+          "security_impact": "high",
+          "rationale": "An empty password permits anonymous access to the Cloud SQL database, exposing connection-level data to unauthorised users.",
+          "compliant": "password is set to a non-empty value of at least 12 characters, sourced from a secret manager.",
+          "non-compliant": "password is empty or omitted.",
           "parent": "credential"
         }
       }

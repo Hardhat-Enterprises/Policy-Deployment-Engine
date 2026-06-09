@@ -1,0 +1,90 @@
+{
+  "resource_name": "spanner_instance_config",
+  "subcategory": "Cloud Spanner",
+  "arguments": {
+    "display_name": {
+      "description": "The name of this instance configuration as it appears in UIs.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "The display name is a required identifier for the instance configuration. It does not directly introduce a security risk but should follow naming conventions for clarity.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "replicas": {
+      "description": "The geographic placement of nodes in this instance configuration and their replication properties.",
+      "required": true,
+      "security_impact": false,
+      "rationale": "Replica placement determines where data is physically stored. No standalone policy is enforced at this level as data residency is controlled at the instance level via the data_residency policy.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null,
+      "arguments": {
+        "location": {
+          "description": "The location of the serving resources, e.g. us-central1.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "The replica location determines the physical region where data is stored. Data residency is enforced at the instance level via the data_residency policy.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "replicas"
+        },
+        "type": {
+          "description": "Indicates the type of replica. Possible values are: READ_WRITE, READ_ONLY, WITNESS.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "The replica type affects availability and performance but does not directly introduce a security risk.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "replicas"
+        },
+        "default_leader_location": {
+          "description": "If true, this location is designated as the default leader location where leader replicas are placed.",
+          "required": false,
+          "security_impact": false,
+          "rationale": "The default leader location affects performance and latency but does not directly introduce a security risk.",
+          "compliant": null,
+          "non-compliant": null,
+          "parent": "replicas"
+        }
+      }
+    },
+    "name": {
+      "description": "A unique identifier for the instance configuration.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "The instance configuration name is an optional identifier. It does not directly introduce a security risk but should follow naming conventions to avoid confusion.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "base_config": {
+      "description": "Base configuration name, e.g. nam3, based on which this configuration is created. Only set for user managed configurations.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "The base configuration determines the foundation for the custom instance configuration. It does not directly introduce a security risk but should reference a trusted Google-managed configuration.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "labels": {
+      "description": "An object containing a list of key-value pairs for labelling the instance configuration.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "Labels are used for organisation and cost allocation. They do not directly introduce a security risk but can be used to enforce governance policies.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    },
+    "project": {
+      "description": "If it is not provided, the provider project is used.",
+      "required": false,
+      "security_impact": false,
+      "rationale": "The project field is optional and defaults to the provider project. It does not directly introduce a security risk but should be explicitly set to avoid deploying resources to unintended projects.",
+      "compliant": null,
+      "non-compliant": null,
+      "parent": null
+    }
+  },
+  "policy_justification": "No standalone policy is defined for google_spanner_instance_config. Replica placement and data-residency risk are enforced at the google_spanner_instance level via the data_residency policy on the config attribute. Custom instance configurations are an advanced, rarely-used feature and inherit the same regional controls."
+}

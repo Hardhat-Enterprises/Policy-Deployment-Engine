@@ -1,0 +1,17 @@
+## 🛡️ Policy Deployment Engine: `healthcare_consent_store`
+
+This section provides a concise policy evaluation for the `healthcare_consent_store` resource in GCP.
+
+Reference: [Terraform Registry – healthcare_consent_store](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/healthcare_consent_store)
+
+---
+
+## Argument Reference  
+
+| Argument | Description | Required | Security Impact | Rationale | Compliant | Non-Compliant |
+|----------|-------------|----------|-----------------|-----------|-----------|---------------|
+| `name` | The name of this ConsentStore, for example: "consent1" | true | false | The name is a resource identifier only and does not affect security posture. | None | None |
+| `dataset` | Identifies the dataset addressed by this request. Must be in the format 'projects/{project}/locations/{location}/datasets/{dataset}' | true | false | The dataset field is a required reference to the parent dataset and does not directly affect security posture. | None | None |
+| `default_consent_ttl` | Default time to live for consents in this store. Must be at least 24 hours. Updating this field will not affect the expiration time of existing consents. A duration in seconds with up to nine fractional digits, terminated by 's'. Example: "3.5s". | false | true | Without a TTL, consents never expire, violating data minimisation principles and HIPAA requirements. An explicit TTL ensures that stale consents are automatically invalidated, limiting the window of unauthorised data access. | default_consent_ttl = "31536000s" | default_consent_ttl not set (null) |
+| `enable_consent_create_on_update` | If true, [consents.patch] [google.cloud.healthcare.v1.consent.UpdateConsent] creates the consent if it does not already exist. | false | true | When set to true, a PATCH request becomes an upsert operation, meaning it can silently create new consent records. This breaks the audit trail by blurring the distinction between create and update operations, making it harder to detect unauthorised consent creation. | enable_consent_create_on_update = false | enable_consent_create_on_update = true |
+| `labels` | User-supplied key-value pairs used to organize Consent stores. Label keys must be between 1 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, and must conform to the following PCRE regular expression: `[\p{Ll}\p{Lo}][\p{Ll}\p{Lo}\p{N}_-]{0,62}` Label values are optional, must be between 1 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, and must conform to the following PCRE regular expression: `[\p{Ll}\p{Lo}\p{N}_-]{0,63}` No more than 64 labels can be associated with a given store. An object containing a list of "key": value pairs. Example: { "name": "wrench", "mass": "1.3kg", "count": "3" }. **Note**: This field is non-authoritative, and will only manage the labels present in your configuration. Please refer to the field `effective_labels` for all of the labels present on the resource. | false | true | Labels are essential for resource governance, cost attribution, and access control enforcement. Missing or unapproved labels make it impossible to identify resource ownership, classify PHI data sensitivity, and apply organisation-wide security policies consistently. | labels = { environment = "prod", owner = "healthcare-team" } | labels not set (null) or missing required keys environment and owner |
