@@ -1,0 +1,81 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "contact_email": {
+      "description": "An email address that can be used for quota related communication between the Google Cloud and the user in case the Google Cloud needs further information to make a decision on whether the user preferred quota can be granted.\n\nThe Google account for the email address must have quota update permission for the project, folder or organization this quota preference is for.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": "Implemented. A pattern whitelist policy was written for approved email domains. During testing, pattern wildcard constraints required explicit handling, so the final rule was domain-focused rather than a full free-form email validator."
+    },
+    "dimensions": {
+      "description": "The dimensions that this quota preference applies to. The key of the map entry is the name of a dimension, such as \"region\", \"zone\", \"network_id\", and the value of the map entry is the dimension value. If a dimension is missing from the map of dimensions, the quota preference applies to all the dimension values except for those that have other quota preferences configured for the specific value.\n\nNOTE: QuotaPreferences can only be applied across all values of \"user\" and \"resource\" dimension. Do not set values for \"user\" or \"resource\" in the dimension map.\n\nExample: '{\"provider\": \"Foo Inc\"}' where \"provider\" is a service specific dimension.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": "Implemented. A whitelist policy was written for `dimensions.region` to allow only approved Australian regions."
+    },
+    "ignore_safety_checks": {
+      "description": "The list of quota safety checks to be ignored. Default value: \"QUOTA_SAFETY_CHECK_UNSPECIFIED\" Possible values: [\"QUOTA_SAFETY_CHECK_UNSPECIFIED\", \"QUOTA_DECREASE_BELOW_USAGE\", \"QUOTA_DECREASE_PERCENTAGE_TOO_HIGH\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": "Implemented. A blacklist policy was written to block unsafe safety-check bypass values."
+    },
+    "justification": {
+      "description": "The reason / justification for this quota preference.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": "Implemented. A whitelist policy was written to allow only approved justification text."
+    },
+    "name": {
+      "description": "The resource name of the quota preference. Required except in the CREATE requests.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": "Not implemented. `name` was used as a message identifier in some tests, but no separate control policy was written because it is not the main governance field."
+    },
+    "parent": {
+      "description": "The parent of the quota preference. Allowed parents are \"projects/[project-id / number]\" or \"folders/[folder-id / number]\" or \"organizations/[org-id / number]\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": "Implemented. A pattern whitelist policy was written so only approved parent paths can be used."
+    },
+    "quota_id": {
+      "description": "The id of the quota to which the quota preference is applied. A quota id is unique in the service.\nExample: 'CPUS-per-project-region'.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": "Implemented. A whitelist policy was written so only approved quota IDs can be used."
+    },
+    "service": {
+      "description": "The name of the service to which the quota preference is applied.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": "Implemented. A whitelist policy was written so only approved services can be used. This is a simple fixed-value control and matches the whitelist policy type."
+    },
+    "quota_config": {
+      "type": "block",
+      "description": "The preferred quota configuration.",
+      "required": true
+    },
+    "quota_config.annotations": {
+      "description": "The annotations map for clients to store small amounts of arbitrary data. Do not put PII or other sensitive information here. See https://google.aip.dev/128#annotations.\n\nAn object containing a list of \"key: value\" pairs. Example: '{ \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }'.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": "Not implemented. The generated schema shows `annotations` under `quota_config`, but no reliable plan-based policy was completed for it in this project. The Terraform test setup used during implementation did not yield a working validation path for this argument."
+    },
+    "quota_config.preferred_value": {
+      "description": "The preferred value. Must be greater than or equal to -1. If set to -1, it means the value is \"unlimited\".",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": "Implemented. A range policy was written to allow only approved values within a safe range."
+    }
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "change_stream_retention": {
+      "description": "Duration to retain change stream data for the table. Set to 0 to disable. Must be between 1 and 7 days.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Sets how long (1-7 days, or 0 to disable) the table retains change-stream/CDC data for downstream replication and integration. This is a data-lifecycle/feature choice teams make for their pipelines, not a platform security control; it does not govern access, encryption, or prevent destructive loss of the stored table data."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_protection": {
+      "description": "A field to make the table protected against data loss i.e. when set to PROTECTED, deleting the table, the column families in the table, and the instance containing the table would be prohibited. If not provided, currently deletion protection will be set to UNPROTECTED as it is the API default value.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Without protection, accidental or malicious deletes can cause permanent data loss and sustained outage (availability impact); `PROTECTED` is a guardrail for data retention and service continuity, not only cosmetic governance."
+    },
+    "instance_name": {
+      "description": "The name of the Bigtable instance.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "References an instance by name; names are not secrets and do not prove caller identity."
+    },
+    "name": {
+      "description": "The name of the table. Must be 1-50 characters and must only contain hyphens, underscores, periods, letters and numbers.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Table name string in configuration; it is not a key or token and does not by itself authorize reads or writes."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Non-secret project id for API ownership; does not embed credentials."
+    },
+    "split_keys": {
+      "description": "A list of predefined keys to split the table on. !> Warning: Modifying the split_keys of an existing table will cause Terraform to delete/recreate the entire google_bigtable_table resource.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "Sharding hints for row distribution at creation time; they tune layout/operations and do not list principals allowed on the table."
+    },
+    "automated_backup_policy": {
+      "type": "block",
+      "description": "Defines an automated backup policy for a table, specified by Retention Period and Frequency. To _create_ a table with automated backup disabled, either omit the automated_backup_policy argument, or set both Retention Period and Frequency properties to \"0\". To disable automated backup on an _existing_ table that has automated backup enabled, set _both_ Retention Period and Frequency properties to \"0\". When updating an existing table, to modify the Retention Period or Frequency properties of the resource's automated backup policy, set the respective property to a non-zero value. If the automated_backup_policy argument is not provided in the configuration on update, the resource's automated backup policy will _not_ be modified.",
+      "required": false
+    },
+    "column_family": {
+      "type": "block",
+      "description": "A group of columns within a table which share a common configuration. This can be specified multiple times.",
+      "required": false
+    },
+    "column_family.family": {
+      "description": "The name of the column family.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier for a column family in schema; not an IAM binding."
+    },
+    "column_family.type": {
+      "description": "The type of the column family.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Selects encoding/storage characteristics where applicable; unrelated to authenticating API callers."
+    }
+  }
+}

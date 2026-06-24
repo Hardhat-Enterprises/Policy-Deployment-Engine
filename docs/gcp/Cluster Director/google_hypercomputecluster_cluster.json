@@ -1,0 +1,630 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "cluster_id": {
+      "description": "ID of the cluster to create. Must start with a lowercase letter,\nuse only lowercase letters and numbers, and be at most 10 characters long.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "User-provided description of the cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "[Labels](https://cloud.google.com/compute/docs/labeling-resources) applied\nto the cluster. Labels can be used to organize clusters and to filter them\nin queries.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_resources": {
+      "type": "block",
+      "description": "Compute resources available to the cluster. Keys specify the ID of the\ncompute resource by which it can be referenced elsewhere, and must conform\nto [RFC-1034](https://datatracker.ietf.org/doc/html/rfc1034) (lower-case,\nalphanumeric, and at most 63 characters).",
+      "required": false
+    },
+    "compute_resources.id": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_resources.config": {
+      "type": "block",
+      "description": "Describes how a compute resource should be created at runtime.",
+      "required": true
+    },
+    "compute_resources.config.new_flex_start_instances": {
+      "type": "block",
+      "description": "When set in a ComputeResourceConfig, indicates that VM instances should\nbe created using [Flex\nStart](https://cloud.google.com/compute/docs/instances/provisioning-models).",
+      "required": false
+    },
+    "compute_resources.config.new_flex_start_instances.machine_type": {
+      "description": "Name of the Compute Engine [machine\ntype](https://cloud.google.com/compute/docs/machine-resource) to use, e.g.\n'n2-standard-2'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_resources.config.new_flex_start_instances.max_duration": {
+      "description": "Specifies the time limit for created instances. Instances will be\nterminated at the end of this duration.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_resources.config.new_flex_start_instances.zone": {
+      "description": "Name of the zone in which VM instances should run, e.g., 'us-central1-a'.\nMust be in the same region as the cluster, and must match the zone of any\nother resources specified in the cluster.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_resources.config.new_on_demand_instances": {
+      "type": "block",
+      "description": "When set in a ComputeResourceConfig, indicates that on-demand (i.e.,\nusing the standard provisioning model) VM instances should be created.",
+      "required": false
+    },
+    "compute_resources.config.new_on_demand_instances.machine_type": {
+      "description": "Name of the Compute Engine [machine\ntype](https://cloud.google.com/compute/docs/machine-resource) to use, e.g.\n'n2-standard-2'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_resources.config.new_on_demand_instances.zone": {
+      "description": "Name of the zone in which VM instances should run, e.g., 'us-central1-a'.\nMust be in the same region as the cluster, and must match the zone of any\nother resources specified in the cluster.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_resources.config.new_reserved_instances": {
+      "type": "block",
+      "description": "When set in a ComputeResourceConfig, indicates that VM instances should\nbe created from a\n[reservation](https://cloud.google.com/compute/docs/instances/reservations-overview).",
+      "required": false
+    },
+    "compute_resources.config.new_reserved_instances.reservation": {
+      "description": "Name of the reservation from which VM instances should be created, in the\nformat 'projects/{project}/zones/{zone}/reservations/{reservation}'.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_resources.config.new_spot_instances": {
+      "type": "block",
+      "description": "When set in a ComputeResourceConfig, indicates that [spot\nVM](https://cloud.google.com/compute/docs/instances/spot) instances should be\ncreated.",
+      "required": false
+    },
+    "compute_resources.config.new_spot_instances.machine_type": {
+      "description": "Name of the Compute Engine [machine\ntype](https://cloud.google.com/compute/docs/machine-resource) to use, e.g.\n'n2-standard-2'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_resources.config.new_spot_instances.termination_action": {
+      "description": "Specifies the termination action of the instance\nPossible values:\nSTOP\nDELETE",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_resources.config.new_spot_instances.zone": {
+      "description": "Name of the zone in which VM instances should run, e.g., 'us-central1-a'.\nMust be in the same region as the cluster, and must match the zone of any\nother resources specified in the cluster.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_resources": {
+      "type": "block",
+      "description": "Network resources available to the cluster. Must contain at most one value.\nKeys specify the ID of the network resource by which it can be referenced\nelsewhere, and must conform to\n[RFC-1034](https://datatracker.ietf.org/doc/html/rfc1034) (lower-case,\nalphanumeric, and at most 63 characters).",
+      "required": true
+    },
+    "network_resources.id": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_resources.config": {
+      "type": "block",
+      "description": "Describes how a network resource should be initialized. Each network resource\ncan either be imported from an existing Google Cloud resource or initialized\nwhen the cluster is created.",
+      "required": false
+    },
+    "network_resources.config.existing_network": {
+      "type": "block",
+      "description": "When set in a NetworkResourceConfig, indicates that an existing network\nshould be imported.",
+      "required": false
+    },
+    "network_resources.config.existing_network.network": {
+      "description": "Name of the network to import, in the format\n'projects/{project}/global/networks/{network}'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_resources.config.existing_network.subnetwork": {
+      "description": "Particular subnetwork to use, in the format\n'projects/{project}/regions/{region}/subnetworks/{subnetwork}'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_resources.config.new_network": {
+      "type": "block",
+      "description": "When set in a NetworkResourceConfig, indicates that a new network should\nbe created.",
+      "required": false
+    },
+    "network_resources.config.new_network.description": {
+      "description": "Description of the network. Maximum of 2048 characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_resources.config.new_network.network": {
+      "description": "Name of the network to create, in the format\n'projects/{project}/global/networks/{network}'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator": {
+      "type": "block",
+      "description": "The component responsible for scheduling and running workloads on the\ncluster as well as providing the user interface for interacting with the\ncluster at runtime.",
+      "required": false
+    },
+    "orchestrator.slurm": {
+      "type": "block",
+      "description": "When set in Orchestrator, indicates that the cluster should use\n[Slurm](https://slurm.schedmd.com/) as the orchestrator.",
+      "required": false
+    },
+    "orchestrator.slurm.default_partition": {
+      "description": "Default partition to use for submitted jobs that do not explicitly specify\na partition. Required if and only if there is more than one partition, in\nwhich case it must match the id of one of the partitions.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.epilog_bash_scripts": {
+      "description": "Slurm [epilog scripts](https://slurm.schedmd.com/prolog_epilog.html), which\nwill be executed by compute nodes whenever a node finishes running a job.\nValues must not be empty.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.prolog_bash_scripts": {
+      "description": "Slurm [prolog scripts](https://slurm.schedmd.com/prolog_epilog.html), which\nwill be executed by compute nodes before a node begins running a new job.\nValues must not be empty.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.login_nodes": {
+      "type": "block",
+      "description": "Configuration for Slurm [login\nnodes](https://slurm.schedmd.com/quickstart_admin.html#login) in the cluster.\nLogin nodes are Compute Engine VM instances that allow users to access the\ncluster over SSH.",
+      "required": true
+    },
+    "orchestrator.slurm.login_nodes.count": {
+      "description": "Number of login node instances to create.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.login_nodes.enable_os_login": {
+      "description": "Whether [OS Login](https://cloud.google.com/compute/docs/oslogin) should be\nenabled on login node instances.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.login_nodes.enable_public_ips": {
+      "description": "Whether login node instances should be assigned [external IP\naddresses](https://cloud.google.com/compute/docs/ip-addresses#externaladdresses).",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.login_nodes.labels": {
+      "description": "[Labels](https://cloud.google.com/compute/docs/labeling-resources) that\nshould be applied to each login node instance.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.login_nodes.machine_type": {
+      "description": "Name of the Compute Engine [machine\ntype](https://cloud.google.com/compute/docs/machine-resource) to use for\nlogin nodes, e.g. 'n2-standard-2'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.login_nodes.startup_script": {
+      "description": "[Startup\nscript](https://cloud.google.com/compute/docs/instances/startup-scripts/linux)\nto be run on each login node instance. Max 256KB.\nThe script must complete within the system-defined default timeout of 5\nminutes. For tasks that require more time, consider running them in the\nbackground using methods such as '&' or 'nohup'.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.login_nodes.zone": {
+      "description": "Name of the zone in which login nodes should run, e.g., 'us-central1-a'.\nMust be in the same region as the cluster, and must match the zone of any\nother resources specified in the cluster.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.login_nodes.boot_disk": {
+      "type": "block",
+      "description": "A [Persistent disk](https://cloud.google.com/compute/docs/disks) used as the\nboot disk for a Compute Engine VM instance.",
+      "required": false
+    },
+    "orchestrator.slurm.login_nodes.boot_disk.size_gb": {
+      "description": "Size of the disk in gigabytes. Must be at least 10GB.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.login_nodes.boot_disk.type": {
+      "description": "[Persistent disk\ntype](https://cloud.google.com/compute/docs/disks#disk-types), in the\nformat 'projects/{project}/zones/{zone}/diskTypes/{disk_type}'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.login_nodes.storage_configs": {
+      "type": "block",
+      "description": "How storage resources should be mounted on each login\nnode.",
+      "required": false
+    },
+    "orchestrator.slurm.login_nodes.storage_configs.id": {
+      "description": "ID of the storage resource to mount, which must match a key in the\ncluster's [storage_resources](Cluster.storage_resources).",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.login_nodes.storage_configs.local_mount": {
+      "description": "A directory inside the VM instance's file system where the storage resource\nshould be mounted (e.g., '/mnt/share').",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.node_sets": {
+      "type": "block",
+      "description": "Configuration of Slurm nodesets, which define groups of compute resources\nthat can be used by Slurm. At least one compute node is required.",
+      "required": true
+    },
+    "orchestrator.slurm.node_sets.compute_id": {
+      "description": "ID of the compute resource on which this nodeset will run. Must match a key\nin the cluster's [compute_resources](Cluster.compute_resources).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.node_sets.id": {
+      "description": "Identifier for the nodeset, which allows it to be referenced by partitions.\nMust conform to\n[RFC-1034](https://datatracker.ietf.org/doc/html/rfc1034) (lower-case,\nalphanumeric, and at most 63 characters).",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.node_sets.max_dynamic_node_count": {
+      "description": "Controls how many additional nodes a cluster can bring online to handle\nworkloads. Set this value to enable dynamic node creation and limit the\nnumber of additional nodes the cluster can bring online. Leave empty if you\ndo not want the cluster to create nodes dynamically, and instead rely only\non static nodes.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.node_sets.static_node_count": {
+      "description": "Number of nodes to be statically created for this nodeset. The cluster will\nattempt to ensure that at least this many nodes exist at all times.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.node_sets.compute_instance": {
+      "type": "block",
+      "description": "When set in a SlurmNodeSet, indicates that the nodeset should be backed\nby Compute Engine VM instances.",
+      "required": false
+    },
+    "orchestrator.slurm.node_sets.compute_instance.labels": {
+      "description": "[Labels](https://cloud.google.com/compute/docs/labeling-resources) that\nshould be applied to each VM instance in the nodeset.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.node_sets.compute_instance.startup_script": {
+      "description": "[Startup\nscript](https://cloud.google.com/compute/docs/instances/startup-scripts/linux)\nto be run on each VM instance in the nodeset. Max 256KB.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.node_sets.compute_instance.boot_disk": {
+      "type": "block",
+      "description": "A [Persistent disk](https://cloud.google.com/compute/docs/disks) used as the\nboot disk for a Compute Engine VM instance.",
+      "required": false
+    },
+    "orchestrator.slurm.node_sets.compute_instance.boot_disk.size_gb": {
+      "description": "Size of the disk in gigabytes. Must be at least 10GB.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.node_sets.compute_instance.boot_disk.type": {
+      "description": "[Persistent disk\ntype](https://cloud.google.com/compute/docs/disks#disk-types), in the\nformat 'projects/{project}/zones/{zone}/diskTypes/{disk_type}'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.node_sets.storage_configs": {
+      "type": "block",
+      "description": "How storage resources should be mounted on each compute\nnode.",
+      "required": false
+    },
+    "orchestrator.slurm.node_sets.storage_configs.id": {
+      "description": "ID of the storage resource to mount, which must match a key in the\ncluster's [storage_resources](Cluster.storage_resources).",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.node_sets.storage_configs.local_mount": {
+      "description": "A directory inside the VM instance's file system where the storage resource\nshould be mounted (e.g., '/mnt/share').",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.partitions": {
+      "type": "block",
+      "description": "Configuration of Slurm partitions, which group one or more nodesets. Acts\nas a queue against which jobs can be submitted. At least one partition is\nrequired.",
+      "required": true
+    },
+    "orchestrator.slurm.partitions.id": {
+      "description": "ID of the partition, which is how users will identify it. Must conform to\n[RFC-1034](https://datatracker.ietf.org/doc/html/rfc1034) (lower-case,\nalphanumeric, and at most 63 characters).",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrator.slurm.partitions.node_set_ids": {
+      "description": "IDs of the nodesets that make up this partition. Values must match\nSlurmNodeSet.id.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage_resources": {
+      "type": "block",
+      "description": "Storage resources available to the cluster. Keys specify the ID of the\nstorage resource by which it can be referenced elsewhere, and must conform\nto [RFC-1034](https://datatracker.ietf.org/doc/html/rfc1034) (lower-case,\nalphanumeric, and at most 63 characters).",
+      "required": false
+    },
+    "storage_resources.id": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage_resources.config": {
+      "type": "block",
+      "description": "Describes how a storage resource should be initialized. Each storage resource\ncan either be imported from an existing Google Cloud resource or initialized\nwhen the cluster is created.",
+      "required": true
+    },
+    "storage_resources.config.existing_bucket": {
+      "type": "block",
+      "description": "When set in a StorageResourceConfig, indicates that an existing\n[Google Cloud Storage](https://cloud.google.com/storage) bucket should be\nimported.",
+      "required": false
+    },
+    "storage_resources.config.existing_bucket.bucket": {
+      "description": "Name of the Cloud Storage bucket to import.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage_resources.config.existing_filestore": {
+      "type": "block",
+      "description": "When set in a StorageResourceConfig, indicates that an existing\n[Filestore](https://cloud.google.com/filestore) instance should be imported.",
+      "required": false
+    },
+    "storage_resources.config.existing_filestore.filestore": {
+      "description": "Name of the Filestore instance to import, in the format\n'projects/{project}/locations/{location}/instances/{instance}'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage_resources.config.existing_lustre": {
+      "type": "block",
+      "description": "When set in a StorageResourceConfig, indicates that an existing\n[Managed Lustre](https://cloud.google.com/products/managed-lustre) instance\nshould be imported.",
+      "required": false
+    },
+    "storage_resources.config.existing_lustre.lustre": {
+      "description": "Name of the Managed Lustre instance to import, in the format\n'projects/{project}/locations/{location}/instances/{instance}'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage_resources.config.new_bucket": {
+      "type": "block",
+      "description": "When set in a StorageResourceConfig, indicates that a new\n[Google Cloud Storage](https://cloud.google.com/storage) bucket should be\ncreated.",
+      "required": false
+    },
+    "storage_resources.config.new_bucket.bucket": {
+      "description": "Name of the Cloud Storage bucket to create.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage_resources.config.new_bucket.storage_class": {
+      "description": "If set, uses the provided storage class as the bucket's default storage\nclass.\nPossible values:\nSTANDARD\nNEARLINE\nCOLDLINE\nARCHIVE",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage_resources.config.new_bucket.autoclass": {
+      "type": "block",
+      "description": "Message describing Google Cloud Storage autoclass configuration",
+      "required": false
+    },
+    "storage_resources.config.new_bucket.autoclass.enabled": {
+      "description": "Enables Auto-class feature.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage_resources.config.new_bucket.autoclass.terminal_storage_class": {
+      "description": "Terminal storage class of the autoclass bucket\nPossible values:\nNEARLINE\nARCHIVE",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage_resources.config.new_bucket.hierarchical_namespace": {
+      "type": "block",
+      "description": "Message describing Google Cloud Storage hierarchical namespace configuration",
+      "required": false
+    },
+    "storage_resources.config.new_bucket.hierarchical_namespace.enabled": {
+      "description": "Enables hierarchical namespace setup for the bucket.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage_resources.config.new_filestore": {
+      "type": "block",
+      "description": "When set in a StorageResourceConfig, indicates that a new\n[Filestore](https://cloud.google.com/filestore) instance should be created.",
+      "required": false
+    },
+    "storage_resources.config.new_filestore.description": {
+      "description": "Description of the instance. Maximum of 2048 characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage_resources.config.new_filestore.filestore": {
+      "description": "Name of the Filestore instance to create, in the format\n'projects/{project}/locations/{location}/instances/{instance}'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage_resources.config.new_filestore.protocol": {
+      "description": "Access protocol to use for all file shares in the instance. Defaults to NFS\nV3 if not set.\nPossible values:\nNFSV3\nNFSV41 Possible values: [\"PROTOCOL_UNSPECIFIED\", \"NFSV3\", \"NFSV41\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage_resources.config.new_filestore.tier": {
+      "description": "Service tier to use for the instance.\nPossible values:\nZONAL\nREGIONAL Possible values: [\"TIER_UNSPECIFIED\", \"ZONAL\", \"REGIONAL\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage_resources.config.new_filestore.file_shares": {
+      "type": "block",
+      "description": "File system shares on the instance. Exactly one file share must be\nspecified.",
+      "required": true
+    },
+    "storage_resources.config.new_filestore.file_shares.capacity_gb": {
+      "description": "Size of the filestore in GB. Must be between 1024 and 102400, and must meet\nscalability requirements described at\nhttps://cloud.google.com/filestore/docs/service-tiers.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage_resources.config.new_filestore.file_shares.file_share": {
+      "description": "Filestore share location",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage_resources.config.new_lustre": {
+      "type": "block",
+      "description": "When set in a StorageResourceConfig, indicates that a new\n[Managed Lustre](https://cloud.google.com/products/managed-lustre) instance\nshould be created.",
+      "required": false
+    },
+    "storage_resources.config.new_lustre.capacity_gb": {
+      "description": "Storage capacity of the instance in gibibytes (GiB). Allowed values are\nbetween 18000 and 7632000.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage_resources.config.new_lustre.description": {
+      "description": "Description of the Managed Lustre instance. Maximum of 2048 characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage_resources.config.new_lustre.filesystem": {
+      "description": "Filesystem name for this instance. This name is used by client-side tools,\nincluding when mounting the instance. Must be 8 characters or less and can\nonly contain letters and numbers.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage_resources.config.new_lustre.lustre": {
+      "description": "Name of the Managed Lustre instance to create, in the format\n'projects/{project}/locations/{location}/instances/{instance}'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage_resources.config.new_lustre.per_unit_storage_throughput": {
+      "description": "Throughput of the instance in MB/s/TiB. Valid values are 125, 250,\n500, 1000. See [Performance tiers and maximum storage\ncapacities](https://cloud.google.com/managed-lustre/docs/create-instance#performance-tiers)\nfor more information.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

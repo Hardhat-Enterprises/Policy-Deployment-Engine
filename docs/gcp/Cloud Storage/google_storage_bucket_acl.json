@@ -1,0 +1,41 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "bucket": {
+      "description": "The name of the bucket it applies to.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Naming of bucket is not security related"
+    },
+    "default_acl": {
+      "description": "Configure this ACL to be the default ACL.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Applies a canned/predefined default ACL to objects in the bucket. Some canned ACLs (e.g. publicRead) expose objects broadly; a policy should reject canned ACLs that grant public or all-authenticated access, keeping default object access private."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "predefined_acl": {
+      "description": "The canned GCS ACL to apply. Must be set if role_entity is not.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "By applying a predefined ACL to an existing bucket or object, you completely replace the existing bucket or object ACL with the predefined ACL. This change might cause you to lose access to the bucket"
+    },
+    "role_entity": {
+      "description": "List of role/entity pairs in the form ROLE:entity. See GCS Bucket ACL documentation  for more details. Must be set if predefined_acl is not.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": true,
+      "rationale": "Role/entity should be restricted to allowed users/domain/group/projects"
+    }
+  }
+}

@@ -1,0 +1,1173 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "backup_id": {
+      "description": "Required. The ID of the backup to restore from.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This identifies the backup source but is not itself a generic explicit security control."
+    },
+    "backup_vault_id": {
+      "description": "Required. The ID of the backup vault.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is a resource reference rather than a generic explicit security control."
+    },
+    "clear_overrides_field_mask": {
+      "description": "Optional. A field mask used to clear server-side default values during restore.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is operational restore behavior, not a generic explicit security control."
+    },
+    "data_source_id": {
+      "description": "Required. The ID of the data source.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is a resource reference rather than a generic explicit security control."
+    },
+    "delete_restored_instance": {
+      "description": "Optional. If true (default), running terraform destroy will delete the live resource in GCP.\nIf false, only the restore record is removed from the state, leaving the resource active.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "This is a clear generic safeguard because disabling automatic deletion reduces the risk of unintentionally removing restored resources during destroy operations."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "Required. The location for the backup vault.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "name": {
+      "description": "The resource name of the backup instance.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is deprecated and acts as an identifier rather than a security control."
+    },
+    "request_id": {
+      "description": "Optional. An optional request ID to identify requests. Specify a unique request ID\nso that if you must retry your request, the server will know to ignore\nthe request if it has already been completed.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is an idempotency and request-tracking field, not a generic explicit security control."
+    },
+    "compute_instance_restore_properties": {
+      "type": "block",
+      "description": "Optional. Compute Engine instance properties to be overridden during restore.",
+      "required": false
+    },
+    "compute_instance_restore_properties.can_ip_forward": {
+      "description": "Optional. Allows this instance to send and receive packets with non-matching destination or source IPs.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "IP forwarding is a clear generic security control because enabling it expands networking capability and exposure."
+    },
+    "compute_instance_restore_properties.deletion_protection": {
+      "description": "Optional. Whether the resource should be protected against deletion.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Deletion protection is a clear explicit security control and can be enforced with a simple boolean rule."
+    },
+    "compute_instance_restore_properties.description": {
+      "description": "Optional. An optional description of this resource.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Description does not affect security enforcement."
+    },
+    "compute_instance_restore_properties.hostname": {
+      "description": "Optional. Specifies the hostname of the instance.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier/operational field, not a generic explicit security control."
+    },
+    "compute_instance_restore_properties.key_revocation_action_type": {
+      "description": "Optional. KeyRevocationActionType of the instance. Possible values: [\"KEY_REVOCATION_ACTION_TYPE_UNSPECIFIED\", \"NONE\", \"STOP\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is conditional key-management behavior rather than a generic explicit security control."
+    },
+    "compute_instance_restore_properties.machine_type": {
+      "description": "Optional. Full or partial URL of the machine type resource to use for this instance.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Sizing/performance field, not a generic explicit security control."
+    },
+    "compute_instance_restore_properties.min_cpu_platform": {
+      "description": "Optional. Minimum CPU platform to use for this instance.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Hardware preference field, not a generic explicit security control."
+    },
+    "compute_instance_restore_properties.name": {
+      "description": "Required. Name of the compute instance.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Name is an identifier and not a generic explicit security control."
+    },
+    "compute_instance_restore_properties.private_ipv6_google_access": {
+      "description": "Optional. The private IPv6 google access type for the VM. Possible values: [\"INSTANCE_PRIVATE_IPV6_GOOGLE_ACCESS_UNSPECIFIED\", \"INHERIT_FROM_SUBNETWORK\", \"ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE\", \"ENABLE_BIDIRECTIONAL_ACCESS_TO_GOOGLE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is conditional networking behavior better handled through custom validation."
+    },
+    "compute_instance_restore_properties.resource_policies": {
+      "description": "Optional. Resource policies applied to this instance.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "This is a resource reference list rather than a generic explicit security control."
+    },
+    "compute_instance_restore_properties.advanced_machine_features": {
+      "type": "block",
+      "description": "Optional. Controls for advanced machine-related behavior features.",
+      "required": false
+    },
+    "compute_instance_restore_properties.advanced_machine_features.enable_nested_virtualization": {
+      "description": "Optional. Whether to enable nested virtualization or not (default is false).",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "It does not have security impact."
+    },
+    "compute_instance_restore_properties.advanced_machine_features.enable_uefi_networking": {
+      "description": "Optional. Whether to enable UEFI networking for instance creation.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "Boot/network compatibility setting rather than a generic explicit security control."
+    },
+    "compute_instance_restore_properties.advanced_machine_features.threads_per_core": {
+      "description": "Optional. The number of threads per physical core.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Performance tuning field, not a generic explicit security control."
+    },
+    "compute_instance_restore_properties.advanced_machine_features.visible_core_count": {
+      "description": "Optional. The number of physical cores to expose to an instance.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Performance sizing field, not a generic explicit security control."
+    },
+    "compute_instance_restore_properties.allocation_affinity": {
+      "type": "block",
+      "description": "Optional. Specifies the reservations that this instance can consume from.",
+      "required": false
+    },
+    "compute_instance_restore_properties.allocation_affinity.consume_allocation_type": {
+      "description": " Possible values: [\"TYPE_UNSPECIFIED\", \"NO_RESERVATION\", \"ANY_RESERVATION\", \"SPECIFIC_RESERVATION\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.allocation_affinity.key": {
+      "description": "The identifier for this object. Format specified above.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.allocation_affinity.values": {
+      "description": "N/A",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.confidential_instance_config": {
+      "type": "block",
+      "description": "Optional. Controls Confidential compute options on the instance.",
+      "required": false
+    },
+    "compute_instance_restore_properties.confidential_instance_config.enable_confidential_compute": {
+      "description": "Optional. Defines whether the instance should have confidential compute enabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Confidential Compute is a clear explicit security control and can be enforced with a simple boolean rule."
+    },
+    "compute_instance_restore_properties.disks": {
+      "type": "block",
+      "description": "Optional. Array of disks associated with this instance.",
+      "required": false
+    },
+    "compute_instance_restore_properties.disks.auto_delete": {
+      "description": "Optional. Specifies whether the disk will be auto-deleted when the instance is deleted.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.disks.boot": {
+      "description": "Optional. Indicates that this is a boot disk.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.disks.device_name": {
+      "description": "Optional. This is used as an identifier for the disks.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.disks.disk_interface": {
+      "description": "Optional. Specifies the disk interface to use for attaching this disk. Possible values: [\"DISK_INTERFACE_UNSPECIFIED\", \"SCSI\", \"NVME\", \"NVDIMM\", \"ISCSI\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.disks.disk_size_gb": {
+      "description": "Optional. The size of the disk in GB.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.disks.disk_type": {
+      "description": "Output only. The URI of the disk type resource.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.disks.index": {
+      "description": "Optional. A zero-based index to this disk, where 0 is reserved for the boot disk.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.disks.kind": {
+      "description": "Optional. Type of the resource.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.disks.license": {
+      "description": "Optional. Any valid publicly visible licenses.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.disks.mode": {
+      "description": "Optional. The mode in which to attach this disk. Possible values: [\"DISK_MODE_UNSPECIFIED\", \"READ_WRITE\", \"READ_ONLY\", \"LOCKED\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.disks.saved_state": {
+      "description": "Optional. Specifies the saved state of the disk. Possible values: [\"DISK_SAVED_STATE_UNSPECIFIED\", \"PRESERVED\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.disks.source": {
+      "description": "Optional. Specifies a valid partial or full URL to an existing Persistent Disk resource.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.disks.type": {
+      "description": "Optional. Specifies the type of the disk. Possible values: [\"DISK_TYPE_UNSPECIFIED\", \"SCRATCH\", \"PERSISTENT\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.disks.disk_encryption_key": {
+      "type": "block",
+      "description": "Optional. Encrypts or decrypts a disk using a customer-supplied encryption key.",
+      "required": false
+    },
+    "compute_instance_restore_properties.disks.disk_encryption_key.kms_key_name": {
+      "description": "Optional. The name of the encryption key that is stored in Google Cloud KMS.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.disks.disk_encryption_key.kms_key_service_account": {
+      "description": "Optional. The service account being used for the encryption request.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.disks.disk_encryption_key.raw_key": {
+      "description": "Optional. Specifies a 256-bit customer-supplied encryption key.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.disks.disk_encryption_key.rsa_encrypted_key": {
+      "description": "Optional. RSA-wrapped 2048-bit customer-supplied encryption key.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.disks.guest_os_feature": {
+      "type": "block",
+      "description": "Optional. A list of features to enable on the guest operating system.",
+      "required": false
+    },
+    "compute_instance_restore_properties.disks.guest_os_feature.type": {
+      "description": "Optional. The ID of a supported feature. Possible values: [\"FEATURE_TYPE_UNSPECIFIED\", \"VIRTIO_SCSI_MULTIQUEUE\", \"WINDOWS\", \"MULTI_IP_SUBNET\", \"UEFI_COMPATIBLE\", \"SECURE_BOOT\", \"GVNIC\", \"SEV_CAPABLE\", \"BARE_METAL_LINUX_COMPATIBLE\", \"SUSPEND_RESUME_COMPATIBLE\", \"SEV_LIVE_MIGRATABLE\", \"SEV_SNP_CAPABLE\", \"TDX_CAPABLE\", \"IDPF\", \"SEV_LIVE_MIGRATABLE_V2\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.disks.initialize_params": {
+      "type": "block",
+      "description": "Optional. Specifies the parameters to initialize this disk.",
+      "required": false
+    },
+    "compute_instance_restore_properties.disks.initialize_params.disk_name": {
+      "description": "Optional. Specifies the disk name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.disks.initialize_params.replica_zones": {
+      "description": "Optional. URL of the zone where the disk should be created.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.display_device": {
+      "type": "block",
+      "description": "Optional. Enables display device for the instance.",
+      "required": false
+    },
+    "compute_instance_restore_properties.display_device.enable_display": {
+      "description": "Optional. Enables display for the Compute Engine VM.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.guest_accelerators": {
+      "type": "block",
+      "description": "Optional. A list of the type and count of accelerator cards attached to the instance.",
+      "required": false
+    },
+    "compute_instance_restore_properties.guest_accelerators.accelerator_count": {
+      "description": "Optional. The number of the guest accelerator cards exposed to this instance.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.guest_accelerators.accelerator_type": {
+      "description": "Optional. Full or partial URL of the accelerator type resource.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.instance_encryption_key": {
+      "type": "block",
+      "description": "Optional. Encrypts suspended data for an instance with a customer-managed encryption key.",
+      "required": false
+    },
+    "compute_instance_restore_properties.instance_encryption_key.kms_key_name": {
+      "description": "Optional. The name of the encryption key that is stored in Google Cloud KMS.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "KMS-based encryption is security-relevant because it controls whether the restored instance uses customer-managed encryption keys for protected data but not writing a policy in T1/2026."
+    },
+    "compute_instance_restore_properties.instance_encryption_key.kms_key_service_account": {
+      "description": "Optional. The service account being used for the encryption request.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Service account selection needs custom validation rather than a simple generic control."
+    },
+    "compute_instance_restore_properties.instance_encryption_key.raw_key": {
+      "description": "Optional. Specifies a 256-bit customer-supplied encryption key.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Raw key presence is sensitive but better handled through custom validation than a generic explicit control."
+    },
+    "compute_instance_restore_properties.instance_encryption_key.rsa_encrypted_key": {
+      "description": "Optional. RSA-wrapped 2048-bit customer-supplied encryption key.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Key material field better handled through custom validation."
+    },
+    "compute_instance_restore_properties.labels": {
+      "type": "block",
+      "description": "Optional. Labels to apply to this instance.",
+      "required": false
+    },
+    "compute_instance_restore_properties.labels.key": {
+      "description": "The identifier for this object. Format specified above.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.labels.value": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.metadata": {
+      "type": "block",
+      "description": "Optional. This includes custom metadata and predefined keys.",
+      "required": false
+    },
+    "compute_instance_restore_properties.metadata.items": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "compute_instance_restore_properties.metadata.items.key": {
+      "description": "The identifier for this object. Format specified above.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.metadata.items.value": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.network_interfaces": {
+      "type": "block",
+      "description": "Optional. An array of network configurations for this instance.",
+      "required": false
+    },
+    "compute_instance_restore_properties.network_interfaces.internal_ipv6_prefix_length": {
+      "description": "Optional. The prefix length of the primary internal IPv6 range.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Network sizing field, not a generic explicit security control."
+    },
+    "compute_instance_restore_properties.network_interfaces.ip_address": {
+      "description": "Optional. An IPv4 internal IP address to assign to the instance.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Address selection is operational and better handled through custom validation."
+    },
+    "compute_instance_restore_properties.network_interfaces.ipv6_access_type": {
+      "description": " Possible values: [\"UNSPECIFIED_IPV6_ACCESS_TYPE\", \"INTERNAL\", \"EXTERNAL\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Addressing mode is better handled through custom validation than a simple generic control."
+    },
+    "compute_instance_restore_properties.network_interfaces.ipv6_address": {
+      "description": "Optional. An IPv6 internal network address for this network interface.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Address selection is operational and better handled through custom validation."
+    },
+    "compute_instance_restore_properties.network_interfaces.network": {
+      "description": "Optional. URL of the VPC network resource for this instance.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Network attachment is a clear security control because it can be restricted to approved networks, but not writing a policy in T1/2026."
+    },
+    "compute_instance_restore_properties.network_interfaces.network_attachment": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Network attachment is a clear security control because it determines connectivity scope, but not writing a policy in T1/2026."
+    },
+    "compute_instance_restore_properties.network_interfaces.nic_type": {
+      "description": " Possible values: [\"NIC_TYPE_UNSPECIFIED\", \"VIRTIO_NET\", \"GVNIC\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Hardware/network performance field, not a generic explicit security control."
+    },
+    "compute_instance_restore_properties.network_interfaces.queue_count": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Performance tuning field, not a generic explicit security control."
+    },
+    "compute_instance_restore_properties.network_interfaces.stack_type": {
+      "description": " Possible values: [\"STACK_TYPE_UNSPECIFIED\", \"IPV4_ONLY\", \"IPV4_IPV6\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Protocol stack choice is generally operational rather than a generic explicit security control."
+    },
+    "compute_instance_restore_properties.network_interfaces.subnetwork": {
+      "description": "Optional. The URL of the Subnetwork resource for this instance.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Subnetwork attachment is a clear security control because it can be restricted to approved subnetworks, but not writing a policy in T1/2026."
+    },
+    "compute_instance_restore_properties.network_interfaces.access_configs": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "compute_instance_restore_properties.network_interfaces.access_configs.external_ip": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Assigning an external IP is a clear explicit security control because it exposes the instance publicly, but not writing a policy in T1/2026."
+    },
+    "compute_instance_restore_properties.network_interfaces.access_configs.external_ipv6": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Assigning an external IPv6 address is a clear explicit security control because it exposes the instance publicly, but not writing a policy in T1/2026."
+    },
+    "compute_instance_restore_properties.network_interfaces.access_configs.external_ipv6_prefix_length": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Address sizing field, not a generic explicit security control."
+    },
+    "compute_instance_restore_properties.network_interfaces.access_configs.name": {
+      "description": "Optional. The name of this access configuration.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier only."
+    },
+    "compute_instance_restore_properties.network_interfaces.access_configs.network_tier": {
+      "description": " Possible values: [\"NETWORK_TIER_UNSPECIFIED\", \"PREMIUM\", \"STANDARD\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Networking service tier selection is operational rather than a generic explicit security control."
+    },
+    "compute_instance_restore_properties.network_interfaces.access_configs.public_ptr_domain_name": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "DNS naming field, not a generic explicit security control."
+    },
+    "compute_instance_restore_properties.network_interfaces.access_configs.set_public_ptr": {
+      "description": "N/A",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "DNS pointer behavior is not usually enforced as a generic explicit security control here."
+    },
+    "compute_instance_restore_properties.network_interfaces.access_configs.type": {
+      "description": "Optional. The type of configuration. Possible values: [\"ACCESS_TYPE_UNSPECIFIED\", \"ONE_TO_ONE_NAT\", \"DIRECT_IPV6\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Access config type is a clear explicit security control because it governs external connectivity, but not writing a policy in T1/2026."
+    },
+    "compute_instance_restore_properties.network_interfaces.alias_ip_ranges": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "compute_instance_restore_properties.network_interfaces.alias_ip_ranges.ip_cidr_range": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.network_interfaces.alias_ip_ranges.subnetwork_range_name": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.network_interfaces.ipv6_access_configs": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "compute_instance_restore_properties.network_interfaces.ipv6_access_configs.external_ip": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.network_interfaces.ipv6_access_configs.external_ipv6": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.network_interfaces.ipv6_access_configs.external_ipv6_prefix_length": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.network_interfaces.ipv6_access_configs.name": {
+      "description": "Optional. The name of this access configuration.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.network_interfaces.ipv6_access_configs.network_tier": {
+      "description": " Possible values: [\"NETWORK_TIER_UNSPECIFIED\", \"PREMIUM\", \"STANDARD\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.network_interfaces.ipv6_access_configs.public_ptr_domain_name": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.network_interfaces.ipv6_access_configs.set_public_ptr": {
+      "description": "N/A",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.network_interfaces.ipv6_access_configs.type": {
+      "description": "Optional. The type of configuration. Possible values: [\"ACCESS_TYPE_UNSPECIFIED\", \"ONE_TO_ONE_NAT\", \"DIRECT_IPV6\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.network_performance_config": {
+      "type": "block",
+      "description": "Optional. Configure network performance such as egress bandwidth tier.",
+      "required": false
+    },
+    "compute_instance_restore_properties.network_performance_config.total_egress_bandwidth_tier": {
+      "description": " Possible values: [\"TIER_UNSPECIFIED\", \"DEFAULT\", \"TIER_1\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.params": {
+      "type": "block",
+      "description": "Input only. Additional params passed with the request.",
+      "required": false
+    },
+    "compute_instance_restore_properties.params.resource_manager_tags": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "compute_instance_restore_properties.params.resource_manager_tags.key": {
+      "description": "The identifier for this object. Format specified above.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.params.resource_manager_tags.value": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.scheduling": {
+      "type": "block",
+      "description": "Optional. Sets the scheduling options for this instance.",
+      "required": false
+    },
+    "compute_instance_restore_properties.scheduling.automatic_restart": {
+      "description": "N/A",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.scheduling.instance_termination_action": {
+      "description": " Possible values: [\"INSTANCE_TERMINATION_ACTION_UNSPECIFIED\", \"DELETE\", \"STOP\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.scheduling.min_node_cpus": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.scheduling.on_host_maintenance": {
+      "description": " Possible values: [\"ON_HOST_MAINTENANCE_UNSPECIFIED\", \"TERMINATE\", \"MIGRATE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.scheduling.preemptible": {
+      "description": "N/A",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.scheduling.provisioning_model": {
+      "description": " Possible values: [\"PROVISIONING_MODEL_UNSPECIFIED\", \"STANDARD\", \"SPOT\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.scheduling.termination_time": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.scheduling.local_ssd_recovery_timeout": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "compute_instance_restore_properties.scheduling.local_ssd_recovery_timeout.nanos": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.scheduling.local_ssd_recovery_timeout.seconds": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.scheduling.max_run_duration": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "compute_instance_restore_properties.scheduling.max_run_duration.nanos": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.scheduling.max_run_duration.seconds": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.scheduling.node_affinities": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "compute_instance_restore_properties.scheduling.node_affinities.key": {
+      "description": "The identifier for this object. Format specified above.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.scheduling.node_affinities.operator": {
+      "description": " Possible values: [\"OPERATOR_UNSPECIFIED\", \"IN\", \"NOT_IN\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.scheduling.node_affinities.values": {
+      "description": "N/A",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_restore_properties.service_accounts": {
+      "type": "block",
+      "description": "Optional. A list of service accounts, with their specified scopes, authorized for this instance.",
+      "required": false
+    },
+    "compute_instance_restore_properties.service_accounts.email": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifies the service account attached to the restored instance. It is a reference to another identity/resource; a generic platform policy cannot constrain it without pinning a specific email, which is overreaching. We do not police which identity a team attaches, only block public/wildcard principals on IAM members."
+    },
+    "compute_instance_restore_properties.service_accounts.scopes": {
+      "description": "N/A",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": true,
+      "rationale": "OAuth scopes are security-relevant because they affect the level of API access available to the attached service account, but not writing a policy in T1/2026."
+    },
+    "compute_instance_restore_properties.shielded_instance_config": {
+      "type": "block",
+      "description": "Optional. Controls Shielded compute options on the instance.",
+      "required": false
+    },
+    "compute_instance_restore_properties.shielded_instance_config.enable_integrity_monitoring": {
+      "description": "N/A",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Integrity monitoring is an explicit security control and can be enforced with a simple boolean rule."
+    },
+    "compute_instance_restore_properties.shielded_instance_config.enable_secure_boot": {
+      "description": "N/A",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Secure Boot has security impact and can be enforced with a simple boolean rule."
+    },
+    "compute_instance_restore_properties.shielded_instance_config.enable_vtpm": {
+      "description": "N/A",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "vTPM is a clear explicit security control and can be enforced with a simple boolean rule."
+    },
+    "compute_instance_restore_properties.tags": {
+      "type": "block",
+      "description": "Optional. Tags to apply to this instance.",
+      "required": false
+    },
+    "compute_instance_restore_properties.tags.items": {
+      "description": "Structure is [documented below](#nested_compute_instance_restore_properties_metadata_items).",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_target_environment": {
+      "type": "block",
+      "description": "The destination environment for GCE VM restoration.",
+      "required": false
+    },
+    "compute_instance_target_environment.project": {
+      "description": "Required. Target project for the Compute Engine instance.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Project is an administrative scoping field rather than a direct generic explicit security control."
+    },
+    "compute_instance_target_environment.use_project_service_account": {
+      "description": "If true, use the BackupDR P4SA credentials for same-project restores. Default is false.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "compute_instance_target_environment.zone": {
+      "description": "Required. The zone of the Compute Engine instance.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Zone placement is operational context and is better handled by service-specific validation than a generic explicit security control."
+    },
+    "disk_restore_properties": {
+      "type": "block",
+      "description": "Optional. Disk properties to be overridden during restore.",
+      "required": false
+    },
+    "disk_restore_properties.access_mode": {
+      "description": "Optional. The access mode of the disk. Possible values: [\"READ_WRITE_SINGLE\", \"READ_WRITE_MANY\", \"READ_ONLY_MANY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Sets the disk attachment mode (READ_WRITE_SINGLE/READ_WRITE_MANY/READ_ONLY_MANY). This governs how a restored disk is shared/attached, a data-management and workload-semantics choice, not a platform security archetype; constraining it would not make the resource more secure."
+    },
+    "disk_restore_properties.architecture": {
+      "description": "Optional. The architecture of the source disk. Possible values: [\"ARCHITECTURE_UNSPECIFIED\", \"X86_64\", \"ARM64\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Compatibility field rather than a generic explicit security control."
+    },
+    "disk_restore_properties.description": {
+      "description": "Optional. An optional description of this resource.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Description does not affect security enforcement."
+    },
+    "disk_restore_properties.enable_confidential_compute": {
+      "description": "Optional. Indicates whether this disk is using confidential compute mode.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Confidential Compute is a clear explicit security control and can be enforced with a simple boolean rule."
+    },
+    "disk_restore_properties.licenses": {
+      "description": "Optional. A list of publicly available licenses that are applicable to this backup.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "Licensing metadata rather than a generic explicit security control."
+    },
+    "disk_restore_properties.name": {
+      "description": "Required. Name of the disk.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier only."
+    },
+    "disk_restore_properties.physical_block_size_bytes": {
+      "description": "Optional. Physical block size of the persistent disk, in bytes.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Performance/storage tuning field, not a generic explicit security control."
+    },
+    "disk_restore_properties.provisioned_iops": {
+      "description": "Optional. Indicates how many IOPS to provision for the disk.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Performance field, not a generic explicit security control."
+    },
+    "disk_restore_properties.provisioned_throughput": {
+      "description": "Optional. Indicates how much throughput to provision for the disk.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Performance field, not a generic explicit security control."
+    },
+    "disk_restore_properties.resource_policy": {
+      "description": "Optional. Resource policies applied to this disk.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "Resource reference rather than a generic explicit security control."
+    },
+    "disk_restore_properties.size_gb": {
+      "description": "Required. The size of the disk in GB.",
+      "required": true,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Capacity field, not a generic explicit security control."
+    },
+    "disk_restore_properties.storage_pool": {
+      "description": "Optional. The storage pool in which the new disk is created.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Placement/operational field rather than a generic explicit security control."
+    },
+    "disk_restore_properties.type": {
+      "description": "Required. URL of the disk type resource describing which disk type to use.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Disk type choice is usually performance/compatibility driven rather than a generic explicit security control."
+    },
+    "disk_restore_properties.disk_encryption_key": {
+      "type": "block",
+      "description": "Optional. Encrypts the disk using a customer-supplied encryption key.",
+      "required": false
+    },
+    "disk_restore_properties.disk_encryption_key.kms_key_name": {
+      "description": "Optional. The name of the encryption key that is stored in Google Cloud KMS.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "disk_restore_properties.disk_encryption_key.kms_key_service_account": {
+      "description": "Optional. The service account being used for the encryption request.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "disk_restore_properties.disk_encryption_key.raw_key": {
+      "description": "Optional. Specifies a 256-bit customer-supplied encryption key.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "disk_restore_properties.disk_encryption_key.rsa_encrypted_key": {
+      "description": "Optional. RSA-wrapped 2048-bit customer-supplied encryption key.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "disk_restore_properties.guest_os_feature": {
+      "type": "block",
+      "description": "Optional. A list of features to enable in the guest operating system.",
+      "required": false
+    },
+    "disk_restore_properties.guest_os_feature.type": {
+      "description": " Possible values: [\"FEATURE_TYPE_UNSPECIFIED\", \"VIRTIO_SCSI_MULTIQUEUE\", \"WINDOWS\", \"MULTI_IP_SUBNET\", \"UEFI_COMPATIBLE\", \"SECURE_BOOT\", \"GVNIC\", \"SEV_CAPABLE\", \"BARE_METAL_LINUX_COMPATIBLE\", \"SUSPEND_RESUME_COMPATIBLE\", \"SEV_LIVE_MIGRATABLE\", \"SEV_SNP_CAPABLE\", \"TDX_CAPABLE\", \"IDPF\", \"SEV_LIVE_MIGRATABLE_V2\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "disk_restore_properties.labels": {
+      "type": "block",
+      "description": "Optional. Labels to apply to this disk.",
+      "required": false
+    },
+    "disk_restore_properties.labels.key": {
+      "description": "The identifier for this object. Format specified above.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "disk_restore_properties.labels.value": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "disk_restore_properties.resource_manager_tags": {
+      "type": "block",
+      "description": "Optional. Resource manager tags to be bound to the disk.",
+      "required": false
+    },
+    "disk_restore_properties.resource_manager_tags.key": {
+      "description": "The identifier for this object. Format specified above.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "disk_restore_properties.resource_manager_tags.value": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "disk_target_environment": {
+      "type": "block",
+      "description": "The destination environment for zonal disk restoration.",
+      "required": false
+    },
+    "disk_target_environment.project": {
+      "description": "Required. Target project for the disk.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Project is an administrative scoping field rather than a direct generic explicit security control."
+    },
+    "disk_target_environment.use_project_service_account": {
+      "description": "If true, use the BackupDR P4SA credentials for same-project restores. Default is false.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "disk_target_environment.zone": {
+      "description": "Required. Target zone for the disk.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Zone placement is operational context and is better handled by service-specific validation than a generic explicit security control."
+    },
+    "region_disk_target_environment": {
+      "type": "block",
+      "description": "The destination environment for regional disk restoration.",
+      "required": false
+    },
+    "region_disk_target_environment.project": {
+      "description": "Required. Target project for the disk.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Project is an administrative scoping field rather than a direct generic explicit security control."
+    },
+    "region_disk_target_environment.region": {
+      "description": "Required. Target region for the disk.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Region placement is operational context and is better handled by service-specific validation than a generic explicit security control."
+    },
+    "region_disk_target_environment.replica_zones": {
+      "description": "Required. Target URLs of the replica zones for the disk.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "This is restore placement logic rather than a generic explicit security control."
+    },
+    "region_disk_target_environment.use_project_service_account": {
+      "description": "If true, use the BackupDR P4SA credentials for same-project restores. Default is false.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

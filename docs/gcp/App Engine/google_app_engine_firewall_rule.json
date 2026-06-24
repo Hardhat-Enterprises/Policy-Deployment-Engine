@@ -1,0 +1,48 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "action": {
+      "description": "The action to take if this rule matches. Possible values: [\"UNSPECIFIED_ACTION\", \"ALLOW\", \"DENY\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Is the explicit binary outcome for a network request, ensuring that the firewall behaves as a definitive gatekeeper rather than allowing traffic to pass through ambiguity."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "An optional string description of this rule.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Is an informative field that does not influence the network logic/security enforcement of the firewall rule."
+    },
+    "priority": {
+      "description": "A positive integer that defines the order of rule evaluation.\nRules with the lowest priority are evaluated first.\n\nA default rule at priority Int32.MaxValue matches all IPv4 and\nIPv6 traffic when no previous rule matches. Only the action of\nthis rule can be modified by the user.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "A positive integer setting the evaluation order of a firewall rule. The correct ordering is entirely rule-set-specific; a generic platform policy cannot prescribe priority values, so it is not a policy target (the allow/deny action and source range are the controls)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Is automatically constrained by the Google provider's project configuration, ensuring that firewall rules are strictly applied to the intended environment without manual entry."
+    },
+    "source_range": {
+      "description": "IP address or range, defined using CIDR notation, of requests that this rule applies to.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Enforces strict IP CIDR boundaries to minimize the application's attack surface by ensuring only trusted networks or specific geographic IP ranges can interact with the App Engine environment."
+    }
+  }
+}

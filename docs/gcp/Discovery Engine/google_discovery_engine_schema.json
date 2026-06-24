@@ -1,0 +1,48 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "data_store_id": {
+      "description": "The unique id of the data store.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier referencing the target data store. We do not constrain resource identifiers or references to other resources."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "json_schema": {
+      "description": "The JSON representation of the schema.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Free-form JSON representation of the data store schema. Writing a generic platform policy that meaningfully constrains an arbitrary embedded schema document is impractical, so it is out of scope."
+    },
+    "location": {
+      "description": "The geographic location where the data store should reside. The value can\nonly be one of \"global\", \"us\" and \"eu\".",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Project the resource belongs to. This is an identifier/reference and is not a security policy target."
+    },
+    "schema_id": {
+      "description": "The unique id of the schema.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier for the schema resource. We do not constrain resource identifiers, so it is not a policy target."
+    }
+  }
+}

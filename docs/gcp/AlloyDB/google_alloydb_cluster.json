@@ -1,0 +1,454 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "annotations": {
+      "description": "Annotations to allow client tools to store small amount of arbitrary data. This is distinct from labels. https://google.aip.dev/128\nAn object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.\n\n\n**Note**: This field is non-authoritative, and will only manage the annotations present in your configuration.\nPlease refer to the field 'effective_annotations' for all of the annotations present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_id": {
+      "description": "The ID of the alloydb cluster.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_type": {
+      "description": "The type of cluster. If not set, defaults to PRIMARY. Default value: \"PRIMARY\" Possible values: [\"PRIMARY\", \"SECONDARY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "database_version": {
+      "description": "The database engine major version. This is an optional field and it's populated at the Cluster creation time.\nNote: Changing this field to a higer version results in upgrading the AlloyDB cluster which is an irreversible change.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "This field uses a custom implementation please refer to documentation under /hashicorp/terraform-provider-google-beta/website/docs/r/alloydb_cluster.html.markdown for specifics",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_protection": {
+      "description": "Whether Terraform will be prevented from destroying the cluster.\nWhen the field is set to true or unset in Terraform state, a 'terraform apply'\nor 'terraform destroy' that would delete the cluster will fail.\nWhen the field is set to false, deleting the cluster is allowed.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "User-settable and human-readable display name for the Cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "etag": {
+      "description": "For Resource freshness validation (https://google.aip.dev/154)",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "User-defined labels for the alloydb cluster.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The location where the alloydb cluster should reside.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "skip_await_major_version_upgrade": {
+      "description": "Set to true to skip awaiting on the major version upgrade of the cluster.\nPossible values: true, false\nDefault value: \"true\"",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "subscription_type": {
+      "description": "The subscrition type of cluster. Possible values: [\"TRIAL\", \"STANDARD\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automated_backup_policy": {
+      "type": "block",
+      "description": "The automated backup policy for this cluster. AutomatedBackupPolicy is disabled by default.",
+      "required": false
+    },
+    "automated_backup_policy.backup_window": {
+      "description": "The length of the time window during which a backup can be taken. If a backup does not succeed within this time window, it will be canceled and considered failed.\n\nThe backup window must be at least 5 minutes long. There is no upper bound on the window. If not set, it will default to 1 hour.\n\nA duration in seconds with up to nine fractional digits, terminated by 's'. Example: \"3.5s\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automated_backup_policy.enabled": {
+      "description": "Whether automated backups are enabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automated_backup_policy.labels": {
+      "description": "Labels to apply to backups created using this configuration.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automated_backup_policy.location": {
+      "description": "The location where the backup will be stored. Currently, the only supported option is to store the backup in the same region as the cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automated_backup_policy.encryption_config": {
+      "type": "block",
+      "description": "EncryptionConfig describes the encryption config of a cluster or a backup that is encrypted with a CMEK (customer-managed encryption key).",
+      "required": false
+    },
+    "automated_backup_policy.encryption_config.kms_key_name": {
+      "description": "The fully-qualified resource name of the KMS key. Each Cloud KMS key is regionalized and has the following format: projects/[PROJECT]/locations/[REGION]/keyRings/[RING]/cryptoKeys/[KEY_NAME].",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automated_backup_policy.quantity_based_retention": {
+      "type": "block",
+      "description": "Quantity-based Backup retention policy to retain recent backups. Conflicts with 'time_based_retention', both can't be set together.",
+      "required": false
+    },
+    "automated_backup_policy.quantity_based_retention.count": {
+      "description": "The number of backups to retain.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automated_backup_policy.time_based_retention": {
+      "type": "block",
+      "description": "Time-based Backup retention policy. Conflicts with 'quantity_based_retention', both can't be set together.",
+      "required": false
+    },
+    "automated_backup_policy.time_based_retention.retention_period": {
+      "description": "The retention period.\nA duration in seconds with up to nine fractional digits, terminated by 's'. Example: \"3.5s\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automated_backup_policy.weekly_schedule": {
+      "type": "block",
+      "description": "Weekly schedule for the Backup.",
+      "required": false
+    },
+    "automated_backup_policy.weekly_schedule.days_of_week": {
+      "description": "The days of the week to perform a backup. At least one day of the week must be provided. Possible values: [\"MONDAY\", \"TUESDAY\", \"WEDNESDAY\", \"THURSDAY\", \"FRIDAY\", \"SATURDAY\", \"SUNDAY\"]",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automated_backup_policy.weekly_schedule.start_times": {
+      "type": "block",
+      "description": "The times during the day to start a backup. At least one start time must be provided. The start times are assumed to be in UTC and to be an exact hour (e.g., 04:00:00).",
+      "required": true
+    },
+    "automated_backup_policy.weekly_schedule.start_times.hours": {
+      "description": "Hours of day in 24 hour format. Should be from 0 to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automated_backup_policy.weekly_schedule.start_times.minutes": {
+      "description": "Minutes of hour of day. Currently, only the value 0 is supported.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automated_backup_policy.weekly_schedule.start_times.nanos": {
+      "description": "Fractions of seconds in nanoseconds. Currently, only the value 0 is supported.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automated_backup_policy.weekly_schedule.start_times.seconds": {
+      "description": "Seconds of minutes of the time. Currently, only the value 0 is supported.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "continuous_backup_config": {
+      "type": "block",
+      "description": "The continuous backup config for this cluster.\n\nIf no policy is provided then the default policy will be used. The default policy takes one backup a day and retains backups for 14 days.",
+      "required": false
+    },
+    "continuous_backup_config.enabled": {
+      "description": "Whether continuous backup recovery is enabled. If not set, defaults to true.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "continuous_backup_config.recovery_window_days": {
+      "description": "The numbers of days that are eligible to restore from using PITR. To support the entire recovery window, backups and logs are retained for one day more than the recovery window.\n\nIf not set, defaults to 14 days.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "continuous_backup_config.encryption_config": {
+      "type": "block",
+      "description": "EncryptionConfig describes the encryption config of a cluster or a backup that is encrypted with a CMEK (customer-managed encryption key).",
+      "required": false
+    },
+    "continuous_backup_config.encryption_config.kms_key_name": {
+      "description": "The fully-qualified resource name of the KMS key. Each Cloud KMS key is regionalized and has the following format: projects/[PROJECT]/locations/[REGION]/keyRings/[RING]/cryptoKeys/[KEY_NAME].",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dataplex_config": {
+      "type": "block",
+      "description": "Configuration for Dataplex integration. This is an optional field. If not set, Dataplex integration will be enabled by default.",
+      "required": false
+    },
+    "dataplex_config.enabled": {
+      "description": "Indicates whether Dataplex integration is enabled for the cluster.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "encryption_config": {
+      "type": "block",
+      "description": "EncryptionConfig describes the encryption config of a cluster or a backup that is encrypted with a CMEK (customer-managed encryption key).",
+      "required": false
+    },
+    "encryption_config.kms_key_name": {
+      "description": "The fully-qualified resource name of the KMS key. Each Cloud KMS key is regionalized and has the following format: projects/[PROJECT]/locations/[REGION]/keyRings/[RING]/cryptoKeys/[KEY_NAME].",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "initial_user": {
+      "type": "block",
+      "description": "Initial user to setup during cluster creation. If unset for new Clusters, a postgres role with null password is created. You will need to create additional users or set the password in order to log in.",
+      "required": false
+    },
+    "initial_user.password": {
+      "description": "The initial password for the user.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "initial_user.password_wo": {
+      "description": "The initial password for the user.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "initial_user.password_wo_version": {
+      "description": "Triggers update of 'password_wo' write-only. Increment this value when an update to 'password_wo' is needed. For more info see [updating write-only arguments](/docs/providers/google/guides/using_write_only_arguments.html#updating-write-only-arguments)",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "initial_user.user": {
+      "description": "The database username.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_update_policy": {
+      "type": "block",
+      "description": "MaintenanceUpdatePolicy defines the policy for system updates.",
+      "required": false
+    },
+    "maintenance_update_policy.maintenance_windows": {
+      "type": "block",
+      "description": "Preferred windows to perform maintenance. Currently limited to 1.",
+      "required": false
+    },
+    "maintenance_update_policy.maintenance_windows.day": {
+      "description": "Preferred day of the week for maintenance, e.g. MONDAY, TUESDAY, etc. Possible values: [\"MONDAY\", \"TUESDAY\", \"WEDNESDAY\", \"THURSDAY\", \"FRIDAY\", \"SATURDAY\", \"SUNDAY\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_update_policy.maintenance_windows.start_time": {
+      "type": "block",
+      "description": "Preferred time to start the maintenance operation on the specified day. Maintenance will start within 1 hour of this time.",
+      "required": true
+    },
+    "maintenance_update_policy.maintenance_windows.start_time.hours": {
+      "description": "Hours of day in 24 hour format. Should be from 0 to 23.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_update_policy.maintenance_windows.start_time.minutes": {
+      "description": "Minutes of hour of day. Currently, only the value 0 is supported.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_update_policy.maintenance_windows.start_time.nanos": {
+      "description": "Fractions of seconds in nanoseconds. Currently, only the value 0 is supported.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_update_policy.maintenance_windows.start_time.seconds": {
+      "description": "Seconds of minutes of the time. Currently, only the value 0 is supported.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_config": {
+      "type": "block",
+      "description": "Metadata related to network configuration.",
+      "required": false
+    },
+    "network_config.allocated_ip_range": {
+      "description": "The name of the allocated IP range for the private IP AlloyDB cluster. For example: \"google-managed-services-default\".\nIf set, the instance IPs for this cluster will be created in the allocated range.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_config.network": {
+      "description": "The resource link for the VPC network in which cluster resources are created and from which they are accessible via Private IP. The network must belong to the same project as the cluster.\nIt is specified in the form: \"projects/{projectNumber}/global/networks/{network_id}\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "psc_config": {
+      "type": "block",
+      "description": "Configuration for Private Service Connect (PSC) for the cluster.",
+      "required": false
+    },
+    "psc_config.psc_enabled": {
+      "description": "Create an instance that allows connections from Private Service Connect endpoints to the instance.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_backup_source": {
+      "type": "block",
+      "description": "The source when restoring from a backup. Conflicts with 'restore_continuous_backup_source', 'restore_backupdr_backup_source' and 'restore_backupdr_pitr_source', they can't be set together.",
+      "required": false
+    },
+    "restore_backup_source.backup_name": {
+      "description": "The name of the backup that this cluster is restored from.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_backupdr_backup_source": {
+      "type": "block",
+      "description": "The source when restoring from a backup. Conflicts with 'restore_continuous_backup_source',  'restore_backup_source' and 'restore_backupdr_pitr_source', they can't be set together.",
+      "required": false
+    },
+    "restore_backupdr_backup_source.backup": {
+      "description": "The name of the BackupDR backup that this cluster is restored from. It must be of the format \"projects/[PROJECT]/locations/[LOCATION]/backupVaults/[VAULT_ID]/dataSources/[DATASOURCE_ID]/backups/[BACKUP_ID]\"",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_backupdr_pitr_source": {
+      "type": "block",
+      "description": "The BackupDR source used for point in time recovery. Conflicts with 'restore_backupdr_backup_source', 'restore_continuous_backup_source' and 'restore_backupdr_backup_source', they can't be set togeter.",
+      "required": false
+    },
+    "restore_backupdr_pitr_source.data_source": {
+      "description": "The name of the BackupDR data source that this cluster is restore from. It must be of the format \"projects/[PROJECT]/locations/[LOCATION]/backupVaults/[VAULT_ID]/dataSources/[DATASOURCE_ID]\"",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_backupdr_pitr_source.point_in_time": {
+      "description": "The point in time that this cluster is restored to, in RFC 3339 format.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_continuous_backup_source": {
+      "type": "block",
+      "description": "The source when restoring via point in time recovery (PITR). Conflicts with 'restore_backup_source', 'restore_backupdr_backup_source' and 'restore_backupdr_pitr_source', they can't be set together.",
+      "required": false
+    },
+    "restore_continuous_backup_source.cluster": {
+      "description": "The name of the source cluster that this cluster is restored from.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_continuous_backup_source.point_in_time": {
+      "description": "The point in time that this cluster is restored to, in RFC 3339 format.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "secondary_config": {
+      "type": "block",
+      "description": "Configuration of the secondary cluster for Cross Region Replication. This should be set if and only if the cluster is of type SECONDARY.",
+      "required": false
+    },
+    "secondary_config.primary_cluster_name": {
+      "description": "Name of the primary cluster must be in the format\n'projects/{project}/locations/{location}/clusters/{cluster_id}'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

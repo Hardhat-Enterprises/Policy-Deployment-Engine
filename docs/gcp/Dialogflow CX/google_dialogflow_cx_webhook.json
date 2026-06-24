@@ -1,0 +1,352 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "disabled": {
+      "description": "Indicates whether the webhook is disabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "The human-readable name of the webhook, unique within the agent.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "enable_spell_correction": {
+      "description": "Deprecated. Indicates if automatic spell correction is enabled in detect intent requests.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "enable_stackdriver_logging": {
+      "description": "Deprecated. Determines whether this agent should log conversation queries.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "parent": {
+      "description": "The agent to create a webhook for.\nFormat: projects/<Project ID>/locations/<Location ID>/agents/<Agent ID>.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "security_settings": {
+      "description": "Deprecated. Name of the SecuritySettings reference for the agent. Format: projects/<Project ID>/locations/<Location ID>/securitySettings/<Security Settings ID>.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "timeout": {
+      "description": "Webhook execution timeout.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "generic_web_service": {
+      "type": "block",
+      "description": "Represents configuration for a generic web service.",
+      "required": false
+    },
+    "generic_web_service.allowed_ca_certs": {
+      "description": "Specifies a list of allowed custom CA certificates (in DER format) for\nHTTPS verification. This overrides the default SSL trust store. If this\nis empty or unspecified, Dialogflow will use Google's default trust store\nto verify certificates.\nN.B. Make sure the HTTPS server certificates are signed with \"subject alt\nname\". For instance a certificate can be self-signed using the following\ncommand,\nopenssl x509 -req -days 200 -in example.com.csr \\\n-signkey example.com.key \\\n-out example.com.crt \\\n-extfile <(printf \"\\nsubjectAltName='DNS:www.example.com'\")",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "generic_web_service.http_method": {
+      "description": "HTTP method for the flexible webhook calls. Standard webhook always uses\nPOST. Possible values: [\"POST\", \"GET\", \"HEAD\", \"PUT\", \"DELETE\", \"PATCH\", \"OPTIONS\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "generic_web_service.parameter_mapping": {
+      "description": "Maps the values extracted from specific fields of the flexible webhook\nresponse into session parameters.\n- Key: session parameter name\n- Value: field path in the webhook response",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "generic_web_service.request_body": {
+      "description": "Defines a custom JSON object as request body to send to flexible webhook.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "generic_web_service.request_headers": {
+      "description": "The HTTP request headers to send together with webhook requests.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "generic_web_service.secret_version_for_username_password": {
+      "description": "The SecretManager secret version resource storing the username:password\npair for HTTP Basic authentication.\nFormat: 'projects/{project}/secrets/{secret}/versions/{version}'",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "generic_web_service.service_agent_auth": {
+      "description": "Indicate the auth token type generated from the [Diglogflow service\nagent](https://cloud.google.com/iam/docs/service-agents#dialogflow-service-agent).\nThe generated token is sent in the Authorization header. Possible values: [\"NONE\", \"ID_TOKEN\", \"ACCESS_TOKEN\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "generic_web_service.uri": {
+      "description": "The webhook URI for receiving POST requests. It must use https protocol.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "generic_web_service.webhook_type": {
+      "description": "Type of the webhook. Possible values: [\"STANDARD\", \"FLEXIBLE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "generic_web_service.oauth_config": {
+      "type": "block",
+      "description": "Represents configuration of OAuth client credential flow for 3rd party\nAPI authentication.",
+      "required": false
+    },
+    "generic_web_service.oauth_config.client_id": {
+      "description": "The client ID provided by the 3rd party platform.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "generic_web_service.oauth_config.client_secret": {
+      "description": "The client secret provided by the 3rd party platform.  If the\n'secret_version_for_client_secret' field is set, this field will be\nignored.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "generic_web_service.oauth_config.scopes": {
+      "description": "The OAuth scopes to grant.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "generic_web_service.oauth_config.secret_version_for_client_secret": {
+      "description": "The name of the SecretManager secret version resource storing the\nclient secret. If this field is set, the 'client_secret' field will be\nignored.\nFormat: 'projects/{project}/secrets/{secret}/versions/{version}'",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "generic_web_service.oauth_config.token_endpoint": {
+      "description": "The token endpoint provided by the 3rd party platform to exchange an\naccess token.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "generic_web_service.secret_versions_for_request_headers": {
+      "type": "block",
+      "description": "The HTTP request headers to send together with webhook requests. Header\nvalues are stored in SecretManager secret versions.\n\nWhen the same header name is specified in both 'request_headers' and\n'secret_versions_for_request_headers', the value in\n'secret_versions_for_request_headers' will be used.",
+      "required": false
+    },
+    "generic_web_service.secret_versions_for_request_headers.key": {
+      "description": "The identifier for this object. Format specified above.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "generic_web_service.secret_versions_for_request_headers.secret_version": {
+      "description": "The SecretManager secret version resource storing the header value.\nFormat: 'projects/{project}/secrets/{secret}/versions/{version}'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "generic_web_service.service_account_auth_config": {
+      "type": "block",
+      "description": "Configuration for authentication using a service account.",
+      "required": false
+    },
+    "generic_web_service.service_account_auth_config.service_account": {
+      "description": "The email address of the service account used to authenticate the webhook call.\nDialogflow uses this service account to exchange an access token and the access\ntoken is then sent in the **Authorization** header of the webhook request.\n\nThe service account must have the **roles/iam.serviceAccountTokenCreator** role\ngranted to the\n[Dialogflow service agent](https://cloud.google.com/iam/docs/service-agents?_gl=1*1jsujvh*_ga*NjYxMzU3OTg2LjE3Njc3MzQ4NjM.*_ga_WH2QY8WWF5*czE3Njc3MzQ2MjgkbzIkZzEkdDE3Njc3MzQ3NzQkajYwJGwwJGgw#dialogflow-service-agent).",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "service_directory": {
+      "type": "block",
+      "description": "Configuration for a Service Directory service.",
+      "required": false
+    },
+    "service_directory.service": {
+      "description": "The name of Service Directory service.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "service_directory.generic_web_service": {
+      "type": "block",
+      "description": "Represents configuration for a generic web service.",
+      "required": false
+    },
+    "service_directory.generic_web_service.allowed_ca_certs": {
+      "description": "Specifies a list of allowed custom CA certificates (in DER format) for\nHTTPS verification. This overrides the default SSL trust store. If this\nis empty or unspecified, Dialogflow will use Google's default trust store\nto verify certificates.\nN.B. Make sure the HTTPS server certificates are signed with \"subject alt\nname\". For instance a certificate can be self-signed using the following\ncommand,\nopenssl x509 -req -days 200 -in example.com.csr \\\n-signkey example.com.key \\\n-out example.com.crt \\\n-extfile <(printf \"\\nsubjectAltName='DNS:www.example.com'\")",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "service_directory.generic_web_service.http_method": {
+      "description": "HTTP method for the flexible webhook calls. Standard webhook always uses\nPOST. Possible values: [\"POST\", \"GET\", \"HEAD\", \"PUT\", \"DELETE\", \"PATCH\", \"OPTIONS\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "service_directory.generic_web_service.parameter_mapping": {
+      "description": "Maps the values extracted from specific fields of the flexible webhook\nresponse into session parameters.\n- Key: session parameter name\n- Value: field path in the webhook response",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "service_directory.generic_web_service.request_body": {
+      "description": "Defines a custom JSON object as request body to send to flexible webhook.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "service_directory.generic_web_service.request_headers": {
+      "description": "The HTTP request headers to send together with webhook requests.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "service_directory.generic_web_service.secret_version_for_username_password": {
+      "description": "The SecretManager secret version resource storing the username:password\npair for HTTP Basic authentication.\nFormat: 'projects/{project}/secrets/{secret}/versions/{version}'",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "service_directory.generic_web_service.service_agent_auth": {
+      "description": "Indicate the auth token type generated from the [Diglogflow service\nagent](https://cloud.google.com/iam/docs/service-agents#dialogflow-service-agent).\nThe generated token is sent in the Authorization header. Possible values: [\"NONE\", \"ID_TOKEN\", \"ACCESS_TOKEN\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "service_directory.generic_web_service.uri": {
+      "description": "The webhook URI for receiving POST requests. It must use https protocol.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "service_directory.generic_web_service.webhook_type": {
+      "description": "Type of the webhook. Possible values: [\"STANDARD\", \"FLEXIBLE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "service_directory.generic_web_service.oauth_config": {
+      "type": "block",
+      "description": "Represents configuration of OAuth client credential flow for 3rd party\nAPI authentication.",
+      "required": false
+    },
+    "service_directory.generic_web_service.oauth_config.client_id": {
+      "description": "The client ID provided by the 3rd party platform.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "service_directory.generic_web_service.oauth_config.client_secret": {
+      "description": "The client secret provided by the 3rd party platform.  If the\n'secret_version_for_client_secret' field is set, this field will be\nignored.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "service_directory.generic_web_service.oauth_config.scopes": {
+      "description": "The OAuth scopes to grant.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "service_directory.generic_web_service.oauth_config.secret_version_for_client_secret": {
+      "description": "The name of the SecretManager secret version resource storing the\nclient secret. If this field is set, the 'client_secret' field will be\nignored.\nFormat: 'projects/{project}/secrets/{secret}/versions/{version}'",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "service_directory.generic_web_service.oauth_config.token_endpoint": {
+      "description": "The token endpoint provided by the 3rd party platform to exchange an\naccess token.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "service_directory.generic_web_service.secret_versions_for_request_headers": {
+      "type": "block",
+      "description": "The HTTP request headers to send together with webhook requests. Header\nvalues are stored in SecretManager secret versions.\n\nWhen the same header name is specified in both 'request_headers' and\n'secret_versions_for_request_headers', the value in\n'secret_versions_for_request_headers' will be used.",
+      "required": false
+    },
+    "service_directory.generic_web_service.secret_versions_for_request_headers.key": {
+      "description": "The identifier for this object. Format specified above.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "service_directory.generic_web_service.secret_versions_for_request_headers.secret_version": {
+      "description": "The SecretManager secret version resource storing the header value.\nFormat: 'projects/{project}/secrets/{secret}/versions/{version}'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "service_directory.generic_web_service.service_account_auth_config": {
+      "type": "block",
+      "description": "Configuration for authentication using a service account.",
+      "required": false
+    },
+    "service_directory.generic_web_service.service_account_auth_config.service_account": {
+      "description": "The email address of the service account used to authenticate the webhook call.\nDialogflow uses this service account to exchange an access token and the access\ntoken is then sent in the **Authorization** header of the webhook request.\n\nThe service account must have the **roles/iam.serviceAccountTokenCreator** role\ngranted to the\n[Dialogflow service agent](https://cloud.google.com/iam/docs/service-agents?_gl=1*1jsujvh*_ga*NjYxMzU3OTg2LjE3Njc3MzQ4NjM.*_ga_WH2QY8WWF5*czE3Njc3MzQ2MjgkbzIkZzEkdDE3Njc3MzQ3NzQkajYwJGwwJGgw#dialogflow-service-agent).",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

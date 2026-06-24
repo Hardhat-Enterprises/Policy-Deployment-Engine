@@ -1,0 +1,602 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "app_id": {
+      "description": "The ID to use for the app, which will become the final component of\nthe app's resource name. If not provided, a unique ID will be\nautomatically assigned for the app.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "Human-readable description of the app.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "Display name of the app.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "global_instruction": {
+      "description": "Instructions for all the agents in the app.\nYou can use this instruction to set up a stable identity or personality\nacross all the agents.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "guardrails": {
+      "description": "List of guardrails for the app.\nFormat:\n'projects/{project}/locations/{location}/apps/{app}/guardrails/{guardrail}'",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "metadata": {
+      "description": "Metadata about the app. This field can be used to store additional\ninformation relevant to the app's details or intended usages.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "pinned": {
+      "description": "Whether the app is pinned in the app list.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "root_agent": {
+      "description": "The root agent is the entry point of the app.\nFormat: 'projects/{project}/locations/{location}/apps/{app}/agents/{agent}'",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "tool_execution_mode": {
+      "description": "The tool execution mode for the app.\nSee the [API reference](https://docs.cloud.google.com/customer-engagement-ai/conversational-agents/ps/reference/rpc/google.cloud.ces.v1#google.cloud.ces.v1.App.ToolExecutionMode) for more details.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "audio_processing_config": {
+      "type": "block",
+      "description": "Configuration for how the input and output audio should be processed and\ndelivered.",
+      "required": false
+    },
+    "audio_processing_config.inactivity_timeout": {
+      "description": "The duration of user inactivity (no speech or interaction) before the agent\nprompts the user for reengagement. If not set, the agent will not prompt\nthe user for reengagement.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "audio_processing_config.ambient_sound_config": {
+      "type": "block",
+      "description": "Configuration for the ambient sound to be played with the synthesized agent\nresponse, to enhance the naturalness of the conversation.",
+      "required": false
+    },
+    "audio_processing_config.ambient_sound_config.gcs_uri": {
+      "description": "Ambient noise as a mono-channel, 16kHz WAV file stored in [Cloud\nStorage](https://cloud.google.com/storage).\nNote: Please make sure the CES service agent\n'service-@gcp-sa-ces.iam.gserviceaccount.com' has\n'storage.objects.get' permission to the Cloud Storage object.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "audio_processing_config.ambient_sound_config.prebuilt_ambient_sound": {
+      "description": "Name of the prebuilt ambient sound.\nValid values are: - \"coffee_shop\" - \"keyboard\" - \"keypad\" - \"hum\"\n-\"office_1\" - \"office_2\" - \"office_3\"\n-\"room_1\" - \"room_2\" - \"room_3\"\n-\"room_4\" - \"room_5\" - \"air_conditioner\"",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "audio_processing_config.ambient_sound_config.volume_gain_db": {
+      "description": "Volume gain (in dB) of the normal native volume supported by\nambient noise, in the range [-96.0, 16.0]. If unset, or set to a value of\n0.0 (dB), will play at normal native signal amplitude. A value of -6.0 (dB)\nwill play at approximately half the amplitude of the normal native signal\namplitude. A value of +6.0 (dB) will play at approximately twice the\namplitude of the normal native signal amplitude. We strongly recommend not\nto exceed +10 (dB) as there's usually no effective increase in loudness for\nany value greater than that.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "audio_processing_config.barge_in_config": {
+      "type": "block",
+      "description": "Configuration for how the user barge-in activities should be handled.",
+      "required": false
+    },
+    "audio_processing_config.barge_in_config.barge_in_awareness": {
+      "description": "If enabled, the agent will adapt its next response based on the assumption\nthat the user hasn't heard the full preceding agent message.\nThis should not be used in scenarios where agent responses are displayed\nvisually.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "audio_processing_config.synthesize_speech_configs": {
+      "type": "block",
+      "description": "Configuration of how the agent response should be synthesized, mapping from\nthe language code to SynthesizeSpeechConfig.\nIf the configuration for the specified language code is not found, the\nconfiguration for the root language code will be used. For example, if the\nmap contains \"en-us\" and \"en\", and the specified language code is \"en-gb\",\nthen \"en\" configuration will be used.\nNote: Language code is case-insensitive.",
+      "required": false
+    },
+    "audio_processing_config.synthesize_speech_configs.language_code": {
+      "description": "The identifier for this object. Format specified above.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "audio_processing_config.synthesize_speech_configs.speaking_rate": {
+      "description": "The speaking rate/speed in the range [0.25, 2.0]. 1.0 is the normal native\nspeed supported by the specific voice. 2.0 is twice as fast, and 0.5 is\nhalf as fast. Values outside of the range [0.25, 2.0] will return an error.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "audio_processing_config.synthesize_speech_configs.voice": {
+      "description": "The name of the voice. If not set, the service will choose a\nvoice based on the other parameters such as language_code.\nFor the list of available voices, please refer to Supported voices and\nlanguages from Cloud Text-to-Speech.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_certificate_settings": {
+      "type": "block",
+      "description": "The default client certificate settings for the app.",
+      "required": false
+    },
+    "client_certificate_settings.passphrase": {
+      "description": "The passphrase to decrypt the private key.\nShould be left unset if the private key is not encrypted.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_certificate_settings.private_key": {
+      "description": "The name of the SecretManager secret version resource\nstoring the private key encoded in PEM format.\nFormat: projects/{project}/secrets/{secret}/versions/{version}",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_certificate_settings.tls_certificate": {
+      "description": "The TLS certificate encoded in PEM format.\nThis string must include the begin header and end footer lines.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_settings": {
+      "type": "block",
+      "description": "Data store related settings for the app.",
+      "required": false
+    },
+    "default_channel_profile": {
+      "type": "block",
+      "description": "A ChannelProfile configures the agent's behavior for a specific communication\nchannel, such as web UI or telephony.",
+      "required": false
+    },
+    "default_channel_profile.channel_type": {
+      "description": "The type of the channel profile.\nPossible values:\nUNKNOWN\nWEB_UI\nAPI\nTWILIO\nGOOGLE_TELEPHONY_PLATFORM\nCONTACT_CENTER_AS_A_SERVICE",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "default_channel_profile.disable_barge_in_control": {
+      "description": "Whether to disable user barge-in in the conversation.\n- true: User interruptions are disabled while the agent is speaking.\n- false: The agent retains automatic control over when the user can interrupt.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "default_channel_profile.disable_dtmf": {
+      "description": "Whether to disable DTMF (dual-tone multi-frequency).",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "default_channel_profile.profile_id": {
+      "description": "The unique identifier of the channel profile.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "default_channel_profile.persona_property": {
+      "type": "block",
+      "description": "Represents the persona property of a channel.",
+      "required": false
+    },
+    "default_channel_profile.persona_property.persona": {
+      "description": "The persona of the channel.\nPossible values:\nUNKNOWN\nCONCISE\nCHATTY",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "default_channel_profile.web_widget_config": {
+      "type": "block",
+      "description": "Message for configuration for the web widget.",
+      "required": false
+    },
+    "default_channel_profile.web_widget_config.modality": {
+      "description": "The modality of the web widget.\nPossible values:\nUNKNOWN_MODALITY\nCHAT_AND_VOICE\nVOICE_ONLY\nCHAT_ONLY",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "default_channel_profile.web_widget_config.theme": {
+      "description": "The theme of the web widget.\nPossible values:\nUNKNOWN_THEME\nLIGHT\nDARK",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "default_channel_profile.web_widget_config.web_widget_title": {
+      "description": "The title of the web widget.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "evaluation_metrics_thresholds": {
+      "type": "block",
+      "description": "Threshold settings for metrics in an Evaluation.",
+      "required": false
+    },
+    "evaluation_metrics_thresholds.golden_evaluation_metrics_thresholds": {
+      "type": "block",
+      "description": "Settings for golden evaluations.",
+      "required": false
+    },
+    "evaluation_metrics_thresholds.golden_evaluation_metrics_thresholds.expectation_level_metrics_thresholds": {
+      "type": "block",
+      "description": "Expectation level metrics thresholds.",
+      "required": false
+    },
+    "evaluation_metrics_thresholds.golden_evaluation_metrics_thresholds.expectation_level_metrics_thresholds.tool_invocation_parameter_correctness_threshold": {
+      "description": "The success threshold for individual tool invocation parameter\ncorrectness. Must be a float between 0 and 1. Default is 1.0.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "evaluation_metrics_thresholds.golden_evaluation_metrics_thresholds.turn_level_metrics_thresholds": {
+      "type": "block",
+      "description": "Turn level metrics thresholds.",
+      "required": false
+    },
+    "evaluation_metrics_thresholds.golden_evaluation_metrics_thresholds.turn_level_metrics_thresholds.overall_tool_invocation_correctness_threshold": {
+      "description": "The success threshold for overall tool invocation correctness. Must be\na float between 0 and 1. Default is 1.0.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "evaluation_metrics_thresholds.golden_evaluation_metrics_thresholds.turn_level_metrics_thresholds.semantic_similarity_success_threshold": {
+      "description": "The success threshold for semantic similarity. Must be an integer\nbetween 0 and 4. Default is >= 3.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "language_settings": {
+      "type": "block",
+      "description": "Language settings of the app.",
+      "required": false
+    },
+    "language_settings.default_language_code": {
+      "description": "The default language code of the app.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "language_settings.enable_multilingual_support": {
+      "description": "Enables multilingual support. If true, agents in the app will use pre-built\ninstructions to improve handling of multilingual input.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "language_settings.fallback_action": {
+      "description": "The action to perform when an agent receives input in an unsupported\nlanguage.\nThis can be a predefined action or a custom tool call.\nValid values are:\n- A tool's full resource name, which triggers a specific tool execution.\n- A predefined system action, such as \"escalate\" or \"exit\", which triggers\nan EndSession signal with corresponding metadata\nto terminate the conversation.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "language_settings.supported_language_codes": {
+      "description": "List of languages codes supported by the app, in addition to the\n'default_language_code'.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "logging_settings": {
+      "type": "block",
+      "description": "Settings to describe the logging behaviors for the app.",
+      "required": false
+    },
+    "logging_settings.audio_recording_config": {
+      "type": "block",
+      "description": "Configuration for how the audio interactions should be recorded.",
+      "required": false
+    },
+    "logging_settings.audio_recording_config.gcs_bucket": {
+      "description": "The [Cloud Storage](https://cloud.google.com/storage) bucket to store the\nsession audio recordings. The URI must start with \"gs://\".\nNote: If the Cloud Storage bucket is in a different project from the app,\nyou should grant 'storage.objects.create' permission to the CES service\nagent 'service-@gcp-sa-ces.iam.gserviceaccount.com'.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "logging_settings.audio_recording_config.gcs_path_prefix": {
+      "description": "The Cloud Storage path prefix for audio recordings.\nThis prefix can include the following placeholders, which will be\ndynamically substituted at serving time:\n- $project:   project ID\n- $location:  app location\n- $app:       app ID\n- $date:      session date in YYYY-MM-DD format\n- $session:   session ID\nIf the path prefix is not specified, the default prefix\n'$project/$location/$app/$date/$session/' will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "logging_settings.bigquery_export_settings": {
+      "type": "block",
+      "description": "Settings to describe the BigQuery export behaviors for the app.",
+      "required": false
+    },
+    "logging_settings.bigquery_export_settings.dataset": {
+      "description": "The BigQuery dataset to export the data to.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "logging_settings.bigquery_export_settings.enabled": {
+      "description": "Indicates whether the BigQuery export is enabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "logging_settings.bigquery_export_settings.project": {
+      "description": "The project ID of the BigQuery dataset to export the data to.\nNote: If the BigQuery dataset is in a different project from the app, you should grant\nroles/bigquery.admin role to the CES service agent service-<PROJECT-\nNUMBER>@gcp-sa-ces.iam.gserviceaccount.com.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "logging_settings.cloud_logging_settings": {
+      "type": "block",
+      "description": "Settings to describe the Cloud Logging behaviors for the app.",
+      "required": false
+    },
+    "logging_settings.cloud_logging_settings.enable_cloud_logging": {
+      "description": "Whether to enable Cloud Logging for the sessions.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "logging_settings.conversation_logging_settings": {
+      "type": "block",
+      "description": "Settings to describe the conversation logging behaviors for the app.",
+      "required": false
+    },
+    "logging_settings.conversation_logging_settings.disable_conversation_logging": {
+      "description": "Whether to disable conversation logging for the sessions.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "logging_settings.redaction_config": {
+      "type": "block",
+      "description": "Configuration to instruct how sensitive data should be handled.",
+      "required": false
+    },
+    "logging_settings.redaction_config.deidentify_template": {
+      "description": "[DLP](https://cloud.google.com/dlp/docs) deidentify template name to\ninstruct on how to de-identify content.\nFormat:\n'projects/{project}/locations/{location}/deidentifyTemplates/{deidentify_template}'",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "logging_settings.redaction_config.enable_redaction": {
+      "description": "If true, redaction will be applied in various logging scenarios, including\nconversation history, Cloud Logging and audio recording.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "logging_settings.redaction_config.inspect_template": {
+      "description": "[DLP](https://cloud.google.com/dlp/docs) inspect template name to configure\ndetection of sensitive data types.\nFormat:\n'projects/{project}/locations/{location}/inspectTemplates/{inspect_template}'",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "model_settings": {
+      "type": "block",
+      "description": "Model settings contains various configurations for the LLM model.",
+      "required": false
+    },
+    "model_settings.model": {
+      "description": "The LLM model that the agent should use.\nIf not set, the agent will inherit the model from its parent agent.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "model_settings.temperature": {
+      "description": "If set, this temperature will be used for the LLM model. Temperature\ncontrols the randomness of the model's responses. Lower temperatures\nproduce responses that are more predictable. Higher temperatures produce\nresponses that are more creative.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "time_zone_settings": {
+      "type": "block",
+      "description": "TimeZone settings of the app.",
+      "required": false
+    },
+    "time_zone_settings.time_zone": {
+      "description": "The time zone of the app from the time zone database, e.g., America/Los_Angeles, Europe/Paris.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "variable_declarations": {
+      "type": "block",
+      "description": "The declarations of the variables.",
+      "required": false
+    },
+    "variable_declarations.description": {
+      "description": "The description of the variable.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "variable_declarations.name": {
+      "description": "The name of the variable. The name must start with a letter or underscore\nand contain only letters, numbers, or underscores.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "variable_declarations.schema": {
+      "type": "block",
+      "description": "Represents a select subset of an OpenAPI 3.0 schema object.",
+      "required": true
+    },
+    "variable_declarations.schema.additional_properties": {
+      "description": "Optional. Defines the schema for additional properties allowed in an object.\nThe value must be a valid JSON string representing the Schema object.\n(Note: OpenAPI also allows a boolean, this definition expects a Schema JSON).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "variable_declarations.schema.any_of": {
+      "description": "Optional. The instance value should be valid against at least one of the schemas in this list.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "variable_declarations.schema.default": {
+      "description": "Optional. Default value of the data. Represents a dynamically typed value\nwhich can be either null, a number, a string, a boolean, a struct,\nor a list of values. The provided default value must be encoded as a JSON string.\nUse 'jsonencode' in Terraform HCL to encode the default value.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "variable_declarations.schema.defs": {
+      "description": "A map of definitions for use by ref. Only allowed at the root of the schema.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "variable_declarations.schema.description": {
+      "description": "The description of the data.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "variable_declarations.schema.enum": {
+      "description": "Possible values of the element of primitive type with enum format.\nExamples:\n1. We can define direction as :\n{type:STRING, format:enum, enum:[\"EAST\", NORTH\", \"SOUTH\", \"WEST\"]}\n2. We can define apartment number as :\n{type:INTEGER, format:enum, enum:[\"101\", \"201\", \"301\"]}",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "variable_declarations.schema.items": {
+      "description": "Schema of the elements of Type.ARRAY.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "variable_declarations.schema.nullable": {
+      "description": "Indicates if the value may be null.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "variable_declarations.schema.prefix_items": {
+      "description": "Optional. Schemas of initial elements of Type.ARRAY.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "variable_declarations.schema.properties": {
+      "description": "Properties of Type.OBJECT.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "variable_declarations.schema.ref": {
+      "description": "Allows indirect references between schema nodes. The value should be a\nvalid reference to a child of the root 'defs'.\nFor example, the following schema defines a reference to a schema node\nnamed \"Pet\":\ntype: object\nproperties:\n  pet:\n    ref: #/defs/Pet\ndefs:\n  Pet:\n    type: object\n    properties:\n      name:\n        type: string\nThe value of the \"pet\" property is a reference to the schema node\nnamed \"Pet\".\nSee details in\nhttps://json-schema.org/understanding-json-schema/structuring.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "variable_declarations.schema.required": {
+      "description": "Required properties of Type.OBJECT.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "variable_declarations.schema.title": {
+      "description": "The title of the schema.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "variable_declarations.schema.type": {
+      "description": "The type of the data.\nPossible values:\nSTRING\nINTEGER\nNUMBER\nBOOLEAN\nOBJECT\nARRAY",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "variable_declarations.schema.unique_items": {
+      "description": "Indicate the items in the array must be unique. Only applies to TYPE.ARRAY.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

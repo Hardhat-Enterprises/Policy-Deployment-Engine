@@ -1,0 +1,978 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "allow_stopping_for_update": {
+      "description": "If true, allows Terraform to stop the instance to update its properties. If you try to update a property that requires stopping the instance without setting this field, the update will fail.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "can_ip_forward": {
+      "description": "Whether sending and receiving of packets with non-matching source or destination IPs is allowed.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_protection": {
+      "description": "Whether deletion protection is enabled on this instance.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "A brief description of the resource.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "desired_status": {
+      "description": "Desired status of the instance. Either \"RUNNING\", \"SUSPENDED\" or \"TERMINATED\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "enable_display": {
+      "description": "Whether the instance has virtual displays enabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "hostname": {
+      "description": "A custom hostname for the instance. Must be a fully qualified DNS name and RFC-1035-valid. Valid format is a series of labels 1-63 characters long matching the regular expression [a-z]([-a-z0-9]*[a-z0-9]), concatenated with periods. The entire hostname must not exceed 253 characters. Changing this forces a new resource to be created.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "key_revocation_action_type": {
+      "description": "Action to be taken when a customer's encryption key is revoked. Supports \"STOP\" and \"NONE\", with \"NONE\" being the default.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "A set of key/value label pairs assigned to the instance.\n\n\t\t\t\t**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\n\t\t\t\tPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "machine_type": {
+      "description": "The machine type to create.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "metadata": {
+      "description": "Metadata key/value pairs made available within the instance.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "metadata_startup_script": {
+      "description": "Metadata startup scripts made available within the instance.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "min_cpu_platform": {
+      "description": "The minimum CPU platform specified for the VM instance.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "name": {
+      "description": "The name of the instance. One of name or self_link must be provided.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If self_link is provided, this value is ignored. If neither self_link nor project are provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "resource_policies": {
+      "description": "A list of self_links of resource policies to attach to the instance. Currently a max of 1 resource policy is supported.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_instance_template": {
+      "description": "Name or self link of an instance template to create the instance based on.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "tags": {
+      "description": "The list of tags attached to the instance.",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "zone": {
+      "description": "The zone of the instance. If self_link is provided, this value is ignored. If neither self_link nor zone are provided, the provider zone is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "advanced_machine_features": {
+      "type": "block",
+      "description": "Controls for advanced machine-related behavior features.",
+      "required": false
+    },
+    "advanced_machine_features.enable_nested_virtualization": {
+      "description": "Whether to enable nested virtualization or not.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "advanced_machine_features.enable_uefi_networking": {
+      "description": "Whether to enable UEFI networking for the instance.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "advanced_machine_features.performance_monitoring_unit": {
+      "description": "The PMU is a hardware component within the CPU core that monitors how the processor runs code. Valid values for the level of PMU are \"STANDARD\", \"ENHANCED\", and \"ARCHITECTURAL\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "advanced_machine_features.threads_per_core": {
+      "description": "The number of threads per physical core. To disable simultaneous multithreading (SMT) set this to 1. If unset, the maximum number of threads supported per core by the underlying processor is assumed.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "advanced_machine_features.turbo_mode": {
+      "description": "Turbo frequency mode to use for the instance. Currently supported modes is \"ALL_CORE_MAX\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "advanced_machine_features.visible_core_count": {
+      "description": "The number of physical cores to expose to an instance. Multiply by the number of threads per core to compute the total number of virtual CPUs to expose to the instance. If unset, the number of cores is inferred from the instance\\'s nominal CPU count and the underlying platform\\'s SMT width.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "attached_disk": {
+      "type": "block",
+      "description": "List of disks attached to the instance",
+      "required": false
+    },
+    "attached_disk.device_name": {
+      "description": "Name with which the attached disk is accessible under /dev/disk/by-id/",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "attached_disk.disk_encryption_key_raw": {
+      "description": "A 256-bit customer-supplied encryption key, encoded in RFC 4648 base64 to encrypt this disk. Only one of kms_key_self_link, disk_encryption_key_rsa and disk_encryption_key_raw may be set.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "attached_disk.disk_encryption_key_rsa": {
+      "description": "Specifies an RFC 4648 base64 encoded, RSA-wrapped 2048-bit customer-supplied encryption key to either encrypt or decrypt this resource. Only one of kms_key_self_link, disk_encryption_key_rsa and disk_encryption_key_raw may be set.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "attached_disk.disk_encryption_service_account": {
+      "description": "The service account being used for the encryption request for the given KMS key. If absent, the Compute Engine default service account is used",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "attached_disk.force_attach": {
+      "description": "Whether to force attach the regional disk even if it's currently attached to another instance. If you try to force attach a zonal disk to an instance, you will receive an error. Setting this parameter cause VM recreation.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "attached_disk.kms_key_self_link": {
+      "description": "The self_link of the encryption key that is stored in Google Cloud KMS to encrypt this disk. Only one of kms_key_self_link, disk_encryption_key_rsa and disk_encryption_key_raw may be set.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "attached_disk.mode": {
+      "description": "Read/write mode for the disk. One of \"READ_ONLY\" or \"READ_WRITE\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "attached_disk.source": {
+      "description": "The name or self_link of the disk attached to this instance.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk": {
+      "type": "block",
+      "description": "The boot disk for the instance.",
+      "required": false
+    },
+    "boot_disk.auto_delete": {
+      "description": "Whether the disk will be auto-deleted when the instance is deleted.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.device_name": {
+      "description": "Name with which attached disk will be accessible under /dev/disk/by-id/",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.disk_encryption_key_raw": {
+      "description": "A 256-bit customer-supplied encryption key, encoded in RFC 4648 base64 to encrypt this disk. Only one of kms_key_self_link, disk_encryption_key_raw and disk_encryption_key_rsa may be set.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.disk_encryption_key_rsa": {
+      "description": "Specifies an RFC 4648 base64 encoded, RSA-wrapped 2048-bit customer-supplied encryption key to either encrypt or decrypt this resource. Only one of kms_key_self_link, disk_encryption_key_raw and disk_encryption_key_rsa may be set.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.disk_encryption_service_account": {
+      "description": "The service account being used for the encryption request for the given KMS key. If absent, the Compute Engine default service account is used",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.force_attach": {
+      "description": "Whether to force attach the regional disk even if it's currently attached to another instance. If you try to force attach a zonal disk to an instance, you will receive an error. Setting this parameter cause VM recreation.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.guest_os_features": {
+      "description": "A list of features to enable on the guest operating system. Applicable only for bootable images.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.interface": {
+      "description": "The disk interface used for attaching this disk. One of SCSI or NVME. (This field is shared with attached_disk and only used for specific cases, please don't specify this field without advice from Google.)",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.kms_key_self_link": {
+      "description": "The self_link of the encryption key that is stored in Google Cloud KMS to encrypt this disk. Only one of kms_key_self_link, disk_encryption_key_raw and disk_encryption_key_rsa may be set.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.mode": {
+      "description": "Read/write mode for the disk. One of \"READ_ONLY\" or \"READ_WRITE\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.source": {
+      "description": "The name or self_link of the disk attached to this instance.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.initialize_params": {
+      "type": "block",
+      "description": "Parameters with which a disk was created alongside the instance.",
+      "required": false
+    },
+    "boot_disk.initialize_params.architecture": {
+      "description": "The architecture of the disk. One of \"X86_64\" or \"ARM64\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.initialize_params.enable_confidential_compute": {
+      "description": "A flag to enable confidential compute mode on boot disk",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.initialize_params.image": {
+      "description": "The image from which this disk was initialised.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.initialize_params.labels": {
+      "description": "A set of key/value label pairs assigned to the disk.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.initialize_params.provisioned_iops": {
+      "description": "Indicates how many IOPS to provision for the disk. This sets the number of I/O operations per second that the disk can handle.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.initialize_params.provisioned_throughput": {
+      "description": "Indicates how much throughput to provision for the disk. This sets the number of throughput mb per second that the disk can handle.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.initialize_params.replica_zones": {
+      "description": "A list of short names or self_links of zones in which to create a regional disk.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.initialize_params.resource_manager_tags": {
+      "description": "A map of resource manager tags. Resource manager tag keys and values have the same definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id}, and values are in the format tagValues/456. The field is ignored (both PUT & PATCH) when empty.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.initialize_params.resource_policies": {
+      "description": "A list of self_links of resource policies to attach to the instance's boot disk. Modifying this list will cause the instance to recreate. Currently a max of 1 resource policy is supported.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.initialize_params.size": {
+      "description": "The size of the image in gigabytes.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.initialize_params.snapshot": {
+      "description": "The snapshot from which this disk was initialised.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.initialize_params.storage_pool": {
+      "description": "The URL of the storage pool in which the new disk is created",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.initialize_params.type": {
+      "description": "The Google Compute Engine disk type. Such as pd-standard, pd-ssd or pd-balanced.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.initialize_params.source_image_encryption_key": {
+      "type": "block",
+      "description": "The encryption key used to decrypt the source image.",
+      "required": false
+    },
+    "boot_disk.initialize_params.source_image_encryption_key.kms_key_self_link": {
+      "description": "The self link of the encryption key that is stored in Google Cloud KMS. Only one of kms_key_self_link, rsa_encrypted_key and raw_key may be set.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.initialize_params.source_image_encryption_key.kms_key_service_account": {
+      "description": "The service account being used for the encryption request for the given KMS key. If absent, the Compute Engine default service account is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.initialize_params.source_image_encryption_key.raw_key": {
+      "description": "Specifies a 256-bit customer-supplied encryption key, encoded in RFC 4648 base64 to either encrypt or decrypt this resource. Only one of kms_key_self_link, rsa_encrypted_key and raw_key may be set.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.initialize_params.source_image_encryption_key.rsa_encrypted_key": {
+      "description": "Specifies an RFC 4648 base64 encoded, RSA-wrapped 2048-bit customer-supplied encryption key to either encrypt or decrypt this resource. Only one of kms_key_self_link, rsa_encrypted_key and raw_key may be set.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.initialize_params.source_snapshot_encryption_key": {
+      "type": "block",
+      "description": "The encryption key used to decrypt the source snapshot.",
+      "required": false
+    },
+    "boot_disk.initialize_params.source_snapshot_encryption_key.kms_key_self_link": {
+      "description": "The self link of the encryption key that is stored in Google Cloud KMS. Only one of kms_key_self_link, rsa_encrypted_key and raw_key may be set.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.initialize_params.source_snapshot_encryption_key.kms_key_service_account": {
+      "description": "The service account being used for the encryption request for the given KMS key. If absent, the Compute Engine default service account is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.initialize_params.source_snapshot_encryption_key.raw_key": {
+      "description": "Specifies a 256-bit customer-supplied encryption key, encoded in RFC 4648 base64 to either encrypt or decrypt this resource. Only one of kms_key_self_link, rsa_encrypted_key and raw_key may be set.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boot_disk.initialize_params.source_snapshot_encryption_key.rsa_encrypted_key": {
+      "description": "Specifies an RFC 4648 base64 encoded, RSA-wrapped 2048-bit customer-supplied encryption key to either encrypt or decrypt this resource. Only one of kms_key_self_link, rsa_encrypted_key and raw_key may be set.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "confidential_instance_config": {
+      "type": "block",
+      "description": "The Confidential VM config being used by the instance.  on_host_maintenance has to be set to TERMINATE or this will fail to create.",
+      "required": false
+    },
+    "confidential_instance_config.confidential_instance_type": {
+      "description": "\n\t\t\t\t\t\t\t\tThe confidential computing technology the instance uses.\n\t\t\t\t\t\t\t\tSEV is an AMD feature. TDX is an Intel feature. One of the following\n\t\t\t\t\t\t\t\tvalues is required: SEV, SEV_SNP, TDX. If SEV_SNP, min_cpu_platform =\n\t\t\t\t\t\t\t\t\"AMD Milan\" is currently required.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "confidential_instance_config.enable_confidential_compute": {
+      "description": "Defines whether the instance should have confidential compute enabled. Field will be deprecated in a future release",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "guest_accelerator": {
+      "type": "block",
+      "description": "List of the type and count of accelerator cards attached to the instance.",
+      "required": false
+    },
+    "guest_accelerator.count": {
+      "description": "The number of the guest accelerator cards exposed to this instance.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "guest_accelerator.type": {
+      "description": "The accelerator type resource exposed to this instance. E.g. nvidia-tesla-k80.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "instance_encryption_key": {
+      "type": "block",
+      "description": "Encryption key used to provide data encryption on the given instance.",
+      "required": false
+    },
+    "instance_encryption_key.kms_key_self_link": {
+      "description": "The self link of the encryption key that is stored in Google Cloud KMS.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "instance_encryption_key.kms_key_service_account": {
+      "description": "The service account being used for the encryption request for the given KMS key. If absent, the Compute Engine default service account is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_interface": {
+      "type": "block",
+      "description": "The networks attached to the instance.",
+      "required": false
+    },
+    "network_interface.igmp_query": {
+      "description": "Indicates whether igmp query is enabled on the network interface or not. If enabled, also indicates the version of IGMP supported.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_interface.network": {
+      "description": "The name or self_link of the network attached to this interface.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_interface.network_attachment": {
+      "description": "The URL of the network attachment that this interface should connect to in the following format: projects/{projectNumber}/regions/{region_name}/networkAttachments/{network_attachment_name}.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_interface.network_ip": {
+      "description": "The private IP address assigned to the instance.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_interface.nic_type": {
+      "description": "The type of vNIC to be used on this interface. Possible values:GVNIC, VIRTIO_NET, IDPF, MRDMA, IRDMA and IDPF",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_interface.queue_count": {
+      "description": "The networking queue count that's specified by users for the network interface. Both Rx and Tx queues will be set to this number. It will be empty if not specified.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_interface.stack_type": {
+      "description": "The stack type for this network interface to identify whether the IPv6 feature is enabled or not. If not specified, IPV4_ONLY will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_interface.subnetwork": {
+      "description": "The name or self_link of the subnetwork attached to this interface.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_interface.subnetwork_project": {
+      "description": "The project in which the subnetwork belongs.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_interface.vlan": {
+      "description": "VLAN tag of a dynamic network interface, must be an integer in the range from 2 to 255 inclusively.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_interface.access_config": {
+      "type": "block",
+      "description": "Access configurations, i.e. IPs via which this instance can be accessed via the Internet.",
+      "required": false
+    },
+    "network_interface.access_config.nat_ip": {
+      "description": "The IP address that is be 1:1 mapped to the instance's network ip.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_interface.access_config.network_tier": {
+      "description": "The networking tier used for configuring this instance. One of PREMIUM or STANDARD.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_interface.access_config.public_ptr_domain_name": {
+      "description": "The DNS domain name for the public PTR record.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_interface.alias_ip_range": {
+      "type": "block",
+      "description": "An array of alias IP ranges for this network interface.",
+      "required": false
+    },
+    "network_interface.alias_ip_range.ip_cidr_range": {
+      "description": "The IP CIDR range represented by this alias IP range.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_interface.alias_ip_range.subnetwork_range_name": {
+      "description": "The subnetwork secondary range name specifying the secondary range from which to allocate the IP CIDR range for this alias IP range.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_interface.ipv6_access_config": {
+      "type": "block",
+      "description": "An array of IPv6 access configurations for this interface. Currently, only one IPv6 access config, DIRECT_IPV6, is supported. If there is no ipv6AccessConfig specified, then this instance will have no external IPv6 Internet access.",
+      "required": false
+    },
+    "network_interface.ipv6_access_config.external_ipv6": {
+      "description": "The first IPv6 address of the external IPv6 range associated with this instance, prefix length is stored in externalIpv6PrefixLength in ipv6AccessConfig. To use a static external IP address, it must be unused and in the same region as the instance's zone. If not specified, Google Cloud will automatically assign an external IPv6 address from the instance's subnetwork.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_interface.ipv6_access_config.external_ipv6_prefix_length": {
+      "description": "The prefix length of the external IPv6 range.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_interface.ipv6_access_config.name": {
+      "description": "The name of this access configuration. In ipv6AccessConfigs, the recommended name is External IPv6.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_interface.ipv6_access_config.network_tier": {
+      "description": "The service-level to be provided for IPv6 traffic when the subnet has an external subnet. Only PREMIUM tier is valid for IPv6",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_interface.ipv6_access_config.public_ptr_domain_name": {
+      "description": "The domain name to be used when creating DNSv6 records for the external IPv6 ranges.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_performance_config": {
+      "type": "block",
+      "description": "Configures network performance settings for the instance. If not specified, the instance will be created with its default network performance configuration.",
+      "required": false
+    },
+    "network_performance_config.total_egress_bandwidth_tier": {
+      "description": "The egress bandwidth tier to enable. Possible values:TIER_1, DEFAULT",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "params": {
+      "type": "block",
+      "description": "Stores additional params passed with the request, but not persisted as part of resource payload.",
+      "required": false
+    },
+    "params.resource_manager_tags": {
+      "description": "A map of resource manager tags. Resource manager tag keys and values have the same definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id}, and values are in the format tagValues/456. The field is ignored (both PUT & PATCH) when empty.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "reservation_affinity": {
+      "type": "block",
+      "description": "Specifies the reservations that this instance can consume from.",
+      "required": false
+    },
+    "reservation_affinity.type": {
+      "description": "The type of reservation from which this instance can consume resources.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "reservation_affinity.specific_reservation": {
+      "type": "block",
+      "description": "Specifies the label selector for the reservation to use.",
+      "required": false
+    },
+    "reservation_affinity.specific_reservation.key": {
+      "description": "Corresponds to the label key of a reservation resource. To target a SPECIFIC_RESERVATION by name, specify compute.googleapis.com/reservation-name as the key and specify the name of your reservation as the only value.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "reservation_affinity.specific_reservation.values": {
+      "description": "Corresponds to the label values of a reservation resource.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "scheduling": {
+      "type": "block",
+      "description": "The scheduling strategy being used by the instance.",
+      "required": false
+    },
+    "scheduling.automatic_restart": {
+      "description": "Specifies if the instance should be restarted if it was terminated by Compute Engine (not a user).",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "scheduling.availability_domain": {
+      "description": "Specifies the availability domain, which this instance should be scheduled on.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "scheduling.instance_termination_action": {
+      "description": "Specifies the action GCE should take when SPOT VM is preempted.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "scheduling.min_node_cpus": {
+      "description": "The minimum number of virtual CPUs this instance will consume when running on a sole-tenant node.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "scheduling.on_host_maintenance": {
+      "description": "Describes maintenance behavior for the instance. One of MIGRATE or TERMINATE,",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "scheduling.preemptible": {
+      "description": "Whether the instance is preemptible.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "scheduling.provisioning_model": {
+      "description": "Whether the instance is spot. If this is set as SPOT.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "scheduling.termination_time": {
+      "description": "Specifies the timestamp, when the instance will be terminated,\nin RFC3339 text format. If specified, the instance termination action\nwill be performed at the termination time.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "scheduling.local_ssd_recovery_timeout": {
+      "type": "block",
+      "description": "Specifies the maximum amount of time a Local Ssd Vm should wait while\n  recovery of the Local Ssd state is attempted. Its value should be in\n  between 0 and 168 hours with hour granularity and the default value being 1\n  hour.",
+      "required": false
+    },
+    "scheduling.local_ssd_recovery_timeout.nanos": {
+      "description": "Span of time that's a fraction of a second at nanosecond\nresolution. Durations less than one second are represented\nwith a 0 seconds field and a positive nanos field. Must\nbe from 0 to 999,999,999 inclusive.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "scheduling.local_ssd_recovery_timeout.seconds": {
+      "description": "Span of time at a resolution of a second.\nMust be from 0 to 315,576,000,000 inclusive.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "scheduling.max_run_duration": {
+      "type": "block",
+      "description": "The timeout for new network connections to hosts.",
+      "required": false
+    },
+    "scheduling.max_run_duration.nanos": {
+      "description": "Span of time that's a fraction of a second at nanosecond\nresolution. Durations less than one second are represented\nwith a 0 seconds field and a positive nanos field. Must\nbe from 0 to 999,999,999 inclusive.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "scheduling.max_run_duration.seconds": {
+      "description": "Span of time at a resolution of a second.\nMust be from 0 to 315,576,000,000 inclusive.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "scheduling.node_affinities": {
+      "type": "block",
+      "description": "Specifies node affinities or anti-affinities to determine which sole-tenant nodes your instances and managed instance groups will use as host systems.",
+      "required": false
+    },
+    "scheduling.node_affinities.key": {
+      "description": "Corresponds to the label key of a reservation resource. To target a SPECIFIC_RESERVATION by name, specify compute.googleapis.com/reservation-name as the key and specify the name of your reservation as the only value.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "scheduling.node_affinities.operator": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "scheduling.node_affinities.values": {
+      "description": "Corresponds to the label values of a reservation resource.",
+      "required": true,
+      "type": "set(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "scheduling.on_instance_stop_action": {
+      "type": "block",
+      "description": "Defines the behaviour for instances with the instance_termination_action.",
+      "required": false
+    },
+    "scheduling.on_instance_stop_action.discard_local_ssd": {
+      "description": "If true, the contents of any attached Local SSD disks will be discarded.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "scratch_disk": {
+      "type": "block",
+      "description": "The scratch disks attached to the instance.",
+      "required": false
+    },
+    "scratch_disk.device_name": {
+      "description": "Name with which the attached disk is accessible under /dev/disk/by-id/",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "scratch_disk.interface": {
+      "description": "The disk interface used for attaching this disk. One of SCSI or NVME.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "scratch_disk.size": {
+      "description": "The size of the disk in gigabytes. One of 375 or 3000.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "service_account": {
+      "type": "block",
+      "description": "The service account to attach to the instance.",
+      "required": false
+    },
+    "service_account.email": {
+      "description": "The service account e-mail address.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "service_account.scopes": {
+      "description": "A list of service scopes.",
+      "required": true,
+      "type": "set(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "shielded_instance_config": {
+      "type": "block",
+      "description": "The shielded vm config being used by the instance.",
+      "required": false
+    },
+    "shielded_instance_config.enable_integrity_monitoring": {
+      "description": "Whether integrity monitoring is enabled for the instance.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "shielded_instance_config.enable_secure_boot": {
+      "description": "Whether secure boot is enabled for the instance.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "shielded_instance_config.enable_vtpm": {
+      "description": "Whether the instance uses vTPM.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

@@ -1,0 +1,352 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "This field uses a custom implementation please refer to documentation under /hashicorp/terraform-provider-google-beta/website/docs/r/vertex_ai_reasoning_engine.html.markdown for specifics",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "The description of the ReasoningEngine.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "The display name of the ReasoningEngine.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "The labels associated with this ReasoningEngine. You can use these to\norganize and group your ReasoningEngines.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "region": {
+      "description": "The region of the reasoning engine. eg us-central1",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "encryption_spec": {
+      "type": "block",
+      "description": "Optional. Customer-managed encryption key spec for a ReasoningEngine.\nIf set, this ReasoningEngine and all sub-resources of this ReasoningEngine\nwill be secured by this key.",
+      "required": false
+    },
+    "encryption_spec.kms_key_name": {
+      "description": "Required. The Cloud KMS resource identifier of the customer managed\nencryption key used to protect a resource. Has the form:\nprojects/my-project/locations/my-region/keyRings/my-kr/cryptoKeys/my-key.\nThe key needs to be in the same region as where the compute resource\nis created.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec": {
+      "type": "block",
+      "description": "Optional. Configurations of the ReasoningEngine.",
+      "required": false
+    },
+    "spec.agent_framework": {
+      "description": "Optional. The OSS agent framework used to develop the agent.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.class_methods": {
+      "description": "Optional. Declarations for object class methods in OpenAPI\nspecification format.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.identity_type": {
+      "description": "Optional. The identity type to use for the Reasoning Engine.\nIf not specified, the 'service_account' field will be used if set,\notherwise the default Vertex AI Reasoning Engine Service Agent in the project will be used.\nPossible values:\n* 'SERVICE_ACCOUNT': Use a custom service account if the 'service_account' field is set, otherwise use the default Vertex AI Reasoning Engine Service Agent in the project.\n* 'AGENT_IDENTITY': Use Agent Identity. The 'service_account' field must not be set. Possible values: [\"SERVICE_ACCOUNT\", \"AGENT_IDENTITY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.service_account": {
+      "description": "Optional. The service account that the Reasoning Engine artifact runs\nas. It should have \"roles/storage.objectViewer\" for reading the user\nproject's Cloud Storage and \"roles/aiplatform.user\" for using Vertex\nextensions. If not specified, the Vertex AI Reasoning Engine service\nAgent in the project will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.container_spec": {
+      "type": "block",
+      "description": "Deploy from a container image with a defined entrypoint and commands.",
+      "required": false
+    },
+    "spec.container_spec.image_uri": {
+      "description": "The Artifact Registry Docker image URI (e.g.,\n'us-central1-docker.pkg.dev/my-project/my-repo/my-image:tag') of the\ncontainer image that is to be run on each worker replica.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.deployment_spec": {
+      "type": "block",
+      "description": "Optional. The specification of a Reasoning Engine deployment.",
+      "required": false
+    },
+    "spec.deployment_spec.container_concurrency": {
+      "description": "Optional. Concurrency for each container and agent server.\nRecommended value: 2 * cpu + 1. Defaults to 9.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.deployment_spec.max_instances": {
+      "description": "Optional. The maximum number of application instances that can be\nlaunched to handle increased traffic. Defaults to 100.\nRange: [1, 1000]. If VPC-SC or PSC-I is enabled, the acceptable\nrange is [1, 100].",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.deployment_spec.min_instances": {
+      "description": "Optional. The minimum number of application instances that will be\nkept running at all times. Defaults to 1. Range: [0, 10].",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.deployment_spec.resource_limits": {
+      "description": "Optional. Resource limits for each container.\nOnly 'cpu' and 'memory' keys are supported.\n\nDefaults to {\"cpu\": \"4\", \"memory\": \"4Gi\"}.\n\nThe only supported values for CPU are '1', '2', '4', '6' and '8'.\nFor more information, go to\nhttps://cloud.google.com/run/docs/configuring/cpu.\n\nThe only supported values for memory are '1Gi', '2Gi', ... '32 Gi'.\nFor more information, go to\nhttps://cloud.google.com/run/docs/configuring/memory-limits.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.deployment_spec.env": {
+      "type": "block",
+      "description": "Optional. Environment variables to be set with the Reasoning\nEngine deployment.",
+      "required": false
+    },
+    "spec.deployment_spec.env.name": {
+      "description": "The name of the environment variable. Must be a valid\nC identifier.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.deployment_spec.env.value": {
+      "description": "Variables that reference a $(VAR_NAME) are expanded using\nthe previous defined environment variables in the container\nand any service environment variables. If a variable cannot\nbe resolved, the reference in the input string will be\nunchanged. The $(VAR_NAME) syntax can be escaped with a\ndouble $$, ie: $$(VAR_NAME). Escaped references will never\nbe expanded, regardless of whether the variable exists\nor not.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.deployment_spec.psc_interface_config": {
+      "type": "block",
+      "description": "Optional. Configuration for PSC-Interface.",
+      "required": false
+    },
+    "spec.deployment_spec.psc_interface_config.network_attachment": {
+      "description": "Optional. The name of the Compute Engine network attachment\nto attach to the resource within the region and user project.\nTo specify this field, you must have already created a network attachment.\nThis field is only used for resources using PSC-Interface.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.deployment_spec.psc_interface_config.dns_peering_configs": {
+      "type": "block",
+      "description": "Optional. DNS peering configurations.\nWhen specified, Vertex AI will attempt to configure DNS\npeering zones in the tenant project VPC to resolve the\nspecified domains using the target network's Cloud DNS.\nThe user must grant the dns.peer role to the Vertex AI\nservice Agent on the target project.",
+      "required": false
+    },
+    "spec.deployment_spec.psc_interface_config.dns_peering_configs.domain": {
+      "description": "Required. The DNS name suffix of the zone being peered\nto, e.g., \"my-internal-domain.corp.\".\nMust end with a dot.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.deployment_spec.psc_interface_config.dns_peering_configs.target_network": {
+      "description": "Required. The VPC network name in the targetProject\nwhere the DNS zone specified by 'domain' is visible.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.deployment_spec.psc_interface_config.dns_peering_configs.target_project": {
+      "description": "Required. The project id hosting the Cloud DNS managed\nzone that contains the 'domain'.\nThe Vertex AI service Agent requires the dns.peer role\non this project.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.deployment_spec.secret_env": {
+      "type": "block",
+      "description": "Optional. Environment variables where the value is a secret in\nCloud Secret Manager. To use this feature, add 'Secret Manager\nSecret Accessor' role (roles/secretmanager.secretAccessor) to AI\nPlatform Reasoning Engine service Agent.",
+      "required": false
+    },
+    "spec.deployment_spec.secret_env.name": {
+      "description": "The name of the environment variable. Must be a valid C\nidentifier.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.deployment_spec.secret_env.secret_ref": {
+      "type": "block",
+      "description": "Reference to a secret stored in the Cloud Secret Manager\nthat will provide the value for this environment variable.",
+      "required": true
+    },
+    "spec.deployment_spec.secret_env.secret_ref.secret": {
+      "description": "The name of the secret in Cloud Secret Manager.\nFormat: {secret_name}.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.deployment_spec.secret_env.secret_ref.version": {
+      "description": "The Cloud Secret Manager secret version. Can be 'latest'\nfor the latest version, an integer for a specific\nversion, or a version alias.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.package_spec": {
+      "type": "block",
+      "description": "Optional. User provided package spec of the ReasoningEngine.\nIgnored when users directly specify a deployment image through\ndeploymentSpec.first_party_image_override, but keeping the\nfield_behavior to avoid introducing breaking changes.",
+      "required": false
+    },
+    "spec.package_spec.dependency_files_gcs_uri": {
+      "description": "Optional. The Cloud Storage URI of the dependency files in tar.gz\nformat.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.package_spec.pickle_object_gcs_uri": {
+      "description": "Optional. The Cloud Storage URI of the pickled python object.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.package_spec.python_version": {
+      "description": "Optional. The Python version. Currently support 3.8, 3.9, 3.10,\n3.11, 3.12, 3.13. If not specified, default value is 3.10.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.package_spec.requirements_gcs_uri": {
+      "description": "Optional. The Cloud Storage URI of the requirements.txtfile",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.source_code_spec": {
+      "type": "block",
+      "description": "Specification for deploying from source code.",
+      "required": false
+    },
+    "spec.source_code_spec.developer_connect_source": {
+      "type": "block",
+      "description": "Specification for source code to be fetched from a Git repository managed through the Developer Connect service.",
+      "required": false
+    },
+    "spec.source_code_spec.developer_connect_source.config": {
+      "type": "block",
+      "description": "The Developer Connect configuration that defines the specific repository, revision, and directory to use as the source code root.",
+      "required": true
+    },
+    "spec.source_code_spec.developer_connect_source.config.dir": {
+      "description": "Directory, relative to the source root, in which to run the build.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.source_code_spec.developer_connect_source.config.git_repository_link": {
+      "description": "The Developer Connect Git repository link, formatted as projects/*/locations/*/connections/*/gitRepositoryLink/*.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.source_code_spec.developer_connect_source.config.revision": {
+      "description": "The revision to fetch from the Git repository such as a branch, a tag, a commit SHA, or any Git ref.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.source_code_spec.image_spec": {
+      "type": "block",
+      "description": "Configuration for building an image with custom config file.",
+      "required": false
+    },
+    "spec.source_code_spec.image_spec.build_args": {
+      "description": "Build arguments to be used. They will be passed through --build-arg flags.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.source_code_spec.inline_source": {
+      "type": "block",
+      "description": "Source code is provided directly in the request.",
+      "required": false
+    },
+    "spec.source_code_spec.inline_source.source_archive": {
+      "description": "Required. Input only.\nThe application source code archive, provided as a compressed\ntarball (.tar.gz) file. A base64-encoded string.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.source_code_spec.python_spec": {
+      "type": "block",
+      "description": "Specification for running a Python application from source.",
+      "required": false
+    },
+    "spec.source_code_spec.python_spec.entrypoint_module": {
+      "description": "Optional. The Python module to load as the entrypoint,\nspecified as a fully qualified module name. For example:\npath.to.agent. If not specified, defaults to \"agent\".\nThe project root will be added to Python sys.path, allowing\nimports to be specified relative to the root.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.source_code_spec.python_spec.entrypoint_object": {
+      "description": "Optional. The name of the callable object within the\nentrypointModule to use as the application If not specified,\ndefaults to \"root_agent\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.source_code_spec.python_spec.requirements_file": {
+      "description": "Optional. The path to the requirements file, relative to the\nsource root. If not specified, defaults to \"requirements.txt\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spec.source_code_spec.python_spec.version": {
+      "description": "Optional. The version of Python to use. Support version\nincludes 3.9, 3.10, 3.11, 3.12, 3.13. If not specified,\ndefault value is 3.10.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

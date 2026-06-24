@@ -1,0 +1,53 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "bucket": {
+      "description": "The bucket to which the linked dataset is attached.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This identifies which logging bucket is linked to BigQuery. It determines which logs become queryable in BigQuery but has no direct security impact on access controls or encryption."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "Describes this link. The maximum length of the description is 8000 characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Description is metadata only and does not affect any security controls."
+    },
+    "link_id": {
+      "description": "The id of the linked dataset.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The link ID is used to generate the BigQuery dataset name and has no direct security implications beyond uniqueness."
+    },
+    "location": {
+      "description": "The location of the linked dataset.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "parent": {
+      "description": "The parent of the linked dataset.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Parent identifies the parent resource hierarchy. Has no direct security impact on the linked dataset."
+    },
+    "bigquery_dataset": {
+      "type": "block",
+      "description": "The information of a BigQuery Dataset. When a link is created, a BigQuery dataset is created along\nwith it, in the same project as the LogBucket it's linked to. This dataset will also have BigQuery\nViews corresponding to the LogViews in the bucket.",
+      "required": false
+    }
+  }
+}

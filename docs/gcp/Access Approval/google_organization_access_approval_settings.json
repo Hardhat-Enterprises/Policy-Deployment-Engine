@@ -1,0 +1,53 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "active_key_version": {
+      "description": "The asymmetric crypto key version to use for signing approval requests.\nEmpty active_key_version indicates that a Google-managed key should be used for signing.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "notification_emails": {
+      "description": "A list of email addresses to which notifications relating to approval requests should be sent.\nNotifications relating to a resource will be sent to all emails in the settings of ancestor\nresources of that resource. A maximum of 50 email addresses are allowed.",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "organization_id": {
+      "description": "ID of the organization of the access approval settings.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "enrolled_services": {
+      "type": "block",
+      "description": "A list of Google Cloud Services for which the given resource has Access Approval enrolled.\nAccess requests for the resource given by name against any of these services contained here will be required\nto have explicit approval. Enrollment can be done for individual services.\n\nA maximum of 10 enrolled services will be enforced, to be expanded as the set of supported services is expanded.",
+      "required": true
+    },
+    "enrolled_services.cloud_product": {
+      "description": "The product for which Access Approval will be enrolled. Allowed values are listed (case-sensitive):\n  all\n  appengine.googleapis.com\n  bigquery.googleapis.com\n  bigtable.googleapis.com\n  cloudkms.googleapis.com\n  compute.googleapis.com\n  dataflow.googleapis.com\n  iam.googleapis.com\n  pubsub.googleapis.com\n  storage.googleapis.com",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": "Allow access to Google services depending on the organization."
+    },
+    "enrolled_services.enrollment_level": {
+      "description": "The enrollment level of the service. Default value: \"BLOCK_ALL\" Possible values: [\"BLOCK_ALL\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": "Ensure default value is already assigned to the enrollment level."
+    }
+  }
+}

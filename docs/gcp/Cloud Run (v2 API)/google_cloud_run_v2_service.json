@@ -1,0 +1,1024 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "annotations": {
+      "description": "Unstructured key value map that may be set by external tools to store and arbitrary metadata. They are not queryable and should be preserved when modifying objects.\n\nCloud Run API v2 does not support annotations with 'run.googleapis.com', 'cloud.googleapis.com', 'serving.knative.dev', or 'autoscaling.knative.dev' namespaces, and they will be rejected in new resources.\nAll system annotations in v1 now have a corresponding field in v2 Service.\n\nThis field follows Kubernetes annotations' namespacing, limits, and rules.\n\n**Note**: This field is non-authoritative, and will only manage the annotations present in your configuration.\nPlease refer to the field 'effective_annotations' for all of the annotations present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "This field stores metadata and does not influence security or runtime behavior."
+    },
+    "client": {
+      "description": "Arbitrary identifier for the API client.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is just an identifier for the API client and has no impact on security."
+    },
+    "client_version": {
+      "description": "Arbitrary version identifier for the API client.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This only tracks version info and does not affect any security controls."
+    },
+    "custom_audiences": {
+      "description": "One or more custom audiences that you want this service to support. Specify each custom audience as the full URL in a string. The custom audiences are encoded in the token and used to authenticate requests.\nFor more information, see https://cloud.google.com/run/docs/configuring/custom-audiences.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "This field defines audiences for tokens but does not directly enforce or bypass security controls."
+    },
+    "default_uri_disabled": {
+      "description": "Disables public resolution of the default URI of this service.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Disables public resolution of the service's default run.app URI. Enforcing it 'disabled' removes an always-public entry point and forces access through controlled ingress/load balancers, reducing public exposure; the current call understates that this is an exposure control."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_protection": {
+      "description": "Whether Terraform will be prevented from destroying the service. Defaults to true.\nWhen a'terraform destroy' or 'terraform apply' would delete the service,\nthe command will fail if this field is not set to false in Terraform state.\nWhen the field is set to true or unset in Terraform state, a 'terraform apply'\nor 'terraform destroy' that would delete the service will fail.\nWhen the field is set to false, deleting the service is allowed.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Prevents accidental or unauthorized deletion of Cloud Run services by enforcing deletion protection."
+    },
+    "description": {
+      "description": "User-provided description of the Service. This field currently has a 512-character limit.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This field is just for user-provided text and does not impact security or system behavior."
+    },
+    "iap_enabled": {
+      "description": "Used to enable/disable IAP for the cloud-run service.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Enables/disables Identity-Aware Proxy in front of the Cloud Run service. IAP enforces authenticated, authorized access at the application edge, so a platform policy can require it to be enabled to prevent unauthenticated reach to the service; leaving it off removes that access-control layer."
+    },
+    "ingress": {
+      "description": "Provides the ingress settings for this Service. On output, returns the currently observed ingress settings, or INGRESS_TRAFFIC_UNSPECIFIED if no revision is active. Possible values: [\"INGRESS_TRAFFIC_ALL\", \"INGRESS_TRAFFIC_INTERNAL_ONLY\", \"INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Restricts external access to Cloud Run services to prevent unauthorized exposure and reduce attack surface by limiting inbound traffic sources."
+    },
+    "invoker_iam_disabled": {
+      "description": "Disables IAM permission check for run.routes.invoke for callers of this service. For more information, visit https://cloud.google.com/run/docs/securing/managing-access#invoker_check.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Ensures Cloud Run services require IAM authentication for invocation to prevent unauthorized or public access."
+    },
+    "labels": {
+      "description": "Unstructured key value map that can be used to organize and categorize objects. User-provided labels are shared with Google's billing system, so they can be used to filter, or break down billing charges by team, component,\nenvironment, state, etc. For more information, visit https://docs.cloud.google.com/resource-manager/docs/creating-managing-labels or https://cloud.google.com/run/docs/configuring/labels.\n\nCloud Run API v2 does not support labels with  'run.googleapis.com', 'cloud.googleapis.com', 'serving.knative.dev', or 'autoscaling.knative.dev' namespaces, and they will be rejected.\nAll system labels in v1 now have a corresponding field in v2 Service.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "This field is used for organizing resources and does not affect access control or security."
+    },
+    "launch_stage": {
+      "description": "The launch stage as defined by [Google Cloud Platform Launch Stages](https://cloud.google.com/products#product-launch-stages). Cloud Run supports ALPHA, BETA, and GA.\nIf no value is specified, GA is assumed. Set the launch stage to a preview stage on input to allow use of preview features in that stage. On read (or output), describes whether the resource uses preview features.\n\nFor example, if ALPHA is provided as input, but only BETA and GA-level features are used, this field will be BETA on output. Possible values: [\"UNIMPLEMENTED\", \"PRELAUNCH\", \"EARLY_ACCESS\", \"ALPHA\", \"BETA\", \"GA\", \"DEPRECATED\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": "This defines feature maturity level, and restricting it does not influence access control."
+    },
+    "location": {
+      "description": "The location of the cloud run service",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "name": {
+      "description": "Name of the Service.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This field only defines the service name and does not affect security, access control, or data handling."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This just specifies the project context and does not directly impact security."
+    },
+    "binary_authorization": {
+      "type": "block",
+      "description": "Settings for the Binary Authorization feature.",
+      "required": false
+    },
+    "binary_authorization.breakglass_justification": {
+      "description": "If present, indicates to use Breakglass using this justification. If useDefault is False, then it must be empty. For more information on breakglass, see https://cloud.google.com/binary-authorization/docs/using-breakglass",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This only provides a justification string and does not itself enforce or bypass security."
+    },
+    "binary_authorization.policy": {
+      "description": "The path to a binary authorization policy. Format: projects/{project}/platforms/cloudRun/{policy-name}",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This references a policy but does not directly change enforcement behavior."
+    },
+    "binary_authorization.use_default": {
+      "description": "If True, indicates to use the default project's binary authorization policy. If False, binary authorization will be disabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Ensures only verified and trusted container images are deployed by enforcing Binary Authorization for Cloud Run services."
+    },
+    "build_config": {
+      "type": "block",
+      "description": "Configuration for building a Cloud Run function.",
+      "required": false
+    },
+    "build_config.base_image": {
+      "description": "The base image used to build the function.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This specifies base image and does not itself enforce security policies."
+    },
+    "build_config.enable_automatic_updates": {
+      "description": "Sets whether the function will receive automatic base image updates.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "This controls updates and does not directly affect security."
+    },
+    "build_config.environment_variables": {
+      "description": "User-provided build-time environment variables for the function.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "This defines build-time variables and does not directly enforce security"
+    },
+    "build_config.function_target": {
+      "description": "The name of the function (as defined in source code) that will be executed. Defaults to the resource name suffix, if not specified. For backward compatibility, if function with given name is not found, then the system will try to use function named \"function\".",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is an output-only metadata field and does not influence security."
+    },
+    "build_config.image_uri": {
+      "description": "Artifact Registry URI to store the built image.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This defines where the image is stored and does not directly affect security."
+    },
+    "build_config.service_account": {
+      "description": "Service account to be used for building the container. The format of this field is 'projects/{projectId}/serviceAccounts/{serviceAccountEmail}'.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This defines build identity but is not enforced here as a security control."
+    },
+    "build_config.source_location": {
+      "description": "The Cloud Storage bucket URI where the function source code is located.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This provides metadata about source location and does not affect security."
+    },
+    "build_config.worker_pool": {
+      "description": "Name of the Cloud Build Custom Worker Pool that should be used to build the Cloud Run function. The format of this field is 'projects/{project}/locations/{region}/workerPools/{workerPool}' where {project} and {region} are the project id and region respectively where the worker pool is defined and {workerPool} is the short name of the worker pool.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This selects a worker pool and does not impact security controls directly."
+    },
+    "multi_region_settings": {
+      "type": "block",
+      "description": "Settings for creating a Multi-Region Service. Make sure to use region = 'global' when using them. For more information, visit https://cloud.google.com/run/docs/multiple-regions#deploy",
+      "required": false
+    },
+    "multi_region_settings.regions": {
+      "description": "The list of regions to deploy the multi-region Service.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "scaling": {
+      "type": "block",
+      "description": "Scaling settings that apply to the whole service",
+      "required": false
+    },
+    "scaling.manual_instance_count": {
+      "description": "Total instance count for the service in manual scaling mode. This number of instances is divided among all revisions with specified traffic based on the percent of traffic they are receiving.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "This sets instance count manually and does not affect security."
+    },
+    "scaling.max_instance_count": {
+      "description": "Combined maximum number of instances for all revisions receiving traffic.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "This controls maximum instances and does not affect security."
+    },
+    "scaling.min_instance_count": {
+      "description": "Minimum number of instances for the service, to be divided among all revisions receiving traffic.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "This controls minimum instances and does not affect security."
+    },
+    "scaling.scaling_mode": {
+      "description": "The [scaling mode](https://cloud.google.com/run/docs/reference/rest/v2/projects.locations.services#scalingmode) for the service. Possible values: [\"AUTOMATIC\", \"MANUAL\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This defines scaling behavior and does not impact access control."
+    },
+    "template": {
+      "type": "block",
+      "description": "The template used to create revisions for this Service.",
+      "required": true
+    },
+    "template.annotations": {
+      "description": "Unstructured key value map that may be set by external tools to store and arbitrary metadata. They are not queryable and should be preserved when modifying objects.\n\nCloud Run API v2 does not support annotations with 'run.googleapis.com', 'cloud.googleapis.com', 'serving.knative.dev', or 'autoscaling.knative.dev' namespaces, and they will be rejected.\nAll system annotations in v1 now have a corresponding field in v2 RevisionTemplate.\n\nThis field follows Kubernetes annotations' namespacing, limits, and rules.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "This stores metadata and does not influence security behavior."
+    },
+    "template.encryption_key": {
+      "description": "A reference to a customer managed encryption key (CMEK) to use to encrypt this container image. For more information, go to https://cloud.google.com/run/docs/securing/using-cmek",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Ensures Cloud Run services use approved customer-managed encryption keys (CMEK) from trusted KMS locations to maintain control over data encryption and prevent unauthorized key usage."
+    },
+    "template.execution_environment": {
+      "description": "The sandbox environment to host this Revision. Possible values: [\"EXECUTION_ENVIRONMENT_GEN1\", \"EXECUTION_ENVIRONMENT_GEN2\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This selects runtime environment version and does not directly affect security controls."
+    },
+    "template.gpu_zonal_redundancy_disabled": {
+      "description": "True if GPU zonal redundancy is disabled on this revision.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": "This impacts availability characteristics, and restricting it does not provide any direct security benefit."
+    },
+    "template.health_check_disabled": {
+      "description": "Disables health checking containers during deployment.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.labels": {
+      "description": "Unstructured key value map that can be used to organize and categorize objects. User-provided labels are shared with Google's billing system, so they can be used to filter, or break down billing charges by team, component, environment, state, etc.\nFor more information, visit https://docs.cloud.google.com/resource-manager/docs/creating-managing-labels or https://cloud.google.com/run/docs/configuring/labels.\n\nCloud Run API v2 does not support labels with 'run.googleapis.com', 'cloud.googleapis.com', 'serving.knative.dev', or 'autoscaling.knative.dev' namespaces, and they will be rejected.\nAll system labels in v1 now have a corresponding field in v2 RevisionTemplate.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "This is metadata for organization and does not affect security."
+    },
+    "template.max_instance_request_concurrency": {
+      "description": "Sets the maximum number of requests that each serving instance can receive.\nIf not specified or 0, defaults to 80 when requested CPU >= 1 and defaults to 1 when requested CPU < 1.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "This controls how many requests an instance handles and does not affect security."
+    },
+    "template.revision": {
+      "description": "The unique name for the revision. If this field is omitted, it will be automatically generated based on the Service name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": "This field is only used to assign a name to a revision for tracking deployments and versioning, so it does not introduce any condition where a security policy would need to validate or restrict its value."
+    },
+    "template.service_account": {
+      "description": "Email address of the IAM service account associated with the revision of the service. The service account represents the identity of the running revision, and determines what permissions the revision has. If not provided, the revision will use the project's default service account.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Ensures Cloud Run services use a dedicated least-privileged service account instead of default accounts to reduce risk of excessive permissions and privilege escalation."
+    },
+    "template.session_affinity": {
+      "description": "Enables session affinity. For more information, go to https://cloud.google.com/run/docs/configuring/session-affinity",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": "This controls session routing behavior, and restricting it is not necessary as it does not affect authentication or authorization."
+    },
+    "template.timeout": {
+      "description": "Max allowed time for an instance to respond to a request.\n\nA duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.5s\".",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This only controls request duration and does not impact access control or data security."
+    },
+    "template.containers": {
+      "type": "block",
+      "description": "Holds the containers that define the unit of execution for this Service.",
+      "required": false
+    },
+    "template.containers.args": {
+      "description": "Arguments to the entrypoint. The docker image's CMD is used if this is not provided. Variable references are not supported in Cloud Run.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "This provides arguments and does not impact security."
+    },
+    "template.containers.base_image_uri": {
+      "description": "Base image for this container. If set, it indicates that the service is enrolled into automatic base image update.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This defines base image reference and does not enforce security."
+    },
+    "template.containers.command": {
+      "description": "Entrypoint array. Not executed within a shell. The docker image's ENTRYPOINT is used if this is not provided. Variable references $(VAR_NAME) are expanded using the container's environment. If a variable cannot be resolved, the reference in the input string will be unchanged. The $(VAR_NAME) syntax can be escaped with a double $$, ie: $$(VAR_NAME). Escaped references will never be expanded, regardless of whether the variable exists or not. More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "This defines runtime command and does not directly enforce security"
+    },
+    "template.containers.depends_on": {
+      "description": "Containers which should be started before this container. If specified the container will wait to start until all containers with the listed names are healthy.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "This controls startup order and does not affect security."
+    },
+    "template.containers.image": {
+      "description": "URL of the Container image in Google Container Registry or Google Artifact Registry. More info: https://kubernetes.io/docs/concepts/containers/images",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Ensures Cloud Run services use only approved container images from trusted registries to reduce supply chain and unverified image risks."
+    },
+    "template.containers.name": {
+      "description": "Name of the container specified as a DNS_LABEL.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.working_dir": {
+      "description": "Container's working directory. If not specified, the container runtime's default will be used, which might be configured in the container image.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This sets working directory and does not impact security."
+    },
+    "template.containers.env": {
+      "type": "block",
+      "description": "List of environment variables to set in the container.",
+      "required": false
+    },
+    "template.containers.env.name": {
+      "description": "Name of the environment variable. Must be a C_IDENTIFIER, and may not exceed 32768 characters.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.env.value": {
+      "description": "Literal value of the environment variable. Defaults to \"\" and the maximum allowed length is 32768 characters. Variable references are not supported in Cloud Run.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.env.value_source": {
+      "type": "block",
+      "description": "Source for the environment variable's value.",
+      "required": false
+    },
+    "template.containers.env.value_source.secret_key_ref": {
+      "type": "block",
+      "description": "Selects a secret and a specific version from Cloud Secret Manager.",
+      "required": false
+    },
+    "template.containers.env.value_source.secret_key_ref.secret": {
+      "description": "The name of the secret in Cloud Secret Manager. Format: {secretName} if the secret is in the same project. projects/{project}/secrets/{secretName} if the secret is in a different project.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.env.value_source.secret_key_ref.version": {
+      "description": "The Cloud Secret Manager secret version. Can be 'latest' for the latest value or an integer for a specific version.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.liveness_probe": {
+      "type": "block",
+      "description": "Periodic probe of container liveness. Container will be restarted if the probe fails. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes",
+      "required": false
+    },
+    "template.containers.liveness_probe.failure_threshold": {
+      "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded. Defaults to 3. Minimum value is 1.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.liveness_probe.initial_delay_seconds": {
+      "description": "Number of seconds after the container has started before the probe is initiated. Defaults to 0 seconds. Minimum value is 0. Maximum value for liveness probe is 3600. Maximum value for startup probe is 240. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.liveness_probe.period_seconds": {
+      "description": "How often (in seconds) to perform the probe. Default to 10 seconds. Minimum value is 1. Maximum value for liveness probe is 3600. Maximum value for startup probe is 240. Must be greater or equal than timeoutSeconds",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.liveness_probe.timeout_seconds": {
+      "description": "Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1. Maximum value is 3600. Must be smaller than periodSeconds. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.liveness_probe.grpc": {
+      "type": "block",
+      "description": "GRPC specifies an action involving a GRPC port.",
+      "required": false
+    },
+    "template.containers.liveness_probe.grpc.port": {
+      "description": "Port number to access on the container. Number must be in the range 1 to 65535.\nIf not specified, defaults to the same value as container.ports[0].containerPort.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.liveness_probe.grpc.service": {
+      "description": "The name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\nIf this is not specified, the default behavior is defined by gRPC.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.liveness_probe.http_get": {
+      "type": "block",
+      "description": "HTTPGet specifies the http request to perform.",
+      "required": false
+    },
+    "template.containers.liveness_probe.http_get.path": {
+      "description": "Path to access on the HTTP server. Defaults to '/'.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.liveness_probe.http_get.port": {
+      "description": "Port number to access on the container. Number must be in the range 1 to 65535.\nIf not specified, defaults to the same value as container.ports[0].containerPort.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.liveness_probe.http_get.http_headers": {
+      "type": "block",
+      "description": "Custom headers to set in the request. HTTP allows repeated headers.",
+      "required": false
+    },
+    "template.containers.liveness_probe.http_get.http_headers.name": {
+      "description": "The header field name",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.liveness_probe.http_get.http_headers.value": {
+      "description": "The header field value",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.liveness_probe.tcp_socket": {
+      "type": "block",
+      "description": "TCPSocketAction describes an action based on opening a socket",
+      "required": false
+    },
+    "template.containers.liveness_probe.tcp_socket.port": {
+      "description": "Port number to access on the container. Must be in the range 1 to 65535.\nIf not specified, defaults to the exposed port of the container, which\nis the value of container.ports[0].containerPort.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.ports": {
+      "type": "block",
+      "description": "List of ports to expose from the container. Only a single port can be specified. The specified ports must be listening on all interfaces (0.0.0.0) within the container to be accessible.\n\nIf omitted, a port number will be chosen and passed to the container through the PORT environment variable for the container to listen on",
+      "required": false
+    },
+    "template.containers.ports.container_port": {
+      "description": "Port number the container listens on. This must be a valid TCP port number, 0 < containerPort < 65536.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "This defines the numeric port value, and since it does not determine who can access the service, it does not require a security policy."
+    },
+    "template.containers.ports.name": {
+      "description": "If specified, used to specify which protocol to use. Allowed values are \"http1\" and \"h2c\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.readiness_probe": {
+      "type": "block",
+      "description": "Periodic probe of container readiness.",
+      "required": false
+    },
+    "template.containers.readiness_probe.failure_threshold": {
+      "description": "Minimum consecutive failures for the probe to be considered failed after\nhaving succeeded. Defaults to 3.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.readiness_probe.period_seconds": {
+      "description": "How often (in seconds) to perform the probe.\nDefault to 10 seconds.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.readiness_probe.success_threshold": {
+      "description": "Minimum consecutive successes for the probe to be considered successful after having failed.\nDefaults to 2.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.readiness_probe.timeout_seconds": {
+      "description": "Number of seconds after which the probe times out.\nDefaults to 1 second. Must be smaller than period_seconds.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.readiness_probe.grpc": {
+      "type": "block",
+      "description": "GRPC specifies an action involving a GRPC port.",
+      "required": false
+    },
+    "template.containers.readiness_probe.grpc.port": {
+      "description": "Port number to access on the container. Number must be in the range 1 to 65535.\nIf not specified, defaults to the same value as container.ports[0].containerPort.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.readiness_probe.grpc.service": {
+      "description": "The name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\nIf this is not specified, the default behavior is defined by gRPC.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.readiness_probe.http_get": {
+      "type": "block",
+      "description": "HttpGet specifies the http request to perform.",
+      "required": false
+    },
+    "template.containers.readiness_probe.http_get.path": {
+      "description": "Path to access on the HTTP server. If set, it should not be empty string.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.readiness_probe.http_get.port": {
+      "description": "Port number to access on the container. Number must be in the range 1 to 65535.\nIf not specified, defaults to the same value as container.ports[0].containerPort.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.resources": {
+      "type": "block",
+      "description": "Compute Resource requirements by this container. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources",
+      "required": false
+    },
+    "template.containers.resources.cpu_idle": {
+      "description": "Determines whether CPU is only allocated during requests. True by default if the parent 'resources' field is not set. However, if\n'resources' is set, this field must be explicitly set to true to preserve the default behavior.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "This controls CPU allocation behavior during idle periods, which is a performance optimization and does not introduce any security concerns needing policy enforcement."
+    },
+    "template.containers.resources.limits": {
+      "description": "Only memory, CPU, and nvidia.com/gpu are supported. Use key 'cpu' for CPU limit, 'memory' for memory limit, 'nvidia.com/gpu' for gpu limit. Note: The only supported values for CPU are '1', '2', '4', '6' and '8'. Setting 4 CPU requires at least 2Gi of memory, setting 6 or more CPU requires at least 4Gi of memory. The values of the map is string form of the 'quantity' k8s type: https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/apimachinery/pkg/api/resource/quantity.go",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "This sets upper bounds on resource usage, which is purely operational and does not affect access control or data protection, so no security policy is required."
+    },
+    "template.containers.resources.startup_cpu_boost": {
+      "description": "Determines whether CPU should be boosted on startup of a new container instance above the requested CPU threshold, this can help reduce cold-start latency.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "This improves startup performance by temporarily increasing CPU, and since it does not interact with access or sensitive data, no security policy is needed."
+    },
+    "template.containers.startup_probe": {
+      "type": "block",
+      "description": "Startup probe of application within the container. All other probes are disabled if a startup probe is provided, until it succeeds. Container will not be added to service endpoints if the probe fails. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes",
+      "required": false
+    },
+    "template.containers.startup_probe.failure_threshold": {
+      "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded. Defaults to 3. Minimum value is 1.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.startup_probe.initial_delay_seconds": {
+      "description": "Number of seconds after the container has started before the probe is initiated. Defaults to 0 seconds. Minimum value is 0. Maximum value for liveness probe is 3600. Maximum value for startup probe is 240. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.startup_probe.period_seconds": {
+      "description": "How often (in seconds) to perform the probe. Default to 10 seconds. Minimum value is 1. Maximum value for liveness probe is 3600. Maximum value for startup probe is 240. Must be greater or equal than timeoutSeconds",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.startup_probe.timeout_seconds": {
+      "description": "Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1. Maximum value is 3600. Must be smaller than periodSeconds. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.startup_probe.grpc": {
+      "type": "block",
+      "description": "GRPC specifies an action involving a GRPC port.",
+      "required": false
+    },
+    "template.containers.startup_probe.grpc.port": {
+      "description": "Port number to access on the container. Number must be in the range 1 to 65535.\nIf not specified, defaults to the same value as container.ports[0].containerPort.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.startup_probe.grpc.service": {
+      "description": "The name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\nIf this is not specified, the default behavior is defined by gRPC.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.startup_probe.http_get": {
+      "type": "block",
+      "description": "HTTPGet specifies the http request to perform. Exactly one of HTTPGet or TCPSocket must be specified.",
+      "required": false
+    },
+    "template.containers.startup_probe.http_get.path": {
+      "description": "Path to access on the HTTP server. Defaults to '/'.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.startup_probe.http_get.port": {
+      "description": "Port number to access on the container. Must be in the range 1 to 65535.\nIf not specified, defaults to the same value as container.ports[0].containerPort.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.startup_probe.http_get.http_headers": {
+      "type": "block",
+      "description": "Custom headers to set in the request. HTTP allows repeated headers.",
+      "required": false
+    },
+    "template.containers.startup_probe.http_get.http_headers.name": {
+      "description": "The header field name",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.startup_probe.http_get.http_headers.value": {
+      "description": "The header field value",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.startup_probe.tcp_socket": {
+      "type": "block",
+      "description": "TCPSocket specifies an action involving a TCP port. Exactly one of HTTPGet or TCPSocket must be specified.",
+      "required": false
+    },
+    "template.containers.startup_probe.tcp_socket.port": {
+      "description": "Port number to access on the container. Must be in the range 1 to 65535.\nIf not specified, defaults to the same value as container.ports[0].containerPort.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.volume_mounts": {
+      "type": "block",
+      "description": "Volume to mount into the container's filesystem.",
+      "required": false
+    },
+    "template.containers.volume_mounts.mount_path": {
+      "description": "Path within the container at which the volume should be mounted. Must not contain ':'. For Cloud SQL volumes, it can be left empty, or must otherwise be /cloudsql. All instances defined in the Volume will be available as /cloudsql/[instance]. For more information on Cloud SQL volumes, visit https://cloud.google.com/sql/docs/mysql/connect-run",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This defines where the volume is mounted inside the container, which is a filesystem detail and does not enforce or bypass any access control, so no policy is needed."
+    },
+    "template.containers.volume_mounts.name": {
+      "description": "This must match the Name of a Volume.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.containers.volume_mounts.sub_path": {
+      "description": "Path within the volume from which the container's volume should be mounted.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.node_selector": {
+      "type": "block",
+      "description": "Node Selector describes the hardware requirements of the resources.",
+      "required": false
+    },
+    "template.node_selector.accelerator": {
+      "description": "The GPU to attach to an instance. See https://cloud.google.com/run/docs/configuring/services/gpu for configuring GPU.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This specifies GPU usage and is purely a hardware configuration detail with no impact on security."
+    },
+    "template.scaling": {
+      "type": "block",
+      "description": "Scaling settings for this Revision.",
+      "required": false
+    },
+    "template.scaling.max_instance_count": {
+      "description": "Maximum number of serving instances that this resource should have. Must not be less than minimum instance count. If absent, Cloud Run will calculate\na default value based on the project's available container instances quota in the region and specified instance size.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.scaling.min_instance_count": {
+      "description": "Minimum number of serving instances that this resource should have. Defaults to 0. Must not be greater than maximum instance count.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.volumes": {
+      "type": "block",
+      "description": "A list of Volumes to make available to containers.",
+      "required": false
+    },
+    "template.volumes.name": {
+      "description": "Volume's name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.volumes.cloud_sql_instance": {
+      "type": "block",
+      "description": "For Cloud SQL volumes, contains the specific instances that should be mounted. Visit https://cloud.google.com/sql/docs/mysql/connect-run for more information on how to connect Cloud SQL and Cloud Run.",
+      "required": false
+    },
+    "template.volumes.cloud_sql_instance.instances": {
+      "description": "The Cloud SQL instance connection names, as can be found in https://console.cloud.google.com/sql/instances. Visit https://cloud.google.com/sql/docs/mysql/connect-run for more information on how to connect Cloud SQL and Cloud Run. Format: {project}:{location}:{instance}",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": false,
+      "rationale": "This lists database instances and does not need security enforcement"
+    },
+    "template.volumes.empty_dir": {
+      "type": "block",
+      "description": "Ephemeral storage used as a shared volume.",
+      "required": false
+    },
+    "template.volumes.empty_dir.medium": {
+      "description": "The different types of medium supported for EmptyDir. Default value: \"MEMORY\" Possible values: [\"MEMORY\", \"DISK\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This defines the storage medium type and does not need a security policy"
+    },
+    "template.volumes.empty_dir.size_limit": {
+      "description": "Limit on the storage usable by this EmptyDir volume. The size limit is also applicable for memory medium. The maximum usage on memory medium EmptyDir would be the minimum value between the SizeLimit specified here and the sum of memory limits of all containers in a pod. This field's values are of the 'Quantity' k8s type: https://kubernetes.io/docs/reference/kubernetes-api/common-definitions/quantity/. The default is nil which means that the limit is undefined. More info: https://kubernetes.io/docs/concepts/storage/volumes/#emptydir.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This sets storage limits and is purely operational, not security-related."
+    },
+    "template.volumes.gcs": {
+      "type": "block",
+      "description": "Cloud Storage bucket mounted as a volume using GCSFuse. This feature is only supported in the gen2 execution environment.",
+      "required": false
+    },
+    "template.volumes.gcs.bucket": {
+      "description": "GCS Bucket name",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This specifies a bucket name and does not require policies here."
+    },
+    "template.volumes.gcs.mount_options": {
+      "description": "A list of flags to pass to the gcsfuse command for configuring this volume.\nFlags should be passed without leading dashes.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "This configures how the bucket is mounted, but does not define access permissions, so it does not require a security policy."
+    },
+    "template.volumes.gcs.read_only": {
+      "description": "If true, mount the GCS bucket as read-only",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.volumes.nfs": {
+      "type": "block",
+      "description": "Represents an NFS mount.",
+      "required": false
+    },
+    "template.volumes.nfs.path": {
+      "description": "Path that is exported by the NFS server.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.volumes.nfs.read_only": {
+      "description": "If true, mount the NFS volume as read only",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.volumes.nfs.server": {
+      "description": "Hostname or IP address of the NFS server",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This specifies the server endpoint and does not require policy since network-level controls handle security."
+    },
+    "template.volumes.secret": {
+      "type": "block",
+      "description": "Secret represents a secret that should populate this volume. More info: https://kubernetes.io/docs/concepts/storage/volumes#secret",
+      "required": false
+    },
+    "template.volumes.secret.default_mode": {
+      "description": "Integer representation of mode bits to use on created files by default. Must be a value between 0000 and 0777 (octal), defaulting to 0444. Directories within the path are not affected by this setting.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "This defines file permission defaults but does not need to be enforced with security policies."
+    },
+    "template.volumes.secret.secret": {
+      "description": "The name of the secret in Cloud Secret Manager. Format: {secret} if the secret is in the same project. projects/{project}/secrets/{secret} if the secret is in a different project.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.volumes.secret.items": {
+      "type": "block",
+      "description": "If unspecified, the volume will expose a file whose name is the secret, relative to VolumeMount.mount_path. If specified, the key will be used as the version to fetch from Cloud Secret Manager and the path will be the name of the file exposed in the volume. When items are defined, they must specify a path and a version.",
+      "required": false
+    },
+    "template.volumes.secret.items.mode": {
+      "description": "Integer octal mode bits to use on this file, must be a value between 01 and 0777 (octal). If 0 or not set, the Volume's default mode will be used.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "This defines permissions and does not require any security policy."
+    },
+    "template.volumes.secret.items.path": {
+      "description": "The relative path of the secret in the container.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.volumes.secret.items.version": {
+      "description": "The Cloud Secret Manager secret version. Can be 'latest' for the latest value or an integer for a specific version",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template.vpc_access": {
+      "type": "block",
+      "description": "VPC Access configuration to use for this Task. For more information, visit https://cloud.google.com/run/docs/configuring/connecting-vpc.",
+      "required": false
+    },
+    "template.vpc_access.connector": {
+      "description": "VPC Access connector name. Format: projects/{project}/locations/{location}/connectors/{connector}, where {project} can be project id or number.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This specifies a connector and does not itself enforce security rules."
+    },
+    "template.vpc_access.egress": {
+      "description": "Traffic VPC egress settings. Possible values: [\"ALL_TRAFFIC\", \"PRIVATE_RANGES_ONLY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Restricts outbound network traffic from Cloud Run services to prevent unauthorized external data access and reduce risk of data exfiltration."
+    },
+    "template.vpc_access.network_interfaces": {
+      "type": "block",
+      "description": "Direct VPC egress settings. Currently only single network interface is supported.",
+      "required": false
+    },
+    "template.vpc_access.network_interfaces.network": {
+      "description": "The VPC network that the Cloud Run resource will be able to send traffic to. At least one of network or subnetwork must be specified. If both\nnetwork and subnetwork are specified, the given VPC subnetwork must belong to the given VPC network. If network is not specified, it will be\nlooked up from the subnetwork.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This defines network reference and does not enforce security controls."
+    },
+    "template.vpc_access.network_interfaces.subnetwork": {
+      "description": "The VPC subnetwork that the Cloud Run resource will get IPs from. At least one of network or subnetwork must be specified. If both\nnetwork and subnetwork are specified, the given VPC subnetwork must belong to the given VPC network. If subnetwork is not specified, the\nsubnetwork with the same name with the network will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This defines subnetwork reference and does not directly affect security."
+    },
+    "template.vpc_access.network_interfaces.tags": {
+      "description": "Network tags applied to this Cloud Run service.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "This is metadata for networking and does not impact security directly."
+    },
+    "traffic": {
+      "type": "block",
+      "description": "Specifies how to distribute traffic over a collection of Revisions belonging to the Service. If traffic is empty or not provided, defaults to 100% traffic to the latest Ready Revision.",
+      "required": false
+    },
+    "traffic.percent": {
+      "description": "Specifies percent of the traffic to this Revision. This defaults to zero if unspecified.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "This controls traffic percentage and does not impact security."
+    },
+    "traffic.revision": {
+      "description": "Revision to which to send this portion of traffic, if traffic allocation is by revision.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This selects a revision for traffic and does not affect security."
+    },
+    "traffic.tag": {
+      "description": "Indicates a string to be part of the URI to exclusively reference this target.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is used for routing and does not affect access control."
+    },
+    "traffic.type": {
+      "description": "The allocation type for this traffic target. Possible values: [\"TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST\", \"TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This defines how traffic is allocated and does not impact security."
+    }
+  }
+}

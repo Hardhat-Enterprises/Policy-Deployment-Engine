@@ -1,0 +1,551 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "admin_cluster_membership": {
+      "description": "The admin cluster this VMware User Cluster belongs to.\nThis is the full resource name of the admin cluster's hub membership.\nIn the future, references to other resource types might be allowed if\nadmin clusters are modeled as their own resources.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "admin cluster membership is not sensitive enough for policy compliance"
+    },
+    "annotations": {
+      "description": "Annotations on the VMware User Cluster.\nThis field has the same restrictions as Kubernetes annotations.\nThe total size of all keys and values combined is limited to 256k.\nKey can have 2 segments: prefix (optional) and name (required),\nseparated by a slash (/).\nPrefix must be a DNS subdomain.\nName must be 63 characters or less, begin and end with alphanumerics,\nwith dashes (-), underscores (_), dots (.), and alphanumerics between.\n\n\n**Note**: This field is non-authoritative, and will only manage the annotations present in your configuration.\nPlease refer to the field 'effective_annotations' for all of the annotations present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "annotations do not impact the security of the service"
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "A human readable description of this VMware User Cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "description does not impact the security of the service"
+    },
+    "disable_bundled_ingress": {
+      "description": "Disable bundled ingress.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "disabling of bundled ingress does not require security compliance"
+    },
+    "enable_advanced_cluster": {
+      "description": "Enable advanced cluster. Default to false.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "enabling of advanced cluster does not require security compliance"
+    },
+    "enable_control_plane_v2": {
+      "description": "Enable control plane V2. Default to false.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "enabling of control plane v2 does not require security compliance"
+    },
+    "location": {
+      "description": "The location of the resource.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "name": {
+      "description": "The VMware cluster name.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "name does not impact the security of the service"
+    },
+    "on_prem_version": {
+      "description": "The Anthos clusters on the VMware version for your user cluster.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "on-prem version is a sensitive configuration parameter as outdated versions may have vulnerabilities"
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "project does not impact the security of the service"
+    },
+    "skip_validations": {
+      "description": "A list of validations to skip during preflight checks. Possible values: [\"VALIDATION_SKIP_UNSPECIFIED\", \"ALL\", \"WORKSTATION\", \"CONFIG\", \"DOCKER\", \"INFRA\", \"LOAD_BALANCER\", \"VIPS\", \"NODE_IPS\", \"DNS\", \"TOD\", \"NET_CONFIG\", \"STORAGE_DRIVER\", \"PROXY\", \"INTERNET\", \"GCP\", \"GKEHUB\", \"RESERVED_IPS\", \"STACKDRIVER\", \"NODEPOOL_AUTOSCALING\", \"OS_IMAGES\", \"CLUSTER_VERSION\", \"CLUSTER_HEALTH\", \"WINDOWS\", \"HSM_SECRET_ENCRYPTION\", \"BACKUP_ADMIN\", \"CONNECTIVITY\", \"CLUSTER_SECRETS_CONFIG\", \"CSI_WORKLOAD\", \"VSPHERE_VERSION\", \"MIGRATION\"]",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "vm_tracking_enabled": {
+      "description": "Enable VM tracking.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "enabling of vm tracking does not require security compliance"
+    },
+    "anti_affinity_groups": {
+      "type": "block",
+      "description": "AAGConfig specifies whether to spread VMware User Cluster nodes across at\nleast three physical hosts in the datacenter.",
+      "required": false
+    },
+    "anti_affinity_groups.aag_config_disabled": {
+      "description": "Spread nodes across at least three physical hosts (requires at least three\nhosts).\nEnabled by default.",
+      "required": true,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "aag_config_disabled does not impact the security of the service"
+    },
+    "authorization": {
+      "type": "block",
+      "description": "RBAC policy that will be applied and managed by GKE On-Prem.",
+      "required": false
+    },
+    "authorization.admin_users": {
+      "type": "block",
+      "description": "Users that will be granted the cluster-admin role on the cluster, providing\nfull access to the cluster.",
+      "required": false
+    },
+    "authorization.admin_users.username": {
+      "description": "The name of the user, e.g. 'my-gcp-id@gmail.com'.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Names a principal granted cluster admin access. As an access-granting principal it is a valid policy target: enforce against public/wildcard principals so admin access is never granted broadly; the policy must not pin specific user identities."
+    },
+    "auto_repair_config": {
+      "type": "block",
+      "description": "Configuration for auto repairing.",
+      "required": false
+    },
+    "auto_repair_config.enabled": {
+      "description": "Whether auto repair is enabled.",
+      "required": true,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "enabling of auto repair config does not require security compliance"
+    },
+    "control_plane_node": {
+      "type": "block",
+      "description": "VMware User Cluster control plane nodes must have either 1 or 3 replicas.",
+      "required": true
+    },
+    "control_plane_node.cpus": {
+      "description": "The number of CPUs for each admin cluster node that serve as control planes\nfor this VMware User Cluster. (default: 4 CPUs)",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "cpus does not impact security posture"
+    },
+    "control_plane_node.memory": {
+      "description": "The megabytes of memory for each admin cluster node that serves as a\ncontrol plane for this VMware User Cluster (default: 8192 MB memory).",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "memory does not impact security posture"
+    },
+    "control_plane_node.replicas": {
+      "description": "The number of control plane nodes for this VMware User Cluster.\n(default: 1 replica).",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "replicas does not impact security posture"
+    },
+    "control_plane_node.auto_resize_config": {
+      "type": "block",
+      "description": "AutoResizeConfig provides auto resizing configurations.",
+      "required": false
+    },
+    "control_plane_node.auto_resize_config.enabled": {
+      "description": "Whether to enable control plane node auto resizing.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dataplane_v2": {
+      "type": "block",
+      "description": "VmwareDataplaneV2Config specifies configuration for Dataplane V2.",
+      "required": false
+    },
+    "dataplane_v2.advanced_networking": {
+      "description": "Enable advanced networking which requires dataplane_v2_enabled to be set true.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "advanced networking does not require security compliance"
+    },
+    "dataplane_v2.dataplane_v2_enabled": {
+      "description": "Enables Dataplane V2.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "enabling of dataplane v2 config does not require security compliance"
+    },
+    "dataplane_v2.windows_dataplane_v2_enabled": {
+      "description": "Enable Dataplane V2 for clusters with Windows nodes.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "enabling of dataplane v2 config does not require security compliance"
+    },
+    "load_balancer": {
+      "type": "block",
+      "description": "Load Balancer configuration.",
+      "required": false
+    },
+    "load_balancer.f5_config": {
+      "type": "block",
+      "description": "Configuration for F5 Big IP typed load balancers.",
+      "required": false
+    },
+    "load_balancer.f5_config.address": {
+      "description": "The load balancer's IP address.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "address is not security impactful enough to warrant policy compliance"
+    },
+    "load_balancer.f5_config.partition": {
+      "description": "he preexisting partition to be used by the load balancer. T\nhis partition is usually created for the admin cluster for example:\n'my-f5-admin-partition'.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "partition is not security impactful enough to warrant policy compliance"
+    },
+    "load_balancer.f5_config.snat_pool": {
+      "description": "The pool name. Only necessary, if using SNAT.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "snat_pool does not impact the security of the service"
+    },
+    "load_balancer.manual_lb_config": {
+      "type": "block",
+      "description": "Manually configured load balancers.",
+      "required": false
+    },
+    "load_balancer.manual_lb_config.control_plane_node_port": {
+      "description": "NodePort for control plane service. The Kubernetes API server in the admin\ncluster is implemented as a Service of type NodePort (ex. 30968).",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "control_plane_node_port is not security impactful enough to warrant policy compliance"
+    },
+    "load_balancer.manual_lb_config.ingress_http_node_port": {
+      "description": "NodePort for ingress service's http. The ingress service in the admin\ncluster is implemented as a Service of type NodePort (ex. 32527).",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "ingress_http_node_port is not security impactful enough to warrant policy compliance"
+    },
+    "load_balancer.manual_lb_config.ingress_https_node_port": {
+      "description": "NodePort for ingress service's https. The ingress service in the admin\ncluster is implemented as a Service of type NodePort (ex. 30139).",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "ingress_https_node_port is not security impactful enough to warrant policy compliance"
+    },
+    "load_balancer.manual_lb_config.konnectivity_server_node_port": {
+      "description": "NodePort for konnectivity server service running as a sidecar in each\nkube-apiserver pod (ex. 30564).",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "konnectivity_server_node_port is not security impactful enough to warrant policy compliance"
+    },
+    "load_balancer.metal_lb_config": {
+      "type": "block",
+      "description": "Configuration for MetalLB typed load balancers.",
+      "required": false
+    },
+    "load_balancer.metal_lb_config.address_pools": {
+      "type": "block",
+      "description": "AddressPools is a list of non-overlapping IP pools used by load balancer\ntyped services. All addresses must be routable to load balancer nodes.\nIngressVIP must be included in the pools.",
+      "required": true
+    },
+    "load_balancer.metal_lb_config.address_pools.addresses": {
+      "description": "The addresses that are part of this pool. Each address\nmust be either in the CIDR form (1.2.3.0/24) or range\nform (1.2.3.1-1.2.3.5).",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "addresses is not security impactful enough to warrant policy compliance"
+    },
+    "load_balancer.metal_lb_config.address_pools.avoid_buggy_ips": {
+      "description": "If true, avoid using IPs ending in .0 or .255.\nThis avoids buggy consumer devices mistakenly dropping IPv4 traffic for\nthose special IP addresses.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "avoid_buggy_ips does not impact the security of the service"
+    },
+    "load_balancer.metal_lb_config.address_pools.manual_assign": {
+      "description": "If true, prevent IP addresses from being automatically assigned.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "manual_assign does not impact the security of the service"
+    },
+    "load_balancer.metal_lb_config.address_pools.pool": {
+      "description": "The name of the address pool.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "pool does not impact the security of the service"
+    },
+    "load_balancer.vip_config": {
+      "type": "block",
+      "description": "The VIPs used by the load balancer.",
+      "required": false
+    },
+    "load_balancer.vip_config.control_plane_vip": {
+      "description": "The VIP which you previously set aside for the Kubernetes API of this cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "A virtual IP address the team sets aside for the Kubernetes API. It is an environment-specific network value; a generic platform policy cannot constrain it without hardcoding an IP, so it is not a useful policy target."
+    },
+    "load_balancer.vip_config.ingress_vip": {
+      "description": "The VIP which you previously set aside for ingress traffic into this cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "A virtual IP address the team sets aside for ingress traffic. It is an environment-specific network value; a generic platform policy cannot constrain it without hardcoding an IP, so it is not a useful policy target."
+    },
+    "network_config": {
+      "type": "block",
+      "description": "The VMware User Cluster network configuration.",
+      "required": false
+    },
+    "network_config.pod_address_cidr_blocks": {
+      "description": "All pods in the cluster are assigned an RFC1918 IPv4 address from these ranges.\nOnly a single range is supported. This field cannot be changed after creation.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "Defines the RFC1918 IP ranges allocated to pods. The ranges are an environment-specific internal-addressing choice; a generic policy cannot constrain them without hardcoding ranges, so it is not a useful policy target."
+    },
+    "network_config.service_address_cidr_blocks": {
+      "description": "All services in the cluster are assigned an RFC1918 IPv4 address\nfrom these ranges. Only a single range is supported.. This field\ncannot be changed after creation.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "Defines the RFC1918 IP ranges allocated to services. The ranges are an environment-specific internal-addressing choice; a generic policy cannot constrain them without hardcoding ranges, so it is not a useful policy target."
+    },
+    "network_config.vcenter_network": {
+      "description": "vcenter_network specifies vCenter network name. Inherited from the admin cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "vcenter_network name is not security impactful"
+    },
+    "network_config.control_plane_v2_config": {
+      "type": "block",
+      "description": "Configuration for control plane V2 mode.",
+      "required": false
+    },
+    "network_config.control_plane_v2_config.control_plane_ip_block": {
+      "type": "block",
+      "description": "Static IP addresses for the control plane nodes.",
+      "required": false
+    },
+    "network_config.control_plane_v2_config.control_plane_ip_block.gateway": {
+      "description": "The network gateway used by the VMware User Cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_config.control_plane_v2_config.control_plane_ip_block.netmask": {
+      "description": "The netmask used by the VMware User Cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_config.control_plane_v2_config.control_plane_ip_block.ips": {
+      "type": "block",
+      "description": "The node's network configurations used by the VMware User Cluster.",
+      "required": false
+    },
+    "network_config.control_plane_v2_config.control_plane_ip_block.ips.hostname": {
+      "description": "Hostname of the machine. VM's name will be used if this field is empty.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_config.control_plane_v2_config.control_plane_ip_block.ips.ip": {
+      "description": "IP could be an IP address (like 1.2.3.4) or a CIDR (like 1.2.3.0/24).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_config.dhcp_ip_config": {
+      "type": "block",
+      "description": "Configuration settings for a DHCP IP configuration.",
+      "required": false
+    },
+    "network_config.dhcp_ip_config.enabled": {
+      "description": "enabled is a flag to mark if DHCP IP allocation is\nused for VMware user clusters.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_config.host_config": {
+      "type": "block",
+      "description": "Represents common network settings irrespective of the host's IP address.",
+      "required": false
+    },
+    "network_config.host_config.dns_search_domains": {
+      "description": "DNS search domains.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "dns search domains do not impact the security of the service"
+    },
+    "network_config.host_config.dns_servers": {
+      "description": "DNS servers.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "dns servers do not impact the security of the service"
+    },
+    "network_config.host_config.ntp_servers": {
+      "description": "NTP servers.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "ntp servers do not impact the security of the service"
+    },
+    "network_config.static_ip_config": {
+      "type": "block",
+      "description": "Configuration settings for a static IP configuration.",
+      "required": false
+    },
+    "network_config.static_ip_config.ip_blocks": {
+      "type": "block",
+      "description": "Represents the configuration values for static IP allocation to nodes.",
+      "required": true
+    },
+    "network_config.static_ip_config.ip_blocks.gateway": {
+      "description": "The network gateway used by the VMware User Cluster.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_config.static_ip_config.ip_blocks.netmask": {
+      "description": "The netmask used by the VMware User Cluster.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_config.static_ip_config.ip_blocks.ips": {
+      "type": "block",
+      "description": "The node's network configurations used by the VMware User Cluster.",
+      "required": true
+    },
+    "network_config.static_ip_config.ip_blocks.ips.hostname": {
+      "description": "Hostname of the machine. VM's name will be used if this field is empty.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_config.static_ip_config.ip_blocks.ips.ip": {
+      "description": "IP could be an IP address (like 1.2.3.4) or a CIDR (like 1.2.3.0/24).",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage": {
+      "type": "block",
+      "description": "Storage configuration.",
+      "required": false
+    },
+    "storage.vsphere_csi_disabled": {
+      "description": "Whether or not to deploy vSphere CSI components in the VMware User Cluster.\nEnabled by default.",
+      "required": true,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "vsphere_csi_disabled does not impact the security of the service"
+    },
+    "upgrade_policy": {
+      "type": "block",
+      "description": "Specifies upgrade policy for the cluster.",
+      "required": false
+    },
+    "upgrade_policy.control_plane_only": {
+      "description": "Controls whether the upgrade applies to the control plane only.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "control plane only upgrade does not require security compliance"
+    },
+    "vcenter": {
+      "type": "block",
+      "description": "VmwareVCenterConfig specifies vCenter config for the user cluster.\nInherited from the admin cluster.",
+      "required": false
+    },
+    "vcenter.ca_cert_data": {
+      "description": "Contains the vCenter CA certificate public key for SSL verification.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "ca_cert_data is not security impactful enough to warrant policy compliance"
+    },
+    "vcenter.cluster": {
+      "description": "The name of the vCenter cluster for the user cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "cluster does not impact the security of the service"
+    },
+    "vcenter.datacenter": {
+      "description": "The name of the vCenter datacenter for the user cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "datacenter does not impact the security of the service"
+    },
+    "vcenter.datastore": {
+      "description": "The name of the vCenter datastore for the user cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "datastore is only an output and does not impact security posture"
+    },
+    "vcenter.folder": {
+      "description": "The name of the vCenter folder for the user cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "folder does not impact the security of the service"
+    },
+    "vcenter.resource_pool": {
+      "description": "The name of the vCenter resource pool for the user cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "resource pool does not impact the security of the service"
+    },
+    "vcenter.storage_policy_name": {
+      "description": "The name of the vCenter storage policy for the user cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "storage_policy_name is only an output and does not impact security posture"
+    }
+  }
+}

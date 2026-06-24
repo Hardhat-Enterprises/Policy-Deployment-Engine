@@ -1,0 +1,386 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "calendar_period": {
+      "description": "A calendar period, semantically \"since the start of the current\n<calendarPeriod>\". Possible values: [\"DAY\", \"WEEK\", \"FORTNIGHT\", \"MONTH\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Evaluation window setting with no security impact."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "Name used for UI elements listing this SLO.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Display metadata with no security impact."
+    },
+    "goal": {
+      "description": "The fraction of service that must be good in order for this objective\nto be met. 0 < goal <= 0.999",
+      "required": true,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "A numeric performance threshold with no direct security impact."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Organisational field, not a security control."
+    },
+    "rolling_period_days": {
+      "description": "A rolling time period, semantically \"in the past X days\".\nMust be between 1 to 30 days, inclusive.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Evaluation window setting with no security impact."
+    },
+    "service": {
+      "description": "ID of the service to which this SLO belongs.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier field with no security impact."
+    },
+    "slo_id": {
+      "description": "The id to use for this ServiceLevelObjective. If omitted, an id will be generated instead.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier field with no security impact."
+    },
+    "user_labels": {
+      "description": "This field is intended to be used for organizing and identifying the AlertPolicy\nobjects.The field can contain up to 64 entries. Each key and value is limited\nto 63 Unicode characters or 128 bytes, whichever is smaller. Labels and values\ncan contain only lowercase letters, numerals, underscores, and dashes. Keys\nmust begin with a letter.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Organisational metadata with no security impact."
+    },
+    "basic_sli": {
+      "type": "block",
+      "description": "Basic Service-Level Indicator (SLI) on a well-known service type.\nPerformance will be computed on the basis of pre-defined metrics.\n\nSLIs are used to measure and calculate the quality of the Service's\nperformance with respect to a single aspect of service quality.\n\nExactly one of the following must be set:\n'basic_sli', 'request_based_sli', 'windows_based_sli'",
+      "required": false
+    },
+    "basic_sli.location": {
+      "description": "An optional set of locations to which this SLI is relevant.\nTelemetry from other locations will not be used to calculate\nperformance for this SLI. If omitted, this SLI applies to all\nlocations in which the Service has activity. For service types\nthat don't support breaking down by location, setting this\nfield will result in an error.",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": false,
+      "rationale": "Geographic scoping with no security impact."
+    },
+    "basic_sli.method": {
+      "description": "An optional set of RPCs to which this SLI is relevant.\nTelemetry from other methods will not be used to calculate\nperformance for this SLI. If omitted, this SLI applies to all\nthe Service's methods. For service types that don't support\nbreaking down by method, setting this field will result in an\nerror.",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": false,
+      "rationale": "Functional scoping with no security impact."
+    },
+    "basic_sli.version": {
+      "description": "The set of API versions to which this SLI is relevant.\nTelemetry from other API versions will not be used to\ncalculate performance for this SLI. If omitted,\nthis SLI applies to all API versions. For service types\nthat don't support breaking down by version, setting this\nfield will result in an error.",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": false,
+      "rationale": "Version scoping with no security impact."
+    },
+    "basic_sli.availability": {
+      "type": "block",
+      "description": "Availability based SLI, dervied from count of requests made to this service that return successfully.",
+      "required": false
+    },
+    "basic_sli.availability.enabled": {
+      "description": "Whether an availability SLI is enabled or not. Must be set to true. Defaults to 'true'.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "basic_sli.latency": {
+      "type": "block",
+      "description": "Parameters for a latency threshold SLI.",
+      "required": false
+    },
+    "basic_sli.latency.threshold": {
+      "description": "A duration string, e.g. 10s.\nGood service is defined to be the count of requests made to\nthis service that return in no more than threshold.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "request_based_sli": {
+      "type": "block",
+      "description": "A request-based SLI defines a SLI for which atomic units of\nservice are counted directly.\n\nA SLI describes a good service.\nIt is used to measure and calculate the quality of the Service's\nperformance with respect to a single aspect of service quality.\nExactly one of the following must be set:\n'basic_sli', 'request_based_sli', 'windows_based_sli'",
+      "required": false
+    },
+    "request_based_sli.distribution_cut": {
+      "type": "block",
+      "description": "Used when good_service is defined by a count of values aggregated in a\nDistribution that fall into a good range. The total_service is the\ntotal count of all values aggregated in the Distribution.\nDefines a distribution TimeSeries filter and thresholds used for\nmeasuring good service and total service.\n\nExactly one of 'distribution_cut' or 'good_total_ratio' can be set.",
+      "required": false
+    },
+    "request_based_sli.distribution_cut.distribution_filter": {
+      "description": "A TimeSeries [monitoring filter](https://cloud.google.com/monitoring/api/v3/filters)\naggregating values to quantify the good service provided.\n\nMust have ValueType = DISTRIBUTION and\nMetricKind = DELTA or MetricKind = CUMULATIVE.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "request_based_sli.distribution_cut.range": {
+      "type": "block",
+      "description": "Range of numerical values. The computed good_service\nwill be the count of values x in the Distribution such\nthat range.min <= x <= range.max. inclusive of min and\nmax. Open ranges can be defined by setting\njust one of min or max.",
+      "required": true
+    },
+    "request_based_sli.distribution_cut.range.max": {
+      "description": "max value for the range (inclusive). If not given,\nwill be set to 0",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "request_based_sli.distribution_cut.range.min": {
+      "description": "Min value for the range (inclusive). If not given,\nwill be set to 0",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "request_based_sli.good_total_ratio": {
+      "type": "block",
+      "description": "A means to compute a ratio of 'good_service' to 'total_service'.\nDefines computing this ratio with two TimeSeries [monitoring filters](https://cloud.google.com/monitoring/api/v3/filters)\nMust specify exactly two of good, bad, and total service filters.\nThe relationship good_service + bad_service = total_service\nwill be assumed.\n\nExactly one of 'distribution_cut' or 'good_total_ratio' can be set.",
+      "required": false
+    },
+    "request_based_sli.good_total_ratio.bad_service_filter": {
+      "description": "A TimeSeries [monitoring filter](https://cloud.google.com/monitoring/api/v3/filters)\nquantifying bad service provided, either demanded service that\nwas not provided or demanded service that was of inadequate\nquality.\n\nMust have ValueType = DOUBLE or ValueType = INT64 and\nmust have MetricKind = DELTA or MetricKind = CUMULATIVE.\n\nExactly two of 'good_service_filter','bad_service_filter','total_service_filter'\nmust be set (good + bad = total is assumed).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "request_based_sli.good_total_ratio.good_service_filter": {
+      "description": "A TimeSeries [monitoring filter](https://cloud.google.com/monitoring/api/v3/filters)\nquantifying good service provided.\nMust have ValueType = DOUBLE or ValueType = INT64 and\nmust have MetricKind = DELTA or MetricKind = CUMULATIVE.\n\nExactly two of 'good_service_filter','bad_service_filter','total_service_filter'\nmust be set (good + bad = total is assumed).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "request_based_sli.good_total_ratio.total_service_filter": {
+      "description": "A TimeSeries [monitoring filter](https://cloud.google.com/monitoring/api/v3/filters)\nquantifying total demanded service.\n\nMust have ValueType = DOUBLE or ValueType = INT64 and\nmust have MetricKind = DELTA or MetricKind = CUMULATIVE.\n\nExactly two of 'good_service_filter','bad_service_filter','total_service_filter'\nmust be set (good + bad = total is assumed).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "windows_based_sli": {
+      "type": "block",
+      "description": "A windows-based SLI defines the criteria for time windows.\ngood_service is defined based off the count of these time windows\nfor which the provided service was of good quality.\n\nA SLI describes a good service. It is used to measure and calculate\nthe quality of the Service's performance with respect to a single\naspect of service quality.\n\nExactly one of the following must be set:\n'basic_sli', 'request_based_sli', 'windows_based_sli'",
+      "required": false
+    },
+    "windows_based_sli.good_bad_metric_filter": {
+      "description": "A TimeSeries [monitoring filter](https://cloud.google.com/monitoring/api/v3/filters)\nwith ValueType = BOOL. The window is good if any true values\nappear in the window. One of 'good_bad_metric_filter',\n'good_total_ratio_threshold', 'metric_mean_in_range',\n'metric_sum_in_range' must be set for 'windows_based_sli'.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Performance measurement filter with no security impact."
+    },
+    "windows_based_sli.window_period": {
+      "description": "Duration over which window quality is evaluated, given as a\nduration string \"{X}s\" representing X seconds. Must be an\ninteger fraction of a day and at least 60s.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Evaluation window setting with no security impact."
+    },
+    "windows_based_sli.good_total_ratio_threshold": {
+      "type": "block",
+      "description": "Criterion that describes a window as good if its performance is\nhigh enough. One of 'good_bad_metric_filter',\n'good_total_ratio_threshold', 'metric_mean_in_range',\n'metric_sum_in_range' must be set for 'windows_based_sli'.",
+      "required": false
+    },
+    "windows_based_sli.good_total_ratio_threshold.threshold": {
+      "description": "If window performance >= threshold, the window is counted\nas good.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "windows_based_sli.good_total_ratio_threshold.basic_sli_performance": {
+      "type": "block",
+      "description": "Basic SLI to evaluate to judge window quality.",
+      "required": false
+    },
+    "windows_based_sli.good_total_ratio_threshold.basic_sli_performance.location": {
+      "description": "An optional set of locations to which this SLI is relevant.\nTelemetry from other locations will not be used to calculate\nperformance for this SLI. If omitted, this SLI applies to all\nlocations in which the Service has activity. For service types\nthat don't support breaking down by location, setting this\nfield will result in an error.",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "windows_based_sli.good_total_ratio_threshold.basic_sli_performance.method": {
+      "description": "An optional set of RPCs to which this SLI is relevant.\nTelemetry from other methods will not be used to calculate\nperformance for this SLI. If omitted, this SLI applies to all\nthe Service's methods. For service types that don't support\nbreaking down by method, setting this field will result in an\nerror.",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "windows_based_sli.good_total_ratio_threshold.basic_sli_performance.version": {
+      "description": "The set of API versions to which this SLI is relevant.\nTelemetry from other API versions will not be used to\ncalculate performance for this SLI. If omitted,\nthis SLI applies to all API versions. For service types\nthat don't support breaking down by version, setting this\nfield will result in an error.",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "windows_based_sli.good_total_ratio_threshold.basic_sli_performance.availability": {
+      "type": "block",
+      "description": "Availability based SLI, dervied from count of requests made to this service that return successfully.",
+      "required": false
+    },
+    "windows_based_sli.good_total_ratio_threshold.basic_sli_performance.availability.enabled": {
+      "description": "Whether an availability SLI is enabled or not. Must be set to 'true. Defaults to 'true'.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "windows_based_sli.good_total_ratio_threshold.basic_sli_performance.latency": {
+      "type": "block",
+      "description": "Parameters for a latency threshold SLI.",
+      "required": false
+    },
+    "windows_based_sli.good_total_ratio_threshold.basic_sli_performance.latency.threshold": {
+      "description": "A duration string, e.g. 10s.\nGood service is defined to be the count of requests made to\nthis service that return in no more than threshold.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "windows_based_sli.good_total_ratio_threshold.performance": {
+      "type": "block",
+      "description": "Request-based SLI to evaluate to judge window quality.",
+      "required": false
+    },
+    "windows_based_sli.good_total_ratio_threshold.performance.distribution_cut": {
+      "type": "block",
+      "description": "Used when good_service is defined by a count of values aggregated in a\nDistribution that fall into a good range. The total_service is the\ntotal count of all values aggregated in the Distribution.\nDefines a distribution TimeSeries filter and thresholds used for\nmeasuring good service and total service.",
+      "required": false
+    },
+    "windows_based_sli.good_total_ratio_threshold.performance.distribution_cut.distribution_filter": {
+      "description": "A TimeSeries [monitoring filter](https://cloud.google.com/monitoring/api/v3/filters)\naggregating values to quantify the good service provided.\n\nMust have ValueType = DISTRIBUTION and\nMetricKind = DELTA or MetricKind = CUMULATIVE.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "windows_based_sli.good_total_ratio_threshold.performance.distribution_cut.range": {
+      "type": "block",
+      "description": "Range of numerical values. The computed good_service\nwill be the count of values x in the Distribution such\nthat range.min <= x <= range.max. inclusive of min and\nmax. Open ranges can be defined by setting\njust one of min or max.",
+      "required": true
+    },
+    "windows_based_sli.good_total_ratio_threshold.performance.distribution_cut.range.max": {
+      "description": "max value for the range (inclusive). If not given,\nwill be set to 0",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "windows_based_sli.good_total_ratio_threshold.performance.distribution_cut.range.min": {
+      "description": "Min value for the range (inclusive). If not given,\nwill be set to 0",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "windows_based_sli.good_total_ratio_threshold.performance.good_total_ratio": {
+      "type": "block",
+      "description": "A means to compute a ratio of 'good_service' to 'total_service'.\nDefines computing this ratio with two TimeSeries [monitoring filters](https://cloud.google.com/monitoring/api/v3/filters)\nMust specify exactly two of good, bad, and total service filters.\nThe relationship good_service + bad_service = total_service\nwill be assumed.",
+      "required": false
+    },
+    "windows_based_sli.good_total_ratio_threshold.performance.good_total_ratio.bad_service_filter": {
+      "description": "A TimeSeries [monitoring filter](https://cloud.google.com/monitoring/api/v3/filters)\nquantifying bad service provided, either demanded service that\nwas not provided or demanded service that was of inadequate\nquality. Exactly two of\ngood, bad, or total service filter must be defined (where\ngood + bad = total is assumed)\n\nMust have ValueType = DOUBLE or ValueType = INT64 and\nmust have MetricKind = DELTA or MetricKind = CUMULATIVE.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "windows_based_sli.good_total_ratio_threshold.performance.good_total_ratio.good_service_filter": {
+      "description": "A TimeSeries [monitoring filter](https://cloud.google.com/monitoring/api/v3/filters)\nquantifying good service provided. Exactly two of\ngood, bad, or total service filter must be defined (where\ngood + bad = total is assumed)\n\nMust have ValueType = DOUBLE or ValueType = INT64 and\nmust have MetricKind = DELTA or MetricKind = CUMULATIVE.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "windows_based_sli.good_total_ratio_threshold.performance.good_total_ratio.total_service_filter": {
+      "description": "A TimeSeries [monitoring filter](https://cloud.google.com/monitoring/api/v3/filters)\nquantifying total demanded service. Exactly two of\ngood, bad, or total service filter must be defined (where\ngood + bad = total is assumed)\n\nMust have ValueType = DOUBLE or ValueType = INT64 and\nmust have MetricKind = DELTA or MetricKind = CUMULATIVE.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "windows_based_sli.metric_mean_in_range": {
+      "type": "block",
+      "description": "Criterion that describes a window as good if the metric's value\nis in a good range, *averaged* across returned streams.\nOne of 'good_bad_metric_filter',\n\n'good_total_ratio_threshold', 'metric_mean_in_range',\n'metric_sum_in_range' must be set for 'windows_based_sli'.\nAverage value X of 'time_series' should satisfy\n'range.min <= X <= range.max' for a good window.",
+      "required": false
+    },
+    "windows_based_sli.metric_mean_in_range.time_series": {
+      "description": "A [monitoring filter](https://cloud.google.com/monitoring/api/v3/filters)\nspecifying the TimeSeries to use for evaluating window\nThe provided TimeSeries must have ValueType = INT64 or\nValueType = DOUBLE and MetricKind = GAUGE. Mean value 'X'\nshould satisfy 'range.min <= X <= range.max'\nunder good service.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "windows_based_sli.metric_mean_in_range.range": {
+      "type": "block",
+      "description": "Range of numerical values. The computed good_service\nwill be the count of values x in the Distribution such\nthat range.min <= x <= range.max. inclusive of min and\nmax. Open ranges can be defined by setting\njust one of min or max. Mean value 'X' of 'time_series'\nvalues should satisfy 'range.min <= X <= range.max' for a\ngood service.",
+      "required": true
+    },
+    "windows_based_sli.metric_mean_in_range.range.max": {
+      "description": "max value for the range (inclusive). If not given,\nwill be set to \"infinity\", defining an open range\n\">= range.min\"",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "windows_based_sli.metric_mean_in_range.range.min": {
+      "description": "Min value for the range (inclusive). If not given,\nwill be set to \"-infinity\", defining an open range\n\"< range.max\"",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "windows_based_sli.metric_sum_in_range": {
+      "type": "block",
+      "description": "Criterion that describes a window as good if the metric's value\nis in a good range, *summed* across returned streams.\nSummed value 'X' of 'time_series' should satisfy\n'range.min <= X <= range.max' for a good window.\n\nOne of 'good_bad_metric_filter',\n'good_total_ratio_threshold', 'metric_mean_in_range',\n'metric_sum_in_range' must be set for 'windows_based_sli'.",
+      "required": false
+    },
+    "windows_based_sli.metric_sum_in_range.time_series": {
+      "description": "A [monitoring filter](https://cloud.google.com/monitoring/api/v3/filters)\nspecifying the TimeSeries to use for evaluating window\nquality. The provided TimeSeries must have\nValueType = INT64 or ValueType = DOUBLE and\nMetricKind = GAUGE.\n\nSummed value 'X' should satisfy\n'range.min <= X <= range.max' for a good window.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "windows_based_sli.metric_sum_in_range.range": {
+      "type": "block",
+      "description": "Range of numerical values. The computed good_service\nwill be the count of values x in the Distribution such\nthat range.min <= x <= range.max. inclusive of min and\nmax. Open ranges can be defined by setting\njust one of min or max. Summed value 'X' should satisfy\n'range.min <= X <= range.max' for a good window.",
+      "required": true
+    },
+    "windows_based_sli.metric_sum_in_range.range.max": {
+      "description": "max value for the range (inclusive). If not given,\nwill be set to \"infinity\", defining an open range\n\">= range.min\"",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "windows_based_sli.metric_sum_in_range.range.min": {
+      "description": "Min value for the range (inclusive). If not given,\nwill be set to \"-infinity\", defining an open range\n\"< range.max\"",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

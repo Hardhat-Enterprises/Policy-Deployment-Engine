@@ -1,0 +1,221 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "name": {
+      "description": "The ID of the Cluster.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "parent": {
+      "description": "The resource name of the private cloud to create a new cluster in.\nResource names are schemeless URIs that follow the conventions in https://cloud.google.com/apis/design/resource_names.\nFor example: projects/my-project/locations/us-west1-a/privateClouds/my-cloud",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autoscaling_settings": {
+      "type": "block",
+      "description": "Configuration of the autoscaling applied to this cluster",
+      "required": false
+    },
+    "autoscaling_settings.cool_down_period": {
+      "description": "The minimum duration between consecutive autoscale operations.\nIt starts once addition or removal of nodes is fully completed.\nMinimum cool down period is 30m.\nCool down period must be in whole minutes (for example, 30m, 31m, 50m).\nMandatory for successful addition of autoscaling settings in cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autoscaling_settings.max_cluster_node_count": {
+      "description": "Maximum number of nodes of any type in a cluster.\nMandatory for successful addition of autoscaling settings in cluster.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autoscaling_settings.min_cluster_node_count": {
+      "description": "Minimum number of nodes of any type in a cluster.\nMandatory for successful addition of autoscaling settings in cluster.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autoscaling_settings.autoscaling_policies": {
+      "type": "block",
+      "description": "The map with autoscaling policies applied to the cluster.\nThe key is the identifier of the policy.\nIt must meet the following requirements:\n  * Only contains 1-63 alphanumeric characters and hyphens\n  * Begins with an alphabetical character\n  * Ends with a non-hyphen character\n  * Not formatted as a UUID\n  * Complies with [RFC 1034](https://datatracker.ietf.org/doc/html/rfc1034) (section 3.5)\n\nCurrently the map must contain only one element\nthat describes the autoscaling policy for compute nodes.",
+      "required": true
+    },
+    "autoscaling_settings.autoscaling_policies.autoscale_policy_id": {
+      "description": "The identifier for this object. Format specified above.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autoscaling_settings.autoscaling_policies.node_type_id": {
+      "description": "The canonical identifier of the node type to add or remove.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autoscaling_settings.autoscaling_policies.scale_out_size": {
+      "description": "Number of nodes to add to a cluster during a scale-out operation.\nMust be divisible by 2 for stretched clusters.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autoscaling_settings.autoscaling_policies.consumed_memory_thresholds": {
+      "type": "block",
+      "description": "Utilization thresholds pertaining to amount of consumed memory.",
+      "required": false
+    },
+    "autoscaling_settings.autoscaling_policies.consumed_memory_thresholds.scale_in": {
+      "description": "The utilization triggering the scale-in operation in percent.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autoscaling_settings.autoscaling_policies.consumed_memory_thresholds.scale_out": {
+      "description": "The utilization triggering the scale-out operation in percent.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autoscaling_settings.autoscaling_policies.cpu_thresholds": {
+      "type": "block",
+      "description": "Utilization thresholds pertaining to CPU utilization.",
+      "required": false
+    },
+    "autoscaling_settings.autoscaling_policies.cpu_thresholds.scale_in": {
+      "description": "The utilization triggering the scale-in operation in percent.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autoscaling_settings.autoscaling_policies.cpu_thresholds.scale_out": {
+      "description": "The utilization triggering the scale-out operation in percent.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autoscaling_settings.autoscaling_policies.storage_thresholds": {
+      "type": "block",
+      "description": "Utilization thresholds pertaining to amount of consumed storage.",
+      "required": false
+    },
+    "autoscaling_settings.autoscaling_policies.storage_thresholds.scale_in": {
+      "description": "The utilization triggering the scale-in operation in percent.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autoscaling_settings.autoscaling_policies.storage_thresholds.scale_out": {
+      "description": "The utilization triggering the scale-out operation in percent.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "datastore_mount_config": {
+      "type": "block",
+      "description": "Optional. Configuration to mount a datastore.\nMount can be done along with cluster create or during cluster update\nSince service subnet is not configured with ip range on mgmt cluster creation, mount on management cluster is done as update only\nfor unmount remove 'datastore_mount_config' config from the update of cluster resource",
+      "required": false
+    },
+    "datastore_mount_config.access_mode": {
+      "description": "Optional. NFS is accessed by hosts in either read or read_write mode\nDefault value used will be READ_WRITE\nPossible values:\nREAD_ONLY\nREAD_WRITE",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "datastore_mount_config.datastore": {
+      "description": "The resource name of the datastore to unmount.\nThe datastore requested to be mounted should be in same region/zone as the\ncluster.\nResource names are schemeless URIs that follow the conventions in\nhttps://cloud.google.com/apis/design/resource_names.\nFor example:\n'projects/my-project/locations/us-central1/datastores/my-datastore'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "datastore_mount_config.ignore_colocation": {
+      "description": "Optional. If set to true, the colocation requirement will be ignored.\nIf set to false, the colocation requirement will be enforced.\nColocation requirement is the requirement that the cluster must be in the\nsame region/zone of datastore.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "datastore_mount_config.nfs_version": {
+      "description": "Optional. The NFS protocol supported by the NFS volume.\nDefault value used will be NFS_V3\nPossible values:\nNFS_V3",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "datastore_mount_config.datastore_network": {
+      "type": "block",
+      "description": "The network configuration for the datastore.",
+      "required": true
+    },
+    "datastore_mount_config.datastore_network.connection_count": {
+      "description": "Optional. The number of connections of the NFS volume.\nSupported from vsphere 8.0u1. Possible values are 1-4.\nDefault value is 4.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "datastore_mount_config.datastore_network.mtu": {
+      "description": "Optional. The Maximal Transmission Unit (MTU) of the datastore.\nMTU value can range from 1330-9000. If not set, system sets\ndefault MTU size to 1500.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "datastore_mount_config.datastore_network.subnet": {
+      "description": "The resource name of the subnet\nResource names are schemeless URIs that follow the conventions in\nhttps://cloud.google.com/apis/design/resource_names.\ne.g. projects/my-project/locations/us-central1/subnets/my-subnet",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_type_configs": {
+      "type": "block",
+      "description": "The map of cluster node types in this cluster,\nwhere the key is canonical identifier of the node type (corresponds to the NodeType).",
+      "required": false
+    },
+    "node_type_configs.custom_core_count": {
+      "description": "Customized number of cores available to each node of the type.\nThis number must always be one of 'nodeType.availableCustomCoreCounts'.\nIf zero is provided max value from 'nodeType.availableCustomCoreCounts' will be used.\nOnce the customer is created then corecount cannot be changed.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_type_configs.node_count": {
+      "description": "The number of nodes of this type in the cluster.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_type_configs.node_type_id": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

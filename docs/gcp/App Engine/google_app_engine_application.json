@@ -1,0 +1,86 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "auth_domain": {
+      "description": "The domain to authenticate users with when using App Engine's User API.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Sets the domain used to authenticate users via App Engine's legacy User API. It selects an identity domain rather than enabling or disabling a security control, and a generic policy cannot pin a domain (team/org-specific), so it is not a policy target."
+    },
+    "database_type": {
+      "description": "The type of the Cloud Firestore or Cloud Datastore database associated with this application. Can be `CLOUD_FIRESTORE` or `CLOUD_DATASTORE_COMPATIBILITY` for new instances.  To support old instances, the value `CLOUD_DATASTORE` is accepted by the provider, but will be rejected by the API. To create a Cloud Firestore database without creating an App Engine application, use the [`google_firestore_database`](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/firestore_database) resource instead.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Selects whether the app uses Cloud Firestore or Datastore-compatibility mode. This is a team data-architecture choice, not a security control, and mandating one mode does not harden the resource."
+    },
+    "location_id": {
+      "description": "The location to serve the app from.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Sets the region the App Engine application is served from. Region/data-residency is a sanctioned policy target: a policy should constrain it to an approved location whitelist (the value is immutable once set, so enforcing it at create time matters)."
+    },
+    "project": {
+      "description": "The project ID to create the application under.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier of the GCP project that owns the application. This is a project reference; we do not constrain which project a resource belongs to, and the ID-vs-number distinction is a deployment-correctness concern, not security."
+    },
+    "serving_status": {
+      "description": "The serving status of the app.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The operational serving state of the application. This is an availability/operational toggle, not a security control, and no generic secure value can be enforced."
+    },
+    "ssl_policy": {
+      "description": "The SSL policy that will be applied to the application. If set to Modern it will restrict traffic with TLS \\u003c 1.2 and allow only Modern Ciphers suite",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "To enforce secure managed SSL certificates to ensure all data in transit is encrypted using modern protocols and to prevent service outages caused by manual certificate expiration."
+    },
+    "feature_settings": {
+      "type": "block",
+      "description": "A block of optional settings to configure specific App Engine features:",
+      "required": false
+    },
+    "feature_settings.split_health_checks": {
+      "description": "Set to false to use the legacy health check instead of the readiness and liveness checks.",
+      "required": true,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "Toggles between split readiness/liveness health checks and the legacy combined check. This is a deployment-reliability/availability choice, not a security control."
+    },
+    "iap": {
+      "type": "block",
+      "description": "Settings for enabling Cloud Identity Aware Proxy",
+      "required": false
+    },
+    "iap.enabled": {
+      "description": "Adapted for use with the app",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "iap.oauth2_client_id": {
+      "description": "OAuth2 client ID to use for the authentication flow.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Mandates a valid OAuth2 Client ID to securely link the IAP to the organization's identity provider, ensuring only verified corporate credentials can grant access."
+    },
+    "iap.oauth2_client_secret": {
+      "description": "OAuth2 client secret to use for the authentication flow. The SHA-256 hash of the value is returned in the oauth2ClientSecretSha256 field.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Ensures the authenticity of the handshake between Google Cloud and the Identity Provider to prevent man-in-the-middle attacks/unauthorized identity spoofing."
+    }
+  }
+}

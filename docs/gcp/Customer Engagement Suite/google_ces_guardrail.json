@@ -1,0 +1,423 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "app": {
+      "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "Description of the guardrail.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "Display name of the guardrail.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "enabled": {
+      "description": "Whether the guardrail is enabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "guardrail_id": {
+      "description": "The ID to use for the guardrail, which will become the final component of\nthe guardrail's resource name. If not provided, a unique ID will be\nautomatically assigned for the guardrail.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "action": {
+      "type": "block",
+      "description": "Action that is taken when a certain precondition is met.",
+      "required": false
+    },
+    "action.generative_answer": {
+      "type": "block",
+      "description": "The agent will immediately respond with a generative answer.",
+      "required": false
+    },
+    "action.generative_answer.prompt": {
+      "description": "The prompt to use for the generative answer.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "action.respond_immediately": {
+      "type": "block",
+      "description": "The agent will immediately respond with a preconfigured response.",
+      "required": false
+    },
+    "action.respond_immediately.responses": {
+      "type": "block",
+      "description": "The canned responses for the agent to choose from. The response is chosen\nrandomly.",
+      "required": true
+    },
+    "action.respond_immediately.responses.disabled": {
+      "description": "Whether the response is disabled. Disabled responses are not used by the\nagent.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "action.respond_immediately.responses.text": {
+      "description": "Text for the agent to respond with.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "action.transfer_agent": {
+      "type": "block",
+      "description": "The agent will transfer the conversation to a different agent.",
+      "required": false
+    },
+    "action.transfer_agent.agent": {
+      "description": "The name of the agent to transfer the conversation to. The agent must be\nin the same app as the current agent.\nFormat:\n'projects/{project}/locations/{location}/apps/{app}/agents/{agent}'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "code_callback": {
+      "type": "block",
+      "description": "Guardrail that blocks the conversation based on the code callbacks\nprovided.",
+      "required": false
+    },
+    "code_callback.after_agent_callback": {
+      "type": "block",
+      "description": "A callback defines the custom logic to be executed at various stages of\nagent interaction.",
+      "required": false
+    },
+    "code_callback.after_agent_callback.description": {
+      "description": "Human-readable description of the callback.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "code_callback.after_agent_callback.disabled": {
+      "description": "Whether the callback is disabled. Disabled callbacks are ignored by the\nagent.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "code_callback.after_agent_callback.python_code": {
+      "description": "The python code to execute for the callback.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "code_callback.after_model_callback": {
+      "type": "block",
+      "description": "A callback defines the custom logic to be executed at various stages of\nagent interaction.",
+      "required": false
+    },
+    "code_callback.after_model_callback.description": {
+      "description": "Human-readable description of the callback.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "code_callback.after_model_callback.disabled": {
+      "description": "Whether the callback is disabled. Disabled callbacks are ignored by the\nagent.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "code_callback.after_model_callback.python_code": {
+      "description": "The python code to execute for the callback.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "code_callback.before_agent_callback": {
+      "type": "block",
+      "description": "A callback defines the custom logic to be executed at various stages of\nagent interaction.",
+      "required": false
+    },
+    "code_callback.before_agent_callback.description": {
+      "description": "Human-readable description of the callback.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "code_callback.before_agent_callback.disabled": {
+      "description": "Whether the callback is disabled. Disabled callbacks are ignored by the\nagent.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "code_callback.before_agent_callback.python_code": {
+      "description": "The python code to execute for the callback.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "code_callback.before_model_callback": {
+      "type": "block",
+      "description": "A callback defines the custom logic to be executed at various stages of\nagent interaction.",
+      "required": false
+    },
+    "code_callback.before_model_callback.description": {
+      "description": "Human-readable description of the callback.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "code_callback.before_model_callback.disabled": {
+      "description": "Whether the callback is disabled. Disabled callbacks are ignored by the\nagent.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "code_callback.before_model_callback.python_code": {
+      "description": "The python code to execute for the callback.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "content_filter": {
+      "type": "block",
+      "description": "Guardrail that bans certain content from being used in the conversation.",
+      "required": false
+    },
+    "content_filter.banned_contents": {
+      "description": "List of banned phrases. Applies to both user inputs and agent responses.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "content_filter.banned_contents_in_agent_response": {
+      "description": "List of banned phrases. Applies only to agent responses.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "content_filter.banned_contents_in_user_input": {
+      "description": "List of banned phrases. Applies only to user inputs.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "content_filter.disregard_diacritics": {
+      "description": "If true, diacritics are ignored during matching.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "content_filter.match_type": {
+      "description": "Match type for the content filter.\nPossible values:\nSIMPLE_STRING_MATCH\nWORD_BOUNDARY_STRING_MATCH\nREGEXP_MATCH",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "llm_policy": {
+      "type": "block",
+      "description": "Guardrail that blocks the conversation if the LLM response is considered\nviolating the policy based on the LLM classification.",
+      "required": false
+    },
+    "llm_policy.allow_short_utterance": {
+      "description": "By default, the LLM policy check is bypassed for short utterances.\nEnabling this setting applies the policy check to all utterances,\nincluding those that would normally be skipped.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "llm_policy.fail_open": {
+      "description": "If an error occurs during the policy check, fail open and do not trigger\nthe guardrail.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "llm_policy.max_conversation_messages": {
+      "description": "When checking this policy, consider the last 'n' messages in the\nconversation.\nWhen not set a default value of 10 will be used.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "llm_policy.policy_scope": {
+      "description": "Defines when to apply the policy check during the conversation. If set to\n'POLICY_SCOPE_UNSPECIFIED', the policy will be applied to the user input.\nWhen applying the policy to the agent response, additional latency will\nbe introduced before the agent can respond.\nPossible values:\nUSER_QUERY\nAGENT_RESPONSE\nUSER_QUERY_AND_AGENT_RESPONSE Possible values: [\"USER_QUERY\", \"AGENT_RESPONSE\", \"USER_QUERY_AND_AGENT_RESPONSE\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "llm_policy.prompt": {
+      "description": "Policy prompt.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "llm_policy.model_settings": {
+      "type": "block",
+      "description": "Model settings contains various configurations for the LLM model.",
+      "required": false
+    },
+    "llm_policy.model_settings.model": {
+      "description": "The LLM model that the agent should use.\nIf not set, the agent will inherit the model from its parent agent.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "llm_policy.model_settings.temperature": {
+      "description": "If set, this temperature will be used for the LLM model. Temperature\ncontrols the randomness of the model's responses. Lower temperatures\nproduce responses that are more predictable. Higher temperatures produce\nresponses that are more creative.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "llm_prompt_security": {
+      "type": "block",
+      "description": "Guardrail that blocks the conversation if the input is considered unsafe\nbased on the LLM classification.",
+      "required": false
+    },
+    "llm_prompt_security.fail_open": {
+      "description": "Determines the behavior when the guardrail encounters an LLM error.\n- If true: the guardrail is bypassed.\n- If false (default): the guardrail triggers/blocks.\nNote: If a custom policy is provided, this field is ignored in favor of\nthe policy's 'failOpen' configuration.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "llm_prompt_security.custom_policy": {
+      "type": "block",
+      "description": "Guardrail that blocks the conversation if the LLM response is considered\nviolating the policy based on the LLM classification.",
+      "required": false
+    },
+    "llm_prompt_security.custom_policy.allow_short_utterance": {
+      "description": "By default, the LLM policy check is bypassed for short utterances.\nEnabling this setting applies the policy check to all utterances,\nincluding those that would normally be skipped.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "llm_prompt_security.custom_policy.fail_open": {
+      "description": "If an error occurs during the policy check, fail open and do not trigger\nthe guardrail.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "llm_prompt_security.custom_policy.max_conversation_messages": {
+      "description": "When checking this policy, consider the last 'n' messages in the\nconversation.\nWhen not set a default value of 10 will be used.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "llm_prompt_security.custom_policy.policy_scope": {
+      "description": "Defines when to apply the policy check during the conversation. If set to\n'POLICY_SCOPE_UNSPECIFIED', the policy will be applied to the user input.\nWhen applying the policy to the agent response, additional latency will\nbe introduced before the agent can respond.\nPossible values:\nUSER_QUERY\nAGENT_RESPONSE\nUSER_QUERY_AND_AGENT_RESPONSE",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "llm_prompt_security.custom_policy.prompt": {
+      "description": "Policy prompt.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "llm_prompt_security.custom_policy.model_settings": {
+      "type": "block",
+      "description": "Model settings contains various configurations for the LLM model.",
+      "required": false
+    },
+    "llm_prompt_security.custom_policy.model_settings.model": {
+      "description": "The LLM model that the agent should use.\nIf not set, the agent will inherit the model from its parent agent.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "llm_prompt_security.custom_policy.model_settings.temperature": {
+      "description": "If set, this temperature will be used for the LLM model. Temperature\ncontrols the randomness of the model's responses. Lower temperatures\nproduce responses that are more predictable. Higher temperatures produce\nresponses that are more creative.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "llm_prompt_security.default_settings": {
+      "type": "block",
+      "description": "Configuration for default system security settings.",
+      "required": false
+    },
+    "model_safety": {
+      "type": "block",
+      "description": "Model safety settings overrides. When this is set, it will override the\ndefault settings and trigger the guardrail if the response is considered\nunsafe.",
+      "required": false
+    },
+    "model_safety.safety_settings": {
+      "type": "block",
+      "description": "List of safety settings.",
+      "required": true
+    },
+    "model_safety.safety_settings.category": {
+      "description": "The harm category.\nPossible values:\nHARM_CATEGORY_HATE_SPEECH\nHARM_CATEGORY_DANGEROUS_CONTENT\nHARM_CATEGORY_HARASSMENT\nHARM_CATEGORY_SEXUALLY_EXPLICIT Possible values: [\"HARM_CATEGORY_HATE_SPEECH\", \"HARM_CATEGORY_DANGEROUS_CONTENT\", \"HARM_CATEGORY_HARASSMENT\", \"HARM_CATEGORY_SEXUALLY_EXPLICIT\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "model_safety.safety_settings.threshold": {
+      "description": "The harm block threshold.\nPossible values:\nBLOCK_LOW_AND_ABOVE\nBLOCK_MEDIUM_AND_ABOVE\nBLOCK_ONLY_HIGH\nBLOCK_NONE\nOFF Possible values: [\"BLOCK_LOW_AND_ABOVE\", \"BLOCK_MEDIUM_AND_ABOVE\", \"BLOCK_ONLY_HIGH\", \"BLOCK_NONE\", \"OFF\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

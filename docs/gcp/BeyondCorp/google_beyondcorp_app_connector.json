@@ -1,0 +1,65 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "An arbitrary user-provided name for the AppConnector.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Display name is for user convenience and does not impact security."
+    },
+    "labels": {
+      "description": "Resource labels to represent user provided metadata.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "User-provided metadata labels on the AppConnector. Labels are cosmetic/descriptive metadata; a generic security policy does not constrain them."
+    },
+    "name": {
+      "description": "ID of the AppConnector.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The name field is required to uniquely identify the AppConnector resource within a project and location."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The project field is used to identify the project resource. Some organisations may have policies that restrict which projects can be used, but this is not inherently a security issue."
+    },
+    "region": {
+      "description": "The region of the AppConnector.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "principal_info": {
+      "type": "block",
+      "description": "Principal information about the Identity of the AppConnector.",
+      "required": true
+    },
+    "principal_info.service_account": {
+      "type": "block",
+      "description": "ServiceAccount represents a GCP service account.",
+      "required": true
+    },
+    "principal_info.service_account.email": {
+      "description": "Email address of the service account.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The email address is used to identify the service account."
+    }
+  }
+}

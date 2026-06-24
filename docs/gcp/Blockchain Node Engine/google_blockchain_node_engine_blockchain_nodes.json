@@ -1,0 +1,126 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "blockchain_node_id": {
+      "description": "ID of the requesting object.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "blockchain_type": {
+      "description": "User-provided key-value pairs Possible values: [\"ETHEREUM\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Selects which blockchain protocol the node runs (e.g. Ethereum). This is a functional/architecture choice, not a security control, and the original rationale itself frames it as correctness/performance."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "User-provided key-value pairs\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "Location of Blockchain Node being created.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "ethereum_details": {
+      "type": "block",
+      "description": "User-provided key-value pairs",
+      "required": false
+    },
+    "ethereum_details.api_enable_admin": {
+      "description": "Enables JSON-RPC access to functions in the admin namespace. Defaults to false.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Enabling the admin API can pose security risks if not properly secured, as it provides access to sensitive functions. Therefore, it is important to carefully consider whether to enable this API based on the specific use case and security requirements."
+    },
+    "ethereum_details.api_enable_debug": {
+      "description": "Enables JSON-RPC access to functions in the debug namespace. Defaults to false.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Enabling the debug API can pose security risks if not properly secured, as it provides access to sensitive functions. Therefore, it is important to carefully consider whether to enable this API based on the specific use case and security requirements."
+    },
+    "ethereum_details.consensus_client": {
+      "description": "The consensus client Possible values: [\"CONSENSUS_CLIENT_UNSPECIFIED\", \"LIGHTHOUSE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Chooses which consensus (beacon) client software the node runs. This is a software-preference/functional choice, not a security control, and no generic secure value can be enforced."
+    },
+    "ethereum_details.execution_client": {
+      "description": "The execution client Possible values: [\"EXECUTION_CLIENT_UNSPECIFIED\", \"GETH\", \"ERIGON\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Chooses which execution client software the node runs (e.g. Geth). This is a software-preference/functional choice, not a security control, and no generic secure value can be enforced."
+    },
+    "ethereum_details.network": {
+      "description": "The Ethereum environment being accessed. Possible values: [\"MAINNET\", \"TESTNET_GOERLI_PRATER\", \"TESTNET_SEPOLIA\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Selects which Ethereum network (e.g. mainnet/testnet) the node connects to. This is a functional environment choice, not a security control, and no generic secure value can be enforced."
+    },
+    "ethereum_details.node_type": {
+      "description": "The type of Ethereum node. Possible values: [\"LIGHT\", \"FULL\", \"ARCHIVE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Selects the node type (LIGHT/FULL/ARCHIVE), which trades resource usage against retained data. This is a capacity/functional choice, not a security control."
+    },
+    "ethereum_details.geth_details": {
+      "type": "block",
+      "description": "User-provided key-value pairs",
+      "required": false
+    },
+    "ethereum_details.geth_details.garbage_collection_mode": {
+      "description": "Blockchain garbage collection modes. Only applicable when NodeType is FULL or ARCHIVE. Possible values: [\"FULL\", \"ARCHIVE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Selects the Geth garbage-collection/retention mode, which trades disk usage against query history. This is a storage/performance tuning choice, not a security control."
+    },
+    "ethereum_details.validator_config": {
+      "type": "block",
+      "description": "Configuration for validator-related parameters on the beacon client, and for any managed validator client.",
+      "required": false
+    },
+    "ethereum_details.validator_config.beacon_fee_recipient": {
+      "description": "An Ethereum address which the beacon client will send fee rewards to if no recipient is configured in the validator client. See https://lighthouse-book.sigmaprime.io/suggested-fee-recipient.html or https://docs.prylabs.network/docs/execution-node/fee-recipient for examples of how this is used. Note that while this is often described as \"suggested\", as we run the execution node we can trust the execution node, and therefore this is considered enforced.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "ethereum_details.validator_config.mev_relay_urls": {
+      "description": "URLs for MEV-relay services to use for block building. When set, a managed MEV-boost service is configured on the beacon client.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "A list of external MEV relay URLs the validator connects to. These are references to external endpoints chosen by the team for profitability; a generic platform policy cannot pin team-specific URLs, so it is not a policy target."
+    }
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "annotations": {
+      "description": "Optional. User defined annotations. See https://google.aip.dev/148#annotations for more details such as format and size limitations\n\n\n**Note**: This field is non-authoritative, and will only manage the annotations present in your configuration.\nPlease refer to the field 'effective_annotations' for all of the annotations present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "Optional. The description of the policy binding. Must be less than or equal to 63 characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The location of the Policy Binding",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "policy": {
+      "description": "Required. Immutable. The resource name of the policy to be bound. The binding parent and policy must belong to the same Organization (or Project).",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policy_binding_id": {
+      "description": "The Policy Binding ID.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policy_kind": {
+      "description": "Immutable. The kind of the policy to attach in this binding. This\nfield must be one of the following:  - Left empty (will be automatically set\nto the policy kind) - The input policy kind   Possible values:  POLICY_KIND_UNSPECIFIED PRINCIPAL_ACCESS_BOUNDARY ACCESS",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "condition": {
+      "type": "block",
+      "description": "Represents a textual expression in the Common Expression Language\n(CEL) syntax. CEL is a C-like expression language. The syntax and semantics of\nCEL are documented at https://github.com/google/cel-spec.\nExample (Comparison):\ntitle: \\\"Summary size limit\\\"\ndescription: \\\"Determines if a summary is less than 100 chars\\\"\nexpression: \\\"document.summary.size() < 100\\\"\nExample\n(Equality):\ntitle: \\\"Requestor is owner\\\"\ndescription: \\\"Determines if requestor is the document owner\\\"\nexpression: \\\"document.owner == request.auth.claims.email\\\"  Example\n(Logic):\ntitle: \\\"Public documents\\\"\ndescription: \\\"Determine whether the document should be publicly visible\\\"\nexpression: \\\"document.type != 'private' && document.type != 'internal'\\\"\nExample (Data Manipulation):\ntitle: \\\"Notification string\\\"\ndescription: \\\"Create a notification string with a timestamp.\\\"\nexpression: \\\"'New message received at ' + string(document.create_time)\\\"\nThe exact variables and functions that may be referenced within an expression are\ndetermined by the service that evaluates it. See the service documentation for\nadditional information.",
+      "required": false
+    },
+    "condition.description": {
+      "description": "Optional. Description of the expression. This is a longer text which describes the expression, e.g. when hovered over it in a UI.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "condition.expression": {
+      "description": "Textual representation of an expression in Common Expression Language syntax.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "condition.location": {
+      "description": "Optional. String indicating the location of the expression for error reporting, e.g. a file name and a position in the file.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "condition.title": {
+      "description": "Optional. Title for the expression, i.e. a short string describing its purpose. This can be used e.g. in UIs which allow to enter the expression.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "target": {
+      "type": "block",
+      "description": "Target is the full resource name of the resource to which the policy will be bound. Immutable once set.",
+      "required": true
+    },
+    "target.principal_set": {
+      "description": "Required. Immutable. Full Resource Name of the principal set used for principal access boundary policy bindings.\nExamples for each one of the following supported principal set types:\n* Project:\n  * '//cloudresourcemanager.googleapis.com/projects/PROJECT_NUMBER'\n  * '//cloudresourcemanager.googleapis.com/projects/PROJECT_ID'\n* Workload Identity Pool: '//iam.googleapis.com/projects/PROJECT_NUMBER/locations/LOCATION/workloadIdentityPools/WORKLOAD_POOL_ID'\nIt must be parent by the policy binding's parent (the project).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

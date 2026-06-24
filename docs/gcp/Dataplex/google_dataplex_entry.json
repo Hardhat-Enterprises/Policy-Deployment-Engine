@@ -1,0 +1,166 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "entry_group_id": {
+      "description": "The entry group id of the entry group the entry will be created in.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "entry_id": {
+      "description": "The entry id of the entry.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "entry_type": {
+      "description": "The relative resource name of the entry type that was used to create this entry, in the format projects/{project_number}/locations/{locationId}/entryTypes/{entryTypeId}.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "fully_qualified_name": {
+      "description": "A name for the entry that can be referenced by an external system. For more information, see https://cloud.google.com/dataplex/docs/fully-qualified-names.\nThe maximum size of the field is 4000 characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The location where entry will be created.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "parent_entry": {
+      "description": "The resource name of the parent entry, in the format projects/{project_number}/locations/{locationId}/entryGroups/{entryGroupId}/entries/{entryId}.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "aspects": {
+      "type": "block",
+      "description": "The aspects that are attached to the entry.",
+      "required": false
+    },
+    "aspects.aspect_key": {
+      "description": "Depending on how the aspect is attached to the entry, the format of the aspect key can be one of the following:\n\nIf the aspect is attached directly to the entry: {project_number}.{locationId}.{aspectTypeId}\nIf the aspect is attached to an entry's path: {project_number}.{locationId}.{aspectTypeId}@{path}",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "aspects.aspect": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": true
+    },
+    "aspects.aspect.data": {
+      "description": "The content of the aspect in JSON form, according to its aspect type schema. The maximum size of the field is 120KB (encoded as UTF-8).",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "entry_source": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "entry_source.create_time": {
+      "description": "The time when the resource was created in the source system.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "entry_source.description": {
+      "description": "A description of the data resource. Maximum length is 2,000 characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "entry_source.display_name": {
+      "description": "A user-friendly display name. Maximum length is 500 characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "entry_source.labels": {
+      "description": "User-defined labels. The maximum size of keys and values is 128 characters each.\nAn object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "entry_source.platform": {
+      "description": "The platform containing the source system. Maximum length is 64 characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "entry_source.resource": {
+      "description": "The name of the resource in the source system. Maximum length is 4,000 characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "entry_source.system": {
+      "description": "The name of the source system. Maximum length is 64 characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "entry_source.update_time": {
+      "description": "The time when the resource was last updated in the source system.\nIf the entry exists in the system and its EntrySource has updateTime populated,\nfurther updates to the EntrySource of the entry must provide incremental updates to its updateTime.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "entry_source.ancestors": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "entry_source.ancestors.name": {
+      "description": "The name of the ancestor resource.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "entry_source.ancestors.type": {
+      "description": "The type of the ancestor resource.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

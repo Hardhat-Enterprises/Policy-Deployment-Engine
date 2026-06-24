@@ -1,0 +1,357 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "backup_plan": {
+      "description": "A reference to the BackupPlan from which Backups may be used\nas the source for Restores created via this RestorePlan.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster": {
+      "description": "The name of the target cluster to which you want to Restore via this RestorePlan.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier of the target cluster a restore writes to. It references another resource; we do not constrain which cluster a team restores into, and a generic policy cannot know a team's approved cluster names."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "User specified descriptive string for this RestorePlan.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "Description: A set of custom labels supplied by the user.\nA list of key->value pairs.\nExample: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The region of the Restore Plan.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "name": {
+      "description": "The full name of the BackupPlan Resource.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config": {
+      "type": "block",
+      "description": "Defines the configuration of Restores created via this RestorePlan.",
+      "required": true
+    },
+    "restore_config.all_namespaces": {
+      "description": "If True, restore all namespaced resources in the Backup.\nSetting this field to False will result in an error.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.cluster_resource_conflict_policy": {
+      "description": "Defines the behavior for handling the situation where cluster-scoped resources\nbeing restored already exist in the target cluster.\nThis MUST be set to a value other than 'CLUSTER_RESOURCE_CONFLICT_POLICY_UNSPECIFIED'\nif 'clusterResourceRestoreScope' is anyting other than 'noGroupKinds'.\nSee https://cloud.google.com/kubernetes-engine/docs/add-on/backup-for-gke/reference/rest/v1/RestoreConfig#clusterresourceconflictpolicy\nfor more information on each policy option. Possible values: [\"USE_EXISTING_VERSION\", \"USE_BACKUP_VERSION\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Conflict policy should default to using existing versions to preserve state stability."
+    },
+    "restore_config.namespaced_resource_restore_mode": {
+      "description": "Defines the behavior for handling the situation where sets of namespaced resources\nbeing restored already exist in the target cluster.\nThis MUST be set to a value other than 'NAMESPACED_RESOURCE_RESTORE_MODE_UNSPECIFIED'\nif the 'namespacedResourceRestoreScope' is anything other than 'noNamespaces'.\nSee https://cloud.google.com/kubernetes-engine/docs/add-on/backup-for-gke/reference/rest/v1/RestoreConfig#namespacedresourcerestoremode\nfor more information on each mode. Possible values: [\"DELETE_AND_RESTORE\", \"FAIL_ON_CONFLICT\", \"MERGE_SKIP_ON_CONFLICT\", \"MERGE_REPLACE_VOLUME_ON_CONFLICT\", \"MERGE_REPLACE_ON_CONFLICT\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.no_namespaces": {
+      "description": "Do not restore any namespaced resources if set to \"True\".\nSpecifying this field to \"False\" is not allowed.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.volume_data_restore_policy": {
+      "description": "Specifies the mechanism to be used to restore volume data.\nThis should be set to a value other than 'NAMESPACED_RESOURCE_RESTORE_MODE_UNSPECIFIED'\nif the 'namespacedResourceRestoreScope' is anything other than 'noNamespaces'.\nIf not specified, it will be treated as 'NO_VOLUME_DATA_RESTORATION'.\nSee https://cloud.google.com/kubernetes-engine/docs/add-on/backup-for-gke/reference/rest/v1/RestoreConfig#VolumeDataRestorePolicy\nfor more information on each policy option. Possible values: [\"RESTORE_VOLUME_DATA_FROM_BACKUP\", \"REUSE_VOLUME_HANDLE_FROM_BACKUP\", \"NO_VOLUME_DATA_RESTORATION\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.cluster_resource_restore_scope": {
+      "type": "block",
+      "description": "Identifies the cluster-scoped resources to restore from the Backup.",
+      "required": false
+    },
+    "restore_config.cluster_resource_restore_scope.all_group_kinds": {
+      "description": "If True, all valid cluster-scoped resources will be restored.\nMutually exclusive to any other field in 'clusterResourceRestoreScope'.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Avoid full cluster restores to prevent overwriting critical existing resources unless explicitly intended."
+    },
+    "restore_config.cluster_resource_restore_scope.no_group_kinds": {
+      "description": "If True, no cluster-scoped resources will be restored.\nMutually exclusive to any other field in 'clusterResourceRestoreScope'.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.cluster_resource_restore_scope.excluded_group_kinds": {
+      "type": "block",
+      "description": "A list of cluster-scoped resource group kinds to NOT restore from the backup.\nIf specified, all valid cluster-scoped resources will be restored except\nfor those specified in the list.\nMutually exclusive to any other field in 'clusterResourceRestoreScope'.",
+      "required": false
+    },
+    "restore_config.cluster_resource_restore_scope.excluded_group_kinds.resource_group": {
+      "description": "API Group string of a Kubernetes resource, e.g.\n\"apiextensions.k8s.io\", \"storage.k8s.io\", etc.\nUse empty string for core group.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.cluster_resource_restore_scope.excluded_group_kinds.resource_kind": {
+      "description": "Kind of a Kubernetes resource, e.g.\n\"CustomResourceDefinition\", \"StorageClass\", etc.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.cluster_resource_restore_scope.selected_group_kinds": {
+      "type": "block",
+      "description": "A list of cluster-scoped resource group kinds to restore from the backup.\nIf specified, only the selected resources will be restored.\nMutually exclusive to any other field in the 'clusterResourceRestoreScope'.",
+      "required": false
+    },
+    "restore_config.cluster_resource_restore_scope.selected_group_kinds.resource_group": {
+      "description": "API Group string of a Kubernetes resource, e.g.\n\"apiextensions.k8s.io\", \"storage.k8s.io\", etc.\nUse empty string for core group.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.cluster_resource_restore_scope.selected_group_kinds.resource_kind": {
+      "description": "Kind of a Kubernetes resource, e.g.\n\"CustomResourceDefinition\", \"StorageClass\", etc.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.excluded_namespaces": {
+      "type": "block",
+      "description": "A list of selected namespaces excluded from restoration.\nAll namespaces except those in this list will be restored.",
+      "required": false
+    },
+    "restore_config.excluded_namespaces.namespaces": {
+      "description": "A list of Kubernetes Namespaces.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.restore_order": {
+      "type": "block",
+      "description": "It contains custom ordering to use on a Restore.",
+      "required": false
+    },
+    "restore_config.restore_order.group_kind_dependencies": {
+      "type": "block",
+      "description": "A list of group kind dependency pairs\nthat is used by Backup for GKE to\ngenerate a group kind restore order.",
+      "required": true
+    },
+    "restore_config.restore_order.group_kind_dependencies.requiring": {
+      "type": "block",
+      "description": "The requiring group kind requires that the satisfying\ngroup kind be restored first.",
+      "required": true
+    },
+    "restore_config.restore_order.group_kind_dependencies.requiring.resource_group": {
+      "description": "API Group of a Kubernetes resource, e.g.\n\"apiextensions.k8s.io\", \"storage.k8s.io\", etc.\nUse empty string for core group.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.restore_order.group_kind_dependencies.requiring.resource_kind": {
+      "description": "Kind of a Kubernetes resource, e.g.\n\"CustomResourceDefinition\", \"StorageClass\", etc.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.restore_order.group_kind_dependencies.satisfying": {
+      "type": "block",
+      "description": "The satisfying group kind must be restored first\nin order to satisfy the dependency.",
+      "required": true
+    },
+    "restore_config.restore_order.group_kind_dependencies.satisfying.resource_group": {
+      "description": "API Group of a Kubernetes resource, e.g.\n\"apiextensions.k8s.io\", \"storage.k8s.io\", etc.\nUse empty string for core group.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.restore_order.group_kind_dependencies.satisfying.resource_kind": {
+      "description": "Kind of a Kubernetes resource, e.g.\n\"CustomResourceDefinition\", \"StorageClass\", etc.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.selected_applications": {
+      "type": "block",
+      "description": "A list of selected ProtectedApplications to restore.\nThe listed ProtectedApplications and all the resources\nto which they refer will be restored.",
+      "required": false
+    },
+    "restore_config.selected_applications.namespaced_names": {
+      "type": "block",
+      "description": "A list of namespaced Kubernetes resources.",
+      "required": true
+    },
+    "restore_config.selected_applications.namespaced_names.name": {
+      "description": "The name of a Kubernetes Resource.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.selected_applications.namespaced_names.namespace": {
+      "description": "The namespace of a Kubernetes Resource.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.selected_namespaces": {
+      "type": "block",
+      "description": "A list of selected namespaces to restore from the Backup.\nThe listed Namespaces and all resources contained in them will be restored.",
+      "required": false
+    },
+    "restore_config.selected_namespaces.namespaces": {
+      "description": "A list of Kubernetes Namespaces.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.transformation_rules": {
+      "type": "block",
+      "description": "A list of transformation rules to be applied against Kubernetes\nresources as they are selected for restoration from a Backup.\nRules are executed in order defined - this order matters,\nas changes made by a rule may impact the filtering logic of subsequent\nrules. An empty list means no transformation will occur.",
+      "required": false
+    },
+    "restore_config.transformation_rules.description": {
+      "description": "The description is a user specified string description\nof the transformation rule.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.transformation_rules.field_actions": {
+      "type": "block",
+      "description": "A list of transformation rule actions to take against candidate\nresources. Actions are executed in order defined - this order\nmatters, as they could potentially interfere with each other and\nthe first operation could affect the outcome of the second operation.",
+      "required": true
+    },
+    "restore_config.transformation_rules.field_actions.from_path": {
+      "description": "A string containing a JSON Pointer value that references the\nlocation in the target document to move the value from.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.transformation_rules.field_actions.op": {
+      "description": "Specifies the operation to perform. Possible values: [\"REMOVE\", \"MOVE\", \"COPY\", \"ADD\", \"TEST\", \"REPLACE\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.transformation_rules.field_actions.path": {
+      "description": "A string containing a JSON-Pointer value that references a\nlocation within the target document where the operation is performed.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.transformation_rules.field_actions.value": {
+      "description": "A string that specifies the desired value in string format\nto use for transformation.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.transformation_rules.resource_filter": {
+      "type": "block",
+      "description": "This field is used to specify a set of fields that should be used to\ndetermine which resources in backup should be acted upon by the\nsupplied transformation rule actions, and this will ensure that only\nspecific resources are affected by transformation rule actions.",
+      "required": false
+    },
+    "restore_config.transformation_rules.resource_filter.json_path": {
+      "description": "This is a JSONPath expression that matches specific fields of\ncandidate resources and it operates as a filtering parameter\n(resources that are not matched with this expression will not\nbe candidates for transformation).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.transformation_rules.resource_filter.namespaces": {
+      "description": "(Filtering parameter) Any resource subject to transformation must\nbe contained within one of the listed Kubernetes Namespace in the\nBackup. If this field is not provided, no namespace filtering will\nbe performed (all resources in all Namespaces, including all\ncluster-scoped resources, will be candidates for transformation).\nTo mix cluster-scoped and namespaced resources in the same rule,\nuse an empty string (\"\") as one of the target namespaces.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.transformation_rules.resource_filter.group_kinds": {
+      "type": "block",
+      "description": "(Filtering parameter) Any resource subject to transformation must\nbelong to one of the listed \"types\". If this field is not provided,\nno type filtering will be performed\n(all resources of all types matching previous filtering parameters\nwill be candidates for transformation).",
+      "required": false
+    },
+    "restore_config.transformation_rules.resource_filter.group_kinds.resource_group": {
+      "description": "API Group string of a Kubernetes resource, e.g.\n\"apiextensions.k8s.io\", \"storage.k8s.io\", etc.\nUse empty string for core group.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.transformation_rules.resource_filter.group_kinds.resource_kind": {
+      "description": "Kind of a Kubernetes resource, e.g.\n\"CustomResourceDefinition\", \"StorageClass\", etc.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.volume_data_restore_policy_bindings": {
+      "type": "block",
+      "description": "A table that binds volumes by their scope to a restore policy. Bindings\nmust have a unique scope. Any volumes not scoped in the bindings are\nsubject to the policy defined in volume_data_restore_policy.",
+      "required": false
+    },
+    "restore_config.volume_data_restore_policy_bindings.policy": {
+      "description": "Specifies the mechanism to be used to restore this volume data.\nSee https://cloud.google.com/kubernetes-engine/docs/add-on/backup-for-gke/reference/rest/v1/RestoreConfig#VolumeDataRestorePolicy\nfor more information on each policy option. Possible values: [\"RESTORE_VOLUME_DATA_FROM_BACKUP\", \"REUSE_VOLUME_HANDLE_FROM_BACKUP\", \"NO_VOLUME_DATA_RESTORATION\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "restore_config.volume_data_restore_policy_bindings.volume_type": {
+      "description": "The volume type, as determined by the PVC's\nbound PV, to apply the policy to. Possible values: [\"GCE_PERSISTENT_DISK\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

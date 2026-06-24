@@ -1,0 +1,46 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Unnecessary as it defaults to the provider-level project configuration if it is not provided, ensuring the resource is naturally governed by the existing project-level access controls."
+    },
+    "dispatch_rules": {
+      "type": "block",
+      "description": "Rules to match an HTTP request and dispatch that request to a service.",
+      "required": true
+    },
+    "dispatch_rules.domain": {
+      "description": "Domain name to match against. The wildcard \"*\" is supported if specified before a period: \"*.\".\nDefaults to matching all domains: \"*\".",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "A domain match pattern (supports wildcards) used by dispatch rules to route requests to a service. This is a routing/reference value, not a security control, and a generic policy cannot pin team-specific domains."
+    },
+    "dispatch_rules.path": {
+      "description": "Pathname within the host. Must start with a \"/\". A single \"*\" can be included at the end of the path.\nThe sum of the lengths of the domain and path may not exceed 100 characters.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "A URL path pattern used by dispatch rules to route requests to a service. This is a team-defined routing value, not a security control, and a generic policy cannot prescribe application-specific paths."
+    },
+    "dispatch_rules.service": {
+      "description": "Pathname within the host. Must start with a \"/\". A single \"*\" can be included at the end of the path.\nThe sum of the lengths of the domain and path may not exceed 100 characters.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "References the target service a dispatch rule routes to. This is a reference/identifier to another resource, not a security control."
+    }
+  }
+}

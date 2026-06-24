@@ -523,8 +523,16 @@ class RepositoryManager:
         markdown_path = docs_dir / filename
 
         if not markdown_path.exists():
+            # The GCP provider is inconsistent about doc filenames: most drop the
+            # provider prefix (kms_crypto_key.html.markdown), but a cluster of core
+            # resources keep it (google_project.html.markdown, google_folder.html.markdown).
+            # Try the prefix-retained filename before falling back to IAM handling.
+            prefixed_path = docs_dir / f"{resource_name}.html.markdown"
+            if prefixed_path.exists():
+                return prefixed_path
+
             # For IAM resource variants (e.g. google_foo_iam_policy → foo_iam.html.markdown)
-            for iam_suffix in ('_iam_policy', '_iam_binding', '_iam_member'):
+            for iam_suffix in ('_iam_policy', '_iam_binding', '_iam_member', '_iam_audit_config'):
                 if resource_name.endswith(iam_suffix):
                     base = resource_name[:-len(iam_suffix)]  # strip _policy/_binding/_member
                     iam_stem = base  # already has provider prefix stripped above
@@ -593,6 +601,11 @@ class RepositoryManager:
         else:
             prefix = ''
         
+        # Some GCP doc filenames already carry the provider prefix
+        # (google_project.html.markdown); don't double-prefix those.
+        def _with_prefix(s: str) -> str:
+            return s if (prefix and s.startswith(prefix)) else f"{prefix}{s}"
+
         resources = []
         for markdown_file in docs_dir.glob('*.html.markdown'):
             stem = markdown_file.stem.replace('.html', '')
@@ -604,10 +617,10 @@ class RepositoryManager:
                     resources.extend(iam_names)
                 else:
                     # Fallback: synthesize the 3 standard names
-                    base = f"{prefix}{stem}"
+                    base = _with_prefix(stem)
                     resources.extend([f"{base}_policy", f"{base}_binding", f"{base}_member"])
             else:
-                resources.append(f"{prefix}{stem}")
+                resources.append(_with_prefix(stem))
 
         logger.debug(f"Found {len(resources)} resources in {docs_dir}")
         return sorted(resources)
@@ -617,7 +630,7 @@ class RepositoryManager:
         try:
             content = iam_file.read_text(encoding='utf-8')
             pattern = re.compile(
-                r'^##\s+(' + re.escape(prefix) + r'\S+_iam_(?:policy|binding|member))\s*$',
+                r'^##\s+(' + re.escape(prefix) + r'\S+_iam_(?:policy|binding|member|audit_config))\s*$',
                 re.MULTILINE
             )
             names = list(dict.fromkeys(pattern.findall(content)))  # preserve order, deduplicate

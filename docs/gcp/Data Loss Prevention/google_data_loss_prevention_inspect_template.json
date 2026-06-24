@@ -1,0 +1,536 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "A description of the inspect template.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "User set display name of the inspect template.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "parent": {
+      "description": "The parent of the inspect template in any of the following formats:\n\n* 'projects/{{project}}'\n* 'projects/{{project}}/locations/{{location}}'\n* 'organizations/{{organization_id}}'\n* 'organizations/{{organization_id}}/locations/{{location}}'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "template_id": {
+      "description": "The template id can contain uppercase and lowercase letters, numbers, and hyphens;\nthat is, it must match the regular expression: [a-zA-Z\\d-_]+. The maximum length is\n100 characters. Can be empty to allow the system to generate one.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config": {
+      "type": "block",
+      "description": "The core content of the template.",
+      "required": false
+    },
+    "inspect_config.content_options": {
+      "description": "List of options defining data content to scan. If empty, text, images, and other content will be included. Possible values: [\"CONTENT_TEXT\", \"CONTENT_IMAGE\"]",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.exclude_info_types": {
+      "description": "When true, excludes type information of the findings.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.include_quote": {
+      "description": "When true, a contextual quote from the data that triggered a finding is included in the response.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.min_likelihood": {
+      "description": "Only returns findings equal or above this threshold. See https://cloud.google.com/dlp/docs/likelihood for more info Default value: \"POSSIBLE\" Possible values: [\"VERY_UNLIKELY\", \"UNLIKELY\", \"POSSIBLE\", \"LIKELY\", \"VERY_LIKELY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.custom_info_types": {
+      "type": "block",
+      "description": "Custom info types to be used. See https://cloud.google.com/dlp/docs/creating-custom-infotypes to learn more.",
+      "required": false
+    },
+    "inspect_config.custom_info_types.exclusion_type": {
+      "description": "If set to EXCLUSION_TYPE_EXCLUDE this infoType will not cause a finding to be returned. It still can be used for rules matching. Possible values: [\"EXCLUSION_TYPE_EXCLUDE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.custom_info_types.likelihood": {
+      "description": "Likelihood to return for this CustomInfoType. This base value can be altered by a detection rule if the finding meets the criteria\nspecified by the rule. Default value: \"VERY_LIKELY\" Possible values: [\"VERY_UNLIKELY\", \"UNLIKELY\", \"POSSIBLE\", \"LIKELY\", \"VERY_LIKELY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.custom_info_types.dictionary": {
+      "type": "block",
+      "description": "Dictionary which defines the rule.",
+      "required": false
+    },
+    "inspect_config.custom_info_types.dictionary.cloud_storage_path": {
+      "type": "block",
+      "description": "Newline-delimited file of words in Cloud Storage. Only a single file is accepted.",
+      "required": false
+    },
+    "inspect_config.custom_info_types.dictionary.cloud_storage_path.path": {
+      "description": "A url representing a file or path (no wildcards) in Cloud Storage. Example: 'gs://[BUCKET_NAME]/dictionary.txt'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.custom_info_types.dictionary.word_list": {
+      "type": "block",
+      "description": "List of words or phrases to search for.",
+      "required": false
+    },
+    "inspect_config.custom_info_types.dictionary.word_list.words": {
+      "description": "Words or phrases defining the dictionary. The dictionary must contain at least one\nphrase and every phrase must contain at least 2 characters that are letters or digits.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.custom_info_types.info_type": {
+      "type": "block",
+      "description": "CustomInfoType can either be a new infoType, or an extension of built-in infoType, when the name matches one of existing\ninfoTypes and that infoType is specified in 'info_types' field. Specifying the latter adds findings to the\none detected by the system. If built-in info type is not specified in 'info_types' list then the name is\ntreated as a custom info type.",
+      "required": true
+    },
+    "inspect_config.custom_info_types.info_type.name": {
+      "description": "Name of the information type. Either a name of your choosing when creating a CustomInfoType, or one of the names\nlisted at https://cloud.google.com/dlp/docs/infotypes-reference when specifying a built-in type.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.custom_info_types.info_type.version": {
+      "description": "Version name for this InfoType.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.custom_info_types.info_type.sensitivity_score": {
+      "type": "block",
+      "description": "Optional custom sensitivity for this InfoType. This only applies to data profiling.",
+      "required": false
+    },
+    "inspect_config.custom_info_types.info_type.sensitivity_score.score": {
+      "description": "The sensitivity score applied to the resource. Possible values: [\"SENSITIVITY_LOW\", \"SENSITIVITY_MODERATE\", \"SENSITIVITY_HIGH\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.custom_info_types.regex": {
+      "type": "block",
+      "description": "Regular expression which defines the rule.",
+      "required": false
+    },
+    "inspect_config.custom_info_types.regex.group_indexes": {
+      "description": "The index of the submatch to extract as findings. When not specified, the entire match is returned. No more than 3 may be included.",
+      "required": false,
+      "type": "list(number)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.custom_info_types.regex.pattern": {
+      "description": "Pattern defining the regular expression.\nIts syntax (https://github.com/google/re2/wiki/Syntax) can be found under the google/re2 repository on GitHub.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.custom_info_types.sensitivity_score": {
+      "type": "block",
+      "description": "Optional custom sensitivity for this InfoType. This only applies to data profiling.",
+      "required": false
+    },
+    "inspect_config.custom_info_types.sensitivity_score.score": {
+      "description": "The sensitivity score applied to the resource. Possible values: [\"SENSITIVITY_LOW\", \"SENSITIVITY_MODERATE\", \"SENSITIVITY_HIGH\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.custom_info_types.stored_type": {
+      "type": "block",
+      "description": "A reference to a StoredInfoType to use with scanning.",
+      "required": false
+    },
+    "inspect_config.custom_info_types.stored_type.name": {
+      "description": "Resource name of the requested StoredInfoType, for example 'organizations/433245324/storedInfoTypes/432452342'\nor 'projects/project-id/storedInfoTypes/432452342'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.custom_info_types.surrogate_type": {
+      "type": "block",
+      "description": "Message for detecting output from deidentification transformations that support reversing.",
+      "required": false
+    },
+    "inspect_config.info_types": {
+      "type": "block",
+      "description": "Restricts what infoTypes to look for. The values must correspond to InfoType values returned by infoTypes.list\nor listed at https://cloud.google.com/dlp/docs/infotypes-reference.\n\nWhen no InfoTypes or CustomInfoTypes are specified in a request, the system may automatically choose what detectors to run.\nBy default this may be all types, but may change over time as detectors are updated.",
+      "required": false
+    },
+    "inspect_config.info_types.name": {
+      "description": "Name of the information type. Either a name of your choosing when creating a CustomInfoType, or one of the names listed\nat https://cloud.google.com/dlp/docs/infotypes-reference when specifying a built-in type.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.info_types.version": {
+      "description": "Version of the information type to use. By default, the version is set to stable",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.info_types.sensitivity_score": {
+      "type": "block",
+      "description": "Optional custom sensitivity for this InfoType. This only applies to data profiling.",
+      "required": false
+    },
+    "inspect_config.info_types.sensitivity_score.score": {
+      "description": "The sensitivity score applied to the resource. Possible values: [\"SENSITIVITY_LOW\", \"SENSITIVITY_MODERATE\", \"SENSITIVITY_HIGH\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.limits": {
+      "type": "block",
+      "description": "Configuration to control the number of findings returned.",
+      "required": false
+    },
+    "inspect_config.limits.max_findings_per_item": {
+      "description": "Max number of findings that will be returned for each item scanned. The maximum returned is 2000.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.limits.max_findings_per_request": {
+      "description": "Max number of findings that will be returned per request/job. The maximum returned is 2000.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.limits.max_findings_per_info_type": {
+      "type": "block",
+      "description": "Configuration of findings limit given for specified infoTypes.",
+      "required": false
+    },
+    "inspect_config.limits.max_findings_per_info_type.max_findings": {
+      "description": "Max findings limit for the given infoType.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.limits.max_findings_per_info_type.info_type": {
+      "type": "block",
+      "description": "Type of information the findings limit applies to. Only one limit per infoType should be provided. If InfoTypeLimit does\nnot have an infoType, the DLP API applies the limit against all infoTypes that are found but not\nspecified in another InfoTypeLimit.",
+      "required": false
+    },
+    "inspect_config.limits.max_findings_per_info_type.info_type.name": {
+      "description": "Name of the information type. Either a name of your choosing when creating a CustomInfoType, or one of the names listed\nat https://cloud.google.com/dlp/docs/infotypes-reference when specifying a built-in type.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.limits.max_findings_per_info_type.info_type.version": {
+      "description": "Version name for this InfoType.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.limits.max_findings_per_info_type.info_type.sensitivity_score": {
+      "type": "block",
+      "description": "Optional custom sensitivity for this InfoType. This only applies to data profiling.",
+      "required": false
+    },
+    "inspect_config.limits.max_findings_per_info_type.info_type.sensitivity_score.score": {
+      "description": "The sensitivity score applied to the resource. Possible values: [\"SENSITIVITY_LOW\", \"SENSITIVITY_MODERATE\", \"SENSITIVITY_HIGH\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.rule_set": {
+      "type": "block",
+      "description": "Set of rules to apply to the findings for this InspectConfig. Exclusion rules, contained in the set are executed in the end,\nother rules are executed in the order they are specified for each info type.",
+      "required": false
+    },
+    "inspect_config.rule_set.info_types": {
+      "type": "block",
+      "description": "List of infoTypes this rule set is applied to.",
+      "required": true
+    },
+    "inspect_config.rule_set.info_types.name": {
+      "description": "Name of the information type. Either a name of your choosing when creating a CustomInfoType, or one of the names listed\nat https://cloud.google.com/dlp/docs/infotypes-reference when specifying a built-in type.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.rule_set.info_types.version": {
+      "description": "Version name for this InfoType.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.rule_set.info_types.sensitivity_score": {
+      "type": "block",
+      "description": "Optional custom sensitivity for this InfoType. This only applies to data profiling.",
+      "required": false
+    },
+    "inspect_config.rule_set.info_types.sensitivity_score.score": {
+      "description": "The sensitivity score applied to the resource. Possible values: [\"SENSITIVITY_LOW\", \"SENSITIVITY_MODERATE\", \"SENSITIVITY_HIGH\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.rule_set.rules": {
+      "type": "block",
+      "description": "Set of rules to be applied to infoTypes. The rules are applied in order.",
+      "required": true
+    },
+    "inspect_config.rule_set.rules.exclusion_rule": {
+      "type": "block",
+      "description": "The rule that specifies conditions when findings of infoTypes specified in InspectionRuleSet are removed from results.",
+      "required": false
+    },
+    "inspect_config.rule_set.rules.exclusion_rule.matching_type": {
+      "description": "How the rule is applied. See the documentation for more information: https://cloud.google.com/dlp/docs/reference/rest/v2/InspectConfig#MatchingType Possible values: [\"MATCHING_TYPE_FULL_MATCH\", \"MATCHING_TYPE_PARTIAL_MATCH\", \"MATCHING_TYPE_INVERSE_MATCH\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.rule_set.rules.exclusion_rule.dictionary": {
+      "type": "block",
+      "description": "Dictionary which defines the rule.",
+      "required": false
+    },
+    "inspect_config.rule_set.rules.exclusion_rule.dictionary.cloud_storage_path": {
+      "type": "block",
+      "description": "Newline-delimited file of words in Cloud Storage. Only a single file is accepted.",
+      "required": false
+    },
+    "inspect_config.rule_set.rules.exclusion_rule.dictionary.cloud_storage_path.path": {
+      "description": "A url representing a file or path (no wildcards) in Cloud Storage. Example: 'gs://[BUCKET_NAME]/dictionary.txt'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.rule_set.rules.exclusion_rule.dictionary.word_list": {
+      "type": "block",
+      "description": "List of words or phrases to search for.",
+      "required": false
+    },
+    "inspect_config.rule_set.rules.exclusion_rule.dictionary.word_list.words": {
+      "description": "Words or phrases defining the dictionary. The dictionary must contain at least one\nphrase and every phrase must contain at least 2 characters that are letters or digits.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.rule_set.rules.exclusion_rule.exclude_by_hotword": {
+      "type": "block",
+      "description": "Drop if the hotword rule is contained in the proximate context.\nFor tabular data, the context includes the column name.",
+      "required": false
+    },
+    "inspect_config.rule_set.rules.exclusion_rule.exclude_by_hotword.hotword_regex": {
+      "type": "block",
+      "description": "Regular expression pattern defining what qualifies as a hotword.",
+      "required": true
+    },
+    "inspect_config.rule_set.rules.exclusion_rule.exclude_by_hotword.hotword_regex.group_indexes": {
+      "description": "The index of the submatch to extract as findings. When not specified,\nthe entire match is returned. No more than 3 may be included.",
+      "required": false,
+      "type": "list(number)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.rule_set.rules.exclusion_rule.exclude_by_hotword.hotword_regex.pattern": {
+      "description": "Pattern defining the regular expression. Its syntax\n(https://github.com/google/re2/wiki/Syntax) can be found under the google/re2 repository on GitHub.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.rule_set.rules.exclusion_rule.exclude_by_hotword.proximity": {
+      "type": "block",
+      "description": "Proximity of the finding within which the entire hotword must reside. The total length of the window cannot\nexceed 1000 characters. Note that the finding itself will be included in the window, so that hotwords may be\nused to match substrings of the finding itself. For example, the certainty of a phone number regex\n'(\\d{3}) \\d{3}-\\d{4}' could be adjusted upwards if the area code is known to be the local area code of a company\noffice using the hotword regex '(xxx)', where 'xxx' is the area code in question.",
+      "required": true
+    },
+    "inspect_config.rule_set.rules.exclusion_rule.exclude_by_hotword.proximity.window_after": {
+      "description": "Number of characters after the finding to consider.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.rule_set.rules.exclusion_rule.exclude_by_hotword.proximity.window_before": {
+      "description": "Number of characters before the finding to consider.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.rule_set.rules.exclusion_rule.exclude_info_types": {
+      "type": "block",
+      "description": "Set of infoTypes for which findings would affect this rule.",
+      "required": false
+    },
+    "inspect_config.rule_set.rules.exclusion_rule.exclude_info_types.info_types": {
+      "type": "block",
+      "description": "If a finding is matched by any of the infoType detectors listed here, the finding will be excluded from the scan results.",
+      "required": true
+    },
+    "inspect_config.rule_set.rules.exclusion_rule.exclude_info_types.info_types.name": {
+      "description": "Name of the information type. Either a name of your choosing when creating a CustomInfoType, or one of the names listed\nat https://cloud.google.com/dlp/docs/infotypes-reference when specifying a built-in type.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.rule_set.rules.exclusion_rule.exclude_info_types.info_types.version": {
+      "description": "Version name for this InfoType.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.rule_set.rules.exclusion_rule.exclude_info_types.info_types.sensitivity_score": {
+      "type": "block",
+      "description": "Optional custom sensitivity for this InfoType. This only applies to data profiling.",
+      "required": false
+    },
+    "inspect_config.rule_set.rules.exclusion_rule.exclude_info_types.info_types.sensitivity_score.score": {
+      "description": "The sensitivity score applied to the resource. Possible values: [\"SENSITIVITY_LOW\", \"SENSITIVITY_MODERATE\", \"SENSITIVITY_HIGH\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.rule_set.rules.exclusion_rule.regex": {
+      "type": "block",
+      "description": "Regular expression which defines the rule.",
+      "required": false
+    },
+    "inspect_config.rule_set.rules.exclusion_rule.regex.group_indexes": {
+      "description": "The index of the submatch to extract as findings. When not specified, the entire match is returned. No more than 3 may be included.",
+      "required": false,
+      "type": "list(number)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.rule_set.rules.exclusion_rule.regex.pattern": {
+      "description": "Pattern defining the regular expression.\nIts syntax (https://github.com/google/re2/wiki/Syntax) can be found under the google/re2 repository on GitHub.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.rule_set.rules.hotword_rule": {
+      "type": "block",
+      "description": "Hotword-based detection rule.",
+      "required": false
+    },
+    "inspect_config.rule_set.rules.hotword_rule.hotword_regex": {
+      "type": "block",
+      "description": "Regular expression pattern defining what qualifies as a hotword.",
+      "required": true
+    },
+    "inspect_config.rule_set.rules.hotword_rule.hotword_regex.group_indexes": {
+      "description": "The index of the submatch to extract as findings. When not specified,\nthe entire match is returned. No more than 3 may be included.",
+      "required": false,
+      "type": "list(number)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.rule_set.rules.hotword_rule.hotword_regex.pattern": {
+      "description": "Pattern defining the regular expression. Its syntax\n(https://github.com/google/re2/wiki/Syntax) can be found under the google/re2 repository on GitHub.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.rule_set.rules.hotword_rule.likelihood_adjustment": {
+      "type": "block",
+      "description": "Likelihood adjustment to apply to all matching findings.",
+      "required": true
+    },
+    "inspect_config.rule_set.rules.hotword_rule.likelihood_adjustment.fixed_likelihood": {
+      "description": "Set the likelihood of a finding to a fixed value. Either this or relative_likelihood can be set. Possible values: [\"VERY_UNLIKELY\", \"UNLIKELY\", \"POSSIBLE\", \"LIKELY\", \"VERY_LIKELY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.rule_set.rules.hotword_rule.likelihood_adjustment.relative_likelihood": {
+      "description": "Increase or decrease the likelihood by the specified number of levels. For example,\nif a finding would be POSSIBLE without the detection rule and relativeLikelihood is 1,\nthen it is upgraded to LIKELY, while a value of -1 would downgrade it to UNLIKELY.\nLikelihood may never drop below VERY_UNLIKELY or exceed VERY_LIKELY, so applying an\nadjustment of 1 followed by an adjustment of -1 when base likelihood is VERY_LIKELY\nwill result in a final likelihood of LIKELY. Either this or fixed_likelihood can be set.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.rule_set.rules.hotword_rule.proximity": {
+      "type": "block",
+      "description": "Proximity of the finding within which the entire hotword must reside. The total length of the window cannot\nexceed 1000 characters. Note that the finding itself will be included in the window, so that hotwords may be\nused to match substrings of the finding itself. For example, the certainty of a phone number regex\n'(\\d{3}) \\d{3}-\\d{4}' could be adjusted upwards if the area code is known to be the local area code of a company\noffice using the hotword regex '(xxx)', where 'xxx' is the area code in question.",
+      "required": true
+    },
+    "inspect_config.rule_set.rules.hotword_rule.proximity.window_after": {
+      "description": "Number of characters after the finding to consider. Either this or window_before must be specified",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_config.rule_set.rules.hotword_rule.proximity.window_before": {
+      "description": "Number of characters before the finding to consider. Either this or window_after must be specified",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}
