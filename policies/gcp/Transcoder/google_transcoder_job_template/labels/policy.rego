@@ -1,4 +1,4 @@
-package terraform.gcp.security.transcoder.google_transcoder_job_template.mandatory_labels
+package terraform.gcp.security.transcoder.google_transcoder_job_template.labels
 
 import data.terraform.helpers
 import data.terraform.gcp.security.transcoder.google_transcoder_job_template.vars

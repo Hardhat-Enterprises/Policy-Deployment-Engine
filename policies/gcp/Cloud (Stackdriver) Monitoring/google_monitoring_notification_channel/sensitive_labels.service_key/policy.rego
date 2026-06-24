@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_monitoring.google_monitoring_notification_channel.service_key
+package terraform.gcp.security.cloud_monitoring.google_monitoring_notification_channel.sensitive_labels_service_key
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_monitoring.google_monitoring_notification_channel.vars
 conditions := [

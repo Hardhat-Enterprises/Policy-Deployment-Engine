@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_bigtable.google_bigtable_table.automated_backup_policy_required
+package terraform.gcp.security.cloud_bigtable.google_bigtable_table.automated_backup_policy_retention_period
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_bigtable.google_bigtable_table.vars
 conditions := [

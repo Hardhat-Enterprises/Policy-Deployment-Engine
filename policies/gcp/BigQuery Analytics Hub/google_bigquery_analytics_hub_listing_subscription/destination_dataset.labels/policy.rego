@@ -1,4 +1,4 @@
-package terraform.gcp.security.bigquery_analytics_hub.google_bigquery_analytics_hub_listing_subscription.require_environment_label
+package terraform.gcp.security.bigquery_analytics_hub.google_bigquery_analytics_hub_listing_subscription.destination_dataset_labels
 
 import data.terraform.gcp.security.bigquery_analytics_hub.google_bigquery_analytics_hub_listing_subscription.vars
 import data.terraform.helpers

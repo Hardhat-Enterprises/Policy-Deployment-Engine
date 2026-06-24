@@ -1,4 +1,4 @@
-package terraform.gcp.security.certificate_manager.google_certificate_manager_certificate_map.approved_environment_label
+package terraform.gcp.security.certificate_manager.google_certificate_manager_certificate_map.labels
 
 import data.terraform.helpers
 import data.terraform.gcp.security.certificate_manager.google_certificate_manager_certificate_map.vars

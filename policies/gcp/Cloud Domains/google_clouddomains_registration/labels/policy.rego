@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_domains.google_clouddomains_registration.mandatory_labels
+package terraform.gcp.security.cloud_domains.google_clouddomains_registration.labels
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_domains.google_clouddomains_registration.vars

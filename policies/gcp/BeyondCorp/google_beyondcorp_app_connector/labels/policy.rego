@@ -1,4 +1,4 @@
-package terraform.gcp.security.beyondcorp.google_beyondcorp_app_connector.labels_required
+package terraform.gcp.security.beyondcorp.google_beyondcorp_app_connector.labels
 
 import data.terraform.helpers
 import data.terraform.gcp.security.beyondcorp.google_beyondcorp_app_connector.vars
