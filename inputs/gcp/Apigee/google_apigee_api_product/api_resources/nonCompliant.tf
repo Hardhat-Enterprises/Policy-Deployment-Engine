@@ -1,0 +1,9 @@
+resource "google_apigee_api_product" "non_compliant_example_1" {
+  org_id        = "PDE_Apigee_API_Product"
+  name          = "non_compliant_example_1"
+  display_name  = "My Basic API Product"
+
+  approval_type = "auto"
+  proxies = ["proxies-noncompliant"]
+  environments = ["Production"]
+}

@@ -1,6 +1,0 @@
-resource "google_app_engine_firewall_rule" "nc" {
-  project      = "gcp-project-12345"
-  priority     = 1000
-  action       = "DENY"
-  source_range = "0.0.0.0/0"
-}

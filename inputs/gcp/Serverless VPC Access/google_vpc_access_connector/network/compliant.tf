@@ -1,0 +1,10 @@
+resource "google_vpc_access_connector" "compliant_example_1" {
+  name           = "compliant_example_1"
+  project        = "PDE"
+  region         = "australia-southeast1"
+  ip_cidr_range  = "10.8.0.0/28"
+  network        = "default"
+  machine_type   = "e2-micro"
+  min_instances  = 2
+  max_instances  = 5
+}
