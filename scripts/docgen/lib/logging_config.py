@@ -70,18 +70,21 @@ def setup_logging(silent: bool = False) -> Path:
     # Console handlers (no timestamps)
     console_format = logging.Formatter("%(name)s - %(levelname)s - %(message)s")
     
+    stderr_handler = logging.StreamHandler(sys.stderr)
+    stderr_handler.setFormatter(console_format)
+
     if not silent:
-        # INFO and WARNING to stdout
+        # INFO and WARNING to stdout; ERROR-only to stderr (no double emit).
         stdout_handler = logging.StreamHandler(sys.stdout)
         stdout_handler.setLevel(logging.INFO)
         stdout_handler.addFilter(lambda record: record.levelno < logging.ERROR)
         stdout_handler.setFormatter(console_format)
         handlers.append(stdout_handler)
-    
-    # WARNING and ERROR to stderr (always, even in silent mode)
-    stderr_handler = logging.StreamHandler(sys.stderr)
-    stderr_handler.setLevel(logging.WARNING)
-    stderr_handler.setFormatter(console_format)
+        stderr_handler.setLevel(logging.ERROR)
+    else:
+        # Silent mode: stdout suppressed, so surface WARNING+ on stderr instead.
+        stderr_handler.setLevel(logging.WARNING)
+
     handlers.append(stderr_handler)
     
     # Configure root logger
