@@ -38,9 +38,10 @@ The ``inputs/`` taxonomy must reconcile *exactly* to the docs taxonomy:
     documented resource for that service (a ``docs/gcp/<service>/<resource>.json``).
 2e. Each resource-dir holds only directories (arguments); each name must match a
     *non-block* argument key in that resource's doc JSON (``arguments`` map).
-2f. Each argument-dir must contain the required files ``c.tf``, ``config.tf``,
-    ``nc.tf``. Terraform-generated artifacts (``INPUT_ALLOWED_TF_FILES`` /
-    ``INPUT_ALLOWED_TF_DIRS``) are tolerated; anything else is flagged for removal.
+2f. Each argument-dir must contain the required files ``compliant.tf``,
+    ``config.tf``, ``nonCompliant.tf``. Terraform-generated artifacts
+    (``INPUT_ALLOWED_TF_FILES`` / ``INPUT_ALLOWED_TF_DIRS``) are tolerated;
+    anything else is flagged for removal.
 
 POLICIES tree (``--tree policies``)
 ===================================
@@ -56,7 +57,7 @@ single ``*.rego`` policy file (not a directory):
     ``docs/gcp/<service>`` directory name exactly.
 3e. Each service-dir holds only directories (resource types); each name must match a
     documented resource for that service (a ``docs/gcp/<service>/<resource>.json``).
-3f. Each resource-dir holds only files: an optional ``vars.rego`` plus one
+3f. Each resource-dir holds only files: an optional ``_vars.rego`` plus one
     ``<argument>.rego`` per policy, where ``<argument>`` (the filename minus the
     ``.rego`` suffix) is a *non-block* argument key in that resource's doc JSON.
     Directories (the old ``<argument>/policy.rego`` layout) are flagged for flattening.
@@ -87,7 +88,7 @@ IGNORE_FILES = {".DS_Store", "Thumbs.db", "desktop.ini"}  # OS junk, ignored eve
 # --------------------------------------------------------------------------- #
 # Inputs-tree allow-lists (argument-dir leaf files). Edit as the pipeline grows.
 # --------------------------------------------------------------------------- #
-INPUT_REQUIRED_FILES = {"c.tf", "config.tf", "nc.tf"}     # must exist in every argument dir
+INPUT_REQUIRED_FILES = {"compliant.tf", "config.tf", "nonCompliant.tf"}  # must exist in every arg dir
 INPUT_ALLOWED_TF_FILES = {                                # terraform-generated, tolerated
     ".terraform.lock.hcl",
     "plan", "plan.json", "tfplan", "tfplan.json", "tfplan_flat.json",
@@ -101,7 +102,9 @@ INPUT_ALLOWED_TF_DIRS = {".terraform"}                    # the only directory t
 # --------------------------------------------------------------------------- #
 POLICIES_HELPERS_DIR = "_helpers"                         # shared rego helpers, exempt from taxonomy
 POLICIES_HELPER_EXTS = {".rego", ".md"}                   # only these file types live under _helpers
-POLICY_VARS_FILE = "vars.rego"                            # per-resource shared variables (optional)
+POLICY_VARS_FILE = "_vars.rego"                          # per-resource shared variables (optional);
+                                                         # underscore-prefixed so it is never mistaken
+                                                         # for an <argument>.rego policy file
 POLICY_REGO_EXT = ".rego"
 
 # --------------------------------------------------------------------------- #
@@ -539,6 +542,159 @@ class PoliciesValidator:
                     self.logger.log(f"{entry_rel}: '{arg}' is a block argument (only non-block keys allowed)")
 
 
+# =========================================================================== #
+# CONTENT CHECKS (opt-in: `--content-checks`)
+# --------------------------------------------------------------------------- #
+# Everything ABOVE this banner is the structural/taxonomy linter; it never opens
+# a .tf or .rego file. The checks BELOW read *inside* files. They are OFF by
+# default (a known backlog of fixtures has not been migrated yet — see below);
+# enable with `--content-checks`. Rules:
+#   A. policies: each .rego `package` matches its path —
+#      terraform.gcp.security.<service>.<resource>.<seg>  (seg = filename stem
+#      with '.'->'_'; _vars.rego -> .<resource>.vars). The <service> segment is
+#      not asserted (the on-disk service dir name differs from the slug).
+#   B. inputs: a fixture (compliant.tf / nonCompliant.tf) contains ONLY the
+#      tested resource type (== its dir); dependency resources are disallowed
+#      (we run `tf plan` only, so the tested resource uses fake values instead).
+#   C. inputs: tested-resource labels follow the example convention,
+#      compliant_example_N (compliant.tf) / non_compliant_example_N
+#      (nonCompliant.tf), sequential from 1, always suffixed.
+# BACKLOG: B/C still fail on fixtures whose dependency references could not be
+# auto-inlined (computed attrs like `.id`) plus a couple of broken fixtures;
+# those keep the old `c`/`nc` shape until fixed by hand.
+# Deliberately NOT carried over from the legacy linter: `terraform fmt`
+# (mutates files) and the lowercase-filename regex (breaks on dotted docs keys).
+# =========================================================================== #
+
+PKG_RE = re.compile(r"^\s*package\s+([A-Za-z0-9_.]+)")
+TF_RESOURCE_RE = re.compile(r'^\s*resource\s+"([^"]+)"\s+"([^"]+)"')
+
+
+class ContentChecksValidator:
+    """Reads inside .rego/.tf files (opt-in; see banner).
+
+    Name *reconciliation* is done by the structural validators above; this only
+    checks that file *contents* line up with those (already-validated) names.
+    """
+
+    def __init__(self, policies_root, inputs_root, logger):
+        self.policies_root = policies_root
+        self.inputs_root = inputs_root
+        self.logger = logger
+
+    def validate(self, only_platform=None):
+        # Only gcp is populated today; aws/azure are .gitkeep placeholders.
+        if only_platform and only_platform != "gcp":
+            return
+        self._check_policies_packages(os.path.join(self.policies_root, "gcp"))
+        self._check_inputs_terraform(os.path.join(self.inputs_root, "gcp"))
+
+    @staticmethod
+    def _read_package(path):
+        try:
+            with open(path, encoding="utf-8") as fh:
+                for line in fh:
+                    m = PKG_RE.match(line)
+                    if m:
+                        return m.group(1).strip()
+        except OSError:
+            return None
+        return None
+
+    # ----- A: rego package path (policies) -------------------------------- #
+    def _check_policies_packages(self, gcp_root):
+        """A (TO BE VERIFIED): each .rego `package` must sit at its path.
+
+        Expected: ``terraform.gcp.security.<service_seg>.<resource>.<seg>`` where
+        ``<seg>`` is the filename stem with dots->underscores (folders may carry
+        dotted docs keys; packages sanitise them). ``_vars.rego`` -> ``.<resource>.vars``.
+        CAVEAT: ``<service_seg>`` is NOT validated — the on-disk service dir
+        (e.g. "Data Catalog") differs from the package service segment (e.g.
+        "google_data_catalog"), so only the prefix and the trailing
+        ``.<resource>.<seg>`` are asserted.
+        """
+        if not os.path.isdir(gcp_root):
+            return
+        for service in sorted(os.listdir(gcp_root)):
+            svc = os.path.join(gcp_root, service)
+            if not os.path.isdir(svc):
+                continue
+            for resource in sorted(os.listdir(svc)):
+                res = os.path.join(svc, resource)
+                if not os.path.isdir(res):
+                    continue
+                for entry in sorted(os.listdir(res)):
+                    if not entry.endswith(POLICY_REGO_EXT):
+                        continue
+                    rel = f"policies/gcp/{service}/{resource}/{entry}"
+                    stem = entry[: -len(POLICY_REGO_EXT)]
+                    seg = "vars" if entry == POLICY_VARS_FILE else stem.replace(".", "_")
+                    pkg = self._read_package(os.path.join(res, entry))
+                    if pkg is None:
+                        self.logger.log(f"[content] {rel}: no `package` declaration found")
+                        continue
+                    if not pkg.startswith("terraform.gcp.security."):
+                        self.logger.log(
+                            f"[content] {rel}: package {pkg!r} must start with 'terraform.gcp.security.'")
+                    expected_suffix = f".{resource}.{seg}"
+                    if not pkg.endswith(expected_suffix):
+                        self.logger.log(
+                            f"[content] {rel}: package {pkg!r} must end with '{expected_suffix}'")
+
+    # ----- B & C: single tested resource + example label convention ------- #
+    FIXTURES = (("compliant.tf", "compliant_example"),
+                ("nonCompliant.tf", "non_compliant_example"))
+
+    def _check_inputs_terraform(self, gcp_root):
+        """B & C: for each compliant.tf / nonCompliant.tf in an argument dir."""
+        if not os.path.isdir(gcp_root):
+            return
+        for service in sorted(os.listdir(gcp_root)):
+            svc = os.path.join(gcp_root, service)
+            if not os.path.isdir(svc):
+                continue
+            for resource in sorted(os.listdir(svc)):
+                res = os.path.join(svc, resource)
+                if not os.path.isdir(res):
+                    continue
+                for arg in sorted(os.listdir(res)):
+                    arg_path = os.path.join(res, arg)
+                    if not os.path.isdir(arg_path):
+                        continue
+                    for tf_name, label_prefix in self.FIXTURES:
+                        tf_path = os.path.join(arg_path, tf_name)
+                        if os.path.isfile(tf_path):
+                            rel = f"inputs/gcp/{service}/{resource}/{arg}/{tf_name}"
+                            self._check_tf_file(tf_path, rel, resource, label_prefix)
+
+    def _check_tf_file(self, tf_path, rel, expected_type, label_prefix):
+        try:
+            with open(tf_path, encoding="utf-8") as fh:
+                lines = fh.read().splitlines()
+        except OSError as e:
+            self.logger.log(f"[content] {rel}: could not read ({e})")
+            return
+        blocks = []
+        for line in lines:
+            m = TF_RESOURCE_RE.match(line)
+            if m:
+                blocks.append((m.group(1), m.group(2)))
+        if not blocks:
+            self.logger.log(f"[content] {rel}: no resource block (expected one '{expected_type}')")
+            return
+        # B: only the tested resource type may appear — no dependency resources
+        foreign = sorted({t for t, _ in blocks if t != expected_type})
+        if foreign:
+            self.logger.log(
+                f"[content] {rel}: dependency resource(s) {foreign} not allowed; only "
+                f"'{expected_type}' may appear (remove deps; use fake values)")
+        # C: tested-resource labels must be <prefix>_N, sequential from 1
+        for i, label in enumerate([l for t, l in blocks if t == expected_type], start=1):
+            expected = f"{label_prefix}_{i}"
+            if label != expected:
+                self.logger.log(f"[content] {rel}: resource label {label!r} should be {expected!r}")
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description="Validate the docs/ and inputs/ trees (structure + cross-reconciliation).")
@@ -549,6 +705,10 @@ def main(argv=None):
                         help="Which tree(s) to validate (default: all).")
     parser.add_argument("--platform", choices=sorted(ALLOWED_PLATFORMS), default=None,
                         help="Limit validation to a single platform.")
+    parser.add_argument("--content-checks", action="store_true",
+                        help="PROVISIONAL/TO BE VERIFIED: also run the ported legacy content "
+                             "checks (rego package paths, terraform resource types/labels). "
+                             "Off by default; see the ContentChecksValidator banner.")
     args = parser.parse_args(argv)
 
     docs_root = os.path.abspath(args.docs)
@@ -591,6 +751,11 @@ def main(argv=None):
               f"{f' (platform: {args.platform})' if args.platform else ''}\n")
         docs_index = build_gcp_docs_index(docs_root, logger)
         PoliciesValidator(policies_root, docs_index, logger).validate_root(only_platform=args.platform)
+
+    if args.content_checks:
+        # PROVISIONAL / TO BE VERIFIED — see ContentChecksValidator banner.
+        print("\n[*] Running PROVISIONAL content checks (TO BE VERIFIED — pending revamp)\n")
+        ContentChecksValidator(policies_root, inputs_root, logger).validate(only_platform=args.platform)
 
     if logger.summary():
         sys.exit(1)

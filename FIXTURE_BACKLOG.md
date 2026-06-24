@@ -1,0 +1,128 @@
+# Fixture migration backlog (Stage 2)
+
+These inputs fixtures still contain dependency resources whose references could
+not be auto-inlined (computed attrs like .id) — they keep the old c/nc labels.
+Each needs: remove the dependency, replace its references with fake values, and
+relabel the tested resource compliant_example_N / non_compliant_example_N.
+
+Detect anytime with: python scripts/linters/linter_v2.py --content-checks
+
+## Broken (tested resource missing entirely — must be authored):
+- inputs/gcp/Backup for GKE/google_gke_backup_restore_channel/name/{compliant,nonCompliant}.tf
+
+## Files with un-inlined dependencies (115):
+- inputs/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_access_level_condition/device_policy.allowed_device_management_levels/compliant.tf
+- inputs/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_access_level_condition/device_policy.allowed_encryption_statuses/compliant.tf
+- inputs/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_access_level_condition/device_policy.os_constraints.minimum_version/compliant.tf
+- inputs/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_access_level_condition/ip_subnetworks/compliant.tf
+- inputs/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_access_level_condition/members/compliant.tf
+- inputs/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_access_level_condition/negate/compliant.tf
+- inputs/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_access_level_condition/required_access_levels/compliant.tf
+- inputs/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_access_levels/access_levels.basic.conditions.device_policy.allowed_device_management_levels/compliant.tf
+- inputs/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_access_levels/access_levels.basic.conditions.device_policy.os_constraints.minimum_version/compliant.tf
+- inputs/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_access_levels/access_levels.basic.conditions.device_policy.require_admin_approval/compliant.tf
+- inputs/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_access_levels/access_levels.basic.conditions.device_policy.require_corp_owned/compliant.tf
+- inputs/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_access_levels/access_levels.basic.conditions.ip_subnetworks/compliant.tf
+- inputs/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_access_levels/access_levels.basic.conditions.members/compliant.tf
+- inputs/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_access_levels/access_levels.basic.conditions.negate/compliant.tf
+- inputs/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_access_levels/access_levels.basic.conditions.required_access_levels/compliant.tf
+- inputs/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_ingress_policy/ingress_policy_name/compliant.tf
+- inputs/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_ingress_policy/resource/compliant.tf
+- inputs/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_service_perimeter_dry_run_resource/perimeter_name/compliant.tf
+- inputs/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_service_perimeter_dry_run_resource/resource/compliant.tf
+- inputs/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_service_perimeter_resource/perimeter_name/compliant.tf
+- inputs/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_service_perimeter_resource/resource/compliant.tf
+- inputs/gcp/Apigee/google_apigee_api_deployment/proxy_id/compliant.tf
+- inputs/gcp/Apigee/google_apigee_api_deployment/proxy_id/nonCompliant.tf
+- inputs/gcp/App Engine/google_app_engine_standard_app_version/service/compliant.tf
+- inputs/gcp/Backup for GKE/google_gke_backup_restore_channel/name/compliant.tf
+- inputs/gcp/Backup for GKE/google_gke_backup_restore_channel/name/nonCompliant.tf
+- inputs/gcp/BeyondCorp/google_beyondcorp_app_connector/labels/compliant.tf
+- inputs/gcp/BeyondCorp/google_beyondcorp_app_connector/labels/nonCompliant.tf
+- inputs/gcp/BeyondCorp/google_beyondcorp_app_connector/region/compliant.tf
+- inputs/gcp/BeyondCorp/google_beyondcorp_app_connector/region/nonCompliant.tf
+- inputs/gcp/BigQuery Analytics Hub/google_bigquery_analytics_hub_listing/restricted_export_config.enabled/compliant.tf
+- inputs/gcp/BigQuery Analytics Hub/google_bigquery_analytics_hub_listing/restricted_export_config.enabled/nonCompliant.tf
+- inputs/gcp/BigQuery Analytics Hub/google_bigquery_analytics_hub_listing_subscription/destination_dataset.labels/compliant.tf
+- inputs/gcp/BigQuery Analytics Hub/google_bigquery_analytics_hub_listing_subscription/destination_dataset.labels/nonCompliant.tf
+- inputs/gcp/BigQuery Reservation/google_bigquery_reservation_assignment/job_type/compliant.tf
+- inputs/gcp/BigQuery Reservation/google_bigquery_reservation_assignment/job_type/nonCompliant.tf
+- inputs/gcp/BigQuery Reservation/google_bigquery_reservation_assignment/location/compliant.tf
+- inputs/gcp/BigQuery Reservation/google_bigquery_reservation_assignment/location/nonCompliant.tf
+- inputs/gcp/Certificate Manager/google_certificate_manager_certificate_map_entry/hostname/compliant.tf
+- inputs/gcp/Certificate Manager/google_certificate_manager_certificate_map_entry/hostname/nonCompliant.tf
+- inputs/gcp/Certificate Manager/google_certificate_manager_certificate_map_entry/labels/compliant.tf
+- inputs/gcp/Certificate Manager/google_certificate_manager_certificate_map_entry/labels/nonCompliant.tf
+- inputs/gcp/Certificate Manager/google_certificate_manager_certificate_map_entry/matcher/compliant.tf
+- inputs/gcp/Certificate Manager/google_certificate_manager_certificate_map_entry/matcher/nonCompliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_consent_store/default_consent_ttl/compliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_consent_store/default_consent_ttl/nonCompliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_consent_store/enable_consent_create_on_update/compliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_consent_store/enable_consent_create_on_update/nonCompliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_consent_store/labels/compliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_consent_store/labels/nonCompliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_consent_store_iam_member/member/compliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_consent_store_iam_member/member/nonCompliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_consent_store_iam_member/role/compliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_consent_store_iam_member/role/nonCompliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_dicom_store/labels/compliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_dicom_store/labels/nonCompliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_dicom_store/notification_config.pubsub_topic/compliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_dicom_store/notification_config.pubsub_topic/nonCompliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_fhir_store/disable_resource_versioning/compliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_fhir_store/disable_resource_versioning/nonCompliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_fhir_store/enable_update_create/compliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_fhir_store/enable_update_create/nonCompliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_fhir_store/labels/compliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_fhir_store/labels/nonCompliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_fhir_store/version/compliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_fhir_store/version/nonCompliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_hl7_v2_store/labels/compliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_hl7_v2_store/labels/nonCompliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_hl7_v2_store/notification_configs.pubsub_topic/compliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_hl7_v2_store/notification_configs.pubsub_topic/nonCompliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_hl7_v2_store/reject_duplicate_message/compliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_hl7_v2_store/reject_duplicate_message/nonCompliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_pipeline_job/disable_lineage/compliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_pipeline_job/disable_lineage/nonCompliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_pipeline_job/labels/compliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_pipeline_job/labels/nonCompliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_workspace/labels/compliant.tf
+- inputs/gcp/Cloud Healthcare/google_healthcare_workspace/labels/nonCompliant.tf
+- inputs/gcp/Cloud Scheduler/google_cloud_scheduler_job/paused/compliant.tf
+- inputs/gcp/Cloud Scheduler/google_cloud_scheduler_job/paused/nonCompliant.tf
+- inputs/gcp/Cloud Scheduler/google_cloud_scheduler_job/region/compliant.tf
+- inputs/gcp/Cloud Scheduler/google_cloud_scheduler_job/region/nonCompliant.tf
+- inputs/gcp/Cloud Scheduler/google_cloud_scheduler_job/retry_config.retry_count/compliant.tf
+- inputs/gcp/Cloud Scheduler/google_cloud_scheduler_job/retry_config.retry_count/nonCompliant.tf
+- inputs/gcp/Cloud Storage/google_storage_object_access_control/entity/compliant.tf
+- inputs/gcp/Cloud Storage/google_storage_object_access_control/entity/nonCompliant.tf
+- inputs/gcp/Cloud Storage/google_storage_object_acl/predefined_acl/compliant.tf
+- inputs/gcp/Cloud Storage/google_storage_object_acl/predefined_acl/nonCompliant.tf
+- inputs/gcp/Cloud Storage/google_storage_object_acl/role_entity/compliant.tf
+- inputs/gcp/Cloud Storage/google_storage_object_acl/role_entity/nonCompliant.tf
+- inputs/gcp/Cloud VMware Engine/google_vmwareengine_network_peering/import_custom_routes_with_public_ip/compliant.tf
+- inputs/gcp/Cloud VMware Engine/google_vmwareengine_network_peering/import_custom_routes_with_public_ip/nonCompliant.tf
+- inputs/gcp/Cloud VMware Engine/google_vmwareengine_network_peering/peer_network_type/compliant.tf
+- inputs/gcp/Cloud VMware Engine/google_vmwareengine_network_peering/peer_network_type/nonCompliant.tf
+- inputs/gcp/Cloud VMware Engine/google_vmwareengine_network_policy/external_ip.enabled/compliant.tf
+- inputs/gcp/Cloud VMware Engine/google_vmwareengine_network_policy/external_ip.enabled/nonCompliant.tf
+- inputs/gcp/Cloud VMware Engine/google_vmwareengine_network_policy/internet_access.enabled/compliant.tf
+- inputs/gcp/Cloud VMware Engine/google_vmwareengine_network_policy/internet_access.enabled/nonCompliant.tf
+- inputs/gcp/Cloud VMware Engine/google_vmwareengine_network_policy/location/compliant.tf
+- inputs/gcp/Cloud VMware Engine/google_vmwareengine_network_policy/location/nonCompliant.tf
+- inputs/gcp/Cloud VMware Engine/google_vmwareengine_private_cloud/location/compliant.tf
+- inputs/gcp/Cloud VMware Engine/google_vmwareengine_private_cloud/location/nonCompliant.tf
+- inputs/gcp/Cloud VMware Engine/google_vmwareengine_private_cloud/management_cluster.stretched_cluster_config.preferred_location/compliant.tf
+- inputs/gcp/Cloud VMware Engine/google_vmwareengine_private_cloud/management_cluster.stretched_cluster_config.preferred_location/nonCompliant.tf
+- inputs/gcp/DatabaseMigrationService/google_database_migration_service_private_connection/create_without_validation/compliant.tf
+- inputs/gcp/DatabaseMigrationService/google_database_migration_service_private_connection/create_without_validation/nonCompliant.tf
+- inputs/gcp/DatabaseMigrationService/google_database_migration_service_private_connection/location/compliant.tf
+- inputs/gcp/DatabaseMigrationService/google_database_migration_service_private_connection/location/nonCompliant.tf
+- inputs/gcp/Integration Connectors/google_integration_connectors_connection/ssl_config.trust_model/compliant.tf
+- inputs/gcp/OS Config v2/google_os_config_v2_policy_orchestrator_for_folder/action/compliant.tf
+- inputs/gcp/OS Config v2/google_os_config_v2_policy_orchestrator_for_folder/orchestrated_resource.os_policy_assignment_v1_payload.instance_filter.inventories.os_short_name/compliant.tf
+- inputs/gcp/OS Config v2/google_os_config_v2_policy_orchestrator_for_folder/orchestration_scope.selectors.location_selector.included_locations/compliant.tf
+- inputs/gcp/Security Command Center (SCC)/google_scc_folder_custom_module/enablement_state/compliant.tf
+- inputs/gcp/Security Command Center (SCC)/google_scc_folder_custom_module/enablement_state/nonCompliant.tf
+- inputs/gcp/Workflows/google_workflows_workflow/service_account/compliant.tf

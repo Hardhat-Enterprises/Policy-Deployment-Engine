@@ -4,12 +4,16 @@ Validate branch naming convention:
 - gcp/service/<service_name> (service-based branches)
 - feature/<feature_name> (feature branches)
 - fix/<fix_name> (bug fix branches)
+- chore/<chore_name> (maintenance/cleanup branches)
+- docs/<docs_name> (documentation branches)
+- refactor/<refactor_name> (refactor branches)
 - Protected: dev
 
 Example valid branches:
 - gcp/service/biglake
 - feature/fix-rego-syntax
 - fix/broken-import
+- chore/docgen-consolidation
 - dev (protected)
 
 Invalid branches:
@@ -39,32 +43,42 @@ def validate_branch_name(branch):
     1. gcp/service/<service_name> (service-based)
     2. feature/<feature_name> (feature branches)
     3. fix/<fix_name> (bug fix branches)
-    
+    4. chore/<chore_name> (maintenance/cleanup branches)
+    5. docs/<docs_name> (documentation branches)
+    6. refactor/<refactor_name> (refactor branches)
+
     Rules for all branches:
     - Must start with the correct prefix
     - Name must be lowercase alphanumeric with underscores or hyphens
     - At least 2 characters long
     """
-    service_pattern = r"^gcp/service/[a-z0-9_-]{2,}$"
-    feature_pattern = r"^feature/[a-z0-9_-]{2,}$"
-    fix_pattern = r"^fix/[a-z0-9_-]{2,}$"
-    
-    if re.match(service_pattern, branch) or re.match(feature_pattern, branch) or re.match(fix_pattern, branch):
+    # gcp uses a two-segment prefix (gcp/service/<name>); the rest are single.
+    patterns = [
+        r"^gcp/service/[a-z0-9_-]{2,}$",
+        r"^feature/[a-z0-9_-]{2,}$",
+        r"^fix/[a-z0-9_-]{2,}$",
+        r"^chore/[a-z0-9_-]{2,}$",
+        r"^docs/[a-z0-9_-]{2,}$",
+        r"^refactor/[a-z0-9_-]{2,}$",
+    ]
+
+    if any(re.match(p, branch) for p in patterns):
         return True, None
-    
+
     return False, (
         f"Branch '{branch}' does not match naming convention.\n"
         f"Expected formats:\n"
         f"  - gcp/service/<service_name> (e.g., gcp/service/biglake)\n"
         f"  - feature/<feature_name> (e.g., feature/add-validator)\n"
         f"  - fix/<fix_name> (e.g., fix/unicode-error)\n"
+        f"  - chore/<chore_name> (e.g., chore/cleanup-egg-info)\n"
+        f"  - docs/<docs_name> (e.g., docs/update-readme)\n"
+        f"  - refactor/<refactor_name> (e.g., refactor/linter-content-checks)\n"
         f"Examples:\n"
         f"  - gcp/service/cloud_run\n"
-        f"  - gcp/service/cloud-storage\n"
         f"  - feature/add-validator\n"
-        f"  - feature/improve-error-handling\n"
         f"  - fix/broken-import\n"
-        f"  - fix/logger-issue"
+        f"  - chore/docgen-consolidation"
     )
 
 

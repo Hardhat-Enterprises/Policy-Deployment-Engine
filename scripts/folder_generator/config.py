@@ -27,6 +27,6 @@ TEMPLATE_BASE_DIR = os.path.join(PROJECT_ROOT, "templates")
 INPUT_BASE_DIR = os.path.join(PROJECT_ROOT, "inputs")
 POLICY_BASE_DIR = os.path.join(PROJECT_ROOT, "policies")
 
-TEMPLATE_FILES_TF = ["c.tf", "config.tf", "nc.tf"]
+TEMPLATE_FILES_TF = ["compliant.tf", "config.tf", "nonCompliant.tf"]
 TEMPLATE_POLICY = "policy.rego"
-TEMPLATE_VARS = "vars.rego"
+TEMPLATE_VARS = "_vars.rego"
