@@ -48,6 +48,21 @@ def _lineage(a, b):
     return a == b or a.startswith(b + "/") or b.startswith(a + "/")
 
 
+def _owned(changed):
+    """The set of paths a contributor is accountable for.
+
+    A contributor owns every file they changed. For input fixtures they also own
+    the whole *argument directory*: compliant.tf and nonCompliant.tf test one
+    argument together, so touching one means owning the pair (and config.tf).
+    Policies/docs stay file-level — each policy/doc is an independent unit.
+    """
+    owned = set(changed)
+    for f in changed:
+        if f.startswith("inputs/") and "/" in f:
+            owned.add(f.rsplit("/", 1)[0])   # the argument directory
+    return owned
+
+
 def _error_path(line):
     """Extract the file/dir path from a '[ERROR] [content] <path>: msg' line."""
     s = line[len("[ERROR]"):].strip()
@@ -79,7 +94,8 @@ def main(argv=None):
     if lint_all:
         mine, backlog = errors, 0
     else:
-        mine = [ln for ln in errors if any(_lineage(_error_path(ln), c) for c in changed)]
+        owned = _owned(changed)
+        mine = [ln for ln in errors if any(_lineage(_error_path(ln), o) for o in owned)]
         backlog = len(errors) - len(mine)
 
     if mine:

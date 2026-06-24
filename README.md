@@ -58,7 +58,9 @@ When you commit, the pre-commit hooks will run automatically:
      `nonCompliant.tf`; `policies/` resources have `<argument>.rego` + optional `_vars.rego`
    - With content checks: fixtures contain only the tested resource type (no
      dependencies) and use the `compliant_example_N` / `non_compliant_example_N` labels
-   - **Only fails on the files you changed** — the repo-wide backlog never blocks you
+   - **Only fails on what you changed** (for input fixtures, the whole argument
+     directory — so editing `compliant.tf` also holds you to its `nonCompliant.tf`)
+     — the repo-wide backlog never blocks you
    - If errors are found in your changes, the commit is **blocked**
 
 2. **Branch Name Check**

@@ -69,8 +69,10 @@ backlog has not been migrated yet (see `FIXTURE_BACKLOG.md`).
 
 **Local (`pre-commit install`, config in `.pre-commit-config.yaml`):**
 `run_precommit_linter.py` runs the whole-tree linter with `--content-checks`
-but fails only on error lines whose path intersects the files you changed.
-Pre-existing backlog errors elsewhere are reported as a count, never blocking.
+but fails only on errors in the files you changed. For input fixtures the unit
+is the whole **argument directory** — `compliant.tf` and `nonCompliant.tf` test
+one argument together, so touching one means you own the pair. Policies/docs are
+file-level. Pre-existing backlog errors elsewhere are counted, never blocking.
 
 ```bash
 python scripts/linters/run_precommit_linter.py            # staged + unstaged (pre-commit)
