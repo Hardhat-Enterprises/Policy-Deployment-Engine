@@ -1,14 +1,8 @@
-resource "google_service_account" "test_account" {
-  account_id   = "my-account"
-  display_name = "Service Account"
-  project       = "pde"
-}
-
-resource "google_workflows_workflow" "c" {
-  name          = "c"
+resource "google_workflows_workflow" "compliant_example_1" {
+  name          = "compliant_example_1"
   project       = "pde"
   region        = "australia-southeast1"
-  service_account = google_service_account.test_account.id
+  service_account = "projects/pde/serviceAccounts/my-account@pde.iam.gserviceaccount.com"
   description   = "description"
   deletion_protection = true
   labels = {
