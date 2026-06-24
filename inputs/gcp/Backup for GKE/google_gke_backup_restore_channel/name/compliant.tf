@@ -1,14 +1,6 @@
-resource "google_gke_backup_restore_plan" "c" {
-  name     = "gke-restore-channel-daily"
-  project  = "PDE"
-  location = "australia-southeast1"
-  backup_plan = "projects/PDE/locations/australia-southeast1/backupPlans/bp1"
-  cluster  = "projects/PDE/locations/australia-southeast1/clusters/c1"
-  restore_config {
-    volume_data_restore_policy = "RESTORE_VOLUME_DATA_FROM_BACKUP"
-    cluster_resource_restore_scope {
-        all_group_kinds = true
-    }
-    all_namespaces = true
-  }
+resource "google_gke_backup_restore_channel" "compliant_example_1" {
+  name                = "compliant_example_1"
+  location            = "australia-southeast1"
+  destination_project = "projects/PDE"
+  description         = "Compliant restore channel"
 }
