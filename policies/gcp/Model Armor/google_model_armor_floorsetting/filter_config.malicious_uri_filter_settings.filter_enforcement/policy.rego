@@ -18,6 +18,18 @@ conditions := [
       ],
       "policy_type": "blacklist"
     }
+  ],
+    [
+    {
+      "situation_description": "malicious_uri_filter_settings.filter_enforcement must be ENABLED",
+      "remedies": ["Set filter_enforcement = \"ENABLED\" in malicious_uri_filter_settings"]
+    },
+    {
+      "condition": "malicious_uri_filter_settings.filter_enforcement must not be DISABLED",
+      "attribute_path": ["filter_config",0,"malicious_uri_filter_settings",0,"filter_enforcement"],
+      "values": ["DISABLED"],
+      "policy_type": "blacklist"
+    }
   ]
 ]
 
