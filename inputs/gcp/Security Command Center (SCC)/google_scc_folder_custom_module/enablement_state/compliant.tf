@@ -1,12 +1,6 @@
-resource "google_folder" "folder_c" {
-  parent              = "organizations/123456789"
-  display_name        = "c"
-  deletion_protection = false
-}
-
-resource "google_scc_folder_custom_module" "c" {
-  folder          = google_folder.folder_c.folder_id
-  display_name    = "c"
+resource "google_scc_folder_custom_module" "compliant_example_1" {
+  folder          = "folders/123456789"
+  display_name    = "compliant_example_1"
   enablement_state = "ENABLED"
 
   custom_config {

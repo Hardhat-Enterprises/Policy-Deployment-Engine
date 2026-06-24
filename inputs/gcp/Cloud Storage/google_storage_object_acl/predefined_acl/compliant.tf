@@ -1,17 +1,6 @@
-resource "google_storage_bucket" "image-store" {
-  name     = "c123"
-  location = "EU"
-}
-
-resource "google_storage_bucket_object" "image" {
-  name   = "c123"
-  bucket = google_storage_bucket.image-store.name
-  source = "image1.jpg"
-}
-
-resource "google_storage_object_acl" "c123" {
-  bucket = google_storage_bucket.image-store.name
-  object = google_storage_bucket_object.image.output_name
+resource "google_storage_object_acl" "compliant_example_1" {
+  bucket = "compliant_example_1"
+  object = "c123"
 
   role_entity = [
     "OWNER:user-my.email@gmail.com",

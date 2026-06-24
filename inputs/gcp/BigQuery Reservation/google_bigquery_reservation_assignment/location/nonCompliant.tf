@@ -1,15 +1,6 @@
-resource "google_bigquery_reservation" "nc" {
-  name              = "nc"
-  project           = "pde-dummy-project"
-  location          = "us-west2"
-  slot_capacity     = 100
-  edition           = "ENTERPRISE"
-  ignore_idle_slots = true
-}
-
-resource "google_bigquery_reservation_assignment" "nc" {
-  assignee    = "nc"
+resource "google_bigquery_reservation_assignment" "non_compliant_example_1" {
+  assignee    = "non_compliant_example_1"
   job_type    = "QUERY"
-  reservation = google_bigquery_reservation.nc.id
+  reservation = "projects/pde-dummy-project/locations/us-west2/reservations/nc"
   location = "us-west2"
 }

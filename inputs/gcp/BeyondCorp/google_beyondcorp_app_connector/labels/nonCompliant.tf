@@ -1,16 +1,10 @@
-
-resource "google_service_account" "accnt_nc" {
-  account_id = "nc-connector-sa-bad"
-  project    = "smooth-verve-467716-v1"
-}
-
-resource "google_beyondcorp_app_connector" "nc" {
-  name = "nc"
+resource "google_beyondcorp_app_connector" "non_compliant_example_1" {
+  name = "non_compliant_example_1"
   project = "smooth-verve-467716-v1"
   region = "us-central1"
   principal_info {
     service_account { 
-      email = google_service_account.accnt_nc.email 
+      email = "nc-connector-sa-bad@smooth-verve-467716-v1.iam.gserviceaccount.com" 
     }
   }
 }

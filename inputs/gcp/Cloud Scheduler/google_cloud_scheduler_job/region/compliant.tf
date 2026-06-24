@@ -1,17 +1,12 @@
-resource "google_pubsub_topic" "c_pubsub" {
-  name        = "c-topic"
-  project     = "PDE"
-}
-
-resource "google_cloud_scheduler_job" "c" {
-  name        = "c"
+resource "google_cloud_scheduler_job" "compliant_example_1" {
+  name        = "compliant_example_1"
   project     = "PDE"
   description = "test job"
   schedule    = "*/2 * * * *"
   region      = "australia-southeast1"
 
   pubsub_target {
-    topic_name = google_pubsub_topic.c_pubsub.id
+    topic_name = "projects/PDE/topics/c-topic"
     data       = base64encode("test")
   }
 }

@@ -1,12 +1,6 @@
-resource "google_folder" "folder_nc" {
-  parent              = "organizations/123456789"
-  display_name        = "nc"
-  deletion_protection = false
-}
-
-resource "google_scc_folder_custom_module" "nc" {
-  folder           = google_folder.folder_nc.folder_id
-  display_name     = "nc"
+resource "google_scc_folder_custom_module" "non_compliant_example_1" {
+  folder           = "folders/123456789"
+  display_name     = "non_compliant_example_1"
   enablement_state = "DISABLED"
 
   custom_config {

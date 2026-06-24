@@ -1,10 +1,10 @@
-resource "google_vmwareengine_private_cloud" "nc" {
+resource "google_vmwareengine_private_cloud" "non_compliant_example_1" {
   location    = "us-west1-a"
-  name        = "nc"
+  name        = "non_compliant_example_1"
   description = "Sample test PC."
   network_config {
     management_cidr       = "192.168.30.0/24"
-    vmware_engine_network = google_vmwareengine_network.pc-nw_nc.id
+    vmware_engine_network = "projects/my-project/locations/global/vmwareEngineNetworks/pc-nw"
   }
   management_cluster {
     cluster_id = "sample-mgmt-cluster"
@@ -15,9 +15,3 @@ resource "google_vmwareengine_private_cloud" "nc" {
   }
 }
 
-resource "google_vmwareengine_network" "pc-nw_nc" {
-  name        = "pc-nw"
-  location    = "global"
-  type        = "STANDARD"
-  description = "PC network description."
-}

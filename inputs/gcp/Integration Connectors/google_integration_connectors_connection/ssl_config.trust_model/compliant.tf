@@ -1,21 +1,5 @@
-resource "google_secret_manager_secret" "secret-basic" {
-  secret_id = "test-secret"
-  project = "PDE_connectors"
-  replication {
-    user_managed {
-      replicas {
-        location = "us-central1"
-      }
-    }
-  }
-}
-
-resource "google_secret_manager_secret_version" "secret-version-basic" {
-  secret = google_secret_manager_secret.secret-basic.id
-  secret_data = "dummypassword"
-}
-resource "google_integration_connectors_connection" "c" {
-  name     = "c"
+resource "google_integration_connectors_connection" "compliant_example_1" {
+  name     = "compliant_example_1"
   location = "us-central1"
   project = "PDE_connectors"
   service_account = "compute@developer.gserviceaccount.com"

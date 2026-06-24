@@ -1,22 +1,8 @@
-resource "google_certificate_manager_certificate" "c_certificate" {
-  name    = "c-certificate"
-  project = "sit764-policy-project"
-
-  managed {
-    domains = ["secure.example.com"]
-  }
-}
-
-resource "google_certificate_manager_certificate_map" "c_map" {
-  name    = "c-map"
-  project = "sit764-policy-project"
-}
-
-resource "google_certificate_manager_certificate_map_entry" "c" {
-  name         = "c"
+resource "google_certificate_manager_certificate_map_entry" "compliant_example_1" {
+  name         = "compliant_example_1"
   project      = "sit764-policy-project"
   description  = "Compliant certificate map entry using an approved hostname."
-  map          = google_certificate_manager_certificate_map.c_map.name
-  certificates = [google_certificate_manager_certificate.c_certificate.id]
+  map          = "c-map"
+  certificates = ["projects/sit764-policy-project/locations/global/certificates/c-certificate"]
   hostname     = "secure.example.com"
 }

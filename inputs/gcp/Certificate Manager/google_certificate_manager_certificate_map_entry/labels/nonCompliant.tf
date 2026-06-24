@@ -1,27 +1,11 @@
-resource "google_certificate_manager_certificate_map" "nc_map" {
+resource "google_certificate_manager_certificate_map_entry" "non_compliant_example_1" {
   project     = "sit764-policy-project"
-  name        = "nc-map"
-  description = "Non-compliant certificate map for approved environment label entry test."
-}
-
-resource "google_certificate_manager_certificate" "nc_certificate" {
-  project     = "sit764-policy-project"
-  name        = "nc-certificate"
-  description = "Non-compliant certificate for approved environment label entry test."
-
-  managed {
-    domains = ["unapproved.example.net"]
-  }
-}
-
-resource "google_certificate_manager_certificate_map_entry" "nc" {
-  project     = "sit764-policy-project"
-  name        = "nc"
+  name        = "non_compliant_example_1"
   description = "Non-compliant certificate map entry with non-approved environment label."
-  map         = google_certificate_manager_certificate_map.nc_map.name
+  map         = "nc-map"
 
   certificates = [
-    google_certificate_manager_certificate.nc_certificate.id
+    "projects/sit764-policy-project/locations/global/certificates/nc-certificate"
   ]
 
   hostname = "unapproved.example.net"

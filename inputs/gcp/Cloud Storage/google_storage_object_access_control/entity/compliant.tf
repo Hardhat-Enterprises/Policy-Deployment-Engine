@@ -1,17 +1,7 @@
-resource "google_storage_object_access_control" "c123" {
-  object = google_storage_bucket_object.object.output_name
-  bucket = google_storage_bucket.bucket.name
+resource "google_storage_object_access_control" "compliant_example_1" {
+  object = "c123"
+  bucket = "compliant_example_1"
   role   = "READER"
   entity = "domain-domain-example.com"
 }
 
-resource "google_storage_bucket" "bucket" {
-  name     = "c123"
-  location = "US"
-}
-
-resource "google_storage_bucket_object" "object" {
-  name   = "c123"
-  bucket = google_storage_bucket.bucket.name
-  source = "../static/img/header-logo.png"
-}

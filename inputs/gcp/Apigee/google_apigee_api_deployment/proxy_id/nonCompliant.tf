@@ -1,12 +1,6 @@
-resource "google_apigee_api" "apigee_api_proxy_nc" {
-  name            = "apigee-proxy-nc"
-  org_id          = "Test"
-  config_bundle   = "random/Apigee_Proxies.zip"
-}
-
-resource "google_apigee_api_deployment" "nc" {
+resource "google_apigee_api_deployment" "non_compliant_example_1" {
   environment = "Prod"
   org_id = "Test"
-  revision = google_apigee_api.apigee_api_proxy_nc.latest_revision_id
-  proxy_id = google_apigee_api.apigee_api_proxy_nc.name
+  revision = "1"
+  proxy_id = "apigee-proxy-nc"
 }

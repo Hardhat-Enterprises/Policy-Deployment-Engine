@@ -1,15 +1,8 @@
-resource "google_vmwareengine_network" "network-policy-nw_nc" {
-    name              = "sample-network"
-    location          = "global" 
-    type              = "STANDARD"
-    description       = "VMwareEngine standard network sample"
-}
-
-resource "google_vmwareengine_network_policy" "nc" {
+resource "google_vmwareengine_network_policy" "non_compliant_example_1" {
     location = "us-west1"
-    name = "nc"
+    name = "non_compliant_example_1"
     edge_services_cidr = "192.168.30.0/26"
-    vmware_engine_network = google_vmwareengine_network.network-policy-nw_nc.id
+    vmware_engine_network = "projects/my-project/locations/global/vmwareEngineNetworks/sample-network"
     description = "Sample Network Policy"
     internet_access {
         enabled = true

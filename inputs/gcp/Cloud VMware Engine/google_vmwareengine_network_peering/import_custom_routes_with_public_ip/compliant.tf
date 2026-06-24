@@ -1,18 +1,8 @@
-resource "google_vmwareengine_network" "network-peering-nw" {
-   name              = "default-np-nw"
-   location          = "global"
-   type              = "STANDARD"
-}
-resource "google_vmwareengine_network" "network-peering-peer-nw" {
-   name              = "peer-np-nw"
-   location          = "global"
-   type              = "STANDARD"
-}
-resource "google_vmwareengine_network_peering" "c" {
-    name = "c"
+resource "google_vmwareengine_network_peering" "compliant_example_1" {
+    name = "compliant_example_1"
 
-    vmware_engine_network = google_vmwareengine_network.network-peering-nw.id
-    peer_network = google_vmwareengine_network.network-peering-peer-nw.id
+    vmware_engine_network = "projects/my-project/locations/global/vmwareEngineNetworks/default-np-nw"
+    peer_network = "projects/my-project/locations/global/vmwareEngineNetworks/peer-np-nw"
     peer_network_type = "VMWARE_ENGINE_NETWORK"
     import_custom_routes_with_public_ip = false
 }

@@ -1,15 +1,6 @@
-resource "google_bigquery_reservation" "c" {
-  name              = "c"
-  project           = "pde-dummy-project"
-  location          = "australia-southeast1"
-  slot_capacity     = 100
-  edition           = "ENTERPRISE"
-  ignore_idle_slots = true
-}
-
-resource "google_bigquery_reservation_assignment" "c" {
-  assignee    = "c"
+resource "google_bigquery_reservation_assignment" "compliant_example_1" {
+  assignee    = "compliant_example_1"
   job_type    = "QUERY"
-  reservation = google_bigquery_reservation.c.id
+  reservation = "projects/pde-dummy-project/locations/australia-southeast1/reservations/c"
   location = "australia-southeast1"
 }

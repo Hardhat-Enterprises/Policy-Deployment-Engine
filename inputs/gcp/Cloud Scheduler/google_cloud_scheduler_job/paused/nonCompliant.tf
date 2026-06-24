@@ -1,10 +1,5 @@
-resource "google_pubsub_topic" "nc_pubsub" {
-  name        = "nc-topic"
-  project     = "PDE"
-}
-
-resource "google_cloud_scheduler_job" "nc" {
-  name        = "nc"
+resource "google_cloud_scheduler_job" "non_compliant_example_1" {
+  name        = "non_compliant_example_1"
   project     = "PDE"
   description = "test job"
   schedule    = "*/2 * * * *"
@@ -12,7 +7,7 @@ resource "google_cloud_scheduler_job" "nc" {
   
 
   pubsub_target {
-    topic_name = google_pubsub_topic.nc_pubsub.id
+    topic_name = "projects/PDE/topics/nc-topic"
     data       = base64encode("test")
   }
 }
