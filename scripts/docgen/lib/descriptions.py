@@ -18,6 +18,16 @@ things require the markdown docs:
 
 A block is kept if its own name is documented OR any of its kept descendant leaves are,
 so the dotted children never become orphaned.
+
+3. **Childless-block repair** — a block that is kept by name but whose schema children
+   are *all* gated out would be emitted as a degenerate, childless block. This happens
+   when the provider markdown documents a block's sub-fields *inline in the block's own
+   bullet* (backticked, e.g. ``automated_backup_policy``'s ``retention_period`` /
+   ``frequency``) or in a sub-section our name-matching doesn't harvest, rather than as
+   their own ``* `name` -`` bullets. Since the schema is authoritative for what a block
+   contains, when gating leaves a documented block with no children we restore its full
+   schema subtree. Genuinely-empty provider blocks (oneof/presence markers with no
+   attributes) have no schema children, so they correctly stay childless.
 """
 
 import re
@@ -230,11 +240,28 @@ class MarkdownProcessor:
             if v.get("type") != "block" and _leaf(k) in names
         }
 
+        # Childless-block repair: a block kept by its own documented name but with no kept
+        # descendant leaf would be emitted childless. Restore its whole schema subtree so
+        # the documented block carries the contents the provider defines for it. Blocks
+        # with no schema children (presence markers) gain nothing and stay childless.
+        forced = set()
+        for key, entry in arguments.items():
+            if entry.get("type") != "block" or _leaf(key) not in names:
+                continue
+            descendants = [k for k in arguments if k.startswith(key + ".")]
+            if descendants and not any(kl.startswith(key + ".") for kl in kept_leaves):
+                forced.update(descendants)
+        kept_leaves |= {
+            k for k in forced if arguments[k].get("type") != "block"
+        }
+
         result: Dict[str, dict] = {}
         na = 0
         for key, entry in arguments.items():
             if entry.get("type") == "block":
-                if _leaf(key) in names or any(p.startswith(key + ".") for p in kept_leaves):
+                if _leaf(key) in names or key in forced or any(
+                    p.startswith(key + ".") for p in kept_leaves
+                ):
                     result[key] = entry
                 continue
             if key not in kept_leaves:

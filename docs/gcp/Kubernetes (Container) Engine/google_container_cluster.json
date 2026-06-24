@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-23T08:26:44Z",
+  "last_updated": "2026-06-24T07:07:53Z",
   "provider_version": "7.37.0",
   "arguments": {
     "allow_net_admin": {
@@ -1152,6 +1152,13 @@
       "description": "Time window specified for daily maintenance operations. Specify start_time in RFC3339 format \"HH:MM”, where HH : [00-23] and MM : [00-59] GMT.",
       "required": false
     },
+    "maintenance_policy.daily_maintenance_window.start_time": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
     "maintenance_policy.disruption_budget": {
       "type": "block",
       "description": "Cluster disruption intervals for minor version and patch version upgrade",
@@ -1200,6 +1207,27 @@
       "description": "Time window for recurring maintenance operations.",
       "required": false
     },
+    "maintenance_policy.recurring_window.end_time": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_policy.recurring_window.recurrence": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_policy.recurring_window.start_time": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
     "master_auth": {
       "type": "block",
       "description": "The authentication information for accessing the Kubernetes master. Some values in this block are only returned by the API if your service account has permission to get credentials for your GKE cluster. If you see an unexpected diff unsetting your client cert, ensure you have the container.clusters.getCredentials permission.",
@@ -1209,6 +1237,13 @@
       "type": "block",
       "description": "Whether client certificate authorization is enabled for this cluster.",
       "required": true
+    },
+    "master_auth.client_certificate_config.issue_client_certificate": {
+      "description": "Whether client certificate authorization is enabled for this cluster.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "master_authorized_networks_config": {
       "type": "block",
@@ -1619,6 +1654,25 @@
       "description": "Parameters for configuring CA certificate and domains.",
       "required": false
     },
+    "node_config.containerd_config.private_registry_access_config.certificate_authority_domain_config.fqdns": {
+      "description": "List of fully-qualified-domain-names. IPv4s and port specification are supported.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.containerd_config.private_registry_access_config.certificate_authority_domain_config.gcp_secret_manager_certificate_config": {
+      "type": "block",
+      "description": "Parameters for configuring a certificate hosted in GCP SecretManager.",
+      "required": true
+    },
+    "node_config.containerd_config.private_registry_access_config.certificate_authority_domain_config.gcp_secret_manager_certificate_config.secret_uri": {
+      "description": "URI for the secret that hosts a certificate. Must be in the format 'projects/PROJECT_NUM/secrets/SECRET_NAME/versions/VERSION_OR_LATEST'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
     "node_config.containerd_config.registry_hosts": {
       "type": "block",
       "description": "Configures containerd registry host configuration. Each registry_hosts entry represents a hosts.toml file.",
@@ -1629,10 +1683,22 @@
       "description": "Configures a list of host-specific configurations for the server.",
       "required": false
     },
+    "node_config.containerd_config.registry_hosts.hosts.client": {
+      "type": "block",
+      "description": "Configures the registry host client certificate and key.",
+      "required": false
+    },
     "node_config.containerd_config.registry_hosts.hosts.client.key": {
       "type": "block",
       "description": "Configures the client private key.",
       "required": false
+    },
+    "node_config.containerd_config.registry_hosts.hosts.client.key.gcp_secret_manager_secret_uri": {
+      "description": "URI for the Secret Manager secret that hosts the private key.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "node_config.containerd_config.registry_hosts.hosts.header": {
       "type": "block",
@@ -2397,6 +2463,13 @@
       "description": "Parameters that can be configured on Windows nodes.",
       "required": false
     },
+    "node_config.windows_node_config.osversion": {
+      "description": "The OS Version of the windows nodepool.Values are OS_VERSION_UNSPECIFIED,OS_VERSION_LTSC2019 and OS_VERSION_LTSC2022",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
     "node_config.workload_metadata_config": {
       "type": "block",
       "description": "The workload metadata configuration for this node.",
@@ -2923,6 +2996,25 @@
       "description": "Parameters for configuring CA certificate and domains.",
       "required": false
     },
+    "node_pool.node_config.containerd_config.private_registry_access_config.certificate_authority_domain_config.fqdns": {
+      "description": "List of fully-qualified-domain-names. IPv4s and port specification are supported.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.containerd_config.private_registry_access_config.certificate_authority_domain_config.gcp_secret_manager_certificate_config": {
+      "type": "block",
+      "description": "Parameters for configuring a certificate hosted in GCP SecretManager.",
+      "required": true
+    },
+    "node_pool.node_config.containerd_config.private_registry_access_config.certificate_authority_domain_config.gcp_secret_manager_certificate_config.secret_uri": {
+      "description": "URI for the secret that hosts a certificate. Must be in the format 'projects/PROJECT_NUM/secrets/SECRET_NAME/versions/VERSION_OR_LATEST'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
     "node_pool.node_config.containerd_config.registry_hosts": {
       "type": "block",
       "description": "Configures containerd registry host configuration. Each registry_hosts entry represents a hosts.toml file.",
@@ -2933,10 +3025,22 @@
       "description": "Configures a list of host-specific configurations for the server.",
       "required": false
     },
+    "node_pool.node_config.containerd_config.registry_hosts.hosts.client": {
+      "type": "block",
+      "description": "Configures the registry host client certificate and key.",
+      "required": false
+    },
     "node_pool.node_config.containerd_config.registry_hosts.hosts.client.key": {
       "type": "block",
       "description": "Configures the client private key.",
       "required": false
+    },
+    "node_pool.node_config.containerd_config.registry_hosts.hosts.client.key.gcp_secret_manager_secret_uri": {
+      "description": "URI for the Secret Manager secret that hosts the private key.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "node_pool.node_config.containerd_config.registry_hosts.hosts.header": {
       "type": "block",
@@ -3701,6 +3805,13 @@
       "description": "Parameters that can be configured on Windows nodes.",
       "required": false
     },
+    "node_pool.node_config.windows_node_config.osversion": {
+      "description": "The OS Version of the windows nodepool.Values are OS_VERSION_UNSPECIFIED,OS_VERSION_LTSC2019 and OS_VERSION_LTSC2022",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
     "node_pool.node_config.workload_metadata_config": {
       "type": "block",
       "description": "The workload metadata configuration for this node.",
@@ -3947,6 +4058,25 @@
       "description": "Parameters for configuring CA certificate and domains.",
       "required": false
     },
+    "node_pool_defaults.node_config_defaults.containerd_config.private_registry_access_config.certificate_authority_domain_config.fqdns": {
+      "description": "List of fully-qualified-domain-names. IPv4s and port specification are supported.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool_defaults.node_config_defaults.containerd_config.private_registry_access_config.certificate_authority_domain_config.gcp_secret_manager_certificate_config": {
+      "type": "block",
+      "description": "Parameters for configuring a certificate hosted in GCP SecretManager.",
+      "required": true
+    },
+    "node_pool_defaults.node_config_defaults.containerd_config.private_registry_access_config.certificate_authority_domain_config.gcp_secret_manager_certificate_config.secret_uri": {
+      "description": "URI for the secret that hosts a certificate. Must be in the format 'projects/PROJECT_NUM/secrets/SECRET_NAME/versions/VERSION_OR_LATEST'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
     "node_pool_defaults.node_config_defaults.containerd_config.registry_hosts": {
       "type": "block",
       "description": "Configures containerd registry host configuration. Each registry_hosts entry represents a hosts.toml file.",
@@ -3957,10 +4087,22 @@
       "description": "Configures a list of host-specific configurations for the server.",
       "required": false
     },
+    "node_pool_defaults.node_config_defaults.containerd_config.registry_hosts.hosts.client": {
+      "type": "block",
+      "description": "Configures the registry host client certificate and key.",
+      "required": false
+    },
     "node_pool_defaults.node_config_defaults.containerd_config.registry_hosts.hosts.client.key": {
       "type": "block",
       "description": "Configures the client private key.",
       "required": false
+    },
+    "node_pool_defaults.node_config_defaults.containerd_config.registry_hosts.hosts.client.key.gcp_secret_manager_secret_uri": {
+      "description": "URI for the Secret Manager secret that hosts the private key.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "node_pool_defaults.node_config_defaults.containerd_config.registry_hosts.hosts.header": {
       "type": "block",

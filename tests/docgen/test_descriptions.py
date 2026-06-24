@@ -137,6 +137,78 @@ def test_block_kept_only_for_documented_children(tmp_path):
     assert "ghost" not in out and "ghost.child" not in out
 
 
+# A block documented only by its own bullet; its sub-fields are mentioned inline
+# (backticked) inside that bullet rather than as their own `* `name`` bullets — the
+# shape that produced childless blocks (e.g. google_bigtable_table.automated_backup_policy).
+INLINE_BLOCK_MD = """
+## Argument Reference
+
+* `name` - (Required) The table name.
+
+* `automated_backup_policy` - (Optional) Defines a policy specified by `retention_period`
+  and `frequency`. The policy also accepts an optional `locations` list.
+"""
+
+
+def test_childless_documented_block_restores_schema_subtree(tmp_path):
+    proc = _processor(INLINE_BLOCK_MD, tmp_path)
+    args = {
+        "name": _leaf(desc="The table name."),
+        "automated_backup_policy": _block(desc="Defines a policy."),
+        "automated_backup_policy.frequency": _leaf(desc="How often."),
+        "automated_backup_policy.locations": _leaf(type_="list(string)"),
+        "automated_backup_policy.retention_period": _leaf(desc="How long."),
+    }
+    out, _ = proc.process("google_bigtable_table", args)
+    # The block is documented but none of its children are bullet-documented; the schema
+    # subtree is restored rather than emitting a childless block.
+    assert "automated_backup_policy" in out
+    assert {
+        "automated_backup_policy.frequency",
+        "automated_backup_policy.locations",
+        "automated_backup_policy.retention_period",
+    } <= set(out)
+
+
+def test_genuinely_empty_block_stays_childless(tmp_path):
+    # A documented presence-marker block with no schema children must not gain phantom args.
+    md = "## Argument Reference\n\n* `name` - (Required) x\n\n* `automatic_update_policy` - (Optional) Enable auto-update.\n"
+    proc = _processor(md, tmp_path)
+    args = {"name": _leaf(desc="x"), "automatic_update_policy": _block()}
+    out, _ = proc.process("google_x", args)
+    assert "automatic_update_policy" in out
+    assert not any(k.startswith("automatic_update_policy.") for k in out)
+
+
+def test_partial_block_not_expanded(tmp_path):
+    # When at least one child IS bullet-documented, the block is not childless, so gating
+    # is respected as-is — undocumented siblings stay dropped (no subtree restoration).
+    proc = _processor(POOL_MD, tmp_path)
+    args = {
+        "name": _leaf(desc="The cluster name."),
+        "address_pools": _block(),
+        "address_pools.addresses": _leaf(type_="list(string)"),  # documented
+        "address_pools.undocumented": _leaf(),                   # not documented
+    }
+    out, _ = proc.process("google_x", args)
+    assert "address_pools.addresses" in out
+    assert "address_pools.undocumented" not in out
+
+
+def test_childless_repair_recurses_into_nested_blocks(tmp_path):
+    # A documented block whose only children are themselves nested blocks/leaves none of
+    # which are bullet-documented: the whole subtree is restored, not just direct leaves.
+    md = "## Argument Reference\n\n* `master_auth` - (Optional) Authentication config.\n"
+    proc = _processor(md, tmp_path)
+    args = {
+        "master_auth": _block(),
+        "master_auth.client_certificate_config": _block(),
+        "master_auth.client_certificate_config.issue_client_certificate": _leaf(),
+    }
+    out, _ = proc.process("google_container_cluster", args)
+    assert set(out) == set(args)
+
+
 def test_extract_inherited_resources():
     md = "In addition to these, all arguments from `google_compute_instance` are supported"
     assert extract_inherited_resources(md) == {"google_compute_instance"}
