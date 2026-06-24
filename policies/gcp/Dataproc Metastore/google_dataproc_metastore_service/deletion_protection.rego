@@ -1,6 +1,6 @@
-package terraform.gcp.security.dataproc_metastore.service.deletion_protection
+package terraform.gcp.security.dataproc_metastore.google_dataproc_metastore_service.deletion_protection
 import data.terraform.helpers
-import data.terraform.gcp.security.dataproc_metastore.service.vars
+import data.terraform.gcp.security.dataproc_metastore.google_dataproc_metastore_service.vars
 
 
 conditions := [

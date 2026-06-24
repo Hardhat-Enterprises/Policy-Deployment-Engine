@@ -1,6 +1,6 @@
-package terraform.gcp.security.gdce.cluster.target_version
+package terraform.gcp.security.gdce.google_edgecontainer_cluster.target_version
 import data.terraform.helpers
-import data.terraform.gcp.security.gdce.cluster.vars
+import data.terraform.gcp.security.gdce.google_edgecontainer_cluster.vars
 
 conditions := [
 

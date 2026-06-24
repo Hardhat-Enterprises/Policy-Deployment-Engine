@@ -1,4 +1,4 @@
-package terraform.gcp.security.application_integration.google_integrations_auth_config.decrypted_credential.jwt.jwt_header
+package terraform.gcp.security.application_integration.google_integrations_auth_config.decrypted_credential_jwt_jwt_header
 
 import data.terraform.helpers
 import data.terraform.gcp.security.application_integration.google_integrations_auth_config.vars

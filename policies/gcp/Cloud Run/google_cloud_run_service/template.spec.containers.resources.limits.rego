@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run.google_cloud_run_service.template.spec.containers.resources.limits
+package terraform.gcp.security.cloud_run.google_cloud_run_service.template_spec_containers_resources_limits
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run.google_cloud_run_service.vars

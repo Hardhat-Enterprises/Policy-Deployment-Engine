@@ -1,6 +1,6 @@
-package terraform.gcp.security.deploy.automation.suspended
+package terraform.gcp.security.deploy.google_clouddeploy_automation.suspended
 import data.terraform.helpers
-import data.terraform.gcp.security.deploy.automation.vars
+import data.terraform.gcp.security.deploy.google_clouddeploy_automation.vars
 
 conditions := [
     [

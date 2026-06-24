@@ -1,6 +1,6 @@
-package terraform.gcp.security.deploy.target.gke_internal_ip
+package terraform.gcp.security.deploy.google_clouddeploy_target.gke_internal_ip
 import data.terraform.helpers
-import data.terraform.gcp.security.deploy.target.vars
+import data.terraform.gcp.security.deploy.google_clouddeploy_target.vars
 
 conditions := [
     [

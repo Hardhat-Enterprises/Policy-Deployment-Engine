@@ -1,7 +1,7 @@
-package terraform.gcp.security.parameter_manager.regional_parameter.location
+package terraform.gcp.security.parameter_manager.google_parameter_manager_regional_parameter.location
 
 import data.terraform.helpers
-import data.terraform.gcp.security.parameter_manager.regional_parameter.vars
+import data.terraform.gcp.security.parameter_manager.google_parameter_manager_regional_parameter.vars
 
 conditions := [[
 	{

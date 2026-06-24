@@ -1,7 +1,7 @@
-package terraform.gcp.security.privileged_access_manager.entitlement.max_request_duration
+package terraform.gcp.security.privileged_access_manager.google_privileged_access_manager_entitlement.max_request_duration
 
 import data.terraform.helpers
-import data.terraform.gcp.security.privileged_access_manager.entitlement.vars
+import data.terraform.gcp.security.privileged_access_manager.google_privileged_access_manager_entitlement.vars
 
 conditions := [
   [

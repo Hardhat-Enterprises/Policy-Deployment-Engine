@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run.google_cloud_run_service.template.spec.containers.resources.requests
+package terraform.gcp.security.cloud_run.google_cloud_run_service.template_spec_containers_resources_requests
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run.google_cloud_run_service.vars

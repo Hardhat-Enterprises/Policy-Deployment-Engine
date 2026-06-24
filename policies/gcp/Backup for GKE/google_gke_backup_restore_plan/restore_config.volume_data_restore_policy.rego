@@ -1,7 +1,7 @@
-package terraform.gcp.security.backup_for_gke.restore_plan.restore_config_volume_data_restore_policy
+package terraform.gcp.security.backup_for_gke.google_gke_backup_restore_plan.restore_config_volume_data_restore_policy
 
 import data.terraform.helpers
-import data.terraform.gcp.security.backup_for_gke.restore_plan.vars
+import data.terraform.gcp.security.backup_for_gke.google_gke_backup_restore_plan.vars
 
 # Merged policy for `restore_config.volume_data_restore_policy` — 2 independent scenarios, each a
 # situation in `conditions`, evaluated separately by helpers.get_multi_summary.

@@ -1,6 +1,6 @@
-package terraform.gcp.security.scc.event_threat_detection_custom_module.enablement_state
+package terraform.gcp.security.scc.google_scc_event_threat_detection_custom_module.enablement_state
 import data.terraform.helpers
-import data.terraform.gcp.security.scc.event_threat_detection_custom_module.vars
+import data.terraform.gcp.security.scc.google_scc_event_threat_detection_custom_module.vars
 
 conditions := [
     [

@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_functions.google_cloudfunctions_function.https_trigger_security_level 
+package terraform.gcp.security.cloud_functions.google_cloudfunctions_function.https_trigger_security_level
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_functions.google_cloudfunctions_function.vars
 

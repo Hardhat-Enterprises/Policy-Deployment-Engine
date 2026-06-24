@@ -1,7 +1,7 @@
 package terraform.gcp.security.gemini.google_gemini_logging_setting.log_metadata
 
 import data.terraform.helpers
-import data.terraform.gcp.security.google_gemini_logging_setting.vars
+import data.terraform.gcp.security.gemini.google_gemini_logging_setting.vars
 
 conditions := [
     [

@@ -1,6 +1,6 @@
-package terraform.gcp.security.google_dataproc_on_gdc.application_environment.spark_application_environment_config  
+package terraform.gcp.security.google_dataproc_on_gdc.google_dataproc_gdc_application_environment.spark_application_environment_config_default_version
 import data.terraform.helpers
-import data.terraform.gcp.security.google_dataproc_on_gdc.application_environment.vars
+import data.terraform.gcp.security.google_dataproc_on_gdc.google_dataproc_gdc_application_environment.vars
 
 conditions := [
     [

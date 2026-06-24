@@ -1,6 +1,6 @@
-package terraform.gcp.security.discovery_engine.license_config.auto_renew
+package terraform.gcp.security.discovery_engine.google_discovery_engine_license_config.auto_renew
 import data.terraform.helpers
-import data.terraform.gcp.security.discovery_engine.license_config.vars
+import data.terraform.gcp.security.discovery_engine.google_discovery_engine_license_config.vars
 
 #license_config_auto_renew
 

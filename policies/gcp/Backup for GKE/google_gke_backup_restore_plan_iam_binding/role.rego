@@ -1,7 +1,7 @@
-package terraform.gcp.security.backup_for_gke.restore_plan_iam_binding.role
+package terraform.gcp.security.backup_for_gke.google_gke_backup_restore_plan_iam_binding.role
 
 import data.terraform.helpers
-import data.terraform.gcp.security.backup_for_gke.restore_plan_iam_binding.vars
+import data.terraform.gcp.security.backup_for_gke.google_gke_backup_restore_plan_iam_binding.vars
 
 # Merged policy for `role` — 3 independent scenarios.
 conditions := [

@@ -1,6 +1,6 @@
-package terraform.gcp.security.discovery_engine.engine_sitemap.location
+package terraform.gcp.security.discovery_engine.google_discovery_engine_sitemap.location
 import data.terraform.helpers
-import data.terraform.gcp.security.discovery_engine.engine_sitemap.vars
+import data.terraform.gcp.security.discovery_engine.google_discovery_engine_sitemap.vars
 
 #engine_sitemap_location
 

@@ -1,7 +1,7 @@
-package terraform.gcp.security.cloud_data_fusion.data_fusion_instance.key_reference
+package terraform.gcp.security.cloud_data_fusion.google_data_fusion_instance.crypto_key_config_key_reference
 
 import data.terraform.helpers
-import data.terraform.gcp.security.cloud_data_fusion.data_fusion_instance.vars
+import data.terraform.gcp.security.cloud_data_fusion.google_data_fusion_instance.vars
 
 conditions := [
     [

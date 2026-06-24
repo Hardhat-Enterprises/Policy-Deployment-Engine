@@ -1,7 +1,7 @@
-package terraform.gcp.security.identity_aware_proxy.google_iap_app_engine_service_iam.member
+package terraform.gcp.security.identity_aware_proxy.google_iap_app_engine_service_iam_member.member
 
 import data.terraform.helpers
-import data.terraform.gcp.security.identity_aware_proxy.google_iap_app_engine_service_iam.vars
+import data.terraform.gcp.security.identity_aware_proxy.google_iap_app_engine_service_iam_member.vars
 
 conditions := [
   # 1) Public principals are never allowed

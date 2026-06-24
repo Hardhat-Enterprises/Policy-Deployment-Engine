@@ -1,4 +1,4 @@
-package terraform.gcp.security.google_cloudfunction.google_cloudfunctions2_function.vpc
+package terraform.gcp.security.google_cloudfunction.google_cloudfunctions2_function.service_config_vpc_connector
 
 import data.terraform.helpers
 import data.terraform.gcp.security.google_cloudfunction.google_cloudfunctions2_function.vars

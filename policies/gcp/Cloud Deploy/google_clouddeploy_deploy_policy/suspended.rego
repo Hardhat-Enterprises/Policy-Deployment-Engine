@@ -1,6 +1,6 @@
-package terraform.gcp.security.deploy.deploy_policy.suspended
+package terraform.gcp.security.deploy.google_clouddeploy_deploy_policy.suspended
 import data.terraform.helpers
-import data.terraform.gcp.security.deploy.deploy_policy.vars
+import data.terraform.gcp.security.deploy.google_clouddeploy_deploy_policy.vars
 
 conditions := [
     [

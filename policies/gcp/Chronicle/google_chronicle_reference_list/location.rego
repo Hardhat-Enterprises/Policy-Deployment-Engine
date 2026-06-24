@@ -1,6 +1,6 @@
-package terraform.gcp.security.chronicle.reference_list.location
+package terraform.gcp.security.chronicle.google_chronicle_reference_list.location
 import data.terraform.helpers
-import data.terraform.gcp.security.chronicle.reference_list.vars
+import data.terraform.gcp.security.chronicle.google_chronicle_reference_list.vars
 
 
 conditions := [

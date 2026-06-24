@@ -1,6 +1,6 @@
-package terraform.gcp.security.discovery_engine.chat_engine.chat_engine_config_allow_cross_region
+package terraform.gcp.security.discovery_engine.google_discovery_engine_chat_engine.chat_engine_config_allow_cross_region
 import data.terraform.helpers
-import data.terraform.gcp.security.discovery_engine.chat_engine.vars
+import data.terraform.gcp.security.discovery_engine.google_discovery_engine_chat_engine.vars
 
 #allow_cross_region
 

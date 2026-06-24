@@ -1,7 +1,7 @@
-package terraform.gcp.security.app_engine.app_engine_service_network_settings.ingress_traffic_allowed
+package terraform.gcp.security.app_engine.google_app_engine_service_network_settings.network_settings_ingress_traffic_allowed
 
 import data.terraform.helpers
-import data.terraform.gcp.security.app_engine.app_engine_service_network_settings.vars
+import data.terraform.gcp.security.app_engine.google_app_engine_service_network_settings.vars
 
 conditions := [
     [

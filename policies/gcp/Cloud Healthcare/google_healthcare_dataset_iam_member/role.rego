@@ -1,7 +1,7 @@
-package terraform.gcp.security.cloud_healthcare.google_healthcare_dataset_iam.role
+package terraform.gcp.security.cloud_healthcare.google_healthcare_dataset_iam_member.role
 
 import data.terraform.helpers
-import data.terraform.gcp.security.cloud_healthcare.google_healthcare_dataset_iam.vars
+import data.terraform.gcp.security.cloud_healthcare.google_healthcare_dataset_iam_member.vars
 
 conditions := [
   [

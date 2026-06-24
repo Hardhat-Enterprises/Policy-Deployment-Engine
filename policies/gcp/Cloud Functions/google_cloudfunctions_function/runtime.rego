@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_functions.google_cloudfunctions_function.runtime 
+package terraform.gcp.security.cloud_functions.google_cloudfunctions_function.runtime
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_functions.google_cloudfunctions_function.vars
 

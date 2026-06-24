@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_functions.google_cloudfunctions_function.timeout 
+package terraform.gcp.security.cloud_functions.google_cloudfunctions_function.timeout
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_functions.google_cloudfunctions_function.vars
 

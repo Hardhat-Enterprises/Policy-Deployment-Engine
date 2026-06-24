@@ -1,6 +1,6 @@
-package terraform.gcp.security.discovery_engine.data_connector.data_source
+package terraform.gcp.security.discovery_engine.google_discovery_engine_data_connector.data_source
 import data.terraform.helpers
-import data.terraform.gcp.security.discovery_engine.data_connector.vars
+import data.terraform.gcp.security.discovery_engine.google_discovery_engine_data_connector.vars
 
 #Data_connector
 

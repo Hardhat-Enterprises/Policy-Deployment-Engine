@@ -1,7 +1,7 @@
-package terraform.gcp.security.app_engine.app_engine_application.iap.oauth2_client_secret
+package terraform.gcp.security.app_engine.google_app_engine_application.iap_oauth2_client_secret
 
 import data.terraform.helpers
-import data.terraform.gcp.security.app_engine.app_engine_application.vars
+import data.terraform.gcp.security.app_engine.google_app_engine_application.vars
 
 conditions := [
   [

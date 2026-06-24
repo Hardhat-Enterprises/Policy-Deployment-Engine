@@ -1,7 +1,7 @@
-package terraform.gcp.security.firebase_app_hosting.backend.serving_locality
+package terraform.gcp.security.firebase_app_hosting.google_firebase_app_hosting_backend.serving_locality
 
 import data.terraform.helpers
-import data.terraform.gcp.security.firebase_app_hosting.backend.vars
+import data.terraform.gcp.security.firebase_app_hosting.google_firebase_app_hosting_backend.vars
 
 conditions := [
     [

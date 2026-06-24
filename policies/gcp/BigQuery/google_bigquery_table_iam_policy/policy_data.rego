@@ -1,7 +1,7 @@
-package terraform.gcp.security.BigQuery.google_bigquery_table_iam.policy_data
+package terraform.gcp.security.BigQuery.google_bigquery_table_iam_policy.policy_data
 
 import data.terraform.helpers
-import data.terraform.gcp.security.BigQuery.google_bigquery_table_iam.vars
+import data.terraform.gcp.security.BigQuery.google_bigquery_table_iam_policy.vars
 
 # Merged policy for `policy_data` — 2 independent scenarios, each a
 # situation in `conditions`, evaluated separately by helpers.get_multi_summary.

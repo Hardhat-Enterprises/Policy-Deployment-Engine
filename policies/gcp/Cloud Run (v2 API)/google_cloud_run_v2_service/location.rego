@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_service.allowed_location 
+package terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_service.location
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_service.vars
 

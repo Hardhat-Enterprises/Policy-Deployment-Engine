@@ -1,6 +1,6 @@
-package terraform.gcp.security.chronicle.chronicle_rule.location
+package terraform.gcp.security.chronicle.google_chronicle_rule.location
 import data.terraform.helpers
-import data.terraform.gcp.security.chronicle.chronicle_rule.vars
+import data.terraform.gcp.security.chronicle.google_chronicle_rule.vars
 
 
 conditions := [

@@ -1,7 +1,7 @@
-package terraform.gcp.security.app_engine.app_engine_service_split_traffic.shard_by
+package terraform.gcp.security.app_engine.google_app_engine_service_split_traffic.split_shard_by
 
 import data.terraform.helpers
-import data.terraform.gcp.security.app_engine.app_engine_service_split_traffic.vars
+import data.terraform.gcp.security.app_engine.google_app_engine_service_split_traffic.vars
 
 conditions := [
    [

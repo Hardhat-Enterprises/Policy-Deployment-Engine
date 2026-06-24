@@ -1,7 +1,7 @@
-package terraform.gcp.security.chronicle.rule_deployment.enabled
+package terraform.gcp.security.chronicle.google_chronicle_rule_deployment.enabled
 
 import data.terraform.helpers
-import data.terraform.gcp.security.chronicle.rule_deployment.vars
+import data.terraform.gcp.security.chronicle.google_chronicle_rule_deployment.vars
 
 conditions := [
     [

@@ -1,7 +1,7 @@
 package terraform.gcp.security.google_kms.google_kms_crypto_key.purpose
 
 import data.terraform.helpers
-import data.terraform.gcp.security.google_kms.google_kms_crypto_key.vars 
+import data.terraform.gcp.security.google_kms.google_kms_crypto_key.vars
 
 # Merged policy for `purpose` — 2 independent scenarios, each a
 # situation in `conditions`, evaluated separately by helpers.get_multi_summary.

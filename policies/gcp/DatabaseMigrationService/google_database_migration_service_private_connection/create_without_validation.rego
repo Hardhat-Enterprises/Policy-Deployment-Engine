@@ -1,6 +1,6 @@
-package terraform.gcp.security.database_migration_service.private_connection.create_without_validation
+package terraform.gcp.security.database_migration_service.google_database_migration_service_private_connection.create_without_validation
 import data.terraform.helpers
-import data.terraform.gcp.security.database_migration_service.private_connection.vars
+import data.terraform.gcp.security.database_migration_service.google_database_migration_service_private_connection.vars
 
 conditions := [
     [

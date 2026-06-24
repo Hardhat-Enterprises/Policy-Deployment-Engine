@@ -1,4 +1,4 @@
-package terraform.gcp.security.biglake.google_biglake_database.enforce_type_hive 
+package terraform.gcp.security.biglake.google_biglake_database.type
 
 import data.terraform.helpers
 import data.terraform.gcp.security.biglake.google_biglake_database.vars

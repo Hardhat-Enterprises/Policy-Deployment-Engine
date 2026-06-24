@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_billing.google_billing_account_iam_member.billing_account_id 
+package terraform.gcp.security.cloud_billing.google_billing_account_iam_member.billing_account_id
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_billing.google_billing_account_iam_member.vars
 

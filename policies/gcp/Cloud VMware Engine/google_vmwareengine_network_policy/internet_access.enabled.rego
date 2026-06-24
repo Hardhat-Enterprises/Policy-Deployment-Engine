@@ -1,7 +1,7 @@
-package terraform.gcp.security.cloud_vmware_engine.network_policy.internet_access_enabled
+package terraform.gcp.security.cloud_vmware_engine.google_vmwareengine_network_policy.internet_access_enabled
 
 import data.terraform.helpers
-import data.terraform.gcp.security.cloud_vmware_engine.network_policy.vars
+import data.terraform.gcp.security.cloud_vmware_engine.google_vmwareengine_network_policy.vars
 
 conditions := [[
 	{

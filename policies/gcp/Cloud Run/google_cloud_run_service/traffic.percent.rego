@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run.google_cloud_run_service.traffic.percent
+package terraform.gcp.security.cloud_run.google_cloud_run_service.traffic_percent
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run.google_cloud_run_service.vars

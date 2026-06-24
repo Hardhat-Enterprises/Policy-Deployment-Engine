@@ -1,7 +1,7 @@
-package terraform.gcp.security.cloud_healthcare.google_healthcare_consent_store_iam.member
+package terraform.gcp.security.cloud_healthcare.google_healthcare_consent_store_iam_member.member
 
 import data.terraform.helpers
-import data.terraform.gcp.security.cloud_healthcare.google_healthcare_consent_store_iam.vars
+import data.terraform.gcp.security.cloud_healthcare.google_healthcare_consent_store_iam_member.vars
 
 conditions := [
   [

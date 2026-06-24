@@ -1,6 +1,6 @@
-package terraform.gcp.security.discovery_engine.engine_control.filter_action_data_store
+package terraform.gcp.security.discovery_engine.google_discovery_engine_control.filter_action_data_store
 import data.terraform.helpers
-import data.terraform.gcp.security.discovery_engine.engine_control.vars
+import data.terraform.gcp.security.discovery_engine.google_discovery_engine_control.vars
 
 #engine_control_filter
 #Can be set to private later, but imgaine its set to only show public for now or something idk.

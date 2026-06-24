@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run.google_cloud_run_service.template.spec.containers.ports.container_port
+package terraform.gcp.security.cloud_run.google_cloud_run_service.template_spec_containers_ports_container_port
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run.google_cloud_run_service.vars

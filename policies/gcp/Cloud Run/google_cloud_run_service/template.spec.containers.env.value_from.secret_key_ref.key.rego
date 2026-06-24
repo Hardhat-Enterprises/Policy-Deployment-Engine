@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run.google_cloud_run_service.template.spec.containers.env.value_from.secret_key_ref.key
+package terraform.gcp.security.cloud_run.google_cloud_run_service.template_spec_containers_env_value_from_secret_key_ref_key
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run.google_cloud_run_service.vars

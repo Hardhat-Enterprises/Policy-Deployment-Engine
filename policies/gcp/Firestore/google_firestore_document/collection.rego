@@ -1,7 +1,7 @@
-package terraform.gcp.security.firestore_document.collection
+package terraform.gcp.security.firestore.google_firestore_document.collection
 
 import data.terraform.helpers
-import data.terraform.gcp.security.firestore.firestore_document.vars
+import data.terraform.gcp.security.firestore.google_firestore_document.vars
 
 conditions := [
     [

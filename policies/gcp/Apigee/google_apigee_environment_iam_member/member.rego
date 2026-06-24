@@ -1,7 +1,7 @@
-package terraform.gcp.security.apigee.google_apigee_environment_iam.member
+package terraform.gcp.security.apigee.google_apigee_environment_iam_member.member
 
 import data.terraform.helpers
-import data.terraform.gcp.security.apigee.google_apigee_environment_iam.vars
+import data.terraform.gcp.security.apigee.google_apigee_environment_iam_member.vars
 
 conditions := [
     [

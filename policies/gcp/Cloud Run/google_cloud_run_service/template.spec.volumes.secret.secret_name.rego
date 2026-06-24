@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run.google_cloud_run_service.template.spec.volumes.secret.secret_name
+package terraform.gcp.security.cloud_run.google_cloud_run_service.template_spec_volumes_secret_secret_name
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run.google_cloud_run_service.vars

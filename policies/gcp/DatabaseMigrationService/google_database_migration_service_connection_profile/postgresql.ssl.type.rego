@@ -1,6 +1,6 @@
-package terraform.gcp.security.database_migration_service.connection_profile.postgresql_ssl_type
+package terraform.gcp.security.database_migration_service.google_database_migration_service_connection_profile.postgresql_ssl_type
 import data.terraform.helpers
-import data.terraform.gcp.security.database_migration_service.connection_profile.vars
+import data.terraform.gcp.security.database_migration_service.google_database_migration_service_connection_profile.vars
 
 conditions := [
     [

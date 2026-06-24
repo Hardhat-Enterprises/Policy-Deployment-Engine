@@ -1,4 +1,4 @@
-package terraform.gcp.security.application_integration.google_integrations_client.cloud_kms_config.kms_ring
+package terraform.gcp.security.application_integration.google_integrations_client.cloud_kms_config_kms_ring
 
 import data.terraform.helpers
 import data.terraform.gcp.security.application_integration.google_integrations_client.vars

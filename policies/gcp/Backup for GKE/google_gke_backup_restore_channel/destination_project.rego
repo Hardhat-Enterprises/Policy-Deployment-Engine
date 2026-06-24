@@ -1,6 +1,6 @@
-package terraform.gcp.security.backup_for_gke.restore_channel.destination_project
+package terraform.gcp.security.backup_for_gke.google_gke_backup_restore_channel.destination_project
 import data.terraform.helpers
-import data.terraform.gcp.security.backup_for_gke.restore_channel.vars
+import data.terraform.gcp.security.backup_for_gke.google_gke_backup_restore_channel.vars
 
 conditions := [
   [

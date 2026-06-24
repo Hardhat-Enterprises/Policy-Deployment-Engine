@@ -1,7 +1,7 @@
 package terraform.gcp.security.cloud_stackdriver_logging.google_logging_log_view_iam_binding.role
 
 import data.terraform.helpers
-import data.terraform.gcp.security.cloud_stackdriver_logging.google_logging_log_view_iam.vars
+import data.terraform.gcp.security.cloud_stackdriver_logging.google_logging_log_view_iam_binding.vars
 
 conditions := [
     [

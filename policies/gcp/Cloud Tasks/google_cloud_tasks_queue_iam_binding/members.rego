@@ -1,7 +1,7 @@
-package terraform.gcp.security.cloud_tasks.google_cloud_tasks_queue_iam.members
+package terraform.gcp.security.cloud_tasks.google_cloud_tasks_queue_iam_binding.members
 
 import data.terraform.helpers
-import data.terraform.gcp.security.cloud_tasks.google_cloud_tasks_queue_iam.vars
+import data.terraform.gcp.security.cloud_tasks.google_cloud_tasks_queue_iam_binding.vars
 
 conditions := [
 

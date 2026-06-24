@@ -1,7 +1,7 @@
-package terraform.gcp.security.cloud_data_fusion.data_fusion_instance_iam_binding.role
+package terraform.gcp.security.cloud_data_fusion.google_data_fusion_instance_iam_binding.role
 import data.terraform.helpers
 
-import data.terraform.gcp.security.cloud_data_fusion.data_fusion_instance_iam_binding.vars
+import data.terraform.gcp.security.cloud_data_fusion.google_data_fusion_instance_iam_binding.vars
 conditions := [
     [
         {

@@ -1,6 +1,6 @@
-package terraform.gcp.security.privileged_access_manager.entitlement.privileged_access_gcp_iam_access_role_bindings_role
+package terraform.gcp.security.privileged_access_manager.google_privileged_access_manager_entitlement.privileged_access_gcp_iam_access_role_bindings_role
 import data.terraform.helpers
-import data.terraform.gcp.security.privileged_access_manager.entitlement.vars
+import data.terraform.gcp.security.privileged_access_manager.google_privileged_access_manager_entitlement.vars
 
 conditions := [
   [

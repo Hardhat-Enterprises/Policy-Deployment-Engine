@@ -1,7 +1,7 @@
-package terraform.gcp.security.google_cloudfunction.google_cloudfunctions2_function_iam.policy
+package terraform.gcp.security.google_cloudfunction.google_cloudfunctions2_function_iam_member.role
 
 import data.terraform.helpers
-import data.terraform.gcp.security.google_cloudfunction.google_cloudfunctions2_function_iam.google_cloudfunctions2_function_iam_member.vars
+import data.terraform.gcp.security.google_cloudfunction.google_cloudfunctions2_function_iam_member.vars
 
 conditions := [
 [

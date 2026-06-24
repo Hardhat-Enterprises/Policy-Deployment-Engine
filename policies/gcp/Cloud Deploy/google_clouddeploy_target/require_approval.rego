@@ -1,6 +1,6 @@
-package terraform.gcp.security.deploy.target.require_approval_check 
+package terraform.gcp.security.deploy.google_clouddeploy_target.require_approval
 import data.terraform.helpers
-import data.terraform.gcp.security.deploy.target.vars
+import data.terraform.gcp.security.deploy.google_clouddeploy_target.vars
 
 conditions := [
     [

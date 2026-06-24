@@ -1,6 +1,6 @@
-package terraform.gcp.security.gdce.cluster.networking_cluster_ipv4_cidr_blocks
+package terraform.gcp.security.gdce.google_edgecontainer_cluster.networking_cluster_ipv4_cidr_blocks
 import data.terraform.helpers
-import data.terraform.gcp.security.gdce.cluster.vars
+import data.terraform.gcp.security.gdce.google_edgecontainer_cluster.vars
 
 conditions := [
     # 1. Overly permissive CIDR ranges

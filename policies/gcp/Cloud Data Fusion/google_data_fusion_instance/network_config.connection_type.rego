@@ -1,7 +1,7 @@
-package terraform.gcp.security.cloud_data_fusion.data_fusion_instance.connection_type
+package terraform.gcp.security.cloud_data_fusion.google_data_fusion_instance.network_config_connection_type
 
 import data.terraform.helpers
-import data.terraform.gcp.security.cloud_data_fusion.data_fusion_instance.vars
+import data.terraform.gcp.security.cloud_data_fusion.google_data_fusion_instance.vars
 
 conditions := [
     [

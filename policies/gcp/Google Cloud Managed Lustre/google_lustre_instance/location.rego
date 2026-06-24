@@ -1,6 +1,6 @@
-package terraform.gcp.security.lustre.lustre_instance.location
+package terraform.gcp.security.lustre.google_lustre_instance.location
 import data.terraform.helpers
-import data.terraform.gcp.security.lustre.lustre_instance.vars
+import data.terraform.gcp.security.lustre.google_lustre_instance.vars
 
 
 conditions := [

@@ -1,4 +1,4 @@
-package terraform.gcp.security.google_cloudfunction.google_cloudfunctions2_function.ingress
+package terraform.gcp.security.google_cloudfunction.google_cloudfunctions2_function.service_config_ingress_settings
 
 import data.terraform.helpers
 import data.terraform.gcp.security.google_cloudfunction.google_cloudfunctions2_function.vars

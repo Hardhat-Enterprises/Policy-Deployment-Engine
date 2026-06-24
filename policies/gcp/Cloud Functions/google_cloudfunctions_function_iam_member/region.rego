@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_functions.google_cloudfunctions_function_iam_member.region  
+package terraform.gcp.security.cloud_functions.google_cloudfunctions_function_iam_member.region
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_functions.google_cloudfunctions_function_iam_member.vars
 

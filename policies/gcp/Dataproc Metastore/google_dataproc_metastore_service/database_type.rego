@@ -1,6 +1,6 @@
-package terraform.gcp.security.dataproc_metastore.service.database_type
+package terraform.gcp.security.dataproc_metastore.google_dataproc_metastore_service.database_type
 import data.terraform.helpers
-import data.terraform.gcp.security.dataproc_metastore.service.vars
+import data.terraform.gcp.security.dataproc_metastore.google_dataproc_metastore_service.vars
 
 
 conditions := [

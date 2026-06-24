@@ -1,7 +1,7 @@
-package terraform.gcp.security.privileged_access_manager.entitlement.additional_notification_targets_admin_email_recipients
+package terraform.gcp.security.privileged_access_manager.google_privileged_access_manager_entitlement.additional_notification_targets_admin_email_recipients
 
 import data.terraform.helpers
-import data.terraform.gcp.security.privileged_access_manager.entitlement.vars
+import data.terraform.gcp.security.privileged_access_manager.google_privileged_access_manager_entitlement.vars
 
 conditions := [
     [

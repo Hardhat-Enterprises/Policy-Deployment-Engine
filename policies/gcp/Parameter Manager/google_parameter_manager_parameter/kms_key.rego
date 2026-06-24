@@ -1,7 +1,7 @@
-package terraform.gcp.security.parameter_manager.parameter.kms_key
+package terraform.gcp.security.parameter_manager.google_parameter_manager_parameter.kms_key
 
 import data.terraform.helpers
-import data.terraform.gcp.security.parameter_manager.parameter.vars
+import data.terraform.gcp.security.parameter_manager.google_parameter_manager_parameter.vars
 
 conditions := [[
 	{

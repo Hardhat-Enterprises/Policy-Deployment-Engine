@@ -1,7 +1,7 @@
-package terraform.gcp.security.app_engine.app_engine_application_url_dispatch_rules.dispatch_rules.dispatch_rules_service
+package terraform.gcp.security.app_engine.google_app_engine_application_url_dispatch_rules.dispatch_rules_service
 
 import data.terraform.helpers
-import data.terraform.gcp.security.app_engine.app_engine_application_url_dispatch_rules.vars
+import data.terraform.gcp.security.app_engine.google_app_engine_application_url_dispatch_rules.vars
 
 conditions := [
   [

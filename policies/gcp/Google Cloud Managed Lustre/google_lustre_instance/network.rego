@@ -1,7 +1,7 @@
-package terraform.gcp.security.lustre.lustre_instance.network
+package terraform.gcp.security.lustre.google_lustre_instance.network
 
 import data.terraform.helpers
-import data.terraform.gcp.security.lustre.lustre_instance.vars
+import data.terraform.gcp.security.lustre.google_lustre_instance.vars
 
 conditions := [
   [

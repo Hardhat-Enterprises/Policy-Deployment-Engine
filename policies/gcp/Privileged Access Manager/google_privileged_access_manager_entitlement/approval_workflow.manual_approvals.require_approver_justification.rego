@@ -1,7 +1,7 @@
-package terraform.gcp.security.privileged_access_manager.entitlement.approval_workflow_manual_approvals_require_approver_justification
+package terraform.gcp.security.privileged_access_manager.google_privileged_access_manager_entitlement.approval_workflow_manual_approvals_require_approver_justification
 
 import data.terraform.helpers
-import data.terraform.gcp.security.privileged_access_manager.entitlement.vars
+import data.terraform.gcp.security.privileged_access_manager.google_privileged_access_manager_entitlement.vars
 
 conditions := [
     [

@@ -1,4 +1,4 @@
-package terraform.gcp.security.memcache.google_memcache_instance.maintenance_policy 
+package terraform.gcp.security.memcache.google_memcache_instance.maintenance_policy_description
 import data.terraform.helpers
 import data.terraform.gcp.security.memcache.google_memcache_instance.vars
 

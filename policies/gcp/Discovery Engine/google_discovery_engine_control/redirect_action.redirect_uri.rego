@@ -1,6 +1,6 @@
-package terraform.gcp.security.discovery_engine.engine_control.redirect_action_redirect_uri
+package terraform.gcp.security.discovery_engine.google_discovery_engine_control.redirect_action_redirect_uri
 import data.terraform.helpers
-import data.terraform.gcp.security.discovery_engine.engine_control.vars
+import data.terraform.gcp.security.discovery_engine.google_discovery_engine_control.vars
 
 #engine_control_redirect_action
 

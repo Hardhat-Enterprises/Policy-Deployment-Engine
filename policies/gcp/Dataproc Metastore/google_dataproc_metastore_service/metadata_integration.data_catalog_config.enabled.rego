@@ -1,6 +1,6 @@
-package terraform.gcp.security.dataproc_metastore.service.metadata_integration 
+package terraform.gcp.security.dataproc_metastore.google_dataproc_metastore_service.metadata_integration_data_catalog_config_enabled
 import data.terraform.helpers
-import data.terraform.gcp.security.dataproc_metastore.service.vars
+import data.terraform.gcp.security.dataproc_metastore.google_dataproc_metastore_service.vars
 
 
 conditions := [

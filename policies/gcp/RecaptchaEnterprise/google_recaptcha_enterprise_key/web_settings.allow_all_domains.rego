@@ -1,6 +1,6 @@
-package terraform.gcp.security.recaptchaenterprise.key.web_settings_allow_all_domains
+package terraform.gcp.security.recaptchaenterprise.google_recaptcha_enterprise_key.web_settings_allow_all_domains
 import data.terraform.helpers
-import data.terraform.gcp.security.recaptchaenterprise.key.vars
+import data.terraform.gcp.security.recaptchaenterprise.google_recaptcha_enterprise_key.vars
 
 conditions := [
   [

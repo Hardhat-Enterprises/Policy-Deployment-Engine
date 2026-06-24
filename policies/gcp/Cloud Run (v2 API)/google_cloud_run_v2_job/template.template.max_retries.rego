@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_job.max_retries 
+package terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_job.template_template_max_retries
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_job.vars
 

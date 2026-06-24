@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run.google_cloud_run_service.traffic.latest_revision
+package terraform.gcp.security.cloud_run.google_cloud_run_service.traffic_latest_revision
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run.google_cloud_run_service.vars

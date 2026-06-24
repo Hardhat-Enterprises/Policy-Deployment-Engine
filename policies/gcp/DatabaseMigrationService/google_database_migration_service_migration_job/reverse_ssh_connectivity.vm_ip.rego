@@ -1,6 +1,6 @@
-package terraform.gcp.security.database_migration_service.migration_job.reverse_ssh_connectivity_vm_ip
+package terraform.gcp.security.database_migration_service.google_database_migration_service_migration_job.reverse_ssh_connectivity_vm_ip
 import data.terraform.helpers
-import data.terraform.gcp.security.database_migration_service.migration_job.vars
+import data.terraform.gcp.security.database_migration_service.google_database_migration_service_migration_job.vars
 
 conditions := [
     [

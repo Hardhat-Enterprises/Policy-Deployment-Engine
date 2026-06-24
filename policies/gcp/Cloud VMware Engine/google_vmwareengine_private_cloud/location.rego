@@ -1,7 +1,7 @@
-package terraform.gcp.security.cloud_vmware_engine.private_cloud.location
+package terraform.gcp.security.cloud_vmware_engine.google_vmwareengine_private_cloud.location
 
 import data.terraform.helpers
-import data.terraform.gcp.security.cloud_vmware_engine.private_cloud.vars
+import data.terraform.gcp.security.cloud_vmware_engine.google_vmwareengine_private_cloud.vars
 
 conditions := [[
 	{

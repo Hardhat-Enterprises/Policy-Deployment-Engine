@@ -1,7 +1,7 @@
 package terraform.gcp.security.gemini.google_gemini_release_channel_setting.release_channel
 
 import data.terraform.helpers
-import data.terraform.gcp.security.google_gemini_release_channel_setting.vars
+import data.terraform.gcp.security.gemini.google_gemini_release_channel_setting.vars
 
 conditions := [
     [

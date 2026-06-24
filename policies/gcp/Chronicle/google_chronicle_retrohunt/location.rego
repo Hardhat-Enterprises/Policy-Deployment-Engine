@@ -1,6 +1,6 @@
-package terraform.gcp.security.chronicle.retrohunt.location
+package terraform.gcp.security.chronicle.google_chronicle_retrohunt.location
 import data.terraform.helpers
-import data.terraform.gcp.security.chronicle.retrohunt.vars
+import data.terraform.gcp.security.chronicle.google_chronicle_retrohunt.vars
 
 
 conditions := [

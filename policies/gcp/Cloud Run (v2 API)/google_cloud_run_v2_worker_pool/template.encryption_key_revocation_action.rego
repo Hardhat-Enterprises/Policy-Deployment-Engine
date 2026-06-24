@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_worker_pool.encryption_key_revocation_action 
+package terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_worker_pool.template_encryption_key_revocation_action
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_worker_pool.vars
 

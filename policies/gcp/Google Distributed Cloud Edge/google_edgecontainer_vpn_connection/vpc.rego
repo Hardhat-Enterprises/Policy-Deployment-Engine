@@ -1,6 +1,6 @@
-package terraform.gcp.security.gdce.vpn_connection.vpc
+package terraform.gcp.security.gdce.google_edgecontainer_vpn_connection.vpc
 import data.terraform.helpers
-import data.terraform.gcp.security.gdce.vpn_connection.vars
+import data.terraform.gcp.security.gdce.google_edgecontainer_vpn_connection.vars
 
 conditions := [
     # VPC format validation - blacklist invalid patterns

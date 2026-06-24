@@ -1,4 +1,4 @@
-package terraform.gcp.security.application_integration.google_integrations_auth_config.decrypted_credential.credential_type
+package terraform.gcp.security.application_integration.google_integrations_auth_config.decrypted_credential_credential_type
 
 import data.terraform.helpers
 import data.terraform.gcp.security.application_integration.google_integrations_auth_config.vars

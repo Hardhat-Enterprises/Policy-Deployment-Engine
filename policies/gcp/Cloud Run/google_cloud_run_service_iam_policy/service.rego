@@ -1,7 +1,7 @@
-package terraform.gcp.security.cloud_run.google_cloud_run_service_iam.service
+package terraform.gcp.security.cloud_run.google_cloud_run_service_iam_policy.service
 
 import data.terraform.helpers
-import data.terraform.gcp.security.cloud_run.google_cloud_run_service_iam.vars
+import data.terraform.gcp.security.cloud_run.google_cloud_run_service_iam_policy.vars
 
 conditions := [
   [

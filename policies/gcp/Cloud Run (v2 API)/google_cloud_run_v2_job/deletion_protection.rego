@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_job.deletion_protection 
+package terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_job.deletion_protection
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_job.vars
 

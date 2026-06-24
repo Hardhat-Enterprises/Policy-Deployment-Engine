@@ -1,4 +1,4 @@
-package terraform.gcp.security.application_integration.google_integrations_client.cloud_kms_config.key
+package terraform.gcp.security.application_integration.google_integrations_client.cloud_kms_config_key
 
 import data.terraform.helpers
 import data.terraform.gcp.security.application_integration.google_integrations_client.vars

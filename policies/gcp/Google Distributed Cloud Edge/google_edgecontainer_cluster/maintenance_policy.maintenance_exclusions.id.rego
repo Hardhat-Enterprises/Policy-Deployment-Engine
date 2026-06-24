@@ -1,6 +1,6 @@
-package terraform.gcp.security.gdce.cluster.maintenance_policy_maintenance_exclusions_id
+package terraform.gcp.security.gdce.google_edgecontainer_cluster.maintenance_policy_maintenance_exclusions_id
 import data.terraform.helpers
-import data.terraform.gcp.security.gdce.cluster.vars
+import data.terraform.gcp.security.gdce.google_edgecontainer_cluster.vars
 
 conditions := [
 

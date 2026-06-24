@@ -1,6 +1,6 @@
-package terraform.gcp.security.deploy.custom_target_type.custom_actions_deploy_action
+package terraform.gcp.security.deploy.google_clouddeploy_custom_target_type.custom_actions_deploy_action
 import data.terraform.helpers
-import data.terraform.gcp.security.deploy.custom_target_type.vars
+import data.terraform.gcp.security.deploy.google_clouddeploy_custom_target_type.vars
 
 conditions := [
     [

@@ -1,7 +1,7 @@
-package terraform.gcp.security.app_engine.app_engine_flexible_app_version.entrypoint.shell
+package terraform.gcp.security.app_engine.google_app_engine_flexible_app_version.entrypoint_shell
 
 import data.terraform.helpers
-import data.terraform.gcp.security.app_engine.app_engine_flexible_app_version.vars
+import data.terraform.gcp.security.app_engine.google_app_engine_flexible_app_version.vars
 
 conditions := [
     [

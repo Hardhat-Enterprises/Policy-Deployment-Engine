@@ -1,7 +1,7 @@
-package terraform.gcp.security.app_engine.app_engine_application.serving_status
+package terraform.gcp.security.app_engine.google_app_engine_application.serving_status
 
 import data.terraform.helpers
-import data.terraform.gcp.security.app_engine.app_engine_application.vars
+import data.terraform.gcp.security.app_engine.google_app_engine_application.vars
 
 conditions := [
   [

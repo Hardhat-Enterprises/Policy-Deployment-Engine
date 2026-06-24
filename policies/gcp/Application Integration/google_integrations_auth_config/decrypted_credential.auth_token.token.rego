@@ -1,4 +1,4 @@
-package terraform.gcp.security.application_integration.google_integrations_auth_config.decrypted_credential.auth_token.token
+package terraform.gcp.security.application_integration.google_integrations_auth_config.decrypted_credential_auth_token_token
 
 import data.terraform.helpers
 import data.terraform.gcp.security.application_integration.google_integrations_auth_config.vars

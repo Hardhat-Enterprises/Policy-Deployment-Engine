@@ -1,7 +1,7 @@
-package terraform.gcp.security.backup_for_gke.restore_plan.restore_config_transformation_rules_field_actions_op
+package terraform.gcp.security.backup_for_gke.google_gke_backup_restore_plan.restore_config_transformation_rules_field_actions_op
 
 import data.terraform.helpers
-import data.terraform.gcp.security.backup_for_gke.restore_plan.vars
+import data.terraform.gcp.security.backup_for_gke.google_gke_backup_restore_plan.vars
 
 # Merged policy for `restore_config.transformation_rules.field_actions.op` — 2 independent scenarios, each a
 # situation in `conditions`, evaluated separately by helpers.get_multi_summary.

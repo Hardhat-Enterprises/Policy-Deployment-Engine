@@ -1,7 +1,7 @@
-package terraform.gcp.security.cloud_data_fusion.data_fusion_instance_iam_policy.policy_data
+package terraform.gcp.security.cloud_data_fusion.google_data_fusion_instance_iam_policy.policy_data
 
 import data.terraform.helpers
-import data.terraform.gcp.security.cloud_data_fusion.data_fusion_instance_iam_policy.vars
+import data.terraform.gcp.security.cloud_data_fusion.google_data_fusion_instance_iam_policy.vars
 
 conditions := [
     [

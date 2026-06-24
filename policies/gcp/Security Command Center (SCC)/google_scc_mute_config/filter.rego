@@ -1,7 +1,7 @@
-package terraform.gcp.security.scc.mute_config.filter
+package terraform.gcp.security.scc.google_scc_mute_config.filter
 
 import data.terraform.helpers
-import data.terraform.gcp.security.scc.mute_config.vars
+import data.terraform.gcp.security.scc.google_scc_mute_config.vars
 
 conditions := [
   [

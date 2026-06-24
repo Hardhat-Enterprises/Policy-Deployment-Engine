@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_worker_pool.approved_encryption_key 
+package terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_worker_pool.template_encryption_key
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_worker_pool.vars
 

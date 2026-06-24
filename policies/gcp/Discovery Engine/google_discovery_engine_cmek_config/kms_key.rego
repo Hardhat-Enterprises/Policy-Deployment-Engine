@@ -1,6 +1,6 @@
-package terraform.gcp.security.discovery_engine.cmek_config.cmek_config_kms_key 
+package terraform.gcp.security.discovery_engine.google_discovery_engine_cmek_config.kms_key
 import data.terraform.helpers
-import data.terraform.gcp.security.discovery_engine.cmek_config.vars
+import data.terraform.gcp.security.discovery_engine.google_discovery_engine_cmek_config.vars
 
 #cmek_config
 

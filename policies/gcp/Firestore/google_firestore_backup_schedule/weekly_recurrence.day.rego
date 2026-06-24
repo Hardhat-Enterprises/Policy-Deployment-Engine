@@ -1,7 +1,7 @@
-package terraform.gcp.security.firestore_backup_schedule.weekly_recurrence_day
+package terraform.gcp.security.firestore.google_firestore_backup_schedule.weekly_recurrence_day
 
 import data.terraform.helpers
-import data.terraform.gcp.security.firestore.firestore_backup_schedule.vars
+import data.terraform.gcp.security.firestore.google_firestore_backup_schedule.vars
 
 conditions := [
     [

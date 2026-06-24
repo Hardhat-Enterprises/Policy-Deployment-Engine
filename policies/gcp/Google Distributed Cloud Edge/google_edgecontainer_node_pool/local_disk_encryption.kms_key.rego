@@ -1,6 +1,6 @@
-package terraform.gcp.security.gdce.node_pool.local_disk_encryption_kms_key
+package terraform.gcp.security.gdce.google_edgecontainer_node_pool.local_disk_encryption_kms_key
 import data.terraform.helpers
-import data.terraform.gcp.security.gdce.node_pool.vars
+import data.terraform.gcp.security.gdce.google_edgecontainer_node_pool.vars
 
 conditions := [
     # 1. KMS Key presence AND format validation

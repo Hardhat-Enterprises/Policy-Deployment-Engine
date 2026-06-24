@@ -1,7 +1,7 @@
-package terraform.gcp.security.cloud_vmware_engine.network_peering.import_custom_routes_with_public_ip
+package terraform.gcp.security.cloud_vmware_engine.google_vmwareengine_network_peering.import_custom_routes_with_public_ip
 
 import data.terraform.helpers
-import data.terraform.gcp.security.cloud_vmware_engine.network_peering.vars
+import data.terraform.gcp.security.cloud_vmware_engine.google_vmwareengine_network_peering.vars
 
 conditions := [[
 	{

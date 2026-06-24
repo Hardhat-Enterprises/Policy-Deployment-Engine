@@ -1,7 +1,7 @@
-package terraform.gcp.security.backup_for_gke.restore_plan_iam_binding.members
+package terraform.gcp.security.backup_for_gke.google_gke_backup_restore_plan_iam_binding.members
 
 import data.terraform.helpers
-import data.terraform.gcp.security.backup_for_gke.restore_plan_iam_binding.vars
+import data.terraform.gcp.security.backup_for_gke.google_gke_backup_restore_plan_iam_binding.vars
 
 # Merged policy for `members` — 6 independent scenarios, each a
 # situation in `conditions`, evaluated separately by helpers.get_multi_summary.

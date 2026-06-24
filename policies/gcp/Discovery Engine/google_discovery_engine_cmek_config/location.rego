@@ -1,6 +1,6 @@
-package terraform.gcp.security.discovery_engine.cmek_config.location
+package terraform.gcp.security.discovery_engine.google_discovery_engine_cmek_config.location
 import data.terraform.helpers
-import data.terraform.gcp.security.discovery_engine.cmek_config.vars
+import data.terraform.gcp.security.discovery_engine.google_discovery_engine_cmek_config.vars
 
 #cmek_config_location
 

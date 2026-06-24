@@ -1,7 +1,7 @@
-package terraform.gcp.security.cloud_run.google_cloud_run_service_iam.policy_data
+package terraform.gcp.security.cloud_run.google_cloud_run_service_iam_policy.policy_data
 
 import data.terraform.helpers
-import data.terraform.gcp.security.cloud_run.google_cloud_run_service_iam.vars
+import data.terraform.gcp.security.cloud_run.google_cloud_run_service_iam_policy.vars
 
 # Merged policy for `policy_data` — 3 independent scenarios.
 conditions := [

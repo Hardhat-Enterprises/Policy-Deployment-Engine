@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_service.gcs_read_only 
+package terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_service.template_volumes_gcs_read_only
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_service.vars
 

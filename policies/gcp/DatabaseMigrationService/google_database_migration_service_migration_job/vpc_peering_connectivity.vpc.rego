@@ -1,6 +1,6 @@
-package terraform.gcp.security.database_migration_service.migration_job.vpc_peering_connectivity_vpc
+package terraform.gcp.security.database_migration_service.google_database_migration_service_migration_job.vpc_peering_connectivity_vpc
 import data.terraform.helpers
-import data.terraform.gcp.security.database_migration_service.migration_job.vars
+import data.terraform.gcp.security.database_migration_service.google_database_migration_service_migration_job.vars
 
 conditions := [
     [

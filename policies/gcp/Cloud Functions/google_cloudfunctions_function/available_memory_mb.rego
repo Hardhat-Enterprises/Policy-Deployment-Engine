@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_functions.google_cloudfunctions_function.available_memory_mb 
+package terraform.gcp.security.cloud_functions.google_cloudfunctions_function.available_memory_mb
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_functions.google_cloudfunctions_function.vars
 

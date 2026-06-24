@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run.google_cloud_run_service.template.spec.container_concurrency
+package terraform.gcp.security.cloud_run.google_cloud_run_service.template_spec_container_concurrency
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run.google_cloud_run_service.vars

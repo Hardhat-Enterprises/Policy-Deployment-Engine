@@ -1,6 +1,6 @@
-package terraform.gcp.security.database_migration_service.connection_profile.oracle_private_connectivity_private_connection
+package terraform.gcp.security.database_migration_service.google_database_migration_service_connection_profile.oracle_private_connectivity_private_connection
 import data.terraform.helpers
-import data.terraform.gcp.security.database_migration_service.connection_profile.vars
+import data.terraform.gcp.security.database_migration_service.google_database_migration_service_connection_profile.vars
 
 conditions := [
     [

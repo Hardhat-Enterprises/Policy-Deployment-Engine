@@ -1,7 +1,7 @@
-package terraform.gcp.security.cloud_vmware_engine.external_access_rule.source_ports
+package terraform.gcp.security.cloud_vmware_engine.google_vmwareengine_external_access_rule.source_ports
 
 import data.terraform.helpers
-import data.terraform.gcp.security.cloud_vmware_engine.external_access_rule.vars
+import data.terraform.gcp.security.cloud_vmware_engine.google_vmwareengine_external_access_rule.vars
 
 conditions := [
     [

@@ -1,6 +1,6 @@
-package terraform.gcp.security.deploy.target_iam_policy.policy_data
+package terraform.gcp.security.deploy.google_clouddeploy_target_iam_policy.policy_data
 import data.terraform.helpers
-import data.terraform.gcp.security.deploy.target_iam_policy.vars
+import data.terraform.gcp.security.deploy.google_clouddeploy_target_iam_policy.vars
 
 conditions := [
   [

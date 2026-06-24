@@ -1,6 +1,6 @@
-package terraform.gcp.security.database_migration_service.migration_job.location
+package terraform.gcp.security.database_migration_service.google_database_migration_service_migration_job.location
 import data.terraform.helpers
-import data.terraform.gcp.security.database_migration_service.migration_job.vars
+import data.terraform.gcp.security.database_migration_service.google_database_migration_service_migration_job.vars
 
 conditions := [
     [

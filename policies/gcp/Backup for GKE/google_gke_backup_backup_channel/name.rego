@@ -1,6 +1,6 @@
-package terraform.gcp.security.backup_for_gke.backup_channel.name
+package terraform.gcp.security.backup_for_gke.google_gke_backup_backup_channel.name
 import data.terraform.helpers
-import data.terraform.gcp.security.backup_for_gke.backup_channel.vars
+import data.terraform.gcp.security.backup_for_gke.google_gke_backup_backup_channel.vars
 
 conditions := [
   [

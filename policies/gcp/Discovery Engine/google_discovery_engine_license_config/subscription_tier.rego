@@ -1,6 +1,6 @@
-package terraform.gcp.security.discovery_engine.license_config.subscription_tier
+package terraform.gcp.security.discovery_engine.google_discovery_engine_license_config.subscription_tier
 import data.terraform.helpers
-import data.terraform.gcp.security.discovery_engine.license_config.vars
+import data.terraform.gcp.security.discovery_engine.google_discovery_engine_license_config.vars
 
 #license_config_subscription_tier
 

@@ -1,6 +1,6 @@
-package terraform.gcp.security.backup_for_gke.restore_plan.restore_config_excluded_namespaces_namespaces
+package terraform.gcp.security.backup_for_gke.google_gke_backup_restore_plan.restore_config_excluded_namespaces_namespaces
 import data.terraform.helpers
-import data.terraform.gcp.security.backup_for_gke.restore_plan.vars
+import data.terraform.gcp.security.backup_for_gke.google_gke_backup_restore_plan.vars
 
 conditions := [
   [

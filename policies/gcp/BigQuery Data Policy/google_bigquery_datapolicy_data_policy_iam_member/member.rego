@@ -1,6 +1,6 @@
-package terraform.gcp.security.bigquery_data_policy.bigquery_datapolicy_data_policy_iam.member
+package terraform.gcp.security.bigquery_data_policy.google_bigquery_datapolicy_data_policy_iam_member.member
 import data.terraform.helpers
-import data.terraform.gcp.security.bigquery_data_policy.bigquery_datapolicy_data_policy_iam.vars
+import data.terraform.gcp.security.bigquery_data_policy.google_bigquery_datapolicy_data_policy_iam_member.vars
 
 conditions := [
     [

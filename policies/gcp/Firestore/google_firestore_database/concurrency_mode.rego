@@ -1,7 +1,7 @@
-package terraform.gcp.security.firestore_database.concurrency_mode
+package terraform.gcp.security.firestore.google_firestore_database.concurrency_mode
 
 import data.terraform.helpers
-import data.terraform.gcp.security.firestore.firestore_database.vars
+import data.terraform.gcp.security.firestore.google_firestore_database.vars
 
 conditions := [
     [

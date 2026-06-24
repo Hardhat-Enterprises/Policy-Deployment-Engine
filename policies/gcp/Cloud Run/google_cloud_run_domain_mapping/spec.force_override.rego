@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run.google_cloud_run_domain_mapping.spec.force_override
+package terraform.gcp.security.cloud_run.google_cloud_run_domain_mapping.spec_force_override
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run.google_cloud_run_domain_mapping.vars
 

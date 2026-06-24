@@ -1,7 +1,7 @@
-package terraform.gcp.security.dataproc_metastore.federation.backend_metastores_name
+package terraform.gcp.security.dataproc_metastore.google_dataproc_metastore_federation.backend_metastores_name
 
 import data.terraform.helpers
-import data.terraform.gcp.security.dataproc_metastore.federation.vars
+import data.terraform.gcp.security.dataproc_metastore.google_dataproc_metastore_federation.vars
 
 
 conditions := [

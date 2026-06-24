@@ -1,7 +1,7 @@
-package terraform.gcp.security.backup_for_gke.backup_plan_iam_binding.members
+package terraform.gcp.security.backup_for_gke.google_gke_backup_backup_plan_iam_binding.members
 
 import data.terraform.helpers
-import data.terraform.gcp.security.backup_for_gke.backup_plan_iam_binding.vars
+import data.terraform.gcp.security.backup_for_gke.google_gke_backup_backup_plan_iam_binding.vars
 
 # Merged policy for `members` — 3 independent scenarios.
 conditions := [

@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_worker_pool.required_use_default 
+package terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_worker_pool.binary_authorization_use_default
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_worker_pool.vars
 

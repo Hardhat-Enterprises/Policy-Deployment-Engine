@@ -1,6 +1,6 @@
-package terraform.gcp.security.backup_for_gke.backup_plan.name
+package terraform.gcp.security.backup_for_gke.google_gke_backup_backup_plan.name
 import data.terraform.helpers
-import data.terraform.gcp.security.backup_for_gke.backup_plan.vars
+import data.terraform.gcp.security.backup_for_gke.google_gke_backup_backup_plan.vars
 
 conditions := [
   [

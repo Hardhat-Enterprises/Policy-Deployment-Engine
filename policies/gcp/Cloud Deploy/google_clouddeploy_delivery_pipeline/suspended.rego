@@ -1,6 +1,6 @@
-package terraform.gcp.security.deploy.delivery_pipeline.suspended
+package terraform.gcp.security.deploy.google_clouddeploy_delivery_pipeline.suspended
 import data.terraform.helpers
-import data.terraform.gcp.security.deploy.delivery_pipeline.vars
+import data.terraform.gcp.security.deploy.google_clouddeploy_delivery_pipeline.vars
 
 conditions := [
     [

@@ -1,4 +1,4 @@
-package terraform.gcp.security.google_cloud_netapp_volumes.google_netapp_active_directory.required_domain  
+package terraform.gcp.security.google_cloud_netapp_volumes.google_netapp_active_directory.domain
 import data.terraform.helpers
 import data.terraform.gcp.security.google_cloud_netapp_volumes.google_netapp_active_directory.vars
 

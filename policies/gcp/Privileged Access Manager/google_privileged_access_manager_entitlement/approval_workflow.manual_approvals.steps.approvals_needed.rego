@@ -1,7 +1,7 @@
-package terraform.gcp.security.privileged_access_manager.entitlement.approval_workflow_manual_approvals_steps_approvals_needed
+package terraform.gcp.security.privileged_access_manager.google_privileged_access_manager_entitlement.approval_workflow_manual_approvals_steps_approvals_needed
 
 import data.terraform.helpers
-import data.terraform.gcp.security.privileged_access_manager.entitlement.vars
+import data.terraform.gcp.security.privileged_access_manager.google_privileged_access_manager_entitlement.vars
 
 conditions := [
     [

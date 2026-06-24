@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run.google_cloud_run_domain_mapping.spec.route_name
+package terraform.gcp.security.cloud_run.google_cloud_run_domain_mapping.spec_route_name
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run.google_cloud_run_domain_mapping.vars
 

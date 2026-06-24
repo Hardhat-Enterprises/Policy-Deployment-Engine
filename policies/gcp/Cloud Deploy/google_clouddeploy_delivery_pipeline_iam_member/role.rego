@@ -1,6 +1,6 @@
-package terraform.gcp.security.deploy.delivery_pipeline_iam_member.required_role 
+package terraform.gcp.security.deploy.google_clouddeploy_delivery_pipeline_iam_member.role
 import data.terraform.helpers
-import data.terraform.gcp.security.deploy.delivery_pipeline_iam_member.vars
+import data.terraform.gcp.security.deploy.google_clouddeploy_delivery_pipeline_iam_member.vars
 
 conditions := [
   [

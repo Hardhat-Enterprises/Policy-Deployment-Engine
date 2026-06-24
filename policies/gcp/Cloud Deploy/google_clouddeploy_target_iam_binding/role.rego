@@ -1,6 +1,6 @@
-package terraform.gcp.security.deploy.target_iam_binding.role
+package terraform.gcp.security.deploy.google_clouddeploy_target_iam_binding.role
 import data.terraform.helpers
-import data.terraform.gcp.security.deploy.target_iam_binding.vars
+import data.terraform.gcp.security.deploy.google_clouddeploy_target_iam_binding.vars
 
 conditions := [
   [

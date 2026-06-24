@@ -1,7 +1,7 @@
-package terraform.gcp.security.privileged_access_manager.entitlement.eligible_users_principals
+package terraform.gcp.security.privileged_access_manager.google_privileged_access_manager_entitlement.eligible_users_principals
 
 import data.terraform.helpers
-import data.terraform.gcp.security.privileged_access_manager.entitlement.vars
+import data.terraform.gcp.security.privileged_access_manager.google_privileged_access_manager_entitlement.vars
 
 conditions := [
     [

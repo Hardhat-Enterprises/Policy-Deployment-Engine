@@ -1,6 +1,6 @@
-package terraform.gcp.security.deploy.target.run_location
+package terraform.gcp.security.deploy.google_clouddeploy_target.run_location
 import data.terraform.helpers
-import data.terraform.gcp.security.deploy.target.vars
+import data.terraform.gcp.security.deploy.google_clouddeploy_target.vars
 
 conditions := [
     [

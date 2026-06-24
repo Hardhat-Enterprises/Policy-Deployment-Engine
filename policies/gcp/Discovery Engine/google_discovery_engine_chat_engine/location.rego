@@ -1,7 +1,7 @@
-package terraform.gcp.security.discovery_engine.chat_engine.location
+package terraform.gcp.security.discovery_engine.google_discovery_engine_chat_engine.location
 import data.terraform.helpers
 
-import data.terraform.gcp.security.discovery_engine.chat_engine.vars
+import data.terraform.gcp.security.discovery_engine.google_discovery_engine_chat_engine.vars
 
 #location check
 

@@ -1,6 +1,6 @@
-package terraform.gcp.security.discovery_engine.engine_assistant.location
+package terraform.gcp.security.discovery_engine.google_discovery_engine_assistant.location
 import data.terraform.helpers
-import data.terraform.gcp.security.discovery_engine.engine_assistant.vars
+import data.terraform.gcp.security.discovery_engine.google_discovery_engine_assistant.vars
 
 #engine_assistant_location
 

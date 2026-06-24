@@ -1,6 +1,6 @@
-package terraform.gcp.security.os_config_v2.policy_orchestrator.action
+package terraform.gcp.security.os_config_v2.google_os_config_v2_policy_orchestrator.action
 import data.terraform.helpers
-import data.terraform.gcp.security.os_config_v2.policy_orchestrator.vars
+import data.terraform.gcp.security.os_config_v2.google_os_config_v2_policy_orchestrator.vars
 
 conditions := [
     [

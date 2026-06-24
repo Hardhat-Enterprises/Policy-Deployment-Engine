@@ -1,6 +1,6 @@
-package terraform.gcp.security.chronicle.rule_deployment.location
+package terraform.gcp.security.chronicle.google_chronicle_rule_deployment.location
 import data.terraform.helpers
-import data.terraform.gcp.security.chronicle.rule_deployment.vars
+import data.terraform.gcp.security.chronicle.google_chronicle_rule_deployment.vars
 
 
 conditions := [

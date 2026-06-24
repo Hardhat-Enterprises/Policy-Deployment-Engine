@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_job.allowed_launch_stage 
+package terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_job.launch_stage
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_job.vars
 

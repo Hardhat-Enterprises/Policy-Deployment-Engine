@@ -1,4 +1,4 @@
-package terraform.gcp.security.memcache.google_memcache_instance.authorized_network 
+package terraform.gcp.security.memcache.google_memcache_instance.authorized_network
 import data.terraform.helpers
 import data.terraform.gcp.security.memcache.google_memcache_instance.vars
 

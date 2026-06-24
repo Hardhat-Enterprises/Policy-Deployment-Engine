@@ -1,6 +1,6 @@
-package terraform.gcp.security.dataproc_metastore.federation.location
+package terraform.gcp.security.dataproc_metastore.google_dataproc_metastore_federation.location
 import data.terraform.helpers
-import data.terraform.gcp.security.dataproc_metastore.federation.vars
+import data.terraform.gcp.security.dataproc_metastore.google_dataproc_metastore_federation.vars
 
 conditions := [
   [

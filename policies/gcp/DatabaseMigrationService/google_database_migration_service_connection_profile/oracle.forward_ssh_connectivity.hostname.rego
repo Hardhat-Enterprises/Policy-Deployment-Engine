@@ -1,6 +1,6 @@
-package terraform.gcp.security.database_migration_service.connection_profile.oracle_forward_ssh_connectivity_hostname
+package terraform.gcp.security.database_migration_service.google_database_migration_service_connection_profile.oracle_forward_ssh_connectivity_hostname
 import data.terraform.helpers
-import data.terraform.gcp.security.database_migration_service.connection_profile.vars
+import data.terraform.gcp.security.database_migration_service.google_database_migration_service_connection_profile.vars
 
 conditions := [
   [

@@ -1,6 +1,6 @@
-package terraform.gcp.security.backup_for_gke.restore_plan.restore_config_namespaced_resource_restore_mode
+package terraform.gcp.security.backup_for_gke.google_gke_backup_restore_plan.restore_config_namespaced_resource_restore_mode
 import data.terraform.helpers
-import data.terraform.gcp.security.backup_for_gke.restore_plan.vars
+import data.terraform.gcp.security.backup_for_gke.google_gke_backup_restore_plan.vars
 
 conditions := [
   [

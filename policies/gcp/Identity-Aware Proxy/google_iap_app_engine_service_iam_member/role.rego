@@ -1,7 +1,7 @@
-package terraform.gcp.security.identity_aware_proxy.google_iap_app_engine_service_iam.role
+package terraform.gcp.security.identity_aware_proxy.google_iap_app_engine_service_iam_member.role
 
 import data.terraform.helpers
-import data.terraform.gcp.security.identity_aware_proxy.google_iap_app_engine_service_iam.vars
+import data.terraform.gcp.security.identity_aware_proxy.google_iap_app_engine_service_iam_member.vars
 
 # SECURITY POLICY for `role` (exact-match, helper-friendly)
 # Goal: Only allow the least-privilege IAP accessor role.

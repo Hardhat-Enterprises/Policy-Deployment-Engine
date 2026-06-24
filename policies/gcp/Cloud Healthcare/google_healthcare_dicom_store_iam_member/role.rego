@@ -1,7 +1,7 @@
-package terraform.gcp.security.cloud_healthcare.google_healthcare_dicom_store_iam.role
+package terraform.gcp.security.cloud_healthcare.google_healthcare_dicom_store_iam_member.role
 
 import data.terraform.helpers
-import data.terraform.gcp.security.cloud_healthcare.google_healthcare_dicom_store_iam.vars
+import data.terraform.gcp.security.cloud_healthcare.google_healthcare_dicom_store_iam_member.vars
 
 conditions := [
   [

@@ -1,6 +1,6 @@
-package terraform.gcp.security.privileged_access_manager.entitlement.location
+package terraform.gcp.security.privileged_access_manager.google_privileged_access_manager_entitlement.location
 import data.terraform.helpers
-import data.terraform.gcp.security.privileged_access_manager.entitlement.vars
+import data.terraform.gcp.security.privileged_access_manager.google_privileged_access_manager_entitlement.vars
 
 conditions := [
     [

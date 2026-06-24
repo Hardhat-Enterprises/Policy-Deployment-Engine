@@ -1,6 +1,6 @@
-package terraform.gcp.security.discovery_engine.data_store.document_processing_config_parsing_config_overrides_ocr_parsing_config_use_native_text
+package terraform.gcp.security.discovery_engine.google_discovery_engine_data_store.document_processing_config_parsing_config_overrides_ocr_parsing_config_use_native_text
 import data.terraform.helpers
-import data.terraform.gcp.security.discovery_engine.data_store.vars
+import data.terraform.gcp.security.discovery_engine.google_discovery_engine_data_store.vars
 
 #document_processing_config
 

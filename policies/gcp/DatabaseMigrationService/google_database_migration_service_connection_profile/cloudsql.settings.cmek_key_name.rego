@@ -1,6 +1,6 @@
-package terraform.gcp.security.database_migration_service.connection_profile.cloudsql_settings_cmek_key_name
+package terraform.gcp.security.database_migration_service.google_database_migration_service_connection_profile.cloudsql_settings_cmek_key_name
 import data.terraform.helpers
-import data.terraform.gcp.security.database_migration_service.connection_profile.vars
+import data.terraform.gcp.security.database_migration_service.google_database_migration_service_connection_profile.vars
 
 conditions := [
     [

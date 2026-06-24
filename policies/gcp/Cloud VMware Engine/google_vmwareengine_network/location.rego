@@ -1,7 +1,7 @@
-package terraform.gcp.security.cloud_vmware_engine.network.location
+package terraform.gcp.security.cloud_vmware_engine.google_vmwareengine_network.location
 
 import data.terraform.helpers
-import data.terraform.gcp.security.cloud_vmware_engine.network.vars
+import data.terraform.gcp.security.cloud_vmware_engine.google_vmwareengine_network.vars
 
 conditions := [[
 	{

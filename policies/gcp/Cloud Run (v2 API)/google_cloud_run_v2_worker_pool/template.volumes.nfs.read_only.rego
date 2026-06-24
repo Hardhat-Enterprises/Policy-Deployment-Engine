@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_worker_pool.nfs_read_only 
+package terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_worker_pool.template_volumes_nfs_read_only
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_worker_pool.vars
 

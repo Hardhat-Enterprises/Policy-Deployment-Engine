@@ -1,7 +1,7 @@
-package terraform.gcp.security.app_engine.app_engine_flexible_app_version.automatic_scaling.cpu_utilization.target_utilization
+package terraform.gcp.security.app_engine.google_app_engine_flexible_app_version.automatic_scaling_cpu_utilization_target_utilization
 
 import data.terraform.helpers
-import data.terraform.gcp.security.app_engine.app_engine_flexible_app_version.vars
+import data.terraform.gcp.security.app_engine.google_app_engine_flexible_app_version.vars
 
 conditions := [
     [

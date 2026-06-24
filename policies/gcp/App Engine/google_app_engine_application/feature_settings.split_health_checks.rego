@@ -1,7 +1,7 @@
-package terraform.gcp.security.app_engine.app_engine_application.split_health_checks
+package terraform.gcp.security.app_engine.google_app_engine_application.feature_settings_split_health_checks
 
 import data.terraform.helpers
-import data.terraform.gcp.security.app_engine.app_engine_application.vars
+import data.terraform.gcp.security.app_engine.google_app_engine_application.vars
 
 conditions := [
   [

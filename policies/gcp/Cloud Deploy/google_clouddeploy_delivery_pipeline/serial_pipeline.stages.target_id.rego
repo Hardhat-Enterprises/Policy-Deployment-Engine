@@ -1,6 +1,6 @@
-package terraform.gcp.security.deploy.delivery_pipeline.serial_pipeline_stages_target_id
+package terraform.gcp.security.deploy.google_clouddeploy_delivery_pipeline.serial_pipeline_stages_target_id
 import data.terraform.helpers
-import data.terraform.gcp.security.deploy.delivery_pipeline.vars
+import data.terraform.gcp.security.deploy.google_clouddeploy_delivery_pipeline.vars
 
 conditions := [
     [

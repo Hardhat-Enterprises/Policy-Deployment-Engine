@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run.google_cloud_run_service.metadata.namespace
+package terraform.gcp.security.cloud_run.google_cloud_run_service.metadata_namespace
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run.google_cloud_run_service.vars

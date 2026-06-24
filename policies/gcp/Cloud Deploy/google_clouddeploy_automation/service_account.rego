@@ -1,6 +1,6 @@
-package terraform.gcp.security.deploy.automation.service_account
+package terraform.gcp.security.deploy.google_clouddeploy_automation.service_account
 import data.terraform.helpers
-import data.terraform.gcp.security.deploy.automation.vars
+import data.terraform.gcp.security.deploy.google_clouddeploy_automation.vars
 
 conditions := [
     [

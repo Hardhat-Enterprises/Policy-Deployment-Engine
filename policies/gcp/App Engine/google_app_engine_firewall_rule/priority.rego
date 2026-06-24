@@ -1,7 +1,7 @@
-package terraform.gcp.security.app_engine.app_engine_firewall_rule.priority
+package terraform.gcp.security.app_engine.google_app_engine_firewall_rule.priority
 
 import data.terraform.helpers
-import data.terraform.gcp.security.app_engine.app_engine_firewall_rule.vars
+import data.terraform.gcp.security.app_engine.google_app_engine_firewall_rule.vars
 
 conditions := [
   [

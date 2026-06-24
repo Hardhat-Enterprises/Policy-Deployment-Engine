@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run.google_cloud_run_service.template.metadata.annotations
+package terraform.gcp.security.cloud_run.google_cloud_run_service.template_metadata_annotations
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run.google_cloud_run_service.vars

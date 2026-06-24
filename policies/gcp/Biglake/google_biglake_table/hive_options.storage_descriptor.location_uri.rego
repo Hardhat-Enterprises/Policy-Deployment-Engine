@@ -1,4 +1,4 @@
-package terraform.gcp.security.biglake.google_biglake_table.storage_location_allowlist 
+package terraform.gcp.security.biglake.google_biglake_table.hive_options_storage_descriptor_location_uri
 import data.terraform.helpers
 import data.terraform.gcp.security.biglake.google_biglake_table.vars
 

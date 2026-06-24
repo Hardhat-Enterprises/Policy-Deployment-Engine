@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run.google_cloud_run_domain_mapping.metadata.namespace
+package terraform.gcp.security.cloud_run.google_cloud_run_domain_mapping.metadata_namespace
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run.google_cloud_run_domain_mapping.vars
 

@@ -1,6 +1,6 @@
-package terraform.gcp.security.bigquery_data_transfer.bigquery_data_transfer_config.location
+package terraform.gcp.security.bigquery_data_transfer.google_bigquery_data_transfer_config.location
 import data.terraform.helpers
-import data.terraform.gcp.security.bigquery_data_transfer.bigquery_data_transfer_config.vars
+import data.terraform.gcp.security.bigquery_data_transfer.google_bigquery_data_transfer_config.vars
 
 conditions := [[
   {

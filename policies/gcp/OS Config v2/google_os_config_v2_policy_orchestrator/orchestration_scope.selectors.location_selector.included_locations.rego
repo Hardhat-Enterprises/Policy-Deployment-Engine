@@ -1,6 +1,6 @@
-package terraform.gcp.security.os_config_v2.policy_orchestrator.orchestration_scope_selectors_location_selector_included_locations
+package terraform.gcp.security.os_config_v2.google_os_config_v2_policy_orchestrator.orchestration_scope_selectors_location_selector_included_locations
 import data.terraform.helpers
-import data.terraform.gcp.security.os_config_v2.policy_orchestrator.vars
+import data.terraform.gcp.security.os_config_v2.google_os_config_v2_policy_orchestrator.vars
 
 conditions := [
     [

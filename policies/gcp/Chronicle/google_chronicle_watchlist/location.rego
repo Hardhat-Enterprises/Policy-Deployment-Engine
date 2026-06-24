@@ -1,6 +1,6 @@
-package terraform.gcp.security.chronicle.watchlist.location
+package terraform.gcp.security.chronicle.google_chronicle_watchlist.location
 import data.terraform.helpers
-import data.terraform.gcp.security.chronicle.watchlist.vars
+import data.terraform.gcp.security.chronicle.google_chronicle_watchlist.vars
 
 
 conditions := [

@@ -1,6 +1,6 @@
-package terraform.gcp.security.discovery_engine.search_engine.industry_vertical
+package terraform.gcp.security.discovery_engine.google_discovery_engine_search_engine.industry_vertical
 import data.terraform.helpers
-import data.terraform.gcp.security.discovery_engine.search_engine.vars
+import data.terraform.gcp.security.discovery_engine.google_discovery_engine_search_engine.vars
 
 #search_engine_industry_vertical
 

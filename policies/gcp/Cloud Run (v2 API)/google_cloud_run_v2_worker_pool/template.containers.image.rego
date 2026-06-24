@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_worker_pool.allowed_image 
+package terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_worker_pool.template_containers_image
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_worker_pool.vars
 

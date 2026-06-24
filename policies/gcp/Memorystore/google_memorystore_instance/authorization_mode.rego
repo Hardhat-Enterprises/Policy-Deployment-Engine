@@ -1,7 +1,7 @@
-package terraform.gcp.security.memorystore_instance.authorization_mode
+package terraform.gcp.security.memorystore.google_memorystore_instance.authorization_mode
 
 import data.terraform.helpers
-import data.terraform.gcp.security.memorystore.memorystore_instance.vars
+import data.terraform.gcp.security.memorystore.google_memorystore_instance.vars
 
 conditions := [
     [

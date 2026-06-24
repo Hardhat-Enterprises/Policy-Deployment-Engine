@@ -1,7 +1,7 @@
-package terraform.gcp.security.firestore_document.fields
+package terraform.gcp.security.firestore.google_firestore_document.fields
 
 import data.terraform.helpers
-import data.terraform.gcp.security.firestore.firestore_document.vars
+import data.terraform.gcp.security.firestore.google_firestore_document.vars
 import future.keywords.if
 
 conditions := [
