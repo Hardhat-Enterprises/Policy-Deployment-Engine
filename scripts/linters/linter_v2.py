@@ -42,10 +42,30 @@ The ``inputs/`` taxonomy must reconcile *exactly* to the docs taxonomy:
     ``nc.tf``. Terraform-generated artifacts (``INPUT_ALLOWED_TF_FILES`` /
     ``INPUT_ALLOWED_TF_DIRS``) are tolerated; anything else is flagged for removal.
 
+POLICIES tree (``--tree policies``)
+===================================
+The ``policies/`` taxonomy mirrors the inputs/docs taxonomy, but each argument is a
+single ``*.rego`` policy file (not a directory):
+
+3a. ``policies/`` contains ONLY the ``_helpers`` directory and the allowed platform
+    folders; no other files or folders.
+3b. ``_helpers/`` contains only directories, ``*.rego`` files and ``*.md`` files
+    (recursively) — nothing else.
+3c. Placeholder platforms (``aws``, ``azure``) contain exactly one entry: ``.gitkeep``.
+3d. ``policies/gcp/`` holds only directories; each service-dir name must match a
+    ``docs/gcp/<service>`` directory name exactly.
+3e. Each service-dir holds only directories (resource types); each name must match a
+    documented resource for that service (a ``docs/gcp/<service>/<resource>.json``).
+3f. Each resource-dir holds only files: an optional ``vars.rego`` plus one
+    ``<argument>.rego`` per policy, where ``<argument>`` (the filename minus the
+    ``.rego`` suffix) is a *non-block* argument key in that resource's doc JSON.
+    Directories (the old ``<argument>/policy.rego`` layout) are flagged for flattening.
+
 Run from the repo root (the folder containing ``docs/`` and ``inputs/``):
     uv run python scripts/linters/linter_v2.py                 # lint every tree
     uv run python scripts/linters/linter_v2.py --tree docs
     uv run python scripts/linters/linter_v2.py --tree inputs --platform gcp
+    uv run python scripts/linters/linter_v2.py --tree policies
 Exit code is 1 when any error is found, else 0.
 """
 
@@ -75,6 +95,14 @@ INPUT_ALLOWED_TF_FILES = {                                # terraform-generated,
     "crash.log",
 }
 INPUT_ALLOWED_TF_DIRS = {".terraform"}                    # the only directory tolerated in an arg dir
+
+# --------------------------------------------------------------------------- #
+# Policies-tree allow-lists.
+# --------------------------------------------------------------------------- #
+POLICIES_HELPERS_DIR = "_helpers"                         # shared rego helpers, exempt from taxonomy
+POLICIES_HELPER_EXTS = {".rego", ".md"}                   # only these file types live under _helpers
+POLICY_VARS_FILE = "vars.rego"                            # per-resource shared variables (optional)
+POLICY_REGO_EXT = ".rego"
 
 # --------------------------------------------------------------------------- #
 # GCP doc JSON schema constants (learned from the existing docs).
@@ -395,12 +423,129 @@ class InputsValidator:
                                 f"(not required and not a terraform artifact — should be removed)")
 
 
+class PoliciesValidator:
+    """Validate the ``policies/`` tree, reconciling its taxonomy to ``docs/gcp``."""
+
+    def __init__(self, policies_root, docs_index, logger):
+        self.root = policies_root
+        self.docs = docs_index  # {service: {resource: {arg: type}}}
+        self.logger = logger
+
+    def _entries(self, path):
+        try:
+            return [e for e in sorted(os.listdir(path)) if e not in IGNORE_FILES]
+        except FileNotFoundError:
+            self.logger.log(f"Folder not found: {path}")
+            return []
+
+    def _dirs_only(self, path, rel):
+        """Return subdir names; flag any plain file (these levels hold only dirs)."""
+        dirs = []
+        for entry in self._entries(path):
+            if os.path.isdir(os.path.join(path, entry)):
+                dirs.append(entry)
+            else:
+                self.logger.log(f"{rel}: unexpected file '{entry}' (only directories allowed here)")
+        return dirs
+
+    # ----- 3a: policies/ root --------------------------------------------- #
+    def validate_root(self, only_platform=None):
+        for entry in self._entries(self.root):
+            full = os.path.join(self.root, entry)
+            if not os.path.isdir(full):
+                self.logger.log(f"policies/: disallowed file '{entry}' "
+                                f"(policies/ holds '{POLICIES_HELPERS_DIR}' and platform dirs only)")
+            elif entry == POLICIES_HELPERS_DIR:
+                continue  # validated below
+            elif entry not in ALLOWED_PLATFORMS:
+                self.logger.log(f"policies/: disallowed folder '{entry}' "
+                                f"(allowed: '{POLICIES_HELPERS_DIR}', {sorted(ALLOWED_PLATFORMS)})")
+
+        helpers = os.path.join(self.root, POLICIES_HELPERS_DIR)
+        if os.path.isdir(helpers) and not only_platform:
+            self.validate_helpers(helpers, f"policies/{POLICIES_HELPERS_DIR}")
+
+        for platform in sorted(ALLOWED_PLATFORMS):
+            if only_platform and platform != only_platform:
+                continue
+            full = os.path.join(self.root, platform)
+            if not os.path.isdir(full):
+                continue  # platform dir is optional (may not exist yet)
+            if platform == "gcp":
+                self.validate_gcp(full)
+            elif platform in PLACEHOLDER_PLATFORMS:
+                self.validate_placeholder(platform, full)
+
+    # ----- 3b: _helpers --------------------------------------------------- #
+    def validate_helpers(self, path, rel):
+        """Only directories, *.rego and *.md files are allowed (recursively)."""
+        for entry in self._entries(path):
+            full = os.path.join(path, entry)
+            if os.path.isdir(full):
+                self.validate_helpers(full, f"{rel}/{entry}")
+            elif os.path.splitext(entry)[1] not in POLICIES_HELPER_EXTS:
+                self.logger.log(f"{rel}/{entry}: unexpected file "
+                                f"(only {sorted(POLICIES_HELPER_EXTS)} allowed under {POLICIES_HELPERS_DIR})")
+
+    # ----- 3c: aws / azure placeholders ----------------------------------- #
+    def validate_placeholder(self, platform, path):
+        entries = self._entries(path)
+        if entries != [".gitkeep"]:
+            self.logger.log(f"policies/{platform}/: must contain only '.gitkeep' "
+                            f"(found: {entries or 'empty'})")
+
+    # ----- 3d: policies/gcp services -------------------------------------- #
+    def validate_gcp(self, gcp_root):
+        for service in self._dirs_only(gcp_root, "policies/gcp"):
+            rel = f"policies/gcp/{service}"
+            docres = self.docs.get(service)  # None => service name doesn't match docs
+            if docres is None:
+                self.logger.log(f"{rel}: service does not match any docs/gcp service")
+            self.validate_service(os.path.join(gcp_root, service), rel, docres)
+
+    # ----- 3e: resource types --------------------------------------------- #
+    def validate_service(self, service_path, rel, docres):
+        for resource in self._dirs_only(service_path, rel):
+            res_rel = f"{rel}/{resource}"
+            if docres is None:
+                docargs = None
+            elif resource not in docres:
+                self.logger.log(f"{res_rel}: resource type not documented for this service")
+                docargs = None
+            else:
+                docargs = docres[resource]
+            self.validate_resource(os.path.join(service_path, resource), res_rel, docargs)
+
+    # ----- 3f: per-argument rego files ------------------------------------ #
+    def validate_resource(self, resource_path, rel, docargs):
+        for entry in self._entries(resource_path):
+            entry_rel = f"{rel}/{entry}"
+            full = os.path.join(resource_path, entry)
+            if os.path.isdir(full):
+                self.logger.log(f"{entry_rel}: directories not allowed in a resource dir "
+                                f"(flatten its policy.rego into '{entry}{POLICY_REGO_EXT}')")
+                continue
+            if entry == POLICY_VARS_FILE:
+                continue
+            if not entry.endswith(POLICY_REGO_EXT):
+                self.logger.log(f"{entry_rel}: unexpected file "
+                                f"(only '{POLICY_VARS_FILE}' and '<argument>{POLICY_REGO_EXT}' allowed)")
+                continue
+            arg = entry[: -len(POLICY_REGO_EXT)]
+            if docargs is not None:
+                if arg not in docargs:
+                    self.logger.log(f"{entry_rel}: '{arg}' is not a documented argument key for this resource")
+                elif docargs[arg] == "block":
+                    self.logger.log(f"{entry_rel}: '{arg}' is a block argument (only non-block keys allowed)")
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description="Validate the docs/ and inputs/ trees (structure + cross-reconciliation).")
     parser.add_argument("--docs", default="docs", help="Path to the docs root (default: docs).")
     parser.add_argument("--inputs", default="inputs", help="Path to the inputs root (default: inputs).")
-    parser.add_argument("--tree", choices=["docs", "inputs", "all"], default="all",
+    parser.add_argument("--policies", default="policies", help="Path to the policies root (default: policies).")
+    parser.add_argument("--tree", choices=["docs", "inputs", "policies", "all"], default="all",
                         help="Which tree(s) to validate (default: all).")
     parser.add_argument("--platform", choices=sorted(ALLOWED_PLATFORMS), default=None,
                         help="Limit validation to a single platform.")
@@ -408,10 +553,12 @@ def main(argv=None):
 
     docs_root = os.path.abspath(args.docs)
     inputs_root = os.path.abspath(args.inputs)
+    policies_root = os.path.abspath(args.policies)
     logger = ErrorLogger()
 
     do_docs = args.tree in ("docs", "all")
     do_inputs = args.tree in ("inputs", "all")
+    do_policies = args.tree in ("policies", "all")
 
     if do_docs:
         if not os.path.isdir(docs_root):
@@ -433,6 +580,18 @@ def main(argv=None):
         docs_index = build_gcp_docs_index(docs_root, logger)
         InputsValidator(inputs_root, docs_index, logger).validate_root(only_platform=args.platform)
 
+    if do_policies:
+        if not os.path.isdir(policies_root):
+            print(f"[ERROR] policies root not found: {policies_root} (run from the repo root or pass --policies).")
+            sys.exit(2)
+        if not os.path.isdir(docs_root):
+            print(f"[ERROR] docs root not found: {docs_root} (needed to reconcile policies).")
+            sys.exit(2)
+        print(f"\n[*] Linting policies tree at {policies_root}"
+              f"{f' (platform: {args.platform})' if args.platform else ''}\n")
+        docs_index = build_gcp_docs_index(docs_root, logger)
+        PoliciesValidator(policies_root, docs_index, logger).validate_root(only_platform=args.platform)
+
     if logger.summary():
         sys.exit(1)
 
@@ -445,6 +604,11 @@ def cli_docs():
 def cli_inputs():
     """Console entry point: validate the inputs/ tree only (forces --tree inputs)."""
     main(["--tree", "inputs", *sys.argv[1:]])
+
+
+def cli_policies():
+    """Console entry point: validate the policies/ tree only (forces --tree policies)."""
+    main(["--tree", "policies", *sys.argv[1:]])
 
 
 if __name__ == "__main__":
