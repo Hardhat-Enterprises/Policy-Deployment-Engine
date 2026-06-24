@@ -15,6 +15,30 @@ permissions:
   issues: write
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # need history for merge-base with the base branch
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Hard gate: the whole tree must stay structurally valid (no --content-checks,
+      # so the known content backlog does not fail CI).
+      - name: Structural lint (whole tree)
+        run: python3 scripts/linters/linter.py --tree all --platform gcp
+
+      # PR gate: structural + content checks, but only fail on files this PR
+      # changed vs its base branch — never on the repo-wide backlog.
+      - name: Content lint (this PR's changed files)
+        run: |
+          git fetch --quiet origin "${{ github.base_ref }}"
+          python3 scripts/linters/run_precommit_linter.py --base "origin/${{ github.base_ref }}"
+
   policy_check:
     runs-on: ubuntu-latest
     if: startsWith(github.head_ref, 'gcp/service/')

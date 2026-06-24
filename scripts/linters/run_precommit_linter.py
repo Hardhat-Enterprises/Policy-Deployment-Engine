@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
-"""Pre-commit gate: run the linter but only fail on the author's *own* changes.
+"""Lint gate: run the linter but only fail on the author's *own* changes.
 
 The linter (scripts/linters/linter.py) is whole-tree by design — it must build
-the full docs index to reconcile inputs/ and policies/ against it, so it can't
-meaningfully lint a single file in isolation. To keep contributors honest about
-their own work *without* blocking them on the repo-wide backlog, we:
+the full docs index to reconcile inputs/ and policies/ against it, so it cannot
+meaningfully lint a single file in isolation. To hold contributors to their own
+work *without* blocking them on the repo-wide backlog, we run the linter once
+over the whole tree (with --content-checks) and fail only on error lines whose
+path intersects the changed set. Pre-existing errors elsewhere are reported as a
+count but never block.
 
-  1. compute the set of changed files relative to ``dev`` (branch divergence +
-     staged + unstaged), restricted to docs/ inputs/ policies/;
-  2. run the linter once over the whole tree (with --content-checks);
-  3. fail only on error lines whose path lineage intersects a changed file.
-
-Pre-existing errors elsewhere (the fixture backlog, etc.) are reported as a
-count but never block the commit. Run from the repo root.
+Modes (run from the repo root):
+  (no args)         pre-commit: changed set = staged + unstaged worktree edits
+  --base <ref>      CI/PR:      changed set = everything this branch changed vs
+                                the merge-base with <ref> (e.g. origin/dev)
+  --all             maintainer: no filter — fail on ANY error in the tree
 """
 import os
 import subprocess
@@ -21,7 +22,6 @@ import sys
 LINTER = [sys.executable, os.path.join("scripts", "linters", "linter.py"),
           "--tree", "all", "--platform", "gcp", "--content-checks"]
 RELEVANT_PREFIXES = ("docs/", "inputs/", "policies/")
-DEV_REFS = ("dev", "origin/dev")
 
 
 def _git(*args):
@@ -29,28 +29,21 @@ def _git(*args):
     return [ln for ln in out.stdout.splitlines() if ln]
 
 
-def _dev_merge_base():
-    """Merge-base with dev so we diff only the branch's own divergence."""
-    for ref in DEV_REFS:
-        r = subprocess.run(["git", "merge-base", "HEAD", ref],
-                           capture_output=True, text=True)
-        if r.returncode == 0 and r.stdout.strip():
-            return r.stdout.strip()
-    return None
-
-
-def changed_files():
-    """Files this branch changed vs dev, plus staged + unstaged worktree edits."""
-    files = set(_git("diff", "--cached", "--name-only"))   # staged (this commit)
-    files |= set(_git("diff", "--name-only"))              # unstaged worktree
-    base = _dev_merge_base()
+def changed_files(base=None):
+    """Changed paths (normalised). vs merge-base(base) for CI, else staged+unstaged."""
     if base:
-        files |= set(_git("diff", "--name-only", base))    # branch divergence vs dev
+        mb = subprocess.run(["git", "merge-base", "HEAD", base],
+                            capture_output=True, text=True)
+        ref = mb.stdout.strip() if mb.returncode == 0 and mb.stdout.strip() else base
+        files = set(_git("diff", "--name-only", ref))
+    else:
+        files = set(_git("diff", "--cached", "--name-only"))   # staged (this commit)
+        files |= set(_git("diff", "--name-only"))              # unstaged worktree
     return {f.replace("\\", "/") for f in files}
 
 
 def _lineage(a, b):
-    """True if path a and b are on the same lineage (one is ancestor-or-equal)."""
+    """True if paths a and b are on the same lineage (one is ancestor-or-equal)."""
     a, b = a.rstrip("/"), b.rstrip("/")
     return a == b or a.startswith(b + "/") or b.startswith(a + "/")
 
@@ -63,31 +56,42 @@ def _error_path(line):
     return s.split(":", 1)[0].strip()
 
 
-def main():
-    changed = {f for f in changed_files() if f.startswith(RELEVANT_PREFIXES)}
-    if not changed:
-        print("No docs/ inputs/ policies/ changes — skipping linter.")
-        return 0
+def main(argv=None):
+    argv = sys.argv[1:] if argv is None else argv
+    lint_all = "--all" in argv
+    base = None
+    if "--base" in argv:
+        i = argv.index("--base")
+        base = argv[i + 1] if i + 1 < len(argv) else "origin/dev"
 
-    print("Changed files under docs/ inputs/ policies/:")
-    for f in sorted(changed):
-        print(f"  {f}")
+    changed = None
+    if not lint_all:
+        changed = {f for f in changed_files(base) if f.startswith(RELEVANT_PREFIXES)}
+        if not changed:
+            print("No docs/ inputs/ policies/ changes — skipping linter.")
+            return 0
+        print("Linting your changed files under docs/ inputs/ policies/:")
+        for f in sorted(changed):
+            print(f"  {f}")
 
     result = subprocess.run(LINTER, capture_output=True, text=True)
     errors = [ln for ln in result.stdout.splitlines() if ln.startswith("[ERROR]")]
-    mine = [ln for ln in errors if any(_lineage(_error_path(ln), c) for c in changed)]
-    backlog = len(errors) - len(mine)
+    if lint_all:
+        mine, backlog = errors, 0
+    else:
+        mine = [ln for ln in errors if any(_lineage(_error_path(ln), c) for c in changed)]
+        backlog = len(errors) - len(mine)
 
     if mine:
-        print("\n[FAIL] lint errors in files you changed:\n")
+        print("\n[FAIL] lint error(s) you must fix:\n")
         for ln in mine:
             print(f"  {ln}")
-        print(f"\nFix the above before committing. "
-              f"({backlog} pre-existing error(s) elsewhere are not attributed to you.)")
+        if backlog:
+            print(f"\n({backlog} pre-existing error(s) elsewhere are not attributed to you.)")
         return 1
 
-    print(f"\n[OK] no lint errors in your changed files "
-          f"({backlog} pre-existing backlog error(s) elsewhere ignored).")
+    suffix = f" ({backlog} pre-existing backlog error(s) elsewhere ignored)" if backlog else ""
+    print(f"\n[OK] no lint errors in scope{suffix}.")
     return 0
 
 
