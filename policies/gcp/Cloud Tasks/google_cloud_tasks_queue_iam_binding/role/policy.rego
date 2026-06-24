@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_tasks.google_cloud_tasks_queue_iam.excessive_roles
+package terraform.gcp.security.cloud_tasks.google_cloud_tasks_queue_iam.role
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_tasks.google_cloud_tasks_queue_iam.vars

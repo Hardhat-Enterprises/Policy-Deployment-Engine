@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_tasks.google_cloud_tasks_queue_iam.public_access
+package terraform.gcp.security.cloud_tasks.google_cloud_tasks_queue_iam.members
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_tasks.google_cloud_tasks_queue_iam.vars

@@ -1,4 +1,4 @@
-package terraform.gcp.security.apigee.google_apigee_environment_iam.apigee_environment_iam_member_public_access
+package terraform.gcp.security.apigee.google_apigee_environment_iam.member
 
 import data.terraform.helpers
 import data.terraform.gcp.security.apigee.google_apigee_environment_iam.vars
