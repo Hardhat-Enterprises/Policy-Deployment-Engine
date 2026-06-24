@@ -1,4 +1,4 @@
-resource "google_gke_backup_restore_plan_iam_binding" "nc" {
+resource "google_gke_backup_restore_plan_iam_binding" "nc_g0" {
   name = "nc"
   location = "australia-southeast1"
   project  = "PDE"
@@ -9,3 +9,28 @@ resource "google_gke_backup_restore_plan_iam_binding" "nc" {
   ]
 }
 
+resource "google_gke_backup_restore_plan_iam_binding" "nc_g1" {
+  name = "nc"
+  location = "australia-southeast1"
+  project = "PDE"
+  
+  role = "roles/gkebackup.restoreAdmin"
+  
+  members = [
+    "projectOwner:fluent-coder-468700-h4",  # SECURITY RISK: All project owners!
+    "projectEditor:fluent-coder-468700-h4",  # SECURITY RISK: All project editors!
+    "projectViewer:fluent-coder-468700-h4"  # SECURITY RISK: All project viewers!
+  ]
+}
+
+resource "google_gke_backup_restore_plan_iam_binding" "nc_g2" {
+  name = "nc"
+  location = "australia-southeast1"
+  project = "PDE"
+  
+  role = "roles/container.clusterAdmin"  # SECURITY RISK: Full cluster admin for restore!
+  
+  members = [
+    "user:contractor@gmail.com"
+  ]
+}

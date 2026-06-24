@@ -1,10 +1,26 @@
-package terraform.gcp.security.binary_authorization.google_binary_authorization_policy.cluster_admission_rule
+package terraform.gcp.security.binary_authorization.google_binary_authorization_policy.default_admission_rule_evaluation_mode
 
 import data.terraform.helpers
 import data.terraform.gcp.security.binary_authorization.google_binary_authorization_policy.vars
 
+# Merged policy for `default_admission_rule.evaluation_mode` — 2 independent scenarios.
 conditions := [
-  [
+[
+    {
+      "situation_description": "Default admission rule is too permissive",
+      "remedies": [
+        "Set evaluation_mode to REQUIRE_ATTESTATION",
+        "Set enforcement_mode to ENFORCED_BLOCK_AND_AUDIT_LOG"
+      ]
+    },
+    {
+      "condition": "Require attestations and enforce blocking",
+      "attribute_path": ["default_admission_rule", 0, "evaluation_mode"],
+      "values": ["REQUIRE_ATTESTATION"],
+      "policy_type": "whitelist"
+    }
+  ],
+[
     {
       "situation_description": "Default admission rule allows all images (ALWAYS_ALLOW)",
       "remedies": [
@@ -34,6 +50,7 @@ conditions := [
   ]
 ]
 
-# Generate summary message and details
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details
