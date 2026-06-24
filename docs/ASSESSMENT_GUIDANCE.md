@@ -1,7 +1,7 @@
 # Security Assessment Guidance
 
 How to decide an argument's `security_impact` (`true`/`false`) and write its `rationale`
-in the `docs_v2/` resource files — and how to review student PRs that do the same.
+in the `docs/` resource files — and how to review student PRs that do the same.
 
 > `security_impact: true` means **"this argument is worth a platform-level security
 > policy"** — a generic rule that constrains its value to make the resource more secure.
