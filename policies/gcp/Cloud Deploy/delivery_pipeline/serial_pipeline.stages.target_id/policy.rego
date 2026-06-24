@@ -1,4 +1,4 @@
-package terraform.gcp.security.deploy.delivery_pipeline.serial_pipeline_validation
+package terraform.gcp.security.deploy.delivery_pipeline.serial_pipeline_stages_target_id
 import data.terraform.helpers
 import data.terraform.gcp.security.deploy.delivery_pipeline.vars
 
@@ -8,8 +8,8 @@ conditions := [
          "remedies": ["Delivery Pipeline must have serial pipeline stages defined for controlled deployment"]},
         {
             "condition": "Delivery Pipeline has serial pipeline configured",
-            "attribute_path": ["serial_pipeline"],
-            "values": [[]],
+            "attribute_path": ["serial_pipeline", 0, "stages", 0, "target_id"],
+            "values": [null],
             "policy_type": "blacklist"
         }
     ]

@@ -1,4 +1,4 @@
-package terraform.gcp.security.certificate_manager.google_certificate_manager_trust_config.no_allowlisted_certificates
+package terraform.gcp.security.certificate_manager.google_certificate_manager_trust_config.allowlisted_certificates_pem_certificate
 
 import data.terraform.helpers
 import data.terraform.gcp.security.certificate_manager.google_certificate_manager_trust_config.vars
@@ -11,8 +11,8 @@ conditions := [
     },
     {
       "condition": "Certificate Manager trust configs should not define allowlisted certificates directly.",
-      "attribute_path": ["allowlisted_certificates"],
-      "values": [[], null],
+      "attribute_path": ["allowlisted_certificates", 0, "pem_certificate"],
+      "values": [null],
       "policy_type": "whitelist"
     }
   ]

@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_domains.google_clouddomains_registration.dnssec_config_present
+package terraform.gcp.security.cloud_domains.google_clouddomains_registration.dns_settings_custom_dns_ds_records_key_tag
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_domains.google_clouddomains_registration.vars
@@ -11,7 +11,7 @@ conditions := [
         },
         {
             "condition": "Check if DNSSEC ds_records are present",
-            "attribute_path": ["dns_settings", 0, "custom_dns", 0, "ds_records", 0],
+            "attribute_path": ["dns_settings", 0, "custom_dns", 0, "ds_records", 0, "key_tag"],
             "values": [null],
             "policy_type": "blacklist"
         }

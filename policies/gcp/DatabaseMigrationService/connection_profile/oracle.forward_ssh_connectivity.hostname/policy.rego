@@ -1,4 +1,4 @@
-package terraform.gcp.security.database_migration_service.connection_profile.forward_ssh_connectivity
+package terraform.gcp.security.database_migration_service.connection_profile.oracle_forward_ssh_connectivity_hostname
 import data.terraform.helpers
 import data.terraform.gcp.security.database_migration_service.connection_profile.vars
 
@@ -10,8 +10,8 @@ conditions := [
     },
     {
       "condition": "forward_ssh_connectivity must be unset",
-      "attribute_path": ["oracle",0,"forward_ssh_connectivity"],
-      "values": [[]],   # Allow empty array only
+      "attribute_path": ["oracle", 0, "forward_ssh_connectivity", 0, "hostname"],
+      "values": [null],   # Allow empty array only
       "policy_type": "whitelist"
     }
   ]

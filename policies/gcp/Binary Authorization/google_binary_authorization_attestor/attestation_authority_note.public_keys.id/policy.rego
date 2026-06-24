@@ -1,4 +1,4 @@
-package terraform.gcp.security.binary_authorization.google_binary_authorization_attestor.public_keys
+package terraform.gcp.security.binary_authorization.google_binary_authorization_attestor.attestation_authority_note_public_keys_id
 
 import data.terraform.helpers
 import data.terraform.gcp.security.binary_authorization.google_binary_authorization_attestor.vars
@@ -13,8 +13,8 @@ conditions := [
         },
         {
             "condition": "public_keys block missing or empty",
-            "attribute_path": ["attestation_authority_note", 0, "public_keys"],
-            "values": [null, []],
+            "attribute_path": ["attestation_authority_note", 0, "public_keys", 0, "id"],
+            "values": [null],
             "policy_type": "blacklist"
         }
     ]
