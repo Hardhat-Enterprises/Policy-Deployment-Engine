@@ -1,11 +1,7 @@
-resource "google_access_context_manager_access_policy" "access-policy" {
-  parent = "organizations/123456789"
-  title  = "my policy"
-  }
-resource "google_access_context_manager_access_levels" "c" {
-  parent = "accessPolicies/${google_access_context_manager_access_policy.access-policy.name}"
+resource "google_access_context_manager_access_levels" "compliant_example_1" {
+  parent = "accessPolicies/123456789"
   access_levels {
-    name  = "accessPolicies/${google_access_context_manager_access_policy.access-policy.name}/accessLevels/c"
+    name  = "accessPolicies/123456789/accessLevels/c"
     title = "level_c"
     basic {
       conditions {
