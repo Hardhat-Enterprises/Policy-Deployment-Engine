@@ -1,4 +1,4 @@
-package terraform.gcp.security.gdce.cluster.maintenance_policy
+package terraform.gcp.security.gdce.cluster.maintenance_policy_maintenance_exclusions_id
 import data.terraform.helpers
 import data.terraform.gcp.security.gdce.cluster.vars
 

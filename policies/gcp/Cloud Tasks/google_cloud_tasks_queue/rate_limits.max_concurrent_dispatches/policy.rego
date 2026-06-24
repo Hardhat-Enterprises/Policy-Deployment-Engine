@@ -1,4 +1,4 @@
-package terraform.gcp.security.cloud_tasks.google_cloud_tasks_queue.rate_limits
+package terraform.gcp.security.cloud_tasks.google_cloud_tasks_queue.rate_limits_max_concurrent_dispatches
 
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_tasks.google_cloud_tasks_queue.vars

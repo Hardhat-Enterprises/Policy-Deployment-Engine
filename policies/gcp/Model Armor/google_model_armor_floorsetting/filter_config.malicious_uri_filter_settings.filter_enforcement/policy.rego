@@ -1,17 +1,17 @@
-package terraform.gcp.security.model_Armor.google_model_armor_template.filter_config
+package terraform.gcp.security.model_Armor.google_model_armor_floorsetting.filter_config_malicious_uri_filter_settings_filter_enforcement
 
 import data.terraform.helpers
-import data.terraform.gcp.security.model_Armor.google_model_armor_template.vars
+import data.terraform.gcp.security.model_Armor.google_model_armor_floorsetting.vars
 
 
 conditions := [
   [
     {
-      "situation_description": "When create the model armor template filter_config cannot be empty, must define at least one category!",
+      "situation_description": "filter_config cannot be empty, must define at least one category!",
       "remedies": ["Ensure at least one filter_config block is defined with proper categories"]
     },
     {
-      "condition": "When create the model armor template filter_config must not be completely empty",
+      "condition": "filter_config must not be completely empty",
       "attribute_path": ["filter_config",0],
       "values": [
         {"malicious_uri_filter_settings":[],"pi_and_jailbreak_filter_settings":[],"rai_settings":[],"sdp_settings":[]}

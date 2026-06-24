@@ -1,4 +1,4 @@
-package terraform.gcp.security.network_security.google_network_security_server_tls_policy.mtls_policy
+package terraform.gcp.security.network_security.google_network_security_server_tls_policy.mtls_policy_client_validation_mode
 import data.terraform.helpers
 import data.terraform.gcp.security.network_security.google_network_security_server_tls_policy.vars
 
