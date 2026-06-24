@@ -5,7 +5,7 @@ not be auto-inlined (computed attrs like .id) — they keep the old c/nc labels.
 Each needs: remove the dependency, replace its references with fake values, and
 relabel the tested resource compliant_example_N / non_compliant_example_N.
 
-Detect anytime with: python scripts/linters/linter_v2.py --content-checks
+Detect anytime with: python scripts/linters/linter.py --content-checks
 
 ## Broken (tested resource missing entirely — must be authored):
 - inputs/gcp/Backup for GKE/google_gke_backup_restore_channel/name/{compliant,nonCompliant}.tf
