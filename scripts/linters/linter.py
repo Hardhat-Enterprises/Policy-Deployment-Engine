@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 linter — validates the ``docs/``, ``inputs/`` and ``policies/`` trees against
-each other (structure + cross-reconciliation), with an opt-in content-checks pass.
+each other (structure + cross-reconciliation), with content checks on by default.
 
 DOCS tree (``--tree docs``)
 ===========================
@@ -544,12 +544,12 @@ class PoliciesValidator:
 
 
 # =========================================================================== #
-# CONTENT CHECKS (opt-in: `--content-checks`)
+# CONTENT CHECKS (on by default; `--no-content-checks` to skip)
 # --------------------------------------------------------------------------- #
 # Everything ABOVE this banner is the structural/taxonomy linter; it never opens
-# a .tf or .rego file. The checks BELOW read *inside* files. They are OFF by
-# default (a known backlog of fixtures has not been migrated yet — see below);
-# enable with `--content-checks`. Rules:
+# a .tf or .rego file. The checks BELOW read *inside* files. They run by default
+# (the fixture backlog is cleared — the whole tree passes); pass
+# `--no-content-checks` for structural validation only. Rules:
 #   A. policies: each .rego `package` matches its path —
 #      terraform.gcp.security.<service>.<resource>.<seg>  (seg = filename stem
 #      with '.'->'_'; _vars.rego -> .<resource>.vars). The <service> segment is
@@ -560,9 +560,6 @@ class PoliciesValidator:
 #   C. inputs: tested-resource labels follow the example convention,
 #      compliant_example_N (compliant.tf) / non_compliant_example_N
 #      (nonCompliant.tf), sequential from 1, always suffixed.
-# BACKLOG: B/C still fail on fixtures whose dependency references could not be
-# auto-inlined (computed attrs like `.id`) plus a couple of broken fixtures;
-# those keep the old `c`/`nc` shape until fixed by hand.
 # Deliberately NOT carried over from the legacy linter: `terraform fmt`
 # (mutates files) and the lowercase-filename regex (breaks on dotted docs keys).
 # =========================================================================== #
@@ -583,12 +580,14 @@ class ContentChecksValidator:
         self.inputs_root = inputs_root
         self.logger = logger
 
-    def validate(self, only_platform=None):
+    def validate(self, only_platform=None, do_inputs=True, do_policies=True):
         # Only gcp is populated today; aws/azure are .gitkeep placeholders.
         if only_platform and only_platform != "gcp":
             return
-        self._check_policies_packages(os.path.join(self.policies_root, "gcp"))
-        self._check_inputs_terraform(os.path.join(self.inputs_root, "gcp"))
+        if do_policies:
+            self._check_policies_packages(os.path.join(self.policies_root, "gcp"))
+        if do_inputs:
+            self._check_inputs_terraform(os.path.join(self.inputs_root, "gcp"))
 
     @staticmethod
     def _read_package(path):
@@ -706,10 +705,10 @@ def main(argv=None):
                         help="Which tree(s) to validate (default: all).")
     parser.add_argument("--platform", choices=sorted(ALLOWED_PLATFORMS), default=None,
                         help="Limit validation to a single platform.")
-    parser.add_argument("--content-checks", action="store_true",
-                        help="PROVISIONAL/TO BE VERIFIED: also run the ported legacy content "
-                             "checks (rego package paths, terraform resource types/labels). "
-                             "Off by default; see the ContentChecksValidator banner.")
+    parser.add_argument("--content-checks", action=argparse.BooleanOptionalAction, default=True,
+                        help="Run the content checks (rego package paths, single tested resource, "
+                             "example label convention). On by default; use --no-content-checks "
+                             "to skip and run structural validation only.")
     args = parser.parse_args(argv)
 
     docs_root = os.path.abspath(args.docs)
@@ -753,10 +752,10 @@ def main(argv=None):
         docs_index = build_gcp_docs_index(docs_root, logger)
         PoliciesValidator(policies_root, docs_index, logger).validate_root(only_platform=args.platform)
 
-    if args.content_checks:
-        # PROVISIONAL / TO BE VERIFIED — see ContentChecksValidator banner.
-        print("\n[*] Running PROVISIONAL content checks (TO BE VERIFIED — pending revamp)\n")
-        ContentChecksValidator(policies_root, inputs_root, logger).validate(only_platform=args.platform)
+    if args.content_checks and (do_inputs or do_policies):
+        print("\n[*] Running content checks\n")
+        ContentChecksValidator(policies_root, inputs_root, logger).validate(
+            only_platform=args.platform, do_inputs=do_inputs, do_policies=do_policies)
 
     if logger.summary():
         sys.exit(1)

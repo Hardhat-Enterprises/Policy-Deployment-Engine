@@ -21,7 +21,7 @@ python scripts/linters/linter.py                      # lint every tree
 python scripts/linters/linter.py --tree docs
 python scripts/linters/linter.py --tree inputs --platform gcp
 python scripts/linters/linter.py --tree policies
-python scripts/linters/linter.py --content-checks     # also read inside files (see §3)
+python scripts/linters/linter.py --no-content-checks  # structural only (skip §3 checks)
 ```
 
 Exit code is `1` if any error is found, else `0`.
@@ -46,10 +46,10 @@ The structural pass never opens a `.tf`/`.rego` file (it does parse docs JSON).
 
 ---
 
-## 3. Content checks (opt-in: `--content-checks`)
+## 3. Content checks (on by default; `--no-content-checks` to skip)
 
-These read inside files. They are **off by default** because a known fixture
-backlog has not been migrated yet (see `FIXTURE_BACKLOG.md`).
+These read inside files. They run by default (the fixture backlog is cleared and
+the whole tree passes). Pass `--no-content-checks` for structural validation only.
 
 - **A — rego package path:** each `.rego` `package` is
   `terraform.gcp.security.<service>.<resource>.<seg>` (`<seg>` = filename stem with
@@ -68,8 +68,8 @@ backlog has not been migrated yet (see `FIXTURE_BACKLOG.md`).
 ## 4. Pre-commit & CI
 
 **Local (`pre-commit install`, config in `.pre-commit-config.yaml`):**
-`run_precommit_linter.py` runs the whole-tree linter with `--content-checks`
-but fails only on errors in the files you changed. For input fixtures the unit
+`run_precommit_linter.py` runs the whole-tree linter (content checks on by
+default) but fails only on errors in the files you changed. For input fixtures the unit
 is the whole **argument directory** — `compliant.tf` and `nonCompliant.tf` test
 one argument together, so touching one means you own the pair. Policies/docs are
 file-level. Pre-existing backlog errors elsewhere are counted, never blocking.
@@ -81,9 +81,10 @@ python scripts/linters/run_precommit_linter.py --all      # whole tree, fail on 
 ```
 
 **CI (`.github/workflows/policy_check_PR.yaml`):** a `lint` job runs
-(1) `linter.py --tree all` as a hard structural gate, and
-(2) `run_precommit_linter.py --base origin/<base>` to enforce content checks on
-the PR's own files.
+(1) `linter.py --tree all --no-content-checks` as a hard whole-tree structural
+gate (structural only, so it never blocks a PR on repo-wide content debt), and
+(2) `run_precommit_linter.py --base origin/<base>` to enforce structural + content
+checks on the PR's own changed files.
 
 ---
 

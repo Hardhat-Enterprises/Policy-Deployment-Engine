@@ -5,7 +5,7 @@ only their tested resource type, use the `compliant_example_N` /
 `non_compliant_example_N` label convention, and pass:
 
 ```
-python scripts/linters/linter.py --tree all --content-checks   # 0 errors
+python scripts/linters/linter.py --tree all   # content checks on by default; 0 errors
 ```
 
 ## ⚠️ Outstanding: validate the injected fake values
