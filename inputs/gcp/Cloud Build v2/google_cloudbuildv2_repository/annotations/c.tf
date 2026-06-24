@@ -1,4 +1,5 @@
-resource "google_cloudbuildv2_repository" "c" {
+# Compliant — a single repository that satisfies every merged scenario
+resource "google_cloudbuildv2_repository" "c1" {
   project           = "c"
   location          = "australia-southeast2"
   name              = "my-repository"
@@ -7,5 +8,6 @@ resource "google_cloudbuildv2_repository" "c" {
 
   annotations = {
     data_classification = "internal"
+    environment         = "prod"
   }
 }

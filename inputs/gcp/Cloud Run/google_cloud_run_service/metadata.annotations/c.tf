@@ -1,13 +1,15 @@
-resource "google_cloud_run_service" "c" {
-  name = "c"
+# Compliant — top-level metadata.annotations satisfying every merged scenario
+resource "google_cloud_run_service" "c1" {
+  name     = "c1"
   location = "australia-southeast1"
   project  = "my-gcp-project"
 
   metadata {
     namespace = "my-gcp-project"
-
     annotations = {
       "run.googleapis.com/ingress" = "internal"
+      "run.googleapis.com/binary-authorization-breakglass" = ""
+      "run.googleapis.com/custom-audiences" = "trusted-client"
     }
   }
 

@@ -1,5 +1,6 @@
-resource "google_cloud_run_service" "c" {
-  name = "c"
+# Compliant — template.metadata.annotations satisfying every merged scenario
+resource "google_cloud_run_service" "c1" {
+  name     = "c1"
   location = "australia-southeast1"
   project  = "my-gcp-project"
 
@@ -11,6 +12,12 @@ resource "google_cloud_run_service" "c" {
     metadata {
       annotations = {
         "run.googleapis.com/ingress" = "internal"
+        "autoscaling.knative.dev/maxScale" = "10"
+        "run.googleapis.com/binary-authorization" = "default"
+        "run.googleapis.com/cloudsql-instances" = "my-gcp-project:australia-southeast1:prod-db"
+        "run.googleapis.com/encryption-key" = "projects/my-gcp-project/locations/australia-southeast1/keyRings/prod-keyring/cryptoKeys/cloudrun-key"
+        "run.googleapis.com/vpc-access-connector" = "projects/my-gcp-project/locations/australia-southeast1/connectors/prod-vpc-connector"
+        "run.googleapis.com/vpc-access-egress" = "private-ranges-only"
       }
     }
 
