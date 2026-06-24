@@ -100,7 +100,7 @@ detection), `parser.extract_subcategory_from_frontmatter`, `errors`, `logging_co
 ## Tests
 
 ```bash
-uv run --extra dev pytest tests/docgen/ -q
+uv run --extra dev pytest scripts/docgen/_tests/ -q
 ```
 
 Covers the flattener (leaf/block shapes, dotted nesting, computed/meta exclusion, object

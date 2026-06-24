@@ -1,3 +1,7 @@
+# This project is NOT an installable package. Run the tools directly, e.g.
+#   python scripts/docgen/generator.py ...
+#   python scripts/linters/linter_v2.py ...
+# This file exists only to record dependencies and configure pytest/coverage.
 [project]
 name = "policy-deployment-engine"
 version = "0.1.0"
@@ -5,20 +9,6 @@ requires-python = ">=3.11"
 dependencies = [
     "pydantic>=2.12.4",
 ]
-
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
-
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["scripts*"]
-exclude = ["tests*", "inputs*", "policies*", "docs*"]
-
-[project.scripts]
-lint = "scripts.linters.linter:main"
-lint_docs = "scripts.linters.linter_v2:cli_docs"
-lint_inputs = "scripts.linters.linter_v2:cli_inputs"
 
 [project.optional-dependencies]
 dev = [
@@ -33,7 +23,10 @@ docgen = [
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+# Tests live next to the tool they cover, in a `_tests/` dir
+# (e.g. scripts/docgen/_tests/). importlib mode keeps same-named test
+# files across different tools from colliding.
+testpaths = ["scripts"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
@@ -41,6 +34,7 @@ addopts = [
     "-v",
     "--strict-markers",
     "--tb=short",
+    "--import-mode=importlib",
 ]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
@@ -50,7 +44,7 @@ markers = [
 [tool.coverage.run]
 source = ["scripts"]
 omit = [
-    "tests/*",
+    "*/_tests/*",
     "*/test_*.py",
     "*/__pycache__/*",
     ".venv/*",

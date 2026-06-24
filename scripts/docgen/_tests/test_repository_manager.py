@@ -37,8 +37,11 @@ class TestRepositoryManagerInit:
     def test_default_cache_dir(self):
         """Test that default cache directory is set correctly."""
         repo_mgr = RepositoryManager()
-        # Expected: scripts/docgen/.cache/
-        expected_dir = Path(__file__).parent.parent.parent / 'scripts' / 'docgen' / '.cache'
+        # Default is scripts/docgen/.cache/, anchored to the source module
+        # (repository_manager.py lives in scripts/docgen/lib/) so this stays
+        # correct regardless of where the test file itself lives.
+        import scripts.docgen.lib.repository_manager as rm_mod
+        expected_dir = Path(rm_mod.__file__).parent.parent / '.cache'
         assert repo_mgr.cache_dir == expected_dir
     
     def test_custom_cache_dir(self, temp_cache_dir):
