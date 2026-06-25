@@ -21,6 +21,8 @@ import argparse
 import os
 from pathlib import Path
 
+from _config_template import GOOGLE_CONFIG_TF
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CACHE_ROOT = REPO_ROOT / ".terraform-cache"
 CANONICAL_LOCK = CACHE_ROOT / "canonical.lock.hcl"
@@ -28,19 +30,6 @@ INPUTS_ROOT = REPO_ROOT / "inputs" / "gcp"
 
 # Single source of truth, shared with auto_test.py and cache_setup.sh.
 TARGET_VERSION = (Path(__file__).resolve().parent / "provider_version.txt").read_text().strip()
-
-GOOGLE_CONFIG_TF = """##### DO NOT EDIT ######
-
-terraform {
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-    }
-  }
-}
-
-provider "google" {}
-"""
 
 
 def leaf_dirs() -> list[Path]:

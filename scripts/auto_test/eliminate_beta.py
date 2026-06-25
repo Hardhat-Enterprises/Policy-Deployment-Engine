@@ -28,24 +28,13 @@ import sys
 import tempfile
 from pathlib import Path
 
+from _config_template import GOOGLE_CONFIG_TF
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CACHE_ROOT = REPO_ROOT / ".terraform-cache"
 CLI_CONFIG_FILE = CACHE_ROOT / "cli.tfrc"
 INPUTS_ROOT = REPO_ROOT / "inputs" / "gcp"
 POLICIES_ROOT = REPO_ROOT / "policies" / "gcp"
-
-GOOGLE_CONFIG_TF = """##### DO NOT EDIT ######
-
-terraform {
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-    }
-  }
-}
-
-provider "google" {}
-"""
 
 PROVIDER_BETA_LINE = re.compile(r"^[ \t]*provider[ \t]*=[ \t]*google-beta[ \t]*\r?\n", re.MULTILINE)
 

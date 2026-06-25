@@ -384,9 +384,9 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
         # writes, no per-dir re-download. TF_DATA_DIR is intentionally left at its
         # per-directory default so each fixture's .terraform is isolated
         # (concurrency-safe) and symlinks into the shared mirror (tiny footprint);
-        # cleanup_workspace removes it after each pair.
+        # cleanup_workspace removes it after each pair. The provider comes from a
+        # filesystem mirror (not TF_PLUGIN_CACHE_DIR), so no plugin-cache env is set.
         'TF_CLI_CONFIG_FILE': str(CLI_CONFIG_FILE),
-        'TF_PLUGIN_CACHE_MAY_BREAK_DEPENDENCY_LOCK_FILE': '1',
     })
 
     plan_json = input_dir / "plan.json"
