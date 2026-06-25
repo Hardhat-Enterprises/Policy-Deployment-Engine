@@ -24,7 +24,7 @@ conditions := [
 			],
 			"policy_type": "whitelist",
 		},
-	],,
+	],
 [
 		{
 			"situation_description": "Bigtable table IAM binding grants an overly broad project or admin role on the table.",

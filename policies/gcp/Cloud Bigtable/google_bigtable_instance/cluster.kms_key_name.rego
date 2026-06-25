@@ -28,7 +28,7 @@ conditions := [
 			],
 			"policy_type": "pattern whitelist",
 		},
-	],,
+	],
 [
 		{
 			"situation_description": "Cloud Bigtable clusters must use customer-managed encryption keys (CMEK); clusters without kms_key_name rely on default encryption only.",

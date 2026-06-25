@@ -1,13 +1,11 @@
+##### DO NOT EDIT ######
+
 terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = ">= 7.11.0"
     }
   }
 }
 
-provider "google" {
-  project = "pde-test-project"
-  region  = "australia-southeast1"
-}
+provider "google" {}

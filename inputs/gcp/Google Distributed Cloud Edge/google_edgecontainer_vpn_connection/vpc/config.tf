@@ -8,7 +8,4 @@ terraform {
   }
 }
 
-provider "google" {
-  project = "gdce-dev"              # Project ID
-  region  = "australia-southeast1"  # GDCE region
-}
+provider "google" {}

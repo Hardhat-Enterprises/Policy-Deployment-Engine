@@ -1,5 +1,4 @@
 resource "google_os_config_v2_policy_orchestrator_for_folder" "non_compliant_example_1" {
-    provider = google-beta
     depends_on = [time_sleep.wait_3_min]
 
     policy_orchestrator_id = "po-folder"

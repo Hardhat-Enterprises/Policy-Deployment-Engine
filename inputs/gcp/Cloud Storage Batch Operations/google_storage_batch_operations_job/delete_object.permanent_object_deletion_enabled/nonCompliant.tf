@@ -1,5 +1,4 @@
 resource "google_storage_batch_operations_job" "non_compliant_example_1" {
-  provider = google-beta
   project  = "test-project"
   job_id   = "non_compliant_example_1"
 

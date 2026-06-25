@@ -2,7 +2,6 @@
 # Keep "nc" as the name to indicate that this resource and its attributes are non-compliant
 
 resource "google_healthcare_fhir_store_iam_member" "non_compliant_example_1" {
-  provider      = google-beta
   fhir_store_id = "non_compliant_example_1"
   member        = "serviceAccount:healthcare-sa@my-project.iam.gserviceaccount.com"
 

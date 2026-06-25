@@ -2,7 +2,6 @@
 # Keep "c" as the name to indicate that this resource and its attributes are compliant
 
 resource "google_healthcare_hl7_v2_store_iam_member" "compliant_example_1" {
-  provider        = google-beta
   hl7_v2_store_id = "compliant_example_1"
   member          = "serviceAccount:healthcare-sa@my-project.iam.gserviceaccount.com"
 

@@ -4,5 +4,4 @@ resource "google_firebase_data_connect_service" "compliant_example_1" {
   location = "us-central1"
   service_id = "example-service"
   deletion_policy = "FORCE"
-  provider = google-beta
 }

@@ -1,3 +1,5 @@
+##### DO NOT EDIT ######
+
 terraform {
   required_providers {
     google = {
@@ -6,7 +8,4 @@ terraform {
   }
 }
 
-provider "google" {
-  project = "your-gcp-project-id"
-  region  = "us-central1"                             
-}
+provider "google" {}

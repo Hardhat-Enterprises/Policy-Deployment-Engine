@@ -1,8 +1,11 @@
+##### DO NOT EDIT ######
+
 terraform {
   required_providers {
-    google      = { source = "hashicorp/google" }
-    google-beta = { source = "hashicorp/google-beta" }
+    google = {
+      source  = "hashicorp/google"
+    }
   }
 }
+
 provider "google" {}
-provider "google-beta" {}

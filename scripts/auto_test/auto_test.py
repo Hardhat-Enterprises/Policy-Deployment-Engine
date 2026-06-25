@@ -10,6 +10,17 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Lock
 
 
+# --- Project-local Terraform provider cache -------------------------------
+# Everything provider-related is scoped to <repo>/.terraform-cache so running
+# tests never touches $HOME/.terraform.d or any other project on the machine.
+# cli.tfrc points Terraform at a filesystem mirror of the single unified provider
+# version, which makes per-directory `terraform init` fully offline and
+# re-download-free (the provider is fetched once when the mirror is built).
+REPO_ROOT = Path(__file__).resolve().parents[2]
+CACHE_ROOT = REPO_ROOT / ".terraform-cache"
+CLI_CONFIG_FILE = CACHE_ROOT / "cli.tfrc"
+
+
 def normalize_policies_root(provided_root: Path) -> Path:
     """
     Traverse up the directory tree to find the root containing _helpers module.
@@ -195,16 +206,17 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
     creds_content = '{"type": "service_account", "project_id": "fake-project"}'
     creds_path.write_text(creds_content)
 
-    plugin_cache = Path.home() / ".terraform.d" / "plugin-cache"
-    global_data_dir = Path(".tfshared").resolve()
-    global_data_dir.mkdir(parents=True, exist_ok=True)
-    
     env.update({
         'GOOGLE_APPLICATION_CREDENTIALS': str(creds_path),
         'GOOGLE_PROJECT': 'fake-project',
         'GOOGLE_REGION': 'us-central1',
-        'TF_PLUGIN_CACHE_DIR': str(plugin_cache),
-        'TF_DATA_DIR': str(global_data_dir),
+        # Project-local, offline provider source (see module header). No global
+        # writes, no per-dir re-download. TF_DATA_DIR is intentionally left at its
+        # per-directory default so each fixture's .terraform is isolated
+        # (concurrency-safe) and symlinks into the shared mirror (tiny footprint);
+        # cleanup_workspace removes it after each pair.
+        'TF_CLI_CONFIG_FILE': str(CLI_CONFIG_FILE),
+        'TF_PLUGIN_CACHE_MAY_BREAK_DEPENDENCY_LOCK_FILE': '1',
     })
 
     commands = [
@@ -342,7 +354,7 @@ def run_policy_check_pair(input_dir: Path, policy_file: Path, policies_root: Pat
 
 def cleanup_workspace(workdir: Path):
     # remove plan binary and other transient parts
-    for fname in ["plan", "fake-creds.json"]:
+    for fname in ["plan", "plan.json", "fake-creds.json"]:
         f = workdir / fname
         try:
             f.unlink()

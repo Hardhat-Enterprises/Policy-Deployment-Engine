@@ -1,13 +1,11 @@
+##### DO NOT EDIT ######
+
 terraform {
   required_providers {
     google = {
-      source = "hashicorp/google-beta"
+      source  = "hashicorp/google"
     }
   }
 }
 
-provider "google" {
-  project      = "test-project"
-  region       = "australia-southeast1"
-  access_token = "test-token"
-}
+provider "google" {}

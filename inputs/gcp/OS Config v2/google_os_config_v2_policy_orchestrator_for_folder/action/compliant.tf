@@ -1,5 +1,4 @@
 resource "google_os_config_v2_policy_orchestrator_for_folder" "compliant_example_1" {
-    provider = google-beta
 
     policy_orchestrator_id = "po-folder"
     folder_id = "folders/123456789"

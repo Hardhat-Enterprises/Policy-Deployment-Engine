@@ -1,3 +1,5 @@
+##### DO NOT EDIT ######
+
 terraform {
   required_providers {
     google = {
@@ -6,8 +8,4 @@ terraform {
   }
 }
 
-provider "google" {
-  # credentials = file("D:/ssd-assignment-326906-96b576ee3fe6.json")  
-  # project     = "your-gcp-project-id"                        
-  # region      = "us-central1"                                
-}
+provider "google" {}
