@@ -1,6 +1,14 @@
 """
 Terraform Markdown Documentation Parser
 
+LEGACY (mostly): the live docgen pipeline derives argument structure/types from
+the Terraform *schema* (lib/arg_flatten.py) and descriptions/gating from
+lib/descriptions.py — NOT from this markdown parser. The only function still used
+in production is ``extract_subcategory_from_frontmatter`` (by lib/service_map.py).
+``parse_resource_markdown`` and the ``Argument``/``Resource`` models it builds are
+retained for their test coverage and possible reuse; they are not on the
+generate path. Do not treat this module as docgen's schema source.
+
 A comprehensive parser for extracting Terraform resource schemas from provider
 markdown documentation. Supports all three major cloud providers (AWS, Azure, GCP)
 and handles both argument-level and resource-level deprecation.

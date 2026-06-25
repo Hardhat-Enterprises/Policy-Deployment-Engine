@@ -1,8 +1,12 @@
 """
 Data models for Terraform resource schemas.
 
-Defines the core data structures produced by the markdown parser
-(``scripts/docgen/lib/parser.py``):
+LEGACY: these dataclasses are produced only by the markdown parser
+(``scripts/docgen/lib/parser.py``), which is no longer on the docgen generate
+path (see that module's note). The live pipeline works with plain flat dicts
+(lib/arg_flatten.py + lib/file_writer.py), so ``Argument``/``Resource`` here are
+kept for the parser's tests, not for output generation.
+
 - Argument: Represents a single resource argument with metadata
 - Resource: Represents a complete Terraform resource with all arguments
 """
