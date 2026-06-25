@@ -1,3 +1,4 @@
+<a id="top"></a>
 <h1 align="center">Step by step policy writing guide</h1>
 
 <p align="center">
