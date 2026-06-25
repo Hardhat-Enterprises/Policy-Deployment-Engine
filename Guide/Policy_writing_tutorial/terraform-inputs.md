@@ -1,12 +1,15 @@
 <a id="top"></a>
 <h1 align="center">Terraform inputs</h1>
 
+> You generate a plan here mainly to **inspect it and find your attribute path**. You do
+> **not** commit `plan.json` — when you run the test harness (`auto_test.py`), it produces and
+> caches the plan for you under `inputs/plan_cache/`.
 
 ### 1. terraform init
 
 Make sure you are in the inputs directory of the attribute you are writing your policy on:
 
-`inputs/gcp/service_name/resource/argument reference(policy)`
+`inputs/gcp/<Service>/<resource>/<attribute>/`
 
 
     terraform init
@@ -37,7 +40,7 @@ if you are having trouble with this section please visit [Common Errors](common-
 
 <div align="center">
 
-[⬅️ Previous: c.tf and nc.tf](c-tf-and-nc-tf.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
+[⬅️ Previous: compliant.tf and nonCompliant.tf](c-tf-and-nc-tf.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
 [📘 Back to Contents](policy-writing-tutorial.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
-[Next: vars.rego ➡️](vars-rego.md#top) 
+[Next: _vars.rego ➡️](vars-rego.md#top) 
 </div>

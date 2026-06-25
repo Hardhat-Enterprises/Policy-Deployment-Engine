@@ -10,7 +10,7 @@ Run the following commands to commit and push your work:
     git commit -m "message"  # e.g. initial commit
 
     git push origin <branch-name>  
-    # e.g. git push origin gcp/service/cloud_functions
+    # e.g. git push origin Service/gcp/cloud_functions/google_cloudfunctions_function
 
 
 ### 2. Create a pull request
@@ -19,7 +19,7 @@ Navigate to the GitHub repository.
 
 Click **"New pull request"**:
 
-![new-pull-request](images/CreatePullRequestNew.PNG)
+![new-pull-request](images/CreatepullrequestNew.PNG)
 
 
 ### 3. Select your branch

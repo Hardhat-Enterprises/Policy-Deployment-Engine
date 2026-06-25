@@ -78,25 +78,22 @@ resource "google_sql_database_instance" "instance" {
 
 ### 1. Copy required files
 
-Copy the following files from `templates/gcp`:
+Copy the fixture files from `templates/gcp` into your **inputs** attribute folder
+`inputs/gcp/<Service>/<IAM resource type>/<attribute>/`:
 
-- `c.tf`
-- `nc.tf`
+- `compliant.tf`
+- `nonCompliant.tf`
 - `config.tf`
 
-Into:
+For the **policies** tree:
 
-`inputs/gcp/service name/IAM resource type/argument reference(policy)`
+- Copy **one** `_vars.rego` into the IAM resource folder
+  `policies/gcp/<Service>/<IAM resource type>/`.
+- Copy `templates/gcp/policy.rego` into that same folder and **rename it to `<attribute>.rego`**
+  (a flat file — there is no per-attribute subfolder).
 
-**one** `vars.rego` into:
-
-`policies/gcp/service name/IAM resource type`
-
-and a `policy.rego` into:
-
-`policies/gcp/service name/IAM resource type/argument reference(policy)`
-
-> **Note:** For IAM resources you need **3 separate `vars.rego` files** — one for each IAM resource type (`_iam_binding`, `_iam_member`, `_iam_policy`).
+> **Note:** Each IAM resource type (`_iam_binding`, `_iam_member`, `_iam_policy`) is its own
+> resource folder, so you need **3 separate `_vars.rego` files** — one per IAM resource type.
 
 ### 2. Rename the folder to match the exact Terraform resource type
 
@@ -122,9 +119,9 @@ GKEHub/
 
 Complete every item before raising a PR:
 
-- [ ] `package` line updated in `policy.rego`
+- [ ] `package` line updated in `<attribute>.rego`
 - [ ] Folder name matches the resource type exactly
-- [ ] `vars.rego` — all 3 fields filled in: `friendly_resource_name`, `resource_type`, `resource_value_name`
+- [ ] `_vars.rego` — all 3 fields filled in: `friendly_resource_name`, `resource_type`, `resource_value_name`
 - [ ] Condition 1 — `["role"]` confirmed in resource JSON
 - [ ] Condition 2 — `attribute_path` confirmed:
   - `_iam_binding` → `["members"]` (array)
@@ -133,12 +130,12 @@ Complete every item before raising a PR:
 - [ ] Condition 3 — `attribute_path` confirmed (same as condition 2)
 - [ ] Valid roles confirmed from resource documentation — pattern whitelist values updated
 - [ ] `_iam_policy` values updated to full JSON string patterns matching your resource's valid roles
-- [ ] `opa eval` tested against a `plan.json` fixture — policy produces expected pass/fail output
+- [ ] `python3 scripts/auto_test/auto_test.py` run for the resource — policy produces expected pass/fail output
 
 <div align="center">
 
 [⬅️ Previous: Policy Writing](policy-writing.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
 [📘 Back to Contents](policy-writing-tutorial.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
-[Next: c.tf & nc.tf ➡️](c-tf-and-nc-tf.md#top)
+[Next: compliant.tf & nonCompliant.tf ➡️](c-tf-and-nc-tf.md#top)
 
 </div>

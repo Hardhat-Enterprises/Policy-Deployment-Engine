@@ -6,13 +6,16 @@
 
 ### 1. Access the Terraform Registry
 
-https://registry.terraform.io/providers/hashicorp/google/7.11.0/docs
+https://registry.terraform.io/providers/hashicorp/google/7.37.0/docs
+
+> Use the provider version the repo is pinned to (see `scripts/auto_test/provider_version.txt`,
+> currently `7.37.0`) so your arguments match what the test harness plans against.
 
 
 
 ### 2. Go to the argument reference of your service’s resource type
 
-![Argument Reference](images/argument-reference.png)
+![Argument Reference](images/argument-reference.PNG)
 
 Policies are written based on the **arguments (3)** which are supported by your **service (1)** and **resource type (2)**.
 
@@ -63,28 +66,33 @@ To document your service, navigate to the `docs/gcp/<service>` directory. Each r
 
 ### Key Components to Complete
 
-Each argument in the JSON file contains the following fields:
+Each argument under the `arguments` object in the JSON file contains the following fields:
 
-#### Description
-- Pulled from the Terraform Registry by default  
+#### description
+- Pulled from the Terraform provider schema by default  
 - Update if needed to improve clarity or accuracy  
 
 
 
-#### Required
+#### required
 - Indicates whether the argument is required (`true` or `false`)  
-- Based on Terraform documentation  
-- Ensure this matches the registry  
+- Generated from the provider schema  
 
 
 
-#### Security Impact
+#### type
+- The Terraform type of the argument (e.g. `string`, `number`, `bool`)  
+- Generated from the provider schema — leave it as produced  
+
+
+
+#### security_impact
 - Set to `true` if the argument affects security  
 - Set to `false` if it has no security relevance  
 
 
 
-#### Rational
+#### rationale
 - Explain **why** the argument does or does not have a security impact  
 - Keep it simple and clear  
 
@@ -92,26 +100,12 @@ Example:
 
     "Display name has no impact on the security of the resource type or data."
 
-
-#### Compliant
-- Provide a compliant example
-
-
-
-#### Non-compliant
-- Provide a non-compliant example
-
-
-
-#### Parent
-- Leave untouched
-
 ### Important Notes
 
 - Not all arguments require policies  
-- You must justify why an argument does not need a policy  
+- You must justify (in `rationale`) why an argument does not need a policy  
 - Use the Terraform Registry as your primary reference  
-- Nested blocks will appear as arguments with child arguments  
+- Nested block arguments appear as **dotted keys** (e.g. `service_config.ingress_settings`)  
 
 
 
@@ -123,45 +117,45 @@ Documentation should clearly show:
 - Whether it impacts security  
 - Why a policy is or is not needed
 
-### 🏗️ Generate Markdown Documentation
+### 🏗️ Generate the resource JSON
 
-Once your JSON files are updated, run:
+The docs JSON is generated from the Terraform **provider schema** by the docgen tool — you
+don't hand-write the skeleton, and there is no separate Markdown-generation step. There is
+one JSON file per resource at `docs/gcp/<Service>/<resource>.json`.
+
+- Create JSON for resources that don't have one yet (existing files are left untouched):
 
 ```bash
-python3 scripts/docgen/create_markdown.py <service_name>
+python3 scripts/docgen/generator.py --csp gcp --mode identify-new --service "<Service>"
 ```
 
-Example
+- Refresh existing files against the pinned provider version (recomputes arguments while
+  preserving your `security_impact` / `rationale` edits):
+
 ```bash
-python3 scripts/docgen/create_markdown.py vertex_ai
+python3 scripts/docgen/generator.py --csp gcp --mode refresh-existing --service "<Service>"
 ```
 
-This will (automatically):
-- Read all JSON files inside `docs/gcp/<service_name>/resource_json/`
-
-- Generate corresponding `.md` files
-
-- Save them in the `docs/gcp/<service_name>/ `folder (next to resource_json)
+Then open each generated `docs/gcp/<Service>/<resource>.json` and fill in `security_impact`
+and `rationale` for every argument.
 
 ### ✅ Example Workflow
 
-1. Get assigned `alloydb` from PDE Leadership.  
-2. Open `docs/gcp/alloydb/resource_json/`.  
-3. Edit `instance.json`, `cluster.json`, etc., filling in descriptions, compliant, and non-compliant values.  
-4. Run:
+1. Get assigned `Cloud Functions` from PDE Leadership.  
+2. Generate its JSON:
 
 ```bash
-python3 scripts/docgen/create_markdown.py alloydb
+python3 scripts/docgen/generator.py --csp gcp --mode identify-new --service "Cloud Functions"
 ```
-5. Review the generated `.md` files files in `docs/gcp/alloydb/`
+3. Open the generated files under `docs/gcp/Cloud Functions/` (e.g. `google_cloudfunctions_function.json`).  
+4. Fill in `security_impact` and `rationale` for each argument.  
 
 ### ⚠️ Notes & Best Practices
 
-- **Do not create new folders** — the structure is already set up.  
-- **JSON keys must match exactly** (`resource_name`, `arguments`, `description`, `required`, `security_impact`, `rationale`, `compliant`, `non-compliant`, `parent`).  
-- **Booleans must be true/false** (not strings).  
-- **Compliant / Non-compliant**: provide practical examples whenever possible.  
-- **Nested arguments**: define them under a parent’s `"arguments"` key.  
+- **Don't hand-create the JSON skeleton or new folders** — docgen produces them from the schema.  
+- **Only edit `security_impact` and `rationale`** — `description`, `required`, and `type` come from the provider schema.  
+- **Booleans must be `true`/`false`** (not strings).  
+- **Nested arguments** appear as dotted keys (e.g. `service_config.ingress_settings`) — edit them in place, don't restructure.  
 
 
 ---

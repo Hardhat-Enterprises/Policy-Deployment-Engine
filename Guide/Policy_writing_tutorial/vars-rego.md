@@ -1,18 +1,19 @@
 <a id="top"></a>
-<h1 align="center">vars.rego</h1>
+<h1 align="center">_vars.rego</h1>
 
-Ensure your `vars.rego` file is located in:
+Ensure your `_vars.rego` file is located in:
 
-`policies/gcp/service name/resource type` and **not** inside the folder for the specific policy. Only one `vars.rego` file is required per resource type.
+`policies/gcp/<Service>/<resource type>/` — directly in the resource folder, alongside the
+`<attribute>.rego` policy files. Only one `_vars.rego` file is required per resource type.
 
 ![policy-structure](images/policy-vars-file-structure.PNG)
 
 
-### Package naming for your `vars.rego`
+### Package naming for your `_vars.rego`
 
 ![vars-rego-packages](images/vars-rego.PNG)
 
-### `vars.rego`
+### `_vars.rego`
 
 ```rego
 package terraform.gcp.security.<service>.<resource_type>.vars

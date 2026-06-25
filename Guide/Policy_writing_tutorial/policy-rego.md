@@ -1,9 +1,13 @@
 <a id="top"></a>
 <h1 align="center">policy.rego</h1>
 
+> Your policy file is named after the attribute it checks — `<attribute>.rego` — and lives
+> **flat** in the resource folder `policies/gcp/<Service>/<resource type>/` (there is no
+> per-attribute subfolder).
+
 ### Rego package naming convention from directory structure
 
-The package name in your `policy.rego` file must follow the directory structure of your policy.
+The package name in your `<attribute>.rego` file must follow the directory structure of your policy.
 
 
 
@@ -232,9 +236,8 @@ Blocks values that match a defined pattern.
 
 <div align="center">
 
-[⬅️ Previous: vars.rego](vars-rego.md) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
+[⬅️ Previous: _vars.rego](vars-rego.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
 [📘 Back to Contents](policy-writing-tutorial.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
-[Next: Testing your policies ➡️](testing-policies.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
-[Next: Testing your policies Beta ➡️](testing-policies-beta.md#top) 
+[Next: Testing your policies ➡️](testing-policies.md#top) 
 
 </div>

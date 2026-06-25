@@ -6,53 +6,58 @@
 1. Get assigned a service from PDE Leadership (e.g. `cloud_functions`).  
 2. Research the service and identify security-relevant arguments.  
 
-3. Create the required folder structure in:
-   - `inputs/gcp/<service>/<resource>/<policy>`
-   - `policies/gcp/<service>/<resource>/<policy>`
+3. Create the required folder structure. Note the two trees are **not** symmetrical:
+   - `inputs/gcp/<Service>/<resource>/<attribute>/` — one folder **per attribute** (holds the fixtures)
+   - `policies/gcp/<Service>/<resource>/` — the policy is a **flat file** `<attribute>.rego` here,
+     plus a single `_vars.rego` for the whole resource (not a folder per attribute)
 
-4. Create and configure:
-   - `c.tf` (compliant example)  
-   - `nc.tf` (non-compliant example)  
+   `<Service>` is the docs-taxonomy folder name (e.g. `Cloud Functions`, with spaces);
+   `<resource>` and `<attribute>` are the exact Terraform resource type and argument names.
+
+4. Create and configure the fixtures (copy them from `templates/gcp`):
+   - `compliant.tf` (compliant example)  
+   - `nonCompliant.tf` (non-compliant example)  
    - `config.tf`  
 
-5. Run Terraform to generate a plan:
+5. (Optional, to discover the attribute path) Generate a Terraform plan and inspect it:
 
     terraform init  
     terraform plan --out=plan  
     terraform show -json plan > plan.json  
 
-6. Use `plan.json` to determine your attribute path.  
+   You don't commit this `plan.json` — the test harness generates and caches plans for you
+   under `inputs/plan_cache/`.
+
+6. Use the plan JSON to determine your attribute path.  
 
 7. Write your:
-   - `policy.rego` (policy logic)  
-   - `vars.rego` (resource metadata)  
+   - `<attribute>.rego` (policy logic)  
+   - `_vars.rego` (resource metadata — one per resource)  
 
-8. Test your policy:
+8. Test your policy. The linter runs automatically via pre-commit, or run it directly:
 
-    python linter.py --gcp `<your service>`
+    python3 scripts/linters/linter.py --platform gcp
 
-    opa eval --data .\policies\gcp --data .\policies\_helpers --input .\inputs\gcp\<SERVICE>\<RESOURCE>\<ATTRIBUTE>\plan.json "data.terraform.gcp.security.<SERVICE>.<RESOURCE>.<ATTRIBUTE>.message" --format pretty
+   Then run the OPA test harness (it handles `terraform plan`, plan caching, and `opa eval`):
 
-    opa eval --data .\policies\gcp --data .\policies\_helpers --input .\inputs\gcp\<SERVICE>\<RESOURCE>\<ATTRIBUTE>\plan.json "data.terraform.gcp.security.<SERVICE>.<RESOURCE>.<ATTRIBUTE>.details" --format pretty
+    python3 scripts/auto_test/auto_test.py "gcp/<Service>/<resource>"
 
 9. Fix any errors and re-test until successful.  
 
-10. Complete documentation:
-   - Update `.json` files in `docs/gcp/<service>/resource_json/`  
+10. Complete documentation in the resource's JSON at `docs/gcp/<Service>/<resource>.json`
+   (one file per resource). Generate/refresh the JSON skeleton from the provider schema with:
 
-11. Generate Markdown documentation:
+    python3 scripts/docgen/generator.py --csp gcp --mode refresh-existing --service "<Service>"
 
-    python3 scripts/docgen/create_markdown.py `<service>`
+   then fill in `security_impact` and `rationale` for each argument.
 
-12. Review generated `.md` files in `docs/gcp/<service>/`.  
-
-13. Commit and push your changes:
+11. Commit and push your changes:
 
     git add .  
     git commit -m "your message"  
-    git push origin `<branch-name>`  
+    git push origin <branch-name>  
 
-14. Create a pull request and wait for review.
+12. Create a pull request and wait for review.
 
 ---
 

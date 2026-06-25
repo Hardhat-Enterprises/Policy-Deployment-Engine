@@ -1,5 +1,5 @@
 <a id="top"></a>
-<h1 align="center">Prerequisitese</h1>
+<h1 align="center">Prerequisites</h1>
 
 
 ### 1. Upskilling guide
@@ -47,14 +47,28 @@ git merge origin/dev
 pre-commit install
 ```
 #### Create your working branch
+
+Branch names must follow the repo convention (enforced by the branch-name check
+and the per-resource CI gate). Use one of:
+
+- `Service/<platform>/<service_slug>/<resource_type>` — when working on a specific resource
+- `feature/<name>` — for a general feature
+- `chore/<name>` — for maintenance/cleanup
+
+The `<service_slug>` is the underscore slug of a `docs/<platform>` service folder
+(folder names contain spaces/parens, which are illegal in git branch names) — e.g.
+`Cloud Run (v2 API)` → `cloud_run_v2_api`. The `<resource_type>` is the exact
+Terraform resource type.
+
 ```
-git checkout -b gcp/service/<service-name>
+git checkout -b Service/gcp/<service_slug>/<resource_type>
+# e.g. git checkout -b Service/gcp/cloud_functions/google_cloudfunctions_function
 ```
 
 #### Push your branch
 
 ```
-git push origin gcp/service/<service-name>
+git push origin Service/gcp/<service_slug>/<resource_type>
 ```
 
 If the push is successful, you have the correct permissions and can continue your work on this branch.
@@ -70,7 +84,7 @@ If the push is successful, you have the correct permissions and can continue you
 
 <div align="center">
 
-[⬅️ Previous:](policy-writing-totourial.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
+[⬅️ Previous: Contents](policy-writing-tutorial.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
 [📘 Back to Contents](policy-writing-tutorial.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
 [Next: Researching and Documentation ➡️](researching-and-documentation.md#top)
 
