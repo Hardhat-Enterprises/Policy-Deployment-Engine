@@ -98,5 +98,3 @@ checks on the PR's own changed files.
 | `[content] ... package '...' must end with '.<resource>.<seg>'` | Fix the rego `package` to match its path. |
 | `[content] ... dependency resource(s) [...] not allowed` | Remove the dependency; give the tested resource fake values. |
 | `[content] ... resource label 'c' should be 'compliant_example_1'` | Adopt the example label convention. |
-
-See `FIXTURE_BACKLOG.md` for the fixtures still pending this migration.
