@@ -94,6 +94,14 @@ class SchemaSource:
 
         schema = self._dump_schema(csp, version)
         resolved = self._resolve_version(csp)
+        # A pin that Terraform couldn't honour exactly would otherwise be stamped
+        # into the docs and cached under the *resolved* version (so the same pin
+        # keeps missing the cache). Surface the mismatch loudly.
+        if version and resolved != _normalize_version(version):
+            logger.warning(
+                f"Requested provider {csp} v{_normalize_version(version)} but Terraform "
+                f"resolved v{resolved}; docs will record v{resolved}. Check the version pin."
+            )
         resource_schemas = self._extract_resource_schemas(schema, csp)
         self._write_cache(csp, resolved, resource_schemas)
         logger.info(
@@ -170,7 +178,13 @@ class SchemaSource:
         for addr, ver in selections.items():
             if addr.endswith(suffix):
                 return ver
-        return "unknown"
+        # No selection for our provider — never fall back to the literal "unknown",
+        # which would poison the cache filename and the docs' provider_version.
+        raise ConnectionError(
+            f"Could not determine the resolved {csp} provider version from "
+            f"`terraform version -json` (selections: {sorted(selections)}).",
+            operation="resolve provider version",
+        )
 
     def _extract_resource_schemas(self, schema: dict, csp: str) -> Dict:
         suffix = PROVIDER_SOURCES[csp]
