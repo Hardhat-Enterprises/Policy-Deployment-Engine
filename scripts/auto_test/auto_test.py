@@ -382,6 +382,8 @@ def find_matching_pairs(inputs_root: Path, policies_base_root: Path, policies_se
 
     input_dirs = [p for p in inputs_root.rglob('*') if p.is_dir() and is_leaf_terraform_dir(p)]
     pairs = []
+    unmatched_inputs = []          # (input_dir, expected_policy_file)
+    matched_policy_files = set()
 
     for input_dir in input_dirs:
         relative = input_dir.relative_to(inputs_root)
@@ -390,9 +392,23 @@ def find_matching_pairs(inputs_root: Path, policies_base_root: Path, policies_se
         policy_file = policies_search_root / relative.parent / f"{relative.name}.rego"
         if policy_file.is_file():
             pairs.append((input_dir, policy_file))
+            matched_policy_files.add(policy_file.resolve())
         else:
-            print(f" No matching policy file for: {input_dir}")
-    return pairs
+            unmatched_inputs.append((input_dir, policy_file))
+
+    # Orphan policies: every <argument>.rego in scope (excluding the per-resource
+    # _vars.rego and the shared _helpers) that no input fixture drives.
+    orphan_policies = []           # (policy_file, expected_input_dir)
+    for pf in policies_search_root.rglob("*.rego"):
+        if pf.name == "_vars.rego" or "_helpers" in pf.parts:
+            continue
+        if pf.resolve() in matched_policy_files:
+            continue
+        rel = pf.relative_to(policies_search_root)
+        expected_input = inputs_root / rel.parent / pf.stem
+        orphan_policies.append((pf, expected_input))
+
+    return pairs, unmatched_inputs, orphan_policies
 
 
 def main():
@@ -408,14 +424,25 @@ def main():
     policies_search_root = Path(args.policies)
     policies_base_root = normalize_policies_root(policies_search_root)
 
-    pairs = find_matching_pairs(inputs_root, policies_base_root, policies_search_root)
-    if not pairs:
-        print(" No matching input/policy pairs found.")
+    pairs, unmatched_inputs, orphan_policies = find_matching_pairs(
+        inputs_root, policies_base_root, policies_search_root)
+    if not pairs and not unmatched_inputs and not orphan_policies:
+        print(" No input/policy pairs or mismatches found.")
         sys.exit(1)
 
     results = []
     failure_flag = False
-    
+
+    # A mismatched input/policy is a hard failure (the pair can never be tested).
+    for input_dir, policy_file in unmatched_inputs:
+        service, resource, attribute = extract_path_parts(input_dir)
+        results.append(make_failure(
+            attribute, f"No matching policy file (expected {policy_file})", service, resource))
+    for policy_file, expected_input in orphan_policies:
+        service, resource, attribute = policy_file.parts[-3], policy_file.parts[-2], policy_file.stem
+        results.append(make_failure(
+            attribute, f"No matching input fixture (expected {expected_input}/)", service, resource))
+
     # Process pairs in parallel
     with ThreadPoolExecutor(max_workers=args.workers) as executor:
         # Submit all tasks
