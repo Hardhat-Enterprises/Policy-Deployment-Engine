@@ -1,0 +1,91 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "expiration_time": {
+      "description": "Time of expiration for this note. Leave empty if note does not expire.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "long_description": {
+      "description": "A detailed description of the note",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "name": {
+      "description": "The name of the note.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "related_note_names": {
+      "description": "Names of other notes related to this note.",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "short_description": {
+      "description": "A one sentence description of the note.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "attestation_authority": {
+      "type": "block",
+      "description": "Note kind that represents a logical attestation \"role\" or \"authority\".\nFor example, an organization might have one AttestationAuthority for\n\"QA\" and one for \"build\". This Note is intended to act strictly as a\ngrouping mechanism for the attached Occurrences (Attestations). This\ngrouping mechanism also provides a security boundary, since IAM ACLs\ngate the ability for a principle to attach an Occurrence to a given\nNote. It also provides a single point of lookup to find all attached\nAttestation Occurrences, even if they don't all live in the same\nproject.",
+      "required": true
+    },
+    "attestation_authority.hint": {
+      "type": "block",
+      "description": "This submessage provides human-readable hints about the purpose of\nthe AttestationAuthority. Because the name of a Note acts as its\nresource reference, it is important to disambiguate the canonical\nname of the Note (which might be a UUID for security purposes)\nfrom \"readable\" names more suitable for debug output. Note that\nthese hints should NOT be used to look up AttestationAuthorities\nin security sensitive contexts, such as when looking up\nAttestations to verify.",
+      "required": true
+    },
+    "attestation_authority.hint.human_readable_name": {
+      "description": "The human readable name of this Attestation Authority, for\nexample \"qa\".",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "related_url": {
+      "type": "block",
+      "description": "URLs associated with this note and related metadata.",
+      "required": false
+    },
+    "related_url.label": {
+      "description": "Label to describe usage of the URL",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "related_url.url": {
+      "description": "Specific URL associated with the resource.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

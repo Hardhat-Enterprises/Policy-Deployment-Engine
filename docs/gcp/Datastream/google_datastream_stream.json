@@ -1,0 +1,1739 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "create_without_validation": {
+      "description": "Create the stream without validating it.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "customer_managed_encryption_key": {
+      "description": "A reference to a KMS encryption key. If provided, it will be used to encrypt the data. If left blank, data\nwill be encrypted using an internal Stream-specific encryption key provisioned through KMS.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "desired_state": {
+      "description": "Desired state of the Stream. Set this field to 'RUNNING' to start the stream,\n'NOT_STARTED' to create the stream without starting and 'PAUSED' to pause\nthe stream from a 'RUNNING' state.\nPossible values: NOT_STARTED, RUNNING, PAUSED. Default: NOT_STARTED",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "Display name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "Labels.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The name of the location this stream is located in.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "stream_id": {
+      "description": "The stream identifier.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all": {
+      "type": "block",
+      "description": "Backfill strategy to automatically backfill the Stream's objects. Specific objects can be excluded.",
+      "required": false
+    },
+    "backfill_all.mongodb_excluded_objects": {
+      "type": "block",
+      "description": "MongoDB data source objects to avoid backfilling.",
+      "required": false
+    },
+    "backfill_all.mongodb_excluded_objects.databases": {
+      "type": "block",
+      "description": "MongoDB databases in the cluster.",
+      "required": true
+    },
+    "backfill_all.mongodb_excluded_objects.databases.database": {
+      "description": "Database name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.mongodb_excluded_objects.databases.collections": {
+      "type": "block",
+      "description": "Collections in the database.",
+      "required": false
+    },
+    "backfill_all.mongodb_excluded_objects.databases.collections.collection": {
+      "description": "Collection name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.mongodb_excluded_objects.databases.collections.fields": {
+      "type": "block",
+      "description": "Fields in the collection.",
+      "required": false
+    },
+    "backfill_all.mongodb_excluded_objects.databases.collections.fields.field": {
+      "description": "Field name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.mysql_excluded_objects": {
+      "type": "block",
+      "description": "MySQL data source objects to avoid backfilling.",
+      "required": false
+    },
+    "backfill_all.mysql_excluded_objects.mysql_databases": {
+      "type": "block",
+      "description": "MySQL databases on the server",
+      "required": true
+    },
+    "backfill_all.mysql_excluded_objects.mysql_databases.database": {
+      "description": "Database name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.mysql_excluded_objects.mysql_databases.mysql_tables": {
+      "type": "block",
+      "description": "Tables in the database.",
+      "required": false
+    },
+    "backfill_all.mysql_excluded_objects.mysql_databases.mysql_tables.table": {
+      "description": "Table name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.mysql_excluded_objects.mysql_databases.mysql_tables.mysql_columns": {
+      "type": "block",
+      "description": "MySQL columns in the schema. When unspecified as part of include/exclude objects, includes/excludes everything.",
+      "required": false
+    },
+    "backfill_all.mysql_excluded_objects.mysql_databases.mysql_tables.mysql_columns.collation": {
+      "description": "Column collation.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.mysql_excluded_objects.mysql_databases.mysql_tables.mysql_columns.column": {
+      "description": "Column name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.mysql_excluded_objects.mysql_databases.mysql_tables.mysql_columns.data_type": {
+      "description": "The MySQL data type. Full data types list can be found here:\nhttps://dev.mysql.com/doc/refman/8.0/en/data-types.html",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.mysql_excluded_objects.mysql_databases.mysql_tables.mysql_columns.nullable": {
+      "description": "Whether or not the column can accept a null value.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.mysql_excluded_objects.mysql_databases.mysql_tables.mysql_columns.ordinal_position": {
+      "description": "The ordinal position of the column in the table.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.mysql_excluded_objects.mysql_databases.mysql_tables.mysql_columns.primary_key": {
+      "description": "Whether or not the column represents a primary key.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.oracle_excluded_objects": {
+      "type": "block",
+      "description": "PostgreSQL data source objects to avoid backfilling.",
+      "required": false
+    },
+    "backfill_all.oracle_excluded_objects.oracle_schemas": {
+      "type": "block",
+      "description": "Oracle schemas/databases in the database server",
+      "required": true
+    },
+    "backfill_all.oracle_excluded_objects.oracle_schemas.schema": {
+      "description": "Schema name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.oracle_excluded_objects.oracle_schemas.oracle_tables": {
+      "type": "block",
+      "description": "Tables in the database.",
+      "required": false
+    },
+    "backfill_all.oracle_excluded_objects.oracle_schemas.oracle_tables.table": {
+      "description": "Table name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.oracle_excluded_objects.oracle_schemas.oracle_tables.oracle_columns": {
+      "type": "block",
+      "description": "Oracle columns in the schema. When unspecified as part of include/exclude objects, includes/excludes everything.",
+      "required": false
+    },
+    "backfill_all.oracle_excluded_objects.oracle_schemas.oracle_tables.oracle_columns.column": {
+      "description": "Column name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.oracle_excluded_objects.oracle_schemas.oracle_tables.oracle_columns.data_type": {
+      "description": "The Oracle data type. Full data types list can be found here:\nhttps://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/Data-Types.html",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.postgresql_excluded_objects": {
+      "type": "block",
+      "description": "PostgreSQL data source objects to avoid backfilling.",
+      "required": false
+    },
+    "backfill_all.postgresql_excluded_objects.postgresql_schemas": {
+      "type": "block",
+      "description": "PostgreSQL schemas on the server",
+      "required": true
+    },
+    "backfill_all.postgresql_excluded_objects.postgresql_schemas.schema": {
+      "description": "Database name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.postgresql_excluded_objects.postgresql_schemas.postgresql_tables": {
+      "type": "block",
+      "description": "Tables in the schema.",
+      "required": false
+    },
+    "backfill_all.postgresql_excluded_objects.postgresql_schemas.postgresql_tables.table": {
+      "description": "Table name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.postgresql_excluded_objects.postgresql_schemas.postgresql_tables.postgresql_columns": {
+      "type": "block",
+      "description": "PostgreSQL columns in the schema. When unspecified as part of include/exclude objects, includes/excludes everything.",
+      "required": false
+    },
+    "backfill_all.postgresql_excluded_objects.postgresql_schemas.postgresql_tables.postgresql_columns.column": {
+      "description": "Column name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.postgresql_excluded_objects.postgresql_schemas.postgresql_tables.postgresql_columns.data_type": {
+      "description": "The PostgreSQL data type. Full data types list can be found here:\nhttps://www.postgresql.org/docs/current/datatype.html",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.postgresql_excluded_objects.postgresql_schemas.postgresql_tables.postgresql_columns.nullable": {
+      "description": "Whether or not the column can accept a null value.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.postgresql_excluded_objects.postgresql_schemas.postgresql_tables.postgresql_columns.ordinal_position": {
+      "description": "The ordinal position of the column in the table.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.postgresql_excluded_objects.postgresql_schemas.postgresql_tables.postgresql_columns.primary_key": {
+      "description": "Whether or not the column represents a primary key.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.salesforce_excluded_objects": {
+      "type": "block",
+      "description": "Salesforce objects to avoid backfilling.",
+      "required": false
+    },
+    "backfill_all.salesforce_excluded_objects.objects": {
+      "type": "block",
+      "description": "Salesforce objects in Salesforce Org.",
+      "required": true
+    },
+    "backfill_all.salesforce_excluded_objects.objects.object_name": {
+      "description": "Name of object in Salesforce Org.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.salesforce_excluded_objects.objects.fields": {
+      "type": "block",
+      "description": "Fields in the Salesforce object. When unspecified as part of include/exclude objects, includes/excludes everything/nothing.",
+      "required": false
+    },
+    "backfill_all.salesforce_excluded_objects.objects.fields.name": {
+      "description": "Field name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.spanner_excluded_objects": {
+      "type": "block",
+      "description": "Spanner objects to avoid backfilling.",
+      "required": false
+    },
+    "backfill_all.spanner_excluded_objects.schemas": {
+      "type": "block",
+      "description": "Spanner schemas in the database",
+      "required": true
+    },
+    "backfill_all.spanner_excluded_objects.schemas.schema": {
+      "description": "Schema name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.spanner_excluded_objects.schemas.tables": {
+      "type": "block",
+      "description": "Tables in the schema.",
+      "required": false
+    },
+    "backfill_all.spanner_excluded_objects.schemas.tables.table": {
+      "description": "Table name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.spanner_excluded_objects.schemas.tables.columns": {
+      "type": "block",
+      "description": "Spanner columns in the table. When unspecified as part of include/exclude objects, includes/excludes everything.",
+      "required": false
+    },
+    "backfill_all.spanner_excluded_objects.schemas.tables.columns.column": {
+      "description": "Column name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.sql_server_excluded_objects": {
+      "type": "block",
+      "description": "SQL Server data source objects to avoid backfilling.",
+      "required": false
+    },
+    "backfill_all.sql_server_excluded_objects.schemas": {
+      "type": "block",
+      "description": "SQL Server schemas/databases in the database server",
+      "required": true
+    },
+    "backfill_all.sql_server_excluded_objects.schemas.schema": {
+      "description": "Schema name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.sql_server_excluded_objects.schemas.tables": {
+      "type": "block",
+      "description": "Tables in the database.",
+      "required": false
+    },
+    "backfill_all.sql_server_excluded_objects.schemas.tables.table": {
+      "description": "Table name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.sql_server_excluded_objects.schemas.tables.columns": {
+      "type": "block",
+      "description": "SQL Server columns in the schema. When unspecified as part of include/exclude objects, includes/excludes everything.",
+      "required": false
+    },
+    "backfill_all.sql_server_excluded_objects.schemas.tables.columns.column": {
+      "description": "Column name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_all.sql_server_excluded_objects.schemas.tables.columns.data_type": {
+      "description": "The SQL Server data type. Full data types list can be found here:\nhttps://learn.microsoft.com/en-us/sql/t-sql/data-types/data-types-transact-sql?view=sql-server-ver16",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "backfill_none": {
+      "type": "block",
+      "description": "Backfill strategy to disable automatic backfill for the Stream's objects.",
+      "required": false
+    },
+    "destination_config": {
+      "type": "block",
+      "description": "Destination connection profile configuration.",
+      "required": true
+    },
+    "destination_config.destination_connection_profile": {
+      "description": "Destination connection profile resource. Format: projects/{project}/locations/{location}/connectionProfiles/{name}",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination_config.bigquery_destination_config": {
+      "type": "block",
+      "description": "A configuration for how data should be loaded to Google BigQuery.",
+      "required": false
+    },
+    "destination_config.bigquery_destination_config.data_freshness": {
+      "description": "The guaranteed data freshness (in seconds) when querying tables created by the stream.\nEditing this field will only affect new tables created in the future, but existing tables\nwill not be impacted. Lower values mean that queries will return fresher data, but may result in higher cost.\nA duration in seconds with up to nine fractional digits, terminated by 's'. Example: \"3.5s\". Defaults to 900s.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination_config.bigquery_destination_config.append_only": {
+      "type": "block",
+      "description": "AppendOnly mode defines that the stream of changes (INSERT, UPDATE-INSERT, UPDATE-DELETE and DELETE\nevents) to a source table will be written to the destination Google BigQuery table, retaining the\nhistorical state of the data.",
+      "required": false
+    },
+    "destination_config.bigquery_destination_config.blmt_config": {
+      "type": "block",
+      "description": "BigLake Managed Tables configuration for BigQuery streams.",
+      "required": false
+    },
+    "destination_config.bigquery_destination_config.blmt_config.bucket": {
+      "description": "The Cloud Storage bucket name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination_config.bigquery_destination_config.blmt_config.connection_name": {
+      "description": "The bigquery connection. Format: '{project}.{location}.{name}'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination_config.bigquery_destination_config.blmt_config.file_format": {
+      "description": "The file format.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination_config.bigquery_destination_config.blmt_config.root_path": {
+      "description": "The root path inside the Cloud Storage bucket.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination_config.bigquery_destination_config.blmt_config.table_format": {
+      "description": "The table format.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination_config.bigquery_destination_config.merge": {
+      "type": "block",
+      "description": "Merge mode defines that all changes to a table will be merged at the destination Google BigQuery\ntable. This is the default write mode. When selected, BigQuery reflects the way the data is stored\nin the source database. With Merge mode, no historical record of the change events is kept.",
+      "required": false
+    },
+    "destination_config.bigquery_destination_config.single_target_dataset": {
+      "type": "block",
+      "description": "A single target dataset to which all data will be streamed.",
+      "required": false
+    },
+    "destination_config.bigquery_destination_config.single_target_dataset.dataset_id": {
+      "description": "Dataset ID in the format projects/{project}/datasets/{dataset_id} or\n{project}:{dataset_id}",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination_config.bigquery_destination_config.source_hierarchy_datasets": {
+      "type": "block",
+      "description": "Destination datasets are created so that hierarchy of the destination data objects matches the source hierarchy.",
+      "required": false
+    },
+    "destination_config.bigquery_destination_config.source_hierarchy_datasets.project_id": {
+      "description": "Optional. The project id of the BigQuery dataset. If not specified, the project will be inferred from the stream resource.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination_config.bigquery_destination_config.source_hierarchy_datasets.dataset_template": {
+      "type": "block",
+      "description": "Dataset template used for dynamic dataset creation.",
+      "required": true
+    },
+    "destination_config.bigquery_destination_config.source_hierarchy_datasets.dataset_template.dataset_id_prefix": {
+      "description": "If supplied, every created dataset will have its name prefixed by the provided value.\nThe prefix and name will be separated by an underscore. i.e. _.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination_config.bigquery_destination_config.source_hierarchy_datasets.dataset_template.kms_key_name": {
+      "description": "Describes the Cloud KMS encryption key that will be used to protect destination BigQuery\ntable. The BigQuery Service Account associated with your project requires access to this\nencryption key. i.e. projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{cryptoKey}.\nSee https://cloud.google.com/bigquery/docs/customer-managed-encryption for more information.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination_config.bigquery_destination_config.source_hierarchy_datasets.dataset_template.location": {
+      "description": "The geographic location where the dataset should reside.\nSee https://cloud.google.com/bigquery/docs/locations for supported locations.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination_config.gcs_destination_config": {
+      "type": "block",
+      "description": "A configuration for how data should be loaded to Cloud Storage.",
+      "required": false
+    },
+    "destination_config.gcs_destination_config.file_rotation_interval": {
+      "description": "The maximum duration for which new events are added before a file is closed and a new file is created.\nValues within the range of 15-60 seconds are allowed.\nA duration in seconds with up to nine fractional digits, terminated by 's'. Example: \"3.5s\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination_config.gcs_destination_config.file_rotation_mb": {
+      "description": "The maximum file size to be saved in the bucket.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination_config.gcs_destination_config.path": {
+      "description": "Path inside the Cloud Storage bucket to write data to.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination_config.gcs_destination_config.avro_file_format": {
+      "type": "block",
+      "description": "AVRO file format configuration.",
+      "required": false
+    },
+    "destination_config.gcs_destination_config.json_file_format": {
+      "type": "block",
+      "description": "JSON file format configuration.",
+      "required": false
+    },
+    "destination_config.gcs_destination_config.json_file_format.compression": {
+      "description": "Compression of the loaded JSON file. Possible values: [\"NO_COMPRESSION\", \"GZIP\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination_config.gcs_destination_config.json_file_format.schema_file_format": {
+      "description": "The schema file format along JSON data files. Possible values: [\"NO_SCHEMA_FILE\", \"AVRO_SCHEMA_FILE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rule_sets": {
+      "type": "block",
+      "description": "Rule sets to apply to the stream.",
+      "required": false
+    },
+    "rule_sets.customization_rules": {
+      "type": "block",
+      "description": "List of customization rules to apply.",
+      "required": true
+    },
+    "rule_sets.customization_rules.bigquery_clustering": {
+      "type": "block",
+      "description": "BigQuery clustering rule.",
+      "required": false
+    },
+    "rule_sets.customization_rules.bigquery_clustering.columns": {
+      "description": "Column names to set as clustering columns.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rule_sets.customization_rules.bigquery_partitioning": {
+      "type": "block",
+      "description": "BigQuery partitioning rule.",
+      "required": false
+    },
+    "rule_sets.customization_rules.bigquery_partitioning.require_partition_filter": {
+      "description": "If true, queries over the table require a partition filter.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rule_sets.customization_rules.bigquery_partitioning.ingestion_time_partition": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "rule_sets.customization_rules.bigquery_partitioning.ingestion_time_partition.partitioning_time_granularity": {
+      "description": "Partition granularity. Possible values: [\"PARTITIONING_TIME_GRANULARITY_UNSPECIFIED\", \"PARTITIONING_TIME_GRANULARITY_HOUR\", \"PARTITIONING_TIME_GRANULARITY_DAY\", \"PARTITIONING_TIME_GRANULARITY_MONTH\", \"PARTITIONING_TIME_GRANULARITY_YEAR\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rule_sets.customization_rules.bigquery_partitioning.integer_range_partition": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "rule_sets.customization_rules.bigquery_partitioning.integer_range_partition.column": {
+      "description": "The partitioning column.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rule_sets.customization_rules.bigquery_partitioning.integer_range_partition.end": {
+      "description": "The ending value for range partitioning (exclusive).",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rule_sets.customization_rules.bigquery_partitioning.integer_range_partition.interval": {
+      "description": "The interval of each range within the partition.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rule_sets.customization_rules.bigquery_partitioning.integer_range_partition.start": {
+      "description": "The starting value for range partitioning (inclusive).",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rule_sets.customization_rules.bigquery_partitioning.time_unit_partition": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "rule_sets.customization_rules.bigquery_partitioning.time_unit_partition.column": {
+      "description": "The partitioning column.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rule_sets.customization_rules.bigquery_partitioning.time_unit_partition.partitioning_time_granularity": {
+      "description": "Partition granularity. Possible values: [\"PARTITIONING_TIME_GRANULARITY_UNSPECIFIED\", \"PARTITIONING_TIME_GRANULARITY_HOUR\", \"PARTITIONING_TIME_GRANULARITY_DAY\", \"PARTITIONING_TIME_GRANULARITY_MONTH\", \"PARTITIONING_TIME_GRANULARITY_YEAR\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rule_sets.object_filter": {
+      "type": "block",
+      "description": "Object filter to apply the customization rules to.",
+      "required": true
+    },
+    "rule_sets.object_filter.source_object_identifier": {
+      "type": "block",
+      "description": "Specific source object identifier.",
+      "required": false
+    },
+    "rule_sets.object_filter.source_object_identifier.mongodb_identifier": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "rule_sets.object_filter.source_object_identifier.mongodb_identifier.collection": {
+      "description": "The MongoDB collection name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rule_sets.object_filter.source_object_identifier.mongodb_identifier.database": {
+      "description": "The MongoDB database name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rule_sets.object_filter.source_object_identifier.mysql_identifier": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "rule_sets.object_filter.source_object_identifier.mysql_identifier.database": {
+      "description": "The database name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rule_sets.object_filter.source_object_identifier.mysql_identifier.table": {
+      "description": "The table name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rule_sets.object_filter.source_object_identifier.oracle_identifier": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "rule_sets.object_filter.source_object_identifier.oracle_identifier.schema": {
+      "description": "The schema name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rule_sets.object_filter.source_object_identifier.oracle_identifier.table": {
+      "description": "The table name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rule_sets.object_filter.source_object_identifier.postgresql_identifier": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "rule_sets.object_filter.source_object_identifier.postgresql_identifier.schema": {
+      "description": "The schema name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rule_sets.object_filter.source_object_identifier.postgresql_identifier.table": {
+      "description": "The table name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rule_sets.object_filter.source_object_identifier.salesforce_identifier": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "rule_sets.object_filter.source_object_identifier.salesforce_identifier.object_name": {
+      "description": "The Salesforce object name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rule_sets.object_filter.source_object_identifier.spanner_identifier": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "rule_sets.object_filter.source_object_identifier.spanner_identifier.schema": {
+      "description": "The schema name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rule_sets.object_filter.source_object_identifier.spanner_identifier.table": {
+      "description": "The table name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rule_sets.object_filter.source_object_identifier.sql_server_identifier": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "rule_sets.object_filter.source_object_identifier.sql_server_identifier.schema": {
+      "description": "The schema name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rule_sets.object_filter.source_object_identifier.sql_server_identifier.table": {
+      "description": "The table name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config": {
+      "type": "block",
+      "description": "Source connection profile configuration.",
+      "required": true
+    },
+    "source_config.source_connection_profile": {
+      "description": "Source connection profile resource. Format: projects/{project}/locations/{location}/connectionProfiles/{name}",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mongodb_source_config": {
+      "type": "block",
+      "description": "MongoDB source configuration.",
+      "required": false
+    },
+    "source_config.mongodb_source_config.max_concurrent_backfill_tasks": {
+      "description": "Optional. Maximum number of concurrent backfill tasks. The number\nshould be non-negative and less than or equal to 50. If not set\n(or set to 0), the system''s default value is used",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mongodb_source_config.exclude_objects": {
+      "type": "block",
+      "description": "MongoDB collections to include in the stream.",
+      "required": false
+    },
+    "source_config.mongodb_source_config.exclude_objects.databases": {
+      "type": "block",
+      "description": "MongoDB databases in the cluster.",
+      "required": false
+    },
+    "source_config.mongodb_source_config.exclude_objects.databases.database": {
+      "description": "Database name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mongodb_source_config.exclude_objects.databases.collections": {
+      "type": "block",
+      "description": "Collections in the database.",
+      "required": false
+    },
+    "source_config.mongodb_source_config.exclude_objects.databases.collections.collection": {
+      "description": "Collection name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mongodb_source_config.exclude_objects.databases.collections.fields": {
+      "type": "block",
+      "description": "Fields in the collection.",
+      "required": false
+    },
+    "source_config.mongodb_source_config.exclude_objects.databases.collections.fields.field": {
+      "description": "Field name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mongodb_source_config.include_objects": {
+      "type": "block",
+      "description": "MongoDB collections to include in the stream.",
+      "required": false
+    },
+    "source_config.mongodb_source_config.include_objects.databases": {
+      "type": "block",
+      "description": "MongoDB databases in the cluster.",
+      "required": false
+    },
+    "source_config.mongodb_source_config.include_objects.databases.database": {
+      "description": "Database name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mongodb_source_config.include_objects.databases.collections": {
+      "type": "block",
+      "description": "Collections in the database.",
+      "required": false
+    },
+    "source_config.mongodb_source_config.include_objects.databases.collections.collection": {
+      "description": "Collection name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mongodb_source_config.include_objects.databases.collections.fields": {
+      "type": "block",
+      "description": "Fields in the collection.",
+      "required": false
+    },
+    "source_config.mongodb_source_config.include_objects.databases.collections.fields.field": {
+      "description": "Field name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mysql_source_config": {
+      "type": "block",
+      "description": "MySQL data source configuration.",
+      "required": false
+    },
+    "source_config.mysql_source_config.max_concurrent_backfill_tasks": {
+      "description": "Maximum number of concurrent backfill tasks. The number should be non negative.\nIf not set (or set to 0), the system's default value will be used.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mysql_source_config.max_concurrent_cdc_tasks": {
+      "description": "Maximum number of concurrent CDC tasks. The number should be non negative.\nIf not set (or set to 0), the system's default value will be used.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mysql_source_config.binary_log_position": {
+      "type": "block",
+      "description": "CDC reader reads from binary logs replication cdc method.",
+      "required": false
+    },
+    "source_config.mysql_source_config.exclude_objects": {
+      "type": "block",
+      "description": "MySQL objects to exclude from the stream.",
+      "required": false
+    },
+    "source_config.mysql_source_config.exclude_objects.mysql_databases": {
+      "type": "block",
+      "description": "MySQL databases on the server",
+      "required": true
+    },
+    "source_config.mysql_source_config.exclude_objects.mysql_databases.database": {
+      "description": "Database name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mysql_source_config.exclude_objects.mysql_databases.mysql_tables": {
+      "type": "block",
+      "description": "Tables in the database.",
+      "required": false
+    },
+    "source_config.mysql_source_config.exclude_objects.mysql_databases.mysql_tables.table": {
+      "description": "Table name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mysql_source_config.exclude_objects.mysql_databases.mysql_tables.mysql_columns": {
+      "type": "block",
+      "description": "MySQL columns in the schema. When unspecified as part of include/exclude objects, includes/excludes everything.",
+      "required": false
+    },
+    "source_config.mysql_source_config.exclude_objects.mysql_databases.mysql_tables.mysql_columns.collation": {
+      "description": "Column collation.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mysql_source_config.exclude_objects.mysql_databases.mysql_tables.mysql_columns.column": {
+      "description": "Column name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mysql_source_config.exclude_objects.mysql_databases.mysql_tables.mysql_columns.data_type": {
+      "description": "The MySQL data type. Full data types list can be found here:\nhttps://dev.mysql.com/doc/refman/8.0/en/data-types.html",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mysql_source_config.exclude_objects.mysql_databases.mysql_tables.mysql_columns.nullable": {
+      "description": "Whether or not the column can accept a null value.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mysql_source_config.exclude_objects.mysql_databases.mysql_tables.mysql_columns.ordinal_position": {
+      "description": "The ordinal position of the column in the table.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mysql_source_config.exclude_objects.mysql_databases.mysql_tables.mysql_columns.primary_key": {
+      "description": "Whether or not the column represents a primary key.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mysql_source_config.gtid": {
+      "type": "block",
+      "description": "CDC reader reads from gtid based replication.",
+      "required": false
+    },
+    "source_config.mysql_source_config.include_objects": {
+      "type": "block",
+      "description": "MySQL objects to retrieve from the source.",
+      "required": false
+    },
+    "source_config.mysql_source_config.include_objects.mysql_databases": {
+      "type": "block",
+      "description": "MySQL databases on the server",
+      "required": true
+    },
+    "source_config.mysql_source_config.include_objects.mysql_databases.database": {
+      "description": "Database name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mysql_source_config.include_objects.mysql_databases.mysql_tables": {
+      "type": "block",
+      "description": "Tables in the database.",
+      "required": false
+    },
+    "source_config.mysql_source_config.include_objects.mysql_databases.mysql_tables.table": {
+      "description": "Table name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mysql_source_config.include_objects.mysql_databases.mysql_tables.mysql_columns": {
+      "type": "block",
+      "description": "MySQL columns in the schema. When unspecified as part of include/exclude objects, includes/excludes everything.",
+      "required": false
+    },
+    "source_config.mysql_source_config.include_objects.mysql_databases.mysql_tables.mysql_columns.collation": {
+      "description": "Column collation.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mysql_source_config.include_objects.mysql_databases.mysql_tables.mysql_columns.column": {
+      "description": "Column name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mysql_source_config.include_objects.mysql_databases.mysql_tables.mysql_columns.data_type": {
+      "description": "The MySQL data type. Full data types list can be found here:\nhttps://dev.mysql.com/doc/refman/8.0/en/data-types.html",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mysql_source_config.include_objects.mysql_databases.mysql_tables.mysql_columns.nullable": {
+      "description": "Whether or not the column can accept a null value.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mysql_source_config.include_objects.mysql_databases.mysql_tables.mysql_columns.ordinal_position": {
+      "description": "The ordinal position of the column in the table.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.mysql_source_config.include_objects.mysql_databases.mysql_tables.mysql_columns.primary_key": {
+      "description": "Whether or not the column represents a primary key.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.oracle_source_config": {
+      "type": "block",
+      "description": "MySQL data source configuration.",
+      "required": false
+    },
+    "source_config.oracle_source_config.max_concurrent_backfill_tasks": {
+      "description": "Maximum number of concurrent backfill tasks. The number should be non negative.\nIf not set (or set to 0), the system's default value will be used.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.oracle_source_config.max_concurrent_cdc_tasks": {
+      "description": "Maximum number of concurrent CDC tasks. The number should be non negative.\nIf not set (or set to 0), the system's default value will be used.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.oracle_source_config.drop_large_objects": {
+      "type": "block",
+      "description": "Configuration to drop large object values.",
+      "required": false
+    },
+    "source_config.oracle_source_config.exclude_objects": {
+      "type": "block",
+      "description": "Oracle objects to exclude from the stream.",
+      "required": false
+    },
+    "source_config.oracle_source_config.exclude_objects.oracle_schemas": {
+      "type": "block",
+      "description": "Oracle schemas/databases in the database server",
+      "required": true
+    },
+    "source_config.oracle_source_config.exclude_objects.oracle_schemas.schema": {
+      "description": "Schema name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.oracle_source_config.exclude_objects.oracle_schemas.oracle_tables": {
+      "type": "block",
+      "description": "Tables in the database.",
+      "required": false
+    },
+    "source_config.oracle_source_config.exclude_objects.oracle_schemas.oracle_tables.table": {
+      "description": "Table name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.oracle_source_config.exclude_objects.oracle_schemas.oracle_tables.oracle_columns": {
+      "type": "block",
+      "description": "Oracle columns in the schema. When unspecified as part of include/exclude objects, includes/excludes everything.",
+      "required": false
+    },
+    "source_config.oracle_source_config.exclude_objects.oracle_schemas.oracle_tables.oracle_columns.column": {
+      "description": "Column name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.oracle_source_config.exclude_objects.oracle_schemas.oracle_tables.oracle_columns.data_type": {
+      "description": "The Oracle data type. Full data types list can be found here:\nhttps://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/Data-Types.html",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.oracle_source_config.include_objects": {
+      "type": "block",
+      "description": "Oracle objects to retrieve from the source.",
+      "required": false
+    },
+    "source_config.oracle_source_config.include_objects.oracle_schemas": {
+      "type": "block",
+      "description": "Oracle schemas/databases in the database server",
+      "required": true
+    },
+    "source_config.oracle_source_config.include_objects.oracle_schemas.schema": {
+      "description": "Schema name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.oracle_source_config.include_objects.oracle_schemas.oracle_tables": {
+      "type": "block",
+      "description": "Tables in the database.",
+      "required": false
+    },
+    "source_config.oracle_source_config.include_objects.oracle_schemas.oracle_tables.table": {
+      "description": "Table name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.oracle_source_config.include_objects.oracle_schemas.oracle_tables.oracle_columns": {
+      "type": "block",
+      "description": "Oracle columns in the schema. When unspecified as part of include/exclude objects, includes/excludes everything.",
+      "required": false
+    },
+    "source_config.oracle_source_config.include_objects.oracle_schemas.oracle_tables.oracle_columns.column": {
+      "description": "Column name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.oracle_source_config.include_objects.oracle_schemas.oracle_tables.oracle_columns.data_type": {
+      "description": "The Oracle data type. Full data types list can be found here:\nhttps://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/Data-Types.html",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.oracle_source_config.stream_large_objects": {
+      "type": "block",
+      "description": "Configuration to drop large object values.",
+      "required": false
+    },
+    "source_config.postgresql_source_config": {
+      "type": "block",
+      "description": "PostgreSQL data source configuration.",
+      "required": false
+    },
+    "source_config.postgresql_source_config.max_concurrent_backfill_tasks": {
+      "description": "Maximum number of concurrent backfill tasks. The number should be non\nnegative. If not set (or set to 0), the system's default value will be used.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.postgresql_source_config.publication": {
+      "description": "The name of the publication that includes the set of all tables\nthat are defined in the stream's include_objects.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.postgresql_source_config.replication_slot": {
+      "description": "The name of the logical replication slot that's configured with\nthe pgoutput plugin.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.postgresql_source_config.exclude_objects": {
+      "type": "block",
+      "description": "PostgreSQL objects to exclude from the stream.",
+      "required": false
+    },
+    "source_config.postgresql_source_config.exclude_objects.postgresql_schemas": {
+      "type": "block",
+      "description": "PostgreSQL schemas on the server",
+      "required": true
+    },
+    "source_config.postgresql_source_config.exclude_objects.postgresql_schemas.schema": {
+      "description": "Database name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.postgresql_source_config.exclude_objects.postgresql_schemas.postgresql_tables": {
+      "type": "block",
+      "description": "Tables in the schema.",
+      "required": false
+    },
+    "source_config.postgresql_source_config.exclude_objects.postgresql_schemas.postgresql_tables.table": {
+      "description": "Table name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.postgresql_source_config.exclude_objects.postgresql_schemas.postgresql_tables.postgresql_columns": {
+      "type": "block",
+      "description": "PostgreSQL columns in the schema. When unspecified as part of include/exclude objects, includes/excludes everything.",
+      "required": false
+    },
+    "source_config.postgresql_source_config.exclude_objects.postgresql_schemas.postgresql_tables.postgresql_columns.column": {
+      "description": "Column name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.postgresql_source_config.exclude_objects.postgresql_schemas.postgresql_tables.postgresql_columns.data_type": {
+      "description": "The PostgreSQL data type. Full data types list can be found here:\nhttps://www.postgresql.org/docs/current/datatype.html",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.postgresql_source_config.exclude_objects.postgresql_schemas.postgresql_tables.postgresql_columns.nullable": {
+      "description": "Whether or not the column can accept a null value.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.postgresql_source_config.exclude_objects.postgresql_schemas.postgresql_tables.postgresql_columns.ordinal_position": {
+      "description": "The ordinal position of the column in the table.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.postgresql_source_config.exclude_objects.postgresql_schemas.postgresql_tables.postgresql_columns.primary_key": {
+      "description": "Whether or not the column represents a primary key.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.postgresql_source_config.include_objects": {
+      "type": "block",
+      "description": "PostgreSQL objects to retrieve from the source.",
+      "required": false
+    },
+    "source_config.postgresql_source_config.include_objects.postgresql_schemas": {
+      "type": "block",
+      "description": "PostgreSQL schemas on the server",
+      "required": true
+    },
+    "source_config.postgresql_source_config.include_objects.postgresql_schemas.schema": {
+      "description": "Database name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.postgresql_source_config.include_objects.postgresql_schemas.postgresql_tables": {
+      "type": "block",
+      "description": "Tables in the schema.",
+      "required": false
+    },
+    "source_config.postgresql_source_config.include_objects.postgresql_schemas.postgresql_tables.table": {
+      "description": "Table name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.postgresql_source_config.include_objects.postgresql_schemas.postgresql_tables.postgresql_columns": {
+      "type": "block",
+      "description": "PostgreSQL columns in the schema. When unspecified as part of include/exclude objects, includes/excludes everything.",
+      "required": false
+    },
+    "source_config.postgresql_source_config.include_objects.postgresql_schemas.postgresql_tables.postgresql_columns.column": {
+      "description": "Column name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.postgresql_source_config.include_objects.postgresql_schemas.postgresql_tables.postgresql_columns.data_type": {
+      "description": "The PostgreSQL data type. Full data types list can be found here:\nhttps://www.postgresql.org/docs/current/datatype.html",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.postgresql_source_config.include_objects.postgresql_schemas.postgresql_tables.postgresql_columns.nullable": {
+      "description": "Whether or not the column can accept a null value.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.postgresql_source_config.include_objects.postgresql_schemas.postgresql_tables.postgresql_columns.ordinal_position": {
+      "description": "The ordinal position of the column in the table.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.postgresql_source_config.include_objects.postgresql_schemas.postgresql_tables.postgresql_columns.primary_key": {
+      "description": "Whether or not the column represents a primary key.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.salesforce_source_config": {
+      "type": "block",
+      "description": "Salesforce data source configuration.",
+      "required": false
+    },
+    "source_config.salesforce_source_config.polling_interval": {
+      "description": "Salesforce objects polling interval. The interval at which new changes will be polled for each object. The duration must be between 5 minutes and 24 hours.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.salesforce_source_config.exclude_objects": {
+      "type": "block",
+      "description": "Salesforce objects to exclude from the stream.",
+      "required": false
+    },
+    "source_config.salesforce_source_config.exclude_objects.objects": {
+      "type": "block",
+      "description": "Salesforce objects in data source.",
+      "required": true
+    },
+    "source_config.salesforce_source_config.exclude_objects.objects.object_name": {
+      "description": "Name of object in Salesforce Org.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.salesforce_source_config.exclude_objects.objects.fields": {
+      "type": "block",
+      "description": "Fields in the Salesforce object. When unspecified as part of include/exclude objects, includes/excludes everything/nothing.",
+      "required": false
+    },
+    "source_config.salesforce_source_config.exclude_objects.objects.fields.name": {
+      "description": "Field name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.salesforce_source_config.include_objects": {
+      "type": "block",
+      "description": "Salesforce objects to retrieve from the source.",
+      "required": false
+    },
+    "source_config.salesforce_source_config.include_objects.objects": {
+      "type": "block",
+      "description": "Salesforce objects in Salesforce Org.",
+      "required": true
+    },
+    "source_config.salesforce_source_config.include_objects.objects.object_name": {
+      "description": "Name of object in Salesforce Org.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.salesforce_source_config.include_objects.objects.fields": {
+      "type": "block",
+      "description": "Fields in the Salesforce object. When unspecified as part of include/exclude objects, includes/excludes everything/nothing.",
+      "required": false
+    },
+    "source_config.salesforce_source_config.include_objects.objects.fields.name": {
+      "description": "Field name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.spanner_source_config": {
+      "type": "block",
+      "description": "Spanner data source configuration.",
+      "required": false
+    },
+    "source_config.spanner_source_config.backfill_data_boost_enabled": {
+      "description": "Whether to use DataBoost for backfill queries.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.spanner_source_config.change_stream_name": {
+      "description": "The Spanner change stream name to use.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.spanner_source_config.fgac_role": {
+      "description": "The FGAC role to use for Spanner queries.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.spanner_source_config.max_concurrent_backfill_tasks": {
+      "description": "Max concurrent backfill tasks.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.spanner_source_config.max_concurrent_cdc_tasks": {
+      "description": "Max concurrent CDC tasks.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.spanner_source_config.spanner_rpc_priority": {
+      "description": "The RPC priority to use for Spanner queries. Possible values: [\"LOW\", \"MEDIUM\", \"HIGH\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.spanner_source_config.exclude_objects": {
+      "type": "block",
+      "description": "Spanner objects to retrieve from the source.",
+      "required": false
+    },
+    "source_config.spanner_source_config.exclude_objects.schemas": {
+      "type": "block",
+      "description": "Spanner schemas in the database",
+      "required": true
+    },
+    "source_config.spanner_source_config.exclude_objects.schemas.schema": {
+      "description": "Schema name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.spanner_source_config.exclude_objects.schemas.tables": {
+      "type": "block",
+      "description": "Tables in the schema.",
+      "required": false
+    },
+    "source_config.spanner_source_config.exclude_objects.schemas.tables.table": {
+      "description": "Table name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.spanner_source_config.exclude_objects.schemas.tables.columns": {
+      "type": "block",
+      "description": "Spanner columns in the table. When unspecified as part of include/exclude objects, includes/excludes everything.",
+      "required": false
+    },
+    "source_config.spanner_source_config.exclude_objects.schemas.tables.columns.column": {
+      "description": "Column name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.spanner_source_config.include_objects": {
+      "type": "block",
+      "description": "Spanner objects to retrieve from the source.",
+      "required": false
+    },
+    "source_config.spanner_source_config.include_objects.schemas": {
+      "type": "block",
+      "description": "Spanner schemas in the database",
+      "required": true
+    },
+    "source_config.spanner_source_config.include_objects.schemas.schema": {
+      "description": "Schema name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.spanner_source_config.include_objects.schemas.tables": {
+      "type": "block",
+      "description": "Tables in the schema.",
+      "required": false
+    },
+    "source_config.spanner_source_config.include_objects.schemas.tables.table": {
+      "description": "Table name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.spanner_source_config.include_objects.schemas.tables.columns": {
+      "type": "block",
+      "description": "Spanner columns in the table. When unspecified as part of include/exclude objects, includes/excludes everything.",
+      "required": false
+    },
+    "source_config.spanner_source_config.include_objects.schemas.tables.columns.column": {
+      "description": "Column name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.sql_server_source_config": {
+      "type": "block",
+      "description": "SQL Server data source configuration.",
+      "required": false
+    },
+    "source_config.sql_server_source_config.max_concurrent_backfill_tasks": {
+      "description": "Max concurrent backfill tasks.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.sql_server_source_config.max_concurrent_cdc_tasks": {
+      "description": "Max concurrent CDC tasks.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.sql_server_source_config.change_tables": {
+      "type": "block",
+      "description": "CDC reader reads from change tables.",
+      "required": false
+    },
+    "source_config.sql_server_source_config.exclude_objects": {
+      "type": "block",
+      "description": "SQL Server objects to exclude from the stream.",
+      "required": false
+    },
+    "source_config.sql_server_source_config.exclude_objects.schemas": {
+      "type": "block",
+      "description": "SQL Server schemas/databases in the database server",
+      "required": true
+    },
+    "source_config.sql_server_source_config.exclude_objects.schemas.schema": {
+      "description": "Schema name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.sql_server_source_config.exclude_objects.schemas.tables": {
+      "type": "block",
+      "description": "Tables in the database.",
+      "required": false
+    },
+    "source_config.sql_server_source_config.exclude_objects.schemas.tables.table": {
+      "description": "Table name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.sql_server_source_config.exclude_objects.schemas.tables.columns": {
+      "type": "block",
+      "description": "SQL Server columns in the schema. When unspecified as part of include/exclude objects, includes/excludes everything.",
+      "required": false
+    },
+    "source_config.sql_server_source_config.exclude_objects.schemas.tables.columns.column": {
+      "description": "Column name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.sql_server_source_config.exclude_objects.schemas.tables.columns.data_type": {
+      "description": "The SQL Server data type. Full data types list can be found here:\nhttps://learn.microsoft.com/en-us/sql/t-sql/data-types/data-types-transact-sql?view=sql-server-ver16",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.sql_server_source_config.include_objects": {
+      "type": "block",
+      "description": "SQL Server objects to retrieve from the source.",
+      "required": false
+    },
+    "source_config.sql_server_source_config.include_objects.schemas": {
+      "type": "block",
+      "description": "SQL Server schemas/databases in the database server",
+      "required": true
+    },
+    "source_config.sql_server_source_config.include_objects.schemas.schema": {
+      "description": "Schema name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.sql_server_source_config.include_objects.schemas.tables": {
+      "type": "block",
+      "description": "Tables in the database.",
+      "required": false
+    },
+    "source_config.sql_server_source_config.include_objects.schemas.tables.table": {
+      "description": "Table name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.sql_server_source_config.include_objects.schemas.tables.columns": {
+      "type": "block",
+      "description": "SQL Server columns in the schema. When unspecified as part of include/exclude objects, includes/excludes everything.",
+      "required": false
+    },
+    "source_config.sql_server_source_config.include_objects.schemas.tables.columns.column": {
+      "description": "Column name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.sql_server_source_config.include_objects.schemas.tables.columns.data_type": {
+      "description": "The SQL Server data type. Full data types list can be found here:\nhttps://learn.microsoft.com/en-us/sql/t-sql/data-types/data-types-transact-sql?view=sql-server-ver16",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_config.sql_server_source_config.transaction_logs": {
+      "type": "block",
+      "description": "CDC reader reads from transaction logs.",
+      "required": false
+    }
+  }
+}

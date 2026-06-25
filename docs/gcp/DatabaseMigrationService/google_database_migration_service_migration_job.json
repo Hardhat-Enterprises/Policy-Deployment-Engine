@@ -1,0 +1,257 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "desired_state": {
+      "description": "The desired state of the migration job. If set to 'RUNNING', the migration job will be started. Possible values: [\"NOT_STARTED\", \"RUNNING\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination": {
+      "description": "The name of the destination connection profile resource in the form of projects/{project}/locations/{location}/connectionProfiles/{destinationConnectionProfile}.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "display_name": {
+      "description": "The migration job display name.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "dump_path": {
+      "description": "The path to the dump file in Google Cloud Storage,\nin the format: (gs://[BUCKET_NAME]/[OBJECT_NAME]).\nThis field and the \"dump_flags\" field are mutually exclusive.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "dump_type": {
+      "description": "The type of the data dump. Supported for MySQL to CloudSQL for MySQL\nmigrations only. Possible values: [\"LOGICAL\", \"PHYSICAL\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Logical dumps preserve schema and allow selective data migration. Physical dumps can include full storage blocks, increasing risk of sensitive data exposure."
+    },
+    "labels": {
+      "description": "The resource labels for migration job to use to annotate any related underlying resources such as Compute Engine VMs.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "location": {
+      "description": "The location where the migration job should reside.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "migration_job_id": {
+      "description": "The ID of the migration job.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "source": {
+      "description": "The name of the source connection profile resource in the form of projects/{project}/locations/{location}/connectionProfiles/{sourceConnectionProfile}.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "stop_on_warnings": {
+      "description": "If set to true, will stop the Terraform apply if there are validation warnings.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "type": {
+      "description": "The type of the migration job. Possible values: [\"ONE_TIME\", \"CONTINUOUS\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Selects whether the migration job is ONE_TIME or CONTINUOUS. This is an operational/data-management choice driven by the team's migration strategy, not a security control; the security of the link is governed by the SSL, private-network and VPC-peering settings instead. Cost is not a security concern."
+    },
+    "dump_flags": {
+      "type": "block",
+      "description": "The initial dump flags.",
+      "required": false
+    },
+    "dump_flags.dump_flags": {
+      "type": "block",
+      "description": "A list of dump flags",
+      "required": false
+    },
+    "dump_flags.dump_flags.name": {
+      "description": "The name of the flag",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dump_flags.dump_flags.value": {
+      "description": "The vale of the flag",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "objects_config": {
+      "type": "block",
+      "description": "The objects that need to be migrated. If unset, the default is to migrate\nall objects available on the source.",
+      "required": false
+    },
+    "objects_config.source_objects_config": {
+      "type": "block",
+      "description": "Configuration for the source objects to be migrated.",
+      "required": false
+    },
+    "objects_config.source_objects_config.objects_selection_type": {
+      "description": "The objects selection type of the migration job. When set to\n'SPECIFIED_OBJECTS', only the objects listed in 'objectConfigs' are\nmigrated. When set to 'ALL_OBJECTS', all objects available on the\nsource are migrated. Possible values: [\"ALL_OBJECTS\", \"SPECIFIED_OBJECTS\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "objects_config.source_objects_config.object_configs": {
+      "type": "block",
+      "description": "The list of objects to migrate. Should only be set when\n'objectsSelectionType' is 'SPECIFIED_OBJECTS'.",
+      "required": false
+    },
+    "objects_config.source_objects_config.object_configs.object_identifier": {
+      "type": "block",
+      "description": "The identifier of the migration job object.",
+      "required": false
+    },
+    "objects_config.source_objects_config.object_configs.object_identifier.database": {
+      "description": "The database name. Required only if the object uses\na database name as part of its unique identifier.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "objects_config.source_objects_config.object_configs.object_identifier.schema": {
+      "description": "The schema name. Required only if the object uses\na schema name as part of its unique identifier.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "objects_config.source_objects_config.object_configs.object_identifier.table": {
+      "description": "The table name. Required only if the object is a level\nbelow database or schema.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "objects_config.source_objects_config.object_configs.object_identifier.type": {
+      "description": "The category of the migration job object: 'DATABASE',\n'SCHEMA', or 'TABLE'. Possible values: [\"DATABASE\", \"SCHEMA\", \"TABLE\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "performance_config": {
+      "type": "block",
+      "description": "Data dump parallelism settings used by the migration.",
+      "required": false
+    },
+    "performance_config.dump_parallel_level": {
+      "description": "Initial dump parallelism level. Possible values: [\"MIN\", \"OPTIMAL\", \"MAX\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "postgres_homogeneous_config": {
+      "type": "block",
+      "description": "PostgreSQL to PostgreSQL configuration.",
+      "required": false
+    },
+    "postgres_homogeneous_config.is_native_logical": {
+      "description": "Whether the migration uses native logical replication.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "postgres_homogeneous_config.max_additional_subscriptions": {
+      "description": "Maximum number of additional subscriptions to use for the migration job.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "reverse_ssh_connectivity": {
+      "type": "block",
+      "description": "The details of the VPC network that the source database is located in.",
+      "required": false
+    },
+    "reverse_ssh_connectivity.vm": {
+      "description": "The name of the virtual machine (Compute Engine) used as the bastion server\nfor the SSH tunnel.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Names the bastion VM used for the reverse-SSH tunnel. It is an identifier referencing a team-owned resource, not a security control on this resource, so its value is not a policy target."
+    },
+    "reverse_ssh_connectivity.vm_ip": {
+      "description": "The IP of the virtual machine (Compute Engine) used as the bastion server\nfor the SSH tunnel.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Specifies the IP address of the bastion VM used for the reverse-SSH tunnel. It is a team-specific endpoint identifier rather than a security control; a generic platform policy cannot meaningfully constrain an arbitrary IP without overreaching."
+    },
+    "reverse_ssh_connectivity.vm_port": {
+      "description": "The forwarding port of the virtual machine (Compute Engine) used as the\nbastion server for the SSH tunnel.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Specifies the port of the bastion VM for the reverse-SSH tunnel. It is a connection-endpoint detail chosen by the team, not a security configuration of this resource, so it is not a useful policy target."
+    },
+    "reverse_ssh_connectivity.vpc": {
+      "description": "The name of the VPC to peer with the Cloud SQL private network.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier of the VPC used for the reverse-SSH tunnel of the migration job. It is a reference to an existing network the team selects, not a security toggle on this resource, so constraining its value is out of scope."
+    },
+    "static_ip_connectivity": {
+      "type": "block",
+      "description": "If set to an empty object ('{}'), the source database will allow incoming\nconnections from the public IP of the destination database.\nYou can retrieve the public IP of the Cloud SQL instance from the\nCloud SQL console or using Cloud SQL APIs.",
+      "required": false
+    },
+    "vpc_peering_connectivity": {
+      "type": "block",
+      "description": "The details of the VPC network that the source database is located in.",
+      "required": false
+    },
+    "vpc_peering_connectivity.vpc": {
+      "description": "The name of the VPC network to peer with the Cloud SQL private network.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "VPC peering is the preferred secure method to connect source and destination over private networks, avoiding public exposure."
+    }
+  }
+}

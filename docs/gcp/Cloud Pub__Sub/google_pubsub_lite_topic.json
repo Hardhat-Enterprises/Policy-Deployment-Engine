@@ -1,0 +1,103 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "name": {
+      "description": "Name of the topic.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "region": {
+      "description": "The region of the pubsub lite topic.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "zone": {
+      "description": "The zone of the pubsub lite topic.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "partition_config": {
+      "type": "block",
+      "description": "The settings for this topic's partitions.",
+      "required": false
+    },
+    "partition_config.count": {
+      "description": "The number of partitions in the topic. Must be at least 1.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "partition_config.capacity": {
+      "type": "block",
+      "description": "The capacity configuration.",
+      "required": false
+    },
+    "partition_config.capacity.publish_mib_per_sec": {
+      "description": "Subscribe throughput capacity per partition in MiB/s. Must be >= 4 and <= 16.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "partition_config.capacity.subscribe_mib_per_sec": {
+      "description": "Publish throughput capacity per partition in MiB/s. Must be >= 4 and <= 16.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "reservation_config": {
+      "type": "block",
+      "description": "The settings for this topic's Reservation usage.",
+      "required": false
+    },
+    "reservation_config.throughput_reservation": {
+      "description": "The Reservation to use for this topic's throughput capacity.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "retention_config": {
+      "type": "block",
+      "description": "The settings for a topic's message retention.",
+      "required": false
+    },
+    "retention_config.per_partition_bytes": {
+      "description": "The provisioned storage, in bytes, per partition. If the number of bytes stored\nin any of the topic's partitions grows beyond this value, older messages will be\ndropped to make room for newer ones, regardless of the value of period.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "retention_config.period": {
+      "description": "How long a published message is retained. If unset, messages will be retained as\nlong as the bytes retained for each partition is below perPartitionBytes. A\nduration in seconds with up to nine fractional digits, terminated by 's'.\nExample: \"3.5s\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

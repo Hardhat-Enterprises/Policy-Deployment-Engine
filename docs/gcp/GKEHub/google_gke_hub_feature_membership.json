@@ -1,0 +1,580 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "feature": {
+      "description": "The name of the feature",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The location of the feature",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "membership": {
+      "description": "The name of the membership",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "membership_location": {
+      "description": "The location of the membership",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The project of the feature",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement": {
+      "type": "block",
+      "description": "Config Management-specific spec.",
+      "required": false
+    },
+    "configmanagement.management": {
+      "description": "Set this field to MANAGEMENT_AUTOMATIC to enable Config Sync auto-upgrades, and set this field to MANAGEMENT_MANUAL or MANAGEMENT_UNSPECIFIED to disable Config Sync auto-upgrades.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.version": {
+      "description": "Optional. Version of ACM to install. Defaults to the latest version.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync": {
+      "type": "block",
+      "description": "Config Sync configuration for the cluster.",
+      "required": false
+    },
+    "configmanagement.config_sync.enabled": {
+      "description": "Enables the installation of ConfigSync. If set to true, ConfigSync resources will be created and the other ConfigSync fields will be applied if exist. If set to false, all other ConfigSync fields will be ignored, ConfigSync resources will be deleted. If omitted, ConfigSync resources will be managed depends on the presence of the git or oci field.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.prevent_drift": {
+      "description": "Set to true to enable the Config Sync admission webhook to prevent drifts. If set to `false`, disables the Config Sync admission webhook and does not prevent drifts.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.source_format": {
+      "description": "Specifies whether the Config Sync Repo is in \"hierarchical\" or \"unstructured\" mode.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.stop_syncing": {
+      "description": "Set to true to stop syncing configs for a single cluster. Default: false.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.deployment_overrides": {
+      "type": "block",
+      "description": "The override configurations for the Config Sync Deployments.",
+      "required": false
+    },
+    "configmanagement.config_sync.deployment_overrides.deployment_name": {
+      "description": "The name of the Deployment.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.deployment_overrides.deployment_namespace": {
+      "description": "The namespace of the Deployment.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.deployment_overrides.containers": {
+      "type": "block",
+      "description": "The override configurations for the containers in the Deployment.",
+      "required": false
+    },
+    "configmanagement.config_sync.deployment_overrides.containers.container_name": {
+      "description": "The name of the container.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.deployment_overrides.containers.cpu_limit": {
+      "description": "The CPU limit of the container.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.deployment_overrides.containers.cpu_request": {
+      "description": "The CPU request of the container.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.deployment_overrides.containers.memory_limit": {
+      "description": "The memory limit of the container.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.deployment_overrides.containers.memory_request": {
+      "description": "The memory request of the container.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.git": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "configmanagement.config_sync.git.gcp_service_account_email": {
+      "description": "The GCP Service Account Email used for auth when secretType is gcpServiceAccount.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.git.https_proxy": {
+      "description": "URL for the HTTPS proxy to be used when communicating with the Git repo.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.git.policy_dir": {
+      "description": "The path within the Git repository that represents the top level of the repo to sync. Default: the root directory of the repository.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.git.secret_type": {
+      "description": "Type of secret configured for access to the Git repo. Must be one of ssh, cookiefile, gcenode, token, gcpserviceaccount or none. The validation of this is case-sensitive.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.git.sync_branch": {
+      "description": "The branch of the repository to sync from. Default: master.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.git.sync_repo": {
+      "description": "The URL of the Git repository to use as the source of truth.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.git.sync_rev": {
+      "description": "Git revision (tag or hash) to check out. Default HEAD.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.git.sync_wait_secs": {
+      "description": "Period in seconds between consecutive syncs. Default: 15.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.oci": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "configmanagement.config_sync.oci.gcp_service_account_email": {
+      "description": "The GCP Service Account Email used for auth when secret_type is gcpserviceaccount. ",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.oci.policy_dir": {
+      "description": "The absolute path of the directory that contains the local resources. Default: the root directory of the image.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.oci.secret_type": {
+      "description": "Type of secret configured for access to the OCI Image. Must be one of gcenode, gcpserviceaccount or none. The validation of this is case-sensitive.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.oci.sync_repo": {
+      "description": "The OCI image repository URL for the package to sync from. e.g. LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY_NAME/PACKAGE_NAME.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.config_sync.oci.sync_wait_secs": {
+      "description": "Period in seconds(int64 format) between consecutive syncs. Default: 15.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.hierarchy_controller": {
+      "type": "block",
+      "description": "Hierarchy Controller configuration for the cluster.",
+      "required": false
+    },
+    "configmanagement.hierarchy_controller.enable_hierarchical_resource_quota": {
+      "description": "Whether hierarchical resource quota is enabled in this cluster.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.hierarchy_controller.enable_pod_tree_labels": {
+      "description": "Whether pod tree labels are enabled in this cluster.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.hierarchy_controller.enabled": {
+      "description": "**DEPRECATED** Configuring Hierarchy Controller through the configmanagement feature is no longer recommended. Use https://github.com/kubernetes-sigs/hierarchical-namespaces instead.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.policy_controller": {
+      "type": "block",
+      "description": "**DEPRECATED** Configuring Policy Controller through the configmanagement feature is no longer recommended. Use the policycontroller feature instead.",
+      "required": false
+    },
+    "configmanagement.policy_controller.audit_interval_seconds": {
+      "description": "Sets the interval for Policy Controller Audit Scans (in seconds). When set to 0, this disables audit functionality altogether.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.policy_controller.enabled": {
+      "description": "Enables the installation of Policy Controller. If false, the rest of PolicyController fields take no effect.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.policy_controller.exemptable_namespaces": {
+      "description": "The set of namespaces that are excluded from Policy Controller checks. Namespaces do not need to currently exist on the cluster.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.policy_controller.log_denies_enabled": {
+      "description": "Logs all denies and dry run failures.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.policy_controller.mutation_enabled": {
+      "description": "Enable or disable mutation in policy controller. If true, mutation CRDs, webhook and controller deployment will be deployed to the cluster.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.policy_controller.referential_rules_enabled": {
+      "description": "Enables the ability to use Constraint Templates that reference to objects other than the object currently being evaluated.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.policy_controller.template_library_installed": {
+      "description": "Installs the default template library along with Policy Controller.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "configmanagement.policy_controller.monitoring": {
+      "type": "block",
+      "description": "Specifies the backends Policy Controller should export metrics to. For example, to specify metrics should be exported to Cloud Monitoring and Prometheus, specify backends: [\"cloudmonitoring\", \"prometheus\"]. Default: [\"cloudmonitoring\", \"prometheus\"]",
+      "required": false
+    },
+    "configmanagement.policy_controller.monitoring.backends": {
+      "description": " Specifies the list of backends Policy Controller will export to. Specifying an empty value `[]` disables metrics export.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mesh": {
+      "type": "block",
+      "description": "Manage Mesh Features",
+      "required": false
+    },
+    "mesh.management": {
+      "description": "Whether to automatically manage Service Mesh. Possible values: MANAGEMENT_UNSPECIFIED, MANAGEMENT_AUTOMATIC, MANAGEMENT_MANUAL",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller": {
+      "type": "block",
+      "description": "Policy Controller-specific spec.",
+      "required": false
+    },
+    "policycontroller.version": {
+      "description": "Optional. Version of Policy Controller to install. Defaults to the latest version.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller.policy_controller_hub_config": {
+      "type": "block",
+      "description": "Policy Controller configuration for the cluster.",
+      "required": true
+    },
+    "policycontroller.policy_controller_hub_config.audit_interval_seconds": {
+      "description": "Sets the interval for Policy Controller Audit Scans (in seconds). When set to 0, this disables audit functionality altogether.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller.policy_controller_hub_config.constraint_violation_limit": {
+      "description": "The maximum number of audit violations to be stored in a constraint. If not set, the internal default of 20 will be used.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller.policy_controller_hub_config.exemptable_namespaces": {
+      "description": "The set of namespaces that are excluded from Policy Controller checks. Namespaces do not need to currently exist on the cluster.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller.policy_controller_hub_config.install_spec": {
+      "description": "Configures the mode of the Policy Controller installation. Possible values: INSTALL_SPEC_UNSPECIFIED, INSTALL_SPEC_NOT_INSTALLED, INSTALL_SPEC_ENABLED, INSTALL_SPEC_SUSPENDED, INSTALL_SPEC_DETACHED",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller.policy_controller_hub_config.log_denies_enabled": {
+      "description": "Logs all denies and dry run failures.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller.policy_controller_hub_config.mutation_enabled": {
+      "description": "Enables the ability to mutate resources using Policy Controller.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller.policy_controller_hub_config.referential_rules_enabled": {
+      "description": "Enables the ability to use Constraint Templates that reference to objects other than the object currently being evaluated.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller.policy_controller_hub_config.deployment_configs": {
+      "type": "block",
+      "description": "Map of deployment configs to deployments (\"admission\", \"audit\", \"mutation\").",
+      "required": false
+    },
+    "policycontroller.policy_controller_hub_config.deployment_configs.component_name": {
+      "description": "The name for the key in the map for which this object is mapped to in the API",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller.policy_controller_hub_config.deployment_configs.pod_affinity": {
+      "description": "Pod affinity configuration. Possible values: AFFINITY_UNSPECIFIED, NO_AFFINITY, ANTI_AFFINITY",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller.policy_controller_hub_config.deployment_configs.replica_count": {
+      "description": "Pod replica count.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller.policy_controller_hub_config.deployment_configs.container_resources": {
+      "type": "block",
+      "description": "Container resource requirements.",
+      "required": false
+    },
+    "policycontroller.policy_controller_hub_config.deployment_configs.container_resources.limits": {
+      "type": "block",
+      "description": "Limits describes the maximum amount of compute resources allowed for use by the running container.",
+      "required": false
+    },
+    "policycontroller.policy_controller_hub_config.deployment_configs.container_resources.limits.cpu": {
+      "description": "CPU requirement expressed in Kubernetes resource units.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller.policy_controller_hub_config.deployment_configs.container_resources.limits.memory": {
+      "description": "Memory requirement expressed in Kubernetes resource units.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller.policy_controller_hub_config.deployment_configs.container_resources.requests": {
+      "type": "block",
+      "description": "Requests describes the amount of compute resources reserved for the container by the kube-scheduler.",
+      "required": false
+    },
+    "policycontroller.policy_controller_hub_config.deployment_configs.container_resources.requests.cpu": {
+      "description": "CPU requirement expressed in Kubernetes resource units.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller.policy_controller_hub_config.deployment_configs.container_resources.requests.memory": {
+      "description": "Memory requirement expressed in Kubernetes resource units.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller.policy_controller_hub_config.deployment_configs.pod_tolerations": {
+      "type": "block",
+      "description": "Pod tolerations of node taints.",
+      "required": false
+    },
+    "policycontroller.policy_controller_hub_config.deployment_configs.pod_tolerations.effect": {
+      "description": "Matches a taint effect.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller.policy_controller_hub_config.deployment_configs.pod_tolerations.key": {
+      "description": "Matches a taint key (not necessarily unique).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller.policy_controller_hub_config.deployment_configs.pod_tolerations.operator": {
+      "description": "Matches a taint operator.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller.policy_controller_hub_config.deployment_configs.pod_tolerations.value": {
+      "description": "Matches a taint value.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller.policy_controller_hub_config.monitoring": {
+      "type": "block",
+      "description": "Specifies the backends Policy Controller should export metrics to. For example, to specify metrics should be exported to Cloud Monitoring and Prometheus, specify backends: [\"cloudmonitoring\", \"prometheus\"]. Default: [\"cloudmonitoring\", \"prometheus\"]",
+      "required": false
+    },
+    "policycontroller.policy_controller_hub_config.monitoring.backends": {
+      "description": " Specifies the list of backends Policy Controller will export to. Specifying an empty value `[]` disables metrics export.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller.policy_controller_hub_config.policy_content": {
+      "type": "block",
+      "description": "Specifies the desired policy content on the cluster.",
+      "required": false
+    },
+    "policycontroller.policy_controller_hub_config.policy_content.bundles": {
+      "type": "block",
+      "description": "map of bundle name to BundleInstallSpec. The bundle name maps to the `bundleName` key in the `policycontroller.gke.io/constraintData` annotation on a constraint.",
+      "required": false
+    },
+    "policycontroller.policy_controller_hub_config.policy_content.bundles.bundle_name": {
+      "description": "The name for the key in the map for which this object is mapped to in the API",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller.policy_controller_hub_config.policy_content.bundles.exempted_namespaces": {
+      "description": "The set of namespaces to be exempted from the bundle.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policycontroller.policy_controller_hub_config.policy_content.template_library": {
+      "type": "block",
+      "description": "Configures the installation of the Template Library.",
+      "required": false
+    },
+    "policycontroller.policy_controller_hub_config.policy_content.template_library.installation": {
+      "description": "Configures the manner in which the template library is installed on the cluster. Possible values: INSTALLATION_UNSPECIFIED, NOT_INSTALLED, ALL",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

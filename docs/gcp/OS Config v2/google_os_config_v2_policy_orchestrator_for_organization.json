@@ -1,0 +1,1003 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "action": {
+      "description": "Required. Action to be done by the orchestrator in\n'projects/{project_id}/zones/{zone_id}' locations defined by the\n'orchestration_scope'. Allowed values:\n- 'UPSERT' - Orchestrator will create or update target resources.\n- 'DELETE' - Orchestrator will delete target resources, if they exist",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Sets whether the orchestrator creates/updates or deletes the orchestrated resources in scope. A DELETE action can remove security policy assignments across the scope; a policy can constrain it so the orchestrator maintains (not deletes) the desired secure state, preventing unintended teardown."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "Optional. Freeform text describing the purpose of the resource.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "Optional. Labels as key value pairs\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "organization_id": {
+      "description": "Part of 'parent'. Required. The parent resource name in the form of:\n* 'organizations/{organization_id}/locations/global'\n* 'folders/{folder_id}/locations/global'\n* 'projects/{project_id_or_number}/locations/global'",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier of the organization the orchestrator is created in. This is a resource identifier/selector; we do not constrain it, and enforcing a specific org would require knowing a team's org ID, which is overreaching."
+    },
+    "policy_orchestrator_id": {
+      "description": "Required. The logical identifier of the policy orchestrator, with the following\nrestrictions:\n\n* Must contain only lowercase letters, numbers, and hyphens.\n* Must start with a letter.\n* Must be between 1-63 characters.\n* Must end with a number or a letter.\n* Must be unique within the parent.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "User-assigned identifier for the orchestrator resource. This is a name/identifier; we do not constrain resource names, and uniqueness is enforced by the platform, not a security policy."
+    },
+    "state": {
+      "description": "Optional. State of the orchestrator. Can be updated to change orchestrator behaviour.\nAllowed values:\n- 'ACTIVE' - orchestrator is actively looking for actions to be taken.\n- 'STOPPED' - orchestrator won't make any changes.\n\nNote: There might be more states added in the future. We use string here\ninstead of an enum, to avoid the need of propagating new states to all the\nclient code.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Allows administrators to control the operational state of the orchestrator, enhancing security management."
+    },
+    "orchestrated_resource": {
+      "type": "block",
+      "description": "Represents a resource that is being orchestrated by the policy orchestrator.",
+      "required": true
+    },
+    "orchestrated_resource.id": {
+      "description": "Optional. ID of the resource to be used while generating set of affected resources.\n\nFor UPSERT action the value is auto-generated during PolicyOrchestrator\ncreation when not set. When the value is set it should following next\nrestrictions:\n\n* Must contain only lowercase letters, numbers, and hyphens.\n* Must start with a letter.\n* Must be between 1-63 characters.\n* Must end with a number or a letter.\n* Must be unique within the project.\n\nFor DELETE action, ID must be specified explicitly during\nPolicyOrchestrator creation.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload": {
+      "type": "block",
+      "description": "OS policy assignment is an API resource that is used to\napply a set of OS policies to a dynamically targeted group of Compute Engine\nVM instances.\n\nAn OS policy is used to define the desired state configuration for a\nCompute Engine VM instance through a set of configuration resources that\nprovide capabilities such as installing or removing software packages, or\nexecuting a script.\n\nFor more information about the OS policy resource definitions and examples,\nsee\n[OS policy and OS policy\nassignment](https://cloud.google.com/compute/docs/os-configuration-management/working-with-os-policies).",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.description": {
+      "description": "OS policy assignment description.\nLength of the description is limited to 1024 characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.etag": {
+      "description": "The etag for this OS policy assignment.\nIf this is provided on update, it must match the server's etag.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.name": {
+      "description": "Resource name.\n\nFormat:\n'projects/{project_number}/locations/{location}/osPolicyAssignments/{os_policy_assignment_id}'\n\nThis field is ignored when you create an OS policy assignment.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.instance_filter": {
+      "type": "block",
+      "description": "Filters to select target VMs for an assignment.\n\nIf more than one filter criteria is specified below, a VM will be selected\nif and only if it satisfies all of them.",
+      "required": true
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.instance_filter.all": {
+      "description": "Target all VMs in the project. If true, no other criteria is\npermitted.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Ensures that all VMs are considered for policy application, preventing accidental exclusions."
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.instance_filter.exclusion_labels": {
+      "type": "block",
+      "description": "List of label sets used for VM exclusion.\n\nIf the list has more than one label set, the VM is excluded if any\nof the label sets are applicable for the VM.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.instance_filter.exclusion_labels.labels": {
+      "description": "Labels are identified by key/value pairs in this map.\nA VM should contain all the key/value pairs specified in this\nmap to be selected.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.instance_filter.inclusion_labels": {
+      "type": "block",
+      "description": "List of label sets used for VM inclusion.\n\nIf the list has more than one 'LabelSet', the VM is included if any\nof the label sets are applicable for the VM.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.instance_filter.inclusion_labels.labels": {
+      "description": "Labels are identified by key/value pairs in this map.\nA VM should contain all the key/value pairs specified in this\nmap to be selected.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.instance_filter.inventories": {
+      "type": "block",
+      "description": "List of inventories to select VMs.\n\nA VM is selected if its inventory data matches at least one of the\nfollowing inventories.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.instance_filter.inventories.os_short_name": {
+      "description": "Required. The OS short name",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.instance_filter.inventories.os_version": {
+      "description": "The OS version\n\nPrefix matches are supported if asterisk(*) is provided as the\nlast character. For example, to match all versions with a major\nversion of '7', specify the following value for this field '7.*'\n\nAn empty string matches all OS versions.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies": {
+      "type": "block",
+      "description": "Required. List of OS policies to be applied to the VMs.",
+      "required": true
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.allow_no_resource_group_match": {
+      "description": "This flag determines the OS policy compliance status when none of the\nresource groups within the policy are applicable for a VM. Set this value\nto 'true' if the policy needs to be reported as compliant even if the\npolicy has nothing to validate or enforce.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.description": {
+      "description": "Policy description.\nLength of the description is limited to 1024 characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.id": {
+      "description": "Required. The id of the OS policy with the following restrictions:\n\n* Must contain only lowercase letters, numbers, and hyphens.\n* Must start with a letter.\n* Must be between 1-63 characters.\n* Must end with a number or a letter.\n* Must be unique within the assignment.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.mode": {
+      "description": "Required. Policy mode\nPossible values:\nMODE_UNSPECIFIED\nVALIDATION\nENFORCEMENT",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Specifying the policy mode ensures that the correct enforcement actions are applied, reducing the risk of misconfiguration."
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups": {
+      "type": "block",
+      "description": "Required. List of resource groups for the policy.\nFor a particular VM, resource groups are evaluated in the order specified\nand the first resource group that is applicable is selected and the rest\nare ignored.\n\nIf none of the resource groups are applicable for a VM, the VM is\nconsidered to be non-compliant w.r.t this policy. This behavior can be\ntoggled by the flag 'allow_no_resource_group_match'",
+      "required": true
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.inventory_filters": {
+      "type": "block",
+      "description": "List of inventory filters for the resource group.\n\nThe resources in this resource group are applied to the target VM if it\nsatisfies at least one of the following inventory filters.\n\nFor example, to apply this resource group to VMs running either 'RHEL' or\n'CentOS' operating systems, specify 2 items for the list with following\nvalues:\ninventory_filters[0].os_short_name='rhel' and\ninventory_filters[1].os_short_name='centos'\n\nIf the list is empty, this resource group will be applied to the target\nVM unconditionally.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.inventory_filters.os_short_name": {
+      "description": "Required. The OS short name",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.inventory_filters.os_version": {
+      "description": "The OS version\n\nPrefix matches are supported if asterisk(*) is provided as the\nlast character. For example, to match all versions with a major\nversion of '7', specify the following value for this field '7.*'\n\nAn empty string matches all OS versions.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources": {
+      "type": "block",
+      "description": "Required. List of resources configured for this resource group.\nThe resources are executed in the exact order specified here.",
+      "required": true
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.id": {
+      "description": "Required. The id of the resource with the following restrictions:\n\n* Must contain only lowercase letters, numbers, and hyphens.\n* Must start with a letter.\n* Must be between 1-63 characters.\n* Must end with a number or a letter.\n* Must be unique within the OS policy.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec": {
+      "type": "block",
+      "description": "A resource that allows executing scripts on the VM.\n\nThe 'ExecResource' has 2 stages: 'validate' and 'enforce' and both stages\naccept a script as an argument to execute.\n\nWhen the 'ExecResource' is applied by the agent, it first executes the\nscript in the 'validate' stage. The 'validate' stage can signal that the\n'ExecResource' is already in the desired state by returning an exit code\nof '100'. If the 'ExecResource' is not in the desired state, it should\nreturn an exit code of '101'. Any other exit code returned by this stage\nis considered an error.\n\nIf the 'ExecResource' is not in the desired state based on the exit code\nfrom the 'validate' stage, the agent proceeds to execute the script from\nthe 'enforce' stage. If the 'ExecResource' is already in the desired\nstate, the 'enforce' stage will not be run.\nSimilar to 'validate' stage, the 'enforce' stage should return an exit\ncode of '100' to indicate that the resource in now in its desired state.\nAny other exit code is considered an error.\n\nNOTE: An exit code of '100' was chosen over '0' (and '101' vs '1') to\nhave an explicit indicator of 'in desired state', 'not in desired state'\nand errors. Because, for example, Powershell will always return an exit\ncode of '0' unless an 'exit' statement is provided in the script. So, for\nreasons of consistency and being explicit, exit codes '100' and '101'\nwere chosen.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.enforce": {
+      "type": "block",
+      "description": "A file or script to execute.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.enforce.args": {
+      "description": "Optional arguments to pass to the source during execution.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.enforce.interpreter": {
+      "description": "Required. The script interpreter to use.\nPossible values:\nINTERPRETER_UNSPECIFIED\nNONE\nSHELL\nPOWERSHELL",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.enforce.output_file_path": {
+      "description": "Only recorded for enforce Exec.\nPath to an output file (that is created by this Exec) whose\ncontent will be recorded in OSPolicyResourceCompliance after a\nsuccessful run. Absence or failure to read this file will result in\nthis ExecResource being non-compliant. Output file size is limited to\n500K bytes.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.enforce.script": {
+      "description": "An inline script.\nThe size of the script is limited to 32KiB.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.enforce.file": {
+      "type": "block",
+      "description": "A remote or local file.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.enforce.file.allow_insecure": {
+      "description": "Defaults to false. When false, files are subject to validations\nbased on the file type:\n\nRemote: A checksum must be specified.\nCloud Storage: An object generation number must be specified.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.enforce.file.local_path": {
+      "description": "A local path within the VM to use.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.enforce.file.gcs": {
+      "type": "block",
+      "description": "Specifies a file available as a Cloud Storage Object.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.enforce.file.gcs.bucket": {
+      "description": "Required. Bucket of the Cloud Storage object.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.enforce.file.gcs.generation": {
+      "description": "Generation number of the Cloud Storage object.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.enforce.file.gcs.object": {
+      "description": "Required. Name of the Cloud Storage object.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.enforce.file.remote": {
+      "type": "block",
+      "description": "Specifies a file available via some URI.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.enforce.file.remote.sha256_checksum": {
+      "description": "SHA256 checksum of the remote file.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.enforce.file.remote.uri": {
+      "description": "Required. URI from which to fetch the object. It should contain both the\nprotocol and path following the format '{protocol}://{location}'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.validate": {
+      "type": "block",
+      "description": "A file or script to execute.",
+      "required": true
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.validate.args": {
+      "description": "Optional arguments to pass to the source during execution.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.validate.interpreter": {
+      "description": "Required. The script interpreter to use.\nPossible values:\nINTERPRETER_UNSPECIFIED\nNONE\nSHELL\nPOWERSHELL",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.validate.output_file_path": {
+      "description": "Only recorded for enforce Exec.\nPath to an output file (that is created by this Exec) whose\ncontent will be recorded in OSPolicyResourceCompliance after a\nsuccessful run. Absence or failure to read this file will result in\nthis ExecResource being non-compliant. Output file size is limited to\n500K bytes.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.validate.script": {
+      "description": "An inline script.\nThe size of the script is limited to 32KiB.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.validate.file": {
+      "type": "block",
+      "description": "A remote or local file.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.validate.file.allow_insecure": {
+      "description": "Defaults to false. When false, files are subject to validations\nbased on the file type:\n\nRemote: A checksum must be specified.\nCloud Storage: An object generation number must be specified.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.validate.file.local_path": {
+      "description": "A local path within the VM to use.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.validate.file.gcs": {
+      "type": "block",
+      "description": "Specifies a file available as a Cloud Storage Object.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.validate.file.gcs.bucket": {
+      "description": "Required. Bucket of the Cloud Storage object.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.validate.file.gcs.generation": {
+      "description": "Generation number of the Cloud Storage object.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.validate.file.gcs.object": {
+      "description": "Required. Name of the Cloud Storage object.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.validate.file.remote": {
+      "type": "block",
+      "description": "Specifies a file available via some URI.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.validate.file.remote.sha256_checksum": {
+      "description": "SHA256 checksum of the remote file.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.validate.file.remote.uri": {
+      "description": "Required. URI from which to fetch the object. It should contain both the\nprotocol and path following the format '{protocol}://{location}'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.file": {
+      "type": "block",
+      "description": "A resource that manages the state of a file.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.file.content": {
+      "description": "A a file with this content.\nThe size of the content is limited to 32KiB.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.file.path": {
+      "description": "Required. The absolute path of the file within the VM.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.file.permissions": {
+      "description": "Consists of three octal digits which represent, in\norder, the permissions of the owner, group, and other users for the\nfile (similarly to the numeric mode used in the linux chmod\nutility). Each digit represents a three bit number with the 4 bit\ncorresponding to the read permissions, the 2 bit corresponds to the\nwrite bit, and the one bit corresponds to the execute permission.\nDefault behavior is 755.\n\nBelow are some examples of permissions and their associated values:\nread, write, and execute: 7\nread and execute: 5\nread and write: 6\nread only: 4",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.file.state": {
+      "description": "Required. Desired state of the file.\nPossible values:\nDESIRED_STATE_UNSPECIFIED\nPRESENT\nABSENT\nCONTENTS_MATCH",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.file.file": {
+      "type": "block",
+      "description": "A remote or local file.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.file.file.allow_insecure": {
+      "description": "Defaults to false. When false, files are subject to validations\nbased on the file type:\n\nRemote: A checksum must be specified.\nCloud Storage: An object generation number must be specified.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.file.file.local_path": {
+      "description": "A local path within the VM to use.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.file.file.gcs": {
+      "type": "block",
+      "description": "Specifies a file available as a Cloud Storage Object.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.file.file.gcs.bucket": {
+      "description": "Required. Bucket of the Cloud Storage object.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.file.file.gcs.generation": {
+      "description": "Generation number of the Cloud Storage object.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.file.file.gcs.object": {
+      "description": "Required. Name of the Cloud Storage object.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.file.file.remote": {
+      "type": "block",
+      "description": "Specifies a file available via some URI.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.file.file.remote.sha256_checksum": {
+      "description": "SHA256 checksum of the remote file.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.file.file.remote.uri": {
+      "description": "Required. URI from which to fetch the object. It should contain both the\nprotocol and path following the format '{protocol}://{location}'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg": {
+      "type": "block",
+      "description": "A resource that manages a system package.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.desired_state": {
+      "description": "Required. The desired state the agent should maintain for this package.\nPossible values:\nDESIRED_STATE_UNSPECIFIED\nINSTALLED\nREMOVED",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.apt": {
+      "type": "block",
+      "description": "A package managed by APT.\n- install: 'apt-get update && apt-get -y install [name]'\n- remove: 'apt-get -y remove [name]'",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.apt.name": {
+      "description": "Required. Package name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.deb": {
+      "type": "block",
+      "description": "A deb package file. dpkg packages only support INSTALLED state.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.deb.pull_deps": {
+      "description": "Whether dependencies should also be installed.\n- install when false: 'dpkg -i package'\n- install when true: 'apt-get update && apt-get -y install\npackage.deb'",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.deb.source": {
+      "type": "block",
+      "description": "A remote or local file.",
+      "required": true
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.deb.source.allow_insecure": {
+      "description": "Defaults to false. When false, files are subject to validations\nbased on the file type:\n\nRemote: A checksum must be specified.\nCloud Storage: An object generation number must be specified.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.deb.source.local_path": {
+      "description": "A local path within the VM to use.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.deb.source.gcs": {
+      "type": "block",
+      "description": "Specifies a file available as a Cloud Storage Object.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.deb.source.gcs.bucket": {
+      "description": "Required. Bucket of the Cloud Storage object.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.deb.source.gcs.generation": {
+      "description": "Generation number of the Cloud Storage object.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.deb.source.gcs.object": {
+      "description": "Required. Name of the Cloud Storage object.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.deb.source.remote": {
+      "type": "block",
+      "description": "Specifies a file available via some URI.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.deb.source.remote.sha256_checksum": {
+      "description": "SHA256 checksum of the remote file.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.deb.source.remote.uri": {
+      "description": "Required. URI from which to fetch the object. It should contain both the\nprotocol and path following the format '{protocol}://{location}'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.googet": {
+      "type": "block",
+      "description": "A package managed by GooGet.\n- install: 'googet -noconfirm install package'\n- remove: 'googet -noconfirm remove package'",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.googet.name": {
+      "description": "Required. Package name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.msi": {
+      "type": "block",
+      "description": "An MSI package. MSI packages only support INSTALLED state.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.msi.properties": {
+      "description": "Additional properties to use during installation.\nThis should be in the format of Property=Setting.\nAppended to the defaults of 'ACTION=INSTALL\nREBOOT=ReallySuppress'.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.msi.source": {
+      "type": "block",
+      "description": "A remote or local file.",
+      "required": true
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.msi.source.allow_insecure": {
+      "description": "Defaults to false. When false, files are subject to validations\nbased on the file type:\n\nRemote: A checksum must be specified.\nCloud Storage: An object generation number must be specified.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.msi.source.local_path": {
+      "description": "A local path within the VM to use.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.msi.source.gcs": {
+      "type": "block",
+      "description": "Specifies a file available as a Cloud Storage Object.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.msi.source.gcs.bucket": {
+      "description": "Required. Bucket of the Cloud Storage object.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.msi.source.gcs.generation": {
+      "description": "Generation number of the Cloud Storage object.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.msi.source.gcs.object": {
+      "description": "Required. Name of the Cloud Storage object.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.msi.source.remote": {
+      "type": "block",
+      "description": "Specifies a file available via some URI.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.msi.source.remote.sha256_checksum": {
+      "description": "SHA256 checksum of the remote file.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.msi.source.remote.uri": {
+      "description": "Required. URI from which to fetch the object. It should contain both the\nprotocol and path following the format '{protocol}://{location}'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.rpm": {
+      "type": "block",
+      "description": "An RPM package file. RPM packages only support INSTALLED state.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.rpm.pull_deps": {
+      "description": "Whether dependencies should also be installed.\n- install when false: 'rpm --upgrade --replacepkgs package.rpm'\n- install when true: 'yum -y install package.rpm' or\n'zypper -y install package.rpm'",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.rpm.source": {
+      "type": "block",
+      "description": "A remote or local file.",
+      "required": true
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.rpm.source.allow_insecure": {
+      "description": "Defaults to false. When false, files are subject to validations\nbased on the file type:\n\nRemote: A checksum must be specified.\nCloud Storage: An object generation number must be specified.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.rpm.source.local_path": {
+      "description": "A local path within the VM to use.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.rpm.source.gcs": {
+      "type": "block",
+      "description": "Specifies a file available as a Cloud Storage Object.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.rpm.source.gcs.bucket": {
+      "description": "Required. Bucket of the Cloud Storage object.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.rpm.source.gcs.generation": {
+      "description": "Generation number of the Cloud Storage object.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.rpm.source.gcs.object": {
+      "description": "Required. Name of the Cloud Storage object.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.rpm.source.remote": {
+      "type": "block",
+      "description": "Specifies a file available via some URI.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.rpm.source.remote.sha256_checksum": {
+      "description": "SHA256 checksum of the remote file.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.rpm.source.remote.uri": {
+      "description": "Required. URI from which to fetch the object. It should contain both the\nprotocol and path following the format '{protocol}://{location}'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.yum": {
+      "type": "block",
+      "description": "A package managed by YUM.\n- install: 'yum -y install package'\n- remove: 'yum -y remove package'",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.yum.name": {
+      "description": "Required. Package name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.zypper": {
+      "type": "block",
+      "description": "A package managed by Zypper.\n- install: 'zypper -y install package'\n- remove: 'zypper -y rm package'",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.zypper.name": {
+      "description": "Required. Package name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository": {
+      "type": "block",
+      "description": "A resource that manages a package repository.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.apt": {
+      "type": "block",
+      "description": "Represents a single apt package repository. These will be added to\na repo file that will be managed at\n'/etc/apt/sources.list.d/google_osconfig.list'.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.apt.archive_type": {
+      "description": "Required. Type of archive files in this repository.\nPossible values:\nARCHIVE_TYPE_UNSPECIFIED\nDEB\nDEB_SRC",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Specifies the APT archive type (e.g. deb vs deb-src) for a repository entry. It is a functional package-source format setting that must match the repository, not an access/encryption/exposure control, so it is not a security policy target."
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.apt.components": {
+      "description": "Required. List of components for this repository. Must contain at least one\nitem.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.apt.distribution": {
+      "description": "Required. Distribution of this repository.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.apt.gpg_key": {
+      "description": "URI of the key file for this repository. The agent maintains a\nkeyring at '/etc/apt/trusted.gpg.d/osconfig_agent_managed.gpg'.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.apt.uri": {
+      "description": "Required. URI for this repository.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.goo": {
+      "type": "block",
+      "description": "Represents a Goo package repository. These are added to a repo file\nthat is managed at\n'C:/ProgramData/GooGet/repos/google_osconfig.repo'.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.goo.name": {
+      "description": "Required. The name of the repository.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.goo.url": {
+      "description": "Required. The url of the repository.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.yum": {
+      "type": "block",
+      "description": "Represents a single yum package repository. These are added to a\nrepo file that is managed at\n'/etc/yum.repos.d/google_osconfig.repo'.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.yum.base_url": {
+      "description": "Required. The location of the repository directory.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.yum.display_name": {
+      "description": "The display name of the repository.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.yum.gpg_keys": {
+      "description": "URIs of GPG keys.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.yum.id": {
+      "description": "Required. A one word, unique name for this repository. This is  the 'repo\nid' in the yum config file and also the 'display_name' if\n'display_name' is omitted. This id is also used as the unique\nidentifier when checking for resource conflicts.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.zypper": {
+      "type": "block",
+      "description": "Represents a single zypper package repository. These are added to a\nrepo file that is managed at\n'/etc/zypp/repos.d/google_osconfig.repo'.",
+      "required": false
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.zypper.base_url": {
+      "description": "Required. The location of the repository directory.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.zypper.display_name": {
+      "description": "The display name of the repository.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.zypper.gpg_keys": {
+      "description": "URIs of GPG keys.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.zypper.id": {
+      "description": "Required. A one word, unique name for this repository. This is the 'repo\nid' in the zypper config file and also the 'display_name' if\n'display_name' is omitted. This id is also used as the unique\nidentifier when checking for GuestPolicy conflicts.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.rollout": {
+      "type": "block",
+      "description": "Message to configure the rollout at the zonal level for the OS policy\nassignment.",
+      "required": true
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.rollout.min_wait_duration": {
+      "description": "Required. This determines the minimum duration of time to wait after the\nconfiguration changes are applied through the current rollout. A\nVM continues to count towards the 'disruption_budget' at least\nuntil this duration of time has passed after configuration changes are\napplied.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.rollout.disruption_budget": {
+      "type": "block",
+      "description": "Message encapsulating a value that can be either absolute (\"fixed\") or\nrelative (\"percent\") to a value.",
+      "required": true
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.rollout.disruption_budget.fixed": {
+      "description": "Specifies a fixed value.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestrated_resource.os_policy_assignment_v1_payload.rollout.disruption_budget.percent": {
+      "description": "Specifies the relative value defined as a percentage, which will be\nmultiplied by a reference value.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestration_scope": {
+      "type": "block",
+      "description": "Defines a set of selectors which drive which resources are in scope of policy\norchestration.",
+      "required": false
+    },
+    "orchestration_scope.selectors": {
+      "type": "block",
+      "description": "Optional. Selectors of the orchestration scope. There is a logical AND between each\nselector defined.\n\nWhen there is no explicit 'ResourceHierarchySelector' selector specified,\nthe scope is by default bounded to the parent of the policy orchestrator\nresource.",
+      "required": false
+    },
+    "orchestration_scope.selectors.location_selector": {
+      "type": "block",
+      "description": "Selector containing locations in scope.",
+      "required": false
+    },
+    "orchestration_scope.selectors.location_selector.included_locations": {
+      "description": "Optional. Names of the locations in scope.\nFormat: 'us-central1-a'",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestration_scope.selectors.resource_hierarchy_selector": {
+      "type": "block",
+      "description": "Selector containing Cloud Resource Manager resource hierarchy nodes.",
+      "required": false
+    },
+    "orchestration_scope.selectors.resource_hierarchy_selector.included_folders": {
+      "description": "Optional. Names of the folders in scope.\nFormat: 'folders/{folder_id}'",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "orchestration_scope.selectors.resource_hierarchy_selector.included_projects": {
+      "description": "Optional. Names of the projects in scope.\nFormat: 'projects/{project_number}'",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

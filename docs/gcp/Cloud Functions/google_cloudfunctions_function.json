@@ -1,0 +1,333 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "available_memory_mb": {
+      "description": "Memory (in MB), available to the function. Default value is 256. Possible values include 128, 256, 512, 1024, etc.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Sets the memory allocated to the function. This is a capacity/performance choice, not a security control, and no generic secure value can be enforced."
+    },
+    "build_environment_variables": {
+      "description": " A set of key/value environment variable pairs available during build time.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "if environment vaiablea are not being used, there is no reason to build the environment variables"
+    },
+    "build_service_account": {
+      "description": "The fully-qualified name of the service account to be used for the build step of deploying this function",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "A provided email to build the service account has no impact on the security of the resource or the data contained"
+    },
+    "build_worker_pool": {
+      "description": "Name of the Cloud Build Custom Worker Pool that should be used to build the function.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Naming the cloud build custom worker pool has no impact on the security of the resource or the data contained"
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "Description of the function.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Description has no impact on the security of the resource or data contained."
+    },
+    "docker_registry": {
+      "description": "Docker Registry to use for storing the function's Docker images. Allowed values are ARTIFACT_REGISTRY (default) and CONTAINER_REGISTRY.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Selects the registry (Artifact Registry vs the deprecated Container Registry) used to store the function image. A policy should require Artifact Registry, which supports CMEK and modern controls, avoiding the deprecated registry."
+    },
+    "docker_repository": {
+      "description": "User managed repository created in Artifact Registry optionally with a customer managed encryption key. If specified, deployments will use Artifact Registry for storing images built with Cloud Build.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier of a user-managed Artifact Registry repository used to store built images. This is a reference to another resource; we do not constrain which repository it points at."
+    },
+    "entry_point": {
+      "description": "Name of the function that will be executed when the Google Cloud Function is triggered.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "entry_point name has no impact on the security of the resource or the data contained"
+    },
+    "environment_variables": {
+      "description": "A set of key/value environment variable pairs to assign to the function.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Free-form runtime environment variable key/value pairs. A generic platform policy cannot meaningfully constrain arbitrary application-defined values, so it is not a policy target (secrets belong in Secret Manager)."
+    },
+    "https_trigger_security_level": {
+      "description": "The security level for the function. Defaults to SECURE_OPTIONAL. Valid only if trigger_http is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Controls whether the HTTPS trigger requires HTTPS (SECURE_ALWAYS) or allows plain HTTP (SECURE_OPTIONAL). A policy should require SECURE_ALWAYS so the function endpoint is only reachable over TLS — a secure-protocol-minimum control."
+    },
+    "https_trigger_url": {
+      "description": "URL which triggers function execution. Returned only if trigger_http is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "ingress_settings": {
+      "description": "String value that controls what traffic can reach the function. Allowed values are ALLOW_ALL and ALLOW_INTERNAL_ONLY. Changes to this field will recreate the cloud function.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "allowing internal traffic prevents untrusted access to the GCP environment"
+    },
+    "kms_key_name": {
+      "description": "Resource name of a KMS crypto key (managed by the user) used to encrypt/decrypt function resources.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Sets the customer-managed KMS key used to encrypt the function's resources. A policy should require it to be non-empty so function code/data is always CMEK-encrypted; it must not pin a specific key, as keys are team/project-specific."
+    },
+    "labels": {
+      "description": "A set of key/value label pairs to assign to the function. Label keys must follow the requirements at https://docs.cloud.google.com/resource-manager/docs/creating-managing-labels#requirements.\n\n\t\t\t\t**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\n\t\t\t\tPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "labels has no impact on the security of the resource or the data contained"
+    },
+    "max_instances": {
+      "description": "The limit on the maximum number of function instances that may coexist at a given time.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Caps the maximum number of concurrent function instances. This is a capacity/cost-control knob; the value is entirely workload-specific and no generic secure value can be enforced, so it is not a policy target."
+    },
+    "min_instances": {
+      "description": "The limit on the minimum number of function instances that may coexist at a given time.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "A minimum number of instances has no impact on the security of the resource or the data contained only maximum"
+    },
+    "name": {
+      "description": "A user-defined name of the function. Function names must be unique globally.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Name has no impact on the security of the resource or data contained."
+    },
+    "project": {
+      "description": "Project of the function. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "region": {
+      "description": "Region of function. If it is not provided, the provider region is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "runtime": {
+      "description": "The runtime in which the function is going to run. Eg. \"nodejs20\", \"python37\", \"go111\".",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Selects the language runtime the function executes on. A policy should whitelist currently-supported (non-deprecated, patched) runtimes so functions are not running on an end-of-life runtime with known vulnerabilities."
+    },
+    "service_account_email": {
+      "description": " If provided, the self-provided service account to run the function with.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Specifies the runtime identity (service account email) the function runs as. This is a reference to a team-chosen identity; a platform policy cannot pin a specific service account, so it is not a generic policy target (IAM on that account is the control)."
+    },
+    "source_archive_bucket": {
+      "description": "The GCS bucket containing the zip archive which contains the function.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The bucket containing the zip archive has no impact on the security of the resource or the data contained"
+    },
+    "source_archive_object": {
+      "description": "The source archive object (file) in archive bucket.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The source achive file has no impact on the security of the resource or the data contained"
+    },
+    "timeout": {
+      "description": "Timeout (in seconds) for the function. Default value is 60 seconds. Cannot be more than 540 seconds.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Sets the maximum execution time of the function. This is a reliability/cost tuning knob; the appropriate value is workload-specific and no generic secure value can be enforced."
+    },
+    "trigger_http": {
+      "description": "Boolean variable. Any HTTP request (of a supported type) to the endpoint will trigger function execution. Supported HTTP request types are: POST, PUT, GET, DELETE, and OPTIONS. Endpoint is returned as https_trigger_url. Cannot be used with trigger_bucket and trigger_topic.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "HTTP triggers only focus on how the function is invoked, and therefore have no impact on the resource security or the data contained"
+    },
+    "vpc_connector": {
+      "description": "The VPC Network Connector that this cloud function can connect to. It can be either the fully-qualified URI, or the short name of the network connector resource. The format of this field is projects/*/locations/*/connectors/*.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The VPC connector has no impact on the security of the resource or the data contained"
+    },
+    "vpc_connector_egress_settings": {
+      "description": "The egress settings for the connector, controlling what traffic is diverted through it. Allowed values are ALL_TRAFFIC and PRIVATE_RANGES_ONLY. Defaults to PRIVATE_RANGES_ONLY. If unset, this field preserves the previously set value.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Controls which egress traffic is routed through the VPC connector (ALL_TRAFFIC vs PRIVATE_RANGES_ONLY). A policy should restrict egress so traffic flows through controlled private routing, reducing exposure of outbound connections."
+    },
+    "automatic_update_policy": {
+      "type": "block",
+      "description": "Security patches are applied automatically to the runtime without requiring the function to be redeployed.",
+      "required": false
+    },
+    "event_trigger": {
+      "type": "block",
+      "description": "A source that fires events in response to a condition in another service. Cannot be used with trigger_http.",
+      "required": false
+    },
+    "event_trigger.event_type": {
+      "description": "The type of event to observe. For example: \"google.storage.object.finalize\". See the documentation on calling Cloud Functions for a full reference of accepted triggers.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Specifies which event (e.g. a Pub/Sub or Storage event) triggers the function. This is an integration/invocation choice, not a security control, and no generic secure value can be enforced."
+    },
+    "event_trigger.resource": {
+      "description": "The name or partial URI of the resource from which to observe events. For example, \"myBucket\" or \"projects/my-project/topics/my-topic\"",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Only identifies the resource of the event and does not modify anything regarding the resource security or the data"
+    },
+    "event_trigger.failure_policy": {
+      "type": "block",
+      "description": "Specifies policy for failed executions",
+      "required": false
+    },
+    "event_trigger.failure_policy.retry": {
+      "description": "Whether the function should be retried on failure. Defaults to false.",
+      "required": true,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "Controls whether a background-triggered function is retried on failure. This is a reliability/delivery-semantics choice, not a security control."
+    },
+    "on_deploy_update_policy": {
+      "type": "block",
+      "description": "Security patches are only applied when a function is redeployed.",
+      "required": false
+    },
+    "secret_environment_variables": {
+      "type": "block",
+      "description": "Secret environment variables configuration",
+      "required": false
+    },
+    "secret_environment_variables.key": {
+      "description": "Name of the environment variable.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": " Name of the environment variable has no impact on the security of the resource or the data contained."
+    },
+    "secret_environment_variables.project_id": {
+      "description": "Project identifier (due to a known limitation, only project number is supported by this field) of the project that contains the secret. If not set, it will be populated with the function's project, assuming that the secret exists in the same project as of the function.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": " A project ID has no impact on the security of the resource or the data contained."
+    },
+    "secret_environment_variables.secret": {
+      "description": "ID of the secret in secret manager (not the full resource name).",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "An ID of a secret has no impact on the security of the resource or the data contained."
+    },
+    "secret_environment_variables.version": {
+      "description": "Version of the secret (version number or the string \"latest\"). It is recommended to use a numeric version for secret environment variables as any updates to the secret value is not reflected until new clones start.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Secret environment variables are not implemented and therefroe the version of the secret has no impact on the security of the resource or the data contained."
+    },
+    "secret_volumes": {
+      "type": "block",
+      "description": "Secret volumes configuration.",
+      "required": false
+    },
+    "secret_volumes.mount_path": {
+      "description": "The path within the container to mount the secret volume. For example, setting the mount_path as \"/etc/secrets\" would mount the secret value files under the \"/etc/secrets\" directory. This directory will also be completely shadowed and unavailable to mount any other secrets. Recommended mount paths: \"/etc/secrets\" Restricted mount paths: \"/cloudsql\", \"/dev/log\", \"/pod\", \"/proc\", \"/var/log\".",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Secret volumes are not configured and therefore mount paths have no impact on the security of the resource or the data contained."
+    },
+    "secret_volumes.project_id": {
+      "description": "Project identifier (due to a known limitation, only project number is supported by this field) of the project that contains the secret. If not set, it will be populated with the function's project, assuming that the secret exists in the same project as of the function.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Secret volumes are not configured and therefore project ID have no impact on the security of the resource or the data contained."
+    },
+    "secret_volumes.secret": {
+      "description": "ID of the secret in secret manager (not the full resource name).",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Secret volumes are not configured and therefore secrets have no impact on the security of the resource or the data contained."
+    },
+    "secret_volumes.versions": {
+      "type": "block",
+      "description": "List of secret versions to mount for this secret. If empty, the \"latest\" version of the secret will be made available in a file named after the secret under the mount point.",
+      "required": false
+    },
+    "secret_volumes.versions.path": {
+      "description": "Relative path of the file under the mount path where the secret value for this version will be fetched and made available. For example, setting the mount_path as \"/etc/secrets\" and path as \"/secret_foo\" would mount the secret value file at \"/etc/secrets/secret_foo\".",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "descriptions of secret versions have no impact on the security of the resource or the data contained."
+    },
+    "secret_volumes.versions.version": {
+      "description": "Version of the secret (version number or the string \"latest\"). It is preferable to use \"latest\" version with secret volumes as secret value changes are reflected immediately.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_repository": {
+      "type": "block",
+      "description": "Represents parameters related to source repository where a function is hosted. Cannot be set alongside source_archive_bucket or source_archive_object.",
+      "required": false
+    },
+    "source_repository.url": {
+      "description": "The URL pointing to the hosted repository where the function is defined.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The URL points to user defined repositories, projects and revisions, the security of source repository will relate back to the region it resides in"
+    }
+  }
+}

@@ -97,14 +97,20 @@ dmypy.json
 .terraform/
 .tfshared/
 
+# Project-local provider cache (filesystem mirror + cli.tfrc + canonical lock)
+# Built by scripts/auto_test/cache_setup.sh; never committed, never global.
+/.terraform-cache/
+
 # State files
 *.tfstate
 *.tfstate.*
 *.tfstate.backup
 .tfshared/
 
-# Lock files (uncomment if you don't want to track lock files)
-# .terraform.lock.hcl
+# Lock files — not tracked; regenerated locally from the project-local mirror
+# (see scripts/auto_test/cache_setup.sh + unify_provider_versions.py).
+**/.terraform.lock.hcl
+.terraform.lock.hcl
 
 # Crash log files
 crash.log
@@ -145,6 +151,9 @@ terraform.rc
 # ============================================================================
 # Project Specific
 # ============================================================================
-# docgen_v2 generated artifacts
+# docgen generated artifacts
 docs/gcp/_history/
 docs/gcp/_changes/
+
+# folder_generator local user state (per-user UI selection, never committed)
+scripts/folder_generator/cache/

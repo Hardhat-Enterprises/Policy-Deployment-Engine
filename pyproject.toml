@@ -1,37 +1,27 @@
+# This project is NOT an installable package. Run the tools directly, e.g.
+#   python scripts/docgen/generator.py ...
+#   python scripts/linters/linter.py ...
+# This file exists only to record dependencies and configure pytest/coverage.
 [project]
 name = "policy-deployment-engine"
 version = "0.1.0"
 requires-python = ">=3.11"
-dependencies = [
-    "pydantic>=2.12.4",
-]
-
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
-
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["scripts*"]
-exclude = ["tests*", "inputs*", "policies*", "docs*"]
-
-[project.scripts]
-lint = "scripts.linters.linter:main"
-aws_doc_gen = "scripts.docgen.aws_doc_gen:main"
+# The docgen/linter/auto_test tools run on the standard library alone (auto_test
+# also shells out to the `terraform` and `opa` binaries). The folder_generator GUI
+# needs customtkinter — see scripts/folder_generator/requirements.txt.
+dependencies = []
 
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0.0",
     "pytest-cov>=4.1.0",
-    "jsonschema>=4.0.0",
-]
-docgen = [
-    "pyyaml>=6.0.0",
-    "pydantic>=2.0.0",
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+# Tests live next to the tool they cover, in a `_tests/` dir
+# (e.g. scripts/docgen/_tests/). importlib mode keeps same-named test
+# files across different tools from colliding.
+testpaths = ["scripts"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
@@ -39,6 +29,7 @@ addopts = [
     "-v",
     "--strict-markers",
     "--tb=short",
+    "--import-mode=importlib",
 ]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
@@ -48,7 +39,7 @@ markers = [
 [tool.coverage.run]
 source = ["scripts"]
 omit = [
-    "tests/*",
+    "*/_tests/*",
     "*/test_*.py",
     "*/__pycache__/*",
     ".venv/*",
@@ -63,9 +54,4 @@ exclude_lines = [
     "raise NotImplementedError",
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
-]
-
-[dependency-groups]
-dev = [
-    "jsonschema>=4.25.1",
 ]

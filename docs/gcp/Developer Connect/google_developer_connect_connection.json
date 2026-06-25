@@ -1,0 +1,429 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "annotations": {
+      "description": "Optional. Allows clients to store small amounts of arbitrary data.\n\n**Note**: This field is non-authoritative, and will only manage the annotations present in your configuration.\nPlease refer to the field 'effective_annotations' for all of the annotations present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "connection_id": {
+      "description": "Required. Id of the requesting object\nIf auto-generating Id server-side, remove this field and\nconnection_id from the method_signature of Create RPC",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "disabled": {
+      "description": "Optional. If disabled is set to true, functionality is disabled for this connection.\nRepository based API methods and webhooks processing for repositories in\nthis connection will be disabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "etag": {
+      "description": "Optional. This checksum is computed by the server based on the value of other\nfields, and may be sent on update and delete requests to ensure the\nclient has an up-to-date value before proceeding.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "Optional. Labels as key value pairs\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "bitbucket_cloud_config": {
+      "type": "block",
+      "description": "Configuration for connections to an instance of Bitbucket Cloud.",
+      "required": false
+    },
+    "bitbucket_cloud_config.webhook_secret_secret_version": {
+      "description": "Required. Immutable. SecretManager resource containing the webhook secret used to verify webhook\nevents, formatted as 'projects/*/secrets/*/versions/*'. This is used to\nvalidate and create webhooks.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "bitbucket_cloud_config.workspace": {
+      "description": "Required. The Bitbucket Cloud Workspace ID to be connected to Google Cloud Platform.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "bitbucket_cloud_config.authorizer_credential": {
+      "type": "block",
+      "description": "Represents a personal access token that authorized the Connection,\nand associated metadata.",
+      "required": true
+    },
+    "bitbucket_cloud_config.authorizer_credential.user_token_secret_version": {
+      "description": "Required. A SecretManager resource containing the user token that authorizes\nthe Developer Connect connection. Format:\n'projects/*/secrets/*/versions/*'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "bitbucket_cloud_config.read_authorizer_credential": {
+      "type": "block",
+      "description": "Represents a personal access token that authorized the Connection,\nand associated metadata.",
+      "required": true
+    },
+    "bitbucket_cloud_config.read_authorizer_credential.user_token_secret_version": {
+      "description": "Required. A SecretManager resource containing the user token that authorizes\nthe Developer Connect connection. Format:\n'projects/*/secrets/*/versions/*'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "bitbucket_data_center_config": {
+      "type": "block",
+      "description": "Configuration for connections to an instance of Bitbucket Data Center.",
+      "required": false
+    },
+    "bitbucket_data_center_config.host_uri": {
+      "description": "Required. The URI of the Bitbucket Data Center host this connection is for.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "bitbucket_data_center_config.ssl_ca_certificate": {
+      "description": "Optional. SSL certificate authority to trust when making requests to Bitbucket Data\nCenter.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "bitbucket_data_center_config.webhook_secret_secret_version": {
+      "description": "Required. Immutable. SecretManager resource containing the webhook secret used to verify webhook\nevents, formatted as 'projects/*/secrets/*/versions/*'. This is used to\nvalidate webhooks.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "bitbucket_data_center_config.authorizer_credential": {
+      "type": "block",
+      "description": "Represents a personal access token that authorized the Connection,\nand associated metadata.",
+      "required": true
+    },
+    "bitbucket_data_center_config.authorizer_credential.user_token_secret_version": {
+      "description": "Required. A SecretManager resource containing the user token that authorizes\nthe Developer Connect connection. Format:\n'projects/*/secrets/*/versions/*'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "bitbucket_data_center_config.read_authorizer_credential": {
+      "type": "block",
+      "description": "Represents a personal access token that authorized the Connection,\nand associated metadata.",
+      "required": true
+    },
+    "bitbucket_data_center_config.read_authorizer_credential.user_token_secret_version": {
+      "description": "Required. A SecretManager resource containing the user token that authorizes\nthe Developer Connect connection. Format:\n'projects/*/secrets/*/versions/*'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "bitbucket_data_center_config.service_directory_config": {
+      "type": "block",
+      "description": "ServiceDirectoryConfig represents Service Directory configuration for a\nconnection.",
+      "required": false
+    },
+    "bitbucket_data_center_config.service_directory_config.service": {
+      "description": "Required. The Service Directory service name.\nFormat:\nprojects/{project}/locations/{location}/namespaces/{namespace}/services/{service}.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "crypto_key_config": {
+      "type": "block",
+      "description": "The crypto key configuration. This field is used by the Customer-managed\nencryption keys (CMEK) feature.",
+      "required": false
+    },
+    "crypto_key_config.key_reference": {
+      "description": "Required. The name of the key which is used to encrypt/decrypt customer data. For key\nin Cloud KMS, the key should be in the format of\n'projects/*/locations/*/keyRings/*/cryptoKeys/*'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "github_config": {
+      "type": "block",
+      "description": "Configuration for connections to github.com.",
+      "required": false
+    },
+    "github_config.app_installation_id": {
+      "description": "Optional. GitHub App installation id.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "github_config.github_app": {
+      "description": "Required. Immutable. The GitHub Application that was installed to the GitHub user or\norganization.\nPossible values:\nGIT_HUB_APP_UNSPECIFIED\nDEVELOPER_CONNECT\nFIREBASE",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "github_config.authorizer_credential": {
+      "type": "block",
+      "description": "Represents an OAuth token of the account that authorized the Connection,\nand associated metadata.",
+      "required": false
+    },
+    "github_config.authorizer_credential.oauth_token_secret_version": {
+      "description": "Required. A SecretManager resource containing the OAuth token that authorizes\nthe connection. Format: 'projects/*/secrets/*/versions/*'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "github_enterprise_config": {
+      "type": "block",
+      "description": "Configuration for connections to an instance of GitHub Enterprise.",
+      "required": false
+    },
+    "github_enterprise_config.app_id": {
+      "description": "Optional. ID of the GitHub App created from the manifest.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "github_enterprise_config.app_installation_id": {
+      "description": "Optional. ID of the installation of the GitHub App.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "github_enterprise_config.host_uri": {
+      "description": "Required. The URI of the GitHub Enterprise host this connection is for.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "github_enterprise_config.private_key_secret_version": {
+      "description": "Optional. SecretManager resource containing the private key of the GitHub App,\nformatted as 'projects/*/secrets/*/versions/*'.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "github_enterprise_config.ssl_ca_certificate": {
+      "description": "Optional. SSL certificate to use for requests to GitHub Enterprise.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "github_enterprise_config.webhook_secret_secret_version": {
+      "description": "Optional. SecretManager resource containing the webhook secret of the GitHub App,\nformatted as 'projects/*/secrets/*/versions/*'.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "github_enterprise_config.service_directory_config": {
+      "type": "block",
+      "description": "ServiceDirectoryConfig represents Service Directory configuration for a\nconnection.",
+      "required": false
+    },
+    "github_enterprise_config.service_directory_config.service": {
+      "description": "Required. The Service Directory service name.\nFormat:\nprojects/{project}/locations/{location}/namespaces/{namespace}/services/{service}.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "gitlab_config": {
+      "type": "block",
+      "description": "Configuration for connections to gitlab.com.",
+      "required": false
+    },
+    "gitlab_config.webhook_secret_secret_version": {
+      "description": "Required. Immutable. SecretManager resource containing the webhook secret of a GitLab project,\nformatted as 'projects/*/secrets/*/versions/*'. This is used to validate\nwebhooks.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "gitlab_config.authorizer_credential": {
+      "type": "block",
+      "description": "Represents a personal access token that authorized the Connection,\nand associated metadata.",
+      "required": true
+    },
+    "gitlab_config.authorizer_credential.user_token_secret_version": {
+      "description": "Required. A SecretManager resource containing the user token that authorizes\nthe Developer Connect connection. Format:\n'projects/*/secrets/*/versions/*'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "gitlab_config.read_authorizer_credential": {
+      "type": "block",
+      "description": "Represents a personal access token that authorized the Connection,\nand associated metadata.",
+      "required": true
+    },
+    "gitlab_config.read_authorizer_credential.user_token_secret_version": {
+      "description": "Required. A SecretManager resource containing the user token that authorizes\nthe Developer Connect connection. Format:\n'projects/*/secrets/*/versions/*'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "gitlab_enterprise_config": {
+      "type": "block",
+      "description": "Configuration for connections to an instance of GitLab Enterprise.",
+      "required": false
+    },
+    "gitlab_enterprise_config.host_uri": {
+      "description": "Required. The URI of the GitLab Enterprise host this connection is for.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "gitlab_enterprise_config.ssl_ca_certificate": {
+      "description": "Optional. SSL Certificate Authority certificate to use for requests to GitLab\nEnterprise instance.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "gitlab_enterprise_config.webhook_secret_secret_version": {
+      "description": "Required. Immutable. SecretManager resource containing the webhook secret of a GitLab project,\nformatted as 'projects/*/secrets/*/versions/*'. This is used to validate\nwebhooks.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "gitlab_enterprise_config.authorizer_credential": {
+      "type": "block",
+      "description": "Represents a personal access token that authorized the Connection,\nand associated metadata.",
+      "required": true
+    },
+    "gitlab_enterprise_config.authorizer_credential.user_token_secret_version": {
+      "description": "Required. A SecretManager resource containing the user token that authorizes\nthe Developer Connect connection. Format:\n'projects/*/secrets/*/versions/*'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "gitlab_enterprise_config.read_authorizer_credential": {
+      "type": "block",
+      "description": "Represents a personal access token that authorized the Connection,\nand associated metadata.",
+      "required": true
+    },
+    "gitlab_enterprise_config.read_authorizer_credential.user_token_secret_version": {
+      "description": "Required. A SecretManager resource containing the user token that authorizes\nthe Developer Connect connection. Format:\n'projects/*/secrets/*/versions/*'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "gitlab_enterprise_config.service_directory_config": {
+      "type": "block",
+      "description": "ServiceDirectoryConfig represents Service Directory configuration for a\nconnection.",
+      "required": false
+    },
+    "gitlab_enterprise_config.service_directory_config.service": {
+      "description": "Required. The Service Directory service name.\nFormat:\nprojects/{project}/locations/{location}/namespaces/{namespace}/services/{service}.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_config": {
+      "type": "block",
+      "description": "Configuration for connections to an HTTP service provider.",
+      "required": false
+    },
+    "http_config.host_uri": {
+      "description": "The service provider's https endpoint.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_config.ssl_ca_certificate": {
+      "description": "The SSL certificate to use for requests to the HTTP service provider.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_config.basic_authentication": {
+      "type": "block",
+      "description": "Basic authentication with username and password.",
+      "required": false
+    },
+    "http_config.basic_authentication.password_secret_version": {
+      "description": "The password SecretManager secret version to authenticate as.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_config.basic_authentication.username": {
+      "description": "The username to authenticate as.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_config.bearer_token_authentication": {
+      "type": "block",
+      "description": "Bearer token authentication with a token.",
+      "required": false
+    },
+    "http_config.bearer_token_authentication.token_secret_version": {
+      "description": "The token SecretManager secret version to authenticate as.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_config.service_directory_config": {
+      "type": "block",
+      "description": "ServiceDirectoryConfig represents Service Directory configuration for a\nconnection.",
+      "required": false
+    },
+    "http_config.service_directory_config.service": {
+      "description": "The Service Directory service name.\nFormat:\nprojects/{project}/locations/{location}/namespaces/{namespace}/services/{service}.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

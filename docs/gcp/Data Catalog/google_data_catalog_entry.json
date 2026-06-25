@@ -1,0 +1,88 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "Entry description, which can consist of several sentences or paragraphs that describe entry contents.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is only descriptive metadata and does not control access to the resource or data."
+    },
+    "display_name": {
+      "description": "Display information such as title and description. A short name to identify the entry,\nfor example, \"Analytics Data - Jan 2011\".",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is only a human-readable display name and does not control access to the resource or data."
+    },
+    "entry_group": {
+      "description": "The name of the entry group this entry is in.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is a user-defined resource reference and does not by itself control access to the underlying resource or data."
+    },
+    "entry_id": {
+      "description": "The id of the entry to create.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is a user-defined identifier and does not control access to the resource or data."
+    },
+    "linked_resource": {
+      "description": "The resource this metadata entry refers to.\nFor Google Cloud Platform resources, linkedResource is the full name of the resource.\nFor example, the linkedResource for a table resource from BigQuery is:\n//bigquery.googleapis.com/projects/projectId/datasets/datasetId/tables/tableId\nOutput only when Entry is of type in the EntryType enum. For entries with userSpecifiedType,\nthis field is optional and defaults to an empty string.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is a metadata reference to another resource and does not control access to the underlying resource or data."
+    },
+    "schema": {
+      "description": "Schema of the entry (e.g. BigQuery, GoogleSQL, Avro schema), as a json string. An entry might not have any schema\nattached to it. See\nhttps://cloud.google.com/data-catalog/docs/reference/rest/v1/projects.locations.entryGroups.entries#schema\nfor what fields this schema can contain.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This describes the data structure for catalog metadata and does not enforce access control or data protection."
+    },
+    "type": {
+      "description": "The type of the entry. Only used for Entries with types in the EntryType enum.\nCurrently, only FILESET enum value is allowed. All other entries created through Data Catalog must use userSpecifiedType. Possible values: [\"FILESET\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is user-defined metadata for classifying the entry and does not control access to the resource or data."
+    },
+    "user_specified_system": {
+      "description": "This field indicates the entry's source system that Data Catalog does not integrate with.\nuserSpecifiedSystem strings must begin with a letter or underscore and can only contain letters, numbers,\nand underscores; are case insensitive; must be at least 1 character and at most 64 characters long.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is user-defined metadata for classifying the entry and does not control access to the resource or data."
+    },
+    "user_specified_type": {
+      "description": "Entry type if it does not fit any of the input-allowed values listed in EntryType enum above.\nWhen creating an entry, users should check the enum values first, if nothing matches the entry\nto be created, then provide a custom value, for example \"my_special_type\".\nuserSpecifiedType strings must begin with a letter or underscore and can only contain letters,\nnumbers, and underscores; are case insensitive; must be at least 1 character and at most 64 characters long.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is user-defined metadata for classifying the entry and does not control access to the resource or data."
+    },
+    "gcs_fileset_spec": {
+      "type": "block",
+      "description": "Specification that applies to a Cloud Storage fileset. This is only valid on entries of type FILESET.",
+      "required": false
+    },
+    "gcs_fileset_spec.file_patterns": {
+      "description": "Patterns to identify a set of files in Google Cloud Storage.\nSee [Cloud Storage documentation](https://cloud.google.com/storage/docs/gsutil/addlhelp/WildcardNames)\nfor more information. Note that bucket wildcards are currently not supported. Examples of valid filePatterns:\n\n* gs://bucket_name/dir/*: matches all files within bucket_name/dir directory.\n* gs://bucket_name/dir/**: matches all files in bucket_name/dir spanning all subdirectories.\n* gs://bucket_name/file*: matches files prefixed by file in bucket_name\n* gs://bucket_name/??.txt: matches files with two characters followed by .txt in bucket_name\n* gs://bucket_name/[aeiou].txt: matches files that contain a single vowel character followed by .txt in bucket_name\n* gs://bucket_name/[a-m].txt: matches files that contain a, b, ... or m followed by .txt in bucket_name\n* gs://bucket_name/a/*/b: matches all files in bucket_name that match a/*/b pattern, such as a/c/b, a/d/b\n* gs://another_bucket/a.txt: matches gs://another_bucket/a.txt",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "This is a user-defined metadata path reference and does not control access to the underlying GCS data."
+    }
+  }
+}

@@ -1,0 +1,751 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "Required. Human readable name for this profile. Max length 1024 bytes.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "language_code": {
+      "description": "Language code for the conversation profile. This should be a BCP-47 language tag.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The location of the conversation profile.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "security_settings": {
+      "description": "Name of the CX SecuritySettings reference for the agent.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "time_zone": {
+      "description": "The time zone of this conversational profile.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automated_agent_config": {
+      "type": "block",
+      "description": "Configuration for an automated agent to use with this profile",
+      "required": false
+    },
+    "automated_agent_config.agent": {
+      "description": "ID of the Dialogflow agent environment to use.\nExpects the format \"projects/<Project ID>/locations/<Location ID>/agent/environments/<EnvironmentID>\"",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automated_agent_config.session_ttl": {
+      "description": "Configure lifetime of the Dialogflow session.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config": {
+      "type": "block",
+      "description": "Configuration for connecting to a live agent",
+      "required": false
+    },
+    "human_agent_assistant_config.end_user_suggestion_config": {
+      "type": "block",
+      "description": "Configuration for agent assistance of end user participant.",
+      "required": false
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.disable_high_latency_features_sync_delivery": {
+      "description": "When disableHighLatencyFeaturesSyncDelivery is true and using the AnalyzeContent API, we will not deliver the responses from high latency features in the API response. The humanAgentAssistantConfig.notification_config must be configured and enableEventBasedSuggestion must be set to true to receive the responses from high latency features in Pub/Sub. High latency feature(s): KNOWLEDGE_ASSIST",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.generators": {
+      "description": "List of various generator resource names used in the conversation profile.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.group_suggestion_responses": {
+      "description": "If groupSuggestionResponses is false, and there are multiple featureConfigs in event based suggestion or StreamingAnalyzeContent, we will try to deliver suggestions to customers as soon as we get new suggestion. Different type of suggestions based on the same context will be in separate Pub/Sub event or StreamingAnalyzeContentResponse.\n\nIf groupSuggestionResponses set to true. All the suggestions to the same participant based on the same context will be grouped into a single Pub/Sub event or StreamingAnalyzeContentResponse.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs": {
+      "type": "block",
+      "description": "Configuration of different suggestion features. One feature can have only one config.",
+      "required": false
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.disable_agent_query_logging": {
+      "description": "Disable the logging of search queries sent by human agents. It can prevent those queries from being stored at answer records.\nThis feature is only supported for types: KNOWLEDGE_SEARCH.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.enable_conversation_augmented_query": {
+      "description": "Enable including conversation context during query answer generation.\nThis feature is only supported for types: KNOWLEDGE_SEARCH.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.enable_event_based_suggestion": {
+      "description": "Automatically iterates all participants and tries to compile suggestions.\nThis feature is only supported for types: ARTICLE_SUGGESTION, FAQ, DIALOGFLOW_ASSIST, KNOWLEDGE_ASSIST.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.enable_query_suggestion_only": {
+      "description": "Enable query suggestion only.\nThis feature is only supported for types: KNOWLEDGE_ASSIST",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.enable_query_suggestion_when_no_answer": {
+      "description": "Enable query suggestion even if we can't find its answer. By default, queries are suggested only if we find its answer.\nThis feature is only supported for types: KNOWLEDGE_ASSIST.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.conversation_model_config": {
+      "type": "block",
+      "description": "Configs of custom conversation model.",
+      "required": false
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.conversation_model_config.baseline_model_version": {
+      "description": "Version of current baseline model. It will be ignored if model is set. Valid versions are: Article Suggestion baseline model: - 0.9 - 1.0 (default) Summarization baseline model: - 1.0",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.conversation_model_config.model": {
+      "description": "Conversation model resource name. Format: projects/<Project ID>/conversationModels/<Model ID>.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.conversation_process_config": {
+      "type": "block",
+      "description": "Config to process conversation.",
+      "required": false
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.conversation_process_config.recent_sentences_count": {
+      "description": "Number of recent non-small-talk sentences to use as context for article and FAQ suggestion",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.query_config": {
+      "type": "block",
+      "description": "Configs of query.",
+      "required": false
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.query_config.confidence_threshold": {
+      "description": "Confidence threshold of query result.\nThis feature is only supported for types: ARTICLE_SUGGESTION, FAQ, SMART_REPLY, SMART_COMPOSE, KNOWLEDGE_SEARCH, KNOWLEDGE_ASSIST, ENTITY_EXTRACTION.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.query_config.max_results": {
+      "description": "Maximum number of results to return.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.query_config.context_filter_settings": {
+      "type": "block",
+      "description": "Determines how recent conversation context is filtered when generating suggestions. If unspecified, no messages will be dropped.",
+      "required": false
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.query_config.context_filter_settings.drop_handoff_messages": {
+      "description": "If set to true, the last message from virtual agent (hand off message) and the message before it (trigger message of hand off) are dropped.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.query_config.context_filter_settings.drop_ivr_messages": {
+      "description": "If set to true, all messages from ivr stage are dropped.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.query_config.context_filter_settings.drop_virtual_agent_messages": {
+      "description": "If set to true, all messages from virtual agent are dropped.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.query_config.dialogflow_query_source": {
+      "type": "block",
+      "description": "Query from Dialogflow agent.\nThis feature is supported for types: DIALOGFLOW_ASSIST.",
+      "required": false
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.query_config.dialogflow_query_source.agent": {
+      "description": "The name of a Dialogflow virtual agent used for end user side intent detection and suggestion. Format: projects/<Project ID>/locations/<Location ID>/agent.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.query_config.dialogflow_query_source.human_agent_side_config": {
+      "type": "block",
+      "description": "The Dialogflow assist configuration for human agent.",
+      "required": false
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.query_config.dialogflow_query_source.human_agent_side_config.agent": {
+      "description": "The name of a dialogflow virtual agent used for intent detection and suggestion triggered by human agent. Format: projects/<Project ID>/locations/<Location ID>/agent.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.query_config.document_query_source": {
+      "type": "block",
+      "description": "Query from knowledge base document.\nThis feature is supported for types: SMART_REPLY, SMART_COMPOSE.",
+      "required": false
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.query_config.document_query_source.documents": {
+      "description": "Knowledge documents to query from. Format: projects/<Project ID>/locations/<Location ID>/knowledgeBases/<KnowledgeBase ID>/documents/<Document ID>.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.query_config.knowledge_base_query_source": {
+      "type": "block",
+      "description": "Query from knowledgebase.\nThis feature is only supported for types: ARTICLE_SUGGESTION, FAQ.",
+      "required": false
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.query_config.knowledge_base_query_source.knowledge_bases": {
+      "description": "Knowledge bases to query. Format: projects/<Project ID>/locations/<Location ID>/knowledgeBases/<Knowledge Base ID>.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.query_config.sections": {
+      "type": "block",
+      "description": "The customized sections chosen to return when requesting a summary of a conversation.",
+      "required": false
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.query_config.sections.section_types": {
+      "description": "The selected sections chosen to return when requesting a summary of a conversation\nIf not provided the default selection will be \"{SITUATION, ACTION, RESULT}\". Possible values: [\"SECTION_TYPE_UNSPECIFIED\", \"SITUATION\", \"ACTION\", \"RESOLUTION\", \"REASON_FOR_CANCELLATION\", \"CUSTOMER_SATISFACTION\", \"ENTITIES\"]",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.suggestion_feature": {
+      "type": "block",
+      "description": "The suggestion feature.",
+      "required": false
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.suggestion_feature.type": {
+      "description": "Type of Human Agent Assistant API feature to request.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.suggestion_trigger_settings": {
+      "type": "block",
+      "description": "Settings of suggestion trigger.\nThis feature is only supported for types: ARTICLE_SUGGESTION, FAQ.",
+      "required": false
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.suggestion_trigger_settings.no_small_talk": {
+      "description": "Do not trigger if last utterance is small talk.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.end_user_suggestion_config.feature_configs.suggestion_trigger_settings.only_end_user": {
+      "description": "Only trigger suggestion if participant role of last utterance is END_USER.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config": {
+      "type": "block",
+      "description": "Configuration for agent assistance of human agent participant.",
+      "required": false
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.disable_high_latency_features_sync_delivery": {
+      "description": "When disableHighLatencyFeaturesSyncDelivery is true and using the AnalyzeContent API, we will not deliver the responses from high latency features in the API response. The humanAgentAssistantConfig.notification_config must be configured and enableEventBasedSuggestion must be set to true to receive the responses from high latency features in Pub/Sub. High latency feature(s): KNOWLEDGE_ASSIST",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.generators": {
+      "description": "List of various generator resource names used in the conversation profile.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.group_suggestion_responses": {
+      "description": "If groupSuggestionResponses is false, and there are multiple featureConfigs in event based suggestion or StreamingAnalyzeContent, we will try to deliver suggestions to customers as soon as we get new suggestion. Different type of suggestions based on the same context will be in separate Pub/Sub event or StreamingAnalyzeContentResponse.\n\nIf groupSuggestionResponses set to true. All the suggestions to the same participant based on the same context will be grouped into a single Pub/Sub event or StreamingAnalyzeContentResponse.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs": {
+      "type": "block",
+      "description": "Configuration of different suggestion features. One feature can have only one config.",
+      "required": false
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.disable_agent_query_logging": {
+      "description": "Disable the logging of search queries sent by human agents. It can prevent those queries from being stored at answer records.\nThis feature is only supported for types: KNOWLEDGE_SEARCH.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.enable_conversation_augmented_query": {
+      "description": "Enable including conversation context during query answer generation.\nThis feature is only supported for types: KNOWLEDGE_SEARCH.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.enable_event_based_suggestion": {
+      "description": "Automatically iterates all participants and tries to compile suggestions.\nThis feature is only supported for types: ARTICLE_SUGGESTION, FAQ, DIALOGFLOW_ASSIST, KNOWLEDGE_ASSIST.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.enable_query_suggestion_only": {
+      "description": "Enable query suggestion only.\nThis feature is only supported for types: KNOWLEDGE_ASSIST",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.enable_query_suggestion_when_no_answer": {
+      "description": "Enable query suggestion even if we can't find its answer. By default, queries are suggested only if we find its answer.\nThis feature is only supported for types: KNOWLEDGE_ASSIST.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.conversation_model_config": {
+      "type": "block",
+      "description": "Configs of custom conversation model.",
+      "required": false
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.conversation_model_config.baseline_model_version": {
+      "description": "Version of current baseline model. It will be ignored if model is set. Valid versions are: Article Suggestion baseline model: - 0.9 - 1.0 (default) Summarization baseline model: - 1.0",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.conversation_model_config.model": {
+      "description": "Conversation model resource name. Format: projects/<Project ID>/conversationModels/<Model ID>.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.conversation_process_config": {
+      "type": "block",
+      "description": "Config to process conversation.",
+      "required": false
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.conversation_process_config.recent_sentences_count": {
+      "description": "Number of recent non-small-talk sentences to use as context for article and FAQ suggestion",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.query_config": {
+      "type": "block",
+      "description": "Configs of query.",
+      "required": false
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.query_config.confidence_threshold": {
+      "description": "Confidence threshold of query result.\nThis feature is only supported for types: ARTICLE_SUGGESTION, FAQ, SMART_REPLY, SMART_COMPOSE, KNOWLEDGE_SEARCH, KNOWLEDGE_ASSIST, ENTITY_EXTRACTION.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.query_config.max_results": {
+      "description": "Maximum number of results to return.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.query_config.context_filter_settings": {
+      "type": "block",
+      "description": "Determines how recent conversation context is filtered when generating suggestions. If unspecified, no messages will be dropped.",
+      "required": false
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.query_config.context_filter_settings.drop_handoff_messages": {
+      "description": "If set to true, the last message from virtual agent (hand off message) and the message before it (trigger message of hand off) are dropped.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.query_config.context_filter_settings.drop_ivr_messages": {
+      "description": "If set to true, all messages from ivr stage are dropped.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.query_config.context_filter_settings.drop_virtual_agent_messages": {
+      "description": "If set to true, all messages from virtual agent are dropped.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.query_config.dialogflow_query_source": {
+      "type": "block",
+      "description": "Query from Dialogflow agent.\nThis feature is supported for types: DIALOGFLOW_ASSIST.",
+      "required": false
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.query_config.dialogflow_query_source.agent": {
+      "description": "The name of a Dialogflow virtual agent used for end user side intent detection and suggestion. Format: projects/<Project ID>/locations/<Location ID>/agent.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.query_config.dialogflow_query_source.human_agent_side_config": {
+      "type": "block",
+      "description": "The Dialogflow assist configuration for human agent.",
+      "required": false
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.query_config.dialogflow_query_source.human_agent_side_config.agent": {
+      "description": "The name of a dialogflow virtual agent used for intent detection and suggestion triggered by human agent. Format: projects/<Project ID>/locations/<Location ID>/agent.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.query_config.sections": {
+      "type": "block",
+      "description": "The customized sections chosen to return when requesting a summary of a conversation.",
+      "required": false
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.query_config.sections.section_types": {
+      "description": "The selected sections chosen to return when requesting a summary of a conversation\nIf not provided the default selection will be \"{SITUATION, ACTION, RESULT}\". Possible values: [\"SECTION_TYPE_UNSPECIFIED\", \"SITUATION\", \"ACTION\", \"RESOLUTION\", \"REASON_FOR_CANCELLATION\", \"CUSTOMER_SATISFACTION\", \"ENTITIES\"]",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.suggestion_feature": {
+      "type": "block",
+      "description": "The suggestion feature.",
+      "required": false
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.suggestion_feature.type": {
+      "description": "Type of Human Agent Assistant API feature to request.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.suggestion_trigger_settings": {
+      "type": "block",
+      "description": "Settings of suggestion trigger.\nThis feature is only supported for types: ARTICLE_SUGGESTION, FAQ.",
+      "required": false
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.suggestion_trigger_settings.no_small_talk": {
+      "description": "Do not trigger if last utterance is small talk.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.human_agent_suggestion_config.feature_configs.suggestion_trigger_settings.only_end_user": {
+      "description": "Only trigger suggestion if participant role of last utterance is END_USER.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.message_analysis_config": {
+      "type": "block",
+      "description": "Configuration for analyzing conversation messages.",
+      "required": false
+    },
+    "human_agent_assistant_config.message_analysis_config.enable_entity_extraction": {
+      "description": "Enable entity extraction in conversation messages on agent assist stage.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.message_analysis_config.enable_sentiment_analysis": {
+      "description": "Enable sentiment analysis in conversation messages on agent assist stage. Sentiment analysis inspects user input and identifies the prevailing subjective opinion, especially to determine a user's attitude as positive, negative, or neutral.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.notification_config": {
+      "type": "block",
+      "description": "Pub/Sub topic on which to publish new agent assistant events.\nExpects the format \"projects/<Project ID>/locations/<Location ID>/topics/<Topic ID>\"",
+      "required": false
+    },
+    "human_agent_assistant_config.notification_config.message_format": {
+      "description": "Format of the message Possible values: [\"MESSAGE_FORMAT_UNSPECIFIED\", \"PROTO\", \"JSON\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_assistant_config.notification_config.topic": {
+      "description": "Name of the Pub/Sub topic to publish conversation events",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "human_agent_handoff_config": {
+      "type": "block",
+      "description": "Defines the hand off to a live agent, typically on which external agent service provider to connect to a conversation.",
+      "required": false
+    },
+    "human_agent_handoff_config.live_person_config": {
+      "type": "block",
+      "description": "Config for using LivePerson.",
+      "required": false
+    },
+    "human_agent_handoff_config.live_person_config.account_number": {
+      "description": "Account number of the LivePerson account to connect.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "logging_config": {
+      "type": "block",
+      "description": "Defines logging behavior for conversation lifecycle events.",
+      "required": false
+    },
+    "logging_config.enable_stackdriver_logging": {
+      "description": "Whether to log conversation events",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "new_message_event_notification_config": {
+      "type": "block",
+      "description": "Pub/Sub topic on which to publish new agent assistant events.\nExpects the format \"projects/<Project ID>/locations/<Location ID>/topics/<Topic ID>\"",
+      "required": false
+    },
+    "new_message_event_notification_config.message_format": {
+      "description": "Format of the message Possible values: [\"MESSAGE_FORMAT_UNSPECIFIED\", \"PROTO\", \"JSON\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "new_message_event_notification_config.topic": {
+      "description": "Name of the Pub/Sub topic to publish conversation events",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "new_recognition_result_notification_config": {
+      "type": "block",
+      "description": "Optional. Configuration for publishing transcription intermediate results. Event will be sent in format of ConversationEvent. If configured, the following information will be populated as ConversationEvent Pub/Sub message attributes: - \"participant_id\" - \"participantRole\" - \"message_id\"",
+      "required": false
+    },
+    "new_recognition_result_notification_config.message_format": {
+      "description": "Format of message. Possible values: [\"MESSAGE_FORMAT_UNSPECIFIED\", \"PROTO\", \"JSON\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "new_recognition_result_notification_config.topic": {
+      "description": "Name of the Pub/Sub topic to publish conversation events like CONVERSATION_STARTED as serialized ConversationEvent protos.\nFor telephony integration to receive notification, make sure either this topic is in the same project as the conversation or you grant service-<Conversation Project Number>@gcp-sa-dialogflow.iam.gserviceaccount.com the Dialogflow Service Agent role in the topic project.\nFor chat integration to receive notification, make sure API caller has been granted the Dialogflow Service Agent role for the topic.\nFormat: projects/<Project ID>/locations/<Location ID>/topics/<Topic ID>.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "notification_config": {
+      "type": "block",
+      "description": "Pub/Sub topic on which to publish new agent assistant events.\nExpects the format \"projects/<Project ID>/locations/<Location ID>/topics/<Topic ID>\"",
+      "required": false
+    },
+    "notification_config.message_format": {
+      "description": "Format of the message Possible values: [\"MESSAGE_FORMAT_UNSPECIFIED\", \"PROTO\", \"JSON\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "notification_config.topic": {
+      "description": "Name of the Pub/Sub topic to publish conversation events",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "stt_config": {
+      "type": "block",
+      "description": "Settings for speech transcription.",
+      "required": false
+    },
+    "stt_config.audio_encoding": {
+      "description": "Audio encoding of the audio content to process. Possible values: [\"AUDIO_ENCODING_UNSPECIFIED\", \"AUDIO_ENCODING_LINEAR_16\", \"AUDIO_ENCODING_FLAC\", \"AUDIO_ENCODING_MULAW\", \"AUDIO_ENCODING_AMR\", \"AUDIO_ENCODING_AMR_WB\", \"AUDIO_ENCODING_OGG_OPUS\", \"AUDIO_ENCODING_SPEEX_WITH_HEADER_BYTE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "stt_config.enable_word_info": {
+      "description": "If true, Dialogflow returns SpeechWordInfo in StreamingRecognitionResult with information about the recognized speech words.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "stt_config.language_code": {
+      "description": "The language of the supplied audio.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "stt_config.model": {
+      "description": "Which Speech model to select.\nLeave this field unspecified to use Agent Speech settings for model selection.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "stt_config.sample_rate_hertz": {
+      "description": "Sample rate (in Hertz) of the audio content sent in the query.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "stt_config.speech_model_variant": {
+      "description": "The speech model used in speech to text. Possible values: [\"SPEECH_MODEL_VARIANT_UNSPECIFIED\", \"USE_BEST_AVAILABLE\", \"USE_STANDARD\", \"USE_ENHANCED\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "stt_config.use_timeout_based_endpointing": {
+      "description": "Use timeout based endpointing, interpreting endpointer sensitivity as seconds of timeout value.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "tts_config": {
+      "type": "block",
+      "description": "Configuration for Text-to-Speech synthesization. If agent defines synthesization options as well, agent settings overrides the option here.",
+      "required": false
+    },
+    "tts_config.effects_profile_id": {
+      "description": "An identifier which selects 'audio effects' profiles that are applied on (post synthesized) text to speech. Effects are applied on top of each other in the order they are given.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "tts_config.pitch": {
+      "description": "Speaking pitch, in the range [-20.0, 20.0]. 20 means increase 20 semitones from the original pitch. -20 means decrease 20 semitones from the original pitch.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "tts_config.speaking_rate": {
+      "description": "Speaking rate/speed, in the range [0.25, 4.0].",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "tts_config.volume_gain_db": {
+      "description": "Volume gain (in dB) of the normal native volume supported by the specific voice.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "tts_config.voice": {
+      "type": "block",
+      "description": "The desired voice of the synthesized audio.",
+      "required": false
+    },
+    "tts_config.voice.name": {
+      "description": "The name of the voice.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "tts_config.voice.ssml_gender": {
+      "description": "The preferred gender of the voice. Possible values: [\"SSML_VOICE_GENDER_UNSPECIFIED\", \"SSML_VOICE_GENDER_MALE\", \"SSML_VOICE_GENDER_FEMALE\", \"SSML_VOICE_GENDER_NEUTRAL\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

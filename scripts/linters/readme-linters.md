@@ -1,121 +1,100 @@
-## 🛡️ Policy Deployment Engine: Linters
+# 🛡️ Policy Deployment Engine — Linters
 
-The Policy Deployment Engine Linters were developed to enforce structure, consistency, and compliance across Terraform inputs and OPA (Open Policy Agent) policies in multi-cloud security automation.
+A single linter, `scripts/linters/linter.py`, enforces structure and
+cross-consistency across three trees — `docs/`, `inputs/`, `policies/` —
+treating `docs/` as the source of truth that `inputs/` and `policies/` must
+reconcile to. It uses only the Python standard library (no extra installs).
 
----
+There are two supporting scripts:
 
-## This document explains:
-
-1. The usage of the linters
-
-2. Libraries and functions used
-
-3. Number and types of checks performed
-
-4. Expected error types and their meaning
-
-5. Functions and their usage
-
-6. How developers can fix common issues
-
-7. Conclusion
+- `run_precommit_linter.py` — runs the linter but fails only on **your** changed
+  files (so you are never blocked by the repo-wide backlog).
+- `check_branch_name.py` — enforces the branch naming convention.
 
 ---
 
 ## 1. Usage
 
-| Command | Description | Example |
-|---------|-------------|---------|
-| `python linter.py` | Run linter on **all services** under `inputs/gcp` and `policies/gcp`. | `python linter.py` |
-| `python linter.py --gcp <service>` | Run linter only for the specified GCP service. | `python linter.py --gcp google_kms` |
+```bash
+# from the repo root
+python scripts/linters/linter.py                      # lint every tree
+python scripts/linters/linter.py --tree docs
+python scripts/linters/linter.py --tree inputs --platform gcp
+python scripts/linters/linter.py --tree policies
+python scripts/linters/linter.py --no-content-checks  # structural only (skip §3 checks)
+```
+
+Exit code is `1` if any error is found, else `0`.
 
 ---
 
-## 2. Libraries used
+## 2. Structural rules (always on)
 
-No need to download any extra modules, these libraries will be present if you have python installed on your device
+The structural pass never opens a `.tf`/`.rego` file (it does parse docs JSON).
 
-| Library |	Purpose |
+- **docs/** — only the platform folders (`gcp`, `aws`, `azure`); `gcp/<service>/`
+  holds one `*.json` per resource, each matching the doc schema (`last_updated`,
+  `provider_version`, `arguments`).
+- **inputs/** — reconciles **exactly** to docs:
+  `inputs/gcp/<service>/<resource>/<argument>/` where `<service>` and `<resource>`
+  match a `docs/gcp/<service>/<resource>.json`, and `<argument>` is a **non-block**
+  argument key in that doc. Each argument dir must contain `compliant.tf`,
+  `config.tf`, `nonCompliant.tf` (terraform artifacts tolerated; anything else flagged).
+- **policies/** — same taxonomy, but each argument is a single `<argument>.rego`
+  file plus an optional per-resource `_vars.rego` (underscore-prefixed so it is
+  never mistaken for a policy).
+
+---
+
+## 3. Content checks (on by default; `--no-content-checks` to skip)
+
+These read inside files. They run by default (the fixture backlog is cleared and
+the whole tree passes). Pass `--no-content-checks` for structural validation only.
+
+- **A — rego package path:** each `.rego` `package` is
+  `terraform.gcp.security.<service>.<resource>.<seg>` (`<seg>` = filename stem with
+  `.`→`_`; `_vars.rego` → `.<resource>.vars`). The `<service>` segment is not asserted.
+- **B — single tested resource:** a `compliant.tf` / `nonCompliant.tf` contains
+  **only** the tested resource type (== its dir). Dependency resources are
+  disallowed — we run `terraform plan` only, so the tested resource uses fake
+  values instead of real dependencies.
+- **C — example labels:** tested-resource labels are `compliant_example_N`
+  (`compliant.tf`) / `non_compliant_example_N` (`nonCompliant.tf`), sequential from
+  1, always suffixed (even when there is only one). The `resource_value_name`
+  attribute (from `_vars.rego`) stays coupled to the label.
+
+---
+
+## 4. Pre-commit & CI
+
+**Local (`pre-commit install`, config in `.pre-commit-config.yaml`):**
+`run_precommit_linter.py` runs the whole-tree linter (content checks on by
+default) but fails only on errors in the files you changed. For input fixtures the unit
+is the whole **argument directory** — `compliant.tf` and `nonCompliant.tf` test
+one argument together, so touching one means you own the pair. Policies/docs are
+file-level. Pre-existing backlog errors elsewhere are counted, never blocking.
+
+```bash
+python scripts/linters/run_precommit_linter.py            # staged + unstaged (pre-commit)
+python scripts/linters/run_precommit_linter.py --base origin/dev   # everything vs dev (CI)
+python scripts/linters/run_precommit_linter.py --all      # whole tree, fail on any error
+```
+
+**CI (`.github/workflows/policy_check_PR.yaml`):** a `lint` job runs
+(1) `linter.py --tree all --no-content-checks` as a hard whole-tree structural
+gate (structural only, so it never blocks a PR on repo-wide content debt), and
+(2) `run_precommit_linter.py --base origin/<base>` to enforce structural + content
+checks on the PR's own changed files.
+
+---
+
+## 5. Common errors & fixes
+
+| Message | Fix |
 |---|---|
-| 'os' | Directory traversal, path operations |
-| 're' |	Regular expressions (regex) for validating filenames and parsing packages |
-| 'sys' |	Exiting with status codes |
-| 'shutil' |	Checking terraform availability |
-| 'subprocess' |	Running terraform fmt |
-| 'argparse' |	Handling command-line flags (--gcp) |
-
-
-## 3. Checks Performed
-
-| Category | Description | Example of Check |
-|----------|-------------|------------------|
-| **Folder Structure** | Only directories allowed under service and resource levels (with exceptions). | No stray `README.md` in `inputs/gcp/google_kms/`. |
-| **Required Files** | Ensures presence of `c.tf`, `nc.tf`, `config.tf`, `plan.json`, `.terraform.lock.hcl`, `plan` for inputs, and `policy.rego`, `vars.rego` for policies. | Missing `config.tf` triggers error. |
-| **Excess Files** | Flags extra files that are not part of the required set. | `notes.txt` inside a policy folder. |
-| **Naming Conventions** | Enforces lowercase snake_case for `.tf` and `.rego` files. | Rejects `Config.TF`. |
-| **Terraform Format** | Runs `terraform fmt -recursive` for consistency. | Indentation and style issues auto-fixed. |
-| **Resource Type Match** | Validates Terraform `resource "<TYPE>"` matches its parent resource folder. | `resource "google_kms_key"` in folder `google_kms_crypto_key` fails. |
-| **Resource Naming** | Enforces sequential names (`c1, c2...` / `nc1, nc2...`) or plain `c` / `nc` if only one block. | `resource "..." "c3"` without `c1, c2` fails. |
-| **Resource Value Name** | The attribute specified in `vars.rego` (e.g., `name`) must equal the resource block name. | `name = "param-c"` with block `c1` fails. |
-| **OPA Package Validation** | Ensures Rego `package` matches folder path: `terraform.gcp.security.<service>.<resource>.<policy>`. | Wrong package path flagged. |
-| **Vars Package Validation** | Ensures `vars.rego` has package suffix `.vars`. | `package terraform.gcp.security.service.resource` is invalid. |
-
----
-
-## 4. Expected Errors
-
-| Error Type | Example Message | Fix |
-|------------|-----------------|-----|
-| Missing file | `[ERROR] Missing files in ... ['c.tf']` | Add missing Terraform/rego files. |
-| Excess file | `[ERROR] Excess files in ... ['notes.txt']` | Remove or relocate extra files. |
-| Unexpected file | `[ERROR] Unexpected file 'README.md' in ... Only directories allowed.` | Remove or move file. |
-| Bad filename | `[ERROR] Bad filename: 'Config.TF'` | Rename file to `config.tf`. |
-| Resource type mismatch | `[ERROR] Resource type 'google_param' in c.tf does not match directory 'parameter'` | Fix resource type or folder. |
-| Resource name error | `[ERROR] Expected 'c1' but found 'c3' in c.tf` | Rename sequentially (`c1, c2…`). |
-| Resource value mismatch | `[ERROR] Wrong name='param-c' in nc.tf; expected 'nc1' or 'nc'` | Fix attribute to match block name. |
-| Package mismatch | `[ERROR] Bad package name in policy.rego. Expected terraform.gcp.security.service.resource.policyA` | Correct the `package` declaration. |
-
----
-
-## 5. Functions Reference
-
-| Function | Location | Purpose |
-|----------|----------|---------|
-| `check_missing_files` | BaseValidator | Detects missing required files. |
-| `check_excess_files` | BaseValidator | Detects extra/unexpected files. |
-| `check_only_directories` | BaseValidator | Ensures only directories at service/resource level. |
-| `run_terraform_fmt` | BaseValidator | Runs `terraform fmt -recursive`. |
-| `read_resource_value_name` | BaseValidator | Reads `resource_value_name` from `vars.rego`. |
-| `validate_resource_type_matches_dir` | BaseValidator | Ensures Terraform resource type matches directory name. |
-| `validate_resource_name_sequence` | BaseValidator | Enforces sequential or plain block names. |
-| `validate_resource_value_names` | BaseValidator | Ensures resource attribute equals block name. |
-| `check_package_for_policy` | BaseValidator | Validates `policy.rego` package path. |
-| `check_vars_package` | BaseValidator | Ensures `vars.rego` package ends with `.vars`. |
-| `validate` | InputValidator / PolicyValidator | Main entry for running all checks. |
-
----
-
-## 6. 🛠 Developer Guide to Fix Errors
-
-1. Always include all required files per policy folder.
-
-2. Follow naming conventions: lowercase, underscores, .tf / .rego.
-
-3. Ensure Terraform resource TYPE = resource folder name.
-
-4. For resources:
-
-> Use c1, c2, … (or c if only one).
-
->Use nc1, nc2, … (or nc if only one).
-
->Make sure the resource value attribute matches the block name.
-
-5. In Rego, ensure the package declaration matches the folder path.
-
----
-## 7. 📖 Conclusion
-
-The linter enforces **structure, compliance, and correctness** across Terraform inputs and OPA Rego policies.  
-
-By following the error messages and applying the recommended fixes, developers can keep the repository **consistent, production-ready, and CI/CD compliant**.
+| `... does not match any docs/gcp service` / `resource type not documented` | The dir name must equal a `docs/gcp/<service>/<resource>.json`. |
+| `not a documented argument key` | Rename the argument dir/file to the exact (non-block) docs key. |
+| `missing required file(s) ['compliant.tf']` | Add the required fixture files. |
+| `[content] ... package '...' must end with '.<resource>.<seg>'` | Fix the rego `package` to match its path. |
+| `[content] ... dependency resource(s) [...] not allowed` | Remove the dependency; give the tested resource fake values. |
+| `[content] ... resource label 'c' should be 'compliant_example_1'` | Adopt the example label convention. |

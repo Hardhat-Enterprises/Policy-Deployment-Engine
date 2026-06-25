@@ -1,0 +1,143 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "A description of the pool. Cannot exceed 256 characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "disabled": {
+      "description": "Whether the pool is disabled. You cannot use a disabled pool to exchange tokens, or use\nexisting tokens to access resources. If the pool is re-enabled, existing tokens grant\naccess again.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "A display name for the pool. Cannot exceed 32 characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mode": {
+      "description": "The mode for the pool is operating in. Pools with an unspecified mode will operate as if they\nare in 'FEDERATION_ONLY' mode.\n\n\n~> **Note** This field cannot be changed after the Workload Identity Pool is created. While\n'terraform plan' may show an update if you change this field's value, 'terraform apply'\n**will fail with an API error** (such as 'Error 400: Attempted to update an immutable field.').\nTo specify a different 'mode', please create a new Workload Identity Pool resource.\n\n* 'FEDERATION_ONLY': Pools can only be used for federating external workload identities into\nGoogle Cloud. Unless otherwise noted, no structure or format constraints are applied to\nworkload identities in a 'FEDERATION_ONLY' mode pool, and you may not create any resources\nwithin the pool besides providers.\n* 'TRUST_DOMAIN': Pools can be used to assign identities to Google Cloud workloads. All\nidentities within a 'TRUST_DOMAIN' mode pool must consist of a single namespace and individual\nworkload identifier. The subject identifier for all identities must conform to the following\nformat: 'ns/<namespace>/sa/<workload_identifier>'.\n'google_iam_workload_identity_pool_provider's cannot be created within 'TRUST_DOMAIN'\nmode pools.\n* 'SYSTEM_TRUST_DOMAIN': Pools are managed by Google Cloud services. Neither\n'google_iam_workload_identity_pool_namespace's nor 'google_iam_workload_identity_pool_provider's\ncan be created within 'SYSTEM_TRUST_DOMAIN' mode pools. All identities within a\n'SYSTEM_TRUST_DOMAIN' mode pool are in one of the following formats:\n\n    * 'spiffe://<trust-domain>/ns/<kubernetes-namespace>/sa/<kubernetes-service-account>'\n    * 'spiffe://<trust-domain>/resources/<resource-scope>/<resource-name>' Possible values: [\"FEDERATION_ONLY\", \"TRUST_DOMAIN\", \"SYSTEM_TRUST_DOMAIN\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "workload_identity_pool_id": {
+      "description": "The ID to use for the pool, which becomes the final component of the resource name. This\nvalue should be 4-32 characters, and may contain the characters [a-z0-9-]. The prefix\n'gcp-' is reserved for use by Google, and may not be specified.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "attestation_rules": {
+      "type": "block",
+      "description": "Defines which workloads can receive an identity within a pool. When an AttestationRule is\ndefined under a managed identity, matching workloads may receive that identity. A maximum of\n50 AttestationRules can be set.",
+      "required": false
+    },
+    "attestation_rules.google_cloud_resource": {
+      "description": "A single workload operating on Google Cloud. For example:\n'//run.googleapis.com/projects/123/type/Service/*'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inline_certificate_issuance_config": {
+      "type": "block",
+      "description": "Represents configuration for generating mutual TLS (mTLS) certificates for the identities\nwithin this pool. Defines the Certificate Authority (CA) pool resources and configurations\nrequired for issuance and rotation of mTLS workload certificates.",
+      "required": false
+    },
+    "inline_certificate_issuance_config.ca_pools": {
+      "description": "A required mapping of a cloud region to the CA pool resource located in that region used\nfor certificate issuance, adhering to these constraints:\n\n* **Key format:** A supported cloud region name equivalent to the location identifier in\nthe corresponding map entry's value.\n* **Value format:** A valid CA pool resource path format like:\n'projects/{project}/locations/{location}/caPools/{ca_pool}'\n* **Region Matching:** Workloads are ONLY issued certificates from CA pools within the\nsame region. Also the CA pool region (in value) must match the workload's region (key).",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inline_certificate_issuance_config.key_algorithm": {
+      "description": "Key algorithm to use when generating the key pair. This key pair will be used to create\nthe certificate. If unspecified, this will default to 'ECDSA_P256'.\n\n* 'RSA_2048': Specifies RSA with a 2048-bit modulus.\n* 'RSA_3072': Specifies RSA with a 3072-bit modulus.\n* 'RSA_4096': Specifies RSA with a 4096-bit modulus.\n* 'ECDSA_P256': Specifies ECDSA with curve P256.\n* 'ECDSA_P384': Specifies ECDSA with curve P384. Possible values: [\"RSA_2048\", \"RSA_3072\", \"RSA_4096\", \"ECDSA_P256\", \"ECDSA_P384\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inline_certificate_issuance_config.lifetime": {
+      "description": "Lifetime of the workload certificates issued by the CA pool in seconds. Must be between\n'86400s' (24 hours) to '2592000s' (30 days), ends in the suffix \"'s'\" (indicating seconds)\nand is preceded by the number of seconds. If unspecified, this will be defaulted to\n'86400s' (24 hours).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inline_certificate_issuance_config.rotation_window_percentage": {
+      "description": "Rotation window percentage indicating when certificate rotation should be initiated based\non remaining lifetime. Must be between '50' - '80'. If unspecified, this will be defaulted\nto '50'.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inline_certificate_issuance_config.use_default_shared_ca": {
+      "description": "If set to true, the trust domain will utilize the GCP-provisioned default CA. A default\nCA in the same region as the workload will be selected to issue the certificate. Enabling\nthis will clear any existing 'ca_pools' configuration to provision the certificates.\n\n\n~> **Note** This field is mutually exclusive with 'ca_pools'. If this flag is enabled,\ncertificates will be automatically provisioned from the default shared CAs. This flag should\nnot be set if you want to use your own CA pools to provision the certificates.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inline_trust_config": {
+      "type": "block",
+      "description": "Represents config to add additional trusted trust domains. Defines configuration for extending\ntrust to additional trust domains. By establishing trust with another domain, the current\ndomain will recognize and accept certificates issued by entities within the trusted domains.\nNote that a trust domain automatically trusts itself, eliminating the need for explicit\nconfiguration.",
+      "required": false
+    },
+    "inline_trust_config.additional_trust_bundles": {
+      "type": "block",
+      "description": "Maps specific trust domains (e.g., \"example.com\") to their corresponding 'TrustStore'\nobjects, which contain the trusted root certificates for that domain. There can be a\nmaximum of '10' trust domain entries in this map.\n\nNote that a trust domain automatically trusts itself and don't need to be specified here.\nIf however, this 'WorkloadIdentityPool''s trust domain contains any trust anchors in the\n'additional_trust_bundles' map, those trust anchors will be *appended to* the Trust Bundle\nautomatically derived from your 'InlineCertificateIssuanceConfig''s 'ca_pools'.",
+      "required": false
+    },
+    "inline_trust_config.additional_trust_bundles.trust_default_shared_ca": {
+      "description": "If set to True, the trust bundle will include the private ca managed identity regional root\npublic certificates.\n\n\n~> **Note** 'trust_default_shared_ca' is only supported for managed identity trust domain\nresource.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inline_trust_config.additional_trust_bundles.trust_domain": {
+      "description": "The identifier for this object. Format specified above.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inline_trust_config.additional_trust_bundles.trust_anchors": {
+      "type": "block",
+      "description": "List of Trust Anchors to be used while performing validation against a given\n'TrustStore'. The incoming end entity's certificate must be chained up to one of the\ntrust anchors here.",
+      "required": true
+    },
+    "inline_trust_config.additional_trust_bundles.trust_anchors.pem_certificate": {
+      "description": "PEM certificate of the PKI used for validation. Must only contain one ca\ncertificate(either root or intermediate cert).",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

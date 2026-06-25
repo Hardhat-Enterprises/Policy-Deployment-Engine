@@ -1,0 +1,233 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "The plugin description. Max length is 2000 characters (Unicode code\npoints).",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Human-readable description only. No security impact."
+    },
+    "display_name": {
+      "description": "The display name of the plugin. Max length is 50 characters (Unicode code\npoints).",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Display name. No security relevance."
+    },
+    "location": {
+      "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "plugin_category": {
+      "description": "Possible values:\nPLUGIN_CATEGORY_UNSPECIFIED\nAPI_GATEWAY\nAPI_PRODUCER",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Categorization metadata. Not sensitive."
+    },
+    "plugin_id": {
+      "description": "The ID to use for the Plugin resource, which will become the final\ncomponent of the Plugin's resource name. This field is optional.\n\n* If provided, the same will be used. The service will throw an error if\nthe specified id is already used by another Plugin resource in the API hub\ninstance.\n* If not provided, a system generated id will be used.\n\nThis value should be 4-63 characters, overall resource name which will be\nof format\n'projects/{project}/locations/{location}/plugins/{plugin}',\nits length is limited to 1000 characters and valid characters are\n/a-z[0-9]-_/.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Acts as identifier. No inherent security risk."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Project reference. No secrets here."
+    },
+    "actions_config": {
+      "type": "block",
+      "description": "The configuration of actions supported by the plugin.",
+      "required": false
+    },
+    "actions_config.description": {
+      "description": "The description of the operation performed by the action.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Metadata only. No security impact."
+    },
+    "actions_config.display_name": {
+      "description": "The display name of the action.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Display only. Not sensitive."
+    },
+    "actions_config.id": {
+      "description": "The id of the action.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier only. Not sensitive."
+    },
+    "actions_config.trigger_mode": {
+      "description": "The trigger mode supported by the action.\nPossible values:\nTRIGGER_MODE_UNSPECIFIED\nAPI_HUB_ON_DEMAND_TRIGGER\nAPI_HUB_SCHEDULE_TRIGGER\nNON_API_HUB_MANAGED",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Configuration setting. Not a secret."
+    },
+    "config_template": {
+      "type": "block",
+      "description": "ConfigTemplate represents the configuration template for a plugin.",
+      "required": false
+    },
+    "config_template.additional_config_template": {
+      "type": "block",
+      "description": "The list of additional configuration variables for the plugin's\nconfiguration.",
+      "required": false
+    },
+    "config_template.additional_config_template.description": {
+      "description": "Description.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config_template.additional_config_template.id": {
+      "description": "ID of the config variable. Must be unique within the configuration.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config_template.additional_config_template.required": {
+      "description": "Flag represents that this 'ConfigVariable' must be provided for a\nPluginInstance.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "Boolean flag. Not sensitive."
+    },
+    "config_template.additional_config_template.validation_regex": {
+      "description": "Regular expression in RE2 syntax used for validating the 'value' of a\n'ConfigVariable'.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Validation expression. Not sensitive."
+    },
+    "config_template.additional_config_template.value_type": {
+      "description": "Type of the parameter: string, int, bool etc.\nPossible values:\nVALUE_TYPE_UNSPECIFIED\nSTRING\nINT\nBOOL\nSECRET\nENUM\nMULTI_SELECT\nMULTI_STRING\nMULTI_INT",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Indicates type of value. Not sensitive itself."
+    },
+    "config_template.additional_config_template.enum_options": {
+      "type": "block",
+      "description": "Enum options. To be populated if 'ValueType' is 'ENUM'.",
+      "required": false
+    },
+    "config_template.additional_config_template.enum_options.description": {
+      "description": "Description of the option.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config_template.additional_config_template.enum_options.display_name": {
+      "description": "Display name of the option.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config_template.additional_config_template.enum_options.id": {
+      "description": "Id of the option.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config_template.additional_config_template.multi_select_options": {
+      "type": "block",
+      "description": "Multi select options. To be populated if 'ValueType' is 'MULTI_SELECT'.",
+      "required": false
+    },
+    "config_template.additional_config_template.multi_select_options.description": {
+      "description": "Description of the option.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config_template.additional_config_template.multi_select_options.display_name": {
+      "description": "Display name of the option.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config_template.additional_config_template.multi_select_options.id": {
+      "description": "Id of the option.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config_template.auth_config_template": {
+      "type": "block",
+      "description": "AuthConfigTemplate represents the authentication template for a plugin.",
+      "required": false
+    },
+    "config_template.auth_config_template.supported_auth_types": {
+      "description": "The list of authentication types supported by the plugin.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "Declares which auth types the plugin template supports. This is a descriptive capability list on a template (not the chosen auth method), so constraining it would not enforce a secure auth choice; the enforceable control is the selected auth_type on the instance."
+    },
+    "config_template.auth_config_template.service_account": {
+      "type": "block",
+      "description": "Config for Google service account authentication.",
+      "required": false
+    },
+    "config_template.auth_config_template.service_account.service_account": {
+      "description": "The service account to be used for authenticating request.\n\nThe 'iam.serviceAccounts.getAccessToken' permission should be granted on\nthis service account to the impersonator service account.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "References the service account used by the auth config template. This is a pointer to an existing identity resource chosen by the team; we do not constrain which specific service account is referenced, and a generic policy could not name one."
+    },
+    "documentation": {
+      "type": "block",
+      "description": "Documentation details.",
+      "required": false
+    },
+    "documentation.external_uri": {
+      "description": "The uri of the externally hosted documentation.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Points to external docs. No secret values."
+    },
+    "hosting_service": {
+      "type": "block",
+      "description": "The information related to the service implemented by the plugin\ndeveloper, used to invoke the plugin's functionality.",
+      "required": false
+    },
+    "hosting_service.service_uri": {
+      "description": "The URI of the service implemented by the plugin developer, used to\ninvoke the plugin's functionality. This information is only required for\nuser defined plugins.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Public endpoint reference. Not secret."
+    }
+  }
+}

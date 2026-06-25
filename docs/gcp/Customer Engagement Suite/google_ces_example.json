@@ -1,0 +1,214 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "app": {
+      "description": "Resource ID segment making up resource 'name', defining the app the example belongs to. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "Human-readable description of the example.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "Display name of the example.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "entry_agent": {
+      "description": "The agent that initially handles the conversation. If not specified, the\nexample represents a conversation that is handled by the root agent.\nFormat: 'projects/{project}/locations/{location}/apps/{app}/agents/{agent}'",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "example_id": {
+      "description": "The ID to use for the example, which will become the final component of\nthe example's resource name. In Terraform, this field is required.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "Resource ID segment making up resource 'name', defining what region the parent app is in. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "messages": {
+      "type": "block",
+      "description": "The collection of messages that make up the conversation.",
+      "required": false
+    },
+    "messages.role": {
+      "description": "The role within the conversation, e.g., user, agent.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "messages.chunks": {
+      "type": "block",
+      "description": "Content of the message as a series of chunks.",
+      "required": false
+    },
+    "messages.chunks.text": {
+      "description": "Text data.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "messages.chunks.updated_variables": {
+      "description": "A struct represents variables that were updated in the conversation,\nkeyed by variable names.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "messages.chunks.agent_transfer": {
+      "type": "block",
+      "description": "Represents an event indicating the transfer of a conversation to a different\nagent.",
+      "required": false
+    },
+    "messages.chunks.agent_transfer.target_agent": {
+      "description": "The agent to which the conversation is being transferred. The agent will\nhandle the conversation from this point forward.\nFormat: 'projects/{project}/locations/{location}/apps/{app}/agents/{agent}'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "messages.chunks.image": {
+      "type": "block",
+      "description": "Represents an image input or output in the conversation.",
+      "required": false
+    },
+    "messages.chunks.image.data": {
+      "description": "Raw bytes of the image.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "messages.chunks.image.mime_type": {
+      "description": "The IANA standard MIME type of the source data.\nSupported image types includes:\n* image/png\n* image/jpeg\n* image/webp",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "messages.chunks.tool_call": {
+      "type": "block",
+      "description": "Request for the client or the agent to execute the specified tool.",
+      "required": false
+    },
+    "messages.chunks.tool_call.args": {
+      "description": "The input parameters and values for the tool in JSON object format.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "messages.chunks.tool_call.id": {
+      "description": "The unique identifier of the tool call. If populated, the client should\nreturn the execution result with the matching ID in\nToolResponse.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "messages.chunks.tool_call.tool": {
+      "description": "The name of the tool to execute.\nFormat: 'projects/{project}/locations/{location}/apps/{app}/tools/{tool}'",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "messages.chunks.tool_call.toolset_tool": {
+      "type": "block",
+      "description": "A tool that is created from a toolset.",
+      "required": false
+    },
+    "messages.chunks.tool_call.toolset_tool.tool_id": {
+      "description": "The tool ID to filter the tools to retrieve the schema for.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "messages.chunks.tool_call.toolset_tool.toolset": {
+      "description": "The resource name of the Toolset from which this tool is derived.\nFormat:\n'projects/{project}/locations/{location}/apps/{app}/toolsets/{toolset}'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "messages.chunks.tool_response": {
+      "type": "block",
+      "description": "The execution result of a specific tool from the client or the agent.",
+      "required": false
+    },
+    "messages.chunks.tool_response.id": {
+      "description": "The matching ID of the tool call the response is for.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "messages.chunks.tool_response.response": {
+      "description": "The tool execution result in JSON object format.\nUse \"output\" key to specify tool response and \"error\" key to specify\nerror details (if any). If \"output\" and \"error\" keys are not specified,\nthen whole \"response\" is treated as tool execution result.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "messages.chunks.tool_response.tool": {
+      "description": "The name of the tool to execute.\nFormat: 'projects/{project}/locations/{location}/apps/{app}/tools/{tool}'",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "messages.chunks.tool_response.toolset_tool": {
+      "type": "block",
+      "description": "A tool that is created from a toolset.",
+      "required": false
+    },
+    "messages.chunks.tool_response.toolset_tool.tool_id": {
+      "description": "The tool ID to filter the tools to retrieve the schema for.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "messages.chunks.tool_response.toolset_tool.toolset": {
+      "description": "The resource name of the Toolset from which this tool is derived.\nFormat:\n'projects/{project}/locations/{location}/apps/{app}/toolsets/{toolset}'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

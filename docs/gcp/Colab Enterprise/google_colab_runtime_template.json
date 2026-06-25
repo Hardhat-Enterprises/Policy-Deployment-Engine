@@ -1,0 +1,243 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "The description of the Runtime Template.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "Required. The display name of the Runtime Template.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "Labels to identify and group the runtime template.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The location for the resource: https://cloud.google.com/colab/docs/locations",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "name": {
+      "description": "The resource name of the Runtime Template",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_tags": {
+      "description": "Applies the given Compute Engine tags to the runtime.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_persistent_disk_spec": {
+      "type": "block",
+      "description": "The configuration for the data disk of the runtime.",
+      "required": false
+    },
+    "data_persistent_disk_spec.disk_size_gb": {
+      "description": "The disk size of the runtime in GB. If specified, the diskType must also be specified. The minimum size is 10GB and the maximum is 65536GB.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_persistent_disk_spec.disk_type": {
+      "description": "The type of the persistent disk.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "encryption_spec": {
+      "type": "block",
+      "description": "Customer-managed encryption key spec for the notebook runtime.",
+      "required": false
+    },
+    "encryption_spec.kms_key_name": {
+      "description": "The Cloud KMS encryption key (customer-managed encryption key) used to protect the runtime.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "euc_config": {
+      "type": "block",
+      "description": "EUC configuration of the NotebookRuntimeTemplate.",
+      "required": false
+    },
+    "euc_config.euc_disabled": {
+      "description": "Disable end user credential access for the runtime.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "idle_shutdown_config": {
+      "type": "block",
+      "description": "Notebook Idle Shutdown configuration for the runtime.",
+      "required": false
+    },
+    "idle_shutdown_config.idle_timeout": {
+      "description": "The duration after which the runtime is automatically shut down. An input of 0s disables the idle shutdown feature, and a valid range is [10m, 24h].",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "machine_spec": {
+      "type": "block",
+      "description": "'The machine configuration of the runtime.'",
+      "required": false
+    },
+    "machine_spec.accelerator_count": {
+      "description": "The number of accelerators used by the runtime.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "machine_spec.accelerator_type": {
+      "description": "The type of hardware accelerator used by the runtime. If specified, acceleratorCount must also be specified.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "machine_spec.machine_type": {
+      "description": "The Compute Engine machine type selected for the runtime.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_spec": {
+      "type": "block",
+      "description": "The network configuration for the runtime.",
+      "required": false
+    },
+    "network_spec.enable_internet_access": {
+      "description": "Enable public internet access for the runtime.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_spec.network": {
+      "description": "The name of the VPC that this runtime is in.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_spec.subnetwork": {
+      "description": "The name of the subnetwork that this runtime is in.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "shielded_vm_config": {
+      "type": "block",
+      "description": "Runtime Shielded VM spec.",
+      "required": false
+    },
+    "shielded_vm_config.enable_secure_boot": {
+      "description": "Enables secure boot for the runtime.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "software_config": {
+      "type": "block",
+      "description": "The notebook software configuration of the notebook runtime.",
+      "required": false
+    },
+    "software_config.colab_image": {
+      "type": "block",
+      "description": "Colab Image Configuration.",
+      "required": false
+    },
+    "software_config.colab_image.release_name": {
+      "description": "The release name of the NotebookRuntime Colab image, e.g. \"py310\". If not specified, detault to the latest release.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "software_config.env": {
+      "type": "block",
+      "description": "Environment variables to be passed to the container.",
+      "required": false
+    },
+    "software_config.env.name": {
+      "description": "Name of the environment variable. Must be a valid C identifier.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "software_config.env.value": {
+      "description": "Variables that reference a $(VAR_NAME) are expanded using the previous defined environment variables in the container and any service environment variables. If a variable cannot be resolved, the reference in the input string will be unchanged. The $(VAR_NAME) syntax can be escaped with a double $$, ie: $$(VAR_NAME). Escaped references will never be expanded, regardless of whether the variable exists or not.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "software_config.post_startup_script_config": {
+      "type": "block",
+      "description": "Post startup script config.",
+      "required": false
+    },
+    "software_config.post_startup_script_config.post_startup_script": {
+      "description": "Post startup script to run after runtime is started.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "software_config.post_startup_script_config.post_startup_script_behavior": {
+      "description": "Post startup script behavior that defines download and execution behavior. Possible values: [\"RUN_ONCE\", \"RUN_EVERY_START\", \"DOWNLOAD_AND_RUN_EVERY_START\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "software_config.post_startup_script_config.post_startup_script_url": {
+      "description": "Post startup script url to download. Example: https://bucket/script.sh.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

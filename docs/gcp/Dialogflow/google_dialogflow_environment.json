@@ -1,0 +1,197 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "agent_version": {
+      "description": "The agent version loaded into this environment. Supported formats:\n- projects/<Project ID>/agent/versions/<Version ID>\n- projects/<Project ID>/locations/<Location ID>/agent/versions/<Version ID>",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "The developer-provided description for this environment.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "environmentid": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "fulfillment": {
+      "type": "block",
+      "description": "desc",
+      "required": false
+    },
+    "fulfillment.display_name": {
+      "description": "The human-readable name of the fulfillment, unique within the agent.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "fulfillment.name": {
+      "description": "The unique identifier of the fulfillment. Supports the following formats:\n- projects/<Project ID>/agent/fulfillment\n- projects/<Project ID>/locations/<Location ID>/agent/fulfillment",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "fulfillment.features": {
+      "type": "block",
+      "description": "The field defines whether the fulfillment is enabled for certain features.",
+      "required": false
+    },
+    "fulfillment.features.type": {
+      "description": "The type of the feature that enabled for fulfillment. Possible values: [\"TYPE_UNSPECIFIED\", \"SMALLTALK\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "fulfillment.generic_web_service": {
+      "type": "block",
+      "description": "Represents configuration for a generic web service.",
+      "required": false
+    },
+    "fulfillment.generic_web_service.password": {
+      "description": "The password for HTTP Basic authentication.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "fulfillment.generic_web_service.request_headers": {
+      "description": "The HTTP request headers to send together with fulfillment requests",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "fulfillment.generic_web_service.uri": {
+      "description": "The fulfillment URI for receiving POST requests. It must use https protocol.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "fulfillment.generic_web_service.username": {
+      "description": "The user name for HTTP Basic authentication.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "text_to_speech_settings": {
+      "type": "block",
+      "description": "Text to speech settings for this environment.",
+      "required": false
+    },
+    "text_to_speech_settings.enable_text_to_speech": {
+      "description": "Indicates whether text to speech is enabled. Even when this field is false, other settings in this proto are still retained.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "text_to_speech_settings.output_audio_encoding": {
+      "description": "Audio encoding of the synthesized audio content. Possible values: [\"OUTPUT_AUDIO_ENCODING_UNSPECIFIED\", \"OUTPUT_AUDIO_ENCODING_LINEAR_16\", \"OUTPUT_AUDIO_ENCODING_MP3\", \"OUTPUT_AUDIO_ENCODING_MP3_64_KBPS\", \"OUTPUT_AUDIO_ENCODING_OGG_OPUS\", \"OUTPUT_AUDIO_ENCODING_MULAW\", \"OUTPUT_AUDIO_ENCODING_ALAW\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "text_to_speech_settings.sample_rate_hertz": {
+      "description": "The synthesis sample rate (in hertz) for this audio.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "text_to_speech_settings.synthesize_speech_configs": {
+      "type": "block",
+      "description": "Configuration of how speech should be synthesized, mapping from language to SynthesizeSpeechConfig.",
+      "required": false
+    },
+    "text_to_speech_settings.synthesize_speech_configs.effects_profile_id": {
+      "description": "An identifier which selects 'audio effects' profiles that are applied on (post synthesized) text to speech. Effects are applied on top of each other in the order they are given.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "text_to_speech_settings.synthesize_speech_configs.language": {
+      "description": "The identifier for this object. Format specified above.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "text_to_speech_settings.synthesize_speech_configs.pitch": {
+      "description": "Speaking pitch, in the range [-20.0, 20.0]. 20 means increase 20 semitones from the original pitch. -20 means decrease 20 semitones from the original pitch.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "text_to_speech_settings.synthesize_speech_configs.speaking_rate": {
+      "description": "Speaking rate/speed, in the range [0.25, 4.0].",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "text_to_speech_settings.synthesize_speech_configs.volume_gain_db": {
+      "description": "Volume gain (in dB) of the normal native volume supported by the specific voice.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "text_to_speech_settings.synthesize_speech_configs.voice": {
+      "type": "block",
+      "description": "The desired voice of the synthesized audio.",
+      "required": false
+    },
+    "text_to_speech_settings.synthesize_speech_configs.voice.name": {
+      "description": "The name of the voice.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "text_to_speech_settings.synthesize_speech_configs.voice.ssml_gender": {
+      "description": "The preferred gender of the voice. Possible values: [\"SSML_VOICE_GENDER_UNSPECIFIED\", \"SSML_VOICE_GENDER_MALE\", \"SSML_VOICE_GENDER_FEMALE\", \"SSML_VOICE_GENDER_NEUTRAL\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

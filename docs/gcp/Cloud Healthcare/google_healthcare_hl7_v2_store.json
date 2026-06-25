@@ -1,0 +1,105 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "dataset": {
+      "description": "Identifies the dataset addressed by this request. Must be in the format\n'projects/{project}/locations/{location}/datasets/{dataset}'",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The dataset field is a required reference to the parent dataset and does not directly affect security posture."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "User-supplied key-value pairs used to organize HL7v2 stores.\n\nLabel keys must be between 1 and 63 characters long, have a UTF-8 encoding of maximum 128 bytes, and must\nconform to the following PCRE regular expression: [\\p{Ll}\\p{Lo}][\\p{Ll}\\p{Lo}\\p{N}_-]{0,62}\n\nLabel values are optional, must be between 1 and 63 characters long, have a UTF-8 encoding of maximum 128\nbytes, and must conform to the following PCRE regular expression: [\\p{Ll}\\p{Lo}\\p{N}_-]{0,63}\n\nNo more than 64 labels can be associated with a given store.\n\nAn object containing a list of \"key\": value pairs.\nExample: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Free-form key/value metadata used for organisation, billing and grouping. Labels do not enforce access control or data protection, and mandating specific label content would require hardcoding team-specific values, so this is not a useful policy target."
+    },
+    "name": {
+      "description": "The resource name for the Hl7V2Store.\n\n** Changing this property may recreate the Hl7v2 store (removing all data) **",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The name is a resource identifier only and does not affect security posture."
+    },
+    "reject_duplicate_message": {
+      "description": "Determines whether duplicate messages are allowed.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Allowing duplicate HL7 V2 messages can lead to duplicate clinical events such as medication orders or lab results being processed multiple times. This creates data integrity issues that may result in incorrect patient care decisions and makes audit trails unreliable."
+    },
+    "notification_config": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "notification_config.pubsub_topic": {
+      "description": "The Cloud Pub/Sub topic that notifications of changes are published on. Supplied by the client.\nPubsubMessage.Data will contain the resource name. PubsubMessage.MessageId is the ID of this message.\nIt is guaranteed to be unique within the topic. PubsubMessage.PublishTime is the time at which the message\nwas published. Notifications are only sent if the topic is non-empty. Topic names must be scoped to a\nproject. service-PROJECT_NUMBER@gcp-sa-healthcare.iam.gserviceaccount.com must have publisher permissions on the given\nCloud Pub/Sub topic. Not having adequate permissions will cause the calls that send notifications to fail.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This field is part of the deprecated notification_config block. Use notification_configs.pubsub_topic instead."
+    },
+    "notification_configs": {
+      "type": "block",
+      "description": "A list of notification configs. Each configuration uses a filter to determine whether to publish a\nmessage (both Ingest & Create) on the corresponding notification destination. Only the message name\nis sent as part of the notification. Supplied by the client.",
+      "required": false
+    },
+    "notification_configs.filter": {
+      "description": "Restricts notifications sent for messages matching a filter. If this is empty, all messages\nare matched. Syntax: https://cloud.google.com/appengine/docs/standard/python/search/query_strings\n\nFields/functions available for filtering are:\n\n* messageType, from the MSH-9.1 field. For example, NOT messageType = \"ADT\".\n* send_date or sendDate, the YYYY-MM-DD date the message was sent in the dataset's timeZone, from the MSH-7 segment. For example, send_date < \"2017-01-02\".\n* sendTime, the timestamp when the message was sent, using the RFC3339 time format for comparisons, from the MSH-7 segment. For example, sendTime < \"2017-01-02T00:00:00-05:00\".\n* sendFacility, the care center that the message came from, from the MSH-4 segment. For example, sendFacility = \"ABC\".\n* PatientId(value, type), which matches if the message lists a patient having an ID of the given value and type in the PID-2, PID-3, or PID-4 segments. For example, PatientId(\"123456\", \"MRN\").\n* labels.x, a string value of the label with key x as set using the Message.labels map. For example, labels.\"priority\"=\"high\". The operator :* can be used to assert the existence of a label. For example, labels.\"priority\":*.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The filter field restricts which messages trigger notifications. Leaving it empty ensures all messages are captured, which is the safest default for audit completeness."
+    },
+    "notification_configs.pubsub_topic": {
+      "description": "The Cloud Pub/Sub topic that notifications of changes are published on. Supplied by the client.\nPubsubMessage.Data will contain the resource name. PubsubMessage.MessageId is the ID of this message.\nIt is guaranteed to be unique within the topic. PubsubMessage.PublishTime is the time at which the message\nwas published. Notifications are only sent if the topic is non-empty. Topic names must be scoped to a\nproject. service-PROJECT_NUMBER@gcp-sa-healthcare.iam.gserviceaccount.com must have publisher permissions on the given\nCloud Pub/Sub topic. Not having adequate permissions will cause the calls that send notifications to fail.\n\nIf a notification cannot be published to Cloud Pub/Sub, errors will be logged to Stackdriver",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "A Pub/Sub topic is required to stream HL7 V2 store events for real-time audit and monitoring. Without it, there is no mechanism to detect or alert on unauthorised ingestion or modification of clinical messaging data."
+    },
+    "parser_config": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "parser_config.allow_null_header": {
+      "description": "Determines whether messages with no header are allowed.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "This field controls whether headerless messages are accepted and does not directly affect security posture."
+    },
+    "parser_config.schema": {
+      "description": "JSON encoded string for schemas used to parse messages in this\nstore if schematized parsing is desired.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The schema field controls message structure validation and does not directly affect security posture."
+    },
+    "parser_config.segment_terminator": {
+      "description": "Byte(s) to be used as the segment terminator. If this is unset, '\\r' will be used as segment terminator.\n\nA base64-encoded string.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The segment terminator is a parsing configuration and does not directly affect security posture."
+    },
+    "parser_config.version": {
+      "description": "The version of the unschematized parser to be used when a custom 'schema' is not set. Default value: \"V1\" Possible values: [\"V1\", \"V2\", \"V3\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The parser version controls message parsing behaviour and does not directly affect security posture."
+    }
+  }
+}

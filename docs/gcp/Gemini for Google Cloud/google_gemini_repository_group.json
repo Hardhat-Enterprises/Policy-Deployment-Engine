@@ -1,0 +1,67 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "code_repository_index": {
+      "description": "Required. Id of the Code Repository Index.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Reference to the code repository index that the repository group belongs to; it is a pointer to another resource, and platform policy does not constrain references to other resources."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "Optional. Labels as key value pairs.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Not security-related."
+    },
+    "location": {
+      "description": "The location of the Code Repository Index, for example 'us-central1'.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Affects resource grouping. Not security-related."
+    },
+    "repository_group_id": {
+      "description": "Required. Id of the Repository Group.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Not security-related."
+    },
+    "repositories": {
+      "type": "block",
+      "description": "Required. List of repositories to group.",
+      "required": true
+    },
+    "repositories.branch_pattern": {
+      "description": "Required. The Git branch pattern used for indexing in RE2 syntax.\nSee https://github.com/google/re2/wiki/syntax for syntax.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Glob pattern selecting which repository branches are included in the repository group; it scopes which code is indexed, not access or encryption, so constraining it would not improve security."
+    },
+    "repositories.resource": {
+      "description": "Required. The DeveloperConnect repository full resource name, relative resource name\nor resource URL to be indexed.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Reference to the source code repository included in the repository group; it points at an external repository resource, which platform policy does not constrain."
+    }
+  }
+}

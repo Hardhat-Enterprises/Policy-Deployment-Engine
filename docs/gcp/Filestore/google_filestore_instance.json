@@ -1,0 +1,320 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_protection_enabled": {
+      "description": "Indicates whether the instance is protected against deletion.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_protection_reason": {
+      "description": "The reason for enabling deletion protection.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "A description of the instance.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "desired_replica_state": {
+      "description": "The desired_replica_state field controls the state of a replica. Terraform will attempt to make the actual state of the replica match the desired state. Default value: \"READY\" Possible values: [\"PAUSED\", \"READY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "kms_key_name": {
+      "description": "KMS key name used for data encryption.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "Resource labels to represent user-provided metadata.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The name of the location of the instance. This can be a region for ENTERPRISE tier instances.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "name": {
+      "description": "The resource name of the instance.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "protocol": {
+      "description": "Either NFSv3, for using NFS version 3 as file sharing protocol,\nor NFSv4.1, for using NFS version 4.1 as file sharing protocol.\nNFSv4.1 can be used with HIGH_SCALE_SSD, ZONAL, REGIONAL and ENTERPRISE.\nThe default is NFSv3. Default value: \"NFS_V3\" Possible values: [\"NFS_V3\", \"NFS_V4_1\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "tags": {
+      "description": "A map of resource manager tags. Resource manager tag keys\nand values have the same definition as resource manager\ntags. Keys must be in the format tagKeys/{tag_key_id},\nand values are in the format tagValues/456. The field is\nignored when empty. The field is immutable and causes\nresource replacement when mutated. This field is only set\nat create time and modifying this field after creation\nwill trigger recreation. To apply tags to an existing\nresource, see the 'google_tags_tag_value' resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "tier": {
+      "description": "The service tier of the instance.\nPossible values include: STANDARD, PREMIUM, BASIC_HDD, BASIC_SSD, HIGH_SCALE_SSD, ZONAL, REGIONAL and ENTERPRISE",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "zone": {
+      "description": "The name of the Filestore zone of the instance.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "directory_services": {
+      "type": "block",
+      "description": "Directory Services configuration.\nShould only be set if protocol is \"NFS_V4_1\".",
+      "required": false
+    },
+    "directory_services.ldap": {
+      "type": "block",
+      "description": "Configuration for LDAP servers.",
+      "required": false
+    },
+    "directory_services.ldap.domain": {
+      "description": "The LDAP domain name in the format of 'my-domain.com'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "directory_services.ldap.groups_ou": {
+      "description": "The groups Organizational Unit (OU) is optional. This parameter is a hint\nto allow faster lookup in the LDAP namespace. In case that this parameter\nis not provided, Filestore instance will query the whole LDAP namespace.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "directory_services.ldap.servers": {
+      "description": "The servers names are used for specifying the LDAP servers names.\nThe LDAP servers names can come with two formats:\n1. DNS name, for example: 'ldap.example1.com', 'ldap.example2.com'.\n2. IP address, for example: '10.0.0.1', '10.0.0.2', '10.0.0.3'.\nAll servers names must be in the same format: either all DNS names or all\nIP addresses.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "directory_services.ldap.users_ou": {
+      "description": "The users Organizational Unit (OU) is optional. This parameter is a hint\nto allow faster lookup in the LDAP namespace. In case that this parameter\nis not provided, Filestore instance will query the whole LDAP namespace.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "file_shares": {
+      "type": "block",
+      "description": "File system shares on the instance. For this version, only a\nsingle file share is supported.",
+      "required": true
+    },
+    "file_shares.capacity_gb": {
+      "description": "File share capacity in GiB. This must be at least 1024 GiB\nfor the standard tier, or 2560 GiB for the premium tier.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "file_shares.name": {
+      "description": "The name of the fileshare (16 characters or less)",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "file_shares.source_backup": {
+      "description": "The resource name of the backup, in the format\nprojects/{projectId}/locations/{locationId}/backups/{backupId},\nthat this file share has been restored from.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "file_shares.source_backupdr_backup": {
+      "description": "The resource name of the BackupDR backup, in the format\n'projects/{project_id}/locations/{location_id}/backupVaults/{backupvault_id}/dataSources/{datasource_id}/backups/{backup_id}',\nthat this file share has been restored from.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "file_shares.nfs_export_options": {
+      "type": "block",
+      "description": "Nfs Export Options. There is a limit of 10 export options per file share.",
+      "required": false
+    },
+    "file_shares.nfs_export_options.access_mode": {
+      "description": "Either READ_ONLY, for allowing only read requests on the exported directory,\nor READ_WRITE, for allowing both read and write requests. The default is READ_WRITE. Default value: \"READ_WRITE\" Possible values: [\"READ_ONLY\", \"READ_WRITE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "file_shares.nfs_export_options.anon_gid": {
+      "description": "An integer representing the anonymous group id with a default value of 65534.\nAnon_gid may only be set with squashMode of ROOT_SQUASH. An error will be returned\nif this field is specified for other squashMode settings.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "file_shares.nfs_export_options.anon_uid": {
+      "description": "An integer representing the anonymous user id with a default value of 65534.\nAnon_uid may only be set with squashMode of ROOT_SQUASH. An error will be returned\nif this field is specified for other squashMode settings.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "file_shares.nfs_export_options.ip_ranges": {
+      "description": "List of either IPv4 addresses, or ranges in CIDR notation which may mount the file share.\nOverlapping IP ranges are not allowed, both within and across NfsExportOptions. An error will be returned.\nThe limit is 64 IP ranges/addresses for each FileShareConfig among all NfsExportOptions.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "file_shares.nfs_export_options.network": {
+      "description": "The source VPC network for 'ip_ranges'.\nRequired for instances using Private Service Connect, optional otherwise.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "file_shares.nfs_export_options.squash_mode": {
+      "description": "Either NO_ROOT_SQUASH, for allowing root access on the exported directory, or ROOT_SQUASH,\nfor not allowing root access. The default is NO_ROOT_SQUASH. Default value: \"NO_ROOT_SQUASH\" Possible values: [\"NO_ROOT_SQUASH\", \"ROOT_SQUASH\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "initial_replication": {
+      "type": "block",
+      "description": "Replication configuration, once set, this cannot be updated.\nAdditionally this should be specified on the replica instance only, indicating the active as the peer_instance",
+      "required": false
+    },
+    "initial_replication.role": {
+      "description": "The replication role. Default value: \"STANDBY\" Possible values: [\"ROLE_UNSPECIFIED\", \"ACTIVE\", \"STANDBY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "initial_replication.replicas": {
+      "type": "block",
+      "description": "The replication role.",
+      "required": false
+    },
+    "initial_replication.replicas.peer_instance": {
+      "description": "The peer instance.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "networks": {
+      "type": "block",
+      "description": "VPC networks to which the instance is connected. For this version,\nonly a single network is supported.",
+      "required": true
+    },
+    "networks.connect_mode": {
+      "description": "The network connect mode of the Filestore instance.\nIf not provided, the connect mode defaults to\nDIRECT_PEERING. Default value: \"DIRECT_PEERING\" Possible values: [\"DIRECT_PEERING\", \"PRIVATE_SERVICE_ACCESS\", \"PRIVATE_SERVICE_CONNECT\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "networks.modes": {
+      "description": "IP versions for which the instance has\nIP addresses assigned. Possible values: [\"ADDRESS_MODE_UNSPECIFIED\", \"MODE_IPV4\", \"MODE_IPV6\"]",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "networks.network": {
+      "description": "The name of the GCE VPC network to which the\ninstance is connected.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "networks.reserved_ip_range": {
+      "description": "A /29 CIDR block that identifies the range of IP\naddresses reserved for this instance.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "networks.psc_config": {
+      "type": "block",
+      "description": "Private Service Connect configuration.\nShould only be set when connect_mode is PRIVATE_SERVICE_CONNECT.",
+      "required": false
+    },
+    "networks.psc_config.endpoint_project": {
+      "description": "Consumer service project in which the Private Service Connect endpoint\nwould be set up. This is optional, and only relevant in case the network\nis a shared VPC. If this is not specified, the endpoint would be set up\nin the VPC host project.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "performance_config": {
+      "type": "block",
+      "description": "Performance configuration for the instance. If not provided,\nthe default performance settings will be used.",
+      "required": false
+    },
+    "performance_config.fixed_iops": {
+      "type": "block",
+      "description": "The instance will have a fixed provisioned IOPS value,\nwhich will remain constant regardless of instance\ncapacity.",
+      "required": false
+    },
+    "performance_config.fixed_iops.max_iops": {
+      "description": "The number of IOPS to provision for the instance.\nmax_iops must be in multiple of 1000.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "performance_config.iops_per_tb": {
+      "type": "block",
+      "description": "The instance provisioned IOPS will change dynamically\nbased on the capacity of the instance.",
+      "required": false
+    },
+    "performance_config.iops_per_tb.max_iops_per_tb": {
+      "description": "The instance max IOPS will be calculated by multiplying\nthe capacity of the instance (TB) by max_iops_per_tb,\nand rounding to the nearest 1000. The instance max IOPS\nwill be changed dynamically based on the instance\ncapacity.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

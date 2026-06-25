@@ -1,0 +1,126 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "An optional description of this resource.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "User-defined labels.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "name": {
+      "description": "The name of the policy based route.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network": {
+      "description": "Fully-qualified URL of the network that this route applies to, for example: projects/my-project/global/networks/my-network.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "next_hop_ilb_ip": {
+      "description": "The IP address of a global-access-enabled L4 ILB that is the next hop for matching packets.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "next_hop_other_routes": {
+      "description": "Other routes that will be referenced to determine the next hop of the packet. Possible values: [\"DEFAULT_ROUTING\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "priority": {
+      "description": "The priority of this policy-based route. Priority is used to break ties in cases where there are more than one matching policy-based routes found. In cases where multiple policy-based routes are matched, the one with the lowest-numbered priority value wins. The default value is 1000. The priority value must be from 1 to 65535, inclusive.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "filter": {
+      "type": "block",
+      "description": "The filter to match L4 traffic.",
+      "required": true
+    },
+    "filter.dest_range": {
+      "description": "The destination IP range of outgoing packets that this policy-based route applies to. Default is \"0.0.0.0/0\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "filter.ip_protocol": {
+      "description": "The IP protocol that this policy-based route applies to. Valid values are 'TCP', 'UDP', and 'ALL'. Default is 'ALL'.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "filter.protocol_version": {
+      "description": "Internet protocol versions this policy-based route applies to. Possible values: [\"IPV4\", \"IPV6\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "filter.src_range": {
+      "description": "The source IP range of outgoing packets that this policy-based route applies to. Default is \"0.0.0.0/0\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "interconnect_attachment": {
+      "type": "block",
+      "description": "The interconnect attachments that this policy-based route applies to.",
+      "required": false
+    },
+    "interconnect_attachment.region": {
+      "description": "Cloud region to install this policy-based route on for Interconnect attachments. Use 'all' to install it on all Interconnect attachments.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "virtual_machine": {
+      "type": "block",
+      "description": "VM instances to which this policy-based route applies to.",
+      "required": false
+    },
+    "virtual_machine.tags": {
+      "description": "A list of VM instance tags that this policy-based route applies to. VM instances that have ANY of tags specified here will install this PBR.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

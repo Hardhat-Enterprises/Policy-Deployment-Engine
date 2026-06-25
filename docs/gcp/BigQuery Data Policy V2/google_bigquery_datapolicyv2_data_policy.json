@@ -1,0 +1,74 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "data_policy_id": {
+      "description": "User-assigned (human readable) ID of the data policy that needs to be\nunique within a project. Used as {data_policy_id} in part of the resource\nname.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier only."
+    },
+    "data_policy_type": {
+      "description": "Type of data policy.\nPossible values:\nDATA_MASKING_POLICY\nRAW_DATA_ACCESS_POLICY\nCOLUMN_LEVEL_SECURITY_POLICY",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "RAW_DATA_ACCESS_POLICY gives direct access to the data."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "etag": {
+      "description": "The etag for this Data Policy.\nThis field is used for UpdateDataPolicy calls. If Data Policy exists, this\nfield is required and must match the server's etag. It will also be\npopulated in the response of GetDataPolicy, CreateDataPolicy, and\nUpdateDataPolicy calls.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "grantees": {
+      "description": "The list of IAM principals that have Fine Grained Access to the underlying\ndata goverened by this data policy.\n\nUses the [IAM V2 principal\nsyntax](https://cloud.google.com/iam/docs/principal-identifiers#v2) Only\nsupports principal types users, groups, serviceaccounts, cloudidentity.\nThis field is supported in V2 Data Policy only. In case of V1 data policies\n(i.e. verion = 1 and policy_tag is set), this field is not populated.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": true,
+      "rationale": "grantees controls who can access the data."
+    },
+    "location": {
+      "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Project selector only."
+    },
+    "data_masking_policy": {
+      "type": "block",
+      "description": "The policy used to specify data masking rule.",
+      "required": false
+    },
+    "data_masking_policy.predefined_expression": {
+      "description": "A predefined masking expression.\nPossible values:\nSHA256\nALWAYS_NULL\nDEFAULT_MASKING_VALUE\nLAST_FOUR_CHARACTERS\nFIRST_FOUR_CHARACTERS\nEMAIL_MASK\nDATE_YEAR_MASK\nRANDOM_HASH",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The masking expression controls how much data is revealed."
+    },
+    "data_masking_policy.routine": {
+      "description": "The name of the BigQuery routine that contains the custom masking\nroutine, in the format of\n'projects/{project_number}/datasets/{dataset_id}/routines/{routine_id}'.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Custom routine can change masking behavior."
+    }
+  }
+}

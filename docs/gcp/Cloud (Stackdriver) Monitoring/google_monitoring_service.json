@@ -1,0 +1,60 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "Name used for UI elements listing this Service.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Display metadata with no security impact."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Organisational field, not a security control."
+    },
+    "service_id": {
+      "description": "An optional service ID to use. If not given, the server will generate a\nservice ID.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier field with no security impact."
+    },
+    "user_labels": {
+      "description": "Labels which have been used to annotate the service. Label keys must start\nwith a letter. Label keys and values may contain lowercase letters,\nnumbers, underscores, and dashes. Label keys and values have a maximum\nlength of 63 characters, and must be less than 128 bytes in size. Up to 64\nlabel entries may be stored. For labels which do not have a semantic value,\nthe empty string may be supplied for the label value.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Organisational metadata with no security impact."
+    },
+    "basic_service": {
+      "type": "block",
+      "description": "A well-known service type, defined by its service type and service labels.\nValid values of service types and services labels are described at\nhttps://cloud.google.com/stackdriver/docs/solutions/slo-monitoring/api/api-structures#basic-svc-w-basic-sli",
+      "required": false
+    },
+    "basic_service.service_labels": {
+      "description": "Labels that specify the resource that emits the monitoring data\nwhich is used for SLO reporting of this 'Service'.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Functional identifiers with no security impact."
+    },
+    "basic_service.service_type": {
+      "description": "The type of service that this basic service defines, e.g.\nAPP_ENGINE service type",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Service type selector with no direct security impact."
+    }
+  }
+}

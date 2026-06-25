@@ -1,0 +1,79 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "database": {
+      "description": "The id of the parent database.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier referencing the parent database the table belongs to. It is a pointer to another resource; constraining resource references is out of scope, so no security policy applies."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "name": {
+      "description": "Output only. The name of the Table. Format:\nprojects/{project_id_or_number}/locations/{locationId}/catalogs/{catalogId}/databases/{databaseId}/tables/{tableId}",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier/name of the table, database, or catalog resource. We do not constrain resource names, so it has no platform security policy."
+    },
+    "type": {
+      "description": "The database type. Possible values: [\"HIVE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Declares the object type (e.g. table/database type such as HIVE). This is a structural/compatibility descriptor, not a security control, so no policy is warranted."
+    },
+    "hive_options": {
+      "type": "block",
+      "description": "Options of a Hive table.",
+      "required": false
+    },
+    "hive_options.parameters": {
+      "description": "Stores user supplied Hive table parameters. An object containing a\nlist of \"key\": value pairs.\nExample: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Free-form key/value Hive metadata parameters for the table or database. This is an arbitrary metadata map; a generic policy cannot meaningfully constrain free-form parameters, so it is not a useful policy target."
+    },
+    "hive_options.table_type": {
+      "description": "Hive table type. For example, MANAGED_TABLE, EXTERNAL_TABLE.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "hive_options.storage_descriptor": {
+      "type": "block",
+      "description": "Stores physical storage information on the data.",
+      "required": false
+    },
+    "hive_options.storage_descriptor.input_format": {
+      "description": "The fully qualified Java class name of the input format.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Hive storage-descriptor input format (the InputFormat class used to read the table's files). This is a data-format/compatibility setting with no confidentiality, integrity, or exposure dimension, so constraining it offers no security gain."
+    },
+    "hive_options.storage_descriptor.location_uri": {
+      "description": "Cloud Storage folder URI where the table data is stored, starting with \"gs://\".",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "A gs:// Cloud Storage path pointing at where the database/table data lives. This is a reference to another resource (a bucket/folder); we secure the bucket itself elsewhere and do not constrain references to it, and a generic policy can't validate an arbitrary path without hardcoding. Exposure/residency is enforced on the bucket's own public-access and location controls, not this pointer."
+    },
+    "hive_options.storage_descriptor.output_format": {
+      "description": "The fully qualified Java class name of the output format.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Hive storage-descriptor output format (the OutputFormat class used to write the table's files). It is a data-format/compatibility setting, not a security control, so it is not a policy target."
+    }
+  }
+}

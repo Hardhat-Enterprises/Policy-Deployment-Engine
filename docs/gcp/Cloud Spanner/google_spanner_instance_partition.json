@@ -1,0 +1,126 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "config": {
+      "description": "The name of the instance partition's configuration (similar to a region) which\ndefines the geographic placement and replication of data in this instance partition.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "A partition inherits the geographic placement and replication controls of its parent instance configuration, which is governed by the data_residency policy on google_spanner_instance. No standalone policy is needed here."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "The descriptive name for this instance partition as it appears in UIs.\nMust be unique per project and between 4 and 30 characters in length.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The display name is a required identifier for the instance partition. It does not directly introduce a security risk but should follow naming conventions for clarity."
+    },
+    "instance": {
+      "description": "The instance to create the instance partition in.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is a required reference to the parent Spanner instance. It does not directly introduce a security risk but must be correctly configured to ensure the partition is created in the intended instance."
+    },
+    "name": {
+      "description": "A unique identifier for the instance partition, which cannot be changed after\nthe instance partition is created. The name must be between 2 and 64 characters\nand match the regular expression [a-z][a-z0-9\\\\-]{0,61}[a-z0-9].",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The instance partition name is a required identifier that cannot be changed after creation. It does not directly introduce a security risk but should follow naming conventions to avoid confusion."
+    },
+    "node_count": {
+      "description": "The number of nodes allocated to this instance partition. One node equals\n1000 processing units. Exactly one of either node_count, processing_units,\nor autoscaling_config must be present.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Node count affects availability and performance but does not directly introduce a security risk."
+    },
+    "processing_units": {
+      "description": "The number of processing units allocated to this instance partition.\nExactly one of either node_count, processing_units, or autoscaling_config\nmust be present.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Processing units affect availability and performance but do not directly introduce a security risk."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The project field is optional and defaults to the provider project. It does not directly introduce a security risk but should be explicitly set to avoid deploying resources to unintended projects."
+    },
+    "autoscaling_config": {
+      "type": "block",
+      "description": "The autoscaling configuration. Autoscaling is enabled if this field is set.\nExactly one of either node_count, processing_units, or autoscaling_config must be\npresent. When autoscaling is enabled, node_count and processing_units are treated as\nOUTPUT_ONLY fields and reflect the current compute capacity allocated to the\ninstance partition.",
+      "required": false
+    },
+    "autoscaling_config.autoscaling_limits": {
+      "type": "block",
+      "description": "Defines scale in controls to reduce the risk of response latency\nand outages due to abrupt scale-in events. Users can define the minimum and\nmaximum compute capacity allocated to the instance partition, and the autoscaler will\nonly scale within that range. Users can either use nodes or processing\nunits to specify the limits, but should use the same unit to set both the\nmin_limit and max_limit.",
+      "required": false
+    },
+    "autoscaling_config.autoscaling_limits.max_nodes": {
+      "description": "Specifies maximum number of nodes allocated to the instance partition. If set, this number\nshould be greater than or equal to min_nodes.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autoscaling_config.autoscaling_limits.max_processing_units": {
+      "description": "Specifies maximum number of processing units allocated to the instance partition.\nIf set, this number should be multiples of 1000 and be greater than or equal to\nmin_processing_units.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autoscaling_config.autoscaling_limits.min_nodes": {
+      "description": "Specifies number of nodes allocated to the instance partition. If set, this number\nshould be greater than or equal to 1.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autoscaling_config.autoscaling_limits.min_processing_units": {
+      "description": "Specifies minimum number of processing units allocated to the instance partition.\nIf set, this number should be multiples of 1000.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autoscaling_config.autoscaling_targets": {
+      "type": "block",
+      "description": "Defines scale in controls to reduce the risk of response latency\nand outages due to abrupt scale-in events",
+      "required": false
+    },
+    "autoscaling_config.autoscaling_targets.high_priority_cpu_utilization_percent": {
+      "description": "Specifies the target high priority cpu utilization percentage that the autoscaler\nshould be trying to achieve for the instance partition.\nThis number is on a scale from 0 (no utilization) to 100 (full utilization).",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autoscaling_config.autoscaling_targets.storage_utilization_percent": {
+      "description": "Specifies the target storage utilization percentage that the autoscaler\nshould be trying to achieve for the instance partition.\nThis number is on a scale from 0 (no utilization) to 100 (full utilization).",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autoscaling_config.autoscaling_targets.total_cpu_utilization_percent": {
+      "description": "Specifies the target total cpu utilization percentage that the autoscaler\nshould be trying to achieve for the instance partition.\nThis number is on a scale from 0 (no utilization) to 100 (full utilization). The valid range is [10, 90] inclusive.\nIf not specified or set to 0, the autoscaler will skip scaling based on total cpu utilization.\nThe value should be higher than high_priority_cpu_utilization_percent if present.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

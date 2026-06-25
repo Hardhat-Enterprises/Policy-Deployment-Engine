@@ -1,0 +1,53 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The location for the Dataset.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "name": {
+      "description": "The resource name for the Dataset.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The name is a resource identifier only and does not affect security posture."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The project field is an optional resource scoping attribute and does not directly affect security posture."
+    },
+    "time_zone": {
+      "description": "The default timezone used by this dataset. Must be a either a valid IANA time zone name such as\n\"America/New_York\" or empty, which defaults to UTC. This is used for parsing times in resources\n(e.g., HL7 messages) where no explicit timezone is specified.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The time_zone field affects timestamp parsing in HL7 messages but does not directly affect the security posture of the dataset."
+    },
+    "encryption_spec": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "encryption_spec.kms_key_name": {
+      "description": "KMS encryption key that is used to secure this dataset and its sub-resources. The key used for\nencryption and the dataset must be in the same location. If empty, the default Google encryption\nkey will be used to secure this dataset. The format is\nprojects/{projectId}/locations/{locationId}/keyRings/{keyRingId}/cryptoKeys/{keyId}.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Without a KMS key, the dataset relies on Google-managed encryption, preventing organisations from controlling key rotation, revocation, and access. A customer-managed key ensures the organisation retains full ownership of PHI encryption and can immediately revoke access if needed."
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "curation_id": {
+      "description": "The ID to use for the curation resource, which will become the final\ncomponent of the curations's resource name. This field is optional.\n\n* If provided, the same will be used. The service will throw an error if\nthe specified ID is already used by another curation resource in the API\nhub.\n* If not provided, a system generated ID will be used.\n\nThis value should be 4-500 characters, and valid characters\nare /a-z[0-9]-_/.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier only."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "The description of the curation.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Purely informational field with no effect on security."
+    },
+    "display_name": {
+      "description": "The display name of the curation.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Required so that terraform operates normally"
+    },
+    "endpoint": {
+      "type": "block",
+      "description": "The endpoint to be triggered for curation.\nThe endpoint will be invoked with a request payload containing\nApiMetadata.\nResponse should contain curated data in the form of\nApiMetadata.",
+      "required": true
+    },
+    "endpoint.application_integration_endpoint_details": {
+      "type": "block",
+      "description": "The details of the Application Integration endpoint to be triggered for\ncuration.",
+      "required": true
+    },
+    "endpoint.application_integration_endpoint_details.trigger_id": {
+      "description": "The API trigger ID of the Application Integration workflow.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier of the Application Integration trigger the curation endpoint references. This is a reference to another resource; we do not constrain resource identifiers or naming, and a generic policy could not know the correct id."
+    },
+    "endpoint.application_integration_endpoint_details.uri": {
+      "description": "The endpoint URI should be a valid REST URI for triggering an Application\nIntegration.\nFormat:\n'https://integrations.googleapis.com/v1/{name=projects/*/locations/*/integrations/*}:execute'\nor\n'https://{location}-integrations.googleapis.com/v1/{name=projects/*/locations/*/integrations/*}:execute'",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "References the Application Integration endpoint URI the curation calls. This is a pointer to another resource/endpoint chosen by the team; we do not constrain references, and a generic policy could not enumerate approved URIs without hardcoding team-specific values."
+    }
+  }
+}

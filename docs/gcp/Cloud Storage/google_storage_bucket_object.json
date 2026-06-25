@@ -1,0 +1,194 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "bucket": {
+      "description": "The name of the containing bucket.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cache_control": {
+      "description": "Cache-Control directive to specify caching behavior of object data. If omitted and object is accessible to all anonymous users, the default will be public, max-age=3600",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "content": {
+      "description": "Data as string to be uploaded. Must be defined if source is not. Note: The content field is marked as sensitive. To view the raw contents of the object, please define an output.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "content_disposition": {
+      "description": "Content-Disposition of the object data.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "content_encoding": {
+      "description": "Content-Encoding of the object data.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "content_language": {
+      "description": "Content-Language of the object data.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "content_type": {
+      "description": "Content-Type of the object data. Defaults to \"application/octet-stream\" or \"text/plain; charset=utf-8\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "detect_md5hash": {
+      "description": "Detect changes to local file or changes made outside of Terraform to the file stored on the server. MD5 hash of the data, encoded using [base64](https://datatracker.ietf.org/doc/html/rfc4648#section-4). This field is not present for [composite objects](https://cloud.google.com/storage/docs/composite-objects). For more information about using the MD5 hash, see [Hashes and ETags: Best Practices](https://cloud.google.com/storage/docs/hashes-etags#json-api).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "event_based_hold": {
+      "description": "Whether an object is under event-based hold. Event-based hold is a way to retain objects until an event occurs, which is signified by the hold's release (i.e. this value is set to false). After being released (set to false), such objects will be subject to bucket-level retention (if any).",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "force_empty_content_type": {
+      "description": "Flag to set empty Content-Type.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "kms_key_name": {
+      "description": "Resource name of the Cloud KMS key that will be used to encrypt the object. Overrides the object metadata's kmsKeyName value, if any.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Encryption should be present either through customer or using kms for data security"
+    },
+    "metadata": {
+      "description": "User-provided metadata, in key/value pairs.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "name": {
+      "description": "The name of the object. If you're interpolating the name of this object, see output_name instead.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source": {
+      "description": "A path to the data you want to upload. Must be defined if content is not.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_md5hash": {
+      "description": "User-provided md5hash, Base 64 MD5 hash of the object data.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage_class": {
+      "description": "The StorageClass of the new bucket object. Supported values include: MULTI_REGIONAL, REGIONAL, NEARLINE, COLDLINE, ARCHIVE. If not provided, this defaults to the bucket's default storage class or to a standard class.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "temporary_hold": {
+      "description": "Whether an object is under temporary hold. While this flag is set to true, the object is protected against deletion and overwrites.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "contexts": {
+      "type": "block",
+      "description": "Contexts attached to an object, in key-value pairs.",
+      "required": false
+    },
+    "contexts.custom": {
+      "type": "block",
+      "description": "A list of custom context key-value pairs.",
+      "required": true
+    },
+    "contexts.custom.key": {
+      "description": "An individual object context. Context keys and their corresponding values must start with an alphanumeric character.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "contexts.custom.value": {
+      "description": "The value associated with this context. This field holds the primary information for the given context key.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "customer_encryption": {
+      "type": "block",
+      "description": "Encryption key; encoded using base64.",
+      "required": false
+    },
+    "customer_encryption.encryption_algorithm": {
+      "description": "The encryption algorithm. Default: AES256",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "customer_encryption.encryption_key": {
+      "description": "Base64 encoded customer supplied encryption key.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "retention": {
+      "type": "block",
+      "description": "Object level retention configuration.",
+      "required": false
+    },
+    "retention.mode": {
+      "description": "The object retention mode. Supported values include: \"Unlocked\", \"Locked\".",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "retention.retain_until_time": {
+      "description": "Time in RFC 3339 (e.g. 2030-01-01T02:03:04Z) until which object retention protects this object.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

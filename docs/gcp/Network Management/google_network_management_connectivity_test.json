@@ -1,0 +1,262 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "bypass_firewall_checks": {
+      "description": "Whether the analysis should skip firewall checking. Default value is false.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "The user-supplied description of the Connectivity Test.\nMaximum of 512 characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "Resource labels to represent user-provided metadata.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "name": {
+      "description": "Unique name for the connectivity test.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "protocol": {
+      "description": "IP Protocol of the test. When not provided, \"TCP\" is assumed.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "related_projects": {
+      "description": "Other projects that may be relevant for reachability analysis.\nThis is applicable to scenarios where a test can cross project\nboundaries.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "round_trip": {
+      "description": "Whether run analysis for the return path from destination to source.\nDefault value is false.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination": {
+      "type": "block",
+      "description": "Required. Destination specification of the Connectivity Test.\n\nYou can use a combination of destination IP address, URI of a supported\nendpoint, project ID, or VPC network to identify the destination location.\n\nReachability analysis proceeds even if the destination location is\nambiguous. However, the test result might include endpoints or use a\ndestination that you don't intend to test.",
+      "required": true
+    },
+    "destination.cloud_sql_instance": {
+      "description": "A Cloud SQL instance URI.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination.forwarding_rule": {
+      "description": "Forwarding rule URI. Forwarding rules are frontends for load balancers,\nPSC endpoints, and Protocol Forwarding.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination.fqdn": {
+      "description": "A DNS endpoint of Google Kubernetes Engine cluster control plane.\nRequires gke_master_cluster to be set, can't be used simultaneoulsly with\nip_address or network. Applicable only to destination endpoint.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination.gke_master_cluster": {
+      "description": "A cluster URI for Google Kubernetes Engine cluster control plane.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination.gke_pod": {
+      "description": "A [GKE Pod](https://cloud.google.com/kubernetes-engine/docs/concepts/pod) URI.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination.instance": {
+      "description": "A Compute Engine instance URI.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination.ip_address": {
+      "description": "The IP address of the endpoint, which can be an external or internal IP.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination.network": {
+      "description": "A VPC network URI.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination.network_type": {
+      "description": "For source endpoints, type of the network where the endpoint is located. Not relevant for destination endpoints. Possible values: [\"GCP_NETWORK\", \"NON_GCP_NETWORK\", \"INTERNET\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination.port": {
+      "description": "The IP protocol port of the endpoint. Only applicable when protocol is\nTCP or UDP.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination.project_id": {
+      "description": "Project ID where the endpoint is located.\nThe project ID can be derived from the URI if you provide a endpoint or\nnetwork URI.\nThe following are two cases where you may need to provide the project ID:\n1. Only the IP address is specified, and the IP address is within a Google\nCloud project.\n2. When you are using Shared VPC and the IP address that you provide is\nfrom the service project. In this case, the network that the IP address\nresides in is defined in the host project.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination.redis_cluster": {
+      "description": "A Redis Cluster URI.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "destination.redis_instance": {
+      "description": "A Redis Instance URI.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source": {
+      "type": "block",
+      "description": "Required. Source specification of the Connectivity Test.\n\nYou can use a combination of source IP address, URI of a supported\nendpoint, project ID, or VPC network to identify the source location.\n\nReachability analysis might proceed even if the source location is\nambiguous. However, the test result might include endpoints or use a source\nthat you don't intend to test.",
+      "required": true
+    },
+    "source.cloud_sql_instance": {
+      "description": "A Cloud SQL instance URI.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source.gke_master_cluster": {
+      "description": "A cluster URI for Google Kubernetes Engine cluster control plane.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source.instance": {
+      "description": "A Compute Engine instance URI.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source.ip_address": {
+      "description": "The IP address of the endpoint, which can be an external or internal IP.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source.network": {
+      "description": "A VPC network URI.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source.network_type": {
+      "description": "Type of the network where the endpoint is located. Possible values: [\"GCP_NETWORK\", \"NON_GCP_NETWORK\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source.port": {
+      "description": "The IP protocol port of the endpoint. Only applicable when protocol is\nTCP or UDP.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source.project_id": {
+      "description": "Project ID where the endpoint is located.\nThe project ID can be derived from the URI if you provide a endpoint or\nnetwork URI.\nThe following are two cases where you may need to provide the project ID:\n1. Only the IP address is specified, and the IP address is within a Google\nCloud project.\n2. When you are using Shared VPC and the IP address that you provide is\nfrom the service project. In this case, the network that the IP address\nresides in is defined in the host project.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source.app_engine_version": {
+      "type": "block",
+      "description": "An App Engine service version.",
+      "required": false
+    },
+    "source.app_engine_version.uri": {
+      "description": "An App Engine service version name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source.cloud_function": {
+      "type": "block",
+      "description": "A Cloud Function.",
+      "required": false
+    },
+    "source.cloud_function.uri": {
+      "description": "A Cloud Function name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source.cloud_run_revision": {
+      "type": "block",
+      "description": "A Cloud Run revision.",
+      "required": false
+    },
+    "source.cloud_run_revision.uri": {
+      "description": "A Cloud Run revision URI.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

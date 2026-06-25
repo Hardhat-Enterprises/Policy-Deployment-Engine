@@ -1,0 +1,958 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "action": {
+      "description": "When the action is CUSTOM, customProvider must be specified.\nWhen the action is ALLOW, only requests matching the policy will be allowed.\nWhen the action is DENY, only requests matching the policy will be denied.\n\nWhen a request arrives, the policies are evaluated in the following order:\n1. If there is a CUSTOM policy that matches the request, the CUSTOM policy is evaluated using the custom authorization providers and the request is denied if the provider rejects the request.\n2. If there are any DENY policies that match the request, the request is denied.\n3. If there are no ALLOW policies for the resource or if any of the ALLOW policies match the request, the request is allowed.\n4. Else the request is denied by default if none of the configured AuthzPolicies with ALLOW action match the request. Possible values: [\"ALLOW\", \"DENY\", \"CUSTOM\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "A human-readable description of the resource.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "Set of labels associated with the AuthzExtension resource.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The location of the resource.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "name": {
+      "description": "Identifier. Name of the AuthzPolicy resource.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policy_profile": {
+      "description": "Defines the type of authorization being performed. 'REQUEST_AUTHZ' applies to request authorization. CUSTOM\nauthorization policies with Authz extensions will be allowed with ext_authz or ext_proc protocols. Extensions are\ninvoked only once when the request headers arrive. 'CONTENT_AUTHZ' applies to content security, sanitization, etc.\nOnly CUSTOM action is allowed in this policy profile. AuthzExtensions in the custom provider must support ext_proc\nprotocol and be capable of receiving all ext_proc events (REQUEST_HEADERS, REQUEST_BODY, REQUEST_TRAILERS,\nRESPONSE_HEADERS, RESPONSE_BODY, RESPONSE_TRAILERS) with FULL_DUPLEX_STREAMED body send mode. Possible values: [\"REQUEST_AUTHZ\", \"CONTENT_AUTHZ\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "custom_provider": {
+      "type": "block",
+      "description": "Required if the action is CUSTOM. Allows delegating authorization decisions to Cloud IAP or to Service Extensions. One of cloudIap or authzExtension must be specified.",
+      "required": false
+    },
+    "custom_provider.authz_extension": {
+      "type": "block",
+      "description": "Delegate authorization decision to user authored Service Extension. Only one of cloudIap or authzExtension can be specified.",
+      "required": false
+    },
+    "custom_provider.authz_extension.resources": {
+      "description": "A list of references to authorization extensions that will be invoked for requests matching this policy. Limited to 1 custom provider.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "custom_provider.cloud_iap": {
+      "type": "block",
+      "description": "Delegates authorization decisions to Cloud IAP. Applicable only for managed load balancers. Enabling Cloud IAP at the AuthzPolicy level is not compatible with Cloud IAP settings in the BackendService. Enabling IAP in both places will result in request failure. Ensure that IAP is enabled in either the AuthzPolicy or the BackendService but not in both places.",
+      "required": false
+    },
+    "custom_provider.cloud_iap.enabled": {
+      "description": "Enable Cloud IAP at the AuthzPolicy level.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules": {
+      "type": "block",
+      "description": "A list of authorization HTTP rules to match against the incoming request.A policy match occurs when at least one HTTP rule matches the request or when no HTTP rules are specified in the policy. At least one HTTP Rule is required for Allow or Deny Action.\nLimited to 5 rules.",
+      "required": false
+    },
+    "http_rules.when": {
+      "description": "CEL expression that describes the conditions to be satisfied for the action. The result of the CEL expression is ANDed with the from and to. Refer to the CEL language reference for a list of available attributes.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from": {
+      "type": "block",
+      "description": "Describes properties of one or more sources of a request.",
+      "required": false
+    },
+    "http_rules.from.not_sources": {
+      "type": "block",
+      "description": "Describes the negated properties of request sources. Matches requests from sources that do not match the criteria specified in this field. At least one of sources or notSources must be specified. Limited to 1 not_source.",
+      "required": false
+    },
+    "http_rules.from.not_sources.ip_blocks": {
+      "type": "block",
+      "description": "A list of IP addresses or IP address ranges to match against the source IP address of the request. Limited to 10 ipBlocks per Authorization Policy",
+      "required": false
+    },
+    "http_rules.from.not_sources.ip_blocks.length": {
+      "description": "The length of the address range.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.not_sources.ip_blocks.prefix": {
+      "description": "The address prefix.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.not_sources.principals": {
+      "type": "block",
+      "description": "A list of identities derived from the client's certificate. This field will not match on a request unless mutual TLS is enabled for the Forwarding rule or Gateway. Each identity is a string whose value is matched against the URI SAN, or DNS SAN or the subject field in the client's certificate. The match can be exact, prefix, suffix or a substring match. One of exact, prefix, suffix or contains must be specified.\nLimited to 5 principals.",
+      "required": false
+    },
+    "http_rules.from.not_sources.principals.contains": {
+      "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.not_sources.principals.exact": {
+      "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.not_sources.principals.ignore_case": {
+      "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.not_sources.principals.prefix": {
+      "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.not_sources.principals.principal_selector": {
+      "description": "An enum to decide what principal value the principal rule will match against. If not specified, the PrincipalSelector is CLIENT_CERT_URI_SAN. Default value: \"CLIENT_CERT_URI_SAN\" Possible values: [\"PRINCIPAL_SELECTOR_UNSPECIFIED\", \"CLIENT_CERT_URI_SAN\", \"CLIENT_CERT_DNS_NAME_SAN\", \"CLIENT_CERT_COMMON_NAME\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.not_sources.principals.suffix": {
+      "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.not_sources.principals.principal": {
+      "type": "block",
+      "description": "Required. A non-empty string whose value is matched against the principal value based on the principalSelector.\nOnly exact match can be applied for CLIENT_CERT_URI_SAN, CLIENT_CERT_DNS_NAME_SAN, CLIENT_CERT_COMMON_NAME selectors.",
+      "required": false
+    },
+    "http_rules.from.not_sources.principals.principal.contains": {
+      "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.not_sources.principals.principal.exact": {
+      "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.not_sources.principals.principal.ignore_case": {
+      "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.not_sources.principals.principal.prefix": {
+      "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.not_sources.principals.principal.suffix": {
+      "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.not_sources.resources": {
+      "type": "block",
+      "description": "A list of resources to match against the resource of the source VM of a request.\nLimited to 5 resources.",
+      "required": false
+    },
+    "http_rules.from.not_sources.resources.iam_service_account": {
+      "type": "block",
+      "description": "An IAM service account to match against the source service account of the VM sending the request.",
+      "required": false
+    },
+    "http_rules.from.not_sources.resources.iam_service_account.contains": {
+      "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.not_sources.resources.iam_service_account.exact": {
+      "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.not_sources.resources.iam_service_account.ignore_case": {
+      "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.not_sources.resources.iam_service_account.prefix": {
+      "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.not_sources.resources.iam_service_account.suffix": {
+      "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.not_sources.resources.tag_value_id_set": {
+      "type": "block",
+      "description": "A list of resource tag value permanent IDs to match against the resource manager tags value associated with the source VM of a request.",
+      "required": false
+    },
+    "http_rules.from.not_sources.resources.tag_value_id_set.ids": {
+      "description": "A list of resource tag value permanent IDs to match against the resource manager tags value associated with the source VM of a request. The match follows AND semantics which means all the ids must match.\nLimited to 5 matches.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.sources": {
+      "type": "block",
+      "description": "Describes the properties of a request's sources. At least one of sources or notSources must be specified. Limited to 1 source. A match occurs when ANY source (in sources or notSources) matches the request. Within a single source, the match follows AND semantics across fields and OR semantics within a single field, i.e. a match occurs when ANY principal matches AND ANY ipBlocks match.",
+      "required": false
+    },
+    "http_rules.from.sources.ip_blocks": {
+      "type": "block",
+      "description": "A list of IP addresses or IP address ranges to match against the source IP address of the request. Limited to 10 ipBlocks per Authorization Policy",
+      "required": false
+    },
+    "http_rules.from.sources.ip_blocks.length": {
+      "description": "The length of the address range.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.sources.ip_blocks.prefix": {
+      "description": "The address prefix.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.sources.principals": {
+      "type": "block",
+      "description": "A list of identities derived from the client's certificate. This field will not match on a request unless mutual TLS is enabled for the Forwarding rule or Gateway. Each identity is a string whose value is matched against the URI SAN, or DNS SAN or the subject field in the client's certificate. The match can be exact, prefix, suffix or a substring match. One of exact, prefix, suffix or contains must be specified.\nLimited to 5 principals.",
+      "required": false
+    },
+    "http_rules.from.sources.principals.contains": {
+      "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.sources.principals.exact": {
+      "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.sources.principals.ignore_case": {
+      "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.sources.principals.prefix": {
+      "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.sources.principals.principal_selector": {
+      "description": "An enum to decide what principal value the principal rule will match against. If not specified, the PrincipalSelector is CLIENT_CERT_URI_SAN. Default value: \"CLIENT_CERT_URI_SAN\" Possible values: [\"PRINCIPAL_SELECTOR_UNSPECIFIED\", \"CLIENT_CERT_URI_SAN\", \"CLIENT_CERT_DNS_NAME_SAN\", \"CLIENT_CERT_COMMON_NAME\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.sources.principals.suffix": {
+      "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.sources.principals.principal": {
+      "type": "block",
+      "description": "Required. A non-empty string whose value is matched against the principal value based on the principalSelector.\nOnly exact match can be applied for CLIENT_CERT_URI_SAN, CLIENT_CERT_DNS_NAME_SAN, CLIENT_CERT_COMMON_NAME selectors.",
+      "required": false
+    },
+    "http_rules.from.sources.principals.principal.contains": {
+      "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.sources.principals.principal.exact": {
+      "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.sources.principals.principal.ignore_case": {
+      "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.sources.principals.principal.prefix": {
+      "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.sources.principals.principal.suffix": {
+      "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.sources.resources": {
+      "type": "block",
+      "description": "A list of resources to match against the resource of the source VM of a request.\nLimited to 5 resources.",
+      "required": false
+    },
+    "http_rules.from.sources.resources.iam_service_account": {
+      "type": "block",
+      "description": "An IAM service account to match against the source service account of the VM sending the request.",
+      "required": false
+    },
+    "http_rules.from.sources.resources.iam_service_account.contains": {
+      "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.sources.resources.iam_service_account.exact": {
+      "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.sources.resources.iam_service_account.ignore_case": {
+      "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.sources.resources.iam_service_account.prefix": {
+      "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.sources.resources.iam_service_account.suffix": {
+      "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.from.sources.resources.tag_value_id_set": {
+      "type": "block",
+      "description": "A list of resource tag value permanent IDs to match against the resource manager tags value associated with the source VM of a request.",
+      "required": false
+    },
+    "http_rules.from.sources.resources.tag_value_id_set.ids": {
+      "description": "A list of resource tag value permanent IDs to match against the resource manager tags value associated with the source VM of a request. The match follows AND semantics which means all the ids must match.\nLimited to 5 matches.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to": {
+      "type": "block",
+      "description": "Describes properties of one or more targets of a request",
+      "required": false
+    },
+    "http_rules.to.not_operations": {
+      "type": "block",
+      "description": "Describes the negated properties of the targets of a request. Matches requests for operations that do not match the criteria specified in this field. At least one of operations or notOperations must be specified. Limited to 1 not_operation.",
+      "required": false
+    },
+    "http_rules.to.not_operations.methods": {
+      "description": "A list of HTTP methods to match against. Each entry must be a valid HTTP method name (GET, PUT, POST, HEAD, PATCH, DELETE, OPTIONS). It only allows exact match and is always case sensitive.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.not_operations.header_set": {
+      "type": "block",
+      "description": "A list of headers to match against in http header.",
+      "required": false
+    },
+    "http_rules.to.not_operations.header_set.headers": {
+      "type": "block",
+      "description": "A list of headers to match against in http header. The match can be one of exact, prefix, suffix, or contains (substring match). The match follows AND semantics which means all the headers must match. Matches are always case sensitive unless the ignoreCase is set. Limited to 10 matches.",
+      "required": false
+    },
+    "http_rules.to.not_operations.header_set.headers.name": {
+      "description": "Specifies the name of the header in the request.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.not_operations.header_set.headers.value": {
+      "type": "block",
+      "description": "Specifies how the header match will be performed.",
+      "required": false
+    },
+    "http_rules.to.not_operations.header_set.headers.value.contains": {
+      "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.not_operations.header_set.headers.value.exact": {
+      "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.not_operations.header_set.headers.value.ignore_case": {
+      "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.not_operations.header_set.headers.value.prefix": {
+      "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.not_operations.header_set.headers.value.suffix": {
+      "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.not_operations.hosts": {
+      "type": "block",
+      "description": "A list of HTTP Hosts to match against. The match can be one of exact, prefix, suffix, or contains (substring match). Matches are always case sensitive unless the ignoreCase is set.\nLimited to 10 matches.",
+      "required": false
+    },
+    "http_rules.to.not_operations.hosts.contains": {
+      "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.not_operations.hosts.exact": {
+      "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.not_operations.hosts.ignore_case": {
+      "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.not_operations.hosts.prefix": {
+      "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.not_operations.hosts.suffix": {
+      "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.not_operations.paths": {
+      "type": "block",
+      "description": "A list of paths to match against. The match can be one of exact, prefix, suffix, or contains (substring match). Matches are always case sensitive unless the ignoreCase is set.\nLimited to 10 matches.\nNote that this path match includes the query parameters. For gRPC services, this should be a fully-qualified name of the form /package.service/method.",
+      "required": false
+    },
+    "http_rules.to.not_operations.paths.contains": {
+      "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.not_operations.paths.exact": {
+      "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.not_operations.paths.ignore_case": {
+      "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.not_operations.paths.prefix": {
+      "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.not_operations.paths.suffix": {
+      "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations": {
+      "type": "block",
+      "description": "Describes properties of one or more targets of a request. At least one of operations or notOperations must be specified. Limited to 1 operation. A match occurs when ANY operation (in operations or notOperations) matches. Within an operation, the match follows AND semantics across fields and OR semantics within a field, i.e. a match occurs when ANY path matches AND ANY header matches and ANY method matches.",
+      "required": false
+    },
+    "http_rules.to.operations.methods": {
+      "description": "A list of HTTP methods to match against. Each entry must be a valid HTTP method name (GET, PUT, POST, HEAD, PATCH, DELETE, OPTIONS). It only allows exact match and is always case sensitive.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.header_set": {
+      "type": "block",
+      "description": "A list of headers to match against in http header.",
+      "required": false
+    },
+    "http_rules.to.operations.header_set.headers": {
+      "type": "block",
+      "description": "A list of headers to match against in http header. The match can be one of exact, prefix, suffix, or contains (substring match). The match follows AND semantics which means all the headers must match. Matches are always case sensitive unless the ignoreCase is set. Limited to 10 matches.",
+      "required": false
+    },
+    "http_rules.to.operations.header_set.headers.name": {
+      "description": "Specifies the name of the header in the request.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.header_set.headers.value": {
+      "type": "block",
+      "description": "Specifies how the header match will be performed.",
+      "required": false
+    },
+    "http_rules.to.operations.header_set.headers.value.contains": {
+      "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.header_set.headers.value.exact": {
+      "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.header_set.headers.value.ignore_case": {
+      "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.header_set.headers.value.prefix": {
+      "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.header_set.headers.value.suffix": {
+      "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.hosts": {
+      "type": "block",
+      "description": "A list of HTTP Hosts to match against. The match can be one of exact, prefix, suffix, or contains (substring match). Matches are always case sensitive unless the ignoreCase is set.\nLimited to 10 matches.",
+      "required": false
+    },
+    "http_rules.to.operations.hosts.contains": {
+      "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.hosts.exact": {
+      "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.hosts.ignore_case": {
+      "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.hosts.prefix": {
+      "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.hosts.suffix": {
+      "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.mcp": {
+      "type": "block",
+      "description": "Defines the MCP protocol attributes to match on. MCP based match is allowed only when the AuthzPolicy points to an AgentGateway.",
+      "required": false
+    },
+    "http_rules.to.operations.mcp.base_protocol_methods_option": {
+      "description": "If specified, matches on the MCP protocol’s non-access specific methods namely: * initialize/ * completion/ * logging/ * notifications/ * ping Default value: \"SKIP_BASE_PROTOCOL_METHODS\" Possible values: [\"SKIP_BASE_PROTOCOL_METHODS\", \"MATCH_BASE_PROTOCOL_METHODS\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.mcp.methods": {
+      "type": "block",
+      "description": "Defines a set of MCP methods and associated parameters to match on. It is recommended to use this field to match on tools, prompts and resource accesses while setting the includeBaseProtocolMethods to true to match on all the other MCP protocol methods.",
+      "required": false
+    },
+    "http_rules.to.operations.mcp.methods.name": {
+      "description": "The MCP method to match against. Allowed values are as follows:\n1) “tools”, “prompts”, “resources” - these will match against all sub methods under the respective methods.\n2) “prompts/list”, “tools/list”, “resources/list”, “resources/templates/list”\n3) “prompts/get”, “tools/call”, “resources/subscribe”, “resources/unsubscribe”, “resources/read”\nParams cannot be specified for categories 1) and 2).",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.mcp.methods.params": {
+      "type": "block",
+      "description": "MCP method parameters to match against.",
+      "required": false
+    },
+    "http_rules.to.operations.mcp.methods.params.contains": {
+      "description": "A substring match on the MCP method parameter name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.mcp.methods.params.exact": {
+      "description": "An exact match on the MCP method parameter name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.mcp.methods.params.ignore_case": {
+      "description": "Specifies that the string match should be case insensitive.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.mcp.methods.params.prefix": {
+      "description": "A prefix match on the MCP method parameter name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.mcp.methods.params.suffix": {
+      "description": "A suffix match on the MCP method parameter name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.paths": {
+      "type": "block",
+      "description": "A list of paths to match against. The match can be one of exact, prefix, suffix, or contains (substring match). Matches are always case sensitive unless the ignoreCase is set.\nLimited to 10 matches.\nNote that this path match includes the query parameters. For gRPC services, this should be a fully-qualified name of the form /package.service/method.",
+      "required": false
+    },
+    "http_rules.to.operations.paths.contains": {
+      "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.paths.exact": {
+      "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.paths.ignore_case": {
+      "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.paths.prefix": {
+      "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_rules.to.operations.paths.suffix": {
+      "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_rules": {
+      "type": "block",
+      "description": "A list of authorization HTTP rules to match against the incoming request.A policy match occurs when at least one HTTP rule matches the request or when no HTTP rules are specified in the policy. At least one HTTP Rule is required for Allow or Deny Action.\nLimited to 5 rules.",
+      "required": false
+    },
+    "network_rules.from": {
+      "type": "block",
+      "description": "Describes properties of one or more sources of a request.",
+      "required": false
+    },
+    "network_rules.from.not_sources": {
+      "type": "block",
+      "description": "Describes the negated properties of request sources. Matches requests from sources that do not match the criteria specified in this field. At least one of sources or notSources must be specified. Limited to 1 not_source.",
+      "required": false
+    },
+    "network_rules.from.not_sources.ip_blocks": {
+      "type": "block",
+      "description": "A list of IP addresses or IP address ranges to match against the source IP address of the request. Limited to 10 ipBlocks per Authorization Policy",
+      "required": false
+    },
+    "network_rules.from.not_sources.ip_blocks.length": {
+      "description": "The length of the address range.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_rules.from.not_sources.ip_blocks.prefix": {
+      "description": "The address prefix.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_rules.from.not_sources.principals": {
+      "type": "block",
+      "description": "A list of identities derived from the client's certificate. This field will not match on a request unless mutual TLS is enabled for the Forwarding rule or Gateway. Each identity is a string whose value is matched against the URI SAN, or DNS SAN or the subject field in the client's certificate. The match can be exact, prefix, suffix or a substring match. One of exact, prefix, suffix or contains must be specified.\nLimited to 5 principals.",
+      "required": false
+    },
+    "network_rules.from.not_sources.principals.principal_selector": {
+      "description": "An enum to decide what principal value the principal rule will match against. If not specified, the PrincipalSelector is CLIENT_CERT_URI_SAN. Default value: \"CLIENT_CERT_URI_SAN\" Possible values: [\"PRINCIPAL_SELECTOR_UNSPECIFIED\", \"CLIENT_CERT_URI_SAN\", \"CLIENT_CERT_DNS_NAME_SAN\", \"CLIENT_CERT_COMMON_NAME\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_rules.from.not_sources.principals.principal": {
+      "type": "block",
+      "description": "Required. A non-empty string whose value is matched against the principal value based on the principalSelector.\nOnly exact match can be applied for CLIENT_CERT_URI_SAN, CLIENT_CERT_DNS_NAME_SAN, CLIENT_CERT_COMMON_NAME selectors.",
+      "required": false
+    },
+    "network_rules.from.not_sources.principals.principal.exact": {
+      "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_rules.from.sources": {
+      "type": "block",
+      "description": "Describes the properties of a request's sources. At least one of sources or notSources must be specified. Limited to 1 source. A match occurs when ANY source (in sources or notSources) matches the request. Within a single source, the match follows AND semantics across fields and OR semantics within a single field, i.e. a match occurs when ANY principal matches AND ANY ipBlocks match.",
+      "required": false
+    },
+    "network_rules.from.sources.ip_blocks": {
+      "type": "block",
+      "description": "A list of IP addresses or IP address ranges to match against the source IP address of the request. Limited to 10 ipBlocks per Authorization Policy",
+      "required": false
+    },
+    "network_rules.from.sources.ip_blocks.length": {
+      "description": "The length of the address range.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_rules.from.sources.ip_blocks.prefix": {
+      "description": "The address prefix.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_rules.from.sources.principals": {
+      "type": "block",
+      "description": "A list of identities derived from the client's certificate. This field will not match on a request unless mutual TLS is enabled for the Forwarding rule or Gateway. Each identity is a string whose value is matched against the URI SAN, or DNS SAN or the subject field in the client's certificate. The match can be exact, prefix, suffix or a substring match. One of exact, prefix, suffix or contains must be specified.\nLimited to 5 principals.",
+      "required": false
+    },
+    "network_rules.from.sources.principals.principal_selector": {
+      "description": "An enum to decide what principal value the principal rule will match against. If not specified, the PrincipalSelector is CLIENT_CERT_URI_SAN. Default value: \"CLIENT_CERT_URI_SAN\" Possible values: [\"PRINCIPAL_SELECTOR_UNSPECIFIED\", \"CLIENT_CERT_URI_SAN\", \"CLIENT_CERT_DNS_NAME_SAN\", \"CLIENT_CERT_COMMON_NAME\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_rules.from.sources.principals.principal": {
+      "type": "block",
+      "description": "Required. A non-empty string whose value is matched against the principal value based on the principalSelector.\nOnly exact match can be applied for CLIENT_CERT_URI_SAN, CLIENT_CERT_DNS_NAME_SAN, CLIENT_CERT_COMMON_NAME selectors.",
+      "required": false
+    },
+    "network_rules.from.sources.principals.principal.exact": {
+      "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_rules.to": {
+      "type": "block",
+      "description": "Describes properties of one or more targets of a request",
+      "required": false
+    },
+    "network_rules.to.operations": {
+      "type": "block",
+      "description": "Describes properties of one or more targets of a request. At least one of operations or notOperations must be specified. Limited to 1 operation.",
+      "required": false
+    },
+    "network_rules.to.operations.snis": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "network_rules.to.operations.snis.exact": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "target": {
+      "type": "block",
+      "description": "Specifies the set of resources to which this policy should be applied to.",
+      "required": true
+    },
+    "target.load_balancing_scheme": {
+      "description": "Required when targeting forwarding rules and secure web proxy. Must not be specified when targeting Agent\nGateway. All resources referenced by this policy and extensions must share the same load balancing scheme.\nFor more information, refer to [Backend services overview](https://cloud.google.com/load-balancing/docs/backend-service). Possible values: [\"INTERNAL_MANAGED\", \"EXTERNAL_MANAGED\", \"INTERNAL_SELF_MANAGED\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "target.resources": {
+      "description": "A list of references to the Forwarding Rules or Secure Web Proxy Gateways or Agent Gateways on which this\npolicy will be applied.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

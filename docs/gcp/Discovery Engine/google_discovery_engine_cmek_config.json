@@ -1,0 +1,60 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "cmek_config_id": {
+      "description": "The unique id of the cmek config.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier referencing an existing CMEK config resource. We do not constrain resource names or references to other resources, so it is not a policy target."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "kms_key": {
+      "description": "KMS key resource name which will be used to encrypt resources\n'projects/{project}/locations/{location}/keyRings/{keyRing}/cryptoKeys/{keyId}'.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Sets the CMEK protecting the resource. A policy should require it be non-empty so data is always customer-managed-key encrypted; it must not pin a specific key, since keys are team/project-specific."
+    },
+    "location": {
+      "description": "The geographic location where the CMEK config should reside. The value can\nonly be one of \"us\" and \"eu\".",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "project ID"
+    },
+    "set_default": {
+      "description": "Set the following CmekConfig as the default to be used for child resources\nif one is not specified. The default value is true.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "Marks this CMEK config as the default for the project/location. This selects which existing config is default rather than enabling or weakening encryption, so it is not itself a security policy target."
+    },
+    "single_region_keys": {
+      "type": "block",
+      "description": "Single-regional CMEKs that are required for some VAIS features.",
+      "required": false
+    },
+    "single_region_keys.kms_key": {
+      "description": "Single-regional kms key resource name which will be used to encrypt\nresources\n'projects/{project}/locations/{location}/keyRings/{keyRing}/cryptoKeys/{keyId}'.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Sets the single-region CMEK protecting the resource. A policy should require it be non-empty so data is always customer-managed-key encrypted, without pinning a specific key."
+    }
+  }
+}

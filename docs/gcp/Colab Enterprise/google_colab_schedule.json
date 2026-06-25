@@ -1,0 +1,173 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "allow_queueing": {
+      "description": "Whether new scheduled runs can be queued when max_concurrent_runs limit is reached. If set to true, new runs will be queued instead of skipped. Default to false.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cron": {
+      "description": "Cron schedule (https://en.wikipedia.org/wiki/Cron) to launch scheduled runs.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "desired_state": {
+      "description": "Desired state of the Colab Schedule. Set this field to 'ACTIVE' to start/resume the schedule, and 'PAUSED' to pause the schedule.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "Required. The display name of the Schedule.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "end_time": {
+      "description": "Timestamp after which no new runs can be scheduled. If specified, the schedule will be completed when either end_time is reached or when scheduled_run_count >= max_run_count. Must be in the RFC 3339 (https://www.ietf.org/rfc/rfc3339.txt) format.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The location for the resource: https://cloud.google.com/colab/docs/locations",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "max_concurrent_run_count": {
+      "description": "Maximum number of runs that can be started concurrently for this Schedule. This is the limit for starting the scheduled requests and not the execution of the notebook execution jobs created by the requests.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "max_run_count": {
+      "description": "Maximum run count of the schedule. If specified, The schedule will be completed when either startedRunCount >= maxRunCount or when endTime is reached. If not specified, new runs will keep getting scheduled until this Schedule is paused or deleted. Already scheduled runs will be allowed to complete. Unset if not specified.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "start_time": {
+      "description": "The timestamp after which the first run can be scheduled. Defaults to the schedule creation time. Must be in the RFC 3339 (https://www.ietf.org/rfc/rfc3339.txt) format.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "create_notebook_execution_job_request": {
+      "type": "block",
+      "description": "Request for google_colab_notebook_execution.",
+      "required": true
+    },
+    "create_notebook_execution_job_request.notebook_execution_job": {
+      "type": "block",
+      "description": "The NotebookExecutionJob to create.",
+      "required": true
+    },
+    "create_notebook_execution_job_request.notebook_execution_job.display_name": {
+      "description": "Required. The display name of the Notebook Execution.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "create_notebook_execution_job_request.notebook_execution_job.execution_timeout": {
+      "description": "Max running time of the execution job in seconds (default 86400s / 24 hrs). A duration in seconds with up to nine fractional digits, ending with \"s\". Example: \"3.5s\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "create_notebook_execution_job_request.notebook_execution_job.execution_user": {
+      "description": "The user email to run the execution as.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "create_notebook_execution_job_request.notebook_execution_job.gcs_output_uri": {
+      "description": "The Cloud Storage location to upload the result to. Format:'gs://bucket-name'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "create_notebook_execution_job_request.notebook_execution_job.notebook_runtime_template_resource_name": {
+      "description": "The NotebookRuntimeTemplate to source compute configuration from.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "create_notebook_execution_job_request.notebook_execution_job.service_account": {
+      "description": "The service account to run the execution as.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "create_notebook_execution_job_request.notebook_execution_job.dataform_repository_source": {
+      "type": "block",
+      "description": "The Dataform Repository containing the input notebook.",
+      "required": false
+    },
+    "create_notebook_execution_job_request.notebook_execution_job.dataform_repository_source.commit_sha": {
+      "description": "The commit SHA to read repository with. If unset, the file will be read at HEAD.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "create_notebook_execution_job_request.notebook_execution_job.dataform_repository_source.dataform_repository_resource_name": {
+      "description": "The resource name of the Dataform Repository.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "create_notebook_execution_job_request.notebook_execution_job.gcs_notebook_source": {
+      "type": "block",
+      "description": "The Cloud Storage uri for the input notebook.",
+      "required": false
+    },
+    "create_notebook_execution_job_request.notebook_execution_job.gcs_notebook_source.generation": {
+      "description": "The version of the Cloud Storage object to read. If unset, the current version of the object is read. See https://cloud.google.com/storage/docs/metadata#generation-number.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "create_notebook_execution_job_request.notebook_execution_job.gcs_notebook_source.uri": {
+      "description": "The Cloud Storage uri pointing to the ipynb file. Format: gs://bucket/notebook_file.ipynb",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

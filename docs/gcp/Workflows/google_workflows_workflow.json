@@ -1,0 +1,111 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "call_log_level": {
+      "description": "Describes the level of platform logging to apply to calls and call responses during\nexecutions of this workflow. If both the workflow and the execution specify a logging level,\nthe execution level takes precedence. Possible values: [\"CALL_LOG_LEVEL_UNSPECIFIED\", \"LOG_ALL_CALLS\", \"LOG_ERRORS_ONLY\", \"LOG_NONE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Controls the platform logging level for workflow calls/responses. A policy can require logging be enabled (not turned off) so workflow execution is auditable; the level should ensure security-relevant events are captured rather than disabled."
+    },
+    "crypto_key_name": {
+      "description": "The KMS key used to encrypt workflow and execution data.\n\nFormat: projects/{project}/locations/{location}/keyRings/{keyRing}/cryptoKeys/{cryptoKey}",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Sets the CMEK used to encrypt the workflow. A policy should require it to be non-empty so the workflow is always customer-managed-key encrypted; it must not pin a specific key or region-specific key path, since keys are team/project-specific."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_protection": {
+      "description": "Whether Terraform will be prevented from destroying the workflow. Defaults to true.\nWhen a'terraform destroy' or 'terraform apply' would delete the workflow,\nthe command will fail if this field is not set to false in Terraform state.\nWhen the field is set to true or unset in Terraform state, a 'terraform apply'\nor 'terraform destroy' that would delete the workflow will fail.\nWhen the field is set to false, deleting the workflow is allowed.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "When true, blocks Terraform from destroying the workflow. A policy should require it enabled to prevent accidental or malicious destructive deletion, matching the prevent-destructive-loss archetype."
+    },
+    "description": {
+      "description": "Description of the workflow provided by the user. Must be at most 1000 unicode characters long.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Purpose is to act as a explanation of workflow which does not have any impact on authentication or authorization"
+    },
+    "execution_history_level": {
+      "description": "Describes the level of execution history to be stored for this workflow. This configuration\ndetermines how much information about workflow executions is preserved. If not specified,\ndefaults to EXECUTION_HISTORY_LEVEL_UNSPECIFIED. Possible values: [\"EXECUTION_HISTORY_LEVEL_UNSPECIFIED\", \"EXECUTION_HISTORY_BASIC\", \"EXECUTION_HISTORY_DETAILED\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Controls how much execution history is retained for the workflow. A policy can require a level that preserves enough history for audit/incident investigation rather than disabling it, supporting the logging/audit archetype."
+    },
+    "labels": {
+      "description": "A set of key/value label pairs to assign to this Workflow.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Used for organisation and naming conventions thus does not have impact on security"
+    },
+    "name": {
+      "description": "Name of the Workflow.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Only used for naming conventions and does not have impact on the security of the service"
+    },
+    "name_prefix": {
+      "description": "Creates a unique name beginning with the specified prefix. If this and name are unspecified, a random value is chosen for the name.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Mainly used to organise and give unique names automatically which does not affect authentication or authorizations"
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Only used for identification of where the project belongs to thus does not affect the security of the service"
+    },
+    "region": {
+      "description": "The region of the workflow.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "service_account": {
+      "description": "Name of the service account associated with the latest workflow version. This service\naccount represents the identity of the workflow and determines what permissions the workflow has.\nFormat: projects/{project}/serviceAccounts/{account} or {account}.\nUsing - as a wildcard for the {project} or not providing one at all will infer the project from the account.\nThe {account} value can be the email address or the unique_id of the service account.\nIf not provided, workflow will use the project's default service account.\nModifying this field for an existing workflow results in a new workflow revision.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Selects the service account the workflow runs as. A policy should require an explicit, non-default service account (the default has a broad editor role) to enforce least privilege; it must not pin a specific account."
+    },
+    "source_contents": {
+      "description": "Workflow code to be executed. The size limit is 128KB.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Holds the free-form workflow definition code. Like a free-form policy document, an arbitrary code body cannot be meaningfully constrained by a generic platform policy, so it is out of scope."
+    },
+    "tags": {
+      "description": "A map of resource manager tags. Resource manager tag keys and values have the same definition\nas resource manager tags. Keys must be in the format tagKeys/{tag_key_id}, and values are in\nthe format tagValues/456. The field is ignored (both PUT & PATCH) when empty.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Purpose is to only catogorise resource with identification, in which the actual permisions are in IAM permissions thus would not affect the authentication of the service."
+    },
+    "user_env_vars": {
+      "description": "User-defined environment variables associated with this workflow revision. This map has a maximum length of 20. Each string can take up to 4KiB. Keys cannot be empty strings and cannot start with \"GOOGLE\" or \"WORKFLOWS\".",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": true,
+      "rationale": "Holds user-defined environment variables for the workflow. These are stored/visible in plaintext, so a policy discouraging secrets here (use Secret Manager instead) addresses credential-hygiene exposure; the original also has a typo ('as as')."
+    }
+  }
+}

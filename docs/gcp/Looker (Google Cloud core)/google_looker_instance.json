@@ -1,0 +1,415 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "consumer_network": {
+      "description": "Network name in the consumer project in the format of: projects/{project}/global/networks/{network}\nNote that the consumer network may be in a different GCP project than the consumer\nproject that is hosting the Looker Instance.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "controlled_egress_enabled": {
+      "description": "Whether controlled egress is enabled on the Looker instance.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "This field uses a custom implementation please refer to documentation under /hashicorp/terraform-provider-google-beta/website/docs/r/looker_instance.html.markdown for specifics",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "fips_enabled": {
+      "description": "FIPS 140-2 Encryption enablement for Looker (Google Cloud Core).",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "gemini_enabled": {
+      "description": "Gemini enablement for Looker (Google Cloud Core).",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "name": {
+      "description": "The ID of the instance or a fully qualified identifier for the instance.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "platform_edition": {
+      "description": "Platform editions for a Looker instance. Each edition maps to a set of instance features, like its size. Must be one of these values:\n- LOOKER_CORE_TRIAL: trial instance (Currently Unavailable)\n- LOOKER_CORE_STANDARD: pay as you go standard instance (Currently Unavailable)\n- LOOKER_CORE_STANDARD_ANNUAL: subscription standard instance\n- LOOKER_CORE_ENTERPRISE_ANNUAL: subscription enterprise instance\n- LOOKER_CORE_EMBED_ANNUAL: subscription embed instance\n- LOOKER_CORE_NONPROD_STANDARD_ANNUAL: nonprod subscription standard instance\n- LOOKER_CORE_NONPROD_ENTERPRISE_ANNUAL: nonprod subscription enterprise instance\n- LOOKER_CORE_NONPROD_EMBED_ANNUAL: nonprod subscription embed instance\n- LOOKER_CORE_TRIAL_STANDARD: A standard trial edition of Looker (Google Cloud core) product.\n- LOOKER_CORE_TRIAL_ENTERPRISE: An enterprise trial edition of Looker (Google Cloud core) product.\n- LOOKER_CORE_TRIAL_EMBED: An embed trial edition of Looker (Google Cloud core) product. Default value: \"LOOKER_CORE_TRIAL\" Possible values: [\"LOOKER_CORE_TRIAL\", \"LOOKER_CORE_STANDARD\", \"LOOKER_CORE_STANDARD_ANNUAL\", \"LOOKER_CORE_ENTERPRISE_ANNUAL\", \"LOOKER_CORE_EMBED_ANNUAL\", \"LOOKER_CORE_NONPROD_STANDARD_ANNUAL\", \"LOOKER_CORE_NONPROD_ENTERPRISE_ANNUAL\", \"LOOKER_CORE_NONPROD_EMBED_ANNUAL\", \"LOOKER_CORE_TRIAL_STANDARD\", \"LOOKER_CORE_TRIAL_ENTERPRISE\", \"LOOKER_CORE_TRIAL_EMBED\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "private_ip_enabled": {
+      "description": "Whether private IP is enabled on the Looker instance.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "psc_enabled": {
+      "description": "Whether Public Service Connect (PSC) is enabled on the Looker instance",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "public_ip_enabled": {
+      "description": "Whether public IP is enabled on the Looker instance.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "region": {
+      "description": "The name of the Looker region of the instance.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "reserved_range": {
+      "description": "Name of a reserved IP address range within the consumer network, to be used for\nprivate service access connection. User may or may not specify this in a request.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "admin_settings": {
+      "type": "block",
+      "description": "Looker instance Admin settings.",
+      "required": false
+    },
+    "admin_settings.allowed_email_domains": {
+      "description": "Email domain allowlist for the instance.\n\nDefine the email domains to which your users can deliver Looker (Google Cloud core) content.\nUpdating this list will restart the instance. Updating the allowed email domains from terraform\nmeans the value provided will be considered as the entire list and not an amendment to the\nexisting list of allowed email domains.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "controlled_egress_config": {
+      "type": "block",
+      "description": "Controlled egress configuration.",
+      "required": false
+    },
+    "controlled_egress_config.egress_fqdns": {
+      "description": "List of fully qualified domain names to be added to the allowlist for\noutbound traffic.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "controlled_egress_config.marketplace_enabled": {
+      "description": "Whether the Looker Marketplace is enabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "custom_domain": {
+      "type": "block",
+      "description": "Custom domain settings for a Looker instance.",
+      "required": false
+    },
+    "custom_domain.domain": {
+      "description": "Domain name",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deny_maintenance_period": {
+      "type": "block",
+      "description": "Maintenance denial period for this instance.\n\nYou must allow at least 14 days of maintenance availability\nbetween any two deny maintenance periods.",
+      "required": false
+    },
+    "deny_maintenance_period.end_date": {
+      "type": "block",
+      "description": "Required. Start date of the deny maintenance period",
+      "required": true
+    },
+    "deny_maintenance_period.end_date.day": {
+      "description": "Day of a month. Must be from 1 to 31 and valid for the year and month, or 0\nto specify a year by itself or a year and month where the day isn't significant.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deny_maintenance_period.end_date.month": {
+      "description": "Month of a year. Must be from 1 to 12, or 0 to specify a year without a\nmonth and day.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deny_maintenance_period.end_date.year": {
+      "description": "Year of the date. Must be from 1 to 9999, or 0 to specify a date without\na year.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deny_maintenance_period.start_date": {
+      "type": "block",
+      "description": "Required. Start date of the deny maintenance period",
+      "required": true
+    },
+    "deny_maintenance_period.start_date.day": {
+      "description": "Day of a month. Must be from 1 to 31 and valid for the year and month, or 0\nto specify a year by itself or a year and month where the day isn't significant.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deny_maintenance_period.start_date.month": {
+      "description": "Month of a year. Must be from 1 to 12, or 0 to specify a year without a\nmonth and day.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deny_maintenance_period.start_date.year": {
+      "description": "Year of the date. Must be from 1 to 9999, or 0 to specify a date without\na year.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deny_maintenance_period.time": {
+      "type": "block",
+      "description": "Required. Start time of the window in UTC time.",
+      "required": true
+    },
+    "deny_maintenance_period.time.hours": {
+      "description": "Hours of day in 24 hour format. Should be from 0 to 23.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deny_maintenance_period.time.minutes": {
+      "description": "Minutes of hour of day. Must be from 0 to 59.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deny_maintenance_period.time.nanos": {
+      "description": "Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deny_maintenance_period.time.seconds": {
+      "description": "Seconds of minutes of the time. Must normally be from 0 to 59.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "encryption_config": {
+      "type": "block",
+      "description": "Looker instance encryption settings.",
+      "required": false
+    },
+    "encryption_config.kms_key_name": {
+      "description": "Name of the customer managed encryption key (CMEK) in KMS.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_window": {
+      "type": "block",
+      "description": "Maintenance window for an instance.\n\nMaintenance of your instance takes place once a month, and will require\nyour instance to be restarted during updates, which will temporarily\ndisrupt service.",
+      "required": false
+    },
+    "maintenance_window.day_of_week": {
+      "description": "Required. Day of the week for this MaintenanceWindow (in UTC).\n\n- MONDAY: Monday\n- TUESDAY: Tuesday\n- WEDNESDAY: Wednesday\n- THURSDAY: Thursday\n- FRIDAY: Friday\n- SATURDAY: Saturday\n- SUNDAY: Sunday Possible values: [\"MONDAY\", \"TUESDAY\", \"WEDNESDAY\", \"THURSDAY\", \"FRIDAY\", \"SATURDAY\", \"SUNDAY\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_window.start_time": {
+      "type": "block",
+      "description": "Required. Start time of the window in UTC time.",
+      "required": true
+    },
+    "maintenance_window.start_time.hours": {
+      "description": "Hours of day in 24 hour format. Should be from 0 to 23.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_window.start_time.minutes": {
+      "description": "Minutes of hour of day. Must be from 0 to 59.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_window.start_time.nanos": {
+      "description": "Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_window.start_time.seconds": {
+      "description": "Seconds of minutes of the time. Must normally be from 0 to 59.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "oauth_config": {
+      "type": "block",
+      "description": "Looker Instance OAuth login settings.",
+      "required": true
+    },
+    "oauth_config.client_id": {
+      "description": "The client ID for the Oauth config.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "oauth_config.client_secret": {
+      "description": "The client secret for the Oauth config.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "periodic_export_config": {
+      "type": "block",
+      "description": "Configuration for periodic export.",
+      "required": false
+    },
+    "periodic_export_config.gcs_uri": {
+      "description": "Cloud Storage bucket URI for periodic export.\nFormat: gs://{bucket_name}",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "periodic_export_config.kms_key": {
+      "description": "Name of the CMEK key in KMS.\nFormat:\nprojects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "periodic_export_config.start_time": {
+      "type": "block",
+      "description": "Time in UTC to start the periodic export job.",
+      "required": true
+    },
+    "periodic_export_config.start_time.hours": {
+      "description": "Hours of day in 24 hour format. Should be from 0 to 23.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "periodic_export_config.start_time.minutes": {
+      "description": "Minutes of hour of day. Must be from 0 to 59.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "periodic_export_config.start_time.nanos": {
+      "description": "Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "periodic_export_config.start_time.seconds": {
+      "description": "Seconds of minutes of the time. Must normally be from 0 to 59.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "psc_config": {
+      "type": "block",
+      "description": "Information for Private Service Connect (PSC) setup for a Looker instance.",
+      "required": false
+    },
+    "psc_config.allowed_vpcs": {
+      "description": "List of VPCs that are allowed ingress into the Looker instance.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "psc_config.service_attachments": {
+      "type": "block",
+      "description": "List of egress service attachment configurations.",
+      "required": false
+    },
+    "psc_config.service_attachments.local_fqdn": {
+      "description": "Fully qualified domain name that will be used in the private DNS record created for the service attachment.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "psc_config.service_attachments.target_service_attachment_uri": {
+      "description": "URI of the service attachment to connect to.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "user_metadata": {
+      "type": "block",
+      "description": "Metadata about users for a Looker instance.\n\nThese settings are only available when platform edition LOOKER_CORE_STANDARD is set.\n\nThere are ten Standard and two Developer users included in the cost of the product.\nYou can allocate additional Standard, Viewer, and Developer users for this instance.\nIt is an optional step and can be modified later.\n\nWith the Standard edition of Looker (Google Cloud core), you can provision up to 50\ntotal users, distributed across Viewer, Standard, and Developer.",
+      "required": false
+    },
+    "user_metadata.additional_developer_user_count": {
+      "description": "Number of additional Developer Users to allocate to the Looker Instance.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "user_metadata.additional_standard_user_count": {
+      "description": "Number of additional Standard Users to allocate to the Looker Instance.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "user_metadata.additional_viewer_user_count": {
+      "description": "Number of additional Viewer Users to allocate to the Looker Instance.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

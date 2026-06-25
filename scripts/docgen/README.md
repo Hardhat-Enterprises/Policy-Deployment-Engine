@@ -1,116 +1,108 @@
-# 🛠️ GCP Service Documentation Builder
+# docgen — GCP resource docs generator (writes to `docs/`)
 
-This repository helps you generate **Markdown documentation** for GCP services (e.g., `vertex_ai`, `access_context_manager`, etc.) using JSON input files.
+Generates one JSON file per Terraform resource type, enumerating every argument so
+policy authors know what they can write security policies against. This is a rewrite of
+`docgen` with a corrected output contract; it writes to `docs/` and leaves the
+existing `docs/` tree untouched.
 
----
+> Status: **GCP only.** AWS/Azure use different prefixes/grouping and are deferred.
 
-## 🚀 How to Document a New Service
+## What's different from docgen
 
-### 1. Get Assigned a Service
-The PDE Leadership team will assign you a GCP service to document (for example, `vertex_ai`).  
-Do not proceed until you have an official assignment.
+- **Source of truth = the provider _schema_, not markdown.** Arguments (description,
+  `required`, `type`, and the full nested block structure) come from
+  `terraform/tofu providers schema -json`. Markdown is used for two things only: the
+  verbatim service-folder name (front matter `subcategory`), and a **description
+  fallback** for the auto-generated IAM resources, whose schema descriptions come back
+  blank (see `lib/descriptions.py`). This is why `type` is always populated and nesting
+  is exact.
+- **Verbatim names.** Folder = the `subcategory` exactly (`Cloud Storage`, spaces kept).
+  File = the full resource type (`google_storage_bucket.json`, prefix kept).
+- **Flat dotted-key arguments.** Nested arguments are flat keys like
+  `lifecycle_rule.action.type` (a block is `lifecycle_rule`, its children are
+  `lifecycle_rule.*`), so repeated leaf names never collide.
 
-### 2. Edit the JSON Resource Definitions
-A folder for your assigned service already exists at:
-docs/gcp/<service_name>/resource_json
+## Output schema
 
-Inside this folder you will find one or more `.json` files, each representing a resource.  
-Your task is to **edit the JSON values** to document the arguments properly.
-
-Example: `docs/gcp/vertex_ai/resource_json/vertex_ai_dataset.json`
+Exactly three top-level keys, in order:
 
 ```json
 {
-  "resource_name": "vertex_ai_dataset",
-  "subcategory": "Vertex AI",
+  "last_updated": "2026-06-23T02:05:51Z",
+  "provider_version": "7.37.0",
   "arguments": {
-    "display_name": {
-      "description": "The user-defined name of the Dataset. The name can be up to 128 characters long and can be consist of any UTF-8 characters.",
-      "required": true,
-      "security_impact": false,
-      "rationale": "Display Name has no impact on the security of the resource or data contained.",
-      "compliant": null,
-      "non-compliant": null,
-      "parent": null
-    },
-    "encryption_spec": {
-      "description": "Customer-managed encryption key spec for a Dataset. If set, this Dataset and all sub-resources of this Dataset will be secured by this key. Structure is [documented below](#nested_encryption_spec).",
-      "required": false,
-      "security_impact": true,
-      "rationale": "Correct encryption standards on the VertexAI Dataset is critical to maintain confidentiality of the data.",
-      "compliant": "Refer to child argument",
-      "non-compliant": "refer to child argument",
-      "parent": null,
-      "arguments": {
-        "kms_key_name": {
-          "description": "Required. The Cloud KMS resource identifier of the customer managed encryption key used to protect a resource. Has the form: projects/my-project/locations/my-region/keyRings/my-kr/cryptoKeys/my-key. The key needs to be in the same region as where the resource is created.",
-          "required": false,
-          "security_impact": true,
-          "rationale": "The Encryption Key Name must be entered in the correct format to ensure encryption is matained on the dataset.",
-          "compliant": "projects/my-project/locations/australia/keyRings/my-kr/cryptoKeys/my-key",
-          "non-compliant": "projects/my-project/locations/us-east1/keyRings/my-kr/cryptoKeys/my-key",
-          "parent": "encryption_spec"
-        }
-      }
-    }
+    "location":             { "description": "...", "required": true, "type": "string",
+                              "security_impact": "true/false", "rationale": "" },
+    "retention_policy":     { "type": "block", "description": "...", "required": false },
+    "retention_policy.is_locked": { "description": "...", "required": false, "type": "bool",
+                              "security_impact": "true/false", "rationale": "" }
   }
 }
 ```
 
-Each argument should include these keys:
+- **Leaf** arg: `description`, `required`, `type`, `security_impact` (default `"true/false"`),
+  `rationale` (default `""`). `security_impact` and `rationale` are filled in by hand.
+- **Block** arg: `type: "block"`, `description`, `required` (no security fields).
+- Excluded: read-only/computed-only attributes, and the `id` / `timeouts` meta-arguments.
 
-- description — a clear explanation of the argument.
+## Requirements
 
-- required — boolean `true` or `false`.
+- `terraform` **or** `tofu` (OpenTofu) on `PATH` — used to download the provider plugin
+  and dump its schema. (CI already installs Terraform.)
+- `git` — to sparse-clone the provider markdown for service grouping.
+- Network access on first run (provider plugin + markdown). Both are cached afterwards.
 
-- security_impact — boolean `true` or `false`.
-
-- rationale — explanation or null.
-
-- compliant — what a compliant value looks like, or null.
-
-- non-compliant — what a non-compliant value looks like, or null.
-
-- parent — `do not edit.`
-
-Nested arguments can be added under an "arguments" object for their parent.
-
-## 🏗️ Generate Markdown Documentation
-
-Once your JSON files are updated, run:
+## Usage
 
 ```bash
-python3 scripts/docgen/create_markdown.py <service_name>
+# Temporary test mode — only 2 services (Cloud Storage + BigQuery), to eyeball output
+uv run python scripts/docgen/generator.py --csp gcp --mode identify-new --test
+
+# Add docs for any brand-new resources/services; never touch existing files
+uv run python scripts/docgen/generator.py --csp gcp --mode identify-new
+
+# Refresh existing files: prune dropped args, add new args, keep human security fields
+uv run python scripts/docgen/generator.py --csp gcp --mode refresh-existing
+
+# Limit to specific services (verbatim or fuzzy); pin a provider version
+uv run python scripts/docgen/generator.py --csp gcp --mode refresh-existing \
+    --service "Cloud Storage" "BigQuery" --provider-version 7.37.0
 ```
 
-Example
+### Re-run modes
+
+- `--mode identify-new` — creates files that don't exist yet and **skips existing files
+  untouched**. Running it after a provider bump only adds the newly-introduced
+  resources; older files keep their previously pinned `provider_version`.
+- `--mode refresh-existing` — operates on **existing files only**: recomputes arguments
+  from the schema, **prunes** dotted keys the provider removed, **adds** new ones, and
+  **preserves** contributor-authored `security_impact` (≠ `"true/false"`) and `rationale`
+  (≠ `""`) matched by dotted key. Bumps `last_updated` and `provider_version`. Does not
+  create new resource files.
+
+## Layout
+
+```
+scripts/docgen/
+  generator.py            # CLI + orchestration + the two re-run modes
+  lib/
+    schema_source.py      # terraform/tofu init + `providers schema -json` (cached)
+    service_map.py        # resource -> verbatim subcategory (reuses docgen clone)
+    arg_flatten.py        # schema block -> flat dotted-key arguments dict
+    descriptions.py       # markdown description fallback (fills blank IAM descriptions)
+    file_writer.py        # 3-key JSON write + refresh merge
+  .cache/                 # gitignored: schema JSON cache + terraform work dir
+```
+
+Reuses from `scripts/docgen/lib/`: `repository_manager` (sparse clone + version
+detection), `parser.extract_subcategory_from_frontmatter`, `errors`, `logging_config`.
+
+## Tests
+
 ```bash
-python3 scripts/docgen/create_markdown.py vertex_ai
+uv run --extra dev pytest scripts/docgen/_tests/ -q
 ```
 
-This will (automatically):
-- Read all JSON files inside `docs/gcp/<service_name>/resource_json/`
-
-- Generate corresponding `.md` files
-
-- Save them in the `docs/gcp/<service_name>/ `folder (next to resource_json)
-
-## ✅ Example Workflow
-
-1. Get assigned `alloydb` from PDE Leadership.  
-2. Open `docs/gcp/alloydb/resource_json/`.  
-3. Edit `instance.json`, `cluster.json`, etc., filling in descriptions, compliant, and non-compliant values.  
-4. Run:
-
-```bash
-python3 scripts/docgen/create_markdown.py alloydb
-```
-5. Review the generated `.md` files files in `docs/gcp/alloydb/`
-
-## ⚠️ Notes & Best Practices
-
-- **Do not create new folders** — the structure is already set up.  
-- **JSON keys must match exactly** (`resource_name`, `arguments`, `description`, `required`, `security_impact`, `rationale`, `compliant`, `non-compliant`, `parent`).  
-- **Booleans must be true/false** (not strings).  
-- **Compliant / Non-compliant**: provide practical examples whenever possible.  
-- **Nested arguments**: define them under a parent’s `"arguments"` key.  
+Covers the flattener (leaf/block shapes, dotted nesting, computed/meta exclusion, object
+expansion) and the writer (key order, refresh preserve/prune). These are offline; the
+schema fetch and clone are exercised by running `--test`.

@@ -1,0 +1,1010 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "app": {
+      "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "execution_type": {
+      "description": "Possible values:\nSYNCHRONOUS\nASYNCHRONOUS",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "tool_id": {
+      "description": "The ID to use for the tool, which will become the final component of\nthe tool's resource name. If not provided, a unique ID will be\nautomatically assigned for the tool.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "agent_tool": {
+      "type": "block",
+      "description": "Represents a tool that allows the agent to call another agent.",
+      "required": false
+    },
+    "agent_tool.agent": {
+      "description": "Optional. The resource name of the agent that is the entry point of the tool.\nFormat: projects/{project}/locations/{location}/agents/{agent}",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "agent_tool.description": {
+      "description": "Optional. Description of the tool's purpose.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "agent_tool.name": {
+      "description": "Required. The name of the agent tool.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function": {
+      "type": "block",
+      "description": "Represents a client-side function that the agent can invoke. When the\ntool is chosen by the agent, control is handed off to the client.\nThe client is responsible for executing the function and returning the result\nas a ToolResponse to continue the interaction with the agent.",
+      "required": false
+    },
+    "client_function.description": {
+      "description": "The function description.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.name": {
+      "description": "The function name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.parameters": {
+      "type": "block",
+      "description": "Represents a select subset of an OpenAPI 3.0 schema object.",
+      "required": false
+    },
+    "client_function.parameters.additional_properties": {
+      "description": "Defines the schema for additional properties allowed in an object.\nThe value must be a valid JSON string representing the Schema object.\n(Note: OpenAPI also allows a boolean, this definition expects a Schema JSON).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.parameters.any_of": {
+      "description": "The instance value should be valid against at least one of the schemas in this list.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.parameters.default": {
+      "description": "Default value of the data. Represents a dynamically typed value\nwhich can be either null, a number, a string, a boolean, a struct,\nor a list of values. The provided default value must be compatible\nwith the defined 'type' and other schema constraints.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.parameters.defs": {
+      "description": "A map of definitions for use by ref. Only allowed at the root of the schema.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.parameters.description": {
+      "description": "The description of the data.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.parameters.enum": {
+      "description": "Possible values of the element of primitive type with enum format.\nExamples:\n1. We can define direction as :\n{type:STRING, format:enum, enum:[\"EAST\", NORTH\", \"SOUTH\", \"WEST\"]}\n2. We can define apartment number as :\n{type:INTEGER, format:enum, enum:[\"101\", \"201\", \"301\"]}",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.parameters.items": {
+      "description": "Schema of the elements of Type.ARRAY.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.parameters.max_items": {
+      "description": "Maximum number of the elements for Type.ARRAY. (int64 format)",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.parameters.maximum": {
+      "description": "Maximum value for Type.INTEGER and Type.NUMBER.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.parameters.min_items": {
+      "description": "Minimum number of the elements for Type.ARRAY. (int64 format)",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.parameters.minimum": {
+      "description": "Minimum value for Type.INTEGER and Type.NUMBER.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.parameters.nullable": {
+      "description": "Indicates if the value may be null.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.parameters.prefix_items": {
+      "description": "Schemas of initial elements of Type.ARRAY.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.parameters.properties": {
+      "description": "Properties of Type.OBJECT.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.parameters.ref": {
+      "description": "Allows indirect references between schema nodes. The value should be a\nvalid reference to a child of the root 'defs'.\nFor example, the following schema defines a reference to a schema node\nnamed \"Pet\":\ntype: object\nproperties:\n  pet:\n    ref: #/defs/Pet\ndefs:\n  Pet:\n    type: object\n    properties:\n      name:\n        type: string\nThe value of the \"pet\" property is a reference to the schema node\nnamed \"Pet\".\nSee details in\nhttps://json-schema.org/understanding-json-schema/structuring.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.parameters.required": {
+      "description": "Required properties of Type.OBJECT.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.parameters.title": {
+      "description": "The title of the schema.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.parameters.type": {
+      "description": "The type of the data.\nPossible values:\nSTRING\nINTEGER\nNUMBER\nBOOLEAN\nOBJECT\nARRAY",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.parameters.unique_items": {
+      "description": "Indicate the items in the array must be unique. Only applies to TYPE.ARRAY.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.response": {
+      "type": "block",
+      "description": "Represents a select subset of an OpenAPI 3.0 schema object.",
+      "required": false
+    },
+    "client_function.response.additional_properties": {
+      "description": "Defines the schema for additional properties allowed in an object.\nThe value must be a valid JSON string representing the Schema object.\n(Note: OpenAPI also allows a boolean, this definition expects a Schema JSON).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.response.any_of": {
+      "description": "The instance value should be valid against at least one of the schemas in this list.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.response.default": {
+      "description": "Default value of the data. Represents a dynamically typed value\nwhich can be either null, a number, a string, a boolean, a struct,\nor a list of values. The provided default value must be compatible\nwith the defined 'type' and other schema constraints.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.response.defs": {
+      "description": "A map of definitions for use by ref. Only allowed at the root of the schema.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.response.description": {
+      "description": "The description of the data.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.response.enum": {
+      "description": "Possible values of the element of primitive type with enum format.\nExamples:\n1. We can define direction as :\n{type:STRING, format:enum, enum:[\"EAST\", NORTH\", \"SOUTH\", \"WEST\"]}\n2. We can define apartment number as :\n{type:INTEGER, format:enum, enum:[\"101\", \"201\", \"301\"]}",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.response.items": {
+      "description": "Schema of the elements of Type.ARRAY.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.response.max_items": {
+      "description": "Maximum number of the elements for Type.ARRAY. (int64 format)",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.response.maximum": {
+      "description": "Maximum value for Type.INTEGER and Type.NUMBER.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.response.min_items": {
+      "description": "Minimum number of the elements for Type.ARRAY. (int64 format)",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.response.minimum": {
+      "description": "Minimum value for Type.INTEGER and Type.NUMBER.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.response.nullable": {
+      "description": "Indicates if the value may be null.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.response.prefix_items": {
+      "description": "Schemas of initial elements of Type.ARRAY.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.response.properties": {
+      "description": "Properties of Type.OBJECT.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.response.ref": {
+      "description": "Allows indirect references between schema nodes. The value should be a\nvalid reference to a child of the root 'defs'.\nFor example, the following schema defines a reference to a schema node\nnamed \"Pet\":\ntype: object\nproperties:\n  pet:\n    ref: #/defs/Pet\ndefs:\n  Pet:\n    type: object\n    properties:\n      name:\n        type: string\nThe value of the \"pet\" property is a reference to the schema node\nnamed \"Pet\".\nSee details in\nhttps://json-schema.org/understanding-json-schema/structuring.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.response.required": {
+      "description": "Required properties of Type.OBJECT.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.response.title": {
+      "description": "The title of the schema.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.response.type": {
+      "description": "The type of the data.\nPossible values:\nSTRING\nINTEGER\nNUMBER\nBOOLEAN\nOBJECT\nARRAY",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_function.response.unique_items": {
+      "description": "Indicate the items in the array must be unique. Only applies to TYPE.ARRAY.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool": {
+      "type": "block",
+      "description": "Tool to retrieve from Vertex AI Search datastore or engine for grounding.\nAccepts either a datastore or an engine, but not both.\nSee Vertex AI Search:\nhttps://cloud.google.com/generative-ai-app-builder/docs/enterprise-search-introduction.",
+      "required": false
+    },
+    "data_store_tool.description": {
+      "description": "The tool description.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.filter_parameter_behavior": {
+      "description": "Optional. The filter parameter behavior.\nPossible values:\nFILTER_PARAMETER_BEHAVIOR_UNSPECIFIED\nALWAYS_INCLUDE\nNEVER_INCLUDE Possible values: [\"FILTER_PARAMETER_BEHAVIOR_UNSPECIFIED\", \"ALWAYS_INCLUDE\", \"NEVER_INCLUDE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.max_results": {
+      "description": "Number of search results to return per query.\nThe default value is 10. The maximum allowed value is 10.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.name": {
+      "description": "The data store tool name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.boost_specs": {
+      "type": "block",
+      "description": "Boost specification to boost certain documents.",
+      "required": false
+    },
+    "data_store_tool.boost_specs.data_stores": {
+      "description": "The Data Store where the boosting configuration is applied. Full resource\nname of DataStore, such as\nprojects/{project}/locations/{location}/collections/{collection}/dataStores/{dataStore}.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.boost_specs.spec": {
+      "type": "block",
+      "description": "A list of boosting specifications.",
+      "required": true
+    },
+    "data_store_tool.boost_specs.spec.condition_boost_specs": {
+      "type": "block",
+      "description": "A list of boosting specifications.",
+      "required": true
+    },
+    "data_store_tool.boost_specs.spec.condition_boost_specs.boost": {
+      "description": "Strength of the boost, which should be in [-1, 1]. Negative boost means\ndemotion. Default is 0.0.\nSetting to 1.0 gives the suggestions a big promotion. However, it does\nnot necessarily mean that the top result will be a boosted suggestion.\nSetting to -1.0 gives the suggestions a big demotion. However, other\nsuggestions that are relevant might still be shown.\nSetting to 0.0 means no boost applied. The boosting condition is\nignored.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.boost_specs.spec.condition_boost_specs.condition": {
+      "description": "An expression which specifies a boost condition. The syntax is the same\nas filter expression syntax. Currently, the only supported condition is\na list of BCP-47 lang codes.\nExample: To boost suggestions in languages en or fr:\n(lang_code: ANY(\"en\", \"fr\"))",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.boost_specs.spec.condition_boost_specs.boost_control_spec": {
+      "type": "block",
+      "description": "Specification for custom ranking based on customer specified attribute\nvalue. It provides more controls for customized ranking than the simple\n(condition, boost) combination above.",
+      "required": false
+    },
+    "data_store_tool.boost_specs.spec.condition_boost_specs.boost_control_spec.attribute_type": {
+      "description": "The attribute type to be used to determine the boost amount. The\nattribute value can be derived from the field value of the specified\nfield_name. In the case of numerical it is straightforward i.e.\nattribute_value = numerical_field_value. In the case of freshness\nhowever, attribute_value = (time.now() - datetime_field_value).\nPossible values:\nNUMERICAL\nFRESHNESS",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.boost_specs.spec.condition_boost_specs.boost_control_spec.field_name": {
+      "description": "The name of the field whose value will be used to determine the\nboost amount.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.boost_specs.spec.condition_boost_specs.boost_control_spec.interpolation_type": {
+      "description": "The interpolation type to be applied to connect the control points\nlisted below.\nPossible values:\nLINEAR",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.boost_specs.spec.condition_boost_specs.boost_control_spec.control_points": {
+      "type": "block",
+      "description": "The control points used to define the curve. The monotonic function\n(defined through the interpolation_type above) passes through the\ncontrol points listed here.",
+      "required": false
+    },
+    "data_store_tool.boost_specs.spec.condition_boost_specs.boost_control_spec.control_points.attribute_value": {
+      "description": "Can be one of:\n1. The numerical field value.\n2. The duration spec for freshness:\nThe value must be formatted as an XSD 'dayTimeDuration' value (a\nrestricted subset of an ISO 8601 duration value). The pattern for\nthis is: 'nDnM]'.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.boost_specs.spec.condition_boost_specs.boost_control_spec.control_points.boost_amount": {
+      "description": "The value between -1 to 1 by which to boost the score if the\nattribute_value evaluates to the value specified above.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.data_store_source": {
+      "type": "block",
+      "description": "Optional. Search within a single specific DataStore.",
+      "required": false
+    },
+    "data_store_tool.data_store_source.filter": {
+      "description": "Optional. Filter specification for the DataStore.\nSee: https://cloud.google.com/generative-ai-app-builder/docs/filter-search-metadata",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.data_store_source.data_store": {
+      "type": "block",
+      "description": "Optional. The data store.",
+      "required": false
+    },
+    "data_store_tool.data_store_source.data_store.name": {
+      "description": "Full resource name of the DataStore.\nFormat: projects/{project}/locations/{location}/collections/{collection}/dataStores/{dataStore}",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.engine_source": {
+      "type": "block",
+      "description": "Configuration for searching within an Engine, potentially targeting\nspecific DataStores.",
+      "required": false
+    },
+    "data_store_tool.engine_source.engine": {
+      "description": "Full resource name of the Engine.\nFormat:\n'projects/{project}/locations/{location}/collections/{collection}/engines/{engine}'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.engine_source.filter": {
+      "description": "A filter applied to the search across the Engine. Not relevant and not\nused if 'data_store_sources' is provided.\nSee:\nhttps://cloud.google.com/generative-ai-app-builder/docs/filter-search-metadata",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.engine_source.data_store_sources": {
+      "type": "block",
+      "description": "Use to target specific DataStores within the Engine.\nIf empty, the search applies to all DataStores associated with the\nEngine.",
+      "required": false
+    },
+    "data_store_tool.engine_source.data_store_sources.filter": {
+      "description": "Filter specification for the DataStore.\nSee:\nhttps://cloud.google.com/generative-ai-app-builder/docs/filter-search-metadata",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.engine_source.data_store_sources.data_store": {
+      "type": "block",
+      "description": "A DataStore resource in Vertex AI Search.",
+      "required": false
+    },
+    "data_store_tool.engine_source.data_store_sources.data_store.name": {
+      "description": "Full resource name of the DataStore.\nFormat:\n'projects/{project}/locations/{location}/collections/{collection}/dataStores/{dataStore}'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.modality_configs": {
+      "type": "block",
+      "description": "The modality configs for the data store.",
+      "required": false
+    },
+    "data_store_tool.modality_configs.modality_type": {
+      "description": "The modality type.\nPossible values:\nTEXT\nAUDIO",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.modality_configs.grounding_config": {
+      "type": "block",
+      "description": "Grounding configuration.",
+      "required": false
+    },
+    "data_store_tool.modality_configs.grounding_config.disabled": {
+      "description": "Whether grounding is disabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.modality_configs.grounding_config.grounding_level": {
+      "description": "The groundedness threshold of the answer based on the retrieved sources.\nThe value has a configurable range of [1, 5]. The level is used to\nthreshold the groundedness of the answer, meaning that all responses with\na groundedness score below the threshold will fall back to returning\nrelevant snippets only.\nFor example, a level of 3 means that the groundedness score must be\n3 or higher for the response to be returned.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.modality_configs.rewriter_config": {
+      "type": "block",
+      "description": "Rewriter configuration.",
+      "required": false
+    },
+    "data_store_tool.modality_configs.rewriter_config.disabled": {
+      "description": "Whether the rewriter is disabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.modality_configs.rewriter_config.prompt": {
+      "description": "The prompt definition. If not set, default prompt will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.modality_configs.rewriter_config.model_settings": {
+      "type": "block",
+      "description": "Model settings contains various configurations for the LLM model.",
+      "required": true
+    },
+    "data_store_tool.modality_configs.rewriter_config.model_settings.model": {
+      "description": "The LLM model that the agent should use.\nIf not set, the agent will inherit the model from its parent agent.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.modality_configs.rewriter_config.model_settings.temperature": {
+      "description": "If set, this temperature will be used for the LLM model. Temperature\ncontrols the randomness of the model's responses. Lower temperatures\nproduce responses that are more predictable. Higher temperatures produce\nresponses that are more creative.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.modality_configs.summarization_config": {
+      "type": "block",
+      "description": "Summarization configuration.",
+      "required": false
+    },
+    "data_store_tool.modality_configs.summarization_config.disabled": {
+      "description": "Whether summarization is disabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.modality_configs.summarization_config.prompt": {
+      "description": "The prompt definition. If not set, default prompt will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.modality_configs.summarization_config.model_settings": {
+      "type": "block",
+      "description": "Model settings contains various configurations for the LLM model.",
+      "required": false
+    },
+    "data_store_tool.modality_configs.summarization_config.model_settings.model": {
+      "description": "The LLM model that the agent should use.\nIf not set, the agent will inherit the model from its parent agent.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_store_tool.modality_configs.summarization_config.model_settings.temperature": {
+      "description": "If set, this temperature will be used for the LLM model. Temperature\ncontrols the randomness of the model's responses. Lower temperatures\nproduce responses that are more predictable. Higher temperatures produce\nresponses that are more creative.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "file_search_tool": {
+      "type": "block",
+      "description": "The file search tool allows the agent to search across the files uploaded by the\napp/agent developer.",
+      "required": false
+    },
+    "file_search_tool.corpus_type": {
+      "description": "Optional. The type of the corpus. Default is FULLY_MANAGED.\nPossible values:\nCORPUS_TYPE_UNSPECIFIED\nUSER_OWNED\nFULLY_MANAGED Possible values: [\"CORPUS_TYPE_UNSPECIFIED\", \"USER_OWNED\", \"FULLY_MANAGED\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "file_search_tool.description": {
+      "description": "Optional. The tool description.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "file_search_tool.file_corpus": {
+      "description": "Optional. The corpus where files are stored.\nFormat: projects/{project}/locations/{location}/ragCorpora/{rag_corpus}",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "file_search_tool.name": {
+      "description": "Required. The tool name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "google_search_tool": {
+      "type": "block",
+      "description": "Represents a tool to perform Google web searches for grounding.\nSee\nhttps://cloud.google.com/vertex-ai/generative-ai/docs/grounding/grounding-with-google-search.",
+      "required": false
+    },
+    "google_search_tool.context_urls": {
+      "description": "Content will be fetched directly from these URLs for context and grounding.\nMore details: https://cloud.google.com/vertex-ai/generative-ai/docs/url-context.\nExample: \"https://example.com/path.html\". A maximum of 20 URLs are allowed.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "google_search_tool.description": {
+      "description": "Description of the tool's purpose.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "google_search_tool.exclude_domains": {
+      "description": "List of domains to be excluded from the search results.\nExample: \"example.com\".\nA maximum of 2000 domains can be excluded.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "google_search_tool.name": {
+      "description": "The name of the tool.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "google_search_tool.preferred_domains": {
+      "description": "Specifies domain names to guide the search.\nThe model will be instructed to prioritize these domains\nwhen formulating queries for google search.\nThis is a best-effort hint and these domains may or may\nnot be exclusively reflected in the final search results.\nExample: \"example.com\", \"another.site\".\nA maximum of 20 domains can be specified.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "google_search_tool.prompt_config": {
+      "type": "block",
+      "description": "Optional. Prompt instructions passed to planner on how the search results should be\nprocessed for text and voice.",
+      "required": false
+    },
+    "google_search_tool.prompt_config.text_prompt": {
+      "description": "Optional. Defines the prompt used for the system instructions when interacting with the\nagent in chat conversations. If not set, default prompt will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "google_search_tool.prompt_config.voice_prompt": {
+      "description": "Optional. Defines the prompt used for the system instructions when interacting with the\nagent in voice conversations. If not set, default prompt will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "python_function": {
+      "type": "block",
+      "description": "A Python function tool.",
+      "required": false
+    },
+    "python_function.name": {
+      "description": "The name of the Python function to execute. Must match a Python function\nname defined in the python code. Case sensitive. If the name is not\nprovided, the first function defined in the python code will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "python_function.python_code": {
+      "description": "The Python code to execute for the tool.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool": {
+      "type": "block",
+      "description": "Represents a widget tool that the agent can invoke.",
+      "required": false
+    },
+    "widget_tool.description": {
+      "description": "Optional. The description of the widget tool.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.name": {
+      "description": "Required. The display name of the widget tool.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.ui_config": {
+      "description": "Optional. Configuration for rendering the widget. Represents a JSON object.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.widget_type": {
+      "description": "Optional. The type of the widget tool. If not specified, the default type will be CUSTOMIZED.\nPossible values:\nWIDGET_TYPE_UNSPECIFIED\nCUSTOM\nPRODUCT_CAROUSEL\nPRODUCT_DETAILS\nQUICK_ACTIONS\nPRODUCT_COMPARISON\nADVANCED_PRODUCT_DETAILS\nSHORT_FORM\nOVERALL_SATISFACTION\nORDER_SUMMARY\nAPPOINTMENT_DETAILS\nAPPOINTMENT_SCHEDULER\nCONTACT_FORM Possible values: [\"WIDGET_TYPE_UNSPECIFIED\", \"CUSTOM\", \"PRODUCT_CAROUSEL\", \"PRODUCT_DETAILS\", \"QUICK_ACTIONS\", \"PRODUCT_COMPARISON\", \"ADVANCED_PRODUCT_DETAILS\", \"SHORT_FORM\", \"OVERALL_SATISFACTION\", \"ORDER_SUMMARY\", \"APPOINTMENT_DETAILS\", \"APPOINTMENT_SCHEDULER\", \"CONTACT_FORM\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.data_mapping": {
+      "type": "block",
+      "description": "Optional. The mapping that defines how data from a source tool is mapped to the\nwidget's input parameters.",
+      "required": false
+    },
+    "widget_tool.data_mapping.field_mappings": {
+      "description": "Optional. A map of widget input parameter fields to the corresponding output fields of the source tool.\nAn object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.data_mapping.mode": {
+      "description": "Optional. The mode of the data mapping.\nPossible values:\nMODE_UNSPECIFIED\nFIELD_MAPPING\nPYTHON_SCRIPT Possible values: [\"MODE_UNSPECIFIED\", \"FIELD_MAPPING\", \"PYTHON_SCRIPT\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.data_mapping.source_tool_name": {
+      "description": "Optional. The resource name of the tool that provides the data for the widget (e.g., a search tool or a custom function).\nFormat: projects/{project}/locations/{location}/agents/{agent}/tools/{tool}",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.data_mapping.python_function": {
+      "type": "block",
+      "description": "Optional. Configuration for a Python function used to transform the source tool's\noutput into the widget's input format.",
+      "required": false
+    },
+    "widget_tool.data_mapping.python_function.name": {
+      "description": "Optional. The name of the Python function to execute. Must match a Python function\nname defined in the python code. Case sensitive. If the name is not\nprovided, the first function defined in the python code will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.data_mapping.python_function.python_code": {
+      "description": "Optional. The Python code to execute for the tool.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.parameters": {
+      "type": "block",
+      "description": "Optional. The input parameters of the widget tool. Represents a Schema object.",
+      "required": false
+    },
+    "widget_tool.parameters.additional_properties": {
+      "description": "Defines the schema for additional properties allowed in an object.\nThe value must be a valid JSON string representing the Schema object.\n(Note: OpenAPI also allows a boolean, this definition expects a Schema JSON).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.parameters.any_of": {
+      "description": "The instance value should be valid against at least one of the schemas in this list.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.parameters.default": {
+      "description": "Default value of the data. Represents a dynamically typed value\nwhich can be either null, a number, a string, a boolean, a struct,\nor a list of values. The provided default value must be compatible\nwith the defined 'type' and other schema constraints.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.parameters.defs": {
+      "description": "A map of definitions for use by ref. Only allowed at the root of the schema.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.parameters.description": {
+      "description": "The description of the data.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.parameters.enum": {
+      "description": "Possible values of the element of primitive type with enum format.\nExamples:\n1. We can define direction as :\n{type:STRING, format:enum, enum:[\"EAST\", NORTH\", \"SOUTH\", \"WEST\"]}\n2. We can define apartment number as :\n{type:INTEGER, format:enum, enum:[\"101\", \"201\", \"301\"]}",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.parameters.items": {
+      "description": "Schema of the elements of Type.ARRAY.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.parameters.max_items": {
+      "description": "Maximum number of the elements for Type.ARRAY. (int64 format)",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.parameters.maximum": {
+      "description": "Maximum value for Type.INTEGER and Type.NUMBER.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.parameters.min_items": {
+      "description": "Minimum number of the elements for Type.ARRAY. (int64 format)",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.parameters.minimum": {
+      "description": "Minimum value for Type.INTEGER and Type.NUMBER.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.parameters.nullable": {
+      "description": "Indicates if the value may be null.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.parameters.prefix_items": {
+      "description": "Schemas of initial elements of Type.ARRAY.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.parameters.properties": {
+      "description": "Properties of Type.OBJECT.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.parameters.ref": {
+      "description": "Allows indirect references between schema nodes. The value should be a\nvalid reference to a child of the root 'defs'.\nFor example, the following schema defines a reference to a schema node\nnamed \"Pet\":\ntype: object\nproperties:\n  pet:\n    ref: #/defs/Pet\ndefs:\n  Pet:\n    type: object\n    properties:\n      name:\n        type: string\nThe value of the \"pet\" property is a reference to the schema node\nnamed \"Pet\".\nSee details in\nhttps://json-schema.org/understanding-json-schema/structuring.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.parameters.required": {
+      "description": "Required properties of Type.OBJECT.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.parameters.title": {
+      "description": "The title of the schema.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.parameters.type": {
+      "description": "The type of the data.\nPossible values:\nSTRING\nINTEGER\nNUMBER\nBOOLEAN\nOBJECT\nARRAY",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.parameters.unique_items": {
+      "description": "Indicate the items in the array must be unique. Only applies to TYPE.ARRAY.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.text_response_config": {
+      "type": "block",
+      "description": "Optional. Configuration for always-included text responses.",
+      "required": false
+    },
+    "widget_tool.text_response_config.static_text": {
+      "description": "Optional. The static text response to return when type is STATIC.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.text_response_config.text_response_instruction": {
+      "description": "Optional. Instruction for the LLM on how to generate the text response. Used as\nthe description for the text response parameter if type is LLM_GENERATED.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "widget_tool.text_response_config.type": {
+      "description": "Optional. The strategy for providing the text response.\nPossible values:\nTYPE_UNSPECIFIED\nNONE\nLLM_GENERATED\nSTATIC Possible values: [\"TYPE_UNSPECIFIED\", \"NONE\", \"LLM_GENERATED\", \"STATIC\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

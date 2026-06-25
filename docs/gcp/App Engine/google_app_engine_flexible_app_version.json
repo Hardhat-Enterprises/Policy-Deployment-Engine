@@ -1,0 +1,812 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "beta_settings": {
+      "description": "Metadata settings that are supplied to this version to enable beta runtime features.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Parameters are intended for temporary experimental features that are not yet part of the stable API."
+    },
+    "default_expiration": {
+      "description": "Duration that static files should be cached by web proxies and browsers.\nOnly applicable if the corresponding StaticFilesHandler does not specify its own expiration time.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Cache-control requirements are dictated by the specific nature of the application's static assets."
+    },
+    "delete_service_on_destroy": {
+      "description": "If set to 'true', the service will be deleted if it is the last version.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "When true, destroying a version also deletes the entire parent service and all its versions. A policy should keep this disabled to prevent destructive, accidental loss of the whole service — matching the prevent-destructive-loss archetype (like force_destroy)."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "env_variables": {
+      "description": "Environment variables available to the application.  As these are not returned in the API request, Terraform will not detect any changes made outside of the Terraform config.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Free-form key/value environment variables passed to the running version. A generic platform policy cannot meaningfully constrain arbitrary application-defined values, so it is not a policy target."
+    },
+    "inbound_services": {
+      "description": "A list of the types of messages that this application is able to receive. Possible values: [\"INBOUND_SERVICE_MAIL\", \"INBOUND_SERVICE_MAIL_BOUNCE\", \"INBOUND_SERVICE_XMPP_ERROR\", \"INBOUND_SERVICE_XMPP_MESSAGE\", \"INBOUND_SERVICE_XMPP_SUBSCRIBE\", \"INBOUND_SERVICE_XMPP_PRESENCE\", \"INBOUND_SERVICE_CHANNEL_PRESENCE\", \"INBOUND_SERVICE_WARMUP\"]",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": false,
+      "rationale": "Enables legacy App Engine bundled inbound services (e.g. mail, warmup). These are optional legacy integrations rather than a primary access control; ingress/firewall settings govern exposure, so a generic policy on this list adds no meaningful hardening."
+    },
+    "instance_class": {
+      "description": "Instance class that is used to run this version. Valid values are\nAutomaticScaling: F1, F2, F4, F4_1G\nManualScaling: B1, B2, B4, B8, B4_1G\nDefaults to F1 for AutomaticScaling and B1 for ManualScaling.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "It is a legacy parameter exclusive to the App Engine Standard environment."
+    },
+    "nobuild_files_regex": {
+      "description": "Files that match this pattern will not be built into this version. Only applicable for Go runtimes.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "File exclusion is more effectively managed via standardized version control ignore files and container-specific exclusion files."
+    },
+    "noop_on_destroy": {
+      "description": "If set to 'true', the application version will not be deleted.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "Ensure that the Terraform state remains a truthful representation of the cloud environment."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "To automatically inherit the provider-level project ID"
+    },
+    "runtime": {
+      "description": "Desired runtime. Example python27.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "To ensure the application environment is patched against known vulnerabilities and remains compatible with organizational security tooling."
+    },
+    "runtime_api_version": {
+      "description": "The version of the API in the given runtime environment.\nPlease see the app.yaml reference for valid values at 'https://cloud.google.com/appengine/docs/standard/<language>/config/appref'\\\nSubstitute '<language>' with 'python', 'java', 'php', 'ruby', 'go' or 'nodejs'.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "As managed internally by the selected runtime, enforcing a specific API version at the policy level would create unnecessary coupling between infrastructure code and language-specific internals."
+    },
+    "runtime_channel": {
+      "description": "The channel of the runtime to use. Only available for some runtimes.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The platform defaults to the stable channel which ensures that applications run on production-ready environment binaries without requiring manual intervention or the risk of using experimental preview features."
+    },
+    "runtime_main_executable_path": {
+      "description": "The path or name of the app's main executable.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Within a containerized Flexible environment the execution logic is better governed by the entrypoint or the container's internal configuration and enforcing a path would break standard deployment conventions for multi-language microservices."
+    },
+    "service": {
+      "description": "AppEngine service resource. Can contain numbers, letters, and hyphens.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The App Engine service name this version belongs to. This is an identifier; we do not constrain resource names."
+    },
+    "service_account": {
+      "description": "The identity that the deployed version will run as. Admin API will use the App Engine Appspot service account as\ndefault if this field is neither provided in app.yaml file nor through CLI flag.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Specifies the runtime identity (service account email) the version runs as. This is a reference to a team-chosen identity; a platform policy cannot pin a specific service account, so it is not a generic policy target."
+    },
+    "serving_status": {
+      "description": "Current serving status of this version. Only the versions with a SERVING status create instances and can be billed. Default value: \"SERVING\" Possible values: [\"SERVING\", \"STOPPED\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "As it governs the operational state of a version which must remain dynamic to allow automated deployments, traffic splitting and manual emergency interventions without triggering policy violations."
+    },
+    "version_id": {
+      "description": "Relative name of the version within the service. For example, 'v1'. Version names can contain only lowercase letters, numbers, or hyphens.\nReserved names,\"default\", \"latest\", and any name with the prefix \"ah-\".",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "to allow CI/CD pipelines to dynamically generate unique identifiers, which is essential for maintaining an immutable audit trail and enabling safe rollbacks."
+    },
+    "api_config": {
+      "type": "block",
+      "description": "Serving configuration for Google Cloud Endpoints.",
+      "required": false
+    },
+    "api_config.auth_fail_action": {
+      "description": "Action to take when users access resources that require authentication. Default value: \"AUTH_FAIL_ACTION_REDIRECT\" Possible values: [\"AUTH_FAIL_ACTION_REDIRECT\", \"AUTH_FAIL_ACTION_UNAUTHORIZED\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "api_config.login": {
+      "description": "Level of login required to access this resource. Default value: \"LOGIN_OPTIONAL\" Possible values: [\"LOGIN_OPTIONAL\", \"LOGIN_ADMIN\", \"LOGIN_REQUIRED\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "api_config.script": {
+      "description": "Path to the script from the application root directory.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "api_config.security_level": {
+      "description": "Security (HTTPS) enforcement for this URL. Possible values: [\"SECURE_DEFAULT\", \"SECURE_NEVER\", \"SECURE_OPTIONAL\", \"SECURE_ALWAYS\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "api_config.url": {
+      "description": "URL to serve the endpoint at.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automatic_scaling": {
+      "type": "block",
+      "description": "Automatic scaling is based on request rate, response latencies, and other application metrics.",
+      "required": false
+    },
+    "automatic_scaling.cool_down_period": {
+      "description": "The time period that the Autoscaler should wait before it starts collecting information from a new instance.\nThis prevents the autoscaler from collecting information when the instance is initializing,\nduring which the collected usage would not be reliable. Default: 120s",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Prevents the App Engine autoscaler from reacting to sudden traffic spikes as new instances are ignored until the period ends."
+    },
+    "automatic_scaling.max_concurrent_requests": {
+      "description": "Number of concurrent requests an automatic scaling instance can accept before the scheduler spawns a new instance.\n\nDefaults to a runtime-specific value.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Can lead to under-utilisation and higher costs by triggering the creation of new instances before the existing ones are actually CPU/memory constrained."
+    },
+    "automatic_scaling.max_idle_instances": {
+      "description": "Maximum number of idle instances that should be maintained for this version.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Autoscaler manages idle instances automatically by default, also manually capping too low can cause performance degradation during volatile traffic spikes."
+    },
+    "automatic_scaling.max_pending_latency": {
+      "description": "Maximum amount of time that a request should wait in the pending queue before starting a new instance to handle it.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Forces requests to sit in a queue for too long before the App Engine autoscaler triggers a new instance."
+    },
+    "automatic_scaling.max_total_instances": {
+      "description": "Maximum number of instances that should be started to handle requests for this version. Default: 20",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Avoid denial-of-service scenarios, as the application cannot scale to meet a legitimate traffic surge and resulting in request timeouts/503 errors."
+    },
+    "automatic_scaling.min_idle_instances": {
+      "description": "Minimum number of idle instances that should be maintained for this version. Only applicable for the default version of a service.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "To ensure the App Engine autoscaler can ingest performance metrics during traffic surges."
+    },
+    "automatic_scaling.min_pending_latency": {
+      "description": "Minimum amount of time a request should wait in the pending queue before starting a new instance to handle it.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Optimal wait time before scaling is highly dependent on a specific workload"
+    },
+    "automatic_scaling.min_total_instances": {
+      "description": "Minimum number of running instances that should be maintained for this version. Default: 2",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "To ensure of allowing the environment to fully de-provision resources during periods of zero activity."
+    },
+    "automatic_scaling.cpu_utilization": {
+      "type": "block",
+      "description": "Target scaling by CPU usage.",
+      "required": true
+    },
+    "automatic_scaling.cpu_utilization.aggregation_window_length": {
+      "description": "Period of time over which CPU utilization is calculated.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automatic_scaling.cpu_utilization.target_utilization": {
+      "description": "Target CPU utilization ratio to maintain when scaling. Must be between 0 and 1.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automatic_scaling.disk_utilization": {
+      "type": "block",
+      "description": "Target scaling by disk usage.",
+      "required": false
+    },
+    "automatic_scaling.disk_utilization.target_read_bytes_per_second": {
+      "description": "Target bytes read per second.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automatic_scaling.disk_utilization.target_read_ops_per_second": {
+      "description": "Target ops read per seconds.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automatic_scaling.disk_utilization.target_write_bytes_per_second": {
+      "description": "Target bytes written per second.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automatic_scaling.disk_utilization.target_write_ops_per_second": {
+      "description": "Target ops written per second.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automatic_scaling.network_utilization": {
+      "type": "block",
+      "description": "Target scaling by network usage.",
+      "required": false
+    },
+    "automatic_scaling.network_utilization.target_received_bytes_per_second": {
+      "description": "Target bytes received per second.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automatic_scaling.network_utilization.target_received_packets_per_second": {
+      "description": "Target packets received per second.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automatic_scaling.network_utilization.target_sent_bytes_per_second": {
+      "description": "Target bytes sent per second.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automatic_scaling.network_utilization.target_sent_packets_per_second": {
+      "description": "Target packets sent per second.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automatic_scaling.request_utilization": {
+      "type": "block",
+      "description": "Target scaling by request utilization.",
+      "required": false
+    },
+    "automatic_scaling.request_utilization.target_concurrent_requests": {
+      "description": "Target number of concurrent requests.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "automatic_scaling.request_utilization.target_request_count_per_second": {
+      "description": "Target requests per second.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deployment": {
+      "type": "block",
+      "description": "Code and application artifacts that make up this version.",
+      "required": false
+    },
+    "deployment.cloud_build_options": {
+      "type": "block",
+      "description": "Options for the build operations performed as a part of the version deployment. Only applicable when creating a version using source code directly.",
+      "required": false
+    },
+    "deployment.cloud_build_options.app_yaml_path": {
+      "description": "Path to the yaml file used in deployment, used to determine runtime configuration details.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deployment.cloud_build_options.cloud_build_timeout": {
+      "description": "The Cloud Build timeout used as part of any dependent builds performed by version creation. Defaults to 10 minutes.\n\nA duration in seconds with up to nine fractional digits, terminated by 's'. Example: \"3.5s\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deployment.container": {
+      "type": "block",
+      "description": "The Docker image for the container that runs the version.",
+      "required": false
+    },
+    "deployment.container.image": {
+      "description": "URI to the hosted container image in Google Container Registry. The URI must be fully qualified and include a tag or digest.\nExamples: \"gcr.io/my-project/image:tag\" or \"gcr.io/my-project/image@digest\"",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deployment.files": {
+      "type": "block",
+      "description": "Manifest of the files stored in Google Cloud Storage that are included as part of this version.\nAll files must be readable using the credentials supplied with this call.",
+      "required": false
+    },
+    "deployment.files.name": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deployment.files.sha1_sum": {
+      "description": "SHA1 checksum of the file",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deployment.files.source_url": {
+      "description": "Source URL",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deployment.zip": {
+      "type": "block",
+      "description": "Zip File",
+      "required": false
+    },
+    "deployment.zip.files_count": {
+      "description": "files count",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deployment.zip.source_url": {
+      "description": "Source URL",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "endpoints_api_service": {
+      "type": "block",
+      "description": "Code and application artifacts that make up this version.",
+      "required": false
+    },
+    "endpoints_api_service.config_id": {
+      "description": "Endpoints service configuration ID as specified by the Service Management API. For example \"2016-09-19r1\".\n\nBy default, the rollout strategy for Endpoints is \"FIXED\". This means that Endpoints starts up with a particular configuration ID.\nWhen a new configuration is rolled out, Endpoints must be given the new configuration ID. The configId field is used to give the configuration ID\nand is required in this case.\n\nEndpoints also has a rollout strategy called \"MANAGED\". When using this, Endpoints fetches the latest configuration and does not need\nthe configuration ID. In this case, configId must be omitted.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "endpoints_api_service.disable_trace_sampling": {
+      "description": "Enable or disable trace sampling. By default, this is set to false for enabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "endpoints_api_service.name": {
+      "description": "Endpoints service name which is the name of the \"service\" resource in the Service Management API.\nFor example \"myapi.endpoints.myproject.cloud.goog\"",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "endpoints_api_service.rollout_strategy": {
+      "description": "Endpoints rollout strategy. If FIXED, configId must be specified. If MANAGED, configId must be omitted. Default value: \"FIXED\" Possible values: [\"FIXED\", \"MANAGED\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "entrypoint": {
+      "type": "block",
+      "description": "The entrypoint for the application.",
+      "required": false
+    },
+    "entrypoint.shell": {
+      "description": "The format should be a shell command that can be fed to bash -c.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "A free-form shell command (fed to bash -c) used as the version entrypoint. This is arbitrary application startup logic; a generic platform policy cannot meaningfully constrain an arbitrary command, so it is not a policy target."
+    },
+    "flexible_runtime_settings": {
+      "type": "block",
+      "description": "Runtime settings for App Engine flexible environment.",
+      "required": false
+    },
+    "flexible_runtime_settings.operating_system": {
+      "description": "Operating System of the application runtime.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "flexible_runtime_settings.runtime_version": {
+      "description": "The runtime version of an App Engine flexible application.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "handlers": {
+      "type": "block",
+      "description": "An ordered list of URL-matching patterns that should be applied to incoming requests.\nThe first matching URL handles the request and other request handlers are not attempted.",
+      "required": false
+    },
+    "handlers.auth_fail_action": {
+      "description": "Actions to take when the user is not logged in. Possible values: [\"AUTH_FAIL_ACTION_REDIRECT\", \"AUTH_FAIL_ACTION_UNAUTHORIZED\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "handlers.login": {
+      "description": "Methods to restrict access to a URL based on login status. Possible values: [\"LOGIN_OPTIONAL\", \"LOGIN_ADMIN\", \"LOGIN_REQUIRED\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "handlers.redirect_http_response_code": {
+      "description": "30x code to use when performing redirects for the secure field. Possible values: [\"REDIRECT_HTTP_RESPONSE_CODE_301\", \"REDIRECT_HTTP_RESPONSE_CODE_302\", \"REDIRECT_HTTP_RESPONSE_CODE_303\", \"REDIRECT_HTTP_RESPONSE_CODE_307\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "handlers.security_level": {
+      "description": "Security (HTTPS) enforcement for this URL. Possible values: [\"SECURE_DEFAULT\", \"SECURE_NEVER\", \"SECURE_OPTIONAL\", \"SECURE_ALWAYS\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "handlers.url_regex": {
+      "description": "URL prefix. Uses regular expression syntax, which means regexp special characters must be escaped, but should not contain groupings.\nAll URLs that begin with this prefix are handled by this handler, using the portion of the URL after the prefix as part of the file path.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "handlers.script": {
+      "type": "block",
+      "description": "Executes a script to handle the requests that match this URL pattern.\nOnly the auto value is supported for Node.js in the App Engine standard environment, for example \"script:\" \"auto\".",
+      "required": false
+    },
+    "handlers.script.script_path": {
+      "description": "Path to the script from the application root directory.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "handlers.static_files": {
+      "type": "block",
+      "description": "Files served directly to the user for a given URL, such as images, CSS stylesheets, or JavaScript source files.\nStatic file handlers describe which files in the application directory are static files, and which URLs serve them.",
+      "required": false
+    },
+    "handlers.static_files.application_readable": {
+      "description": "Whether files should also be uploaded as code data. By default, files declared in static file handlers are\nuploaded as static data and are only served to end users; they cannot be read by the application. If enabled,\nuploads are charged against both your code and static data storage resource quotas.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "handlers.static_files.expiration": {
+      "description": "Time a static file served by this handler should be cached by web proxies and browsers.\nA duration in seconds with up to nine fractional digits, terminated by 's'. Example \"3.5s\".\nDefault is '0s'",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "handlers.static_files.http_headers": {
+      "description": "HTTP headers to use for all responses from these URLs.\nAn object containing a list of \"key:value\" value pairs.\".",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "handlers.static_files.mime_type": {
+      "description": "MIME type used to serve all files served by this handler.\nDefaults to file-specific MIME types, which are derived from each file's filename extension.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "handlers.static_files.path": {
+      "description": "Path to the static files matched by the URL pattern, from the application root directory.\nThe path can refer to text matched in groupings in the URL pattern.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "handlers.static_files.require_matching_file": {
+      "description": "Whether this handler should match the request if the file referenced by the handler does not exist.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "handlers.static_files.upload_path_regex": {
+      "description": "Regular expression that matches the file paths for all files that should be referenced by this handler.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "liveness_check": {
+      "type": "block",
+      "description": "Health checking configuration for VM instances. Unhealthy instances are killed and replaced with new instances.",
+      "required": true
+    },
+    "liveness_check.check_interval": {
+      "description": "Interval between health checks.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "As Google-managed default provides an optimal balance between rapid failure detection and the reduction of unnecessary noise."
+    },
+    "liveness_check.failure_threshold": {
+      "description": "Number of consecutive failed checks required before considering the VM unhealthy. Default: 4.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Number of consecutive failed health checks before an instance is considered unhealthy. This is a reliability/availability tuning knob, not a security control, and no generic secure value exists to enforce."
+    },
+    "liveness_check.host": {
+      "description": "Host header to send when performing a HTTP Readiness check. Example: \"myapp.appspot.com\"",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "App Engine routes health checks to the instance's internal IP, defining a host header is unnecessary and can inadvertently bypass internal security controls if misconfigured."
+    },
+    "liveness_check.initial_delay": {
+      "description": "The initial delay before starting to execute the checks. Default: \"300s\"",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Enforcing a universal delay could lead to premature restarts of slow-starting but healthy applications."
+    },
+    "liveness_check.path": {
+      "description": "The request path.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The request path used by the liveness health check. This is an application-specific health endpoint, not a security control, and no generic value can be enforced."
+    },
+    "liveness_check.success_threshold": {
+      "description": "Number of consecutive successful checks required before considering the VM healthy. Default: 2.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Google Cloud default is sufficiently conservative to prevent flapping and ensures an instance is stable before it is reintroduced to the load balancer."
+    },
+    "liveness_check.timeout": {
+      "description": "Time before the check is considered failed. Default: \"4s\"",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Time a liveness/readiness health probe waits before it is considered failed. This is an availability/reliability tuning knob, not a security control, with no generic secure value to enforce."
+    },
+    "manual_scaling": {
+      "type": "block",
+      "description": "A service with manual scaling runs continuously, allowing you to perform complex initialization and rely on the state of its memory over time.",
+      "required": false
+    },
+    "manual_scaling.instances": {
+      "description": "Number of instances to assign to the service at the start.\n\n**Note:** When managing the number of instances at runtime through the App Engine Admin API or the (now deprecated) Python 2\nModules API set_num_instances() you must use 'lifecycle.ignore_changes = [\"manual_scaling\"[0].instances]' to prevent drift detection.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network": {
+      "type": "block",
+      "description": "Extra network settings",
+      "required": false
+    },
+    "network.forwarded_ports": {
+      "description": "List of ports, or port pairs, to forward from the virtual machine to the application container.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network.instance_tag": {
+      "description": "Tag to apply to the instance during creation.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network.name": {
+      "description": "Google Compute Engine network where the virtual machines are created. Specify the short name, not the resource path.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network.session_affinity": {
+      "description": "Enable session affinity.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network.subnetwork": {
+      "description": "Google Cloud Platform sub-network where the virtual machines are created. Specify the short name, not the resource path.\n\nIf the network that the instance is being created in is a Legacy network, then the IP address is allocated from the IPv4Range.\nIf the network that the instance is being created in is an auto Subnet Mode Network, then only network name should be specified (not the subnetworkName) and the IP address is created from the IPCidrRange of the subnetwork that exists in that zone for that network.\nIf the network that the instance is being created in is a custom Subnet Mode Network, then the subnetworkName must be specified and the IP address is created from the IPCidrRange of the subnetwork.\nIf specified, the subnetwork must exist in the same region as the App Engine flexible environment application.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "readiness_check": {
+      "type": "block",
+      "description": "Configures readiness health checking for instances. Unhealthy instances are not put into the backend traffic rotation.",
+      "required": true
+    },
+    "readiness_check.app_start_timeout": {
+      "description": "A maximum time limit on application initialization, measured from moment the application successfully\nreplies to a healthcheck until it is ready to serve traffic. Default: \"300s\"",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Application initialization times vary drastically based on language runtime, dependency loading, and cache warming requirements."
+    },
+    "readiness_check.check_interval": {
+      "description": "Interval between health checks.  Default: \"5s\".",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "As Google-managed default provides an optimal balance between rapid failure detection and the reduction of unnecessary noise."
+    },
+    "readiness_check.failure_threshold": {
+      "description": "Number of consecutive failed checks required before removing traffic. Default: 2.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Number of consecutive failed health checks before an instance is considered unhealthy. This is a reliability/availability tuning knob, not a security control, and no generic secure value exists to enforce."
+    },
+    "readiness_check.host": {
+      "description": "Host header to send when performing a HTTP Readiness check. Example: \"myapp.appspot.com\"",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "App Engine routes health checks to the instance's internal IP, defining a host header is unnecessary and can inadvertently bypass internal security controls if misconfigured."
+    },
+    "readiness_check.path": {
+      "description": "The request path.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The request path used by the readiness health check. This is an application-specific health endpoint, not a security control, and no generic value can be enforced."
+    },
+    "readiness_check.success_threshold": {
+      "description": "Number of consecutive successful checks required before receiving traffic. Default: 2.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Google Cloud default is sufficiently conservative to prevent flapping and ensures an instance is stable before it is reintroduced to the load balancer."
+    },
+    "readiness_check.timeout": {
+      "description": "Time before the check is considered failed. Default: \"4s\"",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Time a liveness/readiness health probe waits before it is considered failed. This is an availability/reliability tuning knob, not a security control, with no generic secure value to enforce."
+    },
+    "resources": {
+      "type": "block",
+      "description": "Machine resources for a version.",
+      "required": false
+    },
+    "resources.cpu": {
+      "description": "Number of CPU cores needed.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "resources.disk_gb": {
+      "description": "Disk size (GB) needed.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "resources.memory_gb": {
+      "description": "Memory (GB) needed.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "resources.volumes": {
+      "type": "block",
+      "description": "List of ports, or port pairs, to forward from the virtual machine to the application container.",
+      "required": false
+    },
+    "resources.volumes.name": {
+      "description": "Unique name for the volume.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "resources.volumes.size_gb": {
+      "description": "Volume size in gigabytes.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "resources.volumes.volume_type": {
+      "description": "Underlying volume type, e.g. 'tmpfs'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "vpc_access_connector": {
+      "type": "block",
+      "description": "Enables VPC connectivity for standard apps.",
+      "required": false
+    },
+    "vpc_access_connector.name": {
+      "description": "Full Serverless VPC Access Connector name e.g. /projects/my-project/locations/us-central1/connectors/c1.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}
