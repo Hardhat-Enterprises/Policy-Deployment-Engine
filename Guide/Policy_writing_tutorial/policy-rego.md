@@ -234,6 +234,26 @@ Blocks values that match a defined pattern.
     ]
 ```
 
+
+### Element Blacklist
+
+Blocks **array** attributes whose elements contain any blacklisted **substring** (simple
+`contains` matching, not regex). `values` is a flat array of forbidden substrings.
+```rego
+    [
+      {
+        "situation_description": "Resource names must only include authorized projects",
+        "remedies": ["Remove unauthorized or non-production projects"]
+      },
+      {
+        "condition": "Resource names contain a blacklisted substring",
+        "attribute_path": ["resource_names"],
+        "values": ["attacker-project", "test-project", "dev-", "-sandbox"],
+        "policy_type": "element blacklist"
+      }
+    ]
+```
+
 <div align="center">
 
 [⬅️ Previous: _vars.rego](vars-rego.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;

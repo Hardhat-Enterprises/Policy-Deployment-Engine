@@ -30,11 +30,11 @@ variables := {
 ```rego
 package terraform.gcp.security.cloud_functions.google_cloudfunctions_function.vars
 
-    variables := {
-      "friendly_resource_name": "Cloud Function",
-      "resource_type": "google_cloudfunctions_function",
-      "resource_value_name": "name"
-    }
+variables := {
+    "friendly_resource_name": "Cloud Function",
+    "resource_type": "google_cloudfunctions_function",
+    "resource_value_name": "name"
+}
 ```
 
 ### Notes

@@ -104,7 +104,7 @@ Rename each IAM resource folder to match the exact Terraform resource type.
 GKEHub/
   <resource>_iam_binding/
   <resource>_iam_member/
-  <resource>_iam_policy/no_primitive_or_public/
+  <resource>_iam_policy/
 ```
 
 **After:**

@@ -3,7 +3,7 @@
 
 ### ✅ Example Workflow
 
-1. Get assigned a service from PDE Leadership (e.g. `cloud_functions`).  
+1. Get assigned a service from PDE Leadership (e.g. `Cloud Functions`).  
 2. Research the service and identify security-relevant arguments.  
 
 3. Create the required folder structure. Note the two trees are **not** symmetrical:
