@@ -85,6 +85,9 @@ ALLOWED_PLATFORMS = {"gcp", "aws", "azure"}        # only these dirs allowed at 
 ALLOWED_ROOT_FILES = {"ASSESSMENT_GUIDANCE.md"}    # non-platform files allowed at docs/ root
 PLACEHOLDER_PLATFORMS = {"aws", "azure"}           # must hold only .gitkeep (structure TBD)
 IGNORE_FILES = {".DS_Store", "Thumbs.db", "desktop.ini"}  # OS junk, ignored everywhere
+INPUTS_AUX_DIRS = {"plan_cache"}                   # non-taxonomy dirs allowed under inputs/
+                                                   # (committed terraform-plan JSON cache,
+                                                   #  see scripts/auto_test/auto_test.py)
 
 # --------------------------------------------------------------------------- #
 # Inputs-tree allow-lists (argument-dir leaf files). Edit as the pipeline grows.
@@ -350,6 +353,8 @@ class InputsValidator:
         for entry in self._entries(self.root):
             full = os.path.join(self.root, entry)
             if os.path.isdir(full):
+                if entry in INPUTS_AUX_DIRS:
+                    continue  # plan_cache etc. — not part of the taxonomy
                 if entry not in ALLOWED_PLATFORMS:
                     self.logger.log(f"inputs/: disallowed folder '{entry}' "
                                     f"(allowed platforms: {sorted(ALLOWED_PLATFORMS)})")

@@ -5,6 +5,8 @@ import argparse
 import json
 import re
 import shutil
+import hashlib
+import time
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Lock
@@ -21,6 +23,78 @@ CACHE_ROOT = REPO_ROOT / ".terraform-cache"
 CLI_CONFIG_FILE = CACHE_ROOT / "cli.tfrc"
 MIRROR_DIR = CACHE_ROOT / "mirror"
 CACHE_SETUP_SCRIPT = Path(__file__).resolve().parent / "cache_setup.sh"
+
+# --- Committed plan-JSON cache --------------------------------------------
+# `terraform plan` (provider schema load) is ~90% of per-policy time, but the
+# fixtures are static, so the resulting plan.json only changes when a fixture's
+# *.tf or the provider version changes. We cache plan.json under
+# inputs/plan_cache/<platform>/<sha>.json (committed). On a run, a cache hit feeds
+# OPA directly and skips terraform entirely; a miss runs terraform once and writes
+# the cache. Keep TARGET_PROVIDER_VERSION in sync with cache_setup.sh's TARGET_VERSION
+# so a provider bump invalidates every cached plan.
+TARGET_PROVIDER_VERSION = "7.37.0"
+PLAN_CACHE_ROOT = REPO_ROOT / "inputs" / "plan_cache"
+
+
+def fixture_sha(input_dir: Path) -> str:
+    """Stable hash of a fixture: its *.tf contents + the target provider version."""
+    h = hashlib.sha256()
+    h.update(f"provider={TARGET_PROVIDER_VERSION}\n".encode())
+    for tf in sorted(input_dir.glob("*.tf")):
+        h.update(tf.name.encode())
+        h.update(b"\0")
+        h.update(tf.read_bytes())
+        h.update(b"\0")
+    return h.hexdigest()
+
+
+def plan_cache_path(input_dir: Path) -> Path:
+    """inputs/plan_cache/<platform>/<sha>.json for a fixture dir."""
+    parts = input_dir.resolve().parts
+    platform = parts[parts.index("inputs") + 1]   # inputs/<platform>/<service>/...
+    return PLAN_CACHE_ROOT / platform / f"{fixture_sha(input_dir)}.json"
+
+
+def get_or_build_plan(input_dir: Path, cache_path: Path, verbose: bool = False) -> Path | None:
+    """Return the cached plan.json if present; otherwise run terraform and cache it."""
+    if cache_path.exists():
+        return cache_path
+    plan_json = run_terraform_commands(input_dir, verbose)
+    if plan_json is None or not plan_json.exists():
+        return None
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    # Write atomically so an interrupted run never leaves a truncated cache file
+    # that a later run would treat as a valid hit. tmp name is unique per fixture.
+    tmp = cache_path.with_suffix(f".{os.getpid()}.tmp")
+    shutil.copyfile(plan_json, tmp)
+    os.replace(tmp, cache_path)
+    return cache_path
+
+
+def prune_plan_cache(inputs_root: Path, used_paths: set[Path]) -> None:
+    """Delete cached plans no fixture references — only safe after a full-platform run."""
+    repo_inputs = (REPO_ROOT / "inputs").resolve()
+    try:
+        rel = inputs_root.resolve().relative_to(repo_inputs)
+    except ValueError:
+        print("plan-cache prune skipped: --inputs is outside the repo inputs/ tree.")
+        return
+    if len(rel.parts) > 1:
+        print(f"plan-cache prune skipped: run is scoped to '{inputs_root}', not a whole "
+              "platform — a scoped run can't know which cached plans are orphaned.")
+        return
+    platforms = {p.parent.name for p in used_paths}
+    removed = 0
+    for plat in platforms:
+        pdir = PLAN_CACHE_ROOT / plat
+        if not pdir.is_dir():
+            continue
+        keep = {p.name for p in used_paths if p.parent.name == plat}
+        for f in pdir.glob("*.json"):
+            if f.name not in keep:
+                f.unlink()
+                removed += 1
+    print(f"plan-cache prune: removed {removed} orphaned plan(s).")
 
 
 def ensure_cache_ready() -> None:
@@ -76,6 +150,15 @@ def extract_path_parts(path: Path):
     if len(path.parts) < 3:
         sys.exit(f"Invalid path: {path}")
     return path.parts[-3], path.parts[-2], path.parts[-1]  # service, resource, attribute
+
+
+def fmt_duration(seconds: float) -> str:
+    s = int(round(seconds))
+    if s >= 3600:
+        return f"{s // 3600}h{(s % 3600) // 60:02d}m{s % 60:02d}s"
+    if s >= 60:
+        return f"{s // 60}m{s % 60:02d}s"
+    return f"{s}s"
 
 
 def make_failure(attribute: str, reason: str, service: str, resource: str) -> dict:
@@ -411,68 +494,61 @@ def validate_policy_output(attribute: str, resource_type: str | None, plan_path:
     return make_success(attribute, service, resource)
 
 
-def run_policy_check_pair(input_dir: Path, policy_file: Path, policies_root: Path, verbose: bool = False):
+def run_policy_check_pair(input_dir: Path, policy_file: Path, policies_root: Path,
+                          cache_path: Path, verbose: bool = False):
     # Extract data about services and filesystem paths
     abs_input_dir = input_dir.resolve()
     service, resource, attribute = extract_path_parts(input_dir)
-    # Runs TF commands and returns abs path to plan.json
-    plan_path = run_terraform_commands(abs_input_dir, verbose)
+    # Cache hit -> use the committed plan.json; miss -> run terraform and cache it.
+    plan_path = get_or_build_plan(abs_input_dir, cache_path, verbose)
     cleanup_workspace(abs_input_dir)
 
     if plan_path is None:
         res = make_failure(attribute, "Terraform failed to compile!", service, resource)
         return res
 
-    # plan.json is consumed by the OPA evals below, so it must outlive
-    # cleanup_workspace() (which runs before this point); remove it once done.
-    try:
-        message_query, vars_resource_type_query, vars_value_name_query = get_policy_metadata(
-            policy_file, service, resource, attribute)
+    # plan_path is the persistent plan_cache file — never delete it here.
+    message_query, vars_resource_type_query, vars_value_name_query = get_policy_metadata(
+        policy_file, service, resource, attribute)
 
-        # Scope OPA's --data to just the shared helpers + this resource's policy dir
-        # (the .rego + _vars.rego). Loading the whole policies/ tree on every eval
-        # re-compiles ~1000 policies per call and dominates runtime; this is ~20x faster.
-        data_paths = [(policies_root / "_helpers").resolve(), policy_file.parent.resolve()]
+    # Scope OPA's --data to just the shared helpers + this resource's policy dir
+    # (the .rego + _vars.rego). Loading the whole policies/ tree on every eval
+    # re-compiles ~1000 policies per call and dominates runtime; this is ~20x faster.
+    data_paths = [(policies_root / "_helpers").resolve(), policy_file.parent.resolve()]
 
-        resource_type = get_resource_type(data_paths, plan_path, vars_resource_type_query)
-        if resource_type is None:
-            # Get diagnostic info
-            actual_types = get_all_resource_types(plan_path)
-            diagnostics = [
-                f"Query used: {vars_resource_type_query}",
-                f"Resource types found in plan: {', '.join(actual_types) if actual_types else 'NONE'}",
-                f"Plan file: {plan_path}"
-            ]
-            error_msg = "Could not find resource_type variable! " + " | ".join(diagnostics)
-            return make_failure(attribute, error_msg, service, resource)
+    resource_type = get_resource_type(data_paths, plan_path, vars_resource_type_query)
+    if resource_type is None:
+        # Get diagnostic info
+        actual_types = get_all_resource_types(plan_path)
+        diagnostics = [
+            f"Query used: {vars_resource_type_query}",
+            f"Resource types found in plan: {', '.join(actual_types) if actual_types else 'NONE'}",
+            f"Plan file: {plan_path}"
+        ]
+        error_msg = "Could not find resource_type variable! " + " | ".join(diagnostics)
+        return make_failure(attribute, error_msg, service, resource)
 
-        messages = get_policy_messages(data_paths, plan_path, message_query)
-        if not messages:
-            return make_failure(attribute, "Could not run OPA query!", service, resource)
+    messages = get_policy_messages(data_paths, plan_path, message_query)
+    if not messages:
+        return make_failure(attribute, "Could not run OPA query!", service, resource)
 
-        resource_value_name = opa_eval_value(data_paths, plan_path, vars_value_name_query)
-        if not isinstance(resource_value_name, str):
-            resource_value_name = None
+    resource_value_name = opa_eval_value(data_paths, plan_path, vars_value_name_query)
+    if not isinstance(resource_value_name, str):
+        resource_value_name = None
 
-        if verbose:
-            thread_safe_print(f"OPA check: {message_query}")
-            for m in messages:
-                thread_safe_print(m)
+    if verbose:
+        thread_safe_print(f"OPA check: {message_query}")
+        for m in messages:
+            thread_safe_print(m)
 
-        return validate_policy_output(attribute, resource_type, plan_path, messages, verbose, service, resource,
-                                      resource_value_name)
-    finally:
-        try:
-            plan_path.unlink()
-        except OSError:
-            pass
+    return validate_policy_output(attribute, resource_type, plan_path, messages, verbose, service, resource,
+                                  resource_value_name)
 
 def cleanup_workspace(workdir: Path):
-    # remove plan binary and other transient parts (NOT plan.json: it is consumed
-    # by the OPA evals in run_policy_check_pair, which deletes it afterwards).
-    # The lock is regenerated offline from the mirror on each init, so it's
-    # transient too — drop it to keep the (now untracked) tree clean.
-    for fname in ["plan", "fake-creds.json", ".terraform.lock.hcl"]:
+    # Remove transient terraform artifacts from the input dir. plan.json is already
+    # copied into the committed plan_cache before this runs, so the in-dir copy is
+    # transient; the lock is regenerated offline from the mirror on each init.
+    for fname in ["plan", "plan.json", "fake-creds.json", ".terraform.lock.hcl"]:
         f = workdir / fname
         try:
             f.unlink()
@@ -548,9 +624,11 @@ def main():
     parser.add_argument("--policies", default="policies/gcp", help="Root directory for policy files")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
     parser.add_argument("--workers", type=int, default=4, help="Number of parallel workers (default: 4)")
+    parser.add_argument("--prune-plan-cache", action="store_true",
+                        help="After a full-platform run, delete cached plans no fixture references "
+                             "(orphans from changed/removed fixtures). Ignored for scoped runs.")
     args = parser.parse_args()
-
-    ensure_cache_ready()
+    start_time = time.monotonic()
 
     inputs_root = Path(args.inputs)
     policies_search_root = Path(args.policies)
@@ -562,8 +640,18 @@ def main():
         print(" No input/policy pairs or mismatches found.")
         sys.exit(1)
 
+    # Resolve each pair's plan-cache path up front; only stand up the terraform
+    # provider cache if at least one plan is missing (a fully-cached run needs no
+    # terraform/provider at all).
+    pair_cache = {(i, p): plan_cache_path(i) for i, p in pairs}
+    misses = sum(1 for cp in pair_cache.values() if not cp.exists())
+    if misses:
+        print(f"[*] {misses}/{len(pairs)} plan(s) not cached — ensuring terraform provider cache…")
+        ensure_cache_ready()
+    else:
+        print(f"[*] all {len(pairs)} plan(s) cached — skipping terraform entirely")
+
     results = []
-    failure_flag = False
 
     # A mismatched input/policy is a hard failure (the pair can never be tested).
     for input_dir, policy_file in unmatched_inputs:
@@ -579,48 +667,61 @@ def main():
     with ThreadPoolExecutor(max_workers=args.workers) as executor:
         # Submit all tasks
         future_to_pair = {
-            executor.submit(run_policy_check_pair, input_dir, policy_file, policies_base_root, args.verbose): (input_dir, policy_file)
+            executor.submit(run_policy_check_pair, input_dir, policy_file, policies_base_root,
+                            pair_cache[(input_dir, policy_file)], args.verbose): (input_dir, policy_file)
             for input_dir, policy_file in pairs
         }
 
         # Collect results as they complete
+        total = len(future_to_pair)
+        done = passed = 0
         for future in as_completed(future_to_pair):
             input_dir, policy_file = future_to_pair[future]
             try:
                 result = future.result()
                 results.append(result)
+                if result.get("passed"):
+                    passed += 1
             except Exception as exc:
                 thread_safe_print(f"Error processing {input_dir}: {exc}")
                 service, resource, attribute = extract_path_parts(input_dir)
                 results.append(make_failure(attribute, f"Exception: {exc}", service, resource))
+            done += 1
+            if not args.verbose:
+                with print_lock:
+                    pct = 100.0 * done / total
+                    print(f"\r[{pct:5.1f}%] {done}/{total}  ✅ {passed}  ❌ {done - passed}  "
+                          f"{fmt_duration(time.monotonic() - start_time)}", end="", flush=True)
+        if not args.verbose:
+            print()  # newline after the progress line
 
-    # Grouped summary by service -> resource
-    grouped: dict[str, dict[str, list[dict]]] = {}
-    for r in results:
-        grouped.setdefault(r.get("service", "unknown"), {}).setdefault(r.get("resource", "unknown"), []).append(r)
+    if args.prune_plan_cache:
+        prune_plan_cache(inputs_root, set(pair_cache.values()))
 
-    print("\nSummary of policy checks:")
-    for service in sorted(grouped):
-        print(f"Service: {service}")
-        for resource in sorted(grouped[service]):
-            print(f"  Resource: {resource}")
-            for res in grouped[service][resource]:
-                status = "✅" if res["passed"] else "❌"
-                if not res["passed"]:
-                    failure_flag = True
-                print(f"    Policy: {res['policy']} - {status}")
-        print()
+    # Quiet output: successes are silent — print only failures, then a one-line
+    # summary of coverage (services / resource types / policies) and total time.
+    failures = [r for r in results if not r.get("passed")]
+    n_services = len({r.get("service") for r in results})
+    n_rtypes = len({(r.get("service"), r.get("resource")) for r in results})
+    elapsed = fmt_duration(time.monotonic() - start_time)
 
-    if failure_flag:
+    def plural(n, word):
+        return f"{n} {word}{'' if n == 1 else 's'}"
+
+    coverage = (f"{plural(n_services, 'service')}, {plural(n_rtypes, 'resource type')}, "
+                f"{plural(len(results), 'policy').replace('policys', 'policies')}")
+
+    if failures:
         print("\nFailures:")
-        for service in sorted(grouped):
-            for resource in sorted(grouped[service]):
-                for res in grouped[service][resource]:
-                    if not res["passed"]:
-                        print(f"Service: {service} | Resource: {resource} | Policy: {res['policy']}")
-                        print(f"{res['failure']['reason']}")
-                        print()
+        for r in sorted(failures, key=lambda x: (x.get("service", ""), x.get("resource", ""), x.get("policy", ""))):
+            print(f"  ❌ {r.get('service')} / {r.get('resource')} / {r.get('policy')}")
+            print(f"     {r['failure']['reason']}")
+
+    print()
+    if failures:
+        print(f"❌ {len(failures)} FAILED — {coverage}  in {elapsed}")
         sys.exit(1)
+    print(f"✅ all passed — {coverage}  in {elapsed}")
 
 
 if __name__ == "__main__":
