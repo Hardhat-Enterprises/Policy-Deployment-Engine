@@ -111,22 +111,26 @@ def check_resource_deprecation(content: str) -> Tuple[bool, Optional[str]]:
         >>> is_deprecated, message = check_resource_deprecation(content)
         >>> print(is_deprecated)  # True
     """
-    # Azure pattern: Look for deprecation notices in callout blocks
+    # Deprecation notices always sit near the top of the doc. Scan only the first
+    # 50 lines (one split, reused by both patterns) to bound the work and avoid
+    # false positives from "deprecated" mentions in example blocks lower down.
+    lines = content.split('\n')
+    head = '\n'.join(lines[:50])
+
+    # Azure pattern: a callout block, possibly spanning a few lines.
     # Format: !> **Note:** This resource has been deprecated...
     azure_pattern = r'!>\s+\*\*Note:\*\*\s+This resource has been deprecated[^\n]*(?:\n[^\n]+)*?(?=\n\n|\n#)'
-    match = re.search(azure_pattern, content, re.IGNORECASE)
+    match = re.search(azure_pattern, head, re.IGNORECASE)
     if match:
         return True, match.group(0).strip()
-    
-    # GCP pattern: Look for deprecation statements in the resource description
+
+    # GCP pattern: a single-line deprecation statement in the description.
     # Format: "This resource has been deprecated..."
-    # Check only the first 50 lines to avoid false positives in examples
     gcp_pattern = r'^\s*This resource has been deprecated[^\n]*'
-    lines = content.split('\n')
-    for i, line in enumerate(lines[:50]):
+    for line in lines[:50]:
         if re.match(gcp_pattern, line, re.IGNORECASE):
             return True, line.strip()
-    
+
     return False, None
 
 

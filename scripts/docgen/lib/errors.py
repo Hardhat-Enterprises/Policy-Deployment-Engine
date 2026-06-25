@@ -8,13 +8,10 @@ Exit Codes:
     1: Configuration errors (invalid arguments, missing parameters)
     2: Connection errors (unable to access provider documentation)
     3: Parsing errors (malformed documentation or schema)
-    4: Filesystem errors (unable to create directories or write files)
-    5: Validation errors (generated JSON fails validation)
 
 Features:
     - Custom exception classes for each error category
     - Automatic stderr output with detailed context
-    - Fail-fast behavior for critical errors
     - Consistent error message formatting
 
 Example:
@@ -34,8 +31,6 @@ EXIT_SUCCESS = 0
 EXIT_CONFIG_ERROR = 1
 EXIT_CONNECTION_ERROR = 2
 EXIT_PARSING_ERROR = 3
-EXIT_FILESYSTEM_ERROR = 4
-EXIT_VALIDATION_ERROR = 5
 
 
 class GeneratorError(Exception):
@@ -178,119 +173,3 @@ class ParsingError(GeneratorError):
         ... )
     """
     exit_code = EXIT_PARSING_ERROR
-
-
-class FilesystemError(GeneratorError):
-    """
-    Filesystem error (exit code 4).
-    
-    Raised when unable to create directories, write files, or perform
-    other filesystem operations.
-    
-    Examples:
-        - Permission denied creating directory
-        - Disk full when writing file
-        - Path is read-only
-        - File already exists (when not expected)
-    
-    Example:
-        >>> raise FilesystemError(
-        ...     "Permission denied",
-        ...     operation="create directory",
-        ...     file_path="/path/to/output/dir"
-        ... )
-    """
-    exit_code = EXIT_FILESYSTEM_ERROR
-
-
-class ValidationError(GeneratorError):
-    """
-    Validation error (exit code 5).
-    
-    Raised when generated JSON fails validation checks, including
-    missing required fields, invalid parent references, or type errors.
-    
-    Examples:
-        - Missing required field
-        - Invalid parent reference
-        - Type mismatch (e.g., required field not boolean)
-        - Malformed JSON structure
-    
-    Example:
-        >>> raise ValidationError(
-        ...     "Missing required field 'description'",
-        ...     resource_name="aws_s3_bucket",
-        ...     operation="argument validation"
-        ... )
-    """
-    exit_code = EXIT_VALIDATION_ERROR
-
-
-def fail_fast(error: GeneratorError) -> None:
-    """
-    Handle critical error with fail-fast behavior.
-    
-    Writes error to stderr and exits immediately with the appropriate
-    exit code. This function should be called for critical errors that
-    prevent further processing.
-    
-    Args:
-        error: GeneratorError instance to handle
-    
-    Example:
-        >>> try:
-        ...     # Some critical operation
-        ...     pass
-        ... except Exception as e:
-        ...     error = ConfigurationError("Invalid configuration")
-        ...     fail_fast(error)
-    
-    Note:
-        This function does not return - it exits the process.
-    """
-    error.write_to_stderr()
-    sys.exit(error.exit_code)
-
-
-def format_error_context(
-    message: str,
-    resource_name: Optional[str] = None,
-    file_path: Optional[str] = None,
-    operation: Optional[str] = None
-) -> str:
-    """
-    Format error message with context information.
-    
-    Utility function for creating consistent error messages with context
-    when not using exception classes.
-    
-    Args:
-        message: Primary error message
-        resource_name: Optional resource name for context
-        file_path: Optional file path for context
-        operation: Optional operation description for context
-    
-    Returns:
-        str: Formatted error message with context
-    
-    Example:
-        >>> msg = format_error_context(
-        ...     "Failed to process",
-        ...     resource_name="aws_s3_bucket",
-        ...     operation="schema extraction"
-        ... )
-        >>> print(msg)
-        Failed to process | Resource: aws_s3_bucket | Operation: schema extraction
-    """
-    parts = [message]
-    
-    if resource_name:
-        parts.append(f"Resource: {resource_name}")
-    
-    if file_path:
-        parts.append(f"File: {file_path}")
-    
-    if operation:
-        parts.append(f"Operation: {operation}")
-    
-    return " | ".join(parts)

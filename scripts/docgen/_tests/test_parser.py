@@ -9,7 +9,7 @@ Version: 1.0.0
 """
 
 import pytest
-from scripts.docgen.lib.parser import extract_resource_name
+from scripts.docgen.lib.parser import check_resource_deprecation, extract_resource_name
 
 
 class TestExtractResourceName:
@@ -75,3 +75,33 @@ class TestExtractResourceName:
         content = r"# google\_big_query\_dataset" + "\nManages BigQuery dataset."
         result = extract_resource_name(content)
         assert result == "google_big_query_dataset"
+
+
+class TestCheckResourceDeprecation:
+    """Tests for check_resource_deprecation function."""
+
+    def test_azure_callout_deprecation(self):
+        content = (
+            "---\nsubcategory: X\n---\n\n"
+            "!> **Note:** This resource has been deprecated in favour of foo\n"
+            "and will be removed.\n\n# Example\n"
+        )
+        is_dep, msg = check_resource_deprecation(content)
+        assert is_dep is True
+        assert "deprecated" in msg.lower()
+
+    def test_gcp_line_deprecation(self):
+        content = "# google_x\n\nThis resource has been deprecated; use google_y.\n"
+        is_dep, msg = check_resource_deprecation(content)
+        assert is_dep is True
+        assert msg.startswith("This resource has been deprecated")
+
+    def test_not_deprecated(self):
+        content = "# google_x\n\nManages a thing.\n\n* `name` - (Required) name\n"
+        assert check_resource_deprecation(content) == (False, None)
+
+    def test_deprecation_below_head_window_is_ignored(self):
+        # A "deprecated" mention far down (e.g. in an example) must not trigger.
+        content = "# google_x\n\nManages a thing.\n" + ("\n" * 60) + \
+            "This resource has been deprecated\n"
+        assert check_resource_deprecation(content) == (False, None)

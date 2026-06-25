@@ -90,8 +90,13 @@ def parse_args(argv=None) -> argparse.Namespace:
 
 
 def select_services(all_services, requested, test_mode):
-    """Resolve the set of service names to process."""
-    available = set(all_services)
+    """Resolve the set of service names to process.
+
+    An explicit ``--service`` request is honoured in full, even alongside
+    ``--test`` (``--test`` only caps the *default* selection — its help calls
+    ``--service`` an override). Only when no services are requested does
+    ``--test`` limit the run to ``TEST_SERVICE_COUNT`` services.
+    """
     if requested:
         chosen = []
         for r in requested:
@@ -103,8 +108,10 @@ def select_services(all_services, requested, test_mode):
                 chosen.extend(matches)
             else:
                 logger.warning(f"No service matched '{r}'")
-        chosen = sorted(set(chosen))
-    elif test_mode:
+        return sorted(set(chosen))
+
+    if test_mode:
+        available = set(all_services)
         chosen = [s for s in PREFERRED_TEST_SERVICES if s in available]
         if len(chosen) < TEST_SERVICE_COUNT:
             for s in sorted(all_services):
@@ -112,12 +119,9 @@ def select_services(all_services, requested, test_mode):
                     chosen.append(s)
                 if len(chosen) >= TEST_SERVICE_COUNT:
                     break
-    else:
-        chosen = sorted(all_services)
+        return chosen[:TEST_SERVICE_COUNT]
 
-    if test_mode:
-        chosen = chosen[:TEST_SERVICE_COUNT]
-    return chosen
+    return sorted(all_services)
 
 
 def run(args: argparse.Namespace) -> int:
