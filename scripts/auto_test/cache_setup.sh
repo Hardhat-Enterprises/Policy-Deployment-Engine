@@ -46,10 +46,15 @@ echo "✅ wrote $CLI_TFRC"
 # 2) Populate the mirror (once). Prefer the official command; fall back to seeding
 #    from a provider binary already present in a local plugin cache (handy on hosts
 #    where the registry is unreachable, e.g. IPv6-only egress is broken).
+# We build an UNPACKED mirror (the bare provider binary under
+# .../<version>/linux_amd64/) rather than the default packed (.zip) layout, because
+# Terraform can then SYMLINK the binary into each fixture's .terraform instead of
+# extracting a ~120MB copy per directory — far less disk churn across 1000+ runs.
 if [ -f "$MIRROR_LEAF/terraform-provider-google" ]; then
   echo "✅ mirror already populated for google $TARGET_VERSION"
 else
-  tmp="$(mktemp -d)"
+  mkdir -p "$MIRROR_LEAF"
+  tmp="$(mktemp -d)"; tmpcache="$(mktemp -d)"
   cat > "$tmp/main.tf" <<EOF
 terraform {
   required_providers {
@@ -60,16 +65,19 @@ terraform {
   }
 }
 EOF
-  if (cd "$tmp" && terraform providers mirror -platform=linux_amd64 "$MIRROR" >/dev/null 2>&1) \
-     && [ -d "$MIRROR/$PROVIDER" ]; then
-    echo "✅ mirrored google $TARGET_VERSION from the registry"
+  # `terraform init` with a plugin cache unpacks the provider; copy that out.
+  unpacked="$tmpcache/$PROVIDER/$TARGET_VERSION/linux_amd64/terraform-provider-google"
+  if (cd "$tmp" && TF_PLUGIN_CACHE_DIR="$tmpcache" TF_DATA_DIR="$tmp/.tf" \
+        terraform init -no-color >/dev/null 2>&1) \
+     && [ -f "$unpacked" ]; then
+    cp "$unpacked" "$MIRROR_LEAF/"
+    echo "✅ mirrored (unpacked) google $TARGET_VERSION from the registry"
   else
-    echo "⚠️  registry mirror failed; trying to seed from a local plugin cache…"
+    echo "⚠️  registry unreachable; trying to seed from a local plugin cache…"
     seeded=""
     for host in registry.terraform.io registry.opentofu.org; do
       src="$HOME/.terraform.d/plugin-cache/$host/hashicorp/google/$TARGET_VERSION/linux_amd64"
       if [ -f "$src/terraform-provider-google" ]; then
-        mkdir -p "$MIRROR_LEAF"
         cp "$src/terraform-provider-google" "$MIRROR_LEAF/"
         seeded="$src"; break
       fi
@@ -79,7 +87,7 @@ EOF
     fi
     echo "✅ seeded mirror from $seeded"
   fi
-  rm -rf "$tmp"
+  rm -rf "$tmp" "$tmpcache"
 fi
 
 # 3) Canonical lock (no constraint) pinning TARGET_VERSION with the mirror's

@@ -19,6 +19,26 @@ from threading import Lock
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CACHE_ROOT = REPO_ROOT / ".terraform-cache"
 CLI_CONFIG_FILE = CACHE_ROOT / "cli.tfrc"
+MIRROR_DIR = CACHE_ROOT / "mirror"
+CACHE_SETUP_SCRIPT = Path(__file__).resolve().parent / "cache_setup.sh"
+
+
+def ensure_cache_ready() -> None:
+    """Make sure the project-local provider cache exists; build it if not.
+
+    The cache (.terraform-cache/) is gitignored, so a fresh checkout won't have
+    it. Rather than make every student remember a setup step, we detect a missing
+    cache and run cache_setup.sh for them once (it needs the registry reachable on
+    that first build). Subsequent runs are fully offline from the mirror.
+    """
+    if CLI_CONFIG_FILE.exists() and any(MIRROR_DIR.rglob("terraform-provider-*")):
+        return
+    print("⏳ Provider cache not found — running cache_setup.sh (one-time setup)…")
+    result = subprocess.run(["bash", str(CACHE_SETUP_SCRIPT)], cwd=str(REPO_ROOT))
+    if result.returncode != 0 or not CLI_CONFIG_FILE.exists() \
+            or not any(MIRROR_DIR.rglob("terraform-provider-*")):
+        sys.exit("❌ Could not set up the Terraform provider cache. "
+                 "Run 'bash scripts/auto_test/cache_setup.sh' manually and retry.")
 
 
 def normalize_policies_root(provided_root: Path) -> Path:
@@ -515,6 +535,8 @@ def main():
     parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
     parser.add_argument("--workers", type=int, default=4, help="Number of parallel workers (default: 4)")
     args = parser.parse_args()
+
+    ensure_cache_ready()
 
     inputs_root = Path(args.inputs)
     policies_search_root = Path(args.policies)
