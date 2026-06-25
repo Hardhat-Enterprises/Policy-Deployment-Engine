@@ -8,6 +8,10 @@ only their tested resource type, use the `compliant_example_N` /
 python scripts/linters/linter.py --tree all   # content checks on by default; 0 errors
 ```
 
+Orphan policies (a `<arg>.rego` with no input fixture) have been deleted so every
+remaining policy has an input to test it (`docs/` is unchanged — re-add policies +
+inputs when revisiting those resources). auto_test reports 0 unmatched, 0 orphans.
+
 ## ⚠️ Outstanding: validate the injected fake values
 
 Where dependencies were removed, their references were replaced with best-effort
