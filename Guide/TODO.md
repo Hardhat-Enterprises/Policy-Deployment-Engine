@@ -41,20 +41,11 @@ repo.
   replaced by `auto_test.py`. Consider capturing a `python3 scripts/auto_test/auto_test.py
   "gcp/<Service>/<resource>"` run (pass + fail output) to illustrate it.
 
-## 4. Unreferenced image files (cleanup candidates)
+## 4. Unreferenced image files (cleanup candidates) — ✅ DONE
 
-These live in `images/` but are not referenced by any guide page. Most are stale leftovers
-(e.g. the old `opa-eval-*` shots dropped from the testing rewrite). Delete or re-wire as needed:
-
-```
-New-pull-request.PNG            access-terraform-registry.png   argument-reference_policy.png
-create-pull-request.PNG         each-policy-policy-rego.PNG      email.png
-finding-pushed-branch.PNG       inputs-gcp.PNG                   opa-eval-details-output.PNG
-opa-eval-message-output.PNG     pde-logo.png                     plan into json.png
-policy-gcp.PNG                   resource-according-to-terraform.PNG   title-comment.PNG
-vars-package-example.PNG        researching-service-example.png.PNG
-for-example-service-cloud-functions-resource-google-cloudfunctions-function.png
-```
+The 18 images not referenced by any guide page (stale leftovers, including the old `opa-eval-*`
+shots dropped from the testing rewrite) have been deleted. `images/` now contains only the 28
+images the guide actually references.
 
 ## 5. Content gaps / enhancements
 
