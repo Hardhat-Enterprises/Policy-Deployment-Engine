@@ -2,7 +2,7 @@
 
 The Policy Deployment Engine (PDE) is designed to automate and simplify the enforcement of security policies across cloud environments, starting with Google Cloud Platform (GCP) and expanding to AWS and Azure in the future. The project focuses on developing a centralised system to efficiently deploy, manage, and update security policies, ensuring compliance and reducing manual effort. By creating a structured approach to policy implementation, the engine aims to enhance security, improve operational efficiency, and provide organisations with a scalable solution for managing cloud policies. PDE is HardHat's first ever policy-oriented project aimed at securing cloud environments, beginning in T1 2025.
 
-Last updated: T2 2026
+Last updated: 2026-06-25
 
 ## 📁 Repository layout
 
@@ -31,10 +31,7 @@ verbatim provider subcategory (e.g. `Cloud Storage`); `<resource>` is the full t
 
 Before working on a service in PDE, all contributors must follow these steps:
 
-### 1. **Pass the Contributor Test**
-You must pass the contributor test to be assigned a service. This ensures you understand the project structure and quality standards. Test will be shared in week 02. 
-
-### 2. **Clone the Repository**
+### 1. **Clone the Repository**
 Clone the repository to working on your service. Please note that we do not accept PRs from forked repos. 
 
 ```bash
@@ -42,7 +39,7 @@ git clone https://github.com/Hardhat-Enterprises/Policy-Deployment-Engine.git
 cd Policy-Deployment-Engine
 ```
 
-### 3. **Create a Branch Following Naming Convention**
+### 2. **Create a Branch Following Naming Convention**
 All branches must follow one of these patterns:
 - `Service/<platform>/<service_slug>/<resource_type>` - When working on a specific resource
   - `<platform>`: `gcp` (aws/azure are placeholders)
@@ -68,7 +65,7 @@ git checkout -b feature/add-validator
 git checkout -b chore/tidy-fixtures
 ```
 
-### 4. **Install Pre-Commit Hooks**
+### 3. **Install Pre-Commit Hooks**
 All commits are automatically validated using pre-commit hooks. Install them with:
 
 ```bash
