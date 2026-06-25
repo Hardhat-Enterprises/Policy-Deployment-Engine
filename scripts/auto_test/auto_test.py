@@ -324,37 +324,45 @@ def run_policy_check_pair(input_dir: Path, policy_file: Path, policies_root: Pat
         res = make_failure(attribute, "Terraform failed to compile!", service, resource)
         return res
 
-    message_query, vars_resource_type_query = get_policy_metadata(policy_file, service, resource, attribute)
+    # plan.json is consumed by the OPA evals below, so it must outlive
+    # cleanup_workspace() (which runs before this point); remove it once done.
+    try:
+        message_query, vars_resource_type_query = get_policy_metadata(policy_file, service, resource, attribute)
 
-    resource_type = get_resource_type(policies_root, plan_path, vars_resource_type_query)
-    if resource_type is None:
-        # Get diagnostic info
-        actual_types = get_all_resource_types(plan_path)
-        diagnostics = [
-            f"Query used: {vars_resource_type_query}",
-            f"Resource types found in plan: {', '.join(actual_types) if actual_types else 'NONE'}",
-            f"Plan file: {plan_path}"
-        ]
-        error_msg = "Could not find resource_type variable! " + " | ".join(diagnostics)
-        res = make_failure(attribute, error_msg, service, resource)
-        return res
+        resource_type = get_resource_type(policies_root, plan_path, vars_resource_type_query)
+        if resource_type is None:
+            # Get diagnostic info
+            actual_types = get_all_resource_types(plan_path)
+            diagnostics = [
+                f"Query used: {vars_resource_type_query}",
+                f"Resource types found in plan: {', '.join(actual_types) if actual_types else 'NONE'}",
+                f"Plan file: {plan_path}"
+            ]
+            error_msg = "Could not find resource_type variable! " + " | ".join(diagnostics)
+            return make_failure(attribute, error_msg, service, resource)
 
-    messages = get_policy_messages(policies_root, plan_path, message_query)
-    if not messages:
-        res = make_failure(attribute, "Could not run OPA query!", service, resource)
-        return res
+        messages = get_policy_messages(policies_root, plan_path, message_query)
+        if not messages:
+            return make_failure(attribute, "Could not run OPA query!", service, resource)
 
-    if verbose:
-        thread_safe_print(f"OPA check: {message_query}")
-        for m in messages:
-            thread_safe_print(m)
-    
-    res = validate_policy_output(attribute, resource_type, plan_path, messages, verbose, service, resource)
-    return res
+        if verbose:
+            thread_safe_print(f"OPA check: {message_query}")
+            for m in messages:
+                thread_safe_print(m)
+
+        return validate_policy_output(attribute, resource_type, plan_path, messages, verbose, service, resource)
+    finally:
+        try:
+            plan_path.unlink()
+        except OSError:
+            pass
 
 def cleanup_workspace(workdir: Path):
-    # remove plan binary and other transient parts
-    for fname in ["plan", "plan.json", "fake-creds.json"]:
+    # remove plan binary and other transient parts (NOT plan.json: it is consumed
+    # by the OPA evals in run_policy_check_pair, which deletes it afterwards).
+    # The lock is regenerated offline from the mirror on each init, so it's
+    # transient too — drop it to keep the (now untracked) tree clean.
+    for fname in ["plan", "fake-creds.json", ".terraform.lock.hcl"]:
         f = workdir / fname
         try:
             f.unlink()
