@@ -3,7 +3,6 @@
 Validate branch naming convention. Allowed branches:
 
 - feature/<name>
-- chore/<name>
 - Service/<platform>/<service_slug>/<resource_type>
     * <platform>: gcp | aws | azure (only gcp is populated today)
     * <service_slug>: the underscore slug of a docs/<platform> service folder
@@ -16,11 +15,10 @@ Validate branch naming convention. Allowed branches:
 
 Examples:
 - feature/add-validator
-- chore/docgen-consolidation
 - Service/gcp/cloud_run_v2_api/google_cloud_run_v2_service
 - dev (protected)
 
-Invalid: gcp/service/x, fix/x, docs/x, my-branch, main
+Invalid: chore/x, gcp/service/x, fix/x, docs/x, my-branch, main
 """
 import argparse
 import os
@@ -33,9 +31,9 @@ from _service_slug import slug_to_folder, resource_doc_path  # noqa: E402
 
 ALLOWED_PLATFORMS = {"gcp", "aws", "azure"}
 PROTECTED_BRANCHES = {"dev"}
-# feature/<name> | chore/<name>: <name> is free-form (letters incl. uppercase,
-# digits, '.', '_', '-', and '/' for sub-scopes), min 2 chars.
-SIMPLE_BRANCH = re.compile(r"^(feature|chore)/[A-Za-z0-9._/-]{2,}$")
+# feature/<name>: <name> is free-form (letters incl. uppercase, digits, '.',
+# '_', '-', and '/' for sub-scopes), min 2 chars.
+SIMPLE_BRANCH = re.compile(r"^feature/[A-Za-z0-9._/-]{2,}$")
 RESOURCE_TYPE = re.compile(r"^[a-z0-9_]+$")
 
 
@@ -57,7 +55,6 @@ def _allowed_formats():
     return (
         "Allowed branch names:\n"
         "  - feature/<name>\n"
-        "  - chore/<name>\n"
         "  - Service/<platform>/<service_slug>/<resource_type>\n"
         "      platform in gcp|aws|azure; service_slug is the underscore slug of a\n"
         "      docs/<platform> service folder; resource_type is a documented resource.\n"

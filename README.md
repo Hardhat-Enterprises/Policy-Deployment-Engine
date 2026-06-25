@@ -47,8 +47,7 @@ All branches must follow one of these patterns:
     names contain spaces/parens (illegal in git branches), so the slug is used — e.g.
     `Cloud Run (v2 API)` → `cloud_run_v2_api`. It maps back to exactly one folder.
   - `<resource_type>`: a documented resource (a `docs/<platform>/<folder>/<resource>.json`)
-- `feature/<feature_name>` - For general features (e.g., `feature/add-logging`)
-- `chore/<chore_name>` - For maintenance/cleanup work (e.g., `chore/tidy-fixtures`)
+- `feature/<feature_name>` - For general features and any non-resource maintenance/cleanup work (e.g., `feature/add-logging`)
 
 This `Service/...` branch is what scopes the per-resource CI gate to the resource you're
 working on (doc completeness, policy/input coverage, and the OPA test).
@@ -58,11 +57,8 @@ working on (doc completeness, policy/input coverage, and the OPA test).
 # Working on a specific resource
 git checkout -b Service/gcp/cloud_run_v2_api/google_cloud_run_v2_service
 
-# Adding a new feature
+# Adding a feature, or any non-resource maintenance/cleanup work
 git checkout -b feature/add-validator
-
-# Maintenance / cleanup
-git checkout -b chore/tidy-fixtures
 ```
 
 ### 3. **Install Pre-Commit Hooks**
@@ -101,7 +97,6 @@ When you commit, the pre-commit hooks will run automatically:
 
 Allowed branch names:
   - feature/<name>
-  - chore/<name>
   - Service/<platform>/<service_slug>/<resource_type>
       e.g. Service/gcp/cloud_run_v2_api/google_cloud_run_v2_service
   - (protected: dev)

@@ -52,8 +52,7 @@ Branch names must follow the repo convention (enforced by the branch-name check
 and the per-resource CI gate). Use one of:
 
 - `Service/<platform>/<service_slug>/<resource_type>` — when working on a specific resource
-- `feature/<name>` — for a general feature
-- `chore/<name>` — for maintenance/cleanup
+- `feature/<name>` — for a general feature or any non-resource maintenance/cleanup work
 
 The `<service_slug>` is the underscore slug of a `docs/<platform>` service folder
 (folder names contain spaces/parens, which are illegal in git branch names) — e.g.
