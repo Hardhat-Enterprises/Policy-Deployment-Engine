@@ -124,6 +124,13 @@ def select_services(all_services, requested, test_mode):
     return sorted(all_services)
 
 
+def _doc_unchanged(existing: dict, new_doc: dict) -> bool:
+    """True if the docs differ only by their ``last_updated`` timestamp."""
+    a = {k: v for k, v in existing.items() if k != "last_updated"}
+    b = {k: v for k, v in new_doc.items() if k != "last_updated"}
+    return a == b
+
+
 def run(args: argparse.Namespace) -> int:
     output_root = Path(args.output_dir)
 
@@ -189,7 +196,13 @@ def run(args: argparse.Namespace) -> int:
                     skipped += 1
                     logger.debug(f"not existing, skip: {resource_name}")
                     continue
-                existing = file_writer.load_document(path) or {}
+                existing = file_writer.load_document(path)
+                if existing is None:
+                    # File exists but is unreadable/corrupt — skip rather than
+                    # overwrite, which would discard any human-authored fields.
+                    skipped += 1
+                    logger.warning(f"unreadable existing doc, skipping: {path}")
+                    continue
                 merged = file_writer.merge_preserving_human_fields(
                     arguments, existing.get("arguments", {})
                 )
@@ -197,8 +210,13 @@ def run(args: argparse.Namespace) -> int:
                 # keys can't be overwritten by a stale per-resource value (canonical
                 # always wins, per canonical.py's contract).
                 apply_canonical(resource_name, merged)
-                file_writer.write_document(
-                    path, file_writer.build_document(merged, version, run_timestamp))
+                new_doc = file_writer.build_document(merged, version, run_timestamp)
+                # Skip the write (and the churned last_updated) when nothing else changed.
+                if _doc_unchanged(existing, new_doc):
+                    skipped += 1
+                    logger.debug(f"unchanged, skip: {path}")
+                    continue
+                file_writer.write_document(path, new_doc)
                 updated += 1
 
     if low_coverage:
