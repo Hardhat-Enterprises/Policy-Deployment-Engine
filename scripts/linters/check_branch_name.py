@@ -33,7 +33,9 @@ from _service_slug import slug_to_folder, resource_doc_path  # noqa: E402
 
 ALLOWED_PLATFORMS = {"gcp", "aws", "azure"}
 PROTECTED_BRANCHES = {"dev"}
-SIMPLE_BRANCH = re.compile(r"^(feature|chore)/[a-z0-9_-]{2,}$")
+# feature/<name> | chore/<name>: <name> is free-form (letters incl. uppercase,
+# digits, '.', '_', '-', and '/' for sub-scopes), min 2 chars.
+SIMPLE_BRANCH = re.compile(r"^(feature|chore)/[A-Za-z0-9._/-]{2,}$")
 RESOURCE_TYPE = re.compile(r"^[a-z0-9_]+$")
 
 

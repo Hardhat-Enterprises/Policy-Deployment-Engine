@@ -83,7 +83,10 @@ def main(argv=None):
     base = None
     if "--base" in argv:
         i = argv.index("--base")
-        base = argv[i + 1] if i + 1 < len(argv) else "origin/dev"
+        if i + 1 >= len(argv) or argv[i + 1].startswith("--"):
+            print("[ERROR] --base requires a value, e.g. --base origin/dev.")
+            return 2
+        base = argv[i + 1]
 
     changed = None
     if not lint_all:

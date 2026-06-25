@@ -28,6 +28,11 @@ def slug_to_folder(docs_root: str, platform: str) -> dict:
         for name in sorted(os.listdir(base)):
             if os.path.isdir(os.path.join(base, name)):
                 slug = service_slug(name)
+                if not slug:
+                    raise ValueError(
+                        f"Service folder {name!r} in docs/{platform}/ slugs to an empty "
+                        "string (all non-alphanumeric); rename it to something git-ref-safe."
+                    )
                 if slug in out:
                     raise ValueError(
                         f"Ambiguous service slug '{slug}' in docs/{platform}/: "

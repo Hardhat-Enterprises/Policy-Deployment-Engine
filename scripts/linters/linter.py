@@ -608,7 +608,7 @@ class ContentChecksValidator:
 
     # ----- A: rego package path (policies) -------------------------------- #
     def _check_policies_packages(self, gcp_root):
-        """A (TO BE VERIFIED): each .rego `package` must sit at its path.
+        """A: each .rego `package` must sit at its path.
 
         Expected: ``terraform.gcp.security.<service_seg>.<resource>.<seg>`` where
         ``<seg>`` is the filename stem with dots->underscores (folders may carry
