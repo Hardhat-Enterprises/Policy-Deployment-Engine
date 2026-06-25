@@ -640,19 +640,44 @@ def find_matching_pairs(inputs_root: Path, policies_search_root: Path):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Run Terraform + OPA policy checks for all matched input/policy pairs.")
-    parser.add_argument("--inputs", default="inputs/gcp", help="Root directory for Terraform inputs")
-    parser.add_argument("--policies", default="policies/gcp", help="Root directory for policy files")
+        description="Run Terraform + OPA policy checks for matched input/policy pairs.",
+        epilog="Examples:\n"
+               "  auto_test.py                                   # whole repo\n"
+               "  auto_test.py gcp                               # whole platform\n"
+               "  auto_test.py 'gcp/Cloud Storage'               # whole service\n"
+               "  auto_test.py 'gcp/Cloud Storage/google_storage_bucket'   # one resource",
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument(
+        "target", nargs="?", default=None,
+        help="What to test, as <platform>[/<service>[/<resource>]] — e.g. 'gcp', "
+             "'gcp/AlloyDB', 'gcp/AlloyDB/google_alloydb_backup'. Quote service names "
+             "that contain spaces. Omit to test the whole repo. Derives both the inputs/ "
+             "and policies/ roots; cannot be combined with --inputs/--policies.")
+    parser.add_argument("--inputs", default=None,
+                        help="Explicit inputs root (advanced; a positional target overrides it). "
+                             "Default: the whole repo (inputs/), or inputs/<target>.")
+    parser.add_argument("--policies", default=None,
+                        help="Explicit policies root (advanced; a positional target overrides it). "
+                             "Default: the whole repo (policies/), or policies/<target>.")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
     parser.add_argument("--workers", type=int, default=4, help="Number of parallel workers (default: 4)")
     parser.add_argument("--prune-plan-cache", action="store_true",
-                        help="After a full-platform run, delete cached plans no fixture references "
-                             "(orphans from changed/removed fixtures). Ignored for scoped runs.")
+                        help="After a whole-platform/-repo run, delete cached plans no fixture "
+                             "references (orphans from changed/removed fixtures). Ignored for scoped runs.")
     args = parser.parse_args()
     start_time = time.monotonic()
 
-    inputs_root = Path(args.inputs)
-    policies_search_root = Path(args.policies)
+    if args.target and (args.inputs or args.policies):
+        parser.error("pass either a positional target or --inputs/--policies, not both.")
+
+    # A positional target derives both roots from the mirrored trees; otherwise fall
+    # back to the explicit flags, defaulting to the whole repo.
+    if args.target:
+        inputs_root = Path("inputs") / args.target
+        policies_search_root = Path("policies") / args.target
+    else:
+        inputs_root = Path(args.inputs) if args.inputs else Path("inputs")
+        policies_search_root = Path(args.policies) if args.policies else Path("policies")
     policies_base_root = normalize_policies_root(policies_search_root)
 
     pairs, unmatched_inputs, orphan_policies = find_matching_pairs(

@@ -122,15 +122,26 @@ Before opening a PR, run the OPA test suite. It confirms each fixture compiles a
 policy flags the `non_compliant_example_N` resources **and not** the `compliant_example_N`
 ones. The same check runs in CI.
 
-```bash
-# Test just the resource you're working on (recommended):
-python3 scripts/auto_test/auto_test.py \
-  --inputs   "inputs/gcp/<Service>/<google_resource>" \
-  --policies "policies/gcp/<Service>/<google_resource>"
+Pass a single **target** — `<platform>[/<service>[/<resource>]]` — and the runner derives
+both the `inputs/` and `policies/` roots for you (quote service names that contain spaces):
 
-# Test the whole platform:
-python3 scripts/auto_test/auto_test.py --inputs inputs/gcp --policies policies/gcp
+```bash
+# One resource (recommended while you work):
+python3 scripts/auto_test/auto_test.py "gcp/Cloud Storage/google_storage_bucket"
+
+# Whole service:
+python3 scripts/auto_test/auto_test.py "gcp/Cloud Storage"
+
+# Whole platform:
+python3 scripts/auto_test/auto_test.py gcp
+
+# Whole repo (every platform — today that's just gcp):
+python3 scripts/auto_test/auto_test.py
 ```
+
+Add `--verbose` for per-pair detail, or `--workers N` to change parallelism (default 4).
+(The explicit `--inputs <root> --policies <root>` flags still work for advanced/CI use, but
+can't be combined with a target.)
 
 Output is quiet — a live progress line, **only failures are printed**, then a one-line
 summary:
@@ -172,7 +183,7 @@ fixture's `*.tf` files + the provider version):
 > result:
 >
 > ```bash
-> python3 scripts/auto_test/auto_test.py --inputs inputs/gcp --policies policies/gcp --prune-plan-cache
+> python3 scripts/auto_test/auto_test.py gcp --prune-plan-cache
 > ```
 >
 > It is a no-op on a scoped run (it can't tell which other resources' plans are orphaned),
