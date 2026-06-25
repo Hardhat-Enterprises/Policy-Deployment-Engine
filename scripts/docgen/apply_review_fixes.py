@@ -16,6 +16,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+from scripts.docgen.lib.file_writer import sanitize_service  # noqa: E402
 from scripts.docgen.lib.logging_config import get_logger, setup_logging  # noqa: E402
 
 logger = get_logger(__name__)
@@ -40,7 +41,10 @@ def main(argv=None) -> int:
     missing = 0
     for r in approved:
         for occ in r["occurrences"]:
-            path = docs_root / r["service"] / f"{occ['resource']}.json"
+            # The service may contain '/' (e.g. "Cloud Pub/Sub"); on disk it is
+            # written with '/' -> '__' (see file_writer.sanitize_service), so the
+            # raw name would never resolve and the rec would be silently dropped.
+            path = docs_root / sanitize_service(r["service"]) / f"{occ['resource']}.json"
             if not path.exists():
                 logger.warning(f"missing file for {r['service']}/{occ['resource']}")
                 missing += 1
