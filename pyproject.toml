@@ -6,20 +6,15 @@
 name = "policy-deployment-engine"
 version = "0.1.0"
 requires-python = ">=3.11"
-dependencies = [
-    "pydantic>=2.12.4",
-]
+# The docgen/linter/auto_test tools run on the standard library alone (auto_test
+# also shells out to the `terraform` and `opa` binaries). The folder_generator GUI
+# needs customtkinter — see scripts/folder_generator/requirements.txt.
+dependencies = []
 
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0.0",
     "pytest-cov>=4.1.0",
-    "jsonschema>=4.0.0",
-    "hypothesis>=6.0.0",
-]
-docgen = [
-    "pyyaml>=6.0.0",
-    "pydantic>=2.0.0",
 ]
 
 [tool.pytest.ini_options]
@@ -59,9 +54,4 @@ exclude_lines = [
     "raise NotImplementedError",
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
-]
-
-[dependency-groups]
-dev = [
-    "jsonschema>=4.25.1",
 ]
