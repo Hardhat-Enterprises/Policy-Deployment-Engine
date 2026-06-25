@@ -33,6 +33,15 @@ from _service_slug import slug_to_folder  # noqa: E402
 DOCS, INPUTS, POLICIES = "docs", "inputs", "policies"
 AUTO_TEST = str(REPO / "scripts" / "auto_test" / "auto_test.py")
 
+# TODO(after this migration branch merges to dev): confine a Service/ PR's DIFF to
+# its selected service. Fail the PR if it changes any docs/, inputs/ or policies/
+# file outside `<tree>/<platform>/<folder>/` (service-level, per the owner's intent;
+# could tighten to `<folder>/<resource>/` if desired). Add it as a step in the
+# policy_check job (gated on Service/ branches) — e.g. compare
+# `git diff --name-only origin/<base>...HEAD` against the selected service path.
+# DEFERRED because this chore/ branch intentionally modified inputs/policies/docs
+# across many services and must not be blocked by such a guardrail.
+
 
 def parse_branch(branch):
     """Return (platform, slug, resource) for a Service/ branch, else None."""
