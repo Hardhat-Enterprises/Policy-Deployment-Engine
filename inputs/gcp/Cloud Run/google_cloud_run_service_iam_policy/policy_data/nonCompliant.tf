@@ -1,4 +1,4 @@
-data "google_iam_policy" "nc" {
+data "google_iam_policy" "nc1" {
   binding {
     role = "roles/viewer"
 
@@ -11,11 +11,11 @@ data "google_iam_policy" "nc" {
 resource "google_cloud_run_service_iam_policy" "non_compliant_example_1" {
   location    = "australia-southeast1"
   project     = "my-gcp-project"
-  service = "nc"
-  policy_data = data.google_iam_policy.nc.policy_data
+  service     = "non_compliant_example_1"
+  policy_data = data.google_iam_policy.nc1.policy_data
 }
 
-data "google_iam_policy" "nc" {
+data "google_iam_policy" "nc2" {
   binding {
     role = "roles/viewer"
 
@@ -28,11 +28,11 @@ data "google_iam_policy" "nc" {
 resource "google_cloud_run_service_iam_policy" "non_compliant_example_2" {
   location    = "australia-southeast1"
   project     = "my-gcp-project"
-  service = "nc"
-  policy_data = data.google_iam_policy.nc.policy_data
+  service     = "non_compliant_example_2"
+  policy_data = data.google_iam_policy.nc2.policy_data
 }
 
-data "google_iam_policy" "nc" {
+data "google_iam_policy" "nc3" {
   binding {
     role = "roles/run.admin"
 
@@ -45,6 +45,6 @@ data "google_iam_policy" "nc" {
 resource "google_cloud_run_service_iam_policy" "non_compliant_example_3" {
   location    = "australia-southeast1"
   project     = "my-gcp-project"
-  service = "nc"
-  policy_data = data.google_iam_policy.nc.policy_data
+  service     = "non_compliant_example_3"
+  policy_data = data.google_iam_policy.nc3.policy_data
 }

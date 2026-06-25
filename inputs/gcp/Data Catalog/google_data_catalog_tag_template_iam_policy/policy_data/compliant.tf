@@ -12,7 +12,7 @@ resource "google_data_catalog_tag_template_iam_policy" "compliant_example_1" {
   policy_data  = data.google_iam_policy.c.policy_data
 }
 
-data "google_iam_policy" "c" {
+data "google_iam_policy" "c2" {
   binding {
     role    = "roles/datacatalog.viewer"
     members = ["user:security@example.com"]
@@ -23,5 +23,5 @@ resource "google_data_catalog_tag_template_iam_policy" "compliant_example_2" {
   project      = "gcp-project-12345"
   region       = "australia-southeast1"
   tag_template = "approved_template"
-  policy_data  = data.google_iam_policy.c.policy_data
+  policy_data  = data.google_iam_policy.c2.policy_data
 }

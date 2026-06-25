@@ -8,24 +8,24 @@ data "google_iam_policy" "nc" {
 }
 
 resource "google_bigquery_table_iam_policy" "non_compliant_example_1" {
-  project = "PDE"
-  dataset_id = "nc"
-  table_id = "google_bigquery_table.test.table_id"
+  project     = "PDE"
+  dataset_id  = "non_compliant_example_1"
+  table_id    = "table_nc1"
   policy_data = data.google_iam_policy.nc.policy_data
 }
 
-data "google_iam_policy" "nc" {
+data "google_iam_policy" "nc2" {
   binding {
-    role = "roles/invalid"
+    role = "roles/editor"
     members = [
-      "allUsers",
+      "user:jane@example.com",
     ]
   }
 }
 
 resource "google_bigquery_table_iam_policy" "non_compliant_example_2" {
-  project = "PDE"
-  dataset_id = "nc"
-  table_id = "google_bigquery_table.test.table_id"
-  policy_data = data.google_iam_policy.nc.policy_data
+  project     = "PDE"
+  dataset_id  = "non_compliant_example_2"
+  table_id    = "table_nc2"
+  policy_data = data.google_iam_policy.nc2.policy_data
 }

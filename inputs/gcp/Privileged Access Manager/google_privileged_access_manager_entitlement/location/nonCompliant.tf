@@ -1,5 +1,5 @@
 resource "google_privileged_access_manager_entitlement" "non_compliant_example_1" {
-  entitlement_id       = "non_compliant_example_1"
+  entitlement_id       = "non-compliant-example-1"
   location             = "australia-southeast1"
   max_request_duration = "43200s"
   parent               = "projects/my-project-name"

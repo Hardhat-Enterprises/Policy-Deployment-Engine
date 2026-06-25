@@ -1,8 +1,7 @@
 resource "google_os_config_v2_policy_orchestrator_for_folder" "non_compliant_example_1" {
-    depends_on = [time_sleep.wait_3_min]
 
     policy_orchestrator_id = "po-folder"
-    folder_id = google_folder.my_folder.folder_id
+    folder_id = "folders/123456789"
 
     state = "ACTIVE"
     action = "UPSERT"

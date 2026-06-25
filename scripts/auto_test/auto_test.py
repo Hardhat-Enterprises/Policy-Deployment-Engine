@@ -120,6 +120,45 @@ def get_unique_resource_names(plan_json_path: Path, resource_type: str) -> set[s
     return names
 
 
+def get_resource_name_map(plan_json_path: Path, resource_type: str,
+                          resource_value_name: str | None) -> dict[str, str | None]:
+    """Map each resource's Terraform label to the identifier the OPA message uses.
+
+    The rego helper identifies a resource by ``resource_value_name`` via
+    ``values[key] -> resource[key] -> null`` (see _helpers/shared.rego). We mirror
+    that here so a fixture can use a valid id value (e.g. one that rejects the
+    underscore example-name format) and still be matched: the message carries the
+    id *value*, which we map back to the ``compliant_example_N`` label.
+
+    For ``resource_value_name == "name"`` with a computed name, ``values`` has no
+    ``name`` so the lookup falls back to the top-level ``name`` (the label) — the
+    same behaviour the rego helper relies on.
+    """
+    try:
+        data = json.loads(plan_json_path.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"Failed to read/parse JSON: {plan_json_path}: {e}")
+        return {}
+
+    name_map: dict[str, str | None] = {}
+    root = data.get("planned_values", {}).get("root_module", {})
+    for res in root.get("resources", []):
+        if res.get("type") != resource_type:
+            continue
+        label = res.get("name")
+        if not isinstance(label, str):
+            continue
+        identifier: str | None = None
+        if resource_value_name:
+            vals = res.get("values", {}) or {}
+            if resource_value_name in vals:
+                identifier = vals[resource_value_name]
+            elif resource_value_name in res:
+                identifier = res[resource_value_name]
+        name_map[label] = identifier if isinstance(identifier, str) else None
+    return name_map
+
+
 def get_all_resource_types(plan_json_path: Path) -> list[str]:
     """Return all unique resource types found in the plan.json file."""
     try:
@@ -163,6 +202,22 @@ def parse_rego_metadata(policy_file: Path):
     except Exception:
         return None, None
     return pkg, vars_import
+
+
+def extract_non_compliant_text(messages: list[str]) -> list[str]:
+    """Return only the "Non-Compliant Resources: ..." segments of the messages.
+
+    The helper formats each situation as a list whose middle entry is
+    ``Non-Compliant Resources: <comma-list>``; resource matching must look only
+    there, not in the situation description or the "Potential Remedies" text
+    (which may echo an approved value that a compliant fixture uses as its id).
+    Falls back to the full messages if no such segment is present (non-standard
+    message shapes).
+    """
+    segments: list[str] = []
+    for m in messages:
+        segments.extend(re.findall(r"Non-Compliant Resources:\s*([^']*)", m))
+    return segments if segments else messages
 
 
 def match_names_in_messages(messages: list[str], candidate_names: set[str]) -> set[str]:
@@ -247,17 +302,16 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
     return plan_json
 
 
-def get_policy_metadata(policy_file: Path, service: str, resource: str, attribute: str) -> tuple[str, str]:
-    """Return (message_query, vars_resource_type_query)."""
+def get_policy_metadata(policy_file: Path, service: str, resource: str, attribute: str) -> tuple[str, str, str]:
+    """Return (message_query, vars_resource_type_query, vars_value_name_query)."""
     pkg_path, vars_import = parse_rego_metadata(policy_file)
     if not pkg_path:
         pkg_path = f"terraform.gcp.security.{service}.{resource}.{attribute}"
     message_query = f"data.{pkg_path}.message"
-    if vars_import:
-        vars_resource_type_query = f"{vars_import}.variables.resource_type"
-    else:
-        vars_resource_type_query = f"data.terraform.gcp.security.{service}.{resource}.vars.variables.resource_type"
-    return message_query, vars_resource_type_query
+    vars_pkg = vars_import or f"data.terraform.gcp.security.{service}.{resource}.vars"
+    vars_resource_type_query = f"{vars_pkg}.variables.resource_type"
+    vars_value_name_query = f"{vars_pkg}.variables.resource_value_name"
+    return message_query, vars_resource_type_query, vars_value_name_query
 
 
 # Add a lock for thread-safe printing
@@ -270,9 +324,25 @@ def thread_safe_print(*args, **kwargs):
 
 
 def validate_policy_output(attribute: str, resource_type: str | None, plan_path: Path, messages: list[str],
-                           verbose: bool, service: str, resource: str) -> dict:
-    unique_names = get_unique_resource_names(plan_path, str(resource_type))
-    matched = match_names_in_messages(messages, unique_names)
+                           verbose: bool, service: str, resource: str,
+                           resource_value_name: str | None = None) -> dict:
+    # Map each label to the identifier the OPA message uses (the resource_value_name
+    # value). A label counts as flagged if EITHER the label OR its identifier appears
+    # in the messages — so fixtures whose id field rejects the underscore example-name
+    # format can still be matched via a valid id value.
+    name_map = get_resource_name_map(plan_path, str(resource_type), resource_value_name)
+    unique_names = set(name_map.keys())
+    candidates = unique_names | {v for v in name_map.values() if v}
+    # Match only within the "Non-Compliant Resources:" portion(s) of the message,
+    # never the remedy/advisory text — otherwise an approved value echoed in a
+    # remedy ("change ... to <approved>") would falsely flag the compliant example
+    # that legitimately uses that approved value as its id.
+    nc_text = extract_non_compliant_text(messages)
+    matched_strings = match_names_in_messages(nc_text, candidates)
+    matched = {
+        label for label, ident in name_map.items()
+        if label in matched_strings or (ident and ident in matched_strings)
+    }
 
     # Resource labels follow the example convention: compliant_example_N must NOT
     # be flagged (compliant), non_compliant_example_N MUST be flagged.
@@ -327,7 +397,8 @@ def run_policy_check_pair(input_dir: Path, policy_file: Path, policies_root: Pat
     # plan.json is consumed by the OPA evals below, so it must outlive
     # cleanup_workspace() (which runs before this point); remove it once done.
     try:
-        message_query, vars_resource_type_query = get_policy_metadata(policy_file, service, resource, attribute)
+        message_query, vars_resource_type_query, vars_value_name_query = get_policy_metadata(
+            policy_file, service, resource, attribute)
 
         resource_type = get_resource_type(policies_root, plan_path, vars_resource_type_query)
         if resource_type is None:
@@ -345,12 +416,17 @@ def run_policy_check_pair(input_dir: Path, policy_file: Path, policies_root: Pat
         if not messages:
             return make_failure(attribute, "Could not run OPA query!", service, resource)
 
+        resource_value_name = opa_eval_value(policies_root.resolve(), plan_path, vars_value_name_query)
+        if not isinstance(resource_value_name, str):
+            resource_value_name = None
+
         if verbose:
             thread_safe_print(f"OPA check: {message_query}")
             for m in messages:
                 thread_safe_print(m)
 
-        return validate_policy_output(attribute, resource_type, plan_path, messages, verbose, service, resource)
+        return validate_policy_output(attribute, resource_type, plan_path, messages, verbose, service, resource,
+                                      resource_value_name)
     finally:
         try:
             plan_path.unlink()

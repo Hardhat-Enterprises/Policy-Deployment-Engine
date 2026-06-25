@@ -1,7 +1,7 @@
 resource "google_spanner_instance" "compliant_example_1" {
   name         = "c-instance"
   config       = "regional-australia-southeast1"
-  display_name = "Test Instance C"
+  display_name = "compliant_example_1"
   num_nodes    = 1
   force_destroy = false
 }

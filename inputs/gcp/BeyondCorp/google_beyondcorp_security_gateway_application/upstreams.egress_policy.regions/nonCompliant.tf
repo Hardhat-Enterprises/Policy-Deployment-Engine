@@ -4,6 +4,7 @@ resource "google_beyondcorp_security_gateway_application" "non_compliant_example
   application_id      = "non_compliant_example_1"
   endpoint_matchers {
     hostname = "svc.corp.example.com"
+    ports    = [443]
   }
   upstreams {
     egress_policy { 

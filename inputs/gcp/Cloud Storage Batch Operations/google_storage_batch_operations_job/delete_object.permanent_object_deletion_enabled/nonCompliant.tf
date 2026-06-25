@@ -1,6 +1,7 @@
 resource "google_storage_batch_operations_job" "non_compliant_example_1" {
   project  = "test-project"
-  job_id   = "non_compliant_example_1"
+  job_id   = "nc1"
+  description = "non_compliant_example_1"
 
   bucket_list {
     buckets {
