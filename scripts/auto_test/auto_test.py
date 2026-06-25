@@ -87,9 +87,18 @@ def make_success(attribute: str, service: str, resource: str) -> dict:
     return {"service": str(service), "resource": str(resource), "policy": str(attribute), "passed": True}
 
 
-def opa_eval_value(policies_root: Path, plan_json_path: Path, query: str):
-    """Evaluate an OPA query and return the expression value from JSON output or None."""
-    cmd = f'opa eval --data "{policies_root}" --input "{plan_json_path}" --format json "{query}"'
+def opa_eval_value(data_paths, plan_json_path: Path, query: str):
+    """Evaluate an OPA query and return the expression value from JSON output or None.
+
+    ``data_paths`` is one path or a list of paths passed as ``--data``. Passing only
+    the helpers dir + the single resource's policy dir (instead of the whole
+    ``policies/`` tree) makes each eval ~20x faster — OPA otherwise re-parses and
+    compiles all ~1000 policies on every single call.
+    """
+    if isinstance(data_paths, (str, Path)):
+        data_paths = [data_paths]
+    data_flags = " ".join(f'--data "{p}"' for p in data_paths)
+    cmd = f'opa eval {data_flags} --input "{plan_json_path}" --format json "{query}"'
     result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
     if result.returncode != 0:
         thread_safe_print(f"❌ OPA eval failed for query: {query}")
@@ -255,8 +264,8 @@ def match_names_in_messages(messages: list[str], candidate_names: set[str]) -> s
     return matched
 
 
-def get_resource_type(policies_root: Path, plan_path: Path, vars_resource_type_query: str):
-    return opa_eval_value(policies_root.resolve(), plan_path, vars_resource_type_query)
+def get_resource_type(data_paths, plan_path: Path, vars_resource_type_query: str):
+    return opa_eval_value(data_paths, plan_path, vars_resource_type_query)
 
 
 def normalize_messages(messages_value) -> list[str]:
@@ -269,8 +278,8 @@ def normalize_messages(messages_value) -> list[str]:
     return []
 
 
-def get_policy_messages(policies_root: Path, plan_path: Path, message_query: str) -> list[str]:
-    val = opa_eval_value(policies_root.resolve(), plan_path, message_query)
+def get_policy_messages(data_paths, plan_path: Path, message_query: str) -> list[str]:
+    val = opa_eval_value(data_paths, plan_path, message_query)
     return normalize_messages(val)
 
 
@@ -420,7 +429,12 @@ def run_policy_check_pair(input_dir: Path, policy_file: Path, policies_root: Pat
         message_query, vars_resource_type_query, vars_value_name_query = get_policy_metadata(
             policy_file, service, resource, attribute)
 
-        resource_type = get_resource_type(policies_root, plan_path, vars_resource_type_query)
+        # Scope OPA's --data to just the shared helpers + this resource's policy dir
+        # (the .rego + _vars.rego). Loading the whole policies/ tree on every eval
+        # re-compiles ~1000 policies per call and dominates runtime; this is ~20x faster.
+        data_paths = [(policies_root / "_helpers").resolve(), policy_file.parent.resolve()]
+
+        resource_type = get_resource_type(data_paths, plan_path, vars_resource_type_query)
         if resource_type is None:
             # Get diagnostic info
             actual_types = get_all_resource_types(plan_path)
@@ -432,11 +446,11 @@ def run_policy_check_pair(input_dir: Path, policy_file: Path, policies_root: Pat
             error_msg = "Could not find resource_type variable! " + " | ".join(diagnostics)
             return make_failure(attribute, error_msg, service, resource)
 
-        messages = get_policy_messages(policies_root, plan_path, message_query)
+        messages = get_policy_messages(data_paths, plan_path, message_query)
         if not messages:
             return make_failure(attribute, "Could not run OPA query!", service, resource)
 
-        resource_value_name = opa_eval_value(policies_root.resolve(), plan_path, vars_value_name_query)
+        resource_value_name = opa_eval_value(data_paths, plan_path, vars_value_name_query)
         if not isinstance(resource_value_name, str):
             resource_value_name = None
 
