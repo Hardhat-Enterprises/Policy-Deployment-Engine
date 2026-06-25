@@ -4,6 +4,29 @@ The Policy Deployment Engine (PDE) is designed to automate and simplify the enfo
 
 Last updated: T2 2026
 
+## 📁 Repository layout
+
+Three trees mirror each other, keyed off the **docs taxonomy** (the linter enforces that
+`inputs/` and `policies/` reconcile to `docs/`):
+
+```
+docs/<platform>/<Service>/<resource>.json        # SOURCE OF TRUTH: every argument of a
+                                                  #   resource + its security assessment
+inputs/<platform>/<Service>/<resource>/<arg>/     # Terraform fixture per argument:
+                                                  #   compliant.tf, nonCompliant.tf, config.tf
+inputs/plan_cache/<platform>/<sha>.json           # committed terraform-plan JSON cache
+policies/<platform>/<Service>/<resource>/<arg>.rego   # one Rego policy per argument
+policies/_helpers/                                # shared Rego helpers (+ _vars.rego per resource)
+
+templates/<platform>/   # starter files the folder_generator copies for a new resource
+tests/_helpers/         # Rego unit tests for the shared helpers
+scripts/                # tooling — see "Tooling" below
+```
+
+`<platform>` is `gcp` today (aws/azure are placeholders). A `<Service>` folder is the
+verbatim provider subcategory (e.g. `Cloud Storage`); `<resource>` is the full type
+(e.g. `google_storage_bucket`); `<arg>` is a documented, non-block argument key.
+
 ## 📋 Contributor Requirements
 
 Before working on a service in PDE, all contributors must follow these steps:
@@ -157,5 +180,31 @@ fixture's `*.tf` files + the provider version):
 >
 > It is a no-op on a scoped run (it can't tell which other resources' plans are orphaned),
 > and CI never prunes — the runner is ephemeral with nothing committed back.
+
+## 🛠 Tooling (`scripts/`)
+
+| Tool | What it does | Docs |
+|------|--------------|------|
+| `scripts/docgen/` | Generates the `docs/` JSON (one file per resource, every argument) from the Terraform provider **schema**. | [README](scripts/docgen/README.md) |
+| `scripts/linters/` | Validates that `docs/`, `inputs/`, and `policies/` reconcile (structure + content) and checks the branch-name convention. | [README](scripts/linters/readme-linters.md) |
+| `scripts/auto_test/` | `terraform plan` + `opa eval` harness over the fixtures, with a committed plan cache and an offline project-local provider cache. | "Testing Your Policies Locally" above |
+| `scripts/folder_generator/` | Small GUI to scaffold a new resource's input + policy files from `templates/`. | [README](scripts/folder_generator/README.md) |
+
+## 🤖 Continuous integration
+
+Two GitHub Actions workflows in `.github/workflows/`:
+
+- **`policy_check_PR`** — runs on every PR that touches `docs/`, `inputs/`, or `policies/`:
+  - *lint* job (all PRs): branch-name convention → whole-tree **structural** lint → a
+    **content** lint scoped to the files this PR changed (the repo-wide backlog never blocks you).
+  - *policy_check* job (only `Service/...` PRs): the per-resource gate — doc completeness
+    (real `security_impact` + rationale), policy/input coverage for every `true` arg, and the
+    `terraform plan` + OPA test. It then applies a `CI-Approved` / `CI-Review-Required` label.
+- **`policy_check_ALL`** — manual (`workflow_dispatch`) full-tree sweep: whole-tree lint + the
+  complete OPA suite.
+
+A PR is blocked when a lint error lands on a file it changed, or (for `Service/` PRs) when the
+per-resource gate fails. Terraform and OPA versions are pinned in the workflows for
+reproducibility (the provider version is pinned via `scripts/auto_test/provider_version.txt`).
 
 
