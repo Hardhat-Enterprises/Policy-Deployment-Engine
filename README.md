@@ -96,4 +96,60 @@ Allowed branch names:
 5. Stage again and commit until no errors appear
 6. Push: `git push origin your-branch`
 
+## 🧪 Testing Your Policies Locally
+
+Before opening a PR, run the OPA test suite. It confirms each fixture compiles and that the
+policy flags the `non_compliant_example_N` resources **and not** the `compliant_example_N`
+ones. The same check runs in CI.
+
+```bash
+# Test just the resource you're working on (recommended):
+python3 scripts/auto_test/auto_test.py \
+  --inputs   "inputs/gcp/<Service>/<google_resource>" \
+  --policies "policies/gcp/<Service>/<google_resource>"
+
+# Test the whole platform:
+python3 scripts/auto_test/auto_test.py --inputs inputs/gcp --policies policies/gcp
+```
+
+Output is quiet — a live progress line, **only failures are printed**, then a one-line
+summary:
+
+```
+[100.0%] 1021/1021  ✅ 1021  ❌ 0  40s
+✅ all passed — 94 services, 370 resource types, 1021 policies  in 40s
+```
+
+### How it works (and why it's fast)
+
+For each policy the runner produces a `terraform plan` of the fixture, converts it to JSON,
+and evaluates the policy with `opa`. Because the fixtures are static, the JSON plans are
+**committed** under `inputs/plan_cache/<platform>/<sha>.json` (the `<sha>` is a hash of the
+fixture's `*.tf` files + the provider version):
+
+- **Plan already cached** → it is fed straight to OPA and **Terraform is not run at all**.
+  A full run is ~40s and needs only `opa` installed.
+- **You changed a fixture's `.tf`** → its hash changes, so just that fixture re-runs
+  `terraform plan` and the new plan is written to the cache. **Commit the new/updated
+  `inputs/plan_cache/...json` alongside your fixture change.**
+
+### Prerequisites
+
+- **`opa`** — always required (every test evaluates a policy).
+- **`terraform`** — only needed when you change a fixture (a cache miss). The first such run
+  builds a **project-local, offline** provider cache under `.terraform-cache/` (gitignored;
+  it never touches your global `~/.terraform.d` or other projects):
+
+  ```bash
+  bash scripts/auto_test/cache_setup.sh   # one-time per machine
+  ```
+
+  `auto_test.py` runs this automatically if the cache is missing, so usually you don't need
+  to call it yourself.
+
+> **Maintainers:** the full-repo workflow (`policy_check_ALL`) passes `--prune-plan-cache`
+> (its `prune` input defaults to `true`) to drop orphaned cache entries left by changed or
+> removed fixtures. Do **not** use `--prune-plan-cache` on a scoped local run — it is
+> ignored there by design so you can't delete other resources' cached plans.
+
 
