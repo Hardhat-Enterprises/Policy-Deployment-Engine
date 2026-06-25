@@ -55,13 +55,13 @@ def scan_provider_services(cloud):
         print(f"No docs folder for cloud: {cloud}")
         return {}
     for service_name in sorted(os.listdir(docs_folder)):
-        service_path = os.path.join(docs_folder, service_name, "resource_json")
+        # docs are flat: docs/<cloud>/<service>/<resource>.json (no resource_json/ subdir).
+        service_path = os.path.join(docs_folder, service_name)
         if os.path.isdir(service_path):
             resources = []
             for fname in sorted(os.listdir(service_path)):
                 if fname.endswith(".json"):
-                    resource_name = fname[:-5]  # strip .json
-                    resources.append(resource_name)
+                    resources.append(fname[:-5])  # strip .json
             service_resources[service_name] = resources
     return service_resources
 
