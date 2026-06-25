@@ -147,9 +147,15 @@ fixture's `*.tf` files + the provider version):
   `auto_test.py` runs this automatically if the cache is missing, so usually you don't need
   to call it yourself.
 
-> **Maintainers:** the full-repo workflow (`policy_check_ALL`) passes `--prune-plan-cache`
-> (its `prune` input defaults to `true`) to drop orphaned cache entries left by changed or
-> removed fixtures. Do **not** use `--prune-plan-cache` on a scoped local run — it is
-> ignored there by design so you can't delete other resources' cached plans.
+> **Maintainers:** pruning orphaned plan-cache entries (left by changed/removed fixtures)
+> is a *local* operation — run a full-tree pass with `--prune-plan-cache` and commit the
+> result:
+>
+> ```bash
+> python3 scripts/auto_test/auto_test.py --inputs inputs/gcp --policies policies/gcp --prune-plan-cache
+> ```
+>
+> It is a no-op on a scoped run (it can't tell which other resources' plans are orphaned),
+> and CI never prunes — the runner is ephemeral with nothing committed back.
 
 
