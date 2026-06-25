@@ -49,12 +49,17 @@ def main(argv=None) -> int:
                 (occ["key"], r["proposed_security_impact"], r["proposed_rationale"]))
 
     applied_keys = 0
+    skipped_keys = 0
     for path, items in edits.items():
         doc = json.loads(path.read_text(encoding="utf-8"))
         argd = doc.get("arguments", {})
         for key, si, rationale in items:
             entry = argd.get(key)
             if not isinstance(entry, dict) or "security_impact" not in entry:
+                # An approved rec targeting a key that no longer exists as a leaf —
+                # surface it instead of silently dropping it.
+                logger.warning(f"{path}: approved key '{key}' not found as a leaf; skipped")
+                skipped_keys += 1
                 continue
             entry["security_impact"] = si
             entry["rationale"] = rationale
@@ -62,9 +67,11 @@ def main(argv=None) -> int:
         if args.apply:
             path.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
+    verb = "leaf edits" if args.apply else "leaf edits (would apply)"
     logger.info(
         f"{'APPLIED' if args.apply else 'DRY-RUN'} | approved recs={len(approved)} | "
-        f"files touched={len(edits)} | leaf edits={applied_keys} | missing files={missing}"
+        f"files touched={len(edits)} | {verb}={applied_keys} | "
+        f"keys skipped={skipped_keys} | missing files={missing}"
     )
     if not args.apply:
         logger.info("Dry run — re-run with --apply to write.")

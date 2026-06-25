@@ -17,13 +17,23 @@ def service_slug(folder_name: str) -> str:
 
 
 def slug_to_folder(docs_root: str, platform: str) -> dict:
-    """Return ``{service_slug: docs_folder_name}`` for ``docs/<platform>/``."""
+    """Return ``{service_slug: docs_folder_name}`` for ``docs/<platform>/``.
+
+    Raises ``ValueError`` if two folders collapse to the same slug — the slug
+    must map back to exactly one folder for the branch scheme to be unambiguous.
+    """
     base = os.path.join(docs_root, platform)
     out = {}
     if os.path.isdir(base):
         for name in sorted(os.listdir(base)):
             if os.path.isdir(os.path.join(base, name)):
-                out[service_slug(name)] = name
+                slug = service_slug(name)
+                if slug in out:
+                    raise ValueError(
+                        f"Ambiguous service slug '{slug}' in docs/{platform}/: "
+                        f"both {out[slug]!r} and {name!r} map to it. Rename one folder."
+                    )
+                out[slug] = name
     return out
 
 

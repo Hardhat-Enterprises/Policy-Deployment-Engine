@@ -25,7 +25,7 @@ pip install -r requirements.txt
 
 ### Running the Application
 
-Navigate to the `/scripts/folder-generator/` directory and run:`
+Navigate to the `/scripts/folder_generator/` directory and run:
 
 python main.py
 

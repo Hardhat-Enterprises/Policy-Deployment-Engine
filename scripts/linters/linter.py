@@ -292,7 +292,7 @@ class DocsValidator:
                 self.logger.log(f"{where}: 'rationale' must be a string")
 
 
-def build_gcp_docs_index(docs_root, logger):
+def build_gcp_docs_index(docs_root):
     """Return ``{service: {resource: {arg_key: type}}}`` for ``docs/gcp/``.
 
     Used by the inputs validator to reconcile the inputs taxonomy against docs.
@@ -725,6 +725,15 @@ def main(argv=None):
     do_inputs = args.tree in ("inputs", "all")
     do_policies = args.tree in ("policies", "all")
 
+    # The docs index reconciles both the inputs and policies trees; build it once
+    # and share it (parsing every docs JSON is the linter's dominant I/O cost).
+    docs_index = None
+    if do_inputs or do_policies:
+        if not os.path.isdir(docs_root):
+            print(f"[ERROR] docs root not found: {docs_root} (needed to reconcile inputs/policies).")
+            sys.exit(2)
+        docs_index = build_gcp_docs_index(docs_root)
+
     if do_docs:
         if not os.path.isdir(docs_root):
             print(f"[ERROR] docs root not found: {docs_root} (run from the repo root or pass --docs).")
@@ -737,24 +746,16 @@ def main(argv=None):
         if not os.path.isdir(inputs_root):
             print(f"[ERROR] inputs root not found: {inputs_root} (run from the repo root or pass --inputs).")
             sys.exit(2)
-        if not os.path.isdir(docs_root):
-            print(f"[ERROR] docs root not found: {docs_root} (needed to reconcile inputs).")
-            sys.exit(2)
         print(f"\n[*] Linting inputs tree at {inputs_root}"
               f"{f' (platform: {args.platform})' if args.platform else ''}\n")
-        docs_index = build_gcp_docs_index(docs_root, logger)
         InputsValidator(inputs_root, docs_index, logger).validate_root(only_platform=args.platform)
 
     if do_policies:
         if not os.path.isdir(policies_root):
             print(f"[ERROR] policies root not found: {policies_root} (run from the repo root or pass --policies).")
             sys.exit(2)
-        if not os.path.isdir(docs_root):
-            print(f"[ERROR] docs root not found: {docs_root} (needed to reconcile policies).")
-            sys.exit(2)
         print(f"\n[*] Linting policies tree at {policies_root}"
               f"{f' (platform: {args.platform})' if args.platform else ''}\n")
-        docs_index = build_gcp_docs_index(docs_root, logger)
         PoliciesValidator(policies_root, docs_index, logger).validate_root(only_platform=args.platform)
 
     if args.content_checks and (do_inputs or do_policies):
@@ -764,21 +765,6 @@ def main(argv=None):
 
     if logger.summary():
         sys.exit(1)
-
-
-def cli_docs():
-    """Console entry point: validate the docs/ tree only (forces --tree docs)."""
-    main(["--tree", "docs", *sys.argv[1:]])
-
-
-def cli_inputs():
-    """Console entry point: validate the inputs/ tree only (forces --tree inputs)."""
-    main(["--tree", "inputs", *sys.argv[1:]])
-
-
-def cli_policies():
-    """Console entry point: validate the policies/ tree only (forces --tree policies)."""
-    main(["--tree", "policies", *sys.argv[1:]])
 
 
 if __name__ == "__main__":

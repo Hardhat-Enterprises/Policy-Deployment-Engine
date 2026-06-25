@@ -19,7 +19,7 @@ Cache Strategy:
     - To refresh: delete cache directory and re-run
 
 Example:
-    >>> from scripts.docgen.repository_manager import RepositoryManager
+    >>> from scripts.docgen.lib.repository_manager import RepositoryManager
     >>> repo_mgr = RepositoryManager()
     >>> repo_path = repo_mgr.clone_provider_repo('aws', version='5.70.0')
     >>> resources = repo_mgr.list_all_resources(repo_path)
@@ -79,6 +79,10 @@ class RepositoryManager:
             cache_dir = docgen_dir / '.cache'
         
         self.cache_dir = cache_dir
+        # Per-instance caches so each markdown file is located/read at most once per run
+        # (build_service_map and MarkdownProcessor both need the same files).
+        self._md_path_cache = {}   # (repo_path, resource_name) -> Path
+        self._md_text_cache = {}   # str(path) -> text
         logger.debug(f"Repository manager initialized with cache dir: {self.cache_dir}")
     
     def clone_provider_repo(self, csp: str, version: Optional[str] = None) -> Path:
@@ -232,18 +236,28 @@ class RepositoryManager:
         # Normalize version tag (add 'v' prefix if not present)
         if not version.startswith('v'):
             version = f'v{version}'
-        
+
         logger.info(f"Checking out version {version}")
-        
+
         try:
-            # Fetch tags if not already fetched
-            subprocess.run(
-                ['git', '-C', str(repo_path), 'fetch', '--tags'],
-                check=True,
+            # Only hit the network when the tag isn't already present locally. The
+            # offline provider/doc cache is seeded with tags, so on a cache hit this
+            # avoids a `git fetch --tags` round-trip (which would also fail on hosts
+            # with broken egress) on every run.
+            tag_present = subprocess.run(
+                ['git', '-C', str(repo_path), 'rev-parse', '-q', '--verify',
+                 f'refs/tags/{version}'],
                 capture_output=True,
                 text=True
-            )
-            
+            ).returncode == 0
+            if not tag_present:
+                subprocess.run(
+                    ['git', '-C', str(repo_path), 'fetch', '--tags'],
+                    check=True,
+                    capture_output=True,
+                    text=True
+                )
+
             # Checkout the specific tag
             subprocess.run(
                 ['git', '-C', str(repo_path), 'checkout', version],
@@ -251,7 +265,7 @@ class RepositoryManager:
                 capture_output=True,
                 text=True
             )
-            
+
             logger.debug(f"Successfully checked out version {version}")
             
         except subprocess.CalledProcessError as e:
@@ -382,8 +396,10 @@ class RepositoryManager:
             
             if result.returncode == 0 and result.stdout.strip():
                 latest_remote = result.stdout.strip().split('\n')[0]
-                
-                # Compare versions (simple string comparison works for semantic versioning)
+
+                # git already returned the tags newest-first (--sort=-version:refname),
+                # so the head of the list is the latest; we only test inequality here
+                # (NOT a lexicographic >, which would be wrong for semver).
                 if latest_remote != current_version:
                     logger.debug(f"Newer version available: {latest_remote} (current: {current_version})")
                     return latest_remote
@@ -506,7 +522,28 @@ class RepositoryManager:
         Note:
             The resource name prefix (aws_, azurerm_, google_) is stripped
             from the filename in the repository structure.
+            Results are memoized per (repo_path, resource_name) — the filename
+            resolution stats several candidate paths, and both build_service_map
+            and MarkdownProcessor resolve the same resources.
         """
+        cache_key = (str(repo_path), resource_name)
+        cached = self._md_path_cache.get(cache_key)
+        if cached is not None:
+            return cached
+        result = self._locate_markdown(repo_path, resource_name)
+        self._md_path_cache[cache_key] = result
+        return result
+
+    def read_resource_markdown(self, repo_path: Path, resource_name: str) -> str:
+        """Return a resource's markdown text, reading each file at most once per run."""
+        path = self.get_resource_markdown_path(repo_path, resource_name)
+        key = str(path)
+        if key not in self._md_text_cache:
+            self._md_text_cache[key] = path.read_text(encoding='utf-8')
+        return self._md_text_cache[key]
+
+    def _locate_markdown(self, repo_path: Path, resource_name: str) -> Path:
+        """Resolve a resource's markdown path (see get_resource_markdown_path)."""
         docs_dir = repo_path / 'website' / 'docs' / 'r'
         
         # Strip provider prefix from resource name for filename
@@ -535,8 +572,9 @@ class RepositoryManager:
             for iam_suffix in ('_iam_policy', '_iam_binding', '_iam_member', '_iam_audit_config'):
                 if resource_name.endswith(iam_suffix):
                     base = resource_name[:-len(iam_suffix)]  # strip _policy/_binding/_member
-                    iam_stem = base  # already has provider prefix stripped above
-                    # Re-derive iam_stem without provider prefix
+                    # Strip the provider prefix to get the bare stem (e.g.
+                    # google_folder -> folder); default to base if no prefix matches.
+                    iam_stem = base
                     for pfx in ('aws_', 'azurerm_', 'google_'):
                         if base.startswith(pfx):
                             iam_stem = base[len(pfx):]
@@ -635,7 +673,8 @@ class RepositoryManager:
             )
             names = list(dict.fromkeys(pattern.findall(content)))  # preserve order, deduplicate
             return names
-        except Exception:
+        except OSError as e:
+            logger.warning(f"Could not read IAM markdown {iam_file}: {e}")
             return []
     
     def list_resources_by_service(

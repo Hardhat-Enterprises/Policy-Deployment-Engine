@@ -6,6 +6,7 @@ import json
 import re
 import shutil
 import hashlib
+import tempfile
 import time
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -30,9 +31,10 @@ CACHE_SETUP_SCRIPT = Path(__file__).resolve().parent / "cache_setup.sh"
 # *.tf or the provider version changes. We cache plan.json under
 # inputs/plan_cache/<platform>/<sha>.json (committed). On a run, a cache hit feeds
 # OPA directly and skips terraform entirely; a miss runs terraform once and writes
-# the cache. Keep TARGET_PROVIDER_VERSION in sync with cache_setup.sh's TARGET_VERSION
+# the cache. The target provider version is read from provider_version.txt (the
+# single source of truth shared with cache_setup.sh and unify_provider_versions.py)
 # so a provider bump invalidates every cached plan.
-TARGET_PROVIDER_VERSION = "7.37.0"
+TARGET_PROVIDER_VERSION = (Path(__file__).resolve().parent / "provider_version.txt").read_text().strip()
 PLAN_CACHE_ROOT = REPO_ROOT / "inputs" / "plan_cache"
 
 
@@ -180,12 +182,14 @@ def opa_eval_value(data_paths, plan_json_path: Path, query: str):
     """
     if isinstance(data_paths, (str, Path)):
         data_paths = [data_paths]
-    data_flags = " ".join(f'--data "{p}"' for p in data_paths)
-    cmd = f'opa eval {data_flags} --input "{plan_json_path}" --format json "{query}"'
-    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    cmd = ["opa", "eval"]
+    for p in data_paths:
+        cmd += ["--data", str(p)]
+    cmd += ["--input", str(plan_json_path), "--format", "json", query]
+    result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
         thread_safe_print(f"❌ OPA eval failed for query: {query}")
-        thread_safe_print(f"Command: {cmd}")
+        thread_safe_print(f"Command: {' '.join(cmd)}")
         if result.stdout:
             thread_safe_print(f"STDOUT: {result.stdout[:500]}")
         if result.stderr:
@@ -347,10 +351,6 @@ def match_names_in_messages(messages: list[str], candidate_names: set[str]) -> s
     return matched
 
 
-def get_resource_type(data_paths, plan_path: Path, vars_resource_type_query: str):
-    return opa_eval_value(data_paths, plan_path, vars_resource_type_query)
-
-
 def normalize_messages(messages_value) -> list[str]:
     if isinstance(messages_value, list):
         return [str(m) for m in messages_value]
@@ -369,12 +369,15 @@ def get_policy_messages(data_paths, plan_path: Path, message_query: str) -> list
 def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | None:
     env = os.environ.copy()
 
-    creds_path = input_dir / "fake-creds.json"
-    creds_content = '{"type": "service_account", "project_id": "fake-project"}'
-    creds_path.write_text(creds_content)
+    # Fake credentials live in a temp file OUTSIDE the repo tree, so an interrupted
+    # run never leaves a stray file in a fixture dir (and concurrent workers can't
+    # collide on it).
+    creds_fd, creds_name = tempfile.mkstemp(suffix=".json", prefix="fake-creds-")
+    with os.fdopen(creds_fd, "w") as fh:
+        fh.write('{"type": "service_account", "project_id": "fake-project"}')
 
     env.update({
-        'GOOGLE_APPLICATION_CREDENTIALS': str(creds_path),
+        'GOOGLE_APPLICATION_CREDENTIALS': creds_name,
         'GOOGLE_PROJECT': 'fake-project',
         'GOOGLE_REGION': 'us-central1',
         # Project-local, offline provider source (see module header). No global
@@ -386,44 +389,59 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
         'TF_PLUGIN_CACHE_MAY_BREAK_DEPENDENCY_LOCK_FILE': '1',
     })
 
+    plan_json = input_dir / "plan.json"
     commands = [
-        ("terraform init -backend=false"),
-        ("terraform plan -refresh=false -lock=false -input=false -out=plan"),
-        ("terraform show -json plan | cat > plan.json")
+        ["terraform", "init", "-backend=false"],
+        ["terraform", "plan", "-refresh=false", "-lock=false", "-input=false", "-out=plan"],
     ]
 
-    for cmd in commands:
-        result = subprocess.run(
-            cmd,
-            shell=True,
-            cwd=input_dir,
-            capture_output=True,
-            text=True,
-            env=env
-        )
+    try:
+        for cmd in commands:
+            result = subprocess.run(
+                cmd, cwd=input_dir, capture_output=True, text=True, env=env)
+            if result.returncode != 0:
+                if verbose:
+                    print(f"❌ Command failed: {' '.join(cmd)}")
+                    print("--- stdout ---")
+                    print(result.stdout)
+                    print("--- stderr ---")
+                    print(result.stderr)
+                return None
+
+        # `terraform show -json` writes the plan JSON to stdout; redirect it
+        # straight to the file (no shell, no needless `| cat`).
+        with open(plan_json, "w", encoding="utf-8") as fh:
+            result = subprocess.run(
+                ["terraform", "show", "-json", "plan"],
+                cwd=input_dir, stdout=fh, stderr=subprocess.PIPE, text=True, env=env)
         if result.returncode != 0:
             if verbose:
-                print(f"❌ Command failed: {cmd}")
-                print("--- stdout ---")
-                print(result.stdout)
+                print("❌ Command failed: terraform show -json plan")
                 print("--- stderr ---")
                 print(result.stderr)
             return None
+    finally:
+        try:
+            os.unlink(creds_name)
+        except OSError:
+            pass
 
-    plan_json = input_dir / "plan.json"
     return plan_json
 
 
-def get_policy_metadata(policy_file: Path, service: str, resource: str, attribute: str) -> tuple[str, str, str]:
-    """Return (message_query, vars_resource_type_query, vars_value_name_query)."""
+def get_policy_metadata(policy_file: Path, service: str, resource: str, attribute: str) -> tuple[str, str]:
+    """Return (message_query, vars_query).
+
+    ``vars_query`` resolves the whole ``variables`` object so a single OPA eval
+    yields both ``resource_type`` and ``resource_value_name`` (one process launch
+    instead of two — OPA recompiles the policy set on every launch)."""
     pkg_path, vars_import = parse_rego_metadata(policy_file)
     if not pkg_path:
         pkg_path = f"terraform.gcp.security.{service}.{resource}.{attribute}"
     message_query = f"data.{pkg_path}.message"
     vars_pkg = vars_import or f"data.terraform.gcp.security.{service}.{resource}.vars"
-    vars_resource_type_query = f"{vars_pkg}.variables.resource_type"
-    vars_value_name_query = f"{vars_pkg}.variables.resource_value_name"
-    return message_query, vars_resource_type_query, vars_value_name_query
+    vars_query = f"{vars_pkg}.variables"
+    return message_query, vars_query
 
 
 # Add a lock for thread-safe printing
@@ -501,14 +519,14 @@ def run_policy_check_pair(input_dir: Path, policy_file: Path, policies_root: Pat
     service, resource, attribute = extract_path_parts(input_dir)
     # Cache hit -> use the committed plan.json; miss -> run terraform and cache it.
     plan_path = get_or_build_plan(abs_input_dir, cache_path, verbose)
-    cleanup_workspace(abs_input_dir)
+    cleanup_workspace(abs_input_dir, verbose)
 
     if plan_path is None:
         res = make_failure(attribute, "Terraform failed to compile!", service, resource)
         return res
 
     # plan_path is the persistent plan_cache file — never delete it here.
-    message_query, vars_resource_type_query, vars_value_name_query = get_policy_metadata(
+    message_query, vars_query = get_policy_metadata(
         policy_file, service, resource, attribute)
 
     # Scope OPA's --data to just the shared helpers + this resource's policy dir
@@ -516,12 +534,14 @@ def run_policy_check_pair(input_dir: Path, policy_file: Path, policies_root: Pat
     # re-compiles ~1000 policies per call and dominates runtime; this is ~20x faster.
     data_paths = [(policies_root / "_helpers").resolve(), policy_file.parent.resolve()]
 
-    resource_type = get_resource_type(data_paths, plan_path, vars_resource_type_query)
+    # One eval fetches the whole `variables` object (resource_type + value_name).
+    variables = opa_eval_value(data_paths, plan_path, vars_query)
+    resource_type = variables.get("resource_type") if isinstance(variables, dict) else None
     if resource_type is None:
         # Get diagnostic info
         actual_types = get_all_resource_types(plan_path)
         diagnostics = [
-            f"Query used: {vars_resource_type_query}",
+            f"Query used: {vars_query}.resource_type",
             f"Resource types found in plan: {', '.join(actual_types) if actual_types else 'NONE'}",
             f"Plan file: {plan_path}"
         ]
@@ -532,7 +552,7 @@ def run_policy_check_pair(input_dir: Path, policy_file: Path, policies_root: Pat
     if not messages:
         return make_failure(attribute, "Could not run OPA query!", service, resource)
 
-    resource_value_name = opa_eval_value(data_paths, plan_path, vars_value_name_query)
+    resource_value_name = variables.get("resource_value_name")
     if not isinstance(resource_value_name, str):
         resource_value_name = None
 
@@ -544,11 +564,11 @@ def run_policy_check_pair(input_dir: Path, policy_file: Path, policies_root: Pat
     return validate_policy_output(attribute, resource_type, plan_path, messages, verbose, service, resource,
                                   resource_value_name)
 
-def cleanup_workspace(workdir: Path):
+def cleanup_workspace(workdir: Path, verbose: bool = False):
     # Remove transient terraform artifacts from the input dir. plan.json is already
     # copied into the committed plan_cache before this runs, so the in-dir copy is
     # transient; the lock is regenerated offline from the mirror on each init.
-    for fname in ["plan", "plan.json", "fake-creds.json", ".terraform.lock.hcl"]:
+    for fname in ["plan", "plan.json", ".terraform.lock.hcl"]:
         f = workdir / fname
         try:
             f.unlink()
@@ -560,10 +580,11 @@ def cleanup_workspace(workdir: Path):
         if tfdir.is_dir():
             try:
                 shutil.rmtree(tfdir)
-            except Exception as e:
-                pass
+            except OSError as e:
+                if verbose:
+                    thread_safe_print(f"⚠️  could not remove {tfdir}: {e}")
 
-def find_matching_pairs(inputs_root: Path, policies_base_root: Path, policies_search_root: Path):
+def find_matching_pairs(inputs_root: Path, policies_search_root: Path):
     """
     Pair each input argument directory with its policy file.
 
@@ -573,18 +594,18 @@ def find_matching_pairs(inputs_root: Path, policies_base_root: Path, policies_se
 
     Args:
         inputs_root: Root directory for Terraform input files
-        policies_base_root: The actual root containing _helpers (for OPA evaluation)
         policies_search_root: The user-provided policies root (for path matching)
     """
     def is_leaf_terraform_dir(directory: Path) -> bool:
-        # Must have .tf in this directory
-        if not any(f.suffix == ".tf" for f in directory.glob("*.tf")):
-            return False
-        # And no descendant directory with .tf files
+        # A single rglob pass: there must be a .tf directly in this dir and none in
+        # any descendant dir.
+        has_direct = False
         for tf in directory.rglob("*.tf"):
-            if tf.parent != directory:
+            if tf.parent == directory:
+                has_direct = True
+            else:
                 return False
-        return True
+        return has_direct
 
     input_dirs = [p for p in inputs_root.rglob('*') if p.is_dir() and is_leaf_terraform_dir(p)]
     pairs = []
@@ -635,7 +656,7 @@ def main():
     policies_base_root = normalize_policies_root(policies_search_root)
 
     pairs, unmatched_inputs, orphan_policies = find_matching_pairs(
-        inputs_root, policies_base_root, policies_search_root)
+        inputs_root, policies_search_root)
     if not pairs and not unmatched_inputs and not orphan_policies:
         print(" No input/policy pairs or mismatches found.")
         sys.exit(1)
@@ -696,7 +717,17 @@ def main():
             print()  # newline after the progress line
 
     if args.prune_plan_cache:
-        prune_plan_cache(inputs_root, set(pair_cache.values()))
+        # Don't prune if a fixture's terraform failed: we couldn't regenerate that
+        # plan offline, so its cache (if any) must not be treated as orphaned.
+        tf_failed = any(
+            r.get("failure", {}).get("reason", "").startswith("Terraform failed")
+            for r in results
+        )
+        if tf_failed:
+            print("plan-cache prune skipped: some fixtures failed terraform "
+                  "(cannot safely identify orphans).")
+        else:
+            prune_plan_cache(inputs_root, set(pair_cache.values()))
 
     # Quiet output: successes are silent — print only failures, then a one-line
     # summary of coverage (services / resource types / policies) and total time.

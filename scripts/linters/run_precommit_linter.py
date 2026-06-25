@@ -42,10 +42,16 @@ def changed_files(base=None):
     return {f.replace("\\", "/") for f in files}
 
 
-def _lineage(a, b):
-    """True if paths a and b are on the same lineage (one is ancestor-or-equal)."""
-    a, b = a.rstrip("/"), b.rstrip("/")
-    return a == b or a.startswith(b + "/") or b.startswith(a + "/")
+def _owns_error(error_path, owned_path):
+    """True if the contributor (who owns ``owned_path``) is accountable for an
+    error reported at ``error_path``.
+
+    Ownership flows *downward only*: you own errors at your path or anything
+    beneath it, but NOT errors reported on an ancestor directory you merely live
+    under (e.g. a structural error on the whole resource dir must not be blamed
+    on someone who only touched one argument dir below it)."""
+    error_path, owned_path = error_path.rstrip("/"), owned_path.rstrip("/")
+    return error_path == owned_path or error_path.startswith(owned_path + "/")
 
 
 def _owned(changed):
@@ -90,12 +96,20 @@ def main(argv=None):
             print(f"  {f}")
 
     result = subprocess.run(LINTER, capture_output=True, text=True)
+    # The linter exits 1 when it finds lint errors and 2 on a config error (a
+    # missing tree root). Only 0/1 mean "the run is trustworthy"; surface 2+ as a
+    # hard failure rather than parsing stdout and reporting a clean run.
+    if result.returncode not in (0, 1):
+        print("[FAIL] linter could not run (configuration error):\n")
+        print(result.stdout)
+        print(result.stderr)
+        return result.returncode
     errors = [ln for ln in result.stdout.splitlines() if ln.startswith("[ERROR]")]
     if lint_all:
         mine, backlog = errors, 0
     else:
         owned = _owned(changed)
-        mine = [ln for ln in errors if any(_lineage(_error_path(ln), o) for o in owned)]
+        mine = [ln for ln in errors if any(_owns_error(_error_path(ln), o) for o in owned)]
         backlog = len(errors) - len(mine)
 
     if mine:

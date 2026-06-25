@@ -83,6 +83,9 @@ def _processor(md_text, tmp_path):
         def get_resource_markdown_path(self, repo_path, resource_name):
             return md
 
+        def read_resource_markdown(self, repo_path, resource_name):
+            return self.get_resource_markdown_path(repo_path, resource_name).read_text(encoding="utf-8")
+
     return MarkdownProcessor(FakeRM(), tmp_path)
 
 
@@ -238,6 +241,9 @@ def test_inheritance_merges_base_doc(tmp_path):
     class FakeRM:
         def get_resource_markdown_path(self, repo_path, resource_name):
             return base if resource_name == "google_compute_instance" else derived
+
+        def read_resource_markdown(self, repo_path, resource_name):
+            return self.get_resource_markdown_path(repo_path, resource_name).read_text(encoding="utf-8")
 
     proc = MarkdownProcessor(FakeRM(), tmp_path)
     args = {

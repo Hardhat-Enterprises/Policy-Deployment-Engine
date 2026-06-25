@@ -59,7 +59,7 @@ def leaf_args(doc):
             yield name, entry
 
 
-def check_doc_completeness(doc, rel):
+def check_doc_completeness(doc):
     errors = []
     for name, entry in leaf_args(doc):
         si = entry.get("security_impact")
@@ -123,9 +123,8 @@ def main(argv=None):
     doc = json.loads(doc_path.read_text(encoding="utf-8"))
 
     print(f"Resource gate: {platform} / {folder} / {resource}")
-    rel = f"docs/{platform}/{folder}/{resource}.json"
 
-    structural = check_doc_completeness(doc, rel) + check_true_arg_coverage(doc, platform, folder, resource)
+    structural = check_doc_completeness(doc) + check_true_arg_coverage(doc, platform, folder, resource)
     # Only spend time on terraform+OPA once the doc and coverage are sound.
     failures = structural if structural else run_auto_test(platform, folder, resource)
 

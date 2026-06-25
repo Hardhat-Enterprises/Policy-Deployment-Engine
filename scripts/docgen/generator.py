@@ -130,9 +130,11 @@ def run(args: argparse.Namespace) -> int:
     )
 
     # 2. Verbatim service grouping from markdown, pinned to the same version.
+    #    Clone once and reuse the path so build_service_map doesn't re-clone/checkout.
     repo_manager = RepositoryManager()
     repo_path = repo_manager.clone_provider_repo(args.csp, version=version)
-    service_map = build_service_map(args.csp, version=version, repo_manager=repo_manager)
+    service_map = build_service_map(
+        args.csp, version=version, repo_manager=repo_manager, repo_path=repo_path)
     grouped = group_by_service(service_map)
 
     # Gates args to those documented in markdown and fills empty descriptions (IAM / N/A).
@@ -147,6 +149,7 @@ def run(args: argparse.Namespace) -> int:
     created = updated = skipped = missing_schema = 0
     total_omitted = total_na = 0
     low_coverage = []  # (kept_leaves, total_leaves, resource_name)
+    run_timestamp = file_writer.now_iso()  # one timestamp for every file in this run
 
     for service in selected:
         for resource_name in grouped.get(service, []):
@@ -159,7 +162,6 @@ def run(args: argparse.Namespace) -> int:
             flat = flatten_arguments(schema.get("block", {}))
             total_leaves = sum(1 for v in flat.values() if v.get("type") != "block")
             arguments, stats = processor.process(resource_name, flat)
-            apply_canonical(resource_name, arguments)  # prepopulate locked cross-cutting keys
             kept_leaves = sum(1 for v in arguments.values() if v.get("type") != "block")
             total_omitted += stats["omitted"]
             total_na += stats["na"]
@@ -173,7 +175,10 @@ def run(args: argparse.Namespace) -> int:
                     skipped += 1
                     logger.debug(f"exists, skip: {path}")
                     continue
-                file_writer.write_document(path, file_writer.build_document(arguments, version))
+                # Prepopulate locked cross-cutting keys (canonical always wins).
+                apply_canonical(resource_name, arguments)
+                file_writer.write_document(
+                    path, file_writer.build_document(arguments, version, run_timestamp))
                 created += 1
             else:  # refresh-existing
                 if not exists:
@@ -184,7 +189,12 @@ def run(args: argparse.Namespace) -> int:
                 merged = file_writer.merge_preserving_human_fields(
                     arguments, existing.get("arguments", {})
                 )
-                file_writer.write_document(path, file_writer.build_document(merged, version))
+                # Apply canonical AFTER the human-field merge so locked cross-cutting
+                # keys can't be overwritten by a stale per-resource value (canonical
+                # always wins, per canonical.py's contract).
+                apply_canonical(resource_name, merged)
+                file_writer.write_document(
+                    path, file_writer.build_document(merged, version, run_timestamp))
                 updated += 1
 
     if low_coverage:

@@ -26,7 +26,8 @@ CACHE_ROOT = REPO_ROOT / ".terraform-cache"
 CANONICAL_LOCK = CACHE_ROOT / "canonical.lock.hcl"
 INPUTS_ROOT = REPO_ROOT / "inputs" / "gcp"
 
-TARGET_VERSION = "7.37.0"
+# Single source of truth, shared with auto_test.py and cache_setup.sh.
+TARGET_VERSION = (Path(__file__).resolve().parent / "provider_version.txt").read_text().strip()
 
 GOOGLE_CONFIG_TF = """##### DO NOT EDIT ######
 

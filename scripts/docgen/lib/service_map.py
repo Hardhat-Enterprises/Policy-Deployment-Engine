@@ -27,6 +27,7 @@ def build_service_map(
     csp: str,
     version: Optional[str] = None,
     repo_manager: Optional[RepositoryManager] = None,
+    repo_path: Optional[Path] = None,
 ) -> Dict[str, str]:
     """Return ``{resource_name: subcategory}`` for every documented resource.
 
@@ -34,16 +35,18 @@ def build_service_map(
         csp: 'gcp' / 'aws' / 'azure'.
         version: Provider version tag to pin the markdown clone to (e.g. '7.37.0').
         repo_manager: Optional injected RepositoryManager (for testing).
+        repo_path: Already-cloned repo path; pass it to avoid a redundant clone /
+            version checkout when the caller has cloned already.
     """
     rm = repo_manager or RepositoryManager()
-    repo_path = rm.clone_provider_repo(csp, version=version)
+    if repo_path is None:
+        repo_path = rm.clone_provider_repo(csp, version=version)
     resources = rm.list_all_resources(repo_path)
 
     service_map: Dict[str, str] = {}
     for resource_name in resources:
         try:
-            md_path = rm.get_resource_markdown_path(repo_path, resource_name)
-            content = md_path.read_text(encoding="utf-8")
+            content = rm.read_resource_markdown(repo_path, resource_name)
             subcategory, _ = extract_subcategory_from_frontmatter(content)
             service_map[resource_name] = subcategory or UNKNOWN_SERVICE
         except Exception as e:  # noqa: BLE001 - missing/odd doc shouldn't abort the run

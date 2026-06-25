@@ -16,10 +16,12 @@ set -euo pipefail
 # Usage:  bash scripts/auto_test/cache_setup.sh
 # Re-runnable; skips the download if the mirror is already populated.
 
-TARGET_VERSION="${TARGET_VERSION:-7.37.0}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Single source of truth, shared with auto_test.py and unify_provider_versions.py.
+TARGET_VERSION="${TARGET_VERSION:-$(cat "$SCRIPT_DIR/provider_version.txt")}"
 PROVIDER="registry.terraform.io/hashicorp/google"
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 CACHE_ROOT="$REPO_ROOT/.terraform-cache"
 MIRROR="$CACHE_ROOT/mirror"
 CLI_TFRC="$CACHE_ROOT/cli.tfrc"
@@ -102,9 +104,17 @@ terraform {
   }
 }
 EOF
-( cd "$tmp" \
-  && TF_CLI_CONFIG_FILE="$CLI_TFRC" TF_DATA_DIR="$tmp/.tf" \
-     terraform providers lock -fs-mirror="$MIRROR" -platform=linux_amd64 -no-color >/dev/null 2>&1 )
+lock_log="$tmp/lock.log"
+if ! ( cd "$tmp" \
+       && TF_CLI_CONFIG_FILE="$CLI_TFRC" TF_DATA_DIR="$tmp/.tf" \
+          terraform providers lock -fs-mirror="$MIRROR" -platform=linux_amd64 -no-color ) \
+       >"$lock_log" 2>&1 \
+   || [ ! -f "$tmp/.terraform.lock.hcl" ]; then
+  echo "❌ 'terraform providers lock' failed; cannot write $CANON_LOCK:"
+  cat "$lock_log"
+  rm -rf "$tmp"
+  exit 1
+fi
 cp "$tmp/.terraform.lock.hcl" "$CANON_LOCK"
 rm -rf "$tmp"
 echo "✅ wrote $CANON_LOCK"

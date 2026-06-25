@@ -34,6 +34,7 @@ import re
 from pathlib import Path
 from typing import Dict, Optional, Set, Tuple
 
+from scripts.docgen.lib.errors import ParsingError
 from scripts.docgen.lib.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -53,8 +54,9 @@ _INHERIT_HINTS = ("supported", "inherited", "based on", "likewise")
 # Words that signal a block points at another resource's page for its field schema
 # ("See [google_container_cluster](...#nested_node_config) for schema").
 _SCHEMA_HINTS = ("schema", "structure", "fields")
-# A leading "(Required)" / "(Optional)" / "(Required only by `x`)" flag group to strip.
-_LEADING_FLAG_RE = re.compile(r"^\([^)]*\)\s*")
+# Leading flag group(s) to strip, e.g. "(Required)", "(Optional) (Beta)". Repeats
+# so stacked groups are all removed, not just the first.
+_LEADING_FLAG_RE = re.compile(r"^(?:\([^)]*\)\s*)+")
 
 _AMBIGUOUS = object()  # sentinel: name seen with conflicting descriptions
 
@@ -146,6 +148,9 @@ def extract_inherited_resources(markdown_text: str) -> Set[str]:
     """
     out: Set[str] = set()
     for line in markdown_text.splitlines():
+        # Cheap skip: lines without a backticked/linked google_ ref can't contribute.
+        if "`google_" not in line and "[google_" not in line:
+            continue
         low = line.lower()
         refs = _RESOURCE_REF_RE.findall(line)
         if refs and ("argument" in low or "attribute" in low) and any(h in low for h in _INHERIT_HINTS):
@@ -166,15 +171,18 @@ class MarkdownProcessor:
     def __init__(self, repo_manager, repo_path: Path):
         self.repo_manager = repo_manager
         self.repo_path = repo_path
-        # md path -> (own_names, own_descs, text)  — this resource only, no inheritance
+        # md path -> (own_names, own_descs, text)  — this resource only, no inheritance.
+        # Keyed by path so IAM variants sharing one *_iam.html.markdown parse it once.
         self._own_cache: Dict[str, Tuple[Set[str], Dict[str, str], str]] = {}
-        # md path -> (names, descs)  — resolved with one level of inheritance merged in
+        # resource_name -> (names, descs)  — resolved with one level of inheritance.
+        # Keyed by resource (NOT path): the inheritance merge depends on the resource
+        # name, and a path key would be the literal "None" for unresolved resources.
         self._cache: Dict[str, Tuple[Set[str], Dict[str, str]]] = {}
 
     def _md_path(self, resource_name: str):
         try:
             return self.repo_manager.get_resource_markdown_path(self.repo_path, resource_name)
-        except Exception:
+        except (ParsingError, FileNotFoundError):
             return None
 
     def _own(self, resource_name: str) -> Optional[Tuple[Set[str], Dict[str, str], str]]:
@@ -185,8 +193,9 @@ class MarkdownProcessor:
         key = str(md_path)
         if key not in self._own_cache:
             try:
-                text = md_path.read_text(encoding="utf-8")
-            except Exception as e:  # noqa: BLE001
+                # Shared read cache on the repo manager — each file is read once per run.
+                text = self.repo_manager.read_resource_markdown(self.repo_path, resource_name)
+            except OSError as e:
                 logger.warning(f"Could not read markdown for {resource_name}: {e}")
                 return None
             self._own_cache[key] = (extract_documented_names(text), extract_arg_descriptions(text), text)
@@ -200,13 +209,12 @@ class MarkdownProcessor:
         avoids infinite recursion when two resources reference each other (e.g.
         container_cluster <-> container_node_pool).
         """
+        if resource_name in self._cache:
+            return self._cache[resource_name]
         own = self._own(resource_name)
         if own is None:
             return None
         own_names, own_descs, text = own
-        key = str(self._md_path(resource_name))
-        if key in self._cache:
-            return self._cache[key]
 
         names = set(own_names)
         descriptions = dict(own_descs)
@@ -220,8 +228,8 @@ class MarkdownProcessor:
                 descriptions = {**base_descs, **descriptions}  # own page wins on conflicts
                 logger.info(f"{resource_name}: inheriting documented args from {base}")
 
-        self._cache[key] = (names, descriptions)
-        return self._cache[key]
+        self._cache[resource_name] = (names, descriptions)
+        return self._cache[resource_name]
 
     def process(self, resource_name: str, arguments: Dict[str, dict]) -> Tuple[Dict[str, dict], dict]:
         """Filter ``arguments`` to documented ones and fill descriptions.

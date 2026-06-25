@@ -34,15 +34,16 @@ def save_state(state):
     try:
         with open(STATE_FILE, "w", encoding="utf-8") as f:
             json.dump(state, f, indent=2)
-    except Exception:
-        pass
+    except OSError as e:
+        print(f"Warning: could not save state to {STATE_FILE}: {e}")
 
 def load_state():
     if os.path.exists(STATE_FILE):
         try:
             with open(STATE_FILE, "r", encoding="utf-8") as f:
                 return json.load(f)
-        except Exception:
+        except (OSError, json.JSONDecodeError) as e:
+            print(f"Warning: could not read state from {STATE_FILE}: {e}")
             return {}
     return {}
 
@@ -75,28 +76,49 @@ def load_all_cloud_services(force_refresh=False):
 
 # ---------- File Copy Helper ----------
 def copy_files(files, src_dir, dest_dir):
+    """Copy each template file into dest_dir; return the list of missing sources."""
     os.makedirs(dest_dir, exist_ok=True)
+    missing = []
     for file in files:
         src = os.path.join(src_dir, file)
         if os.path.exists(src):
             shutil.copyfile(src, os.path.join(dest_dir, file))
+        else:
+            missing.append(file)
+    return missing
 
 def create_policy_files(cloud, service, resource, policy_name):
-    if not policy_name:
-        messagebox.showerror("Error", "Policy name cannot be empty.")
-        return
     paths = get_cloud_paths(cloud)
     base_folder = service.replace(" ", "_")
     subfolder = resource
     input_dir = os.path.join(paths["input_dir"], base_folder, subfolder, policy_name)
     policy_dir = os.path.join(paths["policy_dir"], base_folder, subfolder, policy_name)
     vars_dir = os.path.join(paths["policy_dir"], base_folder, subfolder)
-    copy_files(TEMPLATE_FILES_TF, paths["template_dir"], input_dir)
-    copy_files([TEMPLATE_POLICY], paths["template_dir"], policy_dir)
+    # Refuse to clobber an existing policy of the same name.
+    if os.path.exists(input_dir) or os.path.exists(policy_dir):
+        if not messagebox.askyesno(
+            "Policy exists",
+            f"A policy named '{policy_name}' already exists for "
+            f"{cloud}/{service}/{resource}. Overwrite its files?",
+        ):
+            return
+    missing = copy_files(TEMPLATE_FILES_TF, paths["template_dir"], input_dir)
+    missing += copy_files([TEMPLATE_POLICY], paths["template_dir"], policy_dir)
     if not os.path.exists(os.path.join(vars_dir, TEMPLATE_VARS)):
         os.makedirs(vars_dir, exist_ok=True)
-        shutil.copyfile(os.path.join(paths["template_dir"], TEMPLATE_VARS), os.path.join(vars_dir, TEMPLATE_VARS))
-    messagebox.showinfo("Success", f"Created structure for {cloud}/{service}/{resource}/{policy_name}")
+        src_vars = os.path.join(paths["template_dir"], TEMPLATE_VARS)
+        if os.path.exists(src_vars):
+            shutil.copyfile(src_vars, os.path.join(vars_dir, TEMPLATE_VARS))
+        else:
+            missing.append(TEMPLATE_VARS)
+    if missing:
+        messagebox.showwarning(
+            "Created with missing templates",
+            f"Created structure for {cloud}/{service}/{resource}/{policy_name}, "
+            f"but these template files were not found and were skipped: {', '.join(missing)}",
+        )
+    else:
+        messagebox.showinfo("Success", f"Created structure for {cloud}/{service}/{resource}/{policy_name}")
 
 # ---------- UI Components ----------
 class SearchableDropdown(ctk.CTkFrame):
@@ -252,8 +274,8 @@ class PolicyApp(ctk.CTk):
         if not service_map:
             messagebox.showerror("Error", f"Failed to refresh {cloud} services.")
             return
-        global runtime_cache
-        runtime_cache[cloud] = service_map
+        # all_service_maps is the same dict object returned by load_all_cloud_services
+        # (the runtime cache), so this single write keeps both in sync.
         self.all_service_maps[cloud] = service_map
         self.service_map = service_map
         self.service_field.set_values(sorted(service_map.keys()))
@@ -303,10 +325,10 @@ class PolicyApp(ctk.CTk):
         if not policy_name:
             messagebox.showerror("Error", "Policy name cannot be empty.")
             return
-        if not re.match(r'^[A-Za-z][A-Za-z_]*$', policy_name):
+        if not re.match(r'^[A-Za-z][A-Za-z0-9_]*$', policy_name):
             messagebox.showerror(
                 "Invalid Policy Name",
-                "Policy name must only contain alphabets with underscores between words. Examples: MyPolicy, My_Policy, Another_Policy_Test"
+                "Policy name must start with a letter and contain only letters, digits, and underscores. Examples: MyPolicy, My_Policy, policy1"
             )
             return
         create_policy_files(cloud, service, resource, policy_name)

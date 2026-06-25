@@ -70,6 +70,8 @@ def ga_resource_types() -> set[str]:
 
 def is_beta_dir(d: Path) -> bool:
     for f in d.iterdir():
+        if not f.is_file():
+            continue  # never read_text() a directory (e.g. a dir literally named "*.tf")
         if f.suffix == ".tf" or f.name == ".terraform.lock.hcl":
             if "google-beta" in f.read_text(encoding="utf-8", errors="ignore"):
                 return True

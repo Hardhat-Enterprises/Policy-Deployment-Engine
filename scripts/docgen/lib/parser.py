@@ -19,7 +19,7 @@ Supported Providers:
 
 Example:
     >>> from pathlib import Path
-    >>> from scripts.docgen.parser import parse_resource_markdown
+    >>> from scripts.docgen.lib.parser import parse_resource_markdown
     >>> resource = parse_resource_markdown(Path('aws_s3_bucket.html.markdown'))
     >>> print(resource.resource_name)  # 'aws_s3_bucket'
     >>> print(len(resource.arguments))  # 19

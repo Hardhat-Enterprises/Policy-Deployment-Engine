@@ -38,9 +38,17 @@ RESOURCE_TYPE = re.compile(r"^[a-z0-9_]+$")
 
 
 def get_current_branch():
+    """Return the current branch name, or None if it can't be determined
+    (git failure / not a repo / detached HEAD — common in CI, where --branch
+    should be passed explicitly)."""
     result = subprocess.run(
         ["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True)
-    return result.stdout.strip()
+    if result.returncode != 0:
+        return None
+    branch = result.stdout.strip()
+    if not branch or branch == "HEAD":  # empty or detached HEAD
+        return None
+    return branch
 
 
 def _allowed_formats():
@@ -95,6 +103,10 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     branch = args.branch if args.branch is not None else get_current_branch()
+    if not branch:
+        print("[ERROR] could not determine the current git branch "
+              "(not a repo, or detached HEAD). Pass --branch <name> explicitly.")
+        return 2
 
     if branch in PROTECTED_BRANCHES:
         print(f"[*] Branch '{branch}' is allowed (protected branch)")
