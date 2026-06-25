@@ -32,8 +32,8 @@ CACHE_SETUP_SCRIPT = Path(__file__).resolve().parent / "cache_setup.sh"
 # inputs/plan_cache/<platform>/<sha>.json (committed). On a run, a cache hit feeds
 # OPA directly and skips terraform entirely; a miss runs terraform once and writes
 # the cache. The target provider version is read from provider_version.txt (the
-# single source of truth shared with cache_setup.sh and unify_provider_versions.py)
-# so a provider bump invalidates every cached plan.
+# single source of truth shared with cache_setup.sh) so a provider bump
+# invalidates every cached plan.
 TARGET_PROVIDER_VERSION = (Path(__file__).resolve().parent / "provider_version.txt").read_text().strip()
 PLAN_CACHE_ROOT = REPO_ROOT / "inputs" / "plan_cache"
 

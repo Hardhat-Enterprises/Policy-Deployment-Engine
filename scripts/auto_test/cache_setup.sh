@@ -17,7 +17,7 @@ set -euo pipefail
 # Re-runnable; skips the download if the mirror is already populated.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# Single source of truth, shared with auto_test.py and unify_provider_versions.py.
+# Single source of truth for the provider version, shared with auto_test.py.
 TARGET_VERSION="${TARGET_VERSION:-$(cat "$SCRIPT_DIR/provider_version.txt")}"
 PROVIDER="registry.terraform.io/hashicorp/google"
 
@@ -31,7 +31,7 @@ MIRROR_LEAF="$MIRROR/$PROVIDER/$TARGET_VERSION/linux_amd64"
 mkdir -p "$MIRROR"
 
 # 1) cli.tfrc — point Terraform at the local mirror for google; everything else
-#    (there should be nothing else after eliminate_beta) may resolve directly.
+#    (there should be nothing else — fixtures use only GA google) may resolve directly.
 cat > "$CLI_TFRC" <<EOF
 provider_installation {
   filesystem_mirror {
@@ -93,7 +93,8 @@ EOF
 fi
 
 # 3) Canonical lock (no constraint) pinning TARGET_VERSION with the mirror's
-#    linux_amd64 h1 hash — distributed to every fixture by unify_provider_versions.py.
+#    linux_amd64 h1 hash. Per-fixture `terraform init` regenerates each fixture's
+#    .terraform.lock.hcl from the mirror (locks are gitignored, not committed).
 tmp="$(mktemp -d)"
 cat > "$tmp/main.tf" <<'EOF'
 terraform {
