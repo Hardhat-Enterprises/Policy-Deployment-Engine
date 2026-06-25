@@ -21,20 +21,28 @@ cd Policy-Deployment-Engine
 
 ### 3. **Create a Branch Following Naming Convention**
 All branches must follow one of these patterns:
-- `gcp/service/<service_name>` - When working on a specific GCP service (e.g., `gcp/service/biglake`)
+- `Service/<platform>/<service_slug>/<resource_type>` - When working on a specific resource
+  - `<platform>`: `gcp` (aws/azure are placeholders)
+  - `<service_slug>`: the underscore slug of a `docs/<platform>` service folder. Docs folder
+    names contain spaces/parens (illegal in git branches), so the slug is used — e.g.
+    `Cloud Run (v2 API)` → `cloud_run_v2_api`. It maps back to exactly one folder.
+  - `<resource_type>`: a documented resource (a `docs/<platform>/<folder>/<resource>.json`)
 - `feature/<feature_name>` - For general features (e.g., `feature/add-logging`)
-- `fix/<fix_name>` - For bug fixes (e.g., `fix/rego-syntax`)
+- `chore/<chore_name>` - For maintenance/cleanup work (e.g., `chore/tidy-fixtures`)
+
+This `Service/...` branch is what scopes the per-resource CI gate to the resource you're
+working on (doc completeness, policy/input coverage, and the OPA test).
 
 **Examples:**
 ```bash
-# Working on BigLake service
-git checkout -b gcp/service/biglake
+# Working on a specific resource
+git checkout -b Service/gcp/cloud_run_v2_api/google_cloud_run_v2_service
 
 # Adding a new feature
 git checkout -b feature/add-validator
 
-# Fixing a bug
-git checkout -b fix/unicode-error
+# Maintenance / cleanup
+git checkout -b chore/tidy-fixtures
 ```
 
 ### 4. **Install Pre-Commit Hooks**
@@ -69,12 +77,14 @@ When you commit, the pre-commit hooks will run automatically:
 
 **Example error message:**
 ```
-[FAIL] Branch 'my-branch' does not match naming convention.
-Expected formats:
-  - gcp/service/<service_name> (e.g., gcp/service/biglake)
-  - feature/<feature_name> (e.g., feature/add-validator)
-  - fix/<fix_name> (e.g., fix/unicode-error)
-  - chore/<chore_name>, docs/<docs_name>, refactor/<refactor_name>
+[FAIL] Invalid branch name
+
+Allowed branch names:
+  - feature/<name>
+  - chore/<name>
+  - Service/<platform>/<service_slug>/<resource_type>
+      e.g. Service/gcp/cloud_run_v2_api/google_cloud_run_v2_service
+  - (protected: dev)
 ```
 
 ### ✅ Making a Successful Commit
