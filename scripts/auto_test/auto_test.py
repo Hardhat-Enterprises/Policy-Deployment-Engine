@@ -638,6 +638,20 @@ def find_matching_pairs(inputs_root: Path, policies_search_root: Path):
     return pairs, unmatched_inputs, orphan_policies
 
 
+def write_report(results: list, path: str) -> None:
+    """Write the full results list to PATH as a JSON array.
+
+    Each entry keeps the shape produced by make_success/make_failure —
+    {"service", "resource", "policy", "passed"} — with failure entries retaining
+    their extra keys (e.g. "failure"). Called before any failure exit so a run
+    with failing policies still emits the complete report (including the
+    passed: false entries) for CI to publish as an artifact.
+    """
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump(results, fh, indent=2)
+        fh.write("\n")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Run Terraform + OPA policy checks for matched input/policy pairs.",
@@ -664,6 +678,11 @@ def main():
     parser.add_argument("--prune-plan-cache", action="store_true",
                         help="After a whole-platform/-repo run, delete cached plans no fixture "
                              "references (orphans from changed/removed fixtures). Ignored for scoped runs.")
+    parser.add_argument("--report", default=None, metavar="PATH",
+                        help="Write the full results list to PATH as a JSON array of "
+                             "{service, resource, policy, passed} objects (failure entries keep "
+                             "their extra keys). Written even when policies fail, before the "
+                             "non-zero exit, so CI can publish it as an artifact.")
     args = parser.parse_args()
     start_time = time.monotonic()
 
@@ -753,6 +772,13 @@ def main():
                   "(cannot safely identify orphans).")
         else:
             prune_plan_cache(inputs_root, set(pair_cache.values()))
+
+    # Emit the machine-readable report BEFORE the failure exit below, so a run with
+    # failing policies still writes the full report (including passed: false entries).
+    # The exit code is unchanged — CI still fails the check on policy failures.
+    if args.report:
+        write_report(results, args.report)
+        print(f"[*] wrote policy report ({len(results)} entries) to {args.report}")
 
     # Quiet output: successes are silent — print only failures, then a one-line
     # summary of coverage (services / resource types / policies) and total time.

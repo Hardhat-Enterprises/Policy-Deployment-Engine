@@ -2,8 +2,14 @@ name: Terraform OPA Policy Check ALL
 
 on:
   workflow_dispatch:
+  # Publish a fresh policy-results artifact on every push to dev so the
+  # AutoCapstone backend can consume the latest verdicts.
+  push:
+    branches:
+      - dev
 
-# Read-only: this is a full-tree verification run; it writes nothing back.
+# Read-only: this is a full-tree verification run; it writes nothing back to the
+# repo. The policy_results.json report is published as a build artifact, not committed.
 permissions:
   contents: read
 
@@ -49,9 +55,29 @@ jobs:
       # discarded. Pruning is a local-maintainer operation:
       #   python3 scripts/auto_test/auto_test.py --inputs inputs/gcp \
       #       --policies policies/gcp --prune-plan-cache   # then commit the result
+      # Only gcp carries fixtures/policies today (inputs/aws and inputs/azure are
+      # empty), so a single gcp run already spans every provider the ALL run scans
+      # and can write policy_results.json directly. When aws/azure gain fixtures,
+      # run auto_test once per provider into provider-specific report files and
+      # merge them here with `jq -s 'add' gcp.json aws.json azure.json > policy_results.json`.
+      # --report is written before the step's non-zero exit, so the artifact upload
+      # below (if: always()) still publishes results when policies fail.
       - name: Run policy checks (Terraform + OPA)
         run: |
           python3 scripts/auto_test/auto_test.py \
             --inputs inputs/gcp \
             --policies policies/gcp \
+            --report policy_results.json \
             --verbose
+
+      # Publish the machine-readable verdicts for the AutoCapstone backend. Runs
+      # even when the policy checks failed (the report is written first), under a
+      # stable name so consumers can always fetch the latest.
+      - name: Upload policy results artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: policy-results
+          path: policy_results.json
+          retention-days: 90
+          if-no-files-found: error
