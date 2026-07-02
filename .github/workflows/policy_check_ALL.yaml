@@ -47,8 +47,16 @@ jobs:
           chmod +x opa
           sudo mv opa /usr/local/bin/opa
 
-      - name: Set up plugin cache config
-        run: bash scripts/auto_test/cache_setup.sh
+      # Best-effort provider mirror. The ALL run is designed to execute OFFLINE from
+      # the committed plan cache (inputs/plan_cache): when every plan is cached,
+      # auto_test skips terraform entirely and this mirror is never touched. So a
+      # registry hiccup here must NOT fail the job — auto_test still lazily builds the
+      # cache itself (ensure_cache_ready) if a fixture ever misses. Don't add `set -e`
+      # semantics: the `|| echo` keeps the step green when the registry is unreachable.
+      - name: Set up provider cache (best-effort; plan cache is the offline source)
+        run: |
+          bash scripts/auto_test/cache_setup.sh \
+            || echo "⚠️  provider mirror unavailable — relying on the committed plan cache"
 
       # NOTE: plan-cache pruning is intentionally NOT done here. The runner is
       # ephemeral and this workflow has no commit/push step, so any prune would be
@@ -80,4 +88,8 @@ jobs:
           name: policy-results
           path: policy_results.json
           retention-days: 90
-          if-no-files-found: error
+          # `warn`, not `error`: this is a safety-net upload (if: always()). The report
+          # is written on every path that runs auto_test to completion (pass or policy
+          # failure), so a missing file means an upstream step already failed the job —
+          # don't let this step manufacture a second, misleading failure.
+          if-no-files-found: warn
