@@ -23,10 +23,10 @@ jobs:
   policy_check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.x'
 
@@ -34,7 +34,7 @@ jobs:
         run: python3 scripts/linters/linter.py --tree all --platform gcp
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
           terraform_wrapper: false   # auto_test redirects `terraform show -json` to a file
@@ -83,7 +83,7 @@ jobs:
       # stable name so consumers can always fetch the latest.
       - name: Upload policy results artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: policy-results
           path: policy_results.json
