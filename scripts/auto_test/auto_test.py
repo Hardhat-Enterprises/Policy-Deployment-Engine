@@ -110,7 +110,24 @@ def ensure_cache_ready() -> None:
     if CLI_CONFIG_FILE.exists() and any(MIRROR_DIR.rglob("terraform-provider-*")):
         return
     print("⏳ Provider cache not found — running cache_setup.sh (one-time setup)…")
-    result = subprocess.run(["bash", str(CACHE_SETUP_SCRIPT)], cwd=str(REPO_ROOT))
+    # Pass the script as a RELATIVE forward-slash path: absolute Windows paths
+    # (C:\...) get their backslashes eaten by bash, and MSYS/WSL bash resolve
+    # a relative path correctly from cwd on every platform. On Windows, prefer
+    # Git Bash over the WSL shim so the cache is built for the same platform
+    # as the terraform.exe that will consume it.
+    bash = None
+    if os.name == "nt":
+        for candidate in (r"C:\Program Files\Git\bin\bash.exe",
+                          r"C:\Program Files (x86)\Git\bin\bash.exe"):
+            if Path(candidate).exists():
+                bash = candidate
+                break
+    if bash is None:
+        bash = shutil.which("bash")
+    if bash is None:
+        sys.exit("❌ bash not found. Install Git Bash (Windows) or run inside WSL.")
+    script_rel = CACHE_SETUP_SCRIPT.relative_to(REPO_ROOT).as_posix()
+    result = subprocess.run([bash, script_rel], cwd=str(REPO_ROOT))
     if result.returncode != 0 or not CLI_CONFIG_FILE.exists() \
             or not any(MIRROR_DIR.rglob("terraform-provider-*")):
         sys.exit("❌ Could not set up the Terraform provider cache. "
