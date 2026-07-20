@@ -6,36 +6,36 @@
       "description": "How often (in seconds) to send a health check. The default value is 5\nseconds.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument controls how frequently backend health is checked and how quickly failures are detected. However, the appropriate interval depends on workload responsiveness and availability requirements, so no single secure value applies across all environments."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument controls whether the health check can be deleted, protected from deletion, or abandoned from Terraform management. Deleting a required health check can disrupt backend monitoring and availability, while abandoning it can create an unmanaged resource and configuration drift. A policy can therefore enforce an approved deletion behaviour."
     },
     "description": {
       "description": "An optional description of this resource. Provide this property when\nyou create the resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument only provides descriptive metadata and does not influence authentication, authorization, network behavior, logging, encryption, availability, or data protection."
     },
     "healthy_threshold": {
       "description": "A so-far unhealthy instance will be marked healthy after this many\nconsecutive successes. The default value is 2.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument affects how quickly an unhealthy backend is returned to service after successful probes. However, the appropriate threshold depends on the application's recovery behaviour and availability requirements, so no single universally secure value can be enforced."
     },
     "name": {
       "description": "Name of the resource. Provided by the client when the resource is\ncreated. The name must be 1-63 characters long, and comply with\nRFC1035.  Specifically, the name must be 1-63 characters long and\nmatch the regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means\nthe first character must be a lowercase letter, and all following\ncharacters must be a dash, lowercase letter, or digit, except the\nlast character, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument identifies the health-check resource and is already subject to Google Cloud naming requirements. It does not affect access control, traffic validation, logging, encryption, availability, or data security, so no additional security policy is required."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
