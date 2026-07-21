@@ -6,36 +6,36 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The argument dictates how Terraform responds to the destruction of a task, due to tasks being reconstructible, and do not hold critical data they can safely default to delete. By setting the default to PREVENT, it would restrict the task's lifecycle without improving security."
     },
     "description": {
       "description": "User-provided description of the task.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is an optional metadata description, and is provided by the users. This description does not affect the configuration or rules of the task."
     },
     "display_name": {
       "description": "User friendly display name.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This an optional description, that provides a human-readable display name. This does not alter configurations, there for the security impact is False."
     },
     "labels": {
       "description": "User-defined labels for the task.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument is used to provide key tags for organization's tasks. This data is designated to teams within the organization, these tags do not interact with security."
     },
     "lake": {
       "description": "The lake in which the task will be created in.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument shows which parent lake the task originates from, there for operating as a pointer to other resources, making it an organizational task. Therefore, a False security impact."
     },
     "location": {
       "description": "The location in which the task will be created in.",
@@ -48,15 +48,15 @@
       "description": "N/A",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument states which Google Cloud Platform (GCP) project owns the task. This shows which project owns specific resources, making it an organization argument that is not altered by policies. Therefore, False."
     },
     "task_id": {
       "description": "The task Id of the task.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument provides data on the task's own identifier. By naming a resource, it does not alter its security. Therefore, False."
     },
     "execution_spec": {
       "type": "block",
@@ -67,36 +67,36 @@
       "description": "The arguments to pass to the task. The args can use placeholders of the format ${placeholder} as part of key/value string. These will be interpolated before passing the args to the driver. Currently supported placeholders: - ${taskId} - ${job_time} To pass positional args, set the key as TASK_ARGS. The value should be a comma-separated string of all the positional arguments. To use a delimiter other than comma, refer to https://cloud.google.com/sdk/gcloud/reference/topic/escaping. In case of other keys being present in the args, then TASK_ARGS will be passed as the last argument. An object containing a list of 'key': value pairs. Example: { 'name': 'wrench', 'mass': '1.3kg', 'count': '3' }.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Execution_spec is a required argument, and provides configurations for the task's cluster structure. Without having a specific policy, the safety of this argument cannot be determined. Therefore, False."
     },
     "execution_spec.kms_key": {
       "description": "The Cloud KMS key to use for encryption, of the form: projects/{project_number}/locations/{locationId}/keyRings/{key-ring-name}/cryptoKeys/{key-name}.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument controls the customer-managed Cloud KMS key, which is used to encrypt task execution. This argument must require a key to alter its configuration. Therefore, True."
     },
     "execution_spec.max_job_execution_lifetime": {
       "description": "The maximum duration after which the job execution is expired. A duration in seconds with up to nine fractional digits, ending with 's'. Example: '3.5s'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument determines how long a job last prior to the execution expiring. The lifetime of a job does not change its security value. Therefore, false."
     },
     "execution_spec.project": {
       "description": "The project in which jobs are run. By default, the project containing the Lake is used. If a project is provided, the ExecutionSpec.service_account must belong to this project.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument acts as a pointer towards project jobs, and where they run, typically defaulting to the lake's project. Due to it being a pointer, and not altering security the security impact is false."
     },
     "execution_spec.service_account": {
       "description": "Service account to use to execute a task. If not provided, the default Compute service account for the project is used.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument provides the IAM identity the task executes as, meaning that it is a reference to an IAM resource. Therefore, false as it acts as an identifier. "
     },
     "notebook": {
       "type": "block",
@@ -107,22 +107,22 @@
       "description": "Cloud Storage URIs of archives to be extracted into the working directory of each executor. Supported file types: .jar, .tar, .tar.gz, .tgz, and .zip.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a cloud storage URI (Uniform Resource Identifier) of archives, which is then placed within the notebook executor's directory. These are the team's job files and there are no rules that determine what a safe location is, False."
     },
     "notebook.file_uris": {
-      "description": "Cloud Storage URIs of files to be placed in the working directory of each executor.",
+      "description": "Cloud Storage URIs of files to be placed in the working directory of each executor ",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument creates storage links to files copied into into the executors directory, which operates as the teams job content. Rules cannot determine where a safe place to run the files is, therefore it is False"
     },
     "notebook.notebook": {
       "description": "Path to input notebook. This can be the Cloud Storage URI of the notebook file or the path to a Notebook Content. The execution args are accessible as environment variables (TASK_key=value).",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This provide the URI of where the task is executed, and the code the team runs is their content. Platform policies typically are unable to determine a safe or unsafe location to run the files, therefore False. "
     },
     "notebook.infrastructure_spec": {
       "type": "block",
@@ -138,15 +138,15 @@
       "description": "Total number of job executors. Executor Count should be between 2 and 100. [Default=2]",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The amount of job executors for the notebook, which can be between 2 and 100. This does not affect security, but it does change cost and performance. Hence, False."
     },
     "notebook.infrastructure_spec.batch.max_executors_count": {
       "description": "Max configurable executors. If maxExecutorsCount > executorsCount, then auto-scaling is enabled. Max Executor Count should be between 2 and 1000. [Default=1000]",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This determines the maximum amount of executor auto-scaling on the notebook's URI. This is irrelevant to security, therefore False."
     },
     "notebook.infrastructure_spec.container_image": {
       "type": "block",
@@ -157,29 +157,29 @@
       "description": "Container image to use.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This determines the container image runtime configuration. To create a whitelist of safe images an organization's registry would be required, and is an invasion of operations. Therefore, the allowed images would be determined by the team. Therefore, False."
     },
     "notebook.infrastructure_spec.container_image.java_jars": {
       "description": "A list of Java JARS to add to the classpath. Valid input includes Cloud Storage URIs to Jar binaries. For example, gs://bucket-name/my/path/to/file.jar",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Cloud storage identifier for Java Archives (JAR) that are added to the notebooks runtime path. Safe JAR locations cannot be simply determined, therefore False."
     },
     "notebook.infrastructure_spec.container_image.properties": {
       "description": "Override to common configuration of open source components installed on the Dataproc cluster. The properties to set on daemon config files. Property keys are specified in prefix:property format, for example core:hadoop.tmp.dir. For more information, see Cluster properties.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This overwrites for open-source component configuration, It is open ended configuration and cannot be inspected in a beneficial way, hence False."
     },
     "notebook.infrastructure_spec.container_image.python_packages": {
       "description": "A list of python packages to be installed. Valid formats include Cloud Storage URI to a PIP installable library. For example, gs://bucket-name/my/path/to/lib.tar.gz",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument determines which image python packages are downloadeded into for the notebooks configuration. Due to the python_package being an open-ended file it cannot be effectively constrained. Hence, false."
     },
     "notebook.infrastructure_spec.vpc_network": {
       "type": "block",
@@ -190,22 +190,22 @@
       "description": "The Cloud VPC network in which the job is run. By default, the Cloud VPC network named Default within the project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a reference to the Virtual Private Cloud (VPC), the job executes within. The network security doesn't operate on the pointer, but the network resource. Therefore, False."
     },
     "notebook.infrastructure_spec.vpc_network.network_tags": {
       "description": "List of network tags to apply to the job.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument provides firewall tags that are attached to the job, these identifiers are organization specific and do not relate to security."
     },
     "notebook.infrastructure_spec.vpc_network.sub_network": {
       "description": "The Cloud VPC sub-network in which the job is run.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument refers to the VPC sub-network utilized by the job. The network is secured where it is defined, so this argument doesn't interact with its security. Hence, False."
     },
     "spark": {
       "type": "block",
@@ -216,50 +216,50 @@
       "description": "Cloud Storage URIs of archives to be extracted into the working directory of each executor. Supported file types: .jar, .tar, .tar.gz, .tgz, and .zip.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument identifies Cloud Storage of archives unpacked for each executor. This relates to team job files, and can not general policy could judge. Therefore, False."
     },
     "spark.file_uris": {
       "description": "Cloud Storage URIs of files to be placed in the working directory of each executor.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument identifies Cloud Storage of files placed within the Spark executor's directory. This relates to team job files, which cannot be determined as insecure by a general policy. Hence, False."
     },
     "spark.main_class": {
       "description": "The name of the driver's main class. The jar file that contains the class must be in the default CLASSPATH or specified in jar_file_uris. The execution args are passed in as a sequence of named process arguments (--key=value).",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument is the Spark driver's main class, which selects which doe the job uses. This is determined by the team, not a policy. Therefore, False."
     },
     "spark.main_jar_file_uri": {
       "description": "The Cloud Storage URI of the jar file that contains the main class. The execution args are passed in as a sequence of named process arguments (--key=value).",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument identifies the Cloud Storage for JARs that contain the main class, and runs the job content. Cannot be determined by a general policy, False."
     },
     "spark.python_script_file": {
       "description": "The Gcloud Storage URI of the main Python file to use as the driver. Must be a .py file. The execution args are passed in as a sequence of named process arguments (--key=value).",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument identifies the Cloud Storage for the python driver script. The python script being ran cannot be determined by a broad general policy. False."
     },
     "spark.sql_script": {
       "description": "The query text. The execution args are used to declare a set of script variables (set key='value';).",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument is the SQL script that the task runs, a policy cannot appropriately inspect query content, therefore False."
     },
     "spark.sql_script_file": {
       "description": "A reference to a query file. This can be the Cloud Storage URI of the query file or it can the path to a SqlScript Content. The execution args are used to declare a set of script variables (set key='value';).",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The identifier for the SQL script file, policies cannot appropriately inspect query content, therefore False."
     },
     "spark.infrastructure_spec": {
       "type": "block",
@@ -275,15 +275,15 @@
       "description": "Total number of job executors. Executor Count should be between 2 and 100. [Default=2]",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument determines the amount of Executors for the spark run (2-100), this relates to the efficiency of computing, not security. False."
     },
     "spark.infrastructure_spec.batch.max_executors_count": {
       "description": "Max configurable executors. If maxExecutorsCount > executorsCount, then auto-scaling is enabled. Max Executor Count should be between 2 and 1000. [Default=1000]",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument determines the maximum amount of auto-scaling provided to spark executors. This configures capacity, not security. False."
     },
     "spark.infrastructure_spec.container_image": {
       "type": "block",
@@ -294,29 +294,29 @@
       "description": "Container image to use.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument provides the container image for the spark runtime. This requires the an organizations image whitelist, and cannot be bound by policies. False. "
     },
     "spark.infrastructure_spec.container_image.java_jars": {
       "description": "A list of Java JARS to add to the classpath. Valid input includes Cloud Storage URIs to Jar binaries. For example, gs://bucket-name/my/path/to/file.jar",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument identifies the cloud storage for JARs added within the classpath of Spark. This is a team dependency, rather than a broad policy. False."
     },
     "spark.infrastructure_spec.container_image.properties": {
       "description": "Override to common configuration of open source components installed on the Dataproc cluster. The properties to set on daemon config files. Property keys are specified in prefix:property format, for example core:hadoop.tmp.dir. For more information, see Cluster properties.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument overwrites for open-source component configurations that is utilized by the spark cluster. Open ended configurations cannot be analyzed by policies. Therefore, false."
     },
     "spark.infrastructure_spec.container_image.python_packages": {
       "description": "A list of python packages to be installed. Valid formats include Cloud Storage URI to a PIP installable library. For example, gs://bucket-name/my/path/to/lib.tar.gz",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument serves as the identifier for the cloud storage of python packages for the spark runtime. These dependency choices are constituted by the team, therefore false."
     },
     "spark.infrastructure_spec.vpc_network": {
       "type": "block",
@@ -327,22 +327,22 @@
       "description": "The Cloud VPC network in which the job is run. By default, the Cloud VPC network named Default within the project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument references the VPC network the spark job uses, the networks security is determined where it is defined. Therefore, false."
     },
     "spark.infrastructure_spec.vpc_network.network_tags": {
       "description": "List of network tags to apply to the job.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument provides network tags for the spark job, these are organization created tags and cannot be enforced by broad scale policies. False."
     },
     "spark.infrastructure_spec.vpc_network.sub_network": {
       "description": "The Cloud VPC sub-network in which the job is run.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument references the VPC subnetwork for the spark job, which is secured on its resource. Therefore, false."
     },
     "trigger_spec": {
       "type": "block",
@@ -353,36 +353,36 @@
       "description": "Prevent the task from executing. This does not cancel already running tasks. It is intended to temporarily disable RECURRING tasks.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument acts as a pause for tasks that repeat, the state of a job (paused/active) does not determine how secure it is. False."
     },
     "trigger_spec.max_retries": {
       "description": "Number of retry attempts before aborting. Set to zero to never attempt to retry a failed task.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This determines how many attempts a failed task can try prior to being aborted. This holds no security values, therefore False."
     },
     "trigger_spec.schedule": {
       "description": "Cron schedule (https://en.wikipedia.org/wiki/Cron) for running tasks periodically. To explicitly set a timezone to the cron tab, apply a prefix in the cron tab: 'CRON_TZ=${IANA_TIME_ZONE}' or 'TZ=${IANA_TIME_ZONE}'. The ${IANA_TIME_ZONE} may only be a valid string from IANA time zone database. For example, CRON_TZ=America/New_York 1 * * * *, or TZ=America/New_York 1 * * * *. This field is required for RECURRING tasks.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is the schedule for reoccurring runs. When the task begins running is determined by operational decisions. Therefore, false. "
     },
     "trigger_spec.start_time": {
       "description": "The first run of the task will be after this time. If not specified, the task will run shortly after being submitted if ON_DEMAND and based on the schedule if RECURRING.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument determines when the first run is allowed to begin running, which relates to scheduling not security. False."
     },
     "trigger_spec.type": {
       "description": "Trigger type of the user-specified Task Possible values: [\"ON_DEMAND\", \"RECURRING\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument selects on_demand or recurring execution. These are legitimate operational modes. False."
     }
   }
 }
