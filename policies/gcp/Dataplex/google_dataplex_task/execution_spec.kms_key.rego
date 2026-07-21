@@ -8,7 +8,7 @@ conditions  := [
         {
             "situation_description": "Task does not have Customer-Managed Encryption Keys (CMEK) configured - use Google-managed keys only",
             "remedies": [
-                "Set execution_spec.kms_key to a customer-managed Key Management Service (KMS) key"
+                "Set execution_spec.kms_key to a customer-managed Key Management Service (KMS) key",
                 "Example format: projects/PROJECT/locations/REGION/keyRings/RING/cryptoKeys/KEY"
             ]
         },
