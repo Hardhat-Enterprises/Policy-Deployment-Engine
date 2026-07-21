@@ -9,3 +9,11 @@ terraform {
 }
 
 provider "google" {}
+
+module "test" {
+  source = "../.."
+
+  cidr = var.cidr
+}
+
+variable "cidr" {}

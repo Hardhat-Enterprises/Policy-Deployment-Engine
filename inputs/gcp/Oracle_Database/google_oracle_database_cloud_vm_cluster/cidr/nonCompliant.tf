@@ -6,6 +6,6 @@
 # We run `terraform plan` only, so point at fake addresses/values instead of
 # creating real dependencies.
 
-resource "RESOURCE_TYPE" "non_compliant_example_1" {
-
+resource "google_oracle_database_cloud_vm_cluster" "non_compliant_example_1" {
+  cidr = "0.0.0.0/0"
 }
