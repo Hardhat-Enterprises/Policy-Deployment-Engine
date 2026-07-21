@@ -6,36 +6,36 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An entry_type is recreatable data, meaning when an entry_type is destroyed or deleted, no critical data is lost. By defaulting to 'PREVENT', the lifecycle is disturbed for no gain in security. "
     },
     "description": {
       "description": "Description of the EntryType.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The description argument purely operates as an optional definition for the EntryType. This has no relationship with security, and can safely be considered False."
     },
     "display_name": {
       "description": "User friendly display name.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument provides a user-friendly (human-readable) display name, it can be safely be deemed 'False', as it is only cosmetic."
     },
     "entry_type_id": {
       "description": "The entry type id of the entry type.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The entry_type_id is an optional name (identifier/label) of the entry type, and does not affect behavior. The security impact can safely be deemed; false. "
     },
     "labels": {
       "description": "User-defined labels for the EntryType.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels are an optional user-definition for the EntryType, determined by the organization. Labels do not affect behavior or contain any sensitive information. Hence, 'False' security impact."
     },
     "location": {
       "description": "The location where entry type will be created in.",
@@ -48,29 +48,29 @@
       "description": "The platform that Entries of this type belongs to.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The platform argument is an optional description of the type of platform the resource belongs. This description does not relate to resource configuration, it can safely be deemed 'False'."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This provides the ID of the project in which the resource belongs. This argument does not alter configurations, and only serves in identifying resources."
     },
     "system": {
       "description": "The system that Entries of this type belongs to.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This an optional argument, that only provides metadata relating to the system that ENtries of this type belong to. "
     },
     "type_aliases": {
       "description": "Indicates the class this Entry Type belongs to, for example, TABLE, DATABASE, MODEL.",
       "required": false,
       "type": "list(string)",
       "security_impact": "true/false",
-      "rationale": ""
+      "rationale": "This argument purely exists as an optional identifier, and does not alter configurations or behavior, it can safely be deemed False."
     },
     "required_aspects": {
       "type": "block",
@@ -81,8 +81,8 @@
       "description": "Required aspect type for the entry type.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is an optional argument that provides Aspectinfo(metadata) for the entry.type, this does not alter configurations and acts purely as a pointer. Hence; False."
     }
   }
 }
