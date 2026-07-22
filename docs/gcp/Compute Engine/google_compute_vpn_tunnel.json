@@ -6,78 +6,78 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Protects against accidental deletion of the VPN tunnel via Terraform. Policy will whitelist \"PREVENT\" so the tunnel can't be destroyed unintentionally."
     },
     "description": {
       "description": "An optional description of this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Free-text description field for human readability only; does not affect the tunnel's configuration or behaviour."
     },
     "ike_version": {
       "description": "IKE protocol version to use when establishing the VPN tunnel with\npeer VPN gateway.\nAcceptable IKE versions are 1 or 2. Default version is 2.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "IKEv1 is older and weaker than IKEv2. Policy will whitelist version 2 to enforce the stronger protocol."
     },
     "labels": {
       "description": "Labels to apply to this VpnTunnel.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Key/value metadata for organisation and billing; does not affect the tunnel's security configuration."
     },
     "local_traffic_selector": {
       "description": "Local traffic selector to use when establishing the VPN tunnel with\npeer VPN gateway. The value should be a CIDR formatted string,\nfor example '192.168.0.0/16'. The ranges should be disjoint.\nOnly IPv4 is supported.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines which local CIDR ranges are exposed through the tunnel. Policy will blacklist overly broad values (e.g. 0.0.0.0/0) to prevent exposing the entire local network."
     },
     "name": {
       "description": "Name of the resource. The name must be 1-63 characters long, and\ncomply with RFC1035. Specifically, the name must be 1-63\ncharacters long and match the regular expression\n'[a-z]([-a-z0-9]*[a-z0-9])?' which means the first character\nmust be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit,\nexcept the last character, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Just a naming/display identifier, no effect on the resource's security posture."
     },
     "peer_external_gateway": {
       "description": "URL of the peer side external VPN gateway to which this VPN tunnel is connected.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Connectivity reference to the peer gateway resource, not itself a configurable security control."
     },
     "peer_external_gateway_interface": {
       "description": "The interface ID of the external VPN gateway to which this VPN tunnel is connected.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects which interface index on the peer gateway is used; a connectivity detail, not a security control."
     },
     "peer_gcp_gateway": {
       "description": "URL of the peer side HA GCP VPN gateway to which this VPN tunnel is connected.\nIf provided, the VPN tunnel will automatically use the same vpn_gateway_interface\nID in the peer GCP VPN gateway.\nThis field must reference a 'google_compute_ha_vpn_gateway' resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Connectivity reference to the peer HA VPN gateway resource, not itself a security control."
     },
     "peer_ip": {
       "description": "IP address of the peer VPN gateway. Only IPv4 is supported.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Identifies the trusted peer VPN endpoint. Policy should ensure this is a known/approved address rather than left open, reducing risk of connecting to an unintended network."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies which GCP project the resource belongs to; an administrative reference, not a security control."
     },
     "region": {
       "description": "The region where the tunnel is located. If unset, is set to the region of 'target_vpn_gateway'.",
@@ -90,57 +90,57 @@
       "description": "Remote traffic selector to use when establishing the VPN tunnel with\npeer VPN gateway. The value should be a CIDR formatted string,\nfor example '192.168.0.0/16'. The ranges should be disjoint.\nOnly IPv4 is supported.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines which remote CIDR ranges the tunnel can route to. Policy will blacklist overly broad values (e.g. 0.0.0.0/0) to prevent unrestricted routing to the peer network."
     },
     "router": {
       "description": "URL of router resource to be used for dynamic routing.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References which Cloud Router handles dynamic routing for this tunnel; an operational/architecture choice, not a security control."
     },
     "shared_secret": {
       "description": "Shared secret used to set the secure session between the Cloud VPN\ngateway and the peer VPN gateway.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This is the pre-shared credential securing the IKE session, equivalent to a password. Policy should ensure it is set and not left blank or trivially weak."
     },
     "shared_secret_wo": {
       "description": "Shared secret used to set the secure session between the Cloud VPN\ngateway and the peer VPN gateway.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Write-only variant of the shared secret credential; carries the same security relevance as shared_secret."
     },
     "shared_secret_wo_version": {
       "description": "Triggers update of 'shared_secret_wo' write-only. Increment this value when an update to 'shared_secret_wo' is needed. For more info see [updating write-only arguments](/docs/providers/google/guides/using_write_only_arguments.html#updating-write-only-arguments)",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A counter that triggers rotation of shared_secret_wo; it is a mechanism, not itself a security control with a compliant/non-compliant value."
     },
     "target_vpn_gateway": {
       "description": "URL of the Target VPN gateway with which this VPN tunnel is\nassociated.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Connectivity reference to the classic Target VPN Gateway this tunnel attaches to, not itself a security control."
     },
     "vpn_gateway": {
       "description": "URL of the VPN gateway with which this VPN tunnel is associated.\nThis must be used if a High Availability VPN gateway resource is created.\nThis field must reference a 'google_compute_ha_vpn_gateway' resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Connectivity reference to the HA VPN gateway this tunnel attaches to, not itself a security control."
     },
     "vpn_gateway_interface": {
       "description": "The interface ID of the VPN gateway with which this VPN tunnel is associated.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects which interface index on the VPN gateway is used; a connectivity detail, not a security control."
     },
     "cipher_suite": {
       "type": "block",
@@ -156,29 +156,29 @@
       "description": "Diffie-Hellman groups.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Diffie-Hellman group used in IKE phase 1 key exchange. Policy will blacklist weak/legacy groups to enforce strong key exchange."
     },
     "cipher_suite.phase1.encryption": {
       "description": "Encryption algorithms.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Encryption algorithm used in IKE phase 1. Policy will blacklist weak ciphers (e.g. DES, 3DES) to enforce strong encryption."
     },
     "cipher_suite.phase1.integrity": {
       "description": "Integrity algorithms.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Integrity/hashing algorithm used in IKE phase 1. Policy will blacklist weak algorithms (e.g. MD5, SHA1) to enforce strong integrity checking."
     },
     "cipher_suite.phase1.prf": {
       "description": "Pseudo-random functions.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Pseudo-random function used in IKE phase 1 key derivation. Policy will blacklist weak PRFs to enforce strong key derivation."
     },
     "cipher_suite.phase2": {
       "type": "block",
@@ -189,22 +189,22 @@
       "description": "Encryption algorithms.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Encryption algorithm used in IKE phase 2 (data channel). Policy will blacklist weak ciphers to enforce strong encryption of tunnel traffic."
     },
     "cipher_suite.phase2.integrity": {
       "description": "Integrity algorithms.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Integrity/hashing algorithm used in IKE phase 2. Policy will blacklist weak algorithms to enforce strong integrity checking of tunnel traffic."
     },
     "cipher_suite.phase2.pfs": {
       "description": "Perfect forward secrecy groups.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Perfect Forward Secrecy group for phase 2. Policy will blacklist weak/legacy groups so past sessions stay protected even if a key is later compromised."
     },
     "params": {
       "type": "block",
@@ -215,8 +215,8 @@
       "description": "Resource manager tags to be bound to the Vpn Tunnel. Tag keys and values have the\nsame definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id},\nand values are in the format tagValues/456.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Binds resource manager tags to the tunnel, which are used for tag-based IAM conditions and org policy enforcement, supporting governance controls."
     }
   }
 }
