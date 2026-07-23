@@ -2,54 +2,61 @@
   "last_updated": "2026-06-23T08:26:44Z",
   "provider_version": "7.37.0",
   "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the resource. Defaults to DELETE. When a 'terraform destroy' or 'terraform apply' would delete the resource, the command will fail if this field is set to \"PREVENT\" in Terraform state. When set to \"ABANDON\", the command will remove the resource from Terraform management without updating or deleting the resource in the API. When set to \"DELETE\", deleting the resource is allowed.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Controls whether the resource can be destroyed or abandoned outside Terraform's management. An incorrect setting could allow unmanaged deletion or leave orphaned resources with no policy enforcement."
+    },
     "export_custom_routes": {
       "description": "Whether to export the custom routes to the peer network.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Exporting custom routes can expose internal network routing information to a peered network and may create unintended network access paths."
     },
     "export_subnet_routes_with_public_ip": {
       "description": "Whether subnet routes with public IP range are exported.\nIPv4 special-use ranges are always exported to peers and\nare not controlled by this field.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Exporting subnet routes containing public IP ranges may expose network information and increase the attack surface between peered networks."
     },
     "import_custom_routes": {
       "description": "Whether to import the custom routes to the peer network.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Importing custom routes from a peer network can introduce untrusted routing paths and affect network traffic control."
     },
     "import_subnet_routes_with_public_ip": {
       "description": "Whether subnet routes with public IP range are imported.\nIPv4 special-use ranges are always imported from peers and\nare not controlled by this field.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Importing subnet routes with public IP ranges can allow external network paths into the environment and may expose resources."
     },
     "network": {
       "description": "The name of the primary network for the peering.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The network determines where the peering route configuration applies. Selecting the wrong network may affect unintended environments."
     },
     "peering": {
       "description": "Name of the peering.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The peering name is an identifier and does not directly change security behaviour."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The project determines the security boundary where the resource is created. Incorrect project selection may deploy network configurations in an unintended environment."
     }
   }
 }
