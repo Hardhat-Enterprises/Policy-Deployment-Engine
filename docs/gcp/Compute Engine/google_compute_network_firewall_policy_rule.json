@@ -13,99 +13,99 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Deletion policy can prevent accidental deletion of critical firewall rules, ensuring that important security configurations are not removed unintentionally."
     },
     "description": {
       "description": "An optional description for this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A description can help identify the purpose and scope of the firewall rule, making it easier to manage and maintain."
     },
     "direction": {
       "description": "The direction in which this rule applies. Possible values: [\"INGRESS\", \"EGRESS\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The direction determines whether the rule applies to incoming or outgoing traffic."
     },
     "disabled": {
       "description": "Denotes whether the firewall policy rule is disabled.\nWhen set to true, the firewall policy rule is not enforced and traffic behaves as if it did not exist.\nIf this is unspecified, the firewall policy rule will be enabled.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": " Can silently turn off enforcement without deleting the rule, effectively exposing the network if flipped by mistake"
     },
     "enable_logging": {
       "description": "Denotes whether to enable logging for a particular rule.\nIf logging is enabled, logs will be exported to the configured export destination in Stackdriver.\nLogs may be exported to BigQuery or Pub/Sub.\nNote: you cannot enable logging on \"goto_next\" rules.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enabling logging allows for the monitoring and auditing of network traffic that matches this rule."
     },
     "firewall_policy": {
       "description": "The firewall policy of the resource.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This points to the parent policy"
     },
     "priority": {
       "description": "An integer indicating the priority of a rule in the list.\nThe priority must be a positive value between 0 and 2147483647.\nRules are evaluated from highest to lowest priority where 0 is the highest priority and 2147483647 is the lowest prority.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets the order rules run in. A weak rule with higher priority can stop a stronger rule from working"
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Shows which GCP project owns the resource"
     },
     "rule_name": {
       "description": "An optional name for the rule. This field is not a unique identifier and can be updated.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": " A label for the rule. It has no effect on how the rule works."
     },
     "security_profile_group": {
       "description": "A fully-qualified URL of a SecurityProfile resource instance.\nExample: https://networksecurity.googleapis.com/v1/projects/{project}/locations/{location}/securityProfileGroups/my-security-profile-group\nMust be specified if action = 'apply_security_profile_group' and cannot be specified for other actions.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Picks which security profile checks the traffic. A wrong or weak profile means the check does not really work."
     },
     "target_forwarding_rules": {
       "description": "A list of forwarding rules to which this rule applies.\nThis field allows you to control which load balancers get this rule.\nFor example, the following are valid values:\n- https://www.googleapis.com/compute/v1/projects/project/global/forwardingRules/forwardingRule\n- https://www.googleapis.com/compute/v1/projects/project/regions/region/forwardingRules/forwardingRule\n- projects/project/global/forwardingRules/forwardingRule\n- projects/project/regions/region/forwardingRules/forwardingRule",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Limits the rule to certain load balancers."
     },
     "target_service_accounts": {
       "description": "A list of service accounts indicating the sets of instances that are applied with this rule.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Limits the rule to instances using certain service accounts."
     },
     "target_type": {
       "description": "Target types of the firewall policy rule.\nDefault value is INSTANCES.\nWhen target_type is INTERNAL_MANAGED_LB, target_forwarding_rules must be set Possible values: [\"INSTANCES\", \"INTERNAL_MANAGED_LB\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets if the rule applies to instances. This changes what the rule covers"
     },
     "tls_inspect": {
       "description": "Boolean flag indicating if the traffic should be TLS decrypted.\nCan be set only if action = 'apply_security_profile_group' and cannot be set for other actions.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Decides if traffic gets decrypted for checking. Without this, hidden threats in encrypted traffic can pass through"
     },
     "match": {
       "type": "block",
@@ -116,92 +116,92 @@
       "description": "Address groups which should be matched against the traffic destination. Maximum number of destination address groups is 10.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets which address groups count as the destination. A wrong group changes what traffic the rule catches."
     },
     "match.dest_fqdns": {
       "description": "Fully Qualified Domain Name (FQDN) which should be matched against traffic destination. Maximum number of destination fqdn allowed is 100.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets which domain names count as the destination. A wide list changes what traffic the rule catches"
     },
     "match.dest_ip_ranges": {
       "description": "CIDR IP address range. Maximum number of destination CIDR IP ranges allowed is 5000.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets which IP ranges count as the destination. Too broad a range widens what the rule affects."
     },
     "match.dest_network_context": {
       "description": "Network context of the traffic destination. Possible values: [\"UNSPECIFIED\", \"INTERNET\", \"INTRA_VPC\", \"NON_INTERNET\", \"VPC_NETWORKS\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets if the destination is internet, or another type. Wrong choice mixes up internal and external traffic"
     },
     "match.dest_region_codes": {
       "description": "Region codes whose IP addresses will be used to match for destination of traffic. Should be specified as 2 letter country code defined as per ISO 3166 alpha-2 country codes. ex.\"US\" Maximum number of dest region codes allowed is 5000.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets which countries count as the destination. Used to block or allow traffic by region."
     },
     "match.dest_threat_intelligences": {
       "description": "Names of Network Threat Intelligence lists. The IPs in these lists will be matched against traffic destination.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets which threat lists to check the destination against. Decides which known bad destinations get caught. A wrong list can let traffic through to known bad destinations or block good traffic."
     },
     "match.src_address_groups": {
       "description": "Address groups which should be matched against the traffic source. Maximum number of source address groups is 10.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets which address groups count as the source. A wrong group changes what traffic the rule catches."
     },
     "match.src_fqdns": {
       "description": "Fully Qualified Domain Name (FQDN) which should be matched against traffic source. Maximum number of source fqdn allowed is 100.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets which domain names count as the source. A wide list changes what traffic the rule catches"
     },
     "match.src_ip_ranges": {
       "description": "CIDR IP address range. Maximum number of source CIDR IP ranges allowed is 5000.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines which source IP ranges the rule matches. Setting this too broad, like allowing all IPs, exposes the rule to traffic from anywhere."
     },
     "match.src_network_context": {
       "description": "Network context of the traffic source. Possible values: [\"UNSPECIFIED\", \"INTERNET\", \"INTRA_VPC\", \"NON_INTERNET\", \"VPC_NETWORKS\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Matches source context. Misclassification changes whether internal or external traffic is covered."
     },
     "match.src_networks": {
       "description": "Networks of the traffic source. It can be either a full or partial url.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Networks matched against source, determines which networks the rule applies to."
     },
     "match.src_region_codes": {
       "description": "Region codes whose IP addresses will be used to match for source of traffic. Should be specified as 2 letter country code defined as per ISO 3166 alpha-2 country codes. ex.\"US\" Maximum number of source region codes allowed is 5000.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Country codes matched against source, used for geo-based access control."
     },
     "match.src_threat_intelligences": {
       "description": "Names of Network Threat Intelligence lists. The IPs in these lists will be matched against traffic source.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Named threat intel lists matched against source, determines which known-malicious sources are caught."
     },
     "match.layer4_configs": {
       "type": "block",
@@ -212,15 +212,15 @@
       "description": "The IP protocol to which this rule applies. The protocol type is required when creating a firewall rule.\nThis value can either be one of the following well known protocol strings (tcp, udp, icmp, esp, ah, ipip, sctp), or the IP protocol number.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": " The IP protocol determines the type of traffic the rule applies to, which is essential for correctly filtering and securing network traffic."
     },
     "match.layer4_configs.ports": {
       "description": "An optional list of ports to which this rule applies. This field is only applicable for UDP or TCP protocol. Each entry must be either an integer or a range. If not specified, this rule applies to connections through any port.\nExample inputs include: [\"22\"], [\"80\",\"443\"], and [\"12345-12349\"].",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "To set a list of ports that can be accessed, which can limit the attack surface and reduce the risk of unauthorized access."
     },
     "match.src_secure_tags": {
       "type": "block",
@@ -231,8 +231,8 @@
       "description": "Name of the secure tag, created with TagManager's TagValue API.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Secure tag matched against traffic source, determines which tagged workloads the rule applies to."
     },
     "target_secure_tags": {
       "type": "block",
@@ -243,8 +243,7 @@
       "description": "Name of the secure tag, created with TagManager's TagValue API.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    }
+      "security_impact": true,
+      "rationale": "Secure tag used to target instances, determines which tagged circumstances apply to the rule."  }
   }
 }
