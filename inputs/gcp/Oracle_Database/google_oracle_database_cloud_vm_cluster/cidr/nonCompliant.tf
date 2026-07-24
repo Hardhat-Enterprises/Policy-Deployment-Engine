@@ -1,11 +1,6 @@
-# Describe your resource type here.
-# Label the resource(s) under test non_compliant_example_1, non_compliant_example_2, ...
-# (sequential, in order; always suffixed with _1 even when there is only one).
-#
-# Only the tested resource type may appear in this file — no dependency resources.
-# We run `terraform plan` only, so point at fake addresses/values instead of
-# creating real dependencies.
-
 resource "google_oracle_database_cloud_vm_cluster" "non_compliant_example_1" {
-  cidr = "0.0.0.0/0"
+  cloud_vm_cluster_id  = "example-cluster-id"
+  location             = "us-central1"
+  exadata_infrastructure = "example-exadata-infrastructure"
+  cidr                 = "0.0.0.0/0"
 }
