@@ -6,71 +6,71 @@
       "description": "Creates the new snapshot in the snapshot chain labeled with the\nspecified name. The chain name must be 1-63 characters long and\ncomply with RFC1035. This is an uncommon option only for advanced\nservice owners who needs to create separate snapshot chains, for\nexample, for chargeback tracking.  When you describe your snapshot\nresource, this field is visible only if it has a non-empty value.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "labels which snapshot chain this belongs to, used for chargeback tracking"
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls the behavior when the snapshot is destroyed, impacting data retention and compliance"
     },
     "description": {
       "description": "An optional description of this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Just a description"
     },
     "labels": {
       "description": "Labels to apply to this Snapshot.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels are used for organizing organization and management, and dont have any security impact"
     },
     "name": {
       "description": "Name of the resource; provided by the client when the resource is\ncreated. The name must be 1-63 characters long, and comply with\nRFC1035. Specifically, the name must be 1-63 characters long and match\nthe regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the\nfirst character must be a lowercase letter, and all following\ncharacters must be a dash, lowercase letter, or digit, except the last\ncharacter, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "just a identifier"
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The project ID is used to determine which GCP project the snapshot belongs to."
     },
     "snapshot_type": {
       "description": "Indicates the type of the snapshot. Possible values: [\"ARCHIVE\", \"STANDARD\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines the type of the snapshot, either ARCHIVE or STANDARD"
     },
     "source_disk": {
       "description": "A reference to the disk used to create this snapshot.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to the disk"
     },
     "source_instant_snapshot": {
       "description": "A reference to the instant snapshot used to create this snapshot.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to the instant snapshot"
     },
     "storage_locations": {
       "description": "Cloud Storage bucket storage location of the snapshot (regional or multi-regional).",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the location where the snapshot will be stored in Cloud Storage"
     },
     "zone": {
       "description": "A reference to the zone where the disk is hosted.",
@@ -88,29 +88,29 @@
       "description": "The name of the encryption key that is stored in Google Cloud KMS.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Points to the KMS key encrypting the snapshot, which is critical for data security and access control"
     },
     "snapshot_encryption_key.kms_key_service_account": {
       "description": "The service account used for the encryption request for the given KMS key.\nIf absent, the Compute Engine Service Agent service account is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls which service account performs the encryption operation, affecting the access chain to the key"
     },
     "snapshot_encryption_key.raw_key": {
       "description": "Specifies a 256-bit customer-supplied encryption key, encoded in\nRFC 4648 base64 to either encrypt or decrypt this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This is encryption key material. Directly controls confidentiality of the snapshot"
     },
     "snapshot_encryption_key.rsa_encrypted_key": {
       "description": "Specifies an encryption key stored in Google Cloud KMS, encoded in\nRFC 4648 base64 to either encrypt or decrypt this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,  
+      "rationale": "An another encrypted form of the customer-supplied key."
     },
     "source_disk_encryption_key": {
       "type": "block",
@@ -121,29 +121,29 @@
       "description": "The name of the encryption key that is stored in Google Cloud KMS.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Points to the KMS key used to decrypt the source disk before creating the snapshot"
     },
     "source_disk_encryption_key.kms_key_service_account": {
       "description": "The service account used for the encryption request for the given KMS key.\nIf absent, the Compute Engine Service Agent service account is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls which service account performs the decryption operation, affecting the access chain to the key"
     },
     "source_disk_encryption_key.raw_key": {
       "description": "Specifies a 256-bit customer-supplied encryption key, encoded in\nRFC 4648 base64 to either encrypt or decrypt this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This is decryption key material. Directly controls access to the source disk"
     },
     "source_disk_encryption_key.rsa_encrypted_key": {
       "description": "Specifies an encryption key stored in Google Cloud KMS, encoded in\nRFC 4648 base64 to either encrypt or decrypt this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "An encrypted form of the customer-supplied key for the source disk"
     }
   }
 }
