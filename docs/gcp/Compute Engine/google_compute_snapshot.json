@@ -135,8 +135,8 @@
       "description": "Specifies a 256-bit customer-supplied encryption key, encoded in\nRFC 4648 base64 to either encrypt or decrypt this resource.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "While handling raw key material in Terraform is a severe security anti-pattern, an enterprise policy cannot target this field effectively because it requires the secret value itself to be omitted or managed externally making it an unsuitable target for a generic structural value constraint"
+      "security_impact": true,
+      "rationale": "Passing raw encryption keys in plaintext Terraform configuration is a critical security vulnerability. A platform policy should unconditionally block this argument from being populated"
     },
     "source_disk_encryption_key.rsa_encrypted_key": {
       "description": "Specifies an encryption key stored in Google Cloud KMS, encoded in\nRFC 4648 base64 to either encrypt or decrypt this resource.",
