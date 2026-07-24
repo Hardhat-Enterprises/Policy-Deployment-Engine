@@ -6,57 +6,57 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls if Terraform may delete the webhook, abandon it from Terraform managmeent, or prevent its destruction. A policy should require PREVENT to reduce the risk of accidental or unauthorised removal that could disrupt the agent's webhook integration."
     },
     "disabled": {
       "description": "Indicates whether the webhook is disabled.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls if Dialogflow can invoke the webhook. The appropriate state depends on if the agent requires the integration, so forcing the webhook to be either enabled or disabled would be an operational decision rather than a generic security control."
     },
     "display_name": {
       "description": "The human-readable name of the webhook, unique within the agent.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the human-readable name used to identify the webhook. It does not control authentication, access, encryption, network exposure, or data handling, so it is not a generic security policy target."
     },
     "enable_spell_correction": {
       "description": "Deprecated. Indicates if automatic spell correction is enabled in detect intent requests.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the automatic spell-correction behaviour used when processing detect-intent requests. This affects how user input is interpreted rather than authentication, access, encryption, exposure, or another generic security control."
     },
     "enable_stackdriver_logging": {
       "description": "Deprecated. Determines whether this agent should log conversation queries.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Dialogflow activity, including webhook requests, responses, and errors, are recorded in Cloud Logging. A policy should require logging to remain enabled to preserve visibility for security monitoring, incident investigation, and auditing."
     },
     "parent": {
       "description": "The agent to create a webhook for.\nFormat: projects/<Project ID>/locations/<Location ID>/agents/<Agent ID>.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the Dialogflow CX agent that owns the webhook. It is a team-specific resource reference, and constraining it would require pinning a particular project, location, or agent rather than improving the webhook's security."
     },
     "security_settings": {
       "description": "Deprecated. Name of the SecuritySettings reference for the agent. Format: projects/<Project ID>/locations/<Location ID>/securitySettings/<Security Settings ID>.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References an existing Dialogflow CX SecuritySettings resource that separately controls data redaction and retention. This field only selects a team-specific resource path, so the security controls should be assessed on the referenced resource rather than by constraining its identifier here."
     },
     "timeout": {
       "description": "Webhook execution timeout.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets how long Dialogflow waits for the webhook response before treating the execution as failed. It is an availability and performance tuning value whose appropriate setting depends on the workload, with no generic secure duration to enforce."
     },
     "generic_web_service": {
       "type": "block",
