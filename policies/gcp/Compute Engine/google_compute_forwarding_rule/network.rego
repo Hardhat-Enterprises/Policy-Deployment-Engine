@@ -6,16 +6,16 @@ import data.terraform.gcp.security.compute_engine.google_compute_forwarding_rule
 conditions := [
     [
         {
-            "situation_description": "Forwarding Rule must not rely on the auto-created default VPC network.",
+            "situation_description": "Forwarding Rule must explicitly set a VPC network rather than relying on the auto-created default network.",
             "remedies": [
-                "Set network to an explicit, purpose-built VPC instead of leaving it unset.",
-                "The auto-mode 'default' network ships permissive firewall rules; use a custom-mode VPC with intentional segmentation."
+                "Set network to an explicit, purpose-built VPC — the field must not be left blank.",
+                "Leaving network unset falls back to the auto-mode 'default' network, which ships permissive firewall rules; use a custom-mode VPC with intentional segmentation."
             ]
         },
         {
-            "condition": "network must not be the default network",
+            "condition": "network must be explicitly set and non-empty",
             "attribute_path": ["network"],
-            "values": ["default"],
+            "values": [""],
             "policy_type": "blacklist"
         }
     ]

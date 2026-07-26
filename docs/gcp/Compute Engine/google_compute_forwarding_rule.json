@@ -7,21 +7,27 @@
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Setting all_ports to true forwards packets on every port (or lacking destination-port info) to the backends, removing port-level restriction entirely. It should stay false unless the rule is a deliberate L3_DEFAULT/protocol-forwarding use case, since it materially broadens the reachable surface of the backends."
+      "rationale": "Setting all_ports to true forwards packets on every port (or lacking destination-port info) to the backends, removing port-level restriction entirely. It should stay false unless the rule is a deliberate L3_DEFAULT/protocol-forwarding use case, since it materially broadens the reachable surface of the backends.",
+      "compliant": false,
+      "non_compliant": true
     },
     "allow_global_access": {
       "description": "This field is used along with the 'backend_service' field for\ninternal load balancing or with the 'target' field for internal\nTargetInstance.\n\nIf the field is set to 'TRUE', clients can access ILB from all\nregions.\n\nOtherwise only allows access from clients in the same region as the\ninternal load balancer.",
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Enabling this lets clients from any region reach an internal load balancer, widening internal access beyond the local-region trust boundary the ILB would otherwise have. Should default to false unless cross-region internal access is an explicit, approved requirement."
+      "rationale": "Enabling this lets clients from any region reach an internal load balancer, widening internal access beyond the local-region trust boundary the ILB would otherwise have. Should default to false unless cross-region internal access is an explicit, approved requirement.",
+      "compliant": false,
+      "non_compliant": true
     },
     "allow_psc_global_access": {
       "description": "This is used in PSC consumer ForwardingRule to control whether the PSC endpoint can be accessed from another region.",
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Enabling this lets a Private Service Connect endpoint be reached from other regions, widening the scope of who can reach the PSC-published service beyond its local region. Should default to false unless cross-region PSC access is an explicit, approved requirement."
+      "rationale": "Enabling this lets a Private Service Connect endpoint be reached from other regions, widening the scope of who can reach the PSC-published service beyond its local region. Should default to false unless cross-region PSC access is an explicit, approved requirement.",
+      "compliant": false,
+      "non_compliant": true
     },
     "backend_service": {
       "description": "Identifies the backend service to which the forwarding rule sends traffic.\n\nRequired for Internal TCP/UDP Load Balancing and Network Load Balancing;\nmust be omitted for all other load balancer types.",
@@ -34,8 +40,10 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Controls Terraform's ability to delete the resource — a state-management/operational-resilience setting, not an access-control or exposure setting. Unlike deletion protection on key material (e.g. a CA), losing a forwarding rule has low blast radius and is easily recreated."
+      "security_impact": true,
+      "rationale": "Controls whether Terraform is prevented from destroying the forwarding rule. Setting this to 'PREVENT' guards against accidental or unauthorised deletion via 'terraform destroy'/'apply' — the same destructive-loss-prevention pattern enforced for deletion_protection on Certificate Authority Service CAs. The default 'DELETE' leaves the rule (and the routing/load-balancing behaviour it provides) exposed to being torn down with no safeguard.",
+      "compliant": "PREVENT",
+      "non_compliant": "DELETE"
     },
     "description": {
       "description": "An optional description of this resource. Provide this property when\nyou create the resource.",
@@ -63,7 +71,9 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Selects the L3/L4 protocol accepted by the rule. Protocols such as L3_DEFAULT or raw ESP/AH bypass port-level filtering entirely and widen the attack surface; the protocol should be restricted to what the workload actually needs (typically TCP/UDP)."
+      "rationale": "Selects the L3/L4 protocol the rule accepts. Under least privilege, the protocol surface should be limited to what the workload actually requires — typically 'TCP'/'UDP'; dangerous or overly-permissive choices like 'L3_DEFAULT' or raw 'ESP'/'AH' bypass port-level filtering entirely and forward everything addressed to the backend, so they should only be used for a documented protocol-forwarding need rather than as a default choice.",
+      "compliant": "TCP",
+      "non_compliant": "ESP"
     },
     "ip_version": {
       "description": "The IP address version that will be used by this forwarding rule.\nValid options are IPV4 and IPV6.\n\nIf not set, the IPv4 address will be used by default. Possible values: [\"IPV4\", \"IPV6\"]",
@@ -91,7 +101,9 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Determines whether the rule is internet-reachable ('EXTERNAL'/'EXTERNAL_MANAGED') or confined to internal VPC traffic ('INTERNAL'/'INTERNAL_MANAGED'). The provider default is 'EXTERNAL', making this the single biggest driver of unintended public exposure for this resource."
+      "rationale": "Determines whether the rule is internet-reachable ('EXTERNAL'/'EXTERNAL_MANAGED') or confined to internal VPC traffic ('INTERNAL'/'INTERNAL_MANAGED'). The provider default is 'EXTERNAL', making this the single biggest driver of unintended public exposure for this resource.",
+      "compliant": "INTERNAL",
+      "non_compliant": "EXTERNAL"
     },
     "name": {
       "description": "Name of the resource; provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply with\n[RFC1035](https://www.ietf.org/rfc/rfc1035.txt).\n\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash.\n\nFor Private Service Connect forwarding rules that forward traffic to Google\nAPIs, the forwarding rule name must be a 1-20 characters string with\nlowercase letters and numbers and must start with a letter.",
@@ -105,7 +117,9 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Identifies the VPC the load-balanced IP belongs to for internal/PSC rules. Leaving it unset falls back to the auto-created 'default' network, a known GCP anti-pattern (permissive auto-mode firewall rules); it should be blacklisted in favour of an explicit, purpose-built VPC."
+      "rationale": "Identifies the VPC the load-balanced IP belongs to for internal/PSC rules. Rather than blacklisting the literal 'default' network name, the policy should require the field be explicitly set and non-empty — leaving it blank falls back to the auto-created 'default' network, a known GCP anti-pattern (permissive auto-mode firewall rules); it must not pin a specific VPC name, since networks are team/project-specific.",
+      "compliant": "projects/pde/global/networks/prod-vpc",
+      "non_compliant": ""
     },
     "network_tier": {
       "description": "This signifies the networking tier used for configuring\nthis load balancer and can only take the following values:\n'PREMIUM', 'STANDARD'.\n\nFor regional ForwardingRule, the valid values are 'PREMIUM' and\n'STANDARD'. For GlobalForwardingRule, the valid value is\n'PREMIUM'.\n\nIf this field is not specified, it is assumed to be 'PREMIUM'.\nIf 'IPAddress' is specified, this value must be equal to the\nnetworkTier of the Address. Possible values: [\"PREMIUM\", \"STANDARD\"]",
@@ -154,7 +168,9 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable).",
+      "compliant": "australia-southeast1",
+      "non_compliant": "us-central1"
     },
     "service_label": {
       "description": "An optional prefix to the service name for this Forwarding Rule.\nIf specified, will be the first label of the fully qualified service\nname.\n\nThe label must be 1-63 characters long, and comply with RFC1035.\nSpecifically, the label must be 1-63 characters long and match the\nregular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the first\ncharacter must be a lowercase letter, and all following characters\nmust be a dash, lowercase letter, or digit, except the last\ncharacter, which cannot be a dash.\n\nThis field is only used for INTERNAL load balancing.",
@@ -168,7 +184,9 @@
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "The allow-list of source IPs/CIDRs permitted to reach an EXTERNAL regional forwarding rule. Explicitly setting an entry to '0.0.0.0/0' opens the rule to any source IP, which should be blacklisted in favour of scoped ranges (consistent with how allowed_ip_cidr_ranges/allowed_ips are treated elsewhere in this repo)."
+      "rationale": "The allow-list of source IPs/CIDRs permitted to reach an EXTERNAL regional forwarding rule. The specific CIDR ranges/routing topology are a team/routing design choice, not a platform policy target (see docs/ASSESSMENT_GUIDANCE.md §8: network address ranges are team addressing, not something this platform polices). What remains a platform-level exposure control is the wildcard case: explicitly setting an entry to '0.0.0.0/0' removes the source restriction entirely and opens the rule to any source IP, so that specific value stays blacklisted.",
+      "compliant": ["203.0.113.0/24"],
+      "non_compliant": ["0.0.0.0/0"]
     },
     "subnetwork": {
       "description": "This field identifies the subnetwork that the load balanced IP should\nbelong to for this Forwarding Rule, used in internal load balancing and\nnetwork load balancing with IPv6.\n\nIf the network specified is in auto subnet mode, this field is optional.\nHowever, a subnetwork must be specified if the network is in custom subnet\nmode or when creating external forwarding rule with IPv6.",

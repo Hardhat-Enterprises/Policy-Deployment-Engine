@@ -6,10 +6,10 @@ import data.terraform.gcp.security.compute_engine.google_compute_forwarding_rule
 conditions := [
     [
         {
-            "situation_description": "Forwarding Rule must be restricted to protocols that support port-level filtering.",
+            "situation_description": "Forwarding Rule must be restricted to the least-privilege protocol the workload requires.",
             "remedies": [
-                "Set ip_protocol to 'TCP' or 'UDP'.",
-                "Avoid 'L3_DEFAULT', 'ESP', 'AH', 'SCTP' and 'ICMP' unless the workload has a documented need for raw protocol forwarding — these bypass port-level filtering."
+                "Set ip_protocol to 'TCP' or 'UDP' — the protocols that support port-level filtering.",
+                "Avoid 'L3_DEFAULT', 'ESP', 'AH', 'SCTP' and 'ICMP' unless the workload has a documented need for raw protocol forwarding; these bypass port-level filtering and widen the reachable surface."
             ]
         },
         {
