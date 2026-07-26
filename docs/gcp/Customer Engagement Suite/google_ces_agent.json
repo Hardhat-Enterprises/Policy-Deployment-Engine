@@ -6,57 +6,57 @@
       "description": "The ID to use for the agent, which will become the final component of\nthe agent's resource name. If not provided, a unique ID will be\nautomatically assigned for the agent.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the unique identifier of the agent. This value is only used to identify the resource and does not control authentication, permissions, or data protection. Restricting the agent ID would not provide any meaningful security benefit."
     },
     "app": {
       "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the parent application that owns the agent. This is a resource reference, and platform security policies should not restrict which application a team uses. Restricting this field would be overreaching."
     },
     "child_agents": {
       "description": "List of child agents in the agent tree.\nFormat: 'projects/{project}/locations/{location}/apps/{app}/agents/{agent}'",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References child agents that belong to the current agent. This field only links existing resources and does not directly affect the security configuration of the agent. Therefore, it is not a suitable policy target."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls how Terraform handles resource deletion. A security policy can require a protective deletion setting to reduce the risk of accidental or unauthorized deletion. This helps protect important resources from being removed unintentionally."
     },
     "description": {
       "description": "Human-readable description of the agent.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides a human-readable description of the agent. It is only used for documentation and does not affect authentication, access control, or data protection. Restricting this field would not improve security."
     },
     "display_name": {
       "description": "Display name of the agent.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the display name shown for the agent. This field is only used for identification and does not control how the resource behaves or who can access it. Therefore, it is not a security policy target."
     },
     "guardrails": {
       "description": "List of guardrails for the agent.\nFormat:\n'projects/{project}/locations/{location}/apps/{app}/guardrails/{guardrail}'",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Specifies the guardrails applied to the agent. Guardrails help control the behaviour of the AI system and reduce unsafe responses. A policy can require guardrails to be configured to improve the overall security and safety of the agent."
     },
     "instruction": {
       "description": "Instructions for the LLM model to guide the agent's behavior.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the instructions that guide the behaviour of the language model. Well-defined instructions help reduce unsafe or unintended behaviour. A security policy can require this field to be configured to encourage secure and responsible AI behaviour."
     },
     "location": {
       "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
@@ -69,15 +69,15 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the Google Cloud project where the resource is created. This is a resource reference, and platform policies should not enforce specific project IDs because different teams use different projects."
     },
     "tools": {
       "description": "List of available tools for the agent.\nFormat: 'projects/{project}/locations/{location}/apps/{app}/tools/{tool}'",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the tools available to the agent. It only points to existing resources and does not directly improve the security of the agent. Restricting tool references would be overreaching."
     },
     "after_agent_callbacks": {
       "type": "block",
@@ -88,22 +88,22 @@
       "description": "Human-readable description of the callback.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides a description for the callback. This field is only for documentation and does not influence the execution or security of the callback. Therefore, it is not a security policy target."
     },
     "after_agent_callbacks.disabled": {
       "description": "Whether the callback is disabled. Disabled callbacks are ignored by the\nagent.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether the callback is enabled or disabled. Disabling important callbacks may remove security checks or validations. A policy can require security-related callbacks to remain enabled."
     },
     "after_agent_callbacks.python_code": {
       "description": "The python code to execute for the callback.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Contains the Python code executed after the agent runs. Because this code directly affects the behaviour of the agent, it should follow organisational security requirements. A policy can help reduce the risk of unsafe or unauthorized code execution."
     },
     "after_model_callbacks": {
       "type": "block",
@@ -114,22 +114,22 @@
       "description": "Human-readable description of the callback.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides a description for the callback. It is only used for documentation and has no effect on the security of the resource."
     },
     "after_model_callbacks.disabled": {
       "description": "Whether the callback is disabled. Disabled callbacks are ignored by the\nagent.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines whether the callback is executed. Disabling callbacks may bypass important validation or monitoring logic. A security policy can require these callbacks to remain enabled."
     },
     "after_model_callbacks.python_code": {
       "description": "The python code to execute for the callback.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Specifies executable Python code that runs after model execution. Since the code directly affects the application's behaviour, it should comply with organisational security policies to reduce security risks."
     },
     "after_tool_callbacks": {
       "type": "block",
@@ -140,22 +140,22 @@
       "description": "Human-readable description of the callback.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides a description of the callback. It does not affect execution or security and is only used for documentation purposes."
     },
     "after_tool_callbacks.disabled": {
       "description": "Whether the callback is disabled. Disabled callbacks are ignored by the\nagent.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines whether the callback is active. Disabling callbacks may remove security controls or monitoring functions. A policy can require critical callbacks to remain enabled."
     },
     "after_tool_callbacks.python_code": {
       "description": "The python code to execute for the callback.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Contains executable Python code that runs after tool execution. Because executable code can affect the security of the agent, a policy can require secure implementation and prevent unsafe code execution."
     },
     "before_agent_callbacks": {
       "type": "block",
@@ -166,22 +166,22 @@
       "description": "Human-readable description of the callback.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides a description of the callback. It has no impact on the security or operation of the resource."
     },
     "before_agent_callbacks.disabled": {
       "description": "Whether the callback is disabled. Disabled callbacks are ignored by the\nagent.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether the callback executes before the agent runs. Disabling important validation callbacks may weaken security. A policy can require them to remain enabled."
     },
     "before_agent_callbacks.python_code": {
       "description": "The python code to execute for the callback.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Contains executable Python code that runs before the agent executes. This code can influence application behaviour and should follow organisational security standards."
     },
     "before_model_callbacks": {
       "type": "block",
@@ -192,22 +192,22 @@
       "description": "Human-readable description of the callback.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Used only to describe the callback. It does not affect security or resource behaviour."
     },
     "before_model_callbacks.disabled": {
       "description": "Whether the callback is disabled. Disabled callbacks are ignored by the\nagent.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines whether the callback is enabled. Keeping important validation callbacks enabled helps maintain consistent security checks before model execution."
     },
     "before_model_callbacks.python_code": {
       "description": "The python code to execute for the callback.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Contains executable Python code executed before the model runs. Since this code directly affects application behaviour, a security policy can require it to follow secure coding practices."
     },
     "before_tool_callbacks": {
       "type": "block",
@@ -218,22 +218,22 @@
       "description": "Human-readable description of the callback.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides documentation for the callback. It has no effect on the security configuration of the resource."
     },
     "before_tool_callbacks.disabled": {
       "description": "Whether the callback is disabled. Disabled callbacks are ignored by the\nagent.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether the callback is active. A policy can require important security callbacks to remain enabled to maintain protection."
     },
     "before_tool_callbacks.python_code": {
       "description": "The python code to execute for the callback.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Contains executable Python code that runs before tool execution. A policy can require secure implementation because the code directly affects application behaviour."
     },
     "llm_agent": {
       "type": "block",
@@ -249,15 +249,15 @@
       "description": "The LLM model that the agent should use.\nIf not set, the agent will inherit the model from its parent agent.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies which language model the agent uses. Choosing a model is a functional configuration decision and does not directly represent a platform security control."
     },
     "model_settings.temperature": {
       "description": "If set, this temperature will be used for the LLM model. Temperature\ncontrols the randomness of the model's responses. Lower temperatures\nproduce responses that are more predictable. Higher temperatures produce\nresponses that are more creative.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the creativity and randomness of model responses. This affects application behaviour but does not directly improve infrastructure or platform security."
     },
     "remote_dialogflow_agent": {
       "type": "block",
@@ -268,43 +268,43 @@
       "description": "The\n[Dialogflow](https://cloud.google.com/dialogflow/cx/docs/concept/console-conversational-agents\nagent resource name.\nFormat: 'projects/{project}/locations/{location}/agents/{agent}'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References an existing Dialogflow agent. It is only a resource reference and platform security policies should not restrict which agent is selected."
     },
     "remote_dialogflow_agent.environment_id": {
       "description": "The environment ID of the Dialogflow agent be used for the agent\nexecution. If not specified, the draft environment will be used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the Dialogflow environment used during execution. This is a configuration reference and does not directly improve security."
     },
     "remote_dialogflow_agent.flow_id": {
       "description": "The flow ID of the flow in the Dialogflow agent.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the Dialogflow flow to execute. Restricting flow identifiers would not improve the security of the resource."
     },
     "remote_dialogflow_agent.input_variable_mapping": {
       "description": "The mapping of the app variables names to the Dialogflow session\nparameters names to be sent to the Dialogflow agent as input.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Maps application variables to Dialogflow parameters. This controls data mapping rather than security, so it is not an appropriate security policy target."
     },
     "remote_dialogflow_agent.output_variable_mapping": {
       "description": "The mapping of the Dialogflow session parameters names to the app\nvariables names to be sent back to the CES agent after the Dialogflow\nagent execution ends.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Maps Dialogflow output values back to application variables. This is functional configuration and does not directly improve resource security."
     },
     "remote_dialogflow_agent.respect_response_interruption_settings": {
       "description": "Indicates whether to respect the message-level interruption settings configured in the Dialogflow agent. * If false: all response messages from the Dialogflow agent follow the app-level barge-in settings. * If true: only response messages with ['allow_playback_interruption'](https://docs.cloud.google.com/dialogflow/cx/docs/reference/rpc/google.cloud.dialogflow.cx.v3#text) set to true will be interruptable, all other messages follow the app-level barge-in settings.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls how response interruptions are handled during conversations. It affects user experience and conversation behaviour rather than platform security."
     },
     "toolsets": {
       "type": "block",
@@ -315,15 +315,15 @@
       "description": "The tools IDs to filter the toolset.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References specific tools within a toolset. It only identifies existing resources and does not directly improve the security of the agent."
     },
     "toolsets.toolset": {
       "description": "The resource name of the toolset.\nFormat:\n'projects/{project}/locations/{location}/apps/{app}/toolsets/{toolset}'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the toolset used by the agent. This is a resource reference and should remain a team-specific configuration rather than a platform security policy."
     }
   }
 }
