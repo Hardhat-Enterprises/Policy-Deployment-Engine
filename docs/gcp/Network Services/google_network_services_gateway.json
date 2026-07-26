@@ -6,70 +6,70 @@
       "description": "Zero or one IPv4 or IPv6 address on which the Gateway will receive the traffic.\nWhen no address is provided, an IP from the subnetwork is allocated.\n\nThis field only applies to gateways of type 'SECURE_WEB_GATEWAY'.\nGateways of type 'OPEN_MESH' listen on 0.0.0.0 for IPv4 and :: for IPv6.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Specifies the IP address assigned to the gateway. This is a networking configuration rather than a security control, and platform policy should not enforce specific IP addresses."
     },
     "all_ports": {
       "description": "Configures this gateway to ​listen on all ports. By enabling the wildcard ports feature on​ ​your Secure Web Proxy Gateway,it will accept traffic destined for any port (1-65535) on its​ assigned IP address.​\nThis field is configurable only for gateways of type SECURE_WEB_GATEWAY.",
       "required": false,
       "type": "bool",
-      "security_impact": "true",
+      "security_impact": true,
       "rationale": "Controls whether the gateway listens on every port (1-65535). A policy should prevent unnecessary exposure by requiring only explicitly needed ports instead of enabling all ports."
     },
     "certificate_urls": {
       "description": "A fully-qualified Certificates URL reference. The proxy presents a Certificate (selected based on SNI) when establishing a TLS connection.\nThis feature only applies to gateways of type 'SECURE_WEB_GATEWAY'.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "References existing certificate resources used for TLS. It is only a pointer to another resource, and platform policy should not enforce which certificate is used."
     },
     "delete_swg_autogen_router_on_destroy": {
       "description": "When deleting a gateway of type 'SECURE_WEB_GATEWAY', this boolean option will also delete auto generated router by the gateway creation.\nIf there is no other gateway of type 'SECURE_WEB_GATEWAY' remaining for that region and network it will be deleted.",
       "required": false,
       "type": "bool",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Controls whether an automatically created router is deleted during resource destruction. This is an operational lifecycle option rather than a security control."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true",
+      "security_impact": true,
       "rationale": "Controls whether Terraform can destroy the gateway. A policy can require PREVENT or disallow unrestricted deletion to reduce accidental or malicious resource destruction."
     },
     "description": {
       "description": "A free-text description of the resource. Max length 1024 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Free-text description used for documentation only. It has no effect on the security posture of the gateway."
     },
     "envoy_headers": {
       "description": "Determines if envoy will insert internal debug headers into upstream requests.\nOther Envoy headers may still be injected.\nBy default, envoy will not insert any debug headers. Possible values: [\"NONE\", \"DEBUG_HEADERS\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true",
+      "security_impact": true,
       "rationale": "Controls insertion of Envoy debug headers. A policy should require debug headers to remain disabled because exposing internal debugging information may leak implementation details."
     },
     "gateway_security_policy": {
       "description": "A fully-qualified GatewaySecurityPolicy URL reference. Defines how a server should apply security policy to inbound (VM to Proxy) initiated connections.\nFor example: 'projects/*/locations/*/gatewaySecurityPolicies/swg-policy'.\nThis policy is specific to gateways of type 'SECURE_WEB_GATEWAY'.",
       "required": false,
       "type": "string",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "References an existing Gateway Security Policy resource. It is only a resource reference; platform policy should not dictate which policy resource is attached."
     },
     "ip_version": {
       "description": "The IP Version that will be used by this gateway. Possible values: [\"IPV4\", \"IPV6\"]",
       "required": false,
       "type": "string",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Selects IPv4 or IPv6 for the gateway. Both are supported networking protocols, and neither is inherently more secure in a generic platform policy."
     },
     "labels": {
       "description": "Set of label tags associated with the Gateway resource.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Metadata used for organization and resource management. Labels do not affect security behaviour."
     },
     "location": {
@@ -83,63 +83,63 @@
       "description": "Name of the Gateway resource.",
       "required": true,
       "type": "string",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Resource identifier only. Platform policy should not constrain resource names."
     },
     "network": {
       "description": "The relative resource name identifying the VPC network that is using this configuration.\nFor example: 'projects/*/global/networks/network-1'.\n\nCurrently, this field is specific to gateways of type 'SECURE_WEB_GATEWAY'.",
       "required": false,
       "type": "string",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "References an existing VPC network. It is a pointer to another resource, and platform policy should not dictate which network is used."
     },
     "ports": {
       "description": "One or more port numbers (1-65535), on which the Gateway will receive traffic.\nThe proxy binds to the specified ports.\n Gateways of type 'OPEN_MESH' listen on 0.0.0.0 for IPv4 and :: for IPv6 and support multiple ports.",
       "required": false,
       "type": "list(number)",
-      "security_impact": "true",
+      "security_impact": true,
       "rationale": "Specifies which ports accept incoming traffic. A policy can restrict allowed ports to approved values, reducing unnecessary attack surface."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Specifies the Google Cloud project containing the resource. Platform policy should not constrain project identifiers."
     },
     "routing_mode": {
       "description": "The routing mode of the Gateway. This field is configurable only for gateways of type SECURE_WEB_GATEWAY. This field is required for gateways of type SECURE_WEB_GATEWAY. Possible values: [\"NEXT_HOP_ROUTING_MODE\", \"EXPLICIT_ROUTING_MODE\"]",
       "required": false,
       "type": "string",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Determines how traffic is routed through the gateway. This is an architectural configuration rather than a generic security control."
     },
     "scope": {
       "description": "Immutable. Scope determines how configuration across multiple Gateway instances are merged.\nThe configuration for multiple Gateway instances with the same scope will be merged as presented as a single coniguration to the proxy/load balancer.\n\nMax length 64 characters. Scope should start with a letter and can only have letters, numbers, hyphens.",
       "required": false,
       "type": "string",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Defines how configurations are merged across gateway instances. It affects configuration behaviour but does not directly improve security through platform policy."
     },
     "server_tls_policy": {
       "description": "A fully-qualified ServerTLSPolicy URL reference. Specifies how TLS traffic is terminated. If empty, TLS termination is disabled.",
       "required": false,
       "type": "string",
-      "security_impact": "true",
+      "security_impact": true,
       "rationale": "References a TLS policy that controls how TLS is terminated. A policy should require a TLS policy to be configured so secure TLS settings are enforced."
     },
     "subnetwork": {
       "description": "The relative resource name identifying the subnetwork in which this SWG is allocated.\nFor example: projects/*/regions/us-central1/subnetworks/network-1.\n\nCurrently, this field is specific to gateways of type 'SECURE_WEB_GATEWAY'.",
       "required": false,
       "type": "string",
-      "security_impact": "true",
+      "security_impact": true,
       "rationale": "References an existing subnet. It is an identifier for another resource, and platform policy should not constrain which subnet is used."
     },
     "type": {
       "description": "Immutable. The type of the customer managed gateway. Possible values: [\"OPEN_MESH\", \"SECURE_WEB_GATEWAY\"]",
       "required": true,
       "type": "string",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Specifies the gateway type (OPEN_MESH or SECURE_WEB_GATEWAY). This is a functional deployment choice rather than a generic security control. A platform policy should not force one architecture over another."
     }
   }
