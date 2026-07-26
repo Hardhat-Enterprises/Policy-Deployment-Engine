@@ -162,8 +162,8 @@
       "description": "Optional. The name of the Compute Engine network attachment\nto attach to the resource within the region and user project.\nTo specify this field, you must have already created a network attachment.\nThis field is only used for resources using PSC-Interface.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "No security impact as it's a pointer to another resource."
     },
     "spec.deployment_spec.psc_interface_config.dns_peering_configs": {
       "type": "block",
@@ -174,22 +174,22 @@
       "description": "Required. The DNS name suffix of the zone being peered\nto, e.g., \"my-internal-domain.corp.\".\nMust end with a dot.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "it is a team-specific network configuration, not a security control."
     },
     "spec.deployment_spec.psc_interface_config.dns_peering_configs.target_network": {
       "description": "Required. The VPC network name in the targetProject\nwhere the DNS zone specified by 'domain' is visible.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "No security impact as it's a pointer to another resource."
     },
     "spec.deployment_spec.psc_interface_config.dns_peering_configs.target_project": {
       "description": "Required. The project id hosting the Cloud DNS managed\nzone that contains the 'domain'.\nThe Vertex AI service Agent requires the dns.peer role\non this project.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the project hosting the DNS zone. No security impact as it's a pointer to another resource."
     },
     "spec.deployment_spec.secret_env": {
       "type": "block",
@@ -200,8 +200,8 @@
       "description": "The name of the environment variable. Must be a valid C\nidentifier.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An identifier with no inherent security impact."
     },
     "spec.deployment_spec.secret_env.secret_ref": {
       "type": "block",
@@ -212,15 +212,15 @@
       "description": "The name of the secret in Cloud Secret Manager.\nFormat: {secret_name}.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "No impact on security as it is an identifier for the project for the resource. It refers to a secret inthe Secret Manager service."
     },
     "spec.deployment_spec.secret_env.secret_ref.version": {
       "description": "The Cloud Secret Manager secret version. Can be 'latest'\nfor the latest version, an integer for a specific\nversion, or a version alias.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Refers to which version of the secret to use. No inherent security impact."
     },
     "spec.package_spec": {
       "type": "block",
@@ -231,29 +231,29 @@
       "description": "Optional. The Cloud Storage URI of the dependency files in tar.gz\nformat.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "No security impact as it's a pointer to another resource. Refers to a tar.gz file in Cloud Storage."
     },
     "spec.package_spec.pickle_object_gcs_uri": {
       "description": "Optional. The Cloud Storage URI of the pickled python object.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "No impact on security as it is a pointer to another resource. Refers to a pickled python object in Cloud Storage."
     },
     "spec.package_spec.python_version": {
       "description": "Optional. The Python version. Currently support 3.8, 3.9, 3.10,\n3.11, 3.12, 3.13. If not specified, default value is 3.10.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "It determines the python version to use for the Reasoning Engine. A policy should see that the correct and secure python version is used instead of a default one."
     },
     "spec.package_spec.requirements_gcs_uri": {
       "description": "Optional. The Cloud Storage URI of the requirements.txtfile",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "No security impact as it's a pointer to another resource. Refers to a requirements file in Cloud Storage."
     },
     "spec.source_code_spec": {
       "type": "block",
@@ -274,22 +274,22 @@
       "description": "Directory, relative to the source root, in which to run the build.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A path with no inherent security impact."
     },
     "spec.source_code_spec.developer_connect_source.config.git_repository_link": {
       "description": "The Developer Connect Git repository link, formatted as projects/*/locations/*/connections/*/gitRepositoryLink/*.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "No security impact as it's a pointer to another resource. Refers to a git repository link of Developer Connect."
     },
     "spec.source_code_spec.developer_connect_source.config.revision": {
       "description": "The revision to fetch from the Git repository such as a branch, a tag, a commit SHA, or any Git ref.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The Git ref to fetch from source code. No inherent security impact."
     },
     "spec.source_code_spec.image_spec": {
       "type": "block",
@@ -300,8 +300,8 @@
       "description": "Build arguments to be used. They will be passed through --build-arg flags.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Docker build arguments, Team-specific configuration and a not platform security control with no inherent security impact."
     },
     "spec.source_code_spec.inline_source": {
       "type": "block",
@@ -312,8 +312,8 @@
       "description": "Required. Input only.\nThe application source code archive, provided as a compressed\ntarball (.tar.gz) file. A base64-encoded string.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The inline source code archive itself. No meaningful security policy can be applied as it is free form source code provided by the user."
     },
     "spec.source_code_spec.python_spec": {
       "type": "block",
@@ -324,29 +324,29 @@
       "description": "Optional. The Python module to load as the entrypoint,\nspecified as a fully qualified module name. For example:\npath.to.agent. If not specified, defaults to \"agent\".\nThe project root will be added to Python sys.path, allowing\nimports to be specified relative to the root.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A functional setting with no security impact."
     },
     "spec.source_code_spec.python_spec.entrypoint_object": {
       "description": "Optional. The name of the callable object within the\nentrypointModule to use as the application If not specified,\ndefaults to \"root_agent\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A functional setting with no security impact."
     },
     "spec.source_code_spec.python_spec.requirements_file": {
       "description": "Optional. The path to the requirements file, relative to the\nsource root. If not specified, defaults to \"requirements.txt\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A functional path with no security impact."
     },
     "spec.source_code_spec.python_spec.version": {
       "description": "Optional. The version of Python to use. Support version\nincludes 3.9, 3.10, 3.11, 3.12, 3.13. If not specified,\ndefault value is 3.10.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The Python version to use. A policy should ensure the correct and secure Python version is used."
     }
   }
 }
