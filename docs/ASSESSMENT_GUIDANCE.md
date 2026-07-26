@@ -31,7 +31,11 @@ project, without naming anything specific:
 - ❌ *"bucket name must be `prod-data`"* — naming a specific resource. Invalid.
 
 Region is the one place a concrete value (even hardcoded) is fine; keys, projects,
-emails, and resource names are not.
+emails, and resource names are not. The residency whitelist applies to **every**
+resource type — networking pieces, sub-resources, and things that hold no customer
+data included (a `region` on a BGP peer or an interconnect attachment is as
+enforceable as one on a bucket). Never mark a region/location/zone argument `false`
+on the grounds that the resource "doesn't store data".
 
 We are ensuring **this resource is cleanly/securely configured** — we are **not** policing
 the names of *other* resources it references (other buckets, projects, datasets). Pointing
@@ -54,7 +58,7 @@ they were distilled from real Azure platform policies and apply equally to GCP:
 | **Disable weak/static auth** | prefer managed identity / IAM over local/basic auth, SAS, shared keys | local-auth toggles, SAS/HMAC keys |
 | **Require logging / audit** | logging/diagnostics enabled and routed | `logging.log_bucket`, diagnostic settings |
 | **Data residency** | region/location must be in an approved **whitelist** | `location`, `zone`, `region` |
-| **Prevent destructive loss** | block hard-destroy; require retention lock, soft-delete, purge protection | `force_destroy` (→false), `retention_policy.is_locked`, `soft_delete_policy` |
+| **Prevent destructive loss** | block hard-destroy; require retention lock, soft-delete, purge protection | `force_destroy` (→false), `deletion_protection`, `deletion_policy` (require the destroy-blocking value), `retention_policy.is_locked`, `soft_delete_policy` |
 | **Require managed identity** | identity assigned to the resource | identity blocks |
 | **Credential hygiene** | enforce rotation / max age; disable static keys | key rotation, SAS expiry |
 | **Enable any security feature / disable anything that weakens security** | the catch-all | various |
@@ -116,6 +120,19 @@ A rationale must **demonstrate understanding of what the argument controls** and
 - Vague or complex fields → explain what they actually control before judging.
 - Be specific and correct (no typos, no hand-wave like *"not security related"* without
   saying what it is).
+- A rationale that only asserts an argument is security-adjacent (*"SSH keys control
+  administrative access"*) is inadequate — even when the `true` call is right. It must
+  do two things. **(1) Explain what the argument actually does in this resource's
+  context** — especially where Terraform's own description is too thin to tell (e.g.
+  *"SSH public keys to be stored with cluster"* leaves the reader none the wiser about
+  what those keys grant access to or how the cluster uses them; the rationale is where
+  that gap gets filled, which takes research beyond the docs page). **(2) State what
+  the policy would enforce**, so the reader can tell its shape: require non-empty,
+  forbid a value, constrain a scheme, etc.
+- Claimed risks must survive a check of what the platform actually **accepts**. If the
+  platform already forbids the insecure values (e.g. a subnet CIDR field that only takes
+  RFC 1918 private ranges), a rationale built on preventing them polices an
+  impossibility — that's insufficient research, not a policy.
 
 **Model rationales**
 
@@ -151,6 +168,13 @@ When reviewing a student's assessment of an argument, **reject** if any of these
 If you simply disagree that enforcing a policy here improves security, that's a valid
 rejection — the bar is *"does a platform-level policy here make the resource more
 secure?"*
+
+**When the call is right but the rationale isn't:** the rejection targets the
+**rationale only**. Say explicitly that the `true`/`false` call is correct and keep it —
+never advise flipping a correct call because its rationale is weak or misframed. Coach
+rather than dictate: point at what the argument actually controls and what the rationale
+fails to address, so the student can rewrite it themselves — don't hand them the
+finished rationale.
 
 ---
 
@@ -194,22 +218,51 @@ Rulings established while reviewing every service — apply these consistently:
   that receives/sends data (e.g. Pub/Sub `push_endpoint`), requiring the TLS scheme is the
   secure-protocol archetype. Constrain the scheme only; never pin the host. (A URL that is
   purely a reference to a team-specific system — e.g. an SCM `host_uri` — stays `false`.)
-- **Monitoring / observability → `true`.** Treat enable-monitoring like logging: require
-  it on so activity is visible. For log-*level* fields, require logging enabled (not OFF)
-  for auditability — favour capturing security events over silencing logs.
+- **Security telemetry → `true`; pure health monitoring → `false`.** Toggles that
+  collect *security-relevant* records — audit/diagnostic events, incident logs, access
+  logs — are the require-logging archetype: enforce them **enabled** so security teams
+  have the data. (The correct rationale is visibility/auditability — *not* "these logs
+  are sensitive and must be locked down".) Liveness/health/performance monitoring is
+  operational, not a security signal — no policy. For log-*level* fields, require
+  logging enabled (not OFF) for auditability — favour capturing security events over
+  silencing logs.
+- **Deletion-blocking flags → `true`, always.** Any argument that prevents the resource
+  itself being destroyed (`deletion_protection`, `deletion_policy`, prevent-destroy
+  toggles) is the prevent-destructive-loss archetype — enforce the destroy-blocking
+  value. This holds on *every* resource type, networking sub-resources included;
+  "operational availability, not security" is **not** a valid reason to mark one
+  `false`. (Distinct from backup-*retention length*, which stays a team choice — see
+  below.)
+- **Enums with an `*_UNSPECIFIED` value → `true`.** Where an enum's accepted values
+  include an unspecified/default sentinel (e.g. `license_type`:
+  `LICENSE_TYPE_UNSPECIFIED` | `LICENSE_INCLUDED` | `BRING_YOUR_OWN_LICENSE`), enforce
+  that one of the *explicit* values is chosen — we prefer explicit configuration over
+  silent defaults. The policy forbids the `*_UNSPECIFIED` value only; it never picks
+  which explicit value the team must use.
 - **Exposure allowlists → `true`.** A list that gates who can reach a private resource
   (e.g. `allowed_projects` on a private cluster) is a network-exposure control: constrain
   the allowlist *shape* (non-empty, not overly broad); don't pin specific entries.
 
 Confirmed **`false`** (not policy targets):
 - Network **address ranges / CIDR blocks** — team addressing; segmentation is enforced by
-  firewall/network-policy resources, not range sizing.
+  firewall/network-policy resources, not range sizing. Many subnet/CIDR fields are also
+  platform-constrained to RFC 1918 private ranges already (e.g. ODB client/backup
+  subnets), so "restrict to private space" rationales police an impossibility (§5).
 - **Functional / architectural enums** with no insecure value (serving scope, hosting
-  type, HTTP method, store type, streaming-engine toggle, provisioning force-override).
+  type, HTTP method, store type, streaming-engine toggle, provisioning force-override) —
+  *except* the `*_UNSPECIFIED` sentinel, which we do forbid (see above).
 - **References to other resources** (buckets/paths, networks, name servers, endpoints,
   driver names, store IDs) — we secure the referenced resource itself, not the pointer.
-- **Backup retention length and deletion/cleanup policies** — data-management /
-  operational hygiene, distinct from blocking destructive data loss.
+- **Backup-retention *length* and data-cleanup/TTL settings** — how long a team keeps
+  data is their choice. This never extends to flags that *block deletion of the resource
+  itself* — those are `true` (see above).
+- **Software / engine version selection** (e.g. `gi_version`) — the platform only offers
+  currently-supported releases, so any accepted value is already vendor-supported; a
+  minimum-version policy would drift and adds no structural guarantee. `false` — unless
+  the field can select a *documented-insecure* option, which makes it the
+  secure-minimums archetype (like min TLS).
+- **Snapshot / storage-layout features** (sparse diskgroups, redundancy modes, local
+  backup toggles) — operational data-management choices, not security controls.
 - **Un-constrainable secret values and free-form documents** (auth tokens, OpenAPI/gRPC
   config blobs) — like IAM `policy_data`, a generic rule can't meaningfully constrain
   them. (Free-form **env-var maps** stay `true` on credential-hygiene grounds — a policy
