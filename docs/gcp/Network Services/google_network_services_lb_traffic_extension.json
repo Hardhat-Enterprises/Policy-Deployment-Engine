@@ -6,35 +6,35 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true",
+      "security_impact": true,
       "rationale": "Controls whether Terraform can destroy the resource. A policy should require destruction protection (for example, PREVENT) to reduce accidental or malicious deletion of critical infrastructure."
     },
     "description": {
       "description": "A human-readable description of the resource.",
       "required": false,
       "type": "string",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Human-readable description used for documentation only. It does not affect the security posture of the resource."
     },
     "forwarding_rules": {
       "description": "A list of references to the forwarding rules to which this service extension is attached to.\nAt least one forwarding rule is required. There can be only one LBTrafficExtension resource per forwarding rule.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "References existing forwarding rule resources. Platform policy should not constrain which forwarding rules a team chooses to attach."
     },
     "labels": {
       "description": "Set of labels associated with the LbTrafficExtension resource.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Metadata used for organization and resource management. Labels do not provide or weaken security controls."
     },
     "load_balancing_scheme": {
       "description": "All backend services and forwarding rules referenced by this extension must share the same load balancing scheme.\nFor more information, refer to [Choosing a load balancer](https://cloud.google.com/load-balancing/docs/backend-service) and\n[Supported application load balancers](https://cloud.google.com/service-extensions/docs/callouts-overview#supported-lbs). Possible values: [\"INTERNAL_MANAGED\", \"EXTERNAL_MANAGED\"]",
       "required": true,
       "type": "string",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Specifies the load balancing architecture (INTERNAL_MANAGED or EXTERNAL_MANAGED). This is a functional deployment choice rather than a generic security control, and platform policy should not enforce one architecture over another."
     },
     "location": {
@@ -48,14 +48,14 @@
       "description": "Name of the LbTrafficExtension resource in the following format: projects/{project}/locations/{location}/lbTrafficExtensions/{lbTrafficExtension}.",
       "required": true,
       "type": "string",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Resource identifier only. Platform policy should not constrain resource names."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Identifies the Google Cloud project containing the resource. Platform policy should not constrain project identifiers."
     },
     "extension_chains": {
@@ -67,7 +67,7 @@
       "description": "The name for this extension chain. The name is logged as part of the HTTP request logs.\nThe name must conform with RFC-1034, is restricted to lower-cased letters, numbers and hyphens,\nand can have a maximum length of 63 characters. Additionally, the first character must be a letter\nand the last a letter or a number.",
       "required": true,
       "type": "string",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Name of the extension chain used for identification and logging. It is an identifier and does not affect security."
     },
     "extension_chains.extensions": {
@@ -79,56 +79,56 @@
       "description": "The :authority header in the gRPC request sent from Envoy to the extension service.",
       "required": false,
       "type": "string",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Specifies the :authority header sent in gRPC requests. This is an application configuration value rather than a generic security control."
     },
     "extension_chains.extensions.fail_open": {
       "description": "Determines how the proxy behaves if the call to the extension fails or times out.\nWhen set to TRUE, request or response processing continues without error.\nAny subsequent extensions in the extension chain are also executed.\nWhen set to FALSE: * If response headers have not been delivered to the downstream client,\na generic 500 error is returned to the client. The error response can be tailored by\nconfiguring a custom error response in the load balancer.",
       "required": false,
       "type": "bool",
-      "security_impact": "true",
+      "security_impact": true,
       "rationale": "Controls gateway behavior when the extension fails. A policy should require fail-closed (false) so requests are not processed when security extensions are unavailable."
     },
     "extension_chains.extensions.forward_headers": {
       "description": "List of the HTTP headers to forward to the extension (from the client or backend).\nIf omitted, all headers are sent. Each element is a string indicating the header name.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true",
+      "security_impact": true,
       "rationale": "Controls which HTTP headers are forwarded to the extension. By default, all headers are forwarded. A policy should restrict forwarded headers to only those required, reducing unnecessary exposure of sensitive information."
     },
     "extension_chains.extensions.metadata": {
       "description": "Metadata associated with the extension. This field is used to pass metadata to the extension service.\nYou can set up key value pairs for metadata as you like and need.\nf.e. {\"key\": \"value\", \"key2\": \"value2\"}.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Free-form metadata passed to the extension service. A generic platform policy cannot meaningfully constrain arbitrary key-value metadata."
     },
     "extension_chains.extensions.name": {
       "description": "The name for this extension. The name is logged as part of the HTTP request logs.\nThe name must conform with RFC-1034, is restricted to lower-cased letters, numbers and hyphens,\nand can have a maximum length of 63 characters. Additionally, the first character must be a letter\nand the last a letter or a number.",
       "required": true,
       "type": "string",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Identifier for the extension. Platform policy should not constrain resource names."
     },
     "extension_chains.extensions.service": {
       "description": "The reference to the service that runs the extension.\n\n* To configure a callout extension, service must be a fully-qualified reference to a backend service.\n* To configure a plugin extension, service must be a reference to a WasmPlugin resource.",
       "required": true,
       "type": "string",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "References an existing backend service or WasmPlugin resource. It is a pointer to another resource, and platform policy should not dictate which service is used."
     },
     "extension_chains.extensions.supported_events": {
       "description": "A set of events during request or response processing for which this extension is called.\nThis field is required for the LbTrafficExtension resource. It's not relevant for the LbRouteExtension\nresource. Possible values:'EVENT_TYPE_UNSPECIFIED', 'REQUEST_HEADERS', 'REQUEST_BODY', 'RESPONSE_HEADERS',\n'RESPONSE_BODY', 'RESPONSE_BODY' and 'RESPONSE_BODY'.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Specifies the request or response events that invoke the extension. This is functional behavior rather than a generic security control."
     },
     "extension_chains.extensions.timeout": {
       "description": "Specifies the timeout for each individual message on the stream. The timeout must be between 10-1000 milliseconds.\nA duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.5s\".",
       "required": false,
       "type": "string",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Configures the timeout for extension communication. This is an operational reliability setting and not a platform security control."
     },
     "extension_chains.match_condition": {
@@ -140,7 +140,7 @@
       "description": "A Common Expression Language (CEL) expression that is used to match requests for which the extension chain is executed.",
       "required": true,
       "type": "string",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Defines the request-matching logic using a CEL expression. This is a free-form policy expression that cannot be generically constrained by a platform security policy."
     }
   }
