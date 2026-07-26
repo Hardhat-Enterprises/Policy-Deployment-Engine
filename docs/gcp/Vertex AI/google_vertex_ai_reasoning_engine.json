@@ -13,29 +13,29 @@
       "description": "The description of the ReasoningEngine.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "It has no impact on security or data as its a free text description "
     },
     "display_name": {
       "description": "The display name of the ReasoningEngine.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "It is only used for display purpose and has no impact on security"
     },
     "labels": {
       "description": "The labels associated with this ReasoningEngine. You can use these to\norganize and group your ReasoningEngines.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "It has no impact on security or data as its only used for display purpose"
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "No impact on security as it is an identifier for the project for the resource"
     },
     "region": {
       "description": "The region of the reasoning engine. eg us-central1",
@@ -53,8 +53,8 @@
       "description": "Required. The Cloud KMS resource identifier of the customer managed\nencryption key used to protect a resource. Has the form:\nprojects/my-project/locations/my-region/keyRings/my-kr/cryptoKeys/my-key.\nThe key needs to be in the same region as where the compute resource\nis created.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "It sets the customer-managed encryption key for the resource. A policy should set a non empty data to always be encrypted"
     },
     "spec": {
       "type": "block",
@@ -65,29 +65,29 @@
       "description": "Optional. The OSS agent framework used to develop the agent.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "It is a functional choice with no inherently unsecure value."
     },
     "spec.class_methods": {
       "description": "Optional. Declarations for object class methods in OpenAPI\nspecification format.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "It declares the object class methods in OpenAPI specification format, which is a functional choice with no inherently unsecure value."
     },
     "spec.identity_type": {
       "description": "Optional. The identity type to use for the Reasoning Engine.\nIf not specified, the 'service_account' field will be used if set,\notherwise the default Vertex AI Reasoning Engine Service Agent in the project will be used.\nPossible values:\n* 'SERVICE_ACCOUNT': Use a custom service account if the 'service_account' field is set, otherwise use the default Vertex AI Reasoning Engine Service Agent in the project.\n* 'AGENT_IDENTITY': Use Agent Identity. The 'service_account' field must not be set. Possible values: [\"SERVICE_ACCOUNT\", \"AGENT_IDENTITY\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "It determines the identity type to use for the Reasoning Engine. A policy should prefer managed identity over static credentials"
     },
     "spec.service_account": {
       "description": "Optional. The service account that the Reasoning Engine artifact runs\nas. It should have \"roles/storage.objectViewer\" for reading the user\nproject's Cloud Storage and \"roles/aiplatform.user\" for using Vertex\nextensions. If not specified, the Vertex AI Reasoning Engine service\nAgent in the project will be used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "It determines the service account to use for the Reasoning Engine. A policy should see that the correct and secure service account is used instead of a default one."
     },
     "spec.container_spec": {
       "type": "block",
@@ -98,8 +98,8 @@
       "description": "The Artifact Registry Docker image URI (e.g.,\n'us-central1-docker.pkg.dev/my-project/my-repo/my-image:tag') of the\ncontainer image that is to be run on each worker replica.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "It is a pointer to another image resource and has no inherent security impact."
     },
     "spec.deployment_spec": {
       "type": "block",
@@ -110,29 +110,29 @@
       "description": "Optional. Concurrency for each container and agent server.\nRecommended value: 2 * cpu + 1. Defaults to 9.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "It is performance tuning parameter and has no inherent security impact."
     },
     "spec.deployment_spec.max_instances": {
       "description": "Optional. The maximum number of application instances that can be\nlaunched to handle increased traffic. Defaults to 100.\nRange: [1, 1000]. If VPC-SC or PSC-I is enabled, the acceptable\nrange is [1, 100].",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "It is the upper bound for autoscaling and has no inherent security impact."
     },
     "spec.deployment_spec.min_instances": {
       "description": "Optional. The minimum number of application instances that will be\nkept running at all times. Defaults to 1. Range: [0, 10].",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "It is the lower bound for autoscaling and has no inherent security impact."
     },
     "spec.deployment_spec.resource_limits": {
       "description": "Optional. Resource limits for each container.\nOnly 'cpu' and 'memory' keys are supported.\n\nDefaults to {\"cpu\": \"4\", \"memory\": \"4Gi\"}.\n\nThe only supported values for CPU are '1', '2', '4', '6' and '8'.\nFor more information, go to\nhttps://cloud.google.com/run/docs/configuring/cpu.\n\nThe only supported values for memory are '1Gi', '2Gi', ... '32 Gi'.\nFor more information, go to\nhttps://cloud.google.com/run/docs/configuring/memory-limits.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "It is a performance tuning parameter and has no inherent security impact."
     },
     "spec.deployment_spec.env": {
       "type": "block",
@@ -143,15 +143,15 @@
       "description": "The name of the environment variable. Must be a valid\nC identifier.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An identifier with no inherent security impact."
     },
     "spec.deployment_spec.env.value": {
       "description": "Variables that reference a $(VAR_NAME) are expanded using\nthe previous defined environment variables in the container\nand any service environment variables. If a variable cannot\nbe resolved, the reference in the input string will be\nunchanged. The $(VAR_NAME) syntax can be escaped with a\ndouble $$, ie: $$(VAR_NAME). Escaped references will never\nbe expanded, regardless of whether the variable exists\nor not.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Value may contain sensitive information and should be protected. secrets should be embedded in a secret manager."
     },
     "spec.deployment_spec.psc_interface_config": {
       "type": "block",
