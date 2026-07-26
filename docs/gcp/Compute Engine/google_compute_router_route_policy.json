@@ -6,43 +6,43 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls how Terraform handles resource deletion. It affects resource lifecycle and state management but does not change the security configuration of the route policy."
     },
     "name": {
       "description": "Name of the route policy. This policy's name, which must be a resource ID segment and unique within all policies owned by the Router",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The resource name is only used to identify the route policy and does not affect its security or behaviour."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the Google Cloud project where the resource is created. It determines resource placement but does not directly affect the security configuration of the route policy."
     },
     "region": {
       "description": "Region where the router and NAT reside.",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+      "rationale": "Determines the region where the resource is created. Restricting deployment to approved regions helps meet organisational and regulatory data residency requirements."
     },
     "router": {
       "description": "The name of the Cloud Router in which this route policy will be configured.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the Cloud Router where the policy is attached. It identifies the target resource but does not directly introduce a security risk"
     },
     "type": {
       "description": "This is policy's type, which is one of IMPORT or EXPORT Possible values: [\"ROUTE_POLICY_TYPE_IMPORT\", \"ROUTE_POLICY_TYPE_EXPORT\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines whether the policy is applied to imported or exported routes. An incorrect policy type could affect network routing behaviour and security."
     },
     "terms": {
       "type": "block",
@@ -53,8 +53,8 @@
       "description": "The evaluation priority for this term, which must be between 0 (inclusive) and 2147483648 (exclusive), and unique within the list.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls the order in which policy terms are evaluated. Incorrect priorities may cause less restrictive rules to be evaluated before more restrictive ones."
     },
     "terms.actions": {
       "type": "block",
@@ -65,29 +65,29 @@
       "description": "Description of the expression",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides a human-readable description of the action and does not affect how the policy is enforced."
     },
     "terms.actions.expression": {
       "description": "Textual representation of an expression in Common Expression\nLanguage syntax.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the action performed when a route matches the policy. Incorrect or unsafe expressions can change routing behaviour and introduce security risks."
     },
     "terms.actions.location": {
       "description": "String indicating the location of the expression for error\nreporting, e.g. a file name and a position in the file",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Used only for error reporting and debugging. It does not affect policy behaviour or security."
     },
     "terms.actions.title": {
       "description": "Title for the expression, i.e. a short string describing its\npurpose.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides a descriptive title for the action. It is informational only and has no impact on security."
     },
     "terms.match": {
       "type": "block",
@@ -98,29 +98,29 @@
       "description": "Description of the expression",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides documentation for the matching condition and does not influence policy evaluation."
     },
     "terms.match.expression": {
       "description": "Textual representation of an expression in Common Expression Language syntax.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the condition used to determine whether the policy term applies. An overly broad or incorrect expression may unintentionally match or exclude routes, affecting network security."
     },
     "terms.match.location": {
       "description": "String indicating the location of the expression for error reporting, e.g. a file name and a position in the file",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Used only for error reporting and debugging. It does not affect the behaviour or security of the route policy."
     },
     "terms.match.title": {
       "description": "Title for the expression, i.e. a short string describing its purpose.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides a descriptive title for the matching condition and has no effect on policy behaviour or security."
     }
   }
 }
