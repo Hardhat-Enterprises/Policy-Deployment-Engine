@@ -6,78 +6,78 @@
       "description": "A [Common Expression Language](https://github.com/google/cel-spec) expression, in\nplain text, to restrict what otherwise valid authentication credentials issued by the\nprovider should not be accepted.\n\nThe expression must output a boolean representing whether to allow the federation.\n\nThe following keywords may be referenced in the expressions:\n  * 'assertion': JSON representing the authentication credential issued by the provider.\n  * 'google': The Google attributes mapped from the assertion in the 'attribute_mappings'.\n    'google.profile_photo' and 'google.display_name' are not supported.\n  * 'attribute': The custom attributes mapped from the assertion in the 'attribute_mappings'.\n\nThe maximum length of the attribute condition expression is 4096 characters.\nIf unspecified, all valid authentication credentials will be accepted.\n\nThe following example shows how to only allow credentials with a mapped 'google.groups' value of 'admins':\n'''\n\"'admins' in google.groups\"\n'''",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls which otherwise valid identity-provider credentials are accepted. A platform policy should require a non-empty restrictive condition so that federation is limited by trusted claims rather than accepting every valid credential."
     },
     "attribute_mapping": {
       "description": "Maps attributes from the authentication credentials issued by an external identity provider\nto Google Cloud attributes, such as 'subject' and 'segment'.\n\nEach key must be a string specifying the Google Cloud IAM attribute to map to.\n\nThe following keys are supported:\n  * 'google.subject': The principal IAM is authenticating. You can reference this value in IAM bindings.\n    This is also the subject that appears in Cloud Logging logs. This is a required field and\n    the mapped subject cannot exceed 127 bytes.\n  * 'google.groups': Groups the authenticating user belongs to. You can grant groups access to\n    resources using an IAM 'principalSet' binding; access applies to all members of the group.\n  * 'google.display_name': The name of the authenticated user. This is an optional field and\n    the mapped display name cannot exceed 100 bytes. If not set, 'google.subject' will be displayed instead.\n    This attribute cannot be referenced in IAM bindings.\n  * 'google.profile_photo': The URL that specifies the authenticated user's thumbnail photo.\n    This is an optional field. When set, the image will be visible as the user's profile picture.\n    If not set, a generic user icon will be displayed instead.\n    This attribute cannot be referenced in IAM bindings.\n\nYou can also provide custom attributes by specifying 'attribute.{custom_attribute}', where {custom_attribute}\nis the name of the custom attribute to be mapped. You can define a maximum of 50 custom attributes.\nThe maximum length of a mapped attribute key is 100 characters, and the key may only contain the characters [a-z0-9_].\n\nYou can reference these attributes in IAM policies to define fine-grained access for a workforce pool\nto Google Cloud resources. For example:\n  * 'google.subject':\n    'principal://iam.googleapis.com/locations/{location}/workforcePools/{pool}/subject/{value}'\n  * 'google.groups':\n    'principalSet://iam.googleapis.com/locations/{location}/workforcePools/{pool}/group/{value}'\n  * 'attribute.{custom_attribute}':\n    'principalSet://iam.googleapis.com/locations/{location}/workforcePools/{pool}/attribute.{custom_attribute}/{value}'\n\nEach value must be a [Common Expression Language](https://github.com/google/cel-spec)\nfunction that maps an identity provider credential to the normalized attribute specified\nby the corresponding map key.\n\nYou can use the 'assertion' keyword in the expression to access a JSON representation of\nthe authentication credential issued by the provider.\n\nThe maximum length of an attribute mapping expression is 2048 characters. When evaluated,\nthe total size of all mapped attributes must not exceed 8KB.\n\nFor OIDC providers, you must supply a custom mapping that includes the 'google.subject' attribute.\nFor example, the following maps the sub claim of the incoming credential to the 'subject' attribute\non a Google token:\n'''\n{\"google.subject\": \"assertion.sub\"}\n'''\n\nAn object containing a list of '\"key\": value' pairs.\nExample: '{ \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }'.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Maps identity-provider claims to Google IAM attributes. The appropriate claim expressions are specific to each team's identity provider and authorization model, while required mappings such as 'google.subject' are already validated by Google. A generic platform policy would therefore duplicate provider validation or overreach into team-specific identity design."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform may destroy the workforce identity provider. Requiring deletion prevention reduces the risk of accidental removal of critical identity infrastructure and resulting authentication disruption."
     },
     "description": {
       "description": "A user-specified description of the provider. Cannot exceed 256 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides descriptive text for the provider and does not affect authentication, authorization, or another security control."
     },
     "detailed_audit_logging": {
       "description": "If true, populates additional debug information in Cloud Audit Logs for this provider. Logged attribute mappings and values can be found in 'sts.googleapis.com' data access logs. Default value is false.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether additional attribute-mapping details are recorded in Cloud Audit Logs. Requiring it to be enabled improves visibility, troubleshooting, and investigation of federated authentication activity."
     },
     "disabled": {
       "description": "Whether the provider is disabled. You cannot use a disabled provider to exchange tokens.\nHowever, existing tokens still grant access.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the operational enabled state of the provider. A platform-wide policy cannot safely force every provider to remain enabled or disabled because that decision depends on each team's lifecycle and incident-response requirements."
     },
     "display_name": {
       "description": "A user-specified display name for the provider. Cannot exceed 32 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides a human-readable display name and does not change the provider's security behaviour."
     },
     "location": {
       "description": "The location for the resource.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+      "security_impact": false,
+      "rationale": "Specifies the location of the workforce pool provider. This resource is configured in the global workforce identity location, so there is no meaningful regional security choice for a platform policy to constrain."
     },
     "provider_id": {
       "description": "The ID for the provider, which becomes the final component of the resource name.\nThis value must be 4-32 characters, and may contain the characters [a-z0-9-].\nThe prefix 'gcp-' is reserved for use by Google, and may not be specified.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the provider's resource identifier. Platform policy should not constrain team-specific resource names beyond the validation already performed by the provider."
     },
     "scim_usage": {
       "description": "Agentspace only. Specifies whether the workforce identity pool\nprovider uses SCIM-managed groups instead of the 'google.groups'\nattribute mapping for authorization checks.\n\nThe 'scimUsage' and 'extendedAttributesOauth2Client' fields are\nmutually exclusive. A request that enables both fields on the same\nworkforce identity pool provider will produce an error.\n* SCIM_USAGE_UNSPECIFIED: Default behaviour\n* ENABLED_FOR_GROUPS: Use SCIM-managed groups instead of the 'google.groups'\n  attribute mapping for authorization checks Possible values: [\"SCIM_USAGE_UNSPECIFIED\", \"ENABLED_FOR_GROUPS\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects whether authorization uses SCIM-managed groups or mapped group attributes. This is an identity-architecture choice, and neither supported value is universally secure for every organisation."
     },
     "workforce_pool_id": {
       "description": "The ID to use for the pool, which becomes the final component of the resource name.\nThe IDs must be a globally unique string of 6 to 63 lowercase letters, digits, or hyphens.\nIt must start with a letter, and cannot have a trailing hyphen.\nThe prefix 'gcp-' is reserved for use by Google, and may not be specified.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the workforce pool containing the provider. It is a resource reference, and platform policy should not constrain which team-specific pool is used."
     },
     "extended_attributes_oauth2_client": {
       "type": "block",
@@ -88,22 +88,22 @@
       "description": "Represents the IdP and type of claims that should be fetched.\n* AZURE_AD_GROUPS_ID:  Used to get the user's group claims from the Azure AD identity provider\nusing configuration provided in ExtendedAttributesOAuth2Client and 'id'\nproperty of the 'microsoft.graph.group' object is used for claim mapping. See\nhttps://learn.microsoft.com/en-us/graph/api/resources/group?view=graph-rest-1.0#properties\nfor more details on 'microsoft.graph.group' properties. The\ngroup IDs obtained from Azure AD are present in 'assertion.groups' for\nOIDC providers and 'assertion.attributes.groups' for SAML providers for\nattribute mapping. Possible values: [\"AZURE_AD_GROUPS_ID\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the supported identity-provider claim type to retrieve. It is a functional configuration choice with no alternative insecure value to prohibit."
     },
     "extended_attributes_oauth2_client.client_id": {
       "description": "The OAuth 2.0 client ID for retrieving extended attributes from the identity provider. Required to get the Access Token using client credentials grant flow.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the team's OAuth client. Platform policy cannot prescribe a specific client identifier, and constraining the identifier itself does not provide a generic security gain."
     },
     "extended_attributes_oauth2_client.issuer_uri": {
       "description": "The OIDC identity provider's issuer URI. Must be a valid URI using the 'https' scheme. Required to get the OIDC discovery document.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the OIDC issuer used to retrieve extended attributes. The Terraform provider already requires a valid HTTPS URI, so an additional platform policy would duplicate provider validation rather than add a distinct security control."
     },
     "extended_attributes_oauth2_client.client_secret": {
       "type": "block",
@@ -119,8 +119,8 @@
       "description": "The plain text of the client secret value.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains the team-specific OAuth client secret. A generic value constraint cannot meaningfully determine whether an arbitrary secret is secure, and platform policy must not prescribe or inspect a specific credential value."
     },
     "extended_attributes_oauth2_client.query_parameters": {
       "type": "block",
@@ -131,8 +131,8 @@
       "description": "The filter used to request specific records from IdP. In case of attributes type as AZURE_AD_GROUPS_ID, it represents the\nfilter used to request specific groups for users from IdP. By default, all of the groups associated with the user are fetched. The\ngroups should be security enabled. See https://learn.microsoft.com/en-us/graph/search-query-parameter for more details.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines a team-specific query used to select identity-provider group records. Its correct content depends on the organisation's directory structure, so a generic platform policy would overreach."
     },
     "extra_attributes_oauth2_client": {
       "type": "block",
@@ -143,22 +143,22 @@
       "description": "Represents the IdP and type of claims that should be fetched.\n* AZURE_AD_GROUPS_MAIL: Used to get the user's group claims from the Azure AD identity provider using configuration provided\nin ExtraAttributesOAuth2Client and 'mail' property of the 'microsoft.graph.group' object is used for claim mapping.\nSee https://learn.microsoft.com/en-us/graph/api/resources/group?view=graph-rest-1.0#properties for more details on\n'microsoft.graph.group' properties. The attributes obtained from idntity provider are mapped to 'assertion.groups'.\n* AZURE_AD_GROUPS_ID:  Used to get the user's group claims from the Azure AD identity provider\nusing configuration provided in ExtraAttributesOAuth2Client and 'id'\nproperty of the 'microsoft.graph.group' object is used for claim mapping. See\nhttps://learn.microsoft.com/en-us/graph/api/resources/group?view=graph-rest-1.0#properties\nfor more details on 'microsoft.graph.group' properties. The\ngroup IDs obtained from Azure AD are present in 'assertion.groups' for\nOIDC providers and 'assertion.attributes.groups' for SAML providers for\nattribute mapping.\n* AZURE_AD_GROUPS_DISPLAY_NAME: Used to get the user's group claims from the Azure AD identity provider\nusing configuration provided in ExtraAttributesOAuth2Client and 'displayName' property\nof the 'microsoft.graph.group' object is used for claim mapping. See\nhttps://learn.microsoft.com/en-us/graph/api/resources/group?view=graph-rest-1.0#properties\nfor more details on 'microsoft.graph.group' properties. The\ngroup displayNames obtained from Azure AD are present in 'assertion.groups' for\nOIDC providers and 'assertion.attributes.groups' for SAML providers for\nattribute mapping. Possible values: [\"AZURE_AD_GROUPS_MAIL\", \"AZURE_AD_GROUPS_ID\", \"AZURE_AD_GROUPS_DISPLAY_NAME\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects which supported Azure AD group attribute is retrieved. This is a functional claim-mapping choice, and no available value is universally insecure."
     },
     "extra_attributes_oauth2_client.client_id": {
       "description": "The OAuth 2.0 client ID for retrieving extra attributes from the identity provider. Required to get the Access Token using client credentials grant flow.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the team's OAuth client. Platform policy should not constrain a team-specific client identifier because the identifier itself is not a generic security control."
     },
     "extra_attributes_oauth2_client.issuer_uri": {
       "description": "The OIDC identity provider's issuer URI. Must be a valid URI using the 'https' scheme. Required to get the OIDC discovery document.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the OIDC issuer used to retrieve additional attributes. The Terraform provider already requires a valid HTTPS URI, so an additional platform policy would duplicate provider validation rather than add a distinct security control."
     },
     "extra_attributes_oauth2_client.client_secret": {
       "type": "block",
@@ -174,8 +174,8 @@
       "description": "The plain text of the client secret value.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains the team-specific OAuth client secret. A generic policy cannot assess or constrain arbitrary secret contents without inspecting or prescribing credentials, which is outside the platform-policy scope."
     },
     "extra_attributes_oauth2_client.query_parameters": {
       "type": "block",
@@ -186,8 +186,8 @@
       "description": "The filter used to request specific records from IdP. In case of attributes type as AZURE_AD_GROUPS_MAIL,\nAZURE_AD_GROUPS_ID and AZURE_AD_GROUPS_DISPLAY_NAME, it represents the filter used to request specific\ngroups for users from IdP. By default, all of the groups associated with the user are fetched. The groups\nshould be security enabled. See https://learn.microsoft.com/en-us/graph/search-query-parameter for more\ndetails.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines a team-specific query for selecting group records from the identity provider. The appropriate filter depends on directory and access requirements and cannot be generically constrained."
     },
     "oidc": {
       "type": "block",
@@ -198,22 +198,22 @@
       "description": "The client ID. Must match the audience claim of the JWT issued by the identity provider.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the OIDC client and expected token audience. It is a team-specific identifier, and platform policy must not prescribe a particular client ID."
     },
     "oidc.issuer_uri": {
       "description": "The OIDC issuer URI. Must be a valid URI using the 'https' scheme.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the trusted OIDC issuer for the provider. The Terraform provider already requires a valid HTTPS URI, so an additional platform policy cannot meaningfully enforce a stronger generic constraint without prescribing a team-specific issuer."
     },
     "oidc.jwks_json": {
       "description": "OIDC JWKs in JSON String format. For details on definition of a\nJWK, see https:tools.ietf.org/html/rfc7517. If not set, then we\nuse the 'jwks_uri' from the discovery document fetched from the\n.well-known path for the 'issuer_uri'. Currently, RSA and EC asymmetric\nkeys are supported. The JWK must use following format and include only\nthe following fields:\n'''\n{\n  \"keys\": [\n    {\n          \"kty\": \"RSA/EC\",\n          \"alg\": \"<algorithm>\",\n          \"use\": \"sig\",\n          \"kid\": \"<key-id>\",\n          \"n\": \"\",\n          \"e\": \"\",\n          \"x\": \"\",\n          \"y\": \"\",\n          \"crv\": \"\"\n    }\n  ]\n}\n'''",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains a free-form JSON Web Key Set supplied by the identity provider. Google validates the supported key structure, while a generic platform policy cannot safely constrain arbitrary team-specific signing keys."
     },
     "oidc.client_secret": {
       "type": "block",
@@ -229,8 +229,8 @@
       "description": "The plain text of the client secret value.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains the team-specific OIDC client secret. A generic policy cannot determine whether an arbitrary secret value is secure and must not prescribe or inspect specific credentials."
     },
     "oidc.web_sso_config": {
       "type": "block",
@@ -241,22 +241,22 @@
       "description": "Additional scopes to request for in the OIDC authentication request on top of scopes requested by default. By default, the 'openid', 'profile' and 'email' scopes that are supported by the identity provider are requested.\nEach additional scope may be at most 256 characters. A maximum of 10 additional scopes may be configured.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Lists additional OIDC scopes requested for web sign-in. Required scopes depend on the identity provider and application requirements, so a generic allowlist would dictate team-specific identity design."
     },
     "oidc.web_sso_config.assertion_claims_behavior": {
       "description": "The behavior for how OIDC Claims are included in the 'assertion' object used for attribute mapping and attribute condition.\n* MERGE_USER_INFO_OVER_ID_TOKEN_CLAIMS: Merge the UserInfo Endpoint Claims with ID Token Claims, preferring UserInfo Claim Values for the same Claim Name. This option is available only for the Authorization Code Flow.\n* ONLY_ID_TOKEN_CLAIMS: Only include ID Token Claims. Possible values: [\"MERGE_USER_INFO_OVER_ID_TOKEN_CLAIMS\", \"ONLY_ID_TOKEN_CLAIMS\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether UserInfo claims are merged with ID-token claims or only ID-token claims are used. Both supported behaviours can be valid depending on the identity provider and required claims, so enforcing one globally would be an architectural choice rather than a generic platform security control."
     },
     "oidc.web_sso_config.response_type": {
       "description": "The Response Type to request for in the OIDC Authorization Request for web sign-in.\n\nThe 'CODE' Response Type is recommended to avoid the Implicit Flow, for security reasons.\n* CODE: The 'response_type=code' selection uses the Authorization Code Flow for web sign-in. Requires a configured client secret.\n* ID_TOKEN: The 'response_type=id_token' selection uses the Implicit Flow for web sign-in. Possible values: [\"CODE\", \"ID_TOKEN\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects the OIDC flow used for web sign-in. A policy should require 'CODE' so the Authorization Code Flow is used instead of the weaker Implicit Flow."
     },
     "saml": {
       "type": "block",
@@ -267,8 +267,8 @@
       "description": "SAML Identity provider configuration metadata xml doc.\nThe xml document should comply with [SAML 2.0 specification](https://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf).\nThe max size of the acceptable xml document will be bounded to 128k characters.\n\nThe metadata xml document should satisfy the following constraints:\n1) Must contain an Identity Provider Entity ID.\n2) Must contain at least one non-expired signing key certificate.\n3) For each signing key:\n  a) Valid from should be no more than 7 days from now.\n  b) Valid to should be no more than 10 years in the future.\n4) Up to 3 IdP signing keys are allowed in the metadata xml.\n\nWhen updating the provider's metadata xml, at least one non-expired signing key\nmust overlap with the existing metadata. This requirement is skipped if there are\nno non-expired signing keys present in the existing metadata.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains the identity provider's team-specific SAML metadata and signing certificates. It is a free-form configuration document validated by Google, and a generic platform policy cannot meaningfully constrain its contents without prescribing a particular IdP."
     }
   }
 }
