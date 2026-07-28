@@ -20,15 +20,15 @@
       "description": "List of gateways this GrpcRoute is attached to, as one of the routing rules to route the requests served by the gateway.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Gateways determine ingress exposure and traffic handling. Policy should enforce a whitelist of approved gateways, preventing routes from attaching to unauthorized or rogue gateway infrastructure that could bypass network controls."
+      "security_impact": false,
+      "rationale": "Gateways are references to other resources. Constraining them requires knowing specific gateway names/IDs, which violates the multi-tenant model. Gateway selection is team-owned configuration, not a platform security control."
     },
     "hostnames": {
       "description": "Required. Service hostnames with an optional port for which this route describes traffic.",
       "required": true,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Hostnames control which services are exposed and routable. Policy should restrict to an approved hostname whitelist, preventing unauthorized service exposure and ensuring only vetted endpoints receive traffic routing."
+      "security_impact": false,
+      "rationale": "Hostnames are service identifiers tied to specific workloads. Mandating which hostnames a team's route can serve is overreach—that choice belongs to the team operating the service."
     },
     "labels": {
       "description": "Set of label tags associated with the GrpcRoute resource.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
@@ -48,8 +48,8 @@
       "description": "List of meshes this GrpcRoute is attached to, as one of the routing rules to route the requests served by the mesh.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Meshes determine which service mesh infrastructure serves this route and its traffic. An unapproved mesh attachment could expose traffic through unauthorized or compromised mesh infrastructure, bypassing service mesh security controls (mTLS, AuthorizationPolicies, PeerAuthentication). A policy should restrict meshes to an approved whitelist, preventing routes from attaching to unauthorized mesh instances."
+      "security_impact": false,
+      "rationale": "Meshes are specific resource references/pointers. Constraining them requires knowing specific mesh names/IDs, which violates the core multi-tenant principle of generic policies."
     },
     "name": {
       "description": "Name of the GrpcRoute resource.",
@@ -62,8 +62,8 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The project determines the GCP security boundary where the route operates. Routes created in unintended projects can bypass data residency controls and isolation policies. A policy should enforce routes only to approved projects, preventing cross-project contamination and ensuring routes remain within their intended security perimeter."
+      "security_impact": false,
+      "rationale": "Project is a resource identifier/reference, which the mental model explicitly places out of scope. Whitelisting specific projects assumes team-specific boundaries—overreach."
     },
     "rules": {
       "type": "block",
@@ -91,8 +91,8 @@
       "description": "The URL of a BackendService to route traffic to.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Backend services determine where traffic is actually forwarded. Routing to an unauthorized or compromised backend exposes the route's traffic to unintended systems. A policy should restrict service_name to an approved backend whitelist, preventing routes from sending traffic to unauthorized destinations."
+      "security_impact": false,
+      "rationale": "service_name is a reference to a backend service resource. References are out of scope; constraining it requires knowing team-specific resource IDs."
     },
     "rules.action.destinations.weight": {
       "description": "Specifies the proportion of requests forwarded to the backend referenced by the serviceName field.",
@@ -184,8 +184,8 @@
       "description": "The type of match. Default value: \"EXACT\" Possible values: [\"TYPE_UNSPECIFIED\", \"EXACT\", \"REGULAR_EXPRESSION\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Header matching type can be EXACT or REGULAR_EXPRESSION. REGEX patterns create ReDoS (regex denial-of-service) vulnerabilities if poorly constructed, consuming CPU and causing latency attacks. A policy should enforce EXACT matching to prevent regex-based DoS vectors."
+      "security_impact": false,
+      "rationale": "Header matching modes (EXACT, REGEX) are functional/architectural configuration without a clear insecure sentinel. ReDoS concerns are speculative and operational, not security properties of this resource."
     },
     "rules.matches.headers.value": {
       "description": "Required. The value of the header.",
@@ -203,8 +203,8 @@
       "description": "Specifies that matches are case sensitive. The default value is true.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Default is true (case-sensitive). If set to false, 'GetUser' and 'getuser' both match. This could bypass authorization policies that enforce case-sensitive method matching at the backend. A policy should enforce case_sensitive=true to prevent authorization bypass through case variation."
+      "security_impact": false,
+      "rationale": "Case sensitivity flags are functional/architectural routing configuration. Backend authorization policies enforce actual access control, not this routing flag."
     },
     "rules.matches.method.grpc_method": {
       "description": "Required. Name of the method to match against.",
