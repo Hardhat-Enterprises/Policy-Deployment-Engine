@@ -6,37 +6,37 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can tear down live routing rules. The `ABANDON` value risks orphaning routes in GCP, leaving unmanaged traffic outside Terraform state. Policy should enforce `PREVENT` and reject `ABANDON`—equivalent to `force_destroy = false` but at the enum level, making it generic and reusable across resource types."
     },
     "description": {
       "description": "A free-text description of the resource. Max length 1024 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Free-text descriptions do not affect the routing behavior or security properties of the GrpcRoute. Enforcing descriptions addresses audit and operational concerns, not the security of this resource's configuration."
     },
     "gateways": {
       "description": "List of gateways this GrpcRoute is attached to, as one of the routing rules to route the requests served by the gateway.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Gateways determine ingress exposure and traffic handling. Policy should enforce a whitelist of approved gateways, preventing routes from attaching to unauthorized or rogue gateway infrastructure that could bypass network controls."
     },
     "hostnames": {
       "description": "Required. Service hostnames with an optional port for which this route describes traffic.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Hostnames control which services are exposed and routable. Policy should restrict to an approved hostname whitelist, preventing unauthorized service exposure and ensuring only vetted endpoints receive traffic routing."
     },
     "labels": {
       "description": "Set of label tags associated with the GrpcRoute resource.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
+      "security_impact": false,
+      "rationale": "Labels are metadata for resource organization and cost allocation. They do not affect the routing behavior or security properties of the GrpcRoute itself. Label enforcement addresses governance and compliance, not the security of this resource's configuration."
+    }, 
     "location": {
       "description": "Location (region) of the GRPCRoute resource to be created. Only the value 'global' is currently allowed; defaults to 'global' if omitted.",
       "required": false,
@@ -48,22 +48,22 @@
       "description": "List of meshes this GrpcRoute is attached to, as one of the routing rules to route the requests served by the mesh.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Meshes determine which service mesh infrastructure serves this route and its traffic. An unapproved mesh attachment could expose traffic through unauthorized or compromised mesh infrastructure, bypassing service mesh security controls (mTLS, AuthorizationPolicies, PeerAuthentication). A policy should restrict meshes to an approved whitelist, preventing routes from attaching to unauthorized mesh instances."
     },
     "name": {
       "description": "Name of the GrpcRoute resource.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The resource name is an identifier for tracking and reference. It does not affect the routing behavior, traffic handling, or security properties of the GrpcRoute itself. Naming conventions are operational and governance concerns, not security of this resource's configuration."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The project determines the GCP security boundary where the route operates. Routes created in unintended projects can bypass data residency controls and isolation policies. A policy should enforce routes only to approved projects, preventing cross-project contamination and ensuring routes remain within their intended security perimeter."
     },
     "rules": {
       "type": "block",
@@ -79,8 +79,8 @@
       "description": "Specifies the timeout for selected route.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Timeout controls request handling duration and affects operational resilience and performance. It does not directly constrain what backends can be routed to or how traffic is secured. Timeout enforcement is a capacity/availability concern, not a security property of this resource."
     },
     "rules.action.destinations": {
       "type": "block",
@@ -91,15 +91,15 @@
       "description": "The URL of a BackendService to route traffic to.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Backend services determine where traffic is actually forwarded. Routing to an unauthorized or compromised backend exposes the route's traffic to unintended systems. A policy should restrict service_name to an approved backend whitelist, preventing routes from sending traffic to unauthorized destinations."
     },
     "rules.action.destinations.weight": {
       "description": "Specifies the proportion of requests forwarded to the backend referenced by the serviceName field.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Weight specifies traffic distribution across backends for load balancing. This is an operational concern affecting performance and availability, not the security boundary of which backends can receive traffic."
     },
     "rules.action.fault_injection_policy": {
       "type": "block",
@@ -115,15 +115,15 @@
       "description": "The HTTP status code used to abort the request.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "HTTP status codes for fault injection are testing configuration used to simulate failures. This affects testing resilience, not the security of the resource itself."
     },
     "rules.action.fault_injection_policy.abort.percentage": {
       "description": "The percentage of traffic which will be aborted.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Percentage of traffic to abort is a testing parameter for chaos engineering. It does not affect the security boundary or routing behavior in production."
     },
     "rules.action.fault_injection_policy.delay": {
       "type": "block",
@@ -134,15 +134,15 @@
       "description": "Specify a fixed delay before forwarding the request.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Fixed delay is a testing/operational parameter used to simulate latency. It does not affect the security properties of this routing configuration."
     },
     "rules.action.fault_injection_policy.delay.percentage": {
       "description": "The percentage of traffic on which delay will be injected.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Percentage of traffic to delay is a testing operational configuration, not a security constraint on this resource."
     },
     "rules.action.retry_policy": {
       "type": "block",
@@ -153,15 +153,15 @@
       "description": "Specifies the allowed number of retries.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Retry count is an availability and resilience control affecting how the system responds to transient failures. It is operational, not a security property of the routing configuration."
     },
     "rules.action.retry_policy.retry_conditions": {
       "description": "Specifies one or more conditions when this retry policy applies. Possible values: [\"connect-failure\", \"refused-stream\", \"cancelled\", \"deadline-exceeded\", \"resource-exhausted\", \"unavailable\"]",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Retry conditions specify which failure types trigger retries (e.g., unavailable, deadline-exceeded). This is resilience and availability configuration, not a security boundary constraint."
     },
     "rules.matches": {
       "type": "block",
@@ -177,22 +177,22 @@
       "description": "Required. The key of the header.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Header keys are part of the request matching logic that determines which traffic this rule applies to. They do not constrain what backends can be routed to or the security boundary of the resource."
     },
     "rules.matches.headers.type": {
       "description": "The type of match. Default value: \"EXACT\" Possible values: [\"TYPE_UNSPECIFIED\", \"EXACT\", \"REGULAR_EXPRESSION\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Header matching type can be EXACT or REGULAR_EXPRESSION. REGEX patterns create ReDoS (regex denial-of-service) vulnerabilities if poorly constructed, consuming CPU and causing latency attacks. A policy should enforce EXACT matching to prevent regex-based DoS vectors."
     },
     "rules.matches.headers.value": {
       "description": "Required. The value of the header.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Header values are part of the request matching logic. They determine which traffic is routed by this rule but do not affect the security boundary of the resource itself."
     },
     "rules.matches.method": {
       "type": "block",
@@ -203,22 +203,22 @@
       "description": "Specifies that matches are case sensitive. The default value is true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Default is true (case-sensitive). If set to false, 'GetUser' and 'getuser' both match. This could bypass authorization policies that enforce case-sensitive method matching at the backend. A policy should enforce case_sensitive=true to prevent authorization bypass through case variation."
     },
     "rules.matches.method.grpc_method": {
       "description": "Required. Name of the method to match against.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "gRPC method name determines which operations this rule applies to. This is routing logic, not a security property of this resource—authorization of specific methods is enforced by the backend, not by this route."
     },
     "rules.matches.method.grpc_service": {
       "description": "Required. Name of the service to match against.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Service name determines which gRPC service this rule applies to. This is routing configuration, not a security constraint on this resource."
     }
   }
 }
