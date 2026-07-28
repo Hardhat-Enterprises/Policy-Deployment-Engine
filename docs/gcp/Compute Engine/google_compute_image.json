@@ -1,0 +1,353 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Deletion policy changes what happens when Terraform tries to destroy the image. Setting it to PREVENT reduces the chance of an important image being deleted accidentally, so it supports availability."
+    },
+    "description": {
+      "description": "An optional description of this resource. Provide this property when\nyou create the resource.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is descriptive metadata for the image. It does not change permissions, encryption, image contents, or availability."
+    },
+    "disk_size_gb": {
+      "description": "Size of the image when restored onto a persistent disk (in GB).",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "This value sets the disk size required when the image is restored. It is a capacity setting and does not provide a security control."
+    },
+    "family": {
+      "description": "The name of the image family to which this image belongs. You can\ncreate disks by specifying an image family instead of a specific\nimage name. The image family always returns its latest image that is\nnot deprecated. The name of the image family must comply with\nRFC1035.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "An image family can be used instead of a fixed image name, and it resolves to the latest active image in that family. A change in the selected image can alter the software or configuration deployed to new VMs, so this can affect integrity."
+    },
+    "labels": {
+      "description": "Labels to apply to this Image.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Labels are mainly used to organise and identify resources. They do not grant access or change the protection of the image."
+    },
+    "licenses": {
+      "description": "Any applicable license URI.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "License URIs record licensing information attached to the image. They do not control who can use the image or how its data is protected."
+    },
+    "name": {
+      "description": "Name of the resource; provided by the client when the resource is\ncreated. The name must be 1-63 characters long, and comply with\nRFC1035. Specifically, the name must be 1-63 characters long and\nmatch the regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means\nthe first character must be a lowercase letter, and all following\ncharacters must be a dash, lowercase letter, or digit, except the\nlast character, which cannot be a dash.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The name identifies the image and must follow the required format. It does not set permissions, encryption, or other security behaviour."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The selected project places the image inside that project's IAM and administrative boundary. Choosing the wrong project could give unintended principals access or apply the wrong security policies."
+    },
+    "source_disk": {
+      "description": "The source disk to create this image based on.\nYou must provide either this property or the\nrawDisk.source property but not both to create an image.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The source disk supplies the data used to build the image. If the wrong disk is chosen, confidential data or insecure system files could be copied into the image."
+    },
+    "source_image": {
+      "description": "URL of the source image used to create this image. In order to create an image, you must provide the full or partial\nURL of one of the following:\n\n* The selfLink URL\n* This property\n* The rawDisk.source URL\n* The sourceDisk URL",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "This field selects the existing image used as the base. A vulnerable or untrusted source can carry insecure software and configuration into the new image."
+    },
+    "source_snapshot": {
+      "description": "URL of the source snapshot used to create this image.\n\nIn order to create an image, you must provide the full or partial URL of one of the following:\n\n* The selfLink URL\n* This property\n* The sourceImage URL\n* The rawDisk.source URL\n* The sourceDisk URL",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The snapshot becomes the content of the new image. Using the wrong snapshot could expose stored data or reproduce compromised configuration."
+    },
+    "storage_locations": {
+      "description": "Cloud Storage bucket storage location of the image\n(regional or multi-regional).\nReference link: https://cloud.google.com/compute/docs/reference/rest/v1/images",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": true,
+      "rationale": "This setting chooses the region or multi-region where the image is stored. That choice can affect data-residency requirements and the availability design for the resource."
+    },
+    "guest_os_features": {
+      "type": "block",
+      "description": "A list of features to enable on the guest operating system.\nApplicable only for bootable images.",
+      "required": false
+    },
+    "guest_os_features.type": {
+      "description": "The type of supported feature. Read [Enabling guest operating system features](https://cloud.google.com/compute/docs/images/create-delete-deprecate-private-images#guest-os-features) to see a list of available options. Possible values: [\"MULTI_IP_SUBNET\", \"SECURE_BOOT\", \"SEV_CAPABLE\", \"UEFI_COMPATIBLE\", \"VIRTIO_SCSI_MULTIQUEUE\", \"WINDOWS\", \"GVNIC\", \"IDPF\", \"SEV_LIVE_MIGRATABLE\", \"SEV_SNP_CAPABLE\", \"SUSPEND_RESUME_COMPATIBLE\", \"TDX_CAPABLE\", \"SEV_LIVE_MIGRATABLE_V2\", \"SNP_SVSM_CAPABLE\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The selected feature changes capabilities available to VMs created from the image, including options such as Secure Boot and confidential-computing support. Because some values enable security protections, this field has a security impact."
+    },
+    "image_encryption_key": {
+      "type": "block",
+      "description": "Encrypts the image using a customer-supplied encryption key.\n\nAfter you encrypt an image with a customer-supplied key, you must\nprovide the same key if you use the image later (e.g. to create a\ndisk from the image)",
+      "required": false
+    },
+    "image_encryption_key.kms_key_self_link": {
+      "description": "The self link of the encryption key that is stored in Google Cloud\nKMS.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "This value points to the Cloud KMS key that protects the image. The key choice determines who can decrypt the image and whether it remains usable."
+    },
+    "image_encryption_key.kms_key_service_account": {
+      "description": "The service account being used for the encryption request for the\ngiven KMS key. If absent, the Compute Engine default service\naccount is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "This account is used to request encryption or decryption with the KMS key. Its IAM permissions therefore affect both access to the key and successful use of the image."
+    },
+    "image_encryption_key.raw_key": {
+      "description": "Specifies a 256-bit customer-supplied encryption key, encoded in\nRFC 4648 base64 to either encrypt or decrypt this resource.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "This field contains the customer-supplied encryption key used for the image. If it is exposed, an unauthorised party may gain access to the encrypted data; if it is lost, the image may become unusable."
+    },
+    "image_encryption_key.rsa_encrypted_key": {
+      "description": "Specifies a 256-bit customer-supplied encryption key, encoded in\nRFC 4648 base64 to either encrypt or decrypt this resource.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "This is the RSA-wrapped form of the customer-supplied key. It still controls encryption and decryption of the image, so incorrect handling can affect confidentiality and availability."
+    },
+    "params": {
+      "type": "block",
+      "description": "Additional params passed with the request, but not persisted as part of resource payload.",
+      "required": false
+    },
+    "params.resource_manager_tags": {
+      "description": "Resource manager tags to be bound to the image. Tag keys and values have the\nsame definition as resource manager tags. Keys and values can be either in numeric format,\nsuch as tagKeys/{tag_key_id} and tagValues/{tag_value_id} or in namespaced format such as\n{org_id|projectId}/{tag_key_short_name} and {tag_value_short_name}. The field is ignored when empty.\nThe field is immutable and causes resource replacement when mutated. This field is only\nset at create time and modifying this field after creation will trigger recreation.\nTo apply tags to an existing resource, see the google_tags_tag_binding resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": true,
+      "rationale": "Resource Manager tags can be evaluated by IAM Conditions and organisation policies. Binding the wrong tag may therefore apply unintended access or governance rules to the image."
+    },
+    "raw_disk": {
+      "type": "block",
+      "description": "The parameters of the raw disk image.",
+      "required": false
+    },
+    "raw_disk.container_type": {
+      "description": "The format used to encode and transmit the block device, which\nshould be TAR. This is just a container and transmission format\nand not a runtime format. Provided by the client when the disk\nimage is created. Default value: \"TAR\" Possible values: [\"TAR\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "TAR is only the packaging and transfer format for the raw disk. Selecting this format does not itself change access, encryption, or trust."
+    },
+    "raw_disk.sha1": {
+      "description": "An optional SHA1 checksum of the disk image before unpackaging.\nThis is provided by the client when the disk image is created.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The SHA-1 value is used to check whether the raw disk file changed before it is unpacked. This relates to integrity, although SHA-1 should not be treated as a strong modern security control."
+    },
+    "raw_disk.source": {
+      "description": "The full Google Cloud Storage URL where disk storage is stored\nYou must provide either this property or the sourceDisk property\nbut not both.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "This URL identifies the Cloud Storage object imported as the raw disk. A wrong or untrusted object could introduce malicious files, unsafe configuration, or sensitive data into the image."
+    },
+    "shielded_instance_initial_state": {
+      "type": "block",
+      "description": "Set the secure boot keys of shielded instance.",
+      "required": false
+    },
+    "shielded_instance_initial_state.dbs": {
+      "type": "block",
+      "description": "The Key Database (db).",
+      "required": false
+    },
+    "shielded_instance_initial_state.dbs.content": {
+      "description": "The raw content in the secure keys file.\n\nA base64-encoded string.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The db content defines trusted Secure Boot signatures. Incorrect entries could trust an unauthorised boot component or block a legitimate one, affecting integrity and availability."
+    },
+    "shielded_instance_initial_state.dbs.file_type": {
+      "description": "The file type of source file.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The file type tells Google Cloud how to read the trusted-signature database. A wrong type can prevent the Secure Boot data from being applied correctly."
+    },
+    "shielded_instance_initial_state.dbxs": {
+      "type": "block",
+      "description": "The forbidden key database (dbx).",
+      "required": false
+    },
+    "shielded_instance_initial_state.dbxs.content": {
+      "description": "The raw content in the secure keys file.\n\nA base64-encoded string.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The dbx content lists forbidden or revoked Secure Boot signatures. An incorrect list may allow a known-untrusted boot component to run."
+    },
+    "shielded_instance_initial_state.dbxs.file_type": {
+      "description": "The file type of source file.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "This value controls how the forbidden-signature file is interpreted. Misidentifying the format can stop the revocation information from being enforced."
+    },
+    "shielded_instance_initial_state.keks": {
+      "type": "block",
+      "description": "The Key Exchange Key (KEK).",
+      "required": false
+    },
+    "shielded_instance_initial_state.keks.content": {
+      "description": "The raw content in the secure keys file.\n\nA base64-encoded string.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The KEK content controls which keys may update the Secure Boot databases. A compromised or incorrect KEK could permit unauthorised changes to the trust configuration."
+    },
+    "shielded_instance_initial_state.keks.file_type": {
+      "description": "The file type of source file.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The chosen file type determines how the KEK file is parsed. An incorrect value may prevent the intended Secure Boot key controls from working."
+    },
+    "shielded_instance_initial_state.pk": {
+      "type": "block",
+      "description": "The Platform Key (PK).",
+      "required": false
+    },
+    "shielded_instance_initial_state.pk.content": {
+      "description": "The raw content in the secure keys file.\n\nA base64-encoded string.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The Platform Key establishes ownership of the Secure Boot key hierarchy. Replacing it with an untrusted key could allow unauthorised changes to the KEK and signature databases."
+    },
+    "shielded_instance_initial_state.pk.file_type": {
+      "description": "The file type of source file.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "This field identifies the format of the Platform Key file. If the format is wrong, the key may not be loaded correctly and Secure Boot control can be affected."
+    },
+    "source_disk_encryption_key": {
+      "type": "block",
+      "description": "The customer-supplied encryption key of the source disk. Required if\nthe source disk is protected by a customer-supplied encryption key.",
+      "required": false
+    },
+    "source_disk_encryption_key.kms_key_self_link": {
+      "description": "The self link of the encryption key used to decrypt this resource. Also called KmsKeyName\nin the cloud console. Your project's Compute Engine System service account\n('service-{{PROJECT_NUMBER}}@compute-system.iam.gserviceaccount.com') must have\n'roles/cloudkms.cryptoKeyEncrypterDecrypter' to use this feature.\nSee https://cloud.google.com/compute/docs/disks/customer-managed-encryption#encrypt_a_new_persistent_disk_with_your_own_keys",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "This link identifies the KMS key needed to decrypt the source disk. Without the correct key and permissions, the disk cannot be read to create the image."
+    },
+    "source_disk_encryption_key.kms_key_service_account": {
+      "description": "The service account being used for the encryption request for the\ngiven KMS key. If absent, the Compute Engine default service\naccount is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The named service account requests access to the source disk's KMS key. Excessive permissions can weaken access control, while insufficient permissions can block decryption."
+    },
+    "source_disk_encryption_key.raw_key": {
+      "description": "Specifies a 256-bit customer-supplied encryption key, encoded in\nRFC 4648 base64 to either encrypt or decrypt this resource.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "This is the raw customer-supplied key for the source disk. Disclosure can expose protected disk data, and loss of the key can prevent the image from being created."
+    },
+    "source_disk_encryption_key.rsa_encrypted_key": {
+      "description": "Specifies an RFC 4648 base64 encoded, RSA-wrapped 2048-bit\ncustomer-supplied encryption key to either encrypt or decrypt\nthis resource. You can provide either the rawKey or the rsaEncryptedKey.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The RSA-wrapped key is used to unlock the encrypted source disk. Using the wrong value blocks access, while poor key handling can put confidentiality at risk."
+    },
+    "source_image_encryption_key": {
+      "type": "block",
+      "description": "The customer-supplied encryption key of the source image. Required if\nthe source image is protected by a customer-supplied encryption key.",
+      "required": false
+    },
+    "source_image_encryption_key.kms_key_self_link": {
+      "description": "The self link of the encryption key used to decrypt this resource. Also called KmsKeyName\nin the cloud console. Your project's Compute Engine System service account\n('service-{{PROJECT_NUMBER}}@compute-system.iam.gserviceaccount.com') must have\n'roles/cloudkms.cryptoKeyEncrypterDecrypter' to use this feature.\nSee https://cloud.google.com/compute/docs/disks/customer-managed-encryption#encrypt_a_new_persistent_disk_with_your_own_keys",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "This reference selects the KMS key required to decrypt the source image. The source cannot be used unless the key and its access permissions are correct."
+    },
+    "source_image_encryption_key.kms_key_service_account": {
+      "description": "The service account being used for the encryption request for the\ngiven KMS key. If absent, the Compute Engine default service\naccount is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "This service account is authorised to use the KMS key for the source image. Its permissions determine whether decryption is allowed and should be limited to what is necessary."
+    },
+    "source_image_encryption_key.raw_key": {
+      "description": "Specifies a 256-bit customer-supplied encryption key, encoded in\nRFC 4648 base64 to either encrypt or decrypt this resource.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The raw key unlocks the encrypted source image. It is sensitive key material, so exposure could reveal protected data and loss could make the source inaccessible."
+    },
+    "source_image_encryption_key.rsa_encrypted_key": {
+      "description": "Specifies an RFC 4648 base64 encoded, RSA-wrapped 2048-bit\ncustomer-supplied encryption key to either encrypt or decrypt\nthis resource. You can provide either the rawKey or the rsaEncryptedKey.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "This wrapped key provides decryption access to the source image. Incorrect handling can either deny access to the source or weaken protection of its data."
+    },
+    "source_snapshot_encryption_key": {
+      "type": "block",
+      "description": "The customer-supplied encryption key of the source snapshot. Required if\nthe source snapshot is protected by a customer-supplied encryption key.",
+      "required": false
+    },
+    "source_snapshot_encryption_key.kms_key_self_link": {
+      "description": "The self link of the encryption key used to decrypt this resource. Also called KmsKeyName\nin the cloud console. Your project's Compute Engine System service account\n('service-{{PROJECT_NUMBER}}@compute-system.iam.gserviceaccount.com') must have\n'roles/cloudkms.cryptoKeyEncrypterDecrypter' to use this feature.\nSee https://cloud.google.com/compute/docs/disks/customer-managed-encryption#encrypt_a_new_persistent_disk_with_your_own_keys",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "This value points to the KMS key used for the source snapshot. Correct key selection and IAM access are required before the snapshot can be read."
+    },
+    "source_snapshot_encryption_key.kms_key_service_account": {
+      "description": "The service account being used for the encryption request for the\ngiven KMS key. If absent, the Compute Engine default service\naccount is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The service account uses the KMS key on behalf of the image-creation request. Its permissions directly control whether the encrypted snapshot can be decrypted."
+    },
+    "source_snapshot_encryption_key.raw_key": {
+      "description": "Specifies a 256-bit customer-supplied encryption key, encoded in\nRFC 4648 base64 to either encrypt or decrypt this resource.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "This field supplies the raw key for the encrypted snapshot. Because the key protects the snapshot data, disclosure or loss can affect confidentiality and availability."
+    },
+    "source_snapshot_encryption_key.rsa_encrypted_key": {
+      "description": "Specifies an RFC 4648 base64 encoded, RSA-wrapped 2048-bit\ncustomer-supplied encryption key to either encrypt or decrypt\nthis resource. You can provide either the rawKey or the rsaEncryptedKey.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The RSA-wrapped key is needed to decrypt the source snapshot. A wrong key prevents access, and insecure handling could weaken protection of the snapshot."
+    }
+  }
+}

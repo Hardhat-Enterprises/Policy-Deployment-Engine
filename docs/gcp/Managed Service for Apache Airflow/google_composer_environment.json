@@ -1,0 +1,696 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "User-defined labels for this environment. The labels map can contain no more than 64 entries. Entries of the labels map are UTF8 strings that comply with the following restrictions: Label keys must be between 1 and 63 characters long and must conform to the following regular expression: [a-z]([-a-z0-9]*[a-z0-9])?. Label values must be between 0 and 63 characters long and must conform to the regular expression ([a-z]([-a-z0-9]*[a-z0-9])?)?. No more than 64 labels can be associated with a given environment. Both keys and values must be <= 128 bytes in size.\n\n\t\t\t\t**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\n\t\t\t\tPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "name": {
+      "description": "Name of the environment.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "region": {
+      "description": "The location or Compute Engine region for the environment.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "config": {
+      "type": "block",
+      "description": "Configuration parameters for this environment.",
+      "required": false
+    },
+    "config.enable_private_builds_only": {
+      "description": "Optional. If true, builds performed during operations that install Python packages have only private connectivity to Google services. If false, the builds also have access to the internet.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.enable_private_environment": {
+      "description": "Optional. If true, a private Composer environment will be created.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.environment_size": {
+      "description": "The size of the Cloud Composer environment. This field is supported for Cloud Composer environments in versions composer-2.*.*-airflow-*.*.* and newer.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.node_count": {
+      "description": "The number of nodes in the Kubernetes Engine cluster that will be used to run this environment. This field is supported for Cloud Composer environments in versions composer-1.*.*-airflow-*.*.*.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.resilience_mode": {
+      "description": "Whether high resilience is enabled or not. This field is supported for Cloud Composer environments in versions composer-2.1.15-airflow-*.*.* and newer.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.data_retention_config": {
+      "type": "block",
+      "description": "The configuration setting for Airflow data retention mechanism. This field is supported for Cloud Composer environments in versions composer-2.0.32-airflow-2.1.4. or newer",
+      "required": false
+    },
+    "config.data_retention_config.airflow_metadata_retention_config": {
+      "type": "block",
+      "description": "Optional. The policy for airflow metadata database retention.",
+      "required": false
+    },
+    "config.data_retention_config.airflow_metadata_retention_config.retention_days": {
+      "description": "How many days data should be retained for. This field is supported for Cloud Composer environments in composer 3 and newer.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.data_retention_config.airflow_metadata_retention_config.retention_mode": {
+      "description": "Whether database retention is enabled or not. This field is supported for Cloud Composer environments in composer 3 and newer.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.data_retention_config.task_logs_retention_config": {
+      "type": "block",
+      "description": "Optional. The configuration setting for Task Logs.",
+      "required": false
+    },
+    "config.data_retention_config.task_logs_retention_config.storage_mode": {
+      "description": "Whether logs in cloud logging only is enabled or not. This field is supported for Cloud Composer environments in versions composer-2.0.32-airflow-2.1.4 and newer but not in composer-3*",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.database_config": {
+      "type": "block",
+      "description": "The configuration of Cloud SQL instance that is used by the Apache Airflow software. This field is supported for Cloud Composer environments in versions composer-1.*.*-airflow-*.*.*.",
+      "required": false
+    },
+    "config.database_config.machine_type": {
+      "description": "Optional. Cloud SQL machine type used by Airflow database. It has to be one of: db-n1-standard-2, db-n1-standard-4, db-n1-standard-8 or db-n1-standard-16. If not specified, db-n1-standard-2 will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.database_config.zone": {
+      "description": "Optional. Cloud SQL database preferred zone.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.encryption_config": {
+      "type": "block",
+      "description": "The encryption options for the Composer environment and its dependencies.",
+      "required": false
+    },
+    "config.encryption_config.kms_key_name": {
+      "description": "Optional. Customer-managed Encryption Key available through Google's Key Management Service. Cannot be updated.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.maintenance_window": {
+      "type": "block",
+      "description": "The configuration for Cloud Composer maintenance window.",
+      "required": false
+    },
+    "config.maintenance_window.end_time": {
+      "description": "Maintenance window end time. It is used only to calculate the duration of the maintenance window. The value for end-time must be in the future, relative to 'start_time'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.maintenance_window.recurrence": {
+      "description": "Maintenance window recurrence. Format is a subset of RFC-5545 (https://tools.ietf.org/html/rfc5545) 'RRULE'. The only allowed values for 'FREQ' field are 'FREQ=DAILY' and 'FREQ=WEEKLY;BYDAY=...'. Example values: 'FREQ=WEEKLY;BYDAY=TU,WE', 'FREQ=DAILY'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.maintenance_window.start_time": {
+      "description": "Start time of the first recurrence of the maintenance window.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.master_authorized_networks_config": {
+      "type": "block",
+      "description": "Configuration options for the master authorized networks feature. Enabled master authorized networks will disallow all external traffic to access Kubernetes master through HTTPS except traffic from the given CIDR blocks, Google Compute Engine Public IPs and Google Prod IPs.",
+      "required": false
+    },
+    "config.master_authorized_networks_config.enabled": {
+      "description": "Whether or not master authorized networks is enabled.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.master_authorized_networks_config.cidr_blocks": {
+      "type": "block",
+      "description": "cidr_blocks define up to 50 external networks that could access Kubernetes master through HTTPS.",
+      "required": false
+    },
+    "config.master_authorized_networks_config.cidr_blocks.cidr_block": {
+      "description": "cidr_block must be specified in CIDR notation.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.master_authorized_networks_config.cidr_blocks.display_name": {
+      "description": "display_name is a field for users to identify CIDR blocks.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.node_config": {
+      "type": "block",
+      "description": "The configuration used for the Kubernetes Engine cluster.",
+      "required": false
+    },
+    "config.node_config.composer_internal_ipv4_cidr_block": {
+      "description": "IPv4 cidr range that will be used by Composer internal components.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.node_config.composer_network_attachment": {
+      "description": "PSC (Private Service Connect) Network entry point. Customers can pre-create the Network Attachment and point Cloud Composer environment to use. It is possible to share network attachment among many environments, provided enough IP addresses are available.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.node_config.disk_size_gb": {
+      "description": "The disk size in GB used for node VMs. Minimum size is 20GB. If unspecified, defaults to 100GB. Cannot be updated. This field is supported for Cloud Composer environments in versions composer-1.*.*-airflow-*.*.*.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.node_config.enable_ip_masq_agent": {
+      "description": "Deploys 'ip-masq-agent' daemon set in the GKE cluster and defines nonMasqueradeCIDRs equals to pod IP range so IP masquerading is used for all destination addresses, except between pods traffic. See: https://cloud.google.com/kubernetes-engine/docs/how-to/ip-masquerade-agent",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.node_config.machine_type": {
+      "description": "The Compute Engine machine type used for cluster instances, specified as a name or relative resource name. For example: \"projects/{project}/zones/{zone}/machineTypes/{machineType}\". Must belong to the enclosing environment's project and region/zone. This field is supported for Cloud Composer environments in versions composer-1.*.*-airflow-*.*.*.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.node_config.network": {
+      "description": "The Compute Engine machine type used for cluster instances, specified as a name or relative resource name. For example: \"projects/{project}/zones/{zone}/machineTypes/{machineType}\". Must belong to the enclosing environment's project and region/zone. The network must belong to the environment's project. If unspecified, the \"default\" network ID in the environment's project is used. If a Custom Subnet Network is provided, subnetwork must also be provided.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Restricting Composer environments to approved VPC networks reduces exposure to untrusted network boundaries and enforces organizational network governance."
+    },
+    "config.node_config.oauth_scopes": {
+      "description": "The set of Google API scopes to be made available on all node VMs. Cannot be updated. If empty, defaults to [\"https://www.googleapis.com/auth/cloud-platform\"]. This field is supported for Cloud Composer environments in versions composer-1.*.*-airflow-*.*.*.",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.node_config.service_account": {
+      "description": "The Google Cloud Platform Service Account to be used by the node VMs. If a service account is not specified, the \"default\" Compute Engine service account is used. Cannot be updated. If given, note that the service account must have roles/composer.worker for any GCP resources created under the Cloud Composer Environment.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Restricting service accounts reduces the risk of privilege escalation and ensures workloads run with only approved and least-privileged identities."
+    },
+    "config.node_config.subnetwork": {
+      "description": "The Compute Engine subnetwork to be used for machine communications, specified as a self-link, relative resource name (e.g. \"projects/{project}/regions/{region}/subnetworks/{subnetwork}\"), or by name. If subnetwork is provided, network must also be provided and the subnetwork must belong to the enclosing environment's project and region.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.node_config.tags": {
+      "description": "The list of instance tags applied to all node VMs. Tags are used to identify valid sources or targets for network firewalls. Each tag within the list must comply with RFC1035. Cannot be updated.",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.node_config.zone": {
+      "description": "The Compute Engine zone in which to deploy the VMs running the Apache Airflow software, specified as the zone name or relative resource name (e.g. \"projects/{project}/zones/{zone}\"). Must belong to the enclosing environment's project and region. This field is supported for Cloud Composer environments in versions composer-1.*.*-airflow-*.*.*.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.node_config.ip_allocation_policy": {
+      "type": "block",
+      "description": "Configuration for controlling how IPs are allocated in the GKE cluster. Cannot be updated.",
+      "required": false
+    },
+    "config.node_config.ip_allocation_policy.cluster_ipv4_cidr_block": {
+      "description": "The IP address range used to allocate IP addresses to pods in the cluster. For Cloud Composer environments in versions composer-1.*.*-airflow-*.*.*, this field is applicable only when use_ip_aliases is true. Set to blank to have GKE choose a range with the default size. Set to /netmask (e.g. /14) to have GKE choose a range with a specific netmask. Set to a CIDR notation (e.g. 10.96.0.0/14) from the RFC-1918 private networks (e.g. 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) to pick a specific range to use. Specify either cluster_secondary_range_name or cluster_ipv4_cidr_block but not both.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.node_config.ip_allocation_policy.cluster_secondary_range_name": {
+      "description": "The name of the cluster's secondary range used to allocate IP addresses to pods. Specify either cluster_secondary_range_name or cluster_ipv4_cidr_block but not both. For Cloud Composer environments in versions composer-1.*.*-airflow-*.*.*, this field is applicable only when use_ip_aliases is true.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.node_config.ip_allocation_policy.services_ipv4_cidr_block": {
+      "description": "The IP address range used to allocate IP addresses in this cluster. For Cloud Composer environments in versions composer-1.*.*-airflow-*.*.*, this field is applicable only when use_ip_aliases is true. Set to blank to have GKE choose a range with the default size. Set to /netmask (e.g. /14) to have GKE choose a range with a specific netmask. Set to a CIDR notation (e.g. 10.96.0.0/14) from the RFC-1918 private networks (e.g. 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) to pick a specific range to use. Specify either services_secondary_range_name or services_ipv4_cidr_block but not both.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.node_config.ip_allocation_policy.services_secondary_range_name": {
+      "description": "The name of the services' secondary range used to allocate IP addresses to the cluster. Specify either services_secondary_range_name or services_ipv4_cidr_block but not both. For Cloud Composer environments in versions composer-1.*.*-airflow-*.*.*, this field is applicable only when use_ip_aliases is true.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.node_config.ip_allocation_policy.use_ip_aliases": {
+      "description": "Whether or not to enable Alias IPs in the GKE cluster. If true, a VPC-native cluster is created. Defaults to true if the ip_allocation_policy block is present in config. This field is only supported for Cloud Composer environments in versions composer-1.*.*-airflow-*.*.*. Environments in newer versions always use VPC-native GKE clusters.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.private_environment_config": {
+      "type": "block",
+      "description": "The configuration used for the Private IP Cloud Composer environment.",
+      "required": false
+    },
+    "config.private_environment_config.cloud_composer_connection_subnetwork": {
+      "description": "When specified, the environment will use Private Service Connect instead of VPC peerings to connect to Cloud SQL in the Tenant Project, and the PSC endpoint in the Customer Project will use an IP address from this subnetwork. This field is supported for Cloud Composer environments in versions composer-2.*.*-airflow-*.*.* and newer.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.private_environment_config.cloud_sql_ipv4_cidr_block": {
+      "description": "The CIDR block from which IP range in tenant project will be reserved for Cloud SQL. Needs to be disjoint from web_server_ipv4_cidr_block.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.private_environment_config.connection_type": {
+      "description": "Mode of internal communication within the Composer environment. Must be one of \"VPC_PEERING\" or \"PRIVATE_SERVICE_CONNECT\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.private_environment_config.enable_private_endpoint": {
+      "description": "If true, access to the public endpoint of the GKE cluster is denied. If this field is set to true, ip_allocation_policy.use_ip_aliases must be set to true for Cloud Composer environments in versions composer-1.*.*-airflow-*.*.*.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.private_environment_config.enable_privately_used_public_ips": {
+      "description": "When enabled, IPs from public (non-RFC1918) ranges can be used for ip_allocation_policy.cluster_ipv4_cidr_block and ip_allocation_policy.service_ipv4_cidr_block.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.private_environment_config.master_ipv4_cidr_block": {
+      "description": "The IP range in CIDR notation to use for the hosted master network. This range is used for assigning internal IP addresses to the cluster master or set of masters and to the internal load balancer virtual IP. This range must not overlap with any other ranges in use within the cluster's network. If left blank, the default value of '172.16.0.0/28' is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.private_environment_config.web_server_ipv4_cidr_block": {
+      "description": "The CIDR block from which IP range for web server will be reserved. Needs to be disjoint from master_ipv4_cidr_block and cloud_sql_ipv4_cidr_block. This field is supported for Cloud Composer environments in versions composer-1.*.*-airflow-*.*.*.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.recovery_config": {
+      "type": "block",
+      "description": "The recovery configuration settings for the Cloud Composer environment",
+      "required": false
+    },
+    "config.recovery_config.scheduled_snapshots_config": {
+      "type": "block",
+      "description": "The configuration settings for scheduled snapshots.",
+      "required": false
+    },
+    "config.recovery_config.scheduled_snapshots_config.enabled": {
+      "description": "When enabled, Cloud Composer periodically saves snapshots of your environment to a Cloud Storage bucket.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.recovery_config.scheduled_snapshots_config.snapshot_creation_schedule": {
+      "description": "Snapshot schedule, in the unix-cron format.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.recovery_config.scheduled_snapshots_config.snapshot_location": {
+      "description": "the URI of a bucket folder where to save the snapshot.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.recovery_config.scheduled_snapshots_config.time_zone": {
+      "description": "A time zone for the schedule. This value is a time offset and does not take into account daylight saving time changes. Valid values are from UTC-12 to UTC+12. Examples: UTC, UTC-01, UTC+03.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.software_config": {
+      "type": "block",
+      "description": "The configuration settings for software inside the environment.",
+      "required": false
+    },
+    "config.software_config.airflow_config_overrides": {
+      "description": "Apache Airflow configuration properties to override. Property keys contain the section and property names, separated by a hyphen, for example \"core-dags_are_paused_at_creation\". Section names must not contain hyphens (\"-\"), opening square brackets (\"[\"), or closing square brackets (\"]\"). The property name must not be empty and cannot contain \"=\" or \";\". Section and property names cannot contain characters: \".\" Apache Airflow configuration property names must be written in snake_case. Property values can contain any character, and can be written in any lower/upper case format. Certain Apache Airflow configuration property values are blacklisted, and cannot be overridden.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.software_config.env_variables": {
+      "description": "Additional environment variables to provide to the Apache Airflow scheduler, worker, and webserver processes. Environment variable names must match the regular expression [a-zA-Z_][a-zA-Z0-9_]*. They cannot specify Apache Airflow software configuration overrides (they cannot match the regular expression AIRFLOW__[A-Z0-9_]+__[A-Z0-9_]+), and they cannot match any of the following reserved names: AIRFLOW_HOME C_FORCE_ROOT CONTAINER_NAME DAGS_FOLDER GCP_PROJECT GCS_BUCKET GKE_CLUSTER_NAME SQL_DATABASE SQL_INSTANCE SQL_PASSWORD SQL_PROJECT SQL_REGION SQL_USER.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": true,
+      "rationale": "Preventing sensitive data in environment variables reduces the risk of secret exposure and enforces the use of secure storage mechanisms like Secret Manager."
+    },
+    "config.software_config.image_version": {
+      "description": "The version of the software running in the environment. This encapsulates both the version of Cloud Composer functionality and the version of Apache Airflow. It must match the regular expression composer-([0-9]+(\\.[0-9]+\\.[0-9]+(-preview\\.[0-9]+)?)?|latest)-airflow-([0-9]+(\\.[0-9]+(\\.[0-9]+)?)?). The Cloud Composer portion of the image version is a full semantic version, or an alias in the form of major version number or 'latest'. The Apache Airflow portion of the image version is a full semantic version that points to one of the supported Apache Airflow versions, or an alias in the form of only major or major.minor versions specified. See documentation for more details and version list.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.software_config.pypi_packages": {
+      "description": "Custom Python Package Index (PyPI) packages to be installed in the environment. Keys refer to the lowercase package name (e.g. \"numpy\"). Values are the lowercase extras and version specifier (e.g. \"==1.12.0\", \"[devel,gcp_api]\", \"[devel]>=1.8.2, <1.9.2\"). To specify a package without pinning it to a version specifier, use the empty string as the value.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.software_config.python_version": {
+      "description": "The major version of Python used to run the Apache Airflow scheduler, worker, and webserver processes. Can be set to '2' or '3'. If not specified, the default is '2'. Cannot be updated. This field is supported for Cloud Composer environments in versions composer-1.*.*-airflow-*.*.*. Environments in newer versions always use Python major version 3.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.software_config.scheduler_count": {
+      "description": "The number of schedulers for Airflow. This field is supported for Cloud Composer environments in versions composer-1.*.*-airflow-2.*.*.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.software_config.web_server_plugins_mode": {
+      "description": "Should be either 'ENABLED' or 'DISABLED'. Defaults to 'ENABLED'. Used in Composer 3.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.software_config.cloud_data_lineage_integration": {
+      "type": "block",
+      "description": "The configuration for Cloud Data Lineage integration. Supported for Cloud Composer environments in versions composer-2.1.2-airflow-*.*.* and newer",
+      "required": false
+    },
+    "config.software_config.cloud_data_lineage_integration.enabled": {
+      "description": "Whether or not Cloud Data Lineage integration is enabled.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.web_server_config": {
+      "type": "block",
+      "description": "The configuration settings for the Airflow web server App Engine instance. This field is supported for Cloud Composer environments in versions composer-1.*.*-airflow-*.*.*.",
+      "required": false
+    },
+    "config.web_server_config.machine_type": {
+      "description": "Optional. Machine type on which Airflow web server is running. It has to be one of: composer-n1-webserver-2, composer-n1-webserver-4 or composer-n1-webserver-8. If not specified, composer-n1-webserver-2 will be used. Value custom is returned only in response, if Airflow web server parameters were manually changed to a non-standard values.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.web_server_network_access_control": {
+      "type": "block",
+      "description": "Network-level access control policy for the Airflow web server.",
+      "required": false
+    },
+    "config.web_server_network_access_control.allowed_ip_range": {
+      "type": "block",
+      "description": "A collection of allowed IP ranges with descriptions.",
+      "required": false
+    },
+    "config.web_server_network_access_control.allowed_ip_range.description": {
+      "description": "A description of this ip range.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.web_server_network_access_control.allowed_ip_range.value": {
+      "description": "IP address or range, defined using CIDR notation, of requests that this rule applies to. Examples: 192.168.1.1 or 192.168.0.0/16 or 2001:db8::/32 or 2001:0db8:0000:0042:0000:8a2e:0370:7334. IP range prefixes should be properly truncated. For example, 1.2.3.4/24 should be truncated to 1.2.3.0/24. Similarly, for IPv6, 2001:db8::1/32 should be truncated to 2001:db8::/32.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.workloads_config": {
+      "type": "block",
+      "description": "The workloads configuration settings for the GKE cluster associated with the Cloud Composer environment. Supported for Cloud Composer environments in versions composer-2.*.*-airflow-*.*.* and newer.",
+      "required": false
+    },
+    "config.workloads_config.dag_processor": {
+      "type": "block",
+      "description": "Configuration for resources used by DAG processor.",
+      "required": false
+    },
+    "config.workloads_config.dag_processor.count": {
+      "description": "Number of DAG processors.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.workloads_config.dag_processor.cpu": {
+      "description": "CPU request and limit for DAG processor.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.workloads_config.dag_processor.memory_gb": {
+      "description": "Memory (GB) request and limit for DAG processor.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.workloads_config.dag_processor.storage_gb": {
+      "description": "Storage (GB) request and limit for DAG processor.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.workloads_config.scheduler": {
+      "type": "block",
+      "description": "Configuration for resources used by Airflow schedulers.",
+      "required": false
+    },
+    "config.workloads_config.scheduler.count": {
+      "description": "The number of schedulers.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.workloads_config.scheduler.cpu": {
+      "description": "CPU request and limit for a single Airflow scheduler replica",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.workloads_config.scheduler.memory_gb": {
+      "description": "Memory (GB) request and limit for a single Airflow scheduler replica.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.workloads_config.scheduler.storage_gb": {
+      "description": "Storage (GB) request and limit for a single Airflow scheduler replica.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.workloads_config.triggerer": {
+      "type": "block",
+      "description": "Configuration for resources used by Airflow triggerers.",
+      "required": false
+    },
+    "config.workloads_config.triggerer.count": {
+      "description": "The number of triggerers.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.workloads_config.triggerer.cpu": {
+      "description": "CPU request and limit for a single Airflow triggerer replica.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.workloads_config.triggerer.memory_gb": {
+      "description": "Memory (GB) request and limit for a single Airflow triggerer replica.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.workloads_config.web_server": {
+      "type": "block",
+      "description": "Configuration for resources used by Airflow web server.",
+      "required": false
+    },
+    "config.workloads_config.web_server.cpu": {
+      "description": "CPU request and limit for Airflow web server.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.workloads_config.web_server.memory_gb": {
+      "description": "Memory (GB) request and limit for Airflow web server.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.workloads_config.web_server.storage_gb": {
+      "description": "Storage (GB) request and limit for Airflow web server.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.workloads_config.worker": {
+      "type": "block",
+      "description": "Configuration for resources used by Airflow workers.",
+      "required": false
+    },
+    "config.workloads_config.worker.cpu": {
+      "description": "CPU request and limit for a single Airflow worker replica.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.workloads_config.worker.max_count": {
+      "description": "Maximum number of workers for autoscaling.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.workloads_config.worker.memory_gb": {
+      "description": "Memory (GB) request and limit for a single Airflow worker replica.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.workloads_config.worker.min_count": {
+      "description": "Minimum number of workers for autoscaling.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "config.workloads_config.worker.storage_gb": {
+      "description": "Storage (GB) request and limit for a single Airflow worker replica.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "storage_config": {
+      "type": "block",
+      "description": "Configuration options for storage used by Composer environment.",
+      "required": false
+    },
+    "storage_config.bucket": {
+      "description": "Optional. Name of an existing Cloud Storage bucket to be used by the environment.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

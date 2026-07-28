@@ -1,0 +1,268 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "dataproc_service_account": {
+      "description": "User-managed service account to set on Dataproc when Cloud Data Fusion creates Dataproc to run data processing pipelines.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Assigns the service account the instance's Dataproc workloads run as. A policy should require a dedicated, non-default service account so pipelines run with least privilege instead of the broadly-permissioned default Compute Engine SA; it must not pin a specific account, since that is team/project-specific."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "An optional description of the instance.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "A description of the instance is optional and poses no security impact for the resource type"
+    },
+    "display_name": {
+      "description": "Display name for an instance.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Display name does not pose risks to security impact"
+    },
+    "enable_rbac": {
+      "description": "Option to enable granular role-based access control.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Preventing unauthorized users from accessing or modifying sensitive data pipelines within shared namespaces, through principle of least privilege"
+    },
+    "enable_stackdriver_logging": {
+      "description": "Option to enable Stackdriver Logging.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Mandating Stackdriver logging ensures all pipeline activities are auditable and to provide the visibility required for rapid troubleshooting and security forensics"
+    },
+    "enable_stackdriver_monitoring": {
+      "description": "Option to enable Stackdriver Monitoring.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Toggles Cloud Monitoring for the instance. Enabling it provides operational and security observability (metrics, anomaly detection, alerting) over the instance; a policy requiring it enabled aligns with the logging/monitoring archetype so abnormal activity is visible."
+    },
+    "labels": {
+      "description": "The resource labels for instance to use to annotate any related underlying resources,\nsuch as Compute Engine VMs.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Free-form key/value metadata used for cost tracking and organisation. Labels do not enforce access control, encryption, or network exposure, and a policy cannot mandate arbitrary label content without hardcoding team-specific values, so this is not a security control."
+    },
+    "name": {
+      "description": "The ID of the instance or a fully qualified identifier for the instance.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The 'name' attribute has no security impact on this specific resource"
+    },
+    "options": {
+      "description": "Map of additional options used to configure the behavior of Data Fusion instance.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Maintains a standardized environment preventing engineers from bypassing security guardrails through custom unvetted settings"
+    },
+    "patch_revision": {
+      "description": "Current patch revision of the Data Fusion.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "private_instance": {
+      "description": "Specifies whether the Data Fusion instance should be private. If set to\ntrue, all Data Fusion nodes will have private IP addresses and will not be\nable to access the public internet.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Data traffic remains entirely off the public internet, protecting sensitive pipelines from external threats and ensuring secure internal connectivity"
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Project in this resource type does not pose security risks"
+    },
+    "region": {
+      "description": "The region of the Data Fusion instance.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "tags": {
+      "description": "A map of resource manager tags.\nResource manager tag keys and values have the same definition as resource manager tags.\nKeys must be in the format tagKeys/{tag_key_id}, and values are in the format tagValues/{tag_value_id}.\nThe field is ignored (both PUT & PATCH) when empty.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "To prevent tag bloat and maintain a centralized governance model"
+    },
+    "type": {
+      "description": "Represents the type of Data Fusion instance. Each type is configured with\nthe default settings for processing and memory.\n- BASIC: Basic Data Fusion instance. In Basic type, the user will be able to create data pipelines\nusing point and click UI. However, there are certain limitations, such as fewer number\nof concurrent pipelines, no support for streaming pipelines, etc.\n- ENTERPRISE: Enterprise Data Fusion instance. In Enterprise type, the user will have more features\navailable, such as support for streaming pipelines, higher number of concurrent pipelines, etc.\n- DEVELOPER: Developer Data Fusion instance. In Developer type, the user will have all features available but\nwith restrictive capabilities. This is to help enterprises design and develop their data ingestion and integration\npipelines at low cost. Possible values: [\"BASIC\", \"ENTERPRISE\", \"DEVELOPER\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Selects the Data Fusion edition (e.g. BASIC vs ENTERPRISE). Higher editions unlock security-relevant capabilities such as RBAC and private networking, so a policy may whitelist editions that include the required security features. The justification is evidence-based capability, not cost."
+    },
+    "version": {
+      "description": "Current version of the Data Fusion.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Allow to leverage the latest patch releases and service updates without being blocked by rigid & hardcoded constraints in the PDE"
+    },
+    "zone": {
+      "description": "Name of the zone in which the Data Fusion instance will be created. Only DEVELOPER instances use this field.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "accelerators": {
+      "type": "block",
+      "description": "List of accelerators enabled for this CDF instance.\n\nIf accelerators are enabled it is possible a permadiff will be created with the Options field.\nUsers will need to either manually update their state file to include these diffed options, or include the field in a [lifecycle ignore changes block](https://developer.hashicorp.com/terraform/language/meta-arguments/lifecycle#ignore_changes).",
+      "required": false
+    },
+    "accelerators.accelerator_type": {
+      "description": "The type of an accelator for a CDF instance. Possible values: [\"CDC\", \"HEALTHCARE\", \"CCAI_INSIGHTS\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "accelerators.state": {
+      "description": "The type of an accelator for a CDF instance. Possible values: [\"ENABLED\", \"DISABLED\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "crypto_key_config": {
+      "type": "block",
+      "description": "The crypto key configuration. This field is used by the Customer-Managed Encryption Keys (CMEK) feature.",
+      "required": false
+    },
+    "crypto_key_config.key_reference": {
+      "description": "The name of the key which is used to encrypt/decrypt customer data. For key in Cloud KMS, the key should be in the format of projects/*/locations/*/keyRings/*/cryptoKeys/*.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "explicitly link the data instance to a specific KMS (Key Management Service) key ensuring that the encryption process is audit-ready and that only authorized cryptographic keys are used to secure sensitive project data."
+    },
+    "event_publish_config": {
+      "type": "block",
+      "description": "Option to enable and pass metadata for event publishing.",
+      "required": false
+    },
+    "event_publish_config.enabled": {
+      "description": "Option to enable Event Publishing.",
+      "required": true,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Enables event publishing for the instance so pipeline activity is emitted to Pub/Sub. Requiring it enabled supports the audit/monitoring archetype, giving security teams a reliable event stream to detect and investigate unauthorised activity."
+    },
+    "event_publish_config.topic": {
+      "description": "The resource name of the Pub/Sub topic. Format: projects/{projectId}/topics/{topic_id}",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Ensure that all event notifications are routed to a specific pre-approved Pub/Sub topic preventing data from being lost in a generic stream and allowing security teams to maintain a clear audit trail of all pipeline activities."
+    },
+    "maintenance_policy": {
+      "type": "block",
+      "description": "Configure the maintenance policy for this instance.",
+      "required": false
+    },
+    "maintenance_policy.maintenance_window": {
+      "type": "block",
+      "description": "The maintenance window of the instance.",
+      "required": false
+    },
+    "maintenance_policy.maintenance_window.recurring_time_window": {
+      "type": "block",
+      "description": "The recurring time window of the maintenance window.",
+      "required": true
+    },
+    "maintenance_policy.maintenance_window.recurring_time_window.recurrence": {
+      "description": "An RRULE with format RFC-5545 for how this window reccurs. They go on for the span of time between the start and end time. The only supported FREQ value is \"WEEKLY\". To have something repeat every weekday, use: \"FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR\".",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_policy.maintenance_window.recurring_time_window.window": {
+      "type": "block",
+      "description": "The window representing the start and end time of recurrences. This field ignores the date components of the provided timestamps. Only the time of day and duration between start and end time are relevant.",
+      "required": true
+    },
+    "maintenance_policy.maintenance_window.recurring_time_window.window.end_time": {
+      "description": "The end time of the time window provided in RFC 3339 format.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_policy.maintenance_window.recurring_time_window.window.start_time": {
+      "description": "The start time of the time window provided in RFC 3339 format.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_config": {
+      "type": "block",
+      "description": "Network configuration options. These are required when a private Data Fusion instance is to be created.",
+      "required": false
+    },
+    "network_config.connection_type": {
+      "description": "Optional. Type of connection for establishing private IP connectivity between the Data Fusion customer project VPC and\nthe corresponding tenant project from a predefined list of available connection modes.\nIf this field is unspecified for a private instance, VPC peering is used. Possible values: [\"VPC_PEERING\", \"PRIVATE_SERVICE_CONNECT_INTERFACES\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Forces data traffic to remain within the internal network rather than traversing the public internet, by utilising VPC peering"
+    },
+    "network_config.ip_allocation": {
+      "description": "The IP range in CIDR notation to use for the managed Data Fusion instance\nnodes. This range must not overlap with any other ranges used in the Data Fusion instance network.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Specifies the CIDR range used for the managed instance's nodes. It is a team-chosen network addressing detail that must be unique within the project's network; a generic platform policy cannot dictate a specific range without hardcoding team-specific values, so it is not a useful policy target."
+    },
+    "network_config.network": {
+      "description": "Name of the network in the project with which the tenant project\nwill be peered for executing pipelines. In case of shared VPC where the network resides in another host\nproject the network should specified in the form of projects/{host-project-id}/global/networks/{network}",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Names the VPC network the tenant project peers with for pipeline execution. It is a reference to an existing network the team selects; we do not constrain the names of networks a resource merely references, so it is not a policy target."
+    },
+    "network_config.private_service_connect_config": {
+      "type": "block",
+      "description": "Optional. Configuration for Private Service Connect.\nThis is required only when using connection type PRIVATE_SERVICE_CONNECT_INTERFACES.",
+      "required": false
+    },
+    "network_config.private_service_connect_config.network_attachment": {
+      "description": "Optional. The reference to the network attachment used to establish private connectivity.\nIt will be of the form projects/{project-id}/regions/{region}/networkAttachments/{network-attachment-id}.\nThis is required only when using connection type PRIVATE_SERVICE_CONNECT_INTERFACES.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_config.private_service_connect_config.unreachable_cidr_block": {
+      "description": "Optional. Input only. The CIDR block to which the CDF instance can't route traffic to in the consumer project VPC.\nThe size of this block should be at least /25. This range should not overlap with the primary address range of any subnetwork used by the network attachment.\nThis range can be used for other purposes in the consumer VPC as long as there is no requirement for CDF to reach destinations using these addresses.\nIf this value is not provided, the server chooses a non RFC 1918 address range. The format of this field is governed by RFC 4632.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

@@ -1,0 +1,292 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "collection_id": {
+      "description": "The collection ID. Currently only accepts \"default_collection\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "control_id": {
+      "description": "The unique id of the control.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier for the control resource. We do not constrain resource identifiers, so it is not a policy target."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "The display name of the control. This field must be a UTF-8 encoded\nstring with a length limit of 128 characters.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "engine_id": {
+      "description": "The engine to add the control to.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier referencing the engine the control belongs to. We do not constrain resource identifiers or references."
+    },
+    "location": {
+      "description": "The geographic location where the data store should reside. The value can\nonly be one of \"global\", \"us\" and \"eu\".",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "solution_type": {
+      "description": "The solution type that the control belongs to. Possible values: [\"SOLUTION_TYPE_RECOMMENDATION\", \"SOLUTION_TYPE_SEARCH\", \"SOLUTION_TYPE_CHAT\", \"SOLUTION_TYPE_GENERATIVE_CHAT\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Selects which Discovery Engine solution (search, recommendation, chat) the control applies to. This is a functional product configuration, not a security control."
+    },
+    "use_cases": {
+      "description": "The use cases that the control is used for. Possible values: [\"SEARCH_USE_CASE_SEARCH\", \"SEARCH_USE_CASE_BROWSE\"]",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boost_action": {
+      "type": "block",
+      "description": "Changes the returned order of results.",
+      "required": false
+    },
+    "boost_action.data_store": {
+      "description": "The data store to boost.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boost_action.filter": {
+      "description": "The filter to apply to the search results.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boost_action.fixed_boost": {
+      "description": "The fixed boost value to apply to the search results. Positive values will increase the relevance of the results, while negative values will decrease the relevance. The value must be between -100 and 100.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boost_action.interpolation_boost_spec": {
+      "type": "block",
+      "description": "The interpolation boost specification to apply to the search results.",
+      "required": false
+    },
+    "boost_action.interpolation_boost_spec.attribute_type": {
+      "description": "The attribute type to be used to determine the boost amount. Possible values: [\"NUMERICAL\", \"FRESHNESS\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boost_action.interpolation_boost_spec.field_name": {
+      "description": "The name of the field whose value will be used to determine the boost amount.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boost_action.interpolation_boost_spec.interpolation_type": {
+      "description": "The interpolation type to be applied to connect the control points. Possible values: [\"LINEAR\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boost_action.interpolation_boost_spec.control_point": {
+      "type": "block",
+      "description": "The control points used to define the curve.",
+      "required": false
+    },
+    "boost_action.interpolation_boost_spec.control_point.attribute_value": {
+      "description": "The attribute value of the control point.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "boost_action.interpolation_boost_spec.control_point.boost_amount": {
+      "description": "The value between -1 to 1 by which to boost the score if the attributeValue\nevaluates to the value specified above.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "conditions": {
+      "type": "block",
+      "description": "The conditions under which the control is active.",
+      "required": false
+    },
+    "conditions.query_regex": {
+      "description": "The regular expression that the query must match for this condition to be met.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "conditions.active_time_range": {
+      "type": "block",
+      "description": "The time range when the condition is active.",
+      "required": false
+    },
+    "conditions.active_time_range.end_time": {
+      "description": "The end time of the active time range.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "conditions.active_time_range.start_time": {
+      "description": "The start time of the active time range.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "conditions.query_terms": {
+      "type": "block",
+      "description": "The query terms that must be present in the search request for this condition to be met.",
+      "required": false
+    },
+    "conditions.query_terms.full_match": {
+      "description": "If true, the query term must be an exact match. Otherwise, the query term can be a partial match.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "conditions.query_terms.value": {
+      "description": "The value of the query term.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "filter_action": {
+      "type": "block",
+      "description": "Removes entries from returned results.",
+      "required": false
+    },
+    "filter_action.data_store": {
+      "description": "The data store to filter.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "filter_action.filter": {
+      "description": "The filter to apply to the search results.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "promote_action": {
+      "type": "block",
+      "description": "Promotes a specified link for a query.",
+      "required": false
+    },
+    "promote_action.data_store": {
+      "description": "The data store to promote.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "promote_action.search_link_promotion": {
+      "type": "block",
+      "description": "The search link promotion to apply to the search results.",
+      "required": true
+    },
+    "promote_action.search_link_promotion.description": {
+      "description": "The description of the promoted link.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "promote_action.search_link_promotion.document": {
+      "description": "The document to promote.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "promote_action.search_link_promotion.enabled": {
+      "description": "Return promotions for basic site search.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "promote_action.search_link_promotion.image_uri": {
+      "description": "The image URI of the promoted link.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "promote_action.search_link_promotion.title": {
+      "description": "The title of the promoted link.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "promote_action.search_link_promotion.uri": {
+      "description": "The URI to promote.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "redirect_action": {
+      "type": "block",
+      "description": "Redirects to a specified URI.",
+      "required": false
+    },
+    "redirect_action.redirect_uri": {
+      "description": "The URI to redirect to.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "synonyms_action": {
+      "type": "block",
+      "description": "Associates queries with each other.",
+      "required": false
+    },
+    "synonyms_action.synonyms": {
+      "description": "The synonyms to apply to the search results.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

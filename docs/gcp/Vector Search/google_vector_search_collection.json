@@ -1,0 +1,129 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "collection_id": {
+      "description": "ID of the Collection to create.\nThe id must be 1-63 characters long, and comply with\n[RFC1035](https://www.ietf.org/rfc/rfc1035.txt).\nSpecifically, it must be 1-63 characters long and match the regular\nexpression '[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_schema": {
+      "description": "JSON Schema for data.\nField names must contain only alphanumeric characters,\nunderscores, and hyphens.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "User-specified description of the collection",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "User-specified display name of the collection",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "Labels as key value pairs.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "encryption_spec": {
+      "type": "block",
+      "description": "Represents a customer-managed encryption key specification that can be\napplied to a Vector Search collection.",
+      "required": false
+    },
+    "encryption_spec.crypto_key_name": {
+      "description": "Resource name of the Cloud KMS key used to protect the resource.\n\nThe Cloud KMS key must be in the same region as the resource. It must have\nthe format\n'projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "vector_schema": {
+      "type": "block",
+      "description": "Schema for vector fields. Only vector fields in this schema will be\nsearchable.\nField names must contain only alphanumeric characters,\nunderscores, and hyphens.",
+      "required": false
+    },
+    "vector_schema.field_name": {
+      "description": "The identifier for this object. Format specified above.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "vector_schema.dense_vector": {
+      "type": "block",
+      "description": "Message describing a dense vector field.",
+      "required": false
+    },
+    "vector_schema.dense_vector.dimensions": {
+      "description": "Dimensionality of the vector field.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "vector_schema.dense_vector.vertex_embedding_config": {
+      "type": "block",
+      "description": "Message describing the configuration for generating embeddings for a vector\nfield using Vertex AI embeddings API.",
+      "required": false
+    },
+    "vector_schema.dense_vector.vertex_embedding_config.model_id": {
+      "description": "Required: ID of the embedding model to use. See\nhttps://cloud.google.com/vertex-ai/generative-ai/docs/learn/models#embeddings-models\nfor the list of supported models.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "vector_schema.dense_vector.vertex_embedding_config.task_type": {
+      "description": "Possible values:\nRETRIEVAL_QUERY\nRETRIEVAL_DOCUMENT\nSEMANTIC_SIMILARITY\nCLASSIFICATION\nCLUSTERING\nQUESTION_ANSWERING\nFACT_VERIFICATION\nCODE_RETRIEVAL_QUERY",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "vector_schema.dense_vector.vertex_embedding_config.text_template": {
+      "description": "Required: Text template for the input to the model. The template must\ncontain one or more references to fields in the DataObject, e.g.:\n\"Movie Title: {title} ---- Movie Plot: {plot}\".",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "vector_schema.sparse_vector": {
+      "type": "block",
+      "description": "Message describing a sparse vector field.",
+      "required": false
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "config": {
+      "description": "Config for the module. For the resident module, its config value is defined at this level.\nFor the inherited module, its config value is inherited from the ancestor module.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": "Ensuring a correct config enforces consistency in detection rules and prevents misconfigurations across projects or folders."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "The human readable name to be displayed for the module.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Human-readable module name; cosmetic, with no security impact."
+    },
+    "enablement_state": {
+      "description": "The state of enablement for the module at the given level of the hierarchy. Possible values: [\"ENABLED\", \"DISABLED\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": "Modules must be enabled to ensure continuous monitoring of security events across the environment."
+    },
+    "organization": {
+      "description": "Numerical ID of the parent organization.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Numerical ID of the parent organization — a reference/identifier, not a platform policy target."
+    },
+    "type": {
+      "description": "Immutable. Type for the module. e.g. CONFIGURABLE_BAD_IP.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": "Restricting to approved types ensures alignment with organizational security requirements and avoids unsupported modules."
+    }
+  }
+}

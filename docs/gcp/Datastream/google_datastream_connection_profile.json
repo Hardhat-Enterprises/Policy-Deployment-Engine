@@ -1,0 +1,490 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "connection_profile_id": {
+      "description": "The connection profile identifier.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "create_without_validation": {
+      "description": "Create the connection profile without validating it.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "Display name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "Labels.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The name of the location this connection profile is located in.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "bigquery_profile": {
+      "type": "block",
+      "description": "BigQuery warehouse profile.",
+      "required": false
+    },
+    "forward_ssh_connectivity": {
+      "type": "block",
+      "description": "Forward SSH tunnel connectivity.",
+      "required": false
+    },
+    "forward_ssh_connectivity.hostname": {
+      "description": "Hostname for the SSH tunnel.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "forward_ssh_connectivity.password": {
+      "description": "SSH password.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "forward_ssh_connectivity.port": {
+      "description": "Port for the SSH tunnel.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "forward_ssh_connectivity.private_key": {
+      "description": "SSH private key.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "forward_ssh_connectivity.username": {
+      "description": "Username for the SSH tunnel.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "gcs_profile": {
+      "type": "block",
+      "description": "Cloud Storage bucket profile.",
+      "required": false
+    },
+    "gcs_profile.bucket": {
+      "description": "The Cloud Storage bucket name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "gcs_profile.root_path": {
+      "description": "The root path inside the Cloud Storage bucket.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mongodb_profile": {
+      "type": "block",
+      "description": "Configuration for connecting to a MongoDB database.",
+      "required": false
+    },
+    "mongodb_profile.password": {
+      "description": "Password for the MongoDB connection. Mutually exclusive with\nsecretManagerStoredPassword.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mongodb_profile.replica_set": {
+      "description": "Name of the replica set.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mongodb_profile.secret_manager_stored_password": {
+      "description": "A reference to a Secret Manager resource name storing the MongoDB\nconnection password. Mutually exclusive with password.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mongodb_profile.username": {
+      "description": "Username for the MongoDB connection.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mongodb_profile.host_addresses": {
+      "type": "block",
+      "description": "List of host addresses for a MongoDB cluster.",
+      "required": true
+    },
+    "mongodb_profile.host_addresses.hostname": {
+      "description": "Hostname for the connection.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mongodb_profile.host_addresses.port": {
+      "description": "Port for the connection.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mongodb_profile.srv_connection_format": {
+      "type": "block",
+      "description": "Srv connection format. Mutually exclusive with\nstandard_connection_Format.",
+      "required": false
+    },
+    "mongodb_profile.ssl_config": {
+      "type": "block",
+      "description": "SSL configuration for the MongoDB connection.",
+      "required": false
+    },
+    "mongodb_profile.ssl_config.ca_certificate": {
+      "description": "PEM-encoded certificate of the CA that signed the source database\nserver's certificate.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mongodb_profile.ssl_config.client_certificate": {
+      "description": "PEM-encoded certificate that will be used by the replica to\nauthenticate against the source database server. If this field\nis used then the 'clientKey' and the 'caCertificate' fields are\nmandatory.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mongodb_profile.ssl_config.client_key": {
+      "description": "PEM-encoded private key associated with the Client Certificate.\nIf this field is used then the 'client_certificate' and the\n'ca_certificate' fields are mandatory.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mongodb_profile.ssl_config.secret_manager_stored_client_key": {
+      "description": "A reference to a Secret Manager resource name storing the\nPEM-encoded private key. Mutually exclusive with clientKey.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mongodb_profile.standard_connection_format": {
+      "type": "block",
+      "description": "Standard connection format. Mutually exclusive with\nsrv_connection_format.",
+      "required": false
+    },
+    "mongodb_profile.standard_connection_format.direct_connection": {
+      "description": "Specifies whether the client connects directly to the\nhost[:port] in the connection URI.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mysql_profile": {
+      "type": "block",
+      "description": "MySQL database profile.",
+      "required": false
+    },
+    "mysql_profile.hostname": {
+      "description": "Hostname for the MySQL connection.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mysql_profile.password": {
+      "description": "Password for the MySQL connection.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mysql_profile.port": {
+      "description": "Port for the MySQL connection.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mysql_profile.secret_manager_stored_password": {
+      "description": "A reference to a Secret Manager resource name storing the user's password.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mysql_profile.username": {
+      "description": "Username for the MySQL connection.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mysql_profile.ssl_config": {
+      "type": "block",
+      "description": "SSL configuration for the MySQL connection.",
+      "required": false
+    },
+    "mysql_profile.ssl_config.ca_certificate": {
+      "description": "PEM-encoded certificate of the CA that signed the source database\nserver's certificate.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mysql_profile.ssl_config.client_certificate": {
+      "description": "PEM-encoded certificate that will be used by the replica to\nauthenticate against the source database server. If this field\nis used then the 'clientKey' and the 'caCertificate' fields are\nmandatory.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mysql_profile.ssl_config.client_key": {
+      "description": "PEM-encoded private key associated with the Client Certificate.\nIf this field is used then the 'client_certificate' and the\n'ca_certificate' fields are mandatory.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "oracle_profile": {
+      "type": "block",
+      "description": "Oracle database profile.",
+      "required": false
+    },
+    "oracle_profile.connection_attributes": {
+      "description": "Connection string attributes",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "oracle_profile.database_service": {
+      "description": "Database for the Oracle connection.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "oracle_profile.hostname": {
+      "description": "Hostname for the Oracle connection.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "oracle_profile.password": {
+      "description": "Password for the Oracle connection.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "oracle_profile.port": {
+      "description": "Port for the Oracle connection.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "oracle_profile.secret_manager_stored_password": {
+      "description": "A reference to a Secret Manager resource name storing the user's password.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "oracle_profile.username": {
+      "description": "Username for the Oracle connection.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "postgresql_profile": {
+      "type": "block",
+      "description": "PostgreSQL database profile.",
+      "required": false
+    },
+    "postgresql_profile.database": {
+      "description": "Database for the PostgreSQL connection.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "postgresql_profile.hostname": {
+      "description": "Hostname for the PostgreSQL connection.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "postgresql_profile.password": {
+      "description": "Password for the PostgreSQL connection.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "postgresql_profile.port": {
+      "description": "Port for the PostgreSQL connection.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "postgresql_profile.secret_manager_stored_password": {
+      "description": "A reference to a Secret Manager resource name storing the user's password.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "postgresql_profile.username": {
+      "description": "Username for the PostgreSQL connection.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "postgresql_profile.ssl_config": {
+      "type": "block",
+      "description": "SSL configuration for the PostgreSQL connection.",
+      "required": false
+    },
+    "postgresql_profile.ssl_config.server_and_client_verification": {
+      "type": "block",
+      "description": "If this field is set, the communication will be encrypted with TLS encryption\nand both the server identity and the client identity will be authenticated.",
+      "required": false
+    },
+    "postgresql_profile.ssl_config.server_and_client_verification.ca_certificate": {
+      "description": "PEM-encoded server root CA certificate.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "postgresql_profile.ssl_config.server_and_client_verification.client_certificate": {
+      "description": "PEM-encoded certificate used by the source database to authenticate the\nclient identity (i.e., the Datastream's identity). This certificate is\nsigned by either a root certificate trusted by the server or one or more\nintermediate certificates (which is stored with the leaf certificate) to\nlink to this certificate to the trusted root certificate.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "postgresql_profile.ssl_config.server_and_client_verification.client_key": {
+      "description": "PEM-encoded private key associated with the client certificate.\nThis value will be used during the SSL/TLS handshake, allowing\nthe PostgreSQL server to authenticate the client's identity,\ni.e. identity of the stream.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "postgresql_profile.ssl_config.server_verification": {
+      "type": "block",
+      "description": "If this field is set, the communication will be encrypted with TLS encryption\nand the server identity will be authenticated.",
+      "required": false
+    },
+    "postgresql_profile.ssl_config.server_verification.ca_certificate": {
+      "description": "PEM-encoded server root CA certificate.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "private_connectivity": {
+      "type": "block",
+      "description": "Private connectivity.",
+      "required": false
+    },
+    "private_connectivity.private_connection": {
+      "description": "A reference to a private connection resource. Format: 'projects/{project}/locations/{location}/privateConnections/{name}'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "sql_server_profile": {
+      "type": "block",
+      "description": "SQL Server database profile.",
+      "required": false
+    },
+    "sql_server_profile.database": {
+      "description": "Database for the SQL Server connection.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "sql_server_profile.hostname": {
+      "description": "Hostname for the SQL Server connection.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "sql_server_profile.password": {
+      "description": "Password for the SQL Server connection.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "sql_server_profile.port": {
+      "description": "Port for the SQL Server connection.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "sql_server_profile.secret_manager_stored_password": {
+      "description": "A reference to a Secret Manager resource name storing the user's password.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "sql_server_profile.username": {
+      "description": "Username for the SQL Server connection.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

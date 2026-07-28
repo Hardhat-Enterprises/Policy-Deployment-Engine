@@ -1,0 +1,174 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "active_directory": {
+      "description": "Specifies the Active Directory policy to be used. Format: 'projects/{{project}}/locations/{{location}}/activeDirectories/{{name}}'.\nThe policy needs to be in the same location as the storage pool.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "allow_auto_tiering": {
+      "description": "Optional. True if the storage pool supports Auto Tiering enabled volumes. Default is false.\nAuto-tiering can be enabled after storage pool creation but it can't be disabled once enabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "capacity_gib": {
+      "description": "Capacity of the storage pool (in GiB).",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "custom_performance_enabled": {
+      "description": "Optional. True if using Independent Scaling of capacity and performance (Hyperdisk). Default is false.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "An optional description of this resource.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "enable_hot_tier_auto_resize": {
+      "description": "Flag indicating that the hot-tier threshold will be auto-increased by 10% of the hot-tier when it hits 100%. Default is true.\nThe increment will kick in only if the new size after increment is still less than or equal to storage pool size.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "hot_tier_size_gib": {
+      "description": "Total hot tier capacity for the Storage Pool. It is applicable only to Flex service level.\nIt should be less than the minimum storage pool size and cannot be more than the current storage pool size. It cannot be decreased once set.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "kms_config": {
+      "description": "Specifies the CMEK policy to be used for volume encryption. Format: 'projects/{{project}}/locations/{{location}}/kmsConfigs/{{name}}'.\nThe policy needs to be in the same location as the storage pool.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "Labels as key value pairs. Example: '{ \"owner\": \"Bob\", \"department\": \"finance\", \"purpose\": \"testing\" }'.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "ldap_enabled": {
+      "description": "When enabled, the volumes uses Active Directory as LDAP name service for UID/GID lookups. Required to enable extended group support for NFSv3,\nusing security identifiers for NFSv4.1 or principal names for kerberized NFSv4.1.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "Name of the location. For zonal Flex pools specify a zone name, in all other cases a region name.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "mode": {
+      "description": "Mode of the storage pool.\nThe operational mode of the storage pool. ONTAP mode enables operations\nvia ONTAP Mode APIs, while DEFAULT mode enables operations via NetApp Volumes APIs.\nIf not specified during creation, the mode defaults to DEFAULT. Possible values: [\"MODE_UNSPECIFIED\", \"DEFAULT\", \"ONTAP\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "name": {
+      "description": "The resource name of the storage pool. Needs to be unique per location/region.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network": {
+      "description": "VPC network name with format: 'projects/{{project}}/global/networks/{{network}}'",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Restricts attachment to approved/non-default VPCs with controlled ingress/egress."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "qos_type": {
+      "description": "QoS (Quality of Service) type of the storage pool.\nPossible values are: AUTO, MANUAL. Possible values: [\"QOS_TYPE_UNSPECIFIED\", \"AUTO\", \"MANUAL\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "replica_zone": {
+      "description": "Specifies the replica zone for regional Flex pools. 'zone' and 'replica_zone' values can be swapped to initiate a\n[zone switch](https://cloud.google.com/netapp/volumes/docs/configure-and-use/storage-pools/edit-or-delete-storage-pool#switch_active_and_replica_zones).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "scale_type": {
+      "description": "The scale type of the storage pool. Defaults to 'SCALE_TYPE_DEFAULT' if not specified. Possible values: [\"SCALE_TYPE_UNSPECIFIED\", \"SCALE_TYPE_DEFAULT\", \"SCALE_TYPE_SCALEOUT\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "service_level": {
+      "description": "Service level of the storage pool. Possible values: [\"PREMIUM\", \"EXTREME\", \"STANDARD\", \"FLEX\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "total_iops": {
+      "description": "Optional. Custom Performance Total IOPS of the pool If not provided, it will be calculated based on the totalThroughputMibps",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "total_throughput_mibps": {
+      "description": "Optional. Custom Performance Total Throughput of the pool (in MiB/s).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "type": {
+      "description": "Type of the storage pool.\nThis field is used to control whether the pool supports FILE based volumes only or UNIFIED (both FILE and BLOCK) volumes.\nIf not specified during creation, it defaults to FILE. Possible values: [\"STORAGE_POOL_TYPE_UNSPECIFIED\", \"FILE\", \"UNIFIED\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "zone": {
+      "description": "Specifies the active zone for regional Flex pools. 'zone' and 'replica_zone' values can be swapped to initiate a\n[zone switch](https://cloud.google.com/netapp/volumes/docs/configure-and-use/storage-pools/edit-or-delete-storage-pool#switch_active_and_replica_zones).\nIf you want to create a zonal Flex pool, specify a zone name for 'location' and omit 'zone'.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    }
+  }
+}

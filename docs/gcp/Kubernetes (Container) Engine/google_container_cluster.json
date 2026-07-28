@@ -1,0 +1,4484 @@
+{
+  "last_updated": "2026-06-24T07:07:53Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "allow_net_admin": {
+      "description": "Enable NET_ADMIN for this cluster.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autopilot_privileged_admission": {
+      "description": "The customer allowlist Cloud Storage paths for the cluster. These paths are used with the `--autopilot-privileged-admission` flag to authorize privileged workloads in Autopilot clusters. To allow default partner allowlists, set to []. To allow no allowlists, set to [\"\"].",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_ipv4_cidr": {
+      "description": "The IP address range of the Kubernetes pods in this cluster in CIDR notation (e.g. 10.96.0.0/14). Leave blank to have one automatically chosen or specify a /14 block in 10.0.0.0/8. This field will only work for routes-based clusters, where ip_allocation_policy is not defined.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "datapath_provider": {
+      "description": "The desired datapath provider for this cluster. By default, uses the IPTables-based kube-proxy implementation.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "default_max_pods_per_node": {
+      "description": "The default maximum number of pods per node in this cluster. This doesn't work on \"routes-based\" clusters, clusters that don't have IP Aliasing enabled.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_protection": {
+      "description": "When the field is set to true or unset in Terraform state, a terraform apply or terraform destroy that would delete the cluster will fail. When the field is set to false, deleting the cluster is allowed.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": " Description of the cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "disable_l4_lb_firewall_reconciliation": {
+      "description": "Disable L4 load balancer VPC firewalls to enable firewall policies.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "enable_autopilot": {
+      "description": "Enable Autopilot for this cluster.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "enable_cilium_clusterwide_network_policy": {
+      "description": "Whether Cilium cluster-wide network policy is enabled on this cluster.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "enable_fqdn_network_policy": {
+      "description": "Whether FQDN Network Policy is enabled on this cluster.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "enable_intranode_visibility": {
+      "description": "Whether Intra-node visibility is enabled for this cluster. This makes same node pod to pod traffic visible for VPC network.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "enable_kubernetes_alpha": {
+      "description": "Whether to enable Kubernetes Alpha features for this cluster. Note that when this option is enabled, the cluster cannot be upgraded and will be automatically deleted after 30 days.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "enable_l4_ilb_subsetting": {
+      "description": "Whether L4ILB Subsetting is enabled for this cluster.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "enable_legacy_abac": {
+      "description": "Whether the ABAC authorizer is enabled for this cluster. When enabled, identities in the system, including service accounts, nodes, and controllers, will have statically granted permissions beyond those provided by the RBAC configuration or IAM. Defaults to false.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "enable_multi_networking": {
+      "description": "Whether multi-networking is enabled for this cluster.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "enable_shielded_nodes": {
+      "description": "Enable Shielded Nodes features on all nodes in this cluster. Defaults to true.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "enable_tpu": {
+      "description": "Whether to enable Cloud TPU resources in this cluster.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "in_transit_encryption_config": {
+      "description": "Defines the config of in-transit encryption",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "initial_node_count": {
+      "description": "The number of nodes to create in this cluster's default node pool. In regional or multi-zonal clusters, this is the number of nodes per zone. Must be set if node_pool is not set. If you're using google_container_node_pool objects with no default node pool, you'll need to set this to a value of at least 1, alongside setting remove_default_node_pool to true.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The location (region or zone) in which the cluster master will be created, as well as the default node location. If you specify a zone (such as us-central1-a), the cluster will be a zonal cluster with a single cluster master. If you specify a region (such as us-west1), the cluster will be a regional cluster with multiple masters spread across zones in the region, and with default node locations in those zones as well.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "logging_service": {
+      "description": "The logging service that the cluster should write logs to. Available options include logging.googleapis.com(Legacy Stackdriver), logging.googleapis.com/kubernetes(Stackdriver Kubernetes Engine Logging), and none. Defaults to logging.googleapis.com/kubernetes.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "min_master_version": {
+      "description": "The minimum version of the master. GKE will auto-update the master to new versions, so this does not guarantee the current master version--use the read-only master_version field to obtain that. If unset, the cluster's version will be set by GKE to the version of the most recent official release (which is not necessarily the latest version).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "monitoring_service": {
+      "description": "The monitoring service that the cluster should write metrics to. Automatically send metrics from pods in the cluster to the Google Cloud Monitoring API. VM metrics will be collected by Google Compute Engine regardless of this setting Available options include monitoring.googleapis.com(Legacy Stackdriver), monitoring.googleapis.com/kubernetes(Stackdriver Kubernetes Engine Monitoring), and none. Defaults to monitoring.googleapis.com/kubernetes.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "name": {
+      "description": "The name of the cluster, unique within the project and location.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network": {
+      "description": "The name or self_link of the Google Compute Engine network to which the cluster is connected. For Shared VPC, set this to the self link of the shared network.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "networking_mode": {
+      "description": "Determines whether alias IPs or routes will be used for pod IPs in the cluster. Defaults to VPC_NATIVE for new clusters.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_locations": {
+      "description": "The list of zones in which the cluster's nodes are located. Nodes must be in the region of their regional cluster or in the same region as their cluster's zone for zonal clusters. If this is specified for a zonal cluster, omit the cluster's zone.",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_version": {
+      "description": "The Kubernetes version on the nodes. Must either be unset or set to the same value as min_master_version on create. Defaults to the default version set by GKE which is not necessarily the latest version. This only affects nodes in the default node pool. While a fuzzy version can be specified, it's recommended that you specify explicit versions as Terraform will see spurious diffs when fuzzy versions are used. See the google_container_engine_versions data source's version_prefix field to approximate fuzzy versions in a Terraform-compatible way. To update nodes in other node pools, use the version attribute on the node pool.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "private_ipv6_google_access": {
+      "description": "The desired state of IPv6 connectivity to Google Services. By default, no private IPv6 access to or from Google Services (all access will be via IPv4).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "remove_default_node_pool": {
+      "description": "If true, deletes the default node pool upon cluster creation. If you're using google_container_node_pool resources with no default node pool, this should be set to true, alongside setting initial_node_count to at least 1.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "resource_labels": {
+      "description": "The GCE resource labels (a map of key/value pairs) to be applied to the cluster.\n\n\t\t\t\t**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\n\t\t\t\tPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "subnetwork": {
+      "description": "The name or self_link of the Google Compute Engine subnetwork in which the cluster's instances are launched.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "addons_config": {
+      "type": "block",
+      "description": "The configuration for addons supported by GKE.",
+      "required": false
+    },
+    "addons_config.cloudrun_config": {
+      "type": "block",
+      "description": "The status of the CloudRun addon. It is disabled by default. Set disabled = false to enable.",
+      "required": false
+    },
+    "addons_config.cloudrun_config.disabled": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "addons_config.cloudrun_config.load_balancer_type": {
+      "description": "The load balancer type of CloudRun ingress service. It is external load balancer by default. Set `load_balancer_type=LOAD_BALANCER_TYPE_INTERNAL` to configure it as internal load balancer.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "addons_config.config_connector_config": {
+      "type": "block",
+      "description": "The of the Config Connector addon.",
+      "required": false
+    },
+    "addons_config.config_connector_config.enabled": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "addons_config.dns_cache_config": {
+      "type": "block",
+      "description": "The status of the NodeLocal DNSCache addon. It is disabled by default. Set enabled = true to enable.",
+      "required": false
+    },
+    "addons_config.dns_cache_config.enabled": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "addons_config.gce_persistent_disk_csi_driver_config": {
+      "type": "block",
+      "description": "Whether this cluster should enable the Google Compute Engine Persistent Disk Container Storage Interface (CSI) Driver. Set enabled = true to enable. The Compute Engine persistent disk CSI Driver is enabled by default on newly created clusters for the following versions: Linux clusters: GKE version 1.18.10-gke.2100 or later, or 1.19.3-gke.2100 or later.",
+      "required": false
+    },
+    "addons_config.gce_persistent_disk_csi_driver_config.enabled": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "addons_config.gcp_filestore_csi_driver_config": {
+      "type": "block",
+      "description": "The status of the Filestore CSI driver addon, which allows the usage of filestore instance as volumes. Defaults to disabled for Standard clusters; set enabled = true to enable. It is enabled by default for Autopilot clusters; set enabled = true to enable it explicitly.",
+      "required": false
+    },
+    "addons_config.gcp_filestore_csi_driver_config.enabled": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "addons_config.gcs_fuse_csi_driver_config": {
+      "type": "block",
+      "description": "The status of the GCS Fuse CSI driver addon, which allows the usage of gcs bucket as volumes. Defaults to disabled; set enabled = true to enable.",
+      "required": false
+    },
+    "addons_config.gcs_fuse_csi_driver_config.enabled": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "addons_config.gke_backup_agent_config": {
+      "type": "block",
+      "description": "The status of the Backup for GKE Agent addon. It is disabled by default. Set enabled = true to enable.",
+      "required": false
+    },
+    "addons_config.gke_backup_agent_config.enabled": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "addons_config.horizontal_pod_autoscaling": {
+      "type": "block",
+      "description": "The status of the Horizontal Pod Autoscaling addon, which increases or decreases the number of replica pods a replication controller has based on the resource usage of the existing pods. It ensures that a Heapster pod is running in the cluster, which is also used by the Cloud Monitoring service. It is enabled by default; set disabled = true to disable.",
+      "required": false
+    },
+    "addons_config.horizontal_pod_autoscaling.disabled": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "addons_config.http_load_balancing": {
+      "type": "block",
+      "description": "The status of the HTTP (L7) load balancing controller addon, which makes it easy to set up HTTP load balancers for services in a cluster. It is enabled by default; set disabled = true to disable.",
+      "required": false
+    },
+    "addons_config.http_load_balancing.disabled": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "addons_config.lustre_csi_driver_config": {
+      "type": "block",
+      "description": "Configuration for the Lustre CSI driver. Defaults to disabled; set enabled = true to enable.",
+      "required": false
+    },
+    "addons_config.lustre_csi_driver_config.disable_multi_nic": {
+      "description": "When set to true, this disables multi-NIC support for the Lustre CSI driver. By default, GKE enables multi-NIC support, which\n\t\t\t\t\t\t\t\t\t\tallows the Lustre CSI driver to automatically detect and configure all suitable network interfaces on a node to maximize I/O performance for demanding workloads.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "addons_config.lustre_csi_driver_config.enable_legacy_lustre_port": {
+      "description": "If set to true, the Lustre CSI driver will initialize LNet (the virtual network layer for Lustre kernel module) using port 6988.\n\t\t\t\t\t\t\t\t\t\tThis flag is required to workaround a port conflict with the gke-metadata-server on GKE nodes.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "addons_config.lustre_csi_driver_config.enabled": {
+      "description": "Whether the Lustre CSI driver is enabled for this cluster.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "addons_config.network_policy_config": {
+      "type": "block",
+      "description": "Whether we should enable the network policy addon for the master. This must be enabled in order to enable network policy for the nodes. To enable this, you must also define a network_policy block, otherwise nothing will happen. It can only be disabled if the nodes already do not have network policies enabled. Defaults to disabled; set disabled = false to enable.",
+      "required": false
+    },
+    "addons_config.network_policy_config.disabled": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "addons_config.parallelstore_csi_driver_config": {
+      "type": "block",
+      "description": "The status of the Parallelstore CSI driver addon, which allows the usage of Parallelstore instances as volumes. Defaults to disabled; set enabled = true to enable.",
+      "required": false
+    },
+    "addons_config.parallelstore_csi_driver_config.enabled": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "addons_config.pod_snapshot_config": {
+      "type": "block",
+      "description": "Configuration for the Pod Snapshot feature.",
+      "required": false
+    },
+    "addons_config.pod_snapshot_config.enabled": {
+      "description": "Whether the Pod Snapshot feature is enabled for this cluster.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "addons_config.ray_operator_config": {
+      "type": "block",
+      "description": "The status of the Ray Operator addon, which enabled management of Ray AI/ML jobs on GKE. Defaults to disabled; set enabled = true to enable.",
+      "required": false
+    },
+    "addons_config.ray_operator_config.enabled": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "addons_config.ray_operator_config.ray_cluster_logging_config": {
+      "type": "block",
+      "description": "The status of Ray Logging, which scrapes Ray cluster logs to Cloud Logging. Defaults to disabled; set enabled = true to enable.",
+      "required": false
+    },
+    "addons_config.ray_operator_config.ray_cluster_logging_config.enabled": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "addons_config.ray_operator_config.ray_cluster_monitoring_config": {
+      "type": "block",
+      "description": "The status of Ray Cluster monitoring, which shows Ray cluster metrics in Cloud Console. Defaults to disabled; set enabled = true to enable.",
+      "required": false
+    },
+    "addons_config.ray_operator_config.ray_cluster_monitoring_config.enabled": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "addons_config.slice_controller_config": {
+      "type": "block",
+      "description": "The status of the Slice Controller addon. It is disabled by default; set enabled = true to enable.",
+      "required": false
+    },
+    "addons_config.slice_controller_config.enabled": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "addons_config.slurm_operator_config": {
+      "type": "block",
+      "description": "The status of the Slurm Operator addon, which creates slurm related CRDs and KCP pods to manage them. Defaults to disabled for Standard clusters; set enabled = true to enable. It can not be enabled for Autopilot clusters.",
+      "required": false
+    },
+    "addons_config.slurm_operator_config.enabled": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "addons_config.stateful_ha_config": {
+      "type": "block",
+      "description": "The status of the Stateful HA addon, which provides automatic configurable failover for stateful applications. Defaults to disabled; set enabled = true to enable.",
+      "required": false
+    },
+    "addons_config.stateful_ha_config.enabled": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "anonymous_authentication_config": {
+      "type": "block",
+      "description": "AnonymousAuthenticationConfig allows users to restrict or enable anonymous access to the cluster.",
+      "required": false
+    },
+    "anonymous_authentication_config.mode": {
+      "description": "Setting this to LIMITED will restrict authentication of anonymous users to health check endpoints only.\n Accepted values are:\n* ENABLED: Authentication of anonymous users is enabled for all endpoints.\n* LIMITED: Anonymous access is only allowed for health check endpoints.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "authenticator_groups_config": {
+      "type": "block",
+      "description": "Configuration for the Google Groups for GKE feature.",
+      "required": false
+    },
+    "authenticator_groups_config.security_group": {
+      "description": "The name of the RBAC security group for use with Google security groups in Kubernetes RBAC. Group name must be in format gke-security-groups@yourdomain.com.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autopilot_cluster_policy_config": {
+      "type": "block",
+      "description": "Configuration for the cluster policy.",
+      "required": false
+    },
+    "autopilot_cluster_policy_config.no_standard_node_pools": {
+      "description": "If true, prevents standard node pools and requires only autopilot node pools.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autopilot_cluster_policy_config.no_system_impersonation": {
+      "description": "If true, prevents impersonation and CSRs for GKE System users.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autopilot_cluster_policy_config.no_system_mutation": {
+      "description": "If true, prevents creation and mutation of resources in GKE managed namespaces and cluster-scoped GKE managed resources.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autopilot_cluster_policy_config.no_unsafe_webhooks": {
+      "description": "If true, unsafe webhooks are not allowed.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "binary_authorization": {
+      "type": "block",
+      "description": "Configuration options for the Binary Authorization feature.",
+      "required": false
+    },
+    "binary_authorization.enabled": {
+      "description": "Enable Binary Authorization for this cluster.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "binary_authorization.evaluation_mode": {
+      "description": "Mode of operation for Binary Authorization policy evaluation.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling": {
+      "type": "block",
+      "description": "Per-cluster configuration of Node Auto-Provisioning with Cluster Autoscaler to automatically adjust the size of the cluster and create/delete node pools based on the current needs of the cluster's workload. See the guide to using Node Auto-Provisioning for more details.",
+      "required": false
+    },
+    "cluster_autoscaling.auto_provisioning_locations": {
+      "description": "The list of Google Compute Engine zones in which the NodePool's nodes can be created by NAP.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.autoscaling_profile": {
+      "description": "Configuration options for the Autoscaling profile feature, which lets you choose whether the cluster autoscaler should optimize for resource utilization or resource availability when deciding to remove nodes from a cluster. Can be BALANCED or OPTIMIZE_UTILIZATION. Defaults to BALANCED.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.default_compute_class_enabled": {
+      "description": "Specifies whether default compute class behaviour is enabled. If enabled, cluster autoscaler will use Compute Class with name default for all the workloads, if not overriden.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.enabled": {
+      "description": "Whether node auto-provisioning is enabled. Resource limits for cpu and memory must be defined to enable node auto-provisioning.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.auto_provisioning_defaults": {
+      "type": "block",
+      "description": "Contains defaults for a node pool created by NAP.",
+      "required": false
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.boot_disk_kms_key": {
+      "description": "The Customer Managed Encryption Key used to encrypt the boot disk attached to each node in the node pool.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.disk_size": {
+      "description": "Size of the disk attached to each node, specified in GB. The smallest allowed disk size is 10GB.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.disk_type": {
+      "description": "Type of the disk attached to each node.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.image_type": {
+      "description": "The default image type used by NAP once a new node pool is being created.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.min_cpu_platform": {
+      "description": "Minimum CPU platform to be used by this instance. The instance may be scheduled on the specified or newer CPU platform. Applicable values are the friendly names of CPU platforms, such as Intel Haswell.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.oauth_scopes": {
+      "description": "Scopes that are used by NAP when creating node pools.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.service_account": {
+      "description": "The Google Cloud Platform Service Account to be used by the node VMs.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.management": {
+      "type": "block",
+      "description": "NodeManagement configuration for this NodePool.",
+      "required": false
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.management.auto_repair": {
+      "description": "Specifies whether the node auto-repair is enabled for the node pool. If enabled, the nodes in this node pool will be monitored and, if they fail health checks too many times, an automatic repair action will be triggered.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.management.auto_upgrade": {
+      "description": "Specifies whether node auto-upgrade is enabled for the node pool. If enabled, node auto-upgrade helps keep the nodes in your node pool up to date with the latest release version of Kubernetes.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.shielded_instance_config": {
+      "type": "block",
+      "description": "Shielded Instance options.",
+      "required": false
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.shielded_instance_config.enable_integrity_monitoring": {
+      "description": "Defines whether the instance has integrity monitoring enabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.shielded_instance_config.enable_secure_boot": {
+      "description": "Defines whether the instance has Secure Boot enabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.upgrade_settings": {
+      "type": "block",
+      "description": "Specifies the upgrade settings for NAP created node pools",
+      "required": false
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.upgrade_settings.max_surge": {
+      "description": "The maximum number of nodes that can be created beyond the current size of the node pool during the upgrade process.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.upgrade_settings.max_unavailable": {
+      "description": "The maximum number of nodes that can be simultaneously unavailable during the upgrade process.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.upgrade_settings.strategy": {
+      "description": "Update strategy of the node pool.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.upgrade_settings.blue_green_settings": {
+      "type": "block",
+      "description": "Settings for blue-green upgrade strategy.",
+      "required": false
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.upgrade_settings.blue_green_settings.node_pool_soak_duration": {
+      "description": "Time needed after draining entire blue pool. After this period, blue pool will be cleaned up.\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tA duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.5s\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.upgrade_settings.blue_green_settings.standard_rollout_policy": {
+      "type": "block",
+      "description": "Standard policy for the blue-green upgrade.",
+      "required": false
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.upgrade_settings.blue_green_settings.standard_rollout_policy.batch_node_count": {
+      "description": "Number of blue nodes to drain in a batch.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.upgrade_settings.blue_green_settings.standard_rollout_policy.batch_percentage": {
+      "description": "Percentage of the bool pool nodes to drain in a batch. The range of this field should be (0.0, 1.0].",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.auto_provisioning_defaults.upgrade_settings.blue_green_settings.standard_rollout_policy.batch_soak_duration": {
+      "description": "Soak time after each batch gets drained.\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tA duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.5s\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.resource_limits": {
+      "type": "block",
+      "description": "Global constraints for machine resources in the cluster. Configuring the cpu and memory types is required if node auto-provisioning is enabled. These limits will apply to node pool autoscaling in addition to node auto-provisioning.",
+      "required": false
+    },
+    "cluster_autoscaling.resource_limits.maximum": {
+      "description": "Maximum amount of the resource in the cluster.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.resource_limits.minimum": {
+      "description": "Minimum amount of the resource in the cluster.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cluster_autoscaling.resource_limits.resource_type": {
+      "description": "The type of the resource. For example, cpu and memory. See the guide to using Node Auto-Provisioning for a list of types.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "confidential_nodes": {
+      "type": "block",
+      "description": "Configuration for the confidential nodes feature, which makes nodes run on confidential VMs. Warning: This configuration can't be changed (or added/removed) after cluster creation without deleting and recreating the entire cluster.",
+      "required": false
+    },
+    "confidential_nodes.confidential_instance_type": {
+      "description": "Defines the type of technology used by the confidential node.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "confidential_nodes.enabled": {
+      "description": "Whether Confidential Nodes feature is enabled for all nodes in this cluster.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "control_plane_endpoints_config": {
+      "type": "block",
+      "description": "Configuration for all of the cluster's control plane endpoints. Currently supports only DNS endpoint configuration and disable IP endpoint. Other IP endpoint configurations are available in private_cluster_config.",
+      "required": false
+    },
+    "control_plane_endpoints_config.dns_endpoint_config": {
+      "type": "block",
+      "description": "DNS endpoint configuration.",
+      "required": false
+    },
+    "control_plane_endpoints_config.dns_endpoint_config.allow_external_traffic": {
+      "description": "Controls whether user traffic is allowed over this endpoint. Note that GCP-managed services may still use the endpoint even if this is false.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "control_plane_endpoints_config.dns_endpoint_config.enable_k8s_certs_via_dns": {
+      "description": "Controls whether the k8s certs auth is allowed via dns.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "control_plane_endpoints_config.dns_endpoint_config.enable_k8s_tokens_via_dns": {
+      "description": "Controls whether the k8s token auth is allowed via dns.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "control_plane_endpoints_config.dns_endpoint_config.endpoint": {
+      "description": "The cluster's DNS endpoint.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "control_plane_endpoints_config.ip_endpoints_config": {
+      "type": "block",
+      "description": "IP endpoint configuration.",
+      "required": false
+    },
+    "control_plane_endpoints_config.ip_endpoints_config.enabled": {
+      "description": "Controls whether to allow direct IP access.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cost_management_config": {
+      "type": "block",
+      "description": "Cost management configuration for the cluster.",
+      "required": false
+    },
+    "cost_management_config.enabled": {
+      "description": "Whether to enable GKE cost allocation. When you enable GKE cost allocation, the cluster name and namespace of your GKE workloads appear in the labels field of the billing export to BigQuery. Defaults to false.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "database_encryption": {
+      "type": "block",
+      "description": "Application-layer Secrets Encryption settings. The object format is {state = string, key_name = string}. Valid values of state are: \"ENCRYPTED\"; \"DECRYPTED\". key_name is the name of a CloudKMS key.",
+      "required": false
+    },
+    "database_encryption.key_name": {
+      "description": "The key to use to encrypt/decrypt secrets.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "database_encryption.state": {
+      "description": "ENCRYPTED, ALL_OBJECTS_ENCRYPTION_ENABLED or DECRYPTED.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "default_snat_status": {
+      "type": "block",
+      "description": "Whether the cluster disables default in-node sNAT rules. In-node sNAT rules will be disabled when defaultSnatStatus is disabled.",
+      "required": false
+    },
+    "default_snat_status.disabled": {
+      "description": "When disabled is set to false, default IP masquerade rules will be applied to the nodes to prevent sNAT on cluster internal traffic.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dns_config": {
+      "type": "block",
+      "description": "Configuration for Cloud DNS for Kubernetes Engine.",
+      "required": false
+    },
+    "dns_config.additive_vpc_scope_dns_domain": {
+      "description": "Enable additive VPC scope DNS in a GKE cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dns_config.cluster_dns": {
+      "description": "Which in-cluster DNS provider should be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dns_config.cluster_dns_domain": {
+      "description": "The suffix used for all cluster service records.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dns_config.cluster_dns_scope": {
+      "description": "The scope of access to cluster DNS records.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "enable_k8s_beta_apis": {
+      "type": "block",
+      "description": "Configuration for Kubernetes Beta APIs.",
+      "required": false
+    },
+    "enable_k8s_beta_apis.enabled_apis": {
+      "description": "Enabled Kubernetes Beta APIs.",
+      "required": true,
+      "type": "set(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "enterprise_config": {
+      "type": "block",
+      "description": "Defines the config needed to enable/disable GKE Enterprise",
+      "required": false
+    },
+    "enterprise_config.desired_tier": {
+      "description": "Indicates the desired cluster tier. Available options include STANDARD and ENTERPRISE.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "fleet": {
+      "type": "block",
+      "description": "Fleet configuration of the cluster.",
+      "required": false
+    },
+    "fleet.membership_type": {
+      "description": "The type of the cluster's fleet membership.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "fleet.project": {
+      "description": "The Fleet host project of the cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "gateway_api_config": {
+      "type": "block",
+      "description": "Configuration for GKE Gateway API controller.",
+      "required": false
+    },
+    "gateway_api_config.channel": {
+      "description": "The Gateway API release channel to use for Gateway API.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "gke_auto_upgrade_config": {
+      "type": "block",
+      "description": "Configuration options for the auto-upgrade patch type feature, which provide more control over the speed of automatic upgrades of your GKE clusters.",
+      "required": false
+    },
+    "gke_auto_upgrade_config.patch_mode": {
+      "description": "The selected auto-upgrade patch type. Accepted values are:\n* ACCELERATED: Upgrades to the latest available patch version in a given minor and release channel.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "identity_service_config": {
+      "type": "block",
+      "description": "Configuration for Identity Service which allows customers to use external identity providers with the K8S API.",
+      "required": false
+    },
+    "identity_service_config.enabled": {
+      "description": "Whether to enable the Identity Service component.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "ip_allocation_policy": {
+      "type": "block",
+      "description": "Configuration of cluster IP allocation for VPC-native clusters. Adding this block enables IP aliasing, making the cluster VPC-native instead of routes-based.",
+      "required": false
+    },
+    "ip_allocation_policy.cluster_ipv4_cidr_block": {
+      "description": "The IP address range for the cluster pod IPs. Set to blank to have a range chosen with the default size. Set to /netmask (e.g. /14) to have a range chosen with a specific netmask. Set to a CIDR notation (e.g. 10.96.0.0/14) from the RFC-1918 private networks (e.g. 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) to pick a specific range to use.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "ip_allocation_policy.cluster_secondary_range_name": {
+      "description": "The name of the existing secondary range in the cluster's subnetwork to use for pod IP addresses. Alternatively, cluster_ipv4_cidr_block can be used to automatically create a GKE-managed one.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "ip_allocation_policy.services_ipv4_cidr_block": {
+      "description": "The IP address range of the services IPs in this cluster. Set to blank to have a range chosen with the default size. Set to /netmask (e.g. /14) to have a range chosen with a specific netmask. Set to a CIDR notation (e.g. 10.96.0.0/14) from the RFC-1918 private networks (e.g. 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) to pick a specific range to use.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "ip_allocation_policy.services_secondary_range_name": {
+      "description": "The name of the existing secondary range in the cluster's subnetwork to use for service ClusterIPs. Alternatively, services_ipv4_cidr_block can be used to automatically create a GKE-managed one.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "ip_allocation_policy.stack_type": {
+      "description": "The IP Stack type of the cluster. Choose between IPV4 and IPV4_IPV6. Default type is IPV4 Only if not set",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "ip_allocation_policy.additional_ip_ranges_config": {
+      "type": "block",
+      "description": "AdditionalIPRangesConfig is the configuration for individual additional subnetworks attached to the cluster",
+      "required": false
+    },
+    "ip_allocation_policy.additional_ip_ranges_config.pod_ipv4_range_names": {
+      "description": "List of secondary ranges names within this subnetwork that can be used for pod IPs.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "ip_allocation_policy.additional_ip_ranges_config.status": {
+      "description": "Status of the subnetwork, If in draining status, subnet will not be selected for new node pools.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "ip_allocation_policy.additional_ip_ranges_config.subnetwork": {
+      "description": "Name of the subnetwork. This can be the full path of the subnetwork or just the name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "ip_allocation_policy.additional_pod_ranges_config": {
+      "type": "block",
+      "description": "AdditionalPodRangesConfig is the configuration for additional pod secondary ranges supporting the ClusterUpdate message.",
+      "required": false
+    },
+    "ip_allocation_policy.additional_pod_ranges_config.pod_range_names": {
+      "description": "Name for pod secondary ipv4 range which has the actual range defined ahead.",
+      "required": true,
+      "type": "set(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "ip_allocation_policy.auto_ipam_config": {
+      "type": "block",
+      "description": "AutoIpamConfig contains all information related to Auto IPAM.",
+      "required": false
+    },
+    "ip_allocation_policy.auto_ipam_config.enabled": {
+      "description": "The flag that enables Auto IPAM on this cluster.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "ip_allocation_policy.network_tier_config": {
+      "type": "block",
+      "description": "Used to determine the default network tier for external IP addresses on cluster resources, such as node pools and load balancers.",
+      "required": false
+    },
+    "ip_allocation_policy.network_tier_config.network_tier": {
+      "description": "Network tier configuration.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "ip_allocation_policy.pod_cidr_overprovision_config": {
+      "type": "block",
+      "description": "Configuration for cluster level pod cidr overprovision. Default is disabled=false.",
+      "required": false
+    },
+    "ip_allocation_policy.pod_cidr_overprovision_config.disabled": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "logging_config": {
+      "type": "block",
+      "description": "Logging configuration for the cluster.",
+      "required": false
+    },
+    "logging_config.enable_components": {
+      "description": "GKE components exposing logs. Valid values include SYSTEM_COMPONENTS, APISERVER, CONTROLLER_MANAGER, KCP_CONNECTION, KCP_SSHD, KCP_HPA, KCP_VPA, SCHEDULER, and WORKLOADS.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_policy": {
+      "type": "block",
+      "description": "The maintenance policy to use for the cluster.",
+      "required": false
+    },
+    "maintenance_policy.daily_maintenance_window": {
+      "type": "block",
+      "description": "Time window specified for daily maintenance operations. Specify start_time in RFC3339 format \"HH:MM”, where HH : [00-23] and MM : [00-59] GMT.",
+      "required": false
+    },
+    "maintenance_policy.daily_maintenance_window.start_time": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_policy.disruption_budget": {
+      "type": "block",
+      "description": "Cluster disruption intervals for minor version and patch version upgrade",
+      "required": false
+    },
+    "maintenance_policy.disruption_budget.minor_version_disruption_interval": {
+      "description": "The minimum duration between two minor version upgrades of the control plane.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_policy.disruption_budget.patch_version_disruption_interval": {
+      "description": "The minimum duration between two patch version upgrades of the control plane.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_policy.maintenance_exclusion": {
+      "type": "block",
+      "description": "Exceptions to maintenance window. Non-emergency maintenance should not occur in these windows.",
+      "required": false
+    },
+    "maintenance_policy.maintenance_exclusion.exclusion_options": {
+      "type": "block",
+      "description": "Maintenance exclusion related options.",
+      "required": false
+    },
+    "maintenance_policy.maintenance_exclusion.exclusion_options.end_time_behavior": {
+      "description": "The behavior of the exclusion end time.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_policy.maintenance_exclusion.exclusion_options.scope": {
+      "description": "The scope of automatic upgrades to restrict in the exclusion window.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_policy.recurring_window": {
+      "type": "block",
+      "description": "Time window for recurring maintenance operations.",
+      "required": false
+    },
+    "maintenance_policy.recurring_window.end_time": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_policy.recurring_window.recurrence": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_policy.recurring_window.start_time": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "master_auth": {
+      "type": "block",
+      "description": "The authentication information for accessing the Kubernetes master. Some values in this block are only returned by the API if your service account has permission to get credentials for your GKE cluster. If you see an unexpected diff unsetting your client cert, ensure you have the container.clusters.getCredentials permission.",
+      "required": false
+    },
+    "master_auth.client_certificate_config": {
+      "type": "block",
+      "description": "Whether client certificate authorization is enabled for this cluster.",
+      "required": true
+    },
+    "master_auth.client_certificate_config.issue_client_certificate": {
+      "description": "Whether client certificate authorization is enabled for this cluster.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "master_authorized_networks_config": {
+      "type": "block",
+      "description": "The desired configuration options for master authorized networks. Omit the nested cidr_blocks attribute to disallow external access (except the cluster node IPs, which GKE automatically whitelists).",
+      "required": false
+    },
+    "master_authorized_networks_config.gcp_public_cidrs_access_enabled": {
+      "description": "Whether Kubernetes master is accessible via Google Compute Engine Public IPs.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "master_authorized_networks_config.private_endpoint_enforcement_enabled": {
+      "description": "Whether authorized networks is enforced on the private endpoint or not. Defaults to false.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "master_authorized_networks_config.cidr_blocks": {
+      "type": "block",
+      "description": "External networks that can access the Kubernetes cluster master through HTTPS.",
+      "required": false
+    },
+    "master_authorized_networks_config.cidr_blocks.cidr_block": {
+      "description": "External network that can access Kubernetes master through HTTPS. Must be specified in CIDR notation.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "master_authorized_networks_config.cidr_blocks.display_name": {
+      "description": "Field for users to identify CIDR blocks.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mesh_certificates": {
+      "type": "block",
+      "description": "If set, and enable_certificates=true, the GKE Workload Identity Certificates controller and node agent will be deployed in the cluster.",
+      "required": false
+    },
+    "mesh_certificates.enable_certificates": {
+      "description": "When enabled the GKE Workload Identity Certificates controller and node agent will be deployed in the cluster.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "monitoring_config": {
+      "type": "block",
+      "description": "Monitoring configuration for the cluster.",
+      "required": false
+    },
+    "monitoring_config.enable_components": {
+      "description": "GKE components exposing metrics. Valid values include SYSTEM_COMPONENTS, APISERVER, SCHEDULER, CONTROLLER_MANAGER, STORAGE, HPA, POD, DAEMONSET, DEPLOYMENT, STATEFULSET, KUBELET, CADVISOR, DCGM and JOBSET.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "monitoring_config.advanced_datapath_observability_config": {
+      "type": "block",
+      "description": "Configuration of Advanced Datapath Observability features.",
+      "required": false
+    },
+    "monitoring_config.advanced_datapath_observability_config.enable_metrics": {
+      "description": "Whether or not the advanced datapath metrics are enabled.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "monitoring_config.advanced_datapath_observability_config.enable_relay": {
+      "description": "Whether or not Relay is enabled.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "monitoring_config.managed_prometheus": {
+      "type": "block",
+      "description": "Configuration for Google Cloud Managed Services for Prometheus.",
+      "required": false
+    },
+    "monitoring_config.managed_prometheus.enabled": {
+      "description": "Whether or not the managed collection is enabled.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "monitoring_config.managed_prometheus.auto_monitoring_config": {
+      "type": "block",
+      "description": "Configuration for GKE Workload Auto-Monitoring.",
+      "required": false
+    },
+    "monitoring_config.managed_prometheus.auto_monitoring_config.scope": {
+      "description": "The scope of auto-monitoring.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_performance_config": {
+      "type": "block",
+      "description": "Network bandwidth tier configuration.",
+      "required": false
+    },
+    "network_performance_config.total_egress_bandwidth_tier": {
+      "description": "Specifies the total network bandwidth tier for NodePools in the cluster.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_policy": {
+      "type": "block",
+      "description": "Configuration options for the NetworkPolicy feature.",
+      "required": false
+    },
+    "network_policy.enabled": {
+      "description": "Whether network policy is enabled on the cluster.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "network_policy.provider": {
+      "description": "The selected network policy provider.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config": {
+      "type": "block",
+      "description": "The configuration of the nodepool",
+      "required": false
+    },
+    "node_config.boot_disk_kms_key": {
+      "description": "The Customer Managed Encryption Key used to encrypt the boot disk attached to each node in the node pool.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.disk_size_gb": {
+      "description": "Size of the disk attached to each node, specified in GB. The smallest allowed disk size is 10GB.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.disk_type": {
+      "description": "Type of the disk attached to each node. Such as pd-standard, pd-balanced or pd-ssd",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.enable_confidential_storage": {
+      "description": "If enabled boot disks are configured with confidential mode.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.flex_start": {
+      "description": "Enables Flex Start provisioning model for the node pool",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.gpudirect_strategy": {
+      "description": "The type of GPUDirect strategy to enable on the node.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.image_type": {
+      "description": "The image type to use for this node. Note that for a given image type, the latest version of it will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.labels": {
+      "description": "The map of Kubernetes labels (key/value pairs) to be applied to each node. These will added in addition to any default label(s) that Kubernetes may apply to the node.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.local_ssd_count": {
+      "description": "The number of local SSD disks to be attached to the node.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.local_ssd_encryption_mode": {
+      "description": "LocalSsdEncryptionMode specified the method used for encrypting the local SSDs attached to the node.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.logging_variant": {
+      "description": "Type of logging agent that is used as the default value for node pools in the cluster. Valid values include DEFAULT and MAX_THROUGHPUT.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.machine_type": {
+      "description": "The name of a Google Compute Engine machine type.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.max_run_duration": {
+      "description": "The runtime of each node in the node pool in seconds, terminated by 's'. Example: \"3600s\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.metadata": {
+      "description": "The metadata key/value pairs assigned to instances in the cluster.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.min_cpu_platform": {
+      "description": "Minimum CPU platform to be used by this instance. The instance may be scheduled on the specified or newer CPU platform.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.node_group": {
+      "description": "Setting this field will assign instances of this pool to run on the specified node group. This is useful for running workloads on sole tenant nodes.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.oauth_scopes": {
+      "description": "The set of Google API scopes to be made available on all of the node VMs.",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.preemptible": {
+      "description": "Whether the nodes are created as preemptible VM instances.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.resource_labels": {
+      "description": "The GCE resource labels (a map of key/value pairs) to be applied to the node pool.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.resource_manager_tags": {
+      "description": "A map of resource manager tags. Resource manager tag keys and values have the same definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id}, and values are in the format tagValues/456. The field is ignored (both PUT & PATCH) when empty.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.service_account": {
+      "description": "The Google Cloud Platform Service Account to be used by the node VMs.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.spot": {
+      "description": "Whether the nodes are created as spot VM instances.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.storage_pools": {
+      "description": "The list of Storage Pools where boot disks are provisioned.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.tags": {
+      "description": "The list of instance tags applied to all nodes.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.advanced_machine_features": {
+      "type": "block",
+      "description": "Specifies options for controlling advanced machine features.",
+      "required": false
+    },
+    "node_config.advanced_machine_features.enable_nested_virtualization": {
+      "description": "Whether the node should have nested virtualization enabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.advanced_machine_features.performance_monitoring_unit": {
+      "description": "Level of Performance Monitoring Unit (PMU) requested. If unset, no access to the PMU is assumed.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.advanced_machine_features.threads_per_core": {
+      "description": "The number of threads per physical core. To disable simultaneous multithreading (SMT) set this to 1. If unset, the maximum number of threads supported per core by the underlying processor is assumed.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.boot_disk": {
+      "type": "block",
+      "description": "Boot disk configuration for node pools nodes.",
+      "required": false
+    },
+    "node_config.boot_disk.disk_type": {
+      "description": "Type of the disk attached to each node. Such as pd-standard, pd-balanced or pd-ssd",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.boot_disk.provisioned_iops": {
+      "description": "Configured IOPs provisioning. Only valid with disk type hyperdisk-balanced.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.boot_disk.provisioned_throughput": {
+      "description": "Configured throughput provisioning. Only valid with disk type hyperdisk-balanced.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.boot_disk.size_gb": {
+      "description": "Size of the disk attached to each node, specified in GB. The smallest allowed disk size is 10GB.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.confidential_nodes": {
+      "type": "block",
+      "description": "Configuration for the confidential nodes feature, which makes nodes run on confidential VMs.",
+      "required": false
+    },
+    "node_config.confidential_nodes.confidential_instance_type": {
+      "description": "Defines the type of technology used by the confidential node.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.confidential_nodes.enabled": {
+      "description": "Whether Confidential Nodes feature is enabled for all nodes in this pool.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.containerd_config": {
+      "type": "block",
+      "description": "Parameters for containerd configuration.",
+      "required": false
+    },
+    "node_config.containerd_config.private_registry_access_config": {
+      "type": "block",
+      "description": "Parameters for private container registries configuration.",
+      "required": false
+    },
+    "node_config.containerd_config.private_registry_access_config.enabled": {
+      "description": "Whether or not private registries are configured.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.containerd_config.private_registry_access_config.certificate_authority_domain_config": {
+      "type": "block",
+      "description": "Parameters for configuring CA certificate and domains.",
+      "required": false
+    },
+    "node_config.containerd_config.private_registry_access_config.certificate_authority_domain_config.fqdns": {
+      "description": "List of fully-qualified-domain-names. IPv4s and port specification are supported.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.containerd_config.private_registry_access_config.certificate_authority_domain_config.gcp_secret_manager_certificate_config": {
+      "type": "block",
+      "description": "Parameters for configuring a certificate hosted in GCP SecretManager.",
+      "required": true
+    },
+    "node_config.containerd_config.private_registry_access_config.certificate_authority_domain_config.gcp_secret_manager_certificate_config.secret_uri": {
+      "description": "URI for the secret that hosts a certificate. Must be in the format 'projects/PROJECT_NUM/secrets/SECRET_NAME/versions/VERSION_OR_LATEST'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.containerd_config.registry_hosts": {
+      "type": "block",
+      "description": "Configures containerd registry host configuration. Each registry_hosts entry represents a hosts.toml file.",
+      "required": false
+    },
+    "node_config.containerd_config.registry_hosts.hosts": {
+      "type": "block",
+      "description": "Configures a list of host-specific configurations for the server.",
+      "required": false
+    },
+    "node_config.containerd_config.registry_hosts.hosts.client": {
+      "type": "block",
+      "description": "Configures the registry host client certificate and key.",
+      "required": false
+    },
+    "node_config.containerd_config.registry_hosts.hosts.client.key": {
+      "type": "block",
+      "description": "Configures the client private key.",
+      "required": false
+    },
+    "node_config.containerd_config.registry_hosts.hosts.client.key.gcp_secret_manager_secret_uri": {
+      "description": "URI for the Secret Manager secret that hosts the private key.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.containerd_config.registry_hosts.hosts.header": {
+      "type": "block",
+      "description": "Configures the registry host headers.",
+      "required": false
+    },
+    "node_config.containerd_config.registry_hosts.hosts.header.key": {
+      "description": "Configures the header key.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.containerd_config.registry_hosts.hosts.header.value": {
+      "description": "Configures the header value.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.containerd_config.writable_cgroups": {
+      "type": "block",
+      "description": "Parameters for writable cgroups configuration.",
+      "required": false
+    },
+    "node_config.containerd_config.writable_cgroups.enabled": {
+      "description": "Whether writable cgroups are enabled.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.ephemeral_storage_local_ssd_config": {
+      "type": "block",
+      "description": "Parameters for the ephemeral storage filesystem. If unspecified, ephemeral storage is backed by the boot disk.",
+      "required": false
+    },
+    "node_config.ephemeral_storage_local_ssd_config.data_cache_count": {
+      "description": "Number of local SSDs to be utilized for GKE Data Cache. Uses NVMe interfaces.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.ephemeral_storage_local_ssd_config.local_ssd_count": {
+      "description": "Number of local SSDs to use to back ephemeral storage. Uses NVMe interfaces. Each local SSD must be 375 or 3000 GB in size, and all local SSDs must share the same size.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.fast_socket": {
+      "type": "block",
+      "description": "Enable or disable NCCL Fast Socket in the node pool.",
+      "required": false
+    },
+    "node_config.fast_socket.enabled": {
+      "description": "Whether or not NCCL Fast Socket is enabled",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.gcfs_config": {
+      "type": "block",
+      "description": "GCFS configuration for this node.",
+      "required": false
+    },
+    "node_config.gcfs_config.enabled": {
+      "description": "Whether or not GCFS is enabled",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.guest_accelerator": {
+      "type": "block",
+      "description": "List of the type and count of accelerator cards attached to the instance.",
+      "required": false
+    },
+    "node_config.guest_accelerator.count": {
+      "description": "The number of the accelerator cards exposed to an instance.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.guest_accelerator.gpu_partition_size": {
+      "description": "Size of partitions to create on the GPU. Valid values are described in the NVIDIA mig user guide (https://docs.nvidia.com/datacenter/tesla/mig-user-guide/#partitioning)",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.guest_accelerator.type": {
+      "description": "The accelerator type resource name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.guest_accelerator.gpu_driver_installation_config": {
+      "type": "block",
+      "description": "Configuration for auto installation of GPU driver.",
+      "required": false
+    },
+    "node_config.guest_accelerator.gpu_driver_installation_config.gpu_driver_version": {
+      "description": "Mode for how the GPU driver is installed.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.guest_accelerator.gpu_sharing_config": {
+      "type": "block",
+      "description": "Configuration for GPU sharing.",
+      "required": false
+    },
+    "node_config.guest_accelerator.gpu_sharing_config.gpu_sharing_strategy": {
+      "description": "The type of GPU sharing strategy to enable on the GPU node. Possible values are described in the API package (https://pkg.go.dev/google.golang.org/api/container/v1#GPUSharingConfig)",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.guest_accelerator.gpu_sharing_config.max_shared_clients_per_gpu": {
+      "description": "The maximum number of containers that can share a GPU.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.gvnic": {
+      "type": "block",
+      "description": "Enable or disable gvnic in the node pool.",
+      "required": false
+    },
+    "node_config.gvnic.enabled": {
+      "description": "Whether or not gvnic is enabled",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config": {
+      "type": "block",
+      "description": "Node kubelet configs.",
+      "required": false
+    },
+    "node_config.kubelet_config.allowed_unsafe_sysctls": {
+      "description": "Defines a comma-separated allowlist of unsafe sysctls or sysctl patterns which can be set on the Pods.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.container_log_max_files": {
+      "description": "Defines the maximum number of container log files that can be present for a container.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.container_log_max_size": {
+      "description": "Defines the maximum size of the container log file before it is rotated.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.cpu_cfs_quota": {
+      "description": "Enable CPU CFS quota enforcement for containers that specify CPU limits.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.cpu_cfs_quota_period": {
+      "description": "Set the CPU CFS quota period value 'cpu.cfs_period_us'.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.cpu_manager_policy": {
+      "description": "Control the CPU management policy on the node.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.eviction_max_pod_grace_period_seconds": {
+      "description": "Defines the maximum allowed grace period (in seconds) to use when terminating pods in response to a soft eviction threshold being met.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.image_gc_high_threshold_percent": {
+      "description": "Defines the percent of disk usage after which image garbage collection is always run.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.image_gc_low_threshold_percent": {
+      "description": "Defines the percent of disk usage before which image garbage collection is never run. Lowest disk usage to garbage collect to.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.image_maximum_gc_age": {
+      "description": "Defines the maximum age an image can be unused before it is garbage collected.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.image_minimum_gc_age": {
+      "description": "Defines the minimum age for an unused image before it is garbage collected.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.insecure_kubelet_readonly_port_enabled": {
+      "description": "Controls whether the kubelet read-only port is enabled. It is strongly recommended to set this to `FALSE`. Possible values: `TRUE`, `FALSE`.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.max_parallel_image_pulls": {
+      "description": "Set the maximum number of image pulls in parallel.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.pod_pids_limit": {
+      "description": "Controls the maximum number of processes allowed to run in a pod.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.single_process_oom_kill": {
+      "description": "Defines whether to enable single process OOM killer.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.crash_loop_back_off": {
+      "type": "block",
+      "description": "Contains configuration options to modify node-level parameters for container restart behavior.",
+      "required": false
+    },
+    "node_config.kubelet_config.crash_loop_back_off.max_container_restart_period": {
+      "description": "The maximum duration the backoff delay can accrue to for container restarts.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.eviction_minimum_reclaim": {
+      "type": "block",
+      "description": "Defines a map of signal names to percentage that defines minimum reclaims. It describes the minimum amount of a given resource the kubelet will reclaim when performing a pod eviction.",
+      "required": false
+    },
+    "node_config.kubelet_config.eviction_minimum_reclaim.imagefs_available": {
+      "description": "Defines percentage of minimum reclaim for imagefs.available.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.eviction_minimum_reclaim.imagefs_inodes_free": {
+      "description": "Defines percentage of minimum reclaim for imagefs.inodesFree.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.eviction_minimum_reclaim.memory_available": {
+      "description": "Defines percentage of minimum reclaim for memory.available.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.eviction_minimum_reclaim.nodefs_available": {
+      "description": "Defines percentage of minimum reclaim for nodefs.available.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.eviction_minimum_reclaim.nodefs_inodes_free": {
+      "description": "Defines percentage of minimum reclaim for nodefs.inodesFree.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.eviction_minimum_reclaim.pid_available": {
+      "description": "Defines percentage of minimum reclaim for pid.available.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.eviction_soft": {
+      "type": "block",
+      "description": "Defines a map of signal names to quantities or percentage that defines soft eviction thresholds.",
+      "required": false
+    },
+    "node_config.kubelet_config.eviction_soft.imagefs_available": {
+      "description": "Defines percentage of soft eviction threshold for imagefs.available.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.eviction_soft.imagefs_inodes_free": {
+      "description": "Defines percentage of soft eviction threshold for imagefs.inodesFree.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.eviction_soft.memory_available": {
+      "description": "Defines quantity of soft eviction threshold for memory.available.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.eviction_soft.nodefs_available": {
+      "description": "Defines percentage of soft eviction threshold for nodefs.available.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.eviction_soft.nodefs_inodes_free": {
+      "description": "Defines percentage of soft eviction threshold for nodefs.inodesFree.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.eviction_soft.pid_available": {
+      "description": "Defines percentage of soft eviction threshold for pid.available.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.eviction_soft_grace_period": {
+      "type": "block",
+      "description": "Defines a map of signal names to durations that defines grace periods for soft eviction thresholds. Each soft eviction threshold must have a corresponding grace period.",
+      "required": false
+    },
+    "node_config.kubelet_config.eviction_soft_grace_period.imagefs_available": {
+      "description": "Defines grace period for the imagefs.available soft eviction threshold",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.eviction_soft_grace_period.imagefs_inodes_free": {
+      "description": "Defines grace period for the imagefs.inodesFree soft eviction threshold.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.eviction_soft_grace_period.memory_available": {
+      "description": "Defines grace period for the memory.available soft eviction threshold.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.eviction_soft_grace_period.nodefs_available": {
+      "description": "Defines grace period for the nodefs.available soft eviction threshold.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.eviction_soft_grace_period.nodefs_inodes_free": {
+      "description": "Defines grace period for the nodefs.inodesFree soft eviction threshold.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.eviction_soft_grace_period.pid_available": {
+      "description": "Defines grace period for the pid.available soft eviction threshold.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.memory_manager": {
+      "type": "block",
+      "description": "Configuration for the Memory Manager on the node. The memory manager optimizes memory and hugepages allocation for pods, especially those in the Guaranteed QoS class, by influencing NUMA affinity.",
+      "required": false
+    },
+    "node_config.kubelet_config.memory_manager.policy": {
+      "description": "The Memory Manager policy to use. This policy guides how memory and hugepages are allocated and managed for pods on the node, influencing NUMA affinity.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.topology_manager": {
+      "type": "block",
+      "description": "Configuration for the Topology Manager on the node. The Topology Manager aligns CPU, memory, and device resources on a node to optimize performance, especially for NUMA-aware workloads, by ensuring resource co-location.",
+      "required": false
+    },
+    "node_config.kubelet_config.topology_manager.policy": {
+      "description": "The Topology Manager policy to use. This policy dictates how resource alignment is handled on the node.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.kubelet_config.topology_manager.scope": {
+      "description": "The Topology Manager scope, defining the granularity at which policy decisions are applied. Valid values are \"container\" (resources are aligned per container within a pod) or \"pod\" (resources are aligned for the entire pod).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.linux_node_config": {
+      "type": "block",
+      "description": "Parameters that can be configured on Linux nodes.",
+      "required": false
+    },
+    "node_config.linux_node_config.cgroup_mode": {
+      "description": "cgroupMode specifies the cgroup mode to be used on the node.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.linux_node_config.sysctls": {
+      "description": "The Linux kernel parameters to be applied to the nodes and all pods running on the nodes.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.linux_node_config.transparent_hugepage_defrag": {
+      "description": "The Linux kernel transparent hugepage defrag setting.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.linux_node_config.transparent_hugepage_enabled": {
+      "description": "The Linux kernel transparent hugepage setting.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.linux_node_config.accurate_time_config": {
+      "type": "block",
+      "description": "The settings for the accurate time configuration.",
+      "required": false
+    },
+    "node_config.linux_node_config.accurate_time_config.enable_ptp_kvm_time_sync": {
+      "description": "Whether to enable accurate time synchronization with PTP-KVM.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.linux_node_config.hugepages_config": {
+      "type": "block",
+      "description": "Amounts for 2M and 1G hugepages.",
+      "required": false
+    },
+    "node_config.linux_node_config.hugepages_config.hugepage_size_1g": {
+      "description": "Amount of 1G hugepages.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.linux_node_config.hugepages_config.hugepage_size_2m": {
+      "description": "Amount of 2M hugepages.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.linux_node_config.node_kernel_module_loading": {
+      "type": "block",
+      "description": "The settings for kernel module loading.",
+      "required": false
+    },
+    "node_config.linux_node_config.node_kernel_module_loading.policy": {
+      "description": "The policy for kernel module loading.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.linux_node_config.swap_config": {
+      "type": "block",
+      "description": "Swap configuration for the node.",
+      "required": false
+    },
+    "node_config.linux_node_config.swap_config.enabled": {
+      "description": "Enables or disables swap for the node pool.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.linux_node_config.swap_config.boot_disk_profile": {
+      "type": "block",
+      "description": "Swap on the node's boot disk.",
+      "required": false
+    },
+    "node_config.linux_node_config.swap_config.boot_disk_profile.swap_size_gib": {
+      "description": "Specifies the size of the swap space in gibibytes (GiB).",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.linux_node_config.swap_config.boot_disk_profile.swap_size_percent": {
+      "description": "Specifies the size of the swap space as a percentage of the boot disk size.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.linux_node_config.swap_config.dedicated_local_ssd_profile": {
+      "type": "block",
+      "description": "Provisions a new, separate local NVMe SSD exclusively for swap.",
+      "required": false
+    },
+    "node_config.linux_node_config.swap_config.dedicated_local_ssd_profile.disk_count": {
+      "description": "The number of physical local NVMe SSD disks to attach.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.linux_node_config.swap_config.encryption_config": {
+      "type": "block",
+      "description": "If omitted, swap space is encrypted by default.",
+      "required": false
+    },
+    "node_config.linux_node_config.swap_config.encryption_config.disabled": {
+      "description": "If true, swap space will not be encrypted. Defaults to false (encrypted).",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.linux_node_config.swap_config.ephemeral_local_ssd_profile": {
+      "type": "block",
+      "description": "Swap on the local SSD shared with pod ephemeral storage.",
+      "required": false
+    },
+    "node_config.linux_node_config.swap_config.ephemeral_local_ssd_profile.swap_size_gib": {
+      "description": "Specifies the size of the swap space in gibibytes (GiB).",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.linux_node_config.swap_config.ephemeral_local_ssd_profile.swap_size_percent": {
+      "description": "Specifies the size of the swap space as a percentage of the ephemeral local SSD capacity.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.local_nvme_ssd_block_config": {
+      "type": "block",
+      "description": "Parameters for raw-block local NVMe SSDs.",
+      "required": false
+    },
+    "node_config.local_nvme_ssd_block_config.local_ssd_count": {
+      "description": "Number of raw-block local NVMe SSD disks to be attached to the node. Each local SSD is 375 GB in size.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.node_image_config": {
+      "type": "block",
+      "description": "The node image configuration to use for this node pool.",
+      "required": false
+    },
+    "node_config.node_image_config.image": {
+      "description": "The name of the image to use for this node.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.node_image_config.image_project": {
+      "description": "The project containing the image to use for this node.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.reservation_affinity": {
+      "type": "block",
+      "description": "The reservation affinity configuration for the node pool.",
+      "required": false
+    },
+    "node_config.reservation_affinity.consume_reservation_type": {
+      "description": "Corresponds to the type of reservation consumption.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.reservation_affinity.key": {
+      "description": "The label key of a reservation resource.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.reservation_affinity.values": {
+      "description": "The label values of the reservation resource.",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.sandbox_config": {
+      "type": "block",
+      "description": "Sandbox configuration for this node.",
+      "required": false
+    },
+    "node_config.sandbox_config.type": {
+      "description": "Type of the sandbox to use for the node (e.g. 'GVISOR').",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.secondary_boot_disks": {
+      "type": "block",
+      "description": "Secondary boot disks for preloading data or container images.",
+      "required": false
+    },
+    "node_config.secondary_boot_disks.disk_image": {
+      "description": "Disk image to create the secondary boot disk from",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.secondary_boot_disks.mode": {
+      "description": "Mode for how the secondary boot disk is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.shielded_instance_config": {
+      "type": "block",
+      "description": "Shielded Instance options.",
+      "required": false
+    },
+    "node_config.shielded_instance_config.enable_integrity_monitoring": {
+      "description": "Defines whether the instance has integrity monitoring enabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.shielded_instance_config.enable_secure_boot": {
+      "description": "Defines whether the instance has Secure Boot enabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.sole_tenant_config": {
+      "type": "block",
+      "description": "Node affinity options for sole tenant node pools.",
+      "required": false
+    },
+    "node_config.sole_tenant_config.min_node_cpus": {
+      "description": "Specifies the minimum number of vCPUs that each sole tenant node must have to use CPU overcommit. If not specified, the CPU overcommit feature is disabled.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.sole_tenant_config.node_affinity": {
+      "type": "block",
+      "description": ".",
+      "required": true
+    },
+    "node_config.sole_tenant_config.node_affinity.key": {
+      "description": ".",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.sole_tenant_config.node_affinity.operator": {
+      "description": ".",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.sole_tenant_config.node_affinity.values": {
+      "description": ".",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.taint": {
+      "type": "block",
+      "description": "List of Kubernetes taints to be applied to each node.",
+      "required": false
+    },
+    "node_config.taint.effect": {
+      "description": "Effect for taint.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.taint.key": {
+      "description": "Key for taint.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.taint.value": {
+      "description": "Value for taint.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.windows_node_config": {
+      "type": "block",
+      "description": "Parameters that can be configured on Windows nodes.",
+      "required": false
+    },
+    "node_config.windows_node_config.osversion": {
+      "description": "The OS Version of the windows nodepool.Values are OS_VERSION_UNSPECIFIED,OS_VERSION_LTSC2019 and OS_VERSION_LTSC2022",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_config.workload_metadata_config": {
+      "type": "block",
+      "description": "The workload metadata configuration for this node.",
+      "required": false
+    },
+    "node_config.workload_metadata_config.mode": {
+      "description": "Mode is the configuration for how to expose metadata to workloads running on the node.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_creation_config": {
+      "type": "block",
+      "description": "NodeCreationConfig defines the settings of node creation mode.",
+      "required": false
+    },
+    "node_creation_config.node_creation_mode": {
+      "description": "NodeCreationMode defines the settings of node creation mode.\n Accepted values are:\n* VIA_KUBELET: Kubelet registers itself.\n* VIA_CONTROL_PLANE: gcp-controller-manager automatically creates the node object after CSR approval.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool": {
+      "type": "block",
+      "description": "List of node pools associated with this cluster. See google_container_node_pool for schema. Warning: node pools defined inside a cluster can't be changed (or added/removed) after cluster creation without deleting and recreating the entire cluster. Unless you absolutely need the ability to say \"these are the only node pools associated with this cluster\", use the google_container_node_pool resource instead of this property.",
+      "required": false
+    },
+    "node_pool.initial_node_count": {
+      "description": "The initial number of nodes for the pool. In regional or multi-zonal clusters, this is the number of nodes per zone. Changing this will force recreation of the resource.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.max_pods_per_node": {
+      "description": "The maximum number of pods per node in this node pool. Note that this does not work on node pools which are \"route-based\" - that is, node pools belonging to clusters that do not have IP Aliasing enabled.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.name": {
+      "description": "The name of the node pool. If left blank, Terraform will auto-generate a unique name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.name_prefix": {
+      "description": "Creates a unique name for the node pool beginning with the specified prefix. Conflicts with name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_count": {
+      "description": "The number of nodes per instance group. This field can be used to update the number of nodes per instance group but should not be used alongside autoscaling.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_locations": {
+      "description": "The list of zones in which the node pool's nodes should be located. Nodes must be in the region of their regional cluster or in the same region as their cluster's zone for zonal clusters. If unspecified, the cluster-level node_locations will be used.",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.version": {
+      "description": "The Kubernetes version for the nodes in this pool. Note that if this field and auto_upgrade are both specified, they will fight each other for what the node version should be, so setting both is highly discouraged. While a fuzzy version can be specified, it's recommended that you specify explicit versions as Terraform will see spurious diffs when fuzzy versions are used. See the google_container_engine_versions data source's version_prefix field to approximate fuzzy versions in a Terraform-compatible way.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.autoscaling": {
+      "type": "block",
+      "description": "Configuration required by cluster autoscaler to adjust the size of the node pool to the current cluster usage.",
+      "required": false
+    },
+    "node_pool.autoscaling.location_policy": {
+      "description": "Location policy specifies the algorithm used when scaling-up the node pool. \"BALANCED\" - Is a best effort policy that aims to balance the sizes of available zones. \"ANY\" - Instructs the cluster autoscaler to prioritize utilization of unused reservations, and reduces preemption risk for Spot VMs.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.autoscaling.max_node_count": {
+      "description": "Maximum number of nodes per zone in the node pool. Must be >= min_node_count. Cannot be used with total limits.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.autoscaling.min_node_count": {
+      "description": "Minimum number of nodes per zone in the node pool. Must be >=0 and <= max_node_count. Cannot be used with total limits.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.autoscaling.total_max_node_count": {
+      "description": "Maximum number of all nodes in the node pool. Must be >= total_min_node_count. Cannot be used with per zone limits.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.autoscaling.total_min_node_count": {
+      "description": "Minimum number of all nodes in the node pool. Must be >=0 and <= total_max_node_count. Cannot be used with per zone limits.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.management": {
+      "type": "block",
+      "description": "Node management configuration, wherein auto-repair and auto-upgrade is configured.",
+      "required": false
+    },
+    "node_pool.management.auto_repair": {
+      "description": "Whether the nodes will be automatically repaired. Enabled by default.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.management.auto_upgrade": {
+      "description": "Whether the nodes will be automatically upgraded. Enabled by default.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.network_config": {
+      "type": "block",
+      "description": "Networking configuration for this NodePool. If specified, it overrides the cluster-level defaults.",
+      "required": false
+    },
+    "node_pool.network_config.accelerator_network_profile": {
+      "description": "The accelerator network profile to use for this node pool.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.network_config.create_pod_range": {
+      "description": "Whether to create a new range for pod IPs in this node pool. Defaults are provided for pod_range and pod_ipv4_cidr_block if they are not specified.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.network_config.enable_private_nodes": {
+      "description": "Whether nodes have internal IP addresses only.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.network_config.pod_ipv4_cidr_block": {
+      "description": "The IP address range for pod IPs in this node pool. Only applicable if create_pod_range is true. Set to blank to have a range chosen with the default size. Set to /netmask (e.g. /14) to have a range chosen with a specific netmask. Set to a CIDR notation (e.g. 10.96.0.0/14) to pick a specific range to use.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.network_config.pod_range": {
+      "description": "The ID of the secondary range for pod IPs. If create_pod_range is true, this ID is used for the new range. If create_pod_range is false, uses an existing secondary range with this ID.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.network_config.subnetwork": {
+      "description": "The subnetwork name/path for the node pool. Format: subnetwork or projects/{project}/regions/{region}/subnetworks/{subnetwork}. This value may be specified via the nested network_config block (setting this attribute directly is supported for backward compatibility). Once created the node pool's subnetwork is immutable. If not set, the provider/API will choose the subnetwork (e.g. based on IP utilization) and report it here.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.network_config.additional_node_network_configs": {
+      "type": "block",
+      "description": "We specify the additional node networks for this node pool using this list. Each node network corresponds to an additional interface",
+      "required": false
+    },
+    "node_pool.network_config.additional_node_network_configs.network": {
+      "description": "Name of the VPC where the additional interface belongs.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.network_config.additional_node_network_configs.subnetwork": {
+      "description": "Name of the subnetwork where the additional interface belongs.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.network_config.additional_pod_network_configs": {
+      "type": "block",
+      "description": "We specify the additional pod networks for this node pool using this list. Each pod network corresponds to an additional alias IP range for the node",
+      "required": false
+    },
+    "node_pool.network_config.additional_pod_network_configs.max_pods_per_node": {
+      "description": "The maximum number of pods per node which use this pod network.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.network_config.additional_pod_network_configs.secondary_pod_range": {
+      "description": "The name of the secondary range on the subnet which provides IP address for this pod range.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.network_config.additional_pod_network_configs.subnetwork": {
+      "description": "Name of the subnetwork where the additional pod network belongs.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.network_config.network_performance_config": {
+      "type": "block",
+      "description": "Network bandwidth tier configuration.",
+      "required": false
+    },
+    "node_pool.network_config.network_performance_config.total_egress_bandwidth_tier": {
+      "description": "Specifies the total network bandwidth tier for the NodePool. [Valid values](https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters.nodePools#NodePool.Tier) include: \"TIER_1\" and \"TIER_UNSPECIFIED\".",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.network_config.pod_cidr_overprovision_config": {
+      "type": "block",
+      "description": "Configuration for node-pool level pod cidr overprovision. If not set, the cluster level setting will be inherited",
+      "required": false
+    },
+    "node_pool.network_config.pod_cidr_overprovision_config.disabled": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config": {
+      "type": "block",
+      "description": "The configuration of the nodepool",
+      "required": false
+    },
+    "node_pool.node_config.boot_disk_kms_key": {
+      "description": "The Customer Managed Encryption Key used to encrypt the boot disk attached to each node in the node pool.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.disk_size_gb": {
+      "description": "Size of the disk attached to each node, specified in GB. The smallest allowed disk size is 10GB.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.disk_type": {
+      "description": "Type of the disk attached to each node. Such as pd-standard, pd-balanced or pd-ssd",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.enable_confidential_storage": {
+      "description": "If enabled boot disks are configured with confidential mode.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.flex_start": {
+      "description": "Enables Flex Start provisioning model for the node pool",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.gpudirect_strategy": {
+      "description": "The type of GPUDirect strategy to enable on the node.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.image_type": {
+      "description": "The image type to use for this node. Note that for a given image type, the latest version of it will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.labels": {
+      "description": "The map of Kubernetes labels (key/value pairs) to be applied to each node. These will added in addition to any default label(s) that Kubernetes may apply to the node.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.local_ssd_count": {
+      "description": "The number of local SSD disks to be attached to the node.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.local_ssd_encryption_mode": {
+      "description": "LocalSsdEncryptionMode specified the method used for encrypting the local SSDs attached to the node.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.logging_variant": {
+      "description": "Type of logging agent that is used as the default value for node pools in the cluster. Valid values include DEFAULT and MAX_THROUGHPUT.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.machine_type": {
+      "description": "The name of a Google Compute Engine machine type.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.max_run_duration": {
+      "description": "The runtime of each node in the node pool in seconds, terminated by 's'. Example: \"3600s\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.metadata": {
+      "description": "The metadata key/value pairs assigned to instances in the cluster.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.min_cpu_platform": {
+      "description": "Minimum CPU platform to be used by this instance. The instance may be scheduled on the specified or newer CPU platform.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.node_group": {
+      "description": "Setting this field will assign instances of this pool to run on the specified node group. This is useful for running workloads on sole tenant nodes.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.oauth_scopes": {
+      "description": "The set of Google API scopes to be made available on all of the node VMs.",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.preemptible": {
+      "description": "Whether the nodes are created as preemptible VM instances.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.resource_labels": {
+      "description": "The GCE resource labels (a map of key/value pairs) to be applied to the node pool.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.resource_manager_tags": {
+      "description": "A map of resource manager tags. Resource manager tag keys and values have the same definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id}, and values are in the format tagValues/456. The field is ignored (both PUT & PATCH) when empty.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.service_account": {
+      "description": "The Google Cloud Platform Service Account to be used by the node VMs.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.spot": {
+      "description": "Whether the nodes are created as spot VM instances.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.storage_pools": {
+      "description": "The list of Storage Pools where boot disks are provisioned.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.tags": {
+      "description": "The list of instance tags applied to all nodes.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.advanced_machine_features": {
+      "type": "block",
+      "description": "Specifies options for controlling advanced machine features.",
+      "required": false
+    },
+    "node_pool.node_config.advanced_machine_features.enable_nested_virtualization": {
+      "description": "Whether the node should have nested virtualization enabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.advanced_machine_features.performance_monitoring_unit": {
+      "description": "Level of Performance Monitoring Unit (PMU) requested. If unset, no access to the PMU is assumed.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.advanced_machine_features.threads_per_core": {
+      "description": "The number of threads per physical core. To disable simultaneous multithreading (SMT) set this to 1. If unset, the maximum number of threads supported per core by the underlying processor is assumed.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.boot_disk": {
+      "type": "block",
+      "description": "Boot disk configuration for node pools nodes.",
+      "required": false
+    },
+    "node_pool.node_config.boot_disk.disk_type": {
+      "description": "Type of the disk attached to each node. Such as pd-standard, pd-balanced or pd-ssd",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.boot_disk.provisioned_iops": {
+      "description": "Configured IOPs provisioning. Only valid with disk type hyperdisk-balanced.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.boot_disk.provisioned_throughput": {
+      "description": "Configured throughput provisioning. Only valid with disk type hyperdisk-balanced.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.boot_disk.size_gb": {
+      "description": "Size of the disk attached to each node, specified in GB. The smallest allowed disk size is 10GB.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.confidential_nodes": {
+      "type": "block",
+      "description": "Configuration for the confidential nodes feature, which makes nodes run on confidential VMs.",
+      "required": false
+    },
+    "node_pool.node_config.confidential_nodes.confidential_instance_type": {
+      "description": "Defines the type of technology used by the confidential node.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.confidential_nodes.enabled": {
+      "description": "Whether Confidential Nodes feature is enabled for all nodes in this pool.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.containerd_config": {
+      "type": "block",
+      "description": "Parameters for containerd configuration.",
+      "required": false
+    },
+    "node_pool.node_config.containerd_config.private_registry_access_config": {
+      "type": "block",
+      "description": "Parameters for private container registries configuration.",
+      "required": false
+    },
+    "node_pool.node_config.containerd_config.private_registry_access_config.enabled": {
+      "description": "Whether or not private registries are configured.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.containerd_config.private_registry_access_config.certificate_authority_domain_config": {
+      "type": "block",
+      "description": "Parameters for configuring CA certificate and domains.",
+      "required": false
+    },
+    "node_pool.node_config.containerd_config.private_registry_access_config.certificate_authority_domain_config.fqdns": {
+      "description": "List of fully-qualified-domain-names. IPv4s and port specification are supported.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.containerd_config.private_registry_access_config.certificate_authority_domain_config.gcp_secret_manager_certificate_config": {
+      "type": "block",
+      "description": "Parameters for configuring a certificate hosted in GCP SecretManager.",
+      "required": true
+    },
+    "node_pool.node_config.containerd_config.private_registry_access_config.certificate_authority_domain_config.gcp_secret_manager_certificate_config.secret_uri": {
+      "description": "URI for the secret that hosts a certificate. Must be in the format 'projects/PROJECT_NUM/secrets/SECRET_NAME/versions/VERSION_OR_LATEST'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.containerd_config.registry_hosts": {
+      "type": "block",
+      "description": "Configures containerd registry host configuration. Each registry_hosts entry represents a hosts.toml file.",
+      "required": false
+    },
+    "node_pool.node_config.containerd_config.registry_hosts.hosts": {
+      "type": "block",
+      "description": "Configures a list of host-specific configurations for the server.",
+      "required": false
+    },
+    "node_pool.node_config.containerd_config.registry_hosts.hosts.client": {
+      "type": "block",
+      "description": "Configures the registry host client certificate and key.",
+      "required": false
+    },
+    "node_pool.node_config.containerd_config.registry_hosts.hosts.client.key": {
+      "type": "block",
+      "description": "Configures the client private key.",
+      "required": false
+    },
+    "node_pool.node_config.containerd_config.registry_hosts.hosts.client.key.gcp_secret_manager_secret_uri": {
+      "description": "URI for the Secret Manager secret that hosts the private key.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.containerd_config.registry_hosts.hosts.header": {
+      "type": "block",
+      "description": "Configures the registry host headers.",
+      "required": false
+    },
+    "node_pool.node_config.containerd_config.registry_hosts.hosts.header.key": {
+      "description": "Configures the header key.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.containerd_config.registry_hosts.hosts.header.value": {
+      "description": "Configures the header value.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.containerd_config.writable_cgroups": {
+      "type": "block",
+      "description": "Parameters for writable cgroups configuration.",
+      "required": false
+    },
+    "node_pool.node_config.containerd_config.writable_cgroups.enabled": {
+      "description": "Whether writable cgroups are enabled.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.ephemeral_storage_local_ssd_config": {
+      "type": "block",
+      "description": "Parameters for the ephemeral storage filesystem. If unspecified, ephemeral storage is backed by the boot disk.",
+      "required": false
+    },
+    "node_pool.node_config.ephemeral_storage_local_ssd_config.data_cache_count": {
+      "description": "Number of local SSDs to be utilized for GKE Data Cache. Uses NVMe interfaces.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.ephemeral_storage_local_ssd_config.local_ssd_count": {
+      "description": "Number of local SSDs to use to back ephemeral storage. Uses NVMe interfaces. Each local SSD must be 375 or 3000 GB in size, and all local SSDs must share the same size.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.fast_socket": {
+      "type": "block",
+      "description": "Enable or disable NCCL Fast Socket in the node pool.",
+      "required": false
+    },
+    "node_pool.node_config.fast_socket.enabled": {
+      "description": "Whether or not NCCL Fast Socket is enabled",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.gcfs_config": {
+      "type": "block",
+      "description": "GCFS configuration for this node.",
+      "required": false
+    },
+    "node_pool.node_config.gcfs_config.enabled": {
+      "description": "Whether or not GCFS is enabled",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.guest_accelerator": {
+      "type": "block",
+      "description": "List of the type and count of accelerator cards attached to the instance.",
+      "required": false
+    },
+    "node_pool.node_config.guest_accelerator.count": {
+      "description": "The number of the accelerator cards exposed to an instance.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.guest_accelerator.gpu_partition_size": {
+      "description": "Size of partitions to create on the GPU. Valid values are described in the NVIDIA mig user guide (https://docs.nvidia.com/datacenter/tesla/mig-user-guide/#partitioning)",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.guest_accelerator.type": {
+      "description": "The accelerator type resource name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.guest_accelerator.gpu_driver_installation_config": {
+      "type": "block",
+      "description": "Configuration for auto installation of GPU driver.",
+      "required": false
+    },
+    "node_pool.node_config.guest_accelerator.gpu_driver_installation_config.gpu_driver_version": {
+      "description": "Mode for how the GPU driver is installed.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.guest_accelerator.gpu_sharing_config": {
+      "type": "block",
+      "description": "Configuration for GPU sharing.",
+      "required": false
+    },
+    "node_pool.node_config.guest_accelerator.gpu_sharing_config.gpu_sharing_strategy": {
+      "description": "The type of GPU sharing strategy to enable on the GPU node. Possible values are described in the API package (https://pkg.go.dev/google.golang.org/api/container/v1#GPUSharingConfig)",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.guest_accelerator.gpu_sharing_config.max_shared_clients_per_gpu": {
+      "description": "The maximum number of containers that can share a GPU.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.gvnic": {
+      "type": "block",
+      "description": "Enable or disable gvnic in the node pool.",
+      "required": false
+    },
+    "node_pool.node_config.gvnic.enabled": {
+      "description": "Whether or not gvnic is enabled",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config": {
+      "type": "block",
+      "description": "Node kubelet configs.",
+      "required": false
+    },
+    "node_pool.node_config.kubelet_config.allowed_unsafe_sysctls": {
+      "description": "Defines a comma-separated allowlist of unsafe sysctls or sysctl patterns which can be set on the Pods.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.container_log_max_files": {
+      "description": "Defines the maximum number of container log files that can be present for a container.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.container_log_max_size": {
+      "description": "Defines the maximum size of the container log file before it is rotated.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.cpu_cfs_quota": {
+      "description": "Enable CPU CFS quota enforcement for containers that specify CPU limits.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.cpu_cfs_quota_period": {
+      "description": "Set the CPU CFS quota period value 'cpu.cfs_period_us'.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.cpu_manager_policy": {
+      "description": "Control the CPU management policy on the node.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.eviction_max_pod_grace_period_seconds": {
+      "description": "Defines the maximum allowed grace period (in seconds) to use when terminating pods in response to a soft eviction threshold being met.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.image_gc_high_threshold_percent": {
+      "description": "Defines the percent of disk usage after which image garbage collection is always run.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.image_gc_low_threshold_percent": {
+      "description": "Defines the percent of disk usage before which image garbage collection is never run. Lowest disk usage to garbage collect to.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.image_maximum_gc_age": {
+      "description": "Defines the maximum age an image can be unused before it is garbage collected.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.image_minimum_gc_age": {
+      "description": "Defines the minimum age for an unused image before it is garbage collected.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.insecure_kubelet_readonly_port_enabled": {
+      "description": "Controls whether the kubelet read-only port is enabled. It is strongly recommended to set this to `FALSE`. Possible values: `TRUE`, `FALSE`.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.max_parallel_image_pulls": {
+      "description": "Set the maximum number of image pulls in parallel.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.pod_pids_limit": {
+      "description": "Controls the maximum number of processes allowed to run in a pod.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.single_process_oom_kill": {
+      "description": "Defines whether to enable single process OOM killer.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.crash_loop_back_off": {
+      "type": "block",
+      "description": "Contains configuration options to modify node-level parameters for container restart behavior.",
+      "required": false
+    },
+    "node_pool.node_config.kubelet_config.crash_loop_back_off.max_container_restart_period": {
+      "description": "The maximum duration the backoff delay can accrue to for container restarts.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.eviction_minimum_reclaim": {
+      "type": "block",
+      "description": "Defines a map of signal names to percentage that defines minimum reclaims. It describes the minimum amount of a given resource the kubelet will reclaim when performing a pod eviction.",
+      "required": false
+    },
+    "node_pool.node_config.kubelet_config.eviction_minimum_reclaim.imagefs_available": {
+      "description": "Defines percentage of minimum reclaim for imagefs.available.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.eviction_minimum_reclaim.imagefs_inodes_free": {
+      "description": "Defines percentage of minimum reclaim for imagefs.inodesFree.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.eviction_minimum_reclaim.memory_available": {
+      "description": "Defines percentage of minimum reclaim for memory.available.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.eviction_minimum_reclaim.nodefs_available": {
+      "description": "Defines percentage of minimum reclaim for nodefs.available.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.eviction_minimum_reclaim.nodefs_inodes_free": {
+      "description": "Defines percentage of minimum reclaim for nodefs.inodesFree.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.eviction_minimum_reclaim.pid_available": {
+      "description": "Defines percentage of minimum reclaim for pid.available.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.eviction_soft": {
+      "type": "block",
+      "description": "Defines a map of signal names to quantities or percentage that defines soft eviction thresholds.",
+      "required": false
+    },
+    "node_pool.node_config.kubelet_config.eviction_soft.imagefs_available": {
+      "description": "Defines percentage of soft eviction threshold for imagefs.available.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.eviction_soft.imagefs_inodes_free": {
+      "description": "Defines percentage of soft eviction threshold for imagefs.inodesFree.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.eviction_soft.memory_available": {
+      "description": "Defines quantity of soft eviction threshold for memory.available.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.eviction_soft.nodefs_available": {
+      "description": "Defines percentage of soft eviction threshold for nodefs.available.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.eviction_soft.nodefs_inodes_free": {
+      "description": "Defines percentage of soft eviction threshold for nodefs.inodesFree.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.eviction_soft.pid_available": {
+      "description": "Defines percentage of soft eviction threshold for pid.available.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.eviction_soft_grace_period": {
+      "type": "block",
+      "description": "Defines a map of signal names to durations that defines grace periods for soft eviction thresholds. Each soft eviction threshold must have a corresponding grace period.",
+      "required": false
+    },
+    "node_pool.node_config.kubelet_config.eviction_soft_grace_period.imagefs_available": {
+      "description": "Defines grace period for the imagefs.available soft eviction threshold",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.eviction_soft_grace_period.imagefs_inodes_free": {
+      "description": "Defines grace period for the imagefs.inodesFree soft eviction threshold.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.eviction_soft_grace_period.memory_available": {
+      "description": "Defines grace period for the memory.available soft eviction threshold.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.eviction_soft_grace_period.nodefs_available": {
+      "description": "Defines grace period for the nodefs.available soft eviction threshold.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.eviction_soft_grace_period.nodefs_inodes_free": {
+      "description": "Defines grace period for the nodefs.inodesFree soft eviction threshold.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.eviction_soft_grace_period.pid_available": {
+      "description": "Defines grace period for the pid.available soft eviction threshold.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.memory_manager": {
+      "type": "block",
+      "description": "Configuration for the Memory Manager on the node. The memory manager optimizes memory and hugepages allocation for pods, especially those in the Guaranteed QoS class, by influencing NUMA affinity.",
+      "required": false
+    },
+    "node_pool.node_config.kubelet_config.memory_manager.policy": {
+      "description": "The Memory Manager policy to use. This policy guides how memory and hugepages are allocated and managed for pods on the node, influencing NUMA affinity.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.topology_manager": {
+      "type": "block",
+      "description": "Configuration for the Topology Manager on the node. The Topology Manager aligns CPU, memory, and device resources on a node to optimize performance, especially for NUMA-aware workloads, by ensuring resource co-location.",
+      "required": false
+    },
+    "node_pool.node_config.kubelet_config.topology_manager.policy": {
+      "description": "The Topology Manager policy to use. This policy dictates how resource alignment is handled on the node.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.kubelet_config.topology_manager.scope": {
+      "description": "The Topology Manager scope, defining the granularity at which policy decisions are applied. Valid values are \"container\" (resources are aligned per container within a pod) or \"pod\" (resources are aligned for the entire pod).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.linux_node_config": {
+      "type": "block",
+      "description": "Parameters that can be configured on Linux nodes.",
+      "required": false
+    },
+    "node_pool.node_config.linux_node_config.cgroup_mode": {
+      "description": "cgroupMode specifies the cgroup mode to be used on the node.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.linux_node_config.sysctls": {
+      "description": "The Linux kernel parameters to be applied to the nodes and all pods running on the nodes.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.linux_node_config.transparent_hugepage_defrag": {
+      "description": "The Linux kernel transparent hugepage defrag setting.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.linux_node_config.transparent_hugepage_enabled": {
+      "description": "The Linux kernel transparent hugepage setting.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.linux_node_config.accurate_time_config": {
+      "type": "block",
+      "description": "The settings for the accurate time configuration.",
+      "required": false
+    },
+    "node_pool.node_config.linux_node_config.accurate_time_config.enable_ptp_kvm_time_sync": {
+      "description": "Whether to enable accurate time synchronization with PTP-KVM.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.linux_node_config.hugepages_config": {
+      "type": "block",
+      "description": "Amounts for 2M and 1G hugepages.",
+      "required": false
+    },
+    "node_pool.node_config.linux_node_config.hugepages_config.hugepage_size_1g": {
+      "description": "Amount of 1G hugepages.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.linux_node_config.hugepages_config.hugepage_size_2m": {
+      "description": "Amount of 2M hugepages.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.linux_node_config.node_kernel_module_loading": {
+      "type": "block",
+      "description": "The settings for kernel module loading.",
+      "required": false
+    },
+    "node_pool.node_config.linux_node_config.node_kernel_module_loading.policy": {
+      "description": "The policy for kernel module loading.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.linux_node_config.swap_config": {
+      "type": "block",
+      "description": "Swap configuration for the node.",
+      "required": false
+    },
+    "node_pool.node_config.linux_node_config.swap_config.enabled": {
+      "description": "Enables or disables swap for the node pool.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.linux_node_config.swap_config.boot_disk_profile": {
+      "type": "block",
+      "description": "Swap on the node's boot disk.",
+      "required": false
+    },
+    "node_pool.node_config.linux_node_config.swap_config.boot_disk_profile.swap_size_gib": {
+      "description": "Specifies the size of the swap space in gibibytes (GiB).",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.linux_node_config.swap_config.boot_disk_profile.swap_size_percent": {
+      "description": "Specifies the size of the swap space as a percentage of the boot disk size.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.linux_node_config.swap_config.dedicated_local_ssd_profile": {
+      "type": "block",
+      "description": "Provisions a new, separate local NVMe SSD exclusively for swap.",
+      "required": false
+    },
+    "node_pool.node_config.linux_node_config.swap_config.dedicated_local_ssd_profile.disk_count": {
+      "description": "The number of physical local NVMe SSD disks to attach.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.linux_node_config.swap_config.encryption_config": {
+      "type": "block",
+      "description": "If omitted, swap space is encrypted by default.",
+      "required": false
+    },
+    "node_pool.node_config.linux_node_config.swap_config.encryption_config.disabled": {
+      "description": "If true, swap space will not be encrypted. Defaults to false (encrypted).",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.linux_node_config.swap_config.ephemeral_local_ssd_profile": {
+      "type": "block",
+      "description": "Swap on the local SSD shared with pod ephemeral storage.",
+      "required": false
+    },
+    "node_pool.node_config.linux_node_config.swap_config.ephemeral_local_ssd_profile.swap_size_gib": {
+      "description": "Specifies the size of the swap space in gibibytes (GiB).",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.linux_node_config.swap_config.ephemeral_local_ssd_profile.swap_size_percent": {
+      "description": "Specifies the size of the swap space as a percentage of the ephemeral local SSD capacity.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.local_nvme_ssd_block_config": {
+      "type": "block",
+      "description": "Parameters for raw-block local NVMe SSDs.",
+      "required": false
+    },
+    "node_pool.node_config.local_nvme_ssd_block_config.local_ssd_count": {
+      "description": "Number of raw-block local NVMe SSD disks to be attached to the node. Each local SSD is 375 GB in size.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.node_image_config": {
+      "type": "block",
+      "description": "The node image configuration to use for this node pool.",
+      "required": false
+    },
+    "node_pool.node_config.node_image_config.image": {
+      "description": "The name of the image to use for this node.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.node_image_config.image_project": {
+      "description": "The project containing the image to use for this node.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.reservation_affinity": {
+      "type": "block",
+      "description": "The reservation affinity configuration for the node pool.",
+      "required": false
+    },
+    "node_pool.node_config.reservation_affinity.consume_reservation_type": {
+      "description": "Corresponds to the type of reservation consumption.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.reservation_affinity.key": {
+      "description": "The label key of a reservation resource.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.reservation_affinity.values": {
+      "description": "The label values of the reservation resource.",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.sandbox_config": {
+      "type": "block",
+      "description": "Sandbox configuration for this node.",
+      "required": false
+    },
+    "node_pool.node_config.sandbox_config.type": {
+      "description": "Type of the sandbox to use for the node (e.g. 'GVISOR').",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.secondary_boot_disks": {
+      "type": "block",
+      "description": "Secondary boot disks for preloading data or container images.",
+      "required": false
+    },
+    "node_pool.node_config.secondary_boot_disks.disk_image": {
+      "description": "Disk image to create the secondary boot disk from",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.secondary_boot_disks.mode": {
+      "description": "Mode for how the secondary boot disk is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.shielded_instance_config": {
+      "type": "block",
+      "description": "Shielded Instance options.",
+      "required": false
+    },
+    "node_pool.node_config.shielded_instance_config.enable_integrity_monitoring": {
+      "description": "Defines whether the instance has integrity monitoring enabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.shielded_instance_config.enable_secure_boot": {
+      "description": "Defines whether the instance has Secure Boot enabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.sole_tenant_config": {
+      "type": "block",
+      "description": "Node affinity options for sole tenant node pools.",
+      "required": false
+    },
+    "node_pool.node_config.sole_tenant_config.min_node_cpus": {
+      "description": "Specifies the minimum number of vCPUs that each sole tenant node must have to use CPU overcommit. If not specified, the CPU overcommit feature is disabled.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.sole_tenant_config.node_affinity": {
+      "type": "block",
+      "description": ".",
+      "required": true
+    },
+    "node_pool.node_config.sole_tenant_config.node_affinity.key": {
+      "description": ".",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.sole_tenant_config.node_affinity.operator": {
+      "description": ".",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.sole_tenant_config.node_affinity.values": {
+      "description": ".",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.taint": {
+      "type": "block",
+      "description": "List of Kubernetes taints to be applied to each node.",
+      "required": false
+    },
+    "node_pool.node_config.taint.effect": {
+      "description": "Effect for taint.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.taint.key": {
+      "description": "Key for taint.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.taint.value": {
+      "description": "Value for taint.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.windows_node_config": {
+      "type": "block",
+      "description": "Parameters that can be configured on Windows nodes.",
+      "required": false
+    },
+    "node_pool.node_config.windows_node_config.osversion": {
+      "description": "The OS Version of the windows nodepool.Values are OS_VERSION_UNSPECIFIED,OS_VERSION_LTSC2019 and OS_VERSION_LTSC2022",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_config.workload_metadata_config": {
+      "type": "block",
+      "description": "The workload metadata configuration for this node.",
+      "required": false
+    },
+    "node_pool.node_config.workload_metadata_config.mode": {
+      "description": "Mode is the configuration for how to expose metadata to workloads running on the node.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_drain_config": {
+      "type": "block",
+      "description": "Node drain configuration for this NodePool.",
+      "required": false
+    },
+    "node_pool.node_drain_config.grace_termination_duration": {
+      "description": "The duration of the grace termination period for node drain.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_drain_config.pdb_timeout_duration": {
+      "description": "The duration of the PDB timeout period for node drain.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.node_drain_config.respect_pdb_during_node_pool_deletion": {
+      "description": "Whether to respect PodDisruptionBudget policy during node pool deletion.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.placement_policy": {
+      "type": "block",
+      "description": "Specifies the node placement policy",
+      "required": false
+    },
+    "node_pool.placement_policy.policy_name": {
+      "description": "If set, refers to the name of a custom resource policy supplied by the user. The resource policy must be in the same project and region as the node pool. If not found, InvalidArgument error is returned.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.placement_policy.tpu_topology": {
+      "description": "The TPU topology like \"2x4\" or \"2x2x2\". https://cloud.google.com/kubernetes-engine/docs/concepts/plan-tpus#topology",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.placement_policy.type": {
+      "description": "Type defines the type of placement policy",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.queued_provisioning": {
+      "type": "block",
+      "description": "Specifies the configuration of queued provisioning",
+      "required": false
+    },
+    "node_pool.queued_provisioning.enabled": {
+      "description": "Whether nodes in this node pool are obtainable solely through the ProvisioningRequest API",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.upgrade_settings": {
+      "type": "block",
+      "description": "Specify node upgrade settings to change how many nodes GKE attempts to upgrade at once. The number of nodes upgraded simultaneously is the sum of max_surge and max_unavailable. The maximum number of nodes upgraded simultaneously is limited to 20.",
+      "required": false
+    },
+    "node_pool.upgrade_settings.max_surge": {
+      "description": "The number of additional nodes that can be added to the node pool during an upgrade. Increasing max_surge raises the number of nodes that can be upgraded simultaneously. Can be set to 0 or greater.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.upgrade_settings.max_unavailable": {
+      "description": "The number of nodes that can be simultaneously unavailable during an upgrade. Increasing max_unavailable raises the number of nodes that can be upgraded in parallel. Can be set to 0 or greater.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.upgrade_settings.strategy": {
+      "description": "Update strategy for the given nodepool.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.upgrade_settings.blue_green_settings": {
+      "type": "block",
+      "description": "Settings for BlueGreen node pool upgrade.",
+      "required": false
+    },
+    "node_pool.upgrade_settings.blue_green_settings.node_pool_soak_duration": {
+      "description": "Time needed after draining entire blue pool. After this period, blue pool will be cleaned up.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.upgrade_settings.blue_green_settings.standard_rollout_policy": {
+      "type": "block",
+      "description": "Standard rollout policy is the default policy for blue-green.",
+      "required": true
+    },
+    "node_pool.upgrade_settings.blue_green_settings.standard_rollout_policy.batch_node_count": {
+      "description": "Number of blue nodes to drain in a batch.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.upgrade_settings.blue_green_settings.standard_rollout_policy.batch_percentage": {
+      "description": "Percentage of the blue pool nodes to drain in a batch.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool.upgrade_settings.blue_green_settings.standard_rollout_policy.batch_soak_duration": {
+      "description": "Soak time after each batch gets drained.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool_auto_config": {
+      "type": "block",
+      "description": "Node pool configs that apply to all auto-provisioned node pools in autopilot clusters and node auto-provisioning enabled clusters.",
+      "required": false
+    },
+    "node_pool_auto_config.resource_manager_tags": {
+      "description": "A map of resource manager tags. Resource manager tag keys and values have the same definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id}, and values are in the format tagValues/456. The field is ignored (both PUT & PATCH) when empty.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool_auto_config.linux_node_config": {
+      "type": "block",
+      "description": "Linux node configuration options.",
+      "required": false
+    },
+    "node_pool_auto_config.linux_node_config.cgroup_mode": {
+      "description": "cgroupMode specifies the cgroup mode to be used on the node.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool_auto_config.linux_node_config.node_kernel_module_loading": {
+      "type": "block",
+      "description": "The settings for kernel module loading.",
+      "required": false
+    },
+    "node_pool_auto_config.linux_node_config.node_kernel_module_loading.policy": {
+      "description": "The policy for kernel module loading.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool_auto_config.network_tags": {
+      "type": "block",
+      "description": "Collection of Compute Engine network tags that can be applied to a node's underlying VM instance.",
+      "required": false
+    },
+    "node_pool_auto_config.network_tags.tags": {
+      "description": "List of network tags applied to auto-provisioned node pools.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool_auto_config.node_kubelet_config": {
+      "type": "block",
+      "description": "Node kubelet configs.",
+      "required": false
+    },
+    "node_pool_auto_config.node_kubelet_config.insecure_kubelet_readonly_port_enabled": {
+      "description": "Controls whether the kubelet read-only port is enabled. It is strongly recommended to set this to `FALSE`. Possible values: `TRUE`, `FALSE`.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool_defaults": {
+      "type": "block",
+      "description": "The default nodel pool settings for the entire cluster.",
+      "required": false
+    },
+    "node_pool_defaults.node_config_defaults": {
+      "type": "block",
+      "description": "Subset of NodeConfig message that has defaults.",
+      "required": false
+    },
+    "node_pool_defaults.node_config_defaults.insecure_kubelet_readonly_port_enabled": {
+      "description": "Controls whether the kubelet read-only port is enabled. It is strongly recommended to set this to `FALSE`. Possible values: `TRUE`, `FALSE`.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool_defaults.node_config_defaults.logging_variant": {
+      "description": "Type of logging agent that is used as the default value for node pools in the cluster. Valid values include DEFAULT and MAX_THROUGHPUT.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool_defaults.node_config_defaults.containerd_config": {
+      "type": "block",
+      "description": "Parameters for containerd configuration.",
+      "required": false
+    },
+    "node_pool_defaults.node_config_defaults.containerd_config.private_registry_access_config": {
+      "type": "block",
+      "description": "Parameters for private container registries configuration.",
+      "required": false
+    },
+    "node_pool_defaults.node_config_defaults.containerd_config.private_registry_access_config.enabled": {
+      "description": "Whether or not private registries are configured.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool_defaults.node_config_defaults.containerd_config.private_registry_access_config.certificate_authority_domain_config": {
+      "type": "block",
+      "description": "Parameters for configuring CA certificate and domains.",
+      "required": false
+    },
+    "node_pool_defaults.node_config_defaults.containerd_config.private_registry_access_config.certificate_authority_domain_config.fqdns": {
+      "description": "List of fully-qualified-domain-names. IPv4s and port specification are supported.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool_defaults.node_config_defaults.containerd_config.private_registry_access_config.certificate_authority_domain_config.gcp_secret_manager_certificate_config": {
+      "type": "block",
+      "description": "Parameters for configuring a certificate hosted in GCP SecretManager.",
+      "required": true
+    },
+    "node_pool_defaults.node_config_defaults.containerd_config.private_registry_access_config.certificate_authority_domain_config.gcp_secret_manager_certificate_config.secret_uri": {
+      "description": "URI for the secret that hosts a certificate. Must be in the format 'projects/PROJECT_NUM/secrets/SECRET_NAME/versions/VERSION_OR_LATEST'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool_defaults.node_config_defaults.containerd_config.registry_hosts": {
+      "type": "block",
+      "description": "Configures containerd registry host configuration. Each registry_hosts entry represents a hosts.toml file.",
+      "required": false
+    },
+    "node_pool_defaults.node_config_defaults.containerd_config.registry_hosts.hosts": {
+      "type": "block",
+      "description": "Configures a list of host-specific configurations for the server.",
+      "required": false
+    },
+    "node_pool_defaults.node_config_defaults.containerd_config.registry_hosts.hosts.client": {
+      "type": "block",
+      "description": "Configures the registry host client certificate and key.",
+      "required": false
+    },
+    "node_pool_defaults.node_config_defaults.containerd_config.registry_hosts.hosts.client.key": {
+      "type": "block",
+      "description": "Configures the client private key.",
+      "required": false
+    },
+    "node_pool_defaults.node_config_defaults.containerd_config.registry_hosts.hosts.client.key.gcp_secret_manager_secret_uri": {
+      "description": "URI for the Secret Manager secret that hosts the private key.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool_defaults.node_config_defaults.containerd_config.registry_hosts.hosts.header": {
+      "type": "block",
+      "description": "Configures the registry host headers.",
+      "required": false
+    },
+    "node_pool_defaults.node_config_defaults.containerd_config.registry_hosts.hosts.header.key": {
+      "description": "Configures the header key.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool_defaults.node_config_defaults.containerd_config.registry_hosts.hosts.header.value": {
+      "description": "Configures the header value.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool_defaults.node_config_defaults.containerd_config.writable_cgroups": {
+      "type": "block",
+      "description": "Parameters for writable cgroups configuration.",
+      "required": false
+    },
+    "node_pool_defaults.node_config_defaults.containerd_config.writable_cgroups.enabled": {
+      "description": "Whether writable cgroups are enabled.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "node_pool_defaults.node_config_defaults.gcfs_config": {
+      "type": "block",
+      "description": "GCFS configuration for this node.",
+      "required": false
+    },
+    "node_pool_defaults.node_config_defaults.gcfs_config.enabled": {
+      "description": "Whether or not GCFS is enabled",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "notification_config": {
+      "type": "block",
+      "description": "The notification config for sending cluster upgrade notifications",
+      "required": false
+    },
+    "notification_config.pubsub": {
+      "type": "block",
+      "description": "Notification config for Cloud Pub/Sub",
+      "required": true
+    },
+    "notification_config.pubsub.enabled": {
+      "description": "Whether or not the notification config is enabled",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "notification_config.pubsub.topic": {
+      "description": "The pubsub topic to push upgrade notifications to. Must be in the same project as the cluster. Must be in the format: projects/{project}/topics/{topic}.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "notification_config.pubsub.filter": {
+      "type": "block",
+      "description": "Allows filtering to one or more specific event types. If event types are present, those and only those event types will be transmitted to the cluster. Other types will be skipped. If no filter is specified, or no event types are present, all event types will be sent",
+      "required": false
+    },
+    "notification_config.pubsub.filter.event_type": {
+      "description": "Can be used to filter what notifications are sent. Valid values include include UPGRADE_AVAILABLE_EVENT, UPGRADE_EVENT, SECURITY_BULLETIN_EVENT, and UPGRADE_INFO_EVENT",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "pod_autoscaling": {
+      "type": "block",
+      "description": "PodAutoscaling is used for configuration of parameters for workload autoscaling",
+      "required": false
+    },
+    "pod_autoscaling.hpa_profile": {
+      "description": "\n\t\t\t\t\t\t\t\tHPA Profile is used to configure the Horizontal Pod Autoscaler (HPA) profile for the cluster.\n\t\t\t\t\t\t\t\tAvailable options include:\n\t\t\t\t\t\t\t\t- NONE: Customers explicitly opt-out of HPA profiles.\n\t\t\t\t\t\t\t\t- PERFORMANCE: PERFORMANCE is used when customers opt-in to the performance HPA profile. In this profile we support a higher number of HPAs per cluster and faster metrics collection for workload autoscaling.\n\t\t\t\t\t\t\t",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "private_cluster_config": {
+      "type": "block",
+      "description": "Configuration for private clusters, clusters with private nodes.",
+      "required": false
+    },
+    "private_cluster_config.enable_private_endpoint": {
+      "description": "When true, the cluster's private endpoint is used as the cluster endpoint and access through the public endpoint is disabled. When false, either endpoint can be used.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "private_cluster_config.enable_private_nodes": {
+      "description": "Enables the private cluster feature, creating a private endpoint on the cluster. In a private cluster, nodes only have RFC 1918 private addresses and communicate with the master's private endpoint via private networking.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "private_cluster_config.master_ipv4_cidr_block": {
+      "description": "The IP range in CIDR notation to use for the hosted master network. This range will be used for assigning private IP addresses to the cluster master(s) and the ILB VIP. This range must not overlap with any other ranges in use within the cluster's network, and it must be a /28 subnet. See Private Cluster Limitations for more details. This field only applies to private clusters, when enable_private_nodes is true.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "private_cluster_config.private_endpoint_subnetwork": {
+      "description": "Subnetwork in cluster's network where master's endpoint will be provisioned.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "private_cluster_config.master_global_access_config": {
+      "type": "block",
+      "description": "Controls cluster master global access settings.",
+      "required": false
+    },
+    "private_cluster_config.master_global_access_config.enabled": {
+      "description": "Whether the cluster master is accessible globally or not.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rbac_binding_config": {
+      "type": "block",
+      "description": "RBACBindingConfig allows user to restrict ClusterRoleBindings an RoleBindings that can be created.",
+      "required": false
+    },
+    "rbac_binding_config.enable_insecure_binding_system_authenticated": {
+      "description": "Setting this to true will allow any ClusterRoleBinding and RoleBinding with subjects system:authenticated.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rbac_binding_config.enable_insecure_binding_system_unauthenticated": {
+      "description": "Setting this to true will allow any ClusterRoleBinding and RoleBinding with subjects system:anonymous or system:unauthenticated.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "release_channel": {
+      "type": "block",
+      "description": "Configuration options for the Release channel feature, which provide more control over automatic upgrades of your GKE clusters. Note that removing this field from your config will not unenroll it. Instead, use the \"UNSPECIFIED\" channel.",
+      "required": false
+    },
+    "release_channel.channel": {
+      "description": "The selected release channel. Accepted values are:\n* UNSPECIFIED: Not set.\n* RAPID: Weekly upgrade cadence; Early testers and developers who requires new features.\n* REGULAR: Multiple per month upgrade cadence; Production users who need features not yet offered in the Stable channel.\n* STABLE: Every few months upgrade cadence; Production users who need stability above all else, and for whom frequent upgrades are too risky.\n* EXTENDED: GKE provides extended support for Kubernetes minor versions through the Extended channel. With this channel, you can stay on a minor version for up to 24 months.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "resource_usage_export_config": {
+      "type": "block",
+      "description": "Configuration for the ResourceUsageExportConfig feature.",
+      "required": false
+    },
+    "resource_usage_export_config.enable_network_egress_metering": {
+      "description": "Whether to enable network egress metering for this cluster. If enabled, a daemonset will be created in the cluster to meter network egress traffic.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "resource_usage_export_config.enable_resource_consumption_metering": {
+      "description": "Whether to enable resource consumption metering on this cluster. When enabled, a table will be created in the resource export BigQuery dataset to store resource consumption data. The resulting table can be joined with the resource usage table or with BigQuery billing export. Defaults to true.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "resource_usage_export_config.bigquery_destination": {
+      "type": "block",
+      "description": "Parameters for using BigQuery as the destination of resource usage export.",
+      "required": true
+    },
+    "resource_usage_export_config.bigquery_destination.dataset_id": {
+      "description": "The ID of a BigQuery Dataset.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "secret_manager_config": {
+      "type": "block",
+      "description": "Configuration for the Secret Manager feature.",
+      "required": false
+    },
+    "secret_manager_config.enabled": {
+      "description": "Enable the Secret manager csi component.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "secret_manager_config.rotation_config": {
+      "type": "block",
+      "description": "Configuration for Secret Manager auto rotation.",
+      "required": false
+    },
+    "secret_manager_config.rotation_config.enabled": {
+      "description": "Enable the Secret manager auto rotation.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "secret_manager_config.rotation_config.rotation_interval": {
+      "description": "The interval between two consecutive rotations. Default rotation interval is 2 minutes",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "secret_sync_config": {
+      "type": "block",
+      "description": "Configuration for the Sync as k8s secrets feature.",
+      "required": false
+    },
+    "secret_sync_config.enabled": {
+      "description": "Enable the Sync as k8s secret add-on.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "secret_sync_config.rotation_config": {
+      "type": "block",
+      "description": "Configuration for Secret Sync auto rotation.",
+      "required": false
+    },
+    "secret_sync_config.rotation_config.enabled": {
+      "description": "Enable the Secret sync auto rotation.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "secret_sync_config.rotation_config.rotation_interval": {
+      "description": "The interval between two consecutive rotations. Default rotation interval is 2 minutes",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "security_posture_config": {
+      "type": "block",
+      "description": "Defines the config needed to enable/disable features for the Security Posture API",
+      "required": false
+    },
+    "security_posture_config.mode": {
+      "description": "Sets the mode of the Kubernetes security posture API's off-cluster features. Available options include DISABLED, BASIC, and ENTERPRISE.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "security_posture_config.vulnerability_mode": {
+      "description": "Sets the mode of the Kubernetes security posture API's workload vulnerability scanning. Available options include VULNERABILITY_DISABLED, VULNERABILITY_BASIC and VULNERABILITY_ENTERPRISE.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "service_external_ips_config": {
+      "type": "block",
+      "description": "If set, and enabled=true, services with external ips field will not be blocked",
+      "required": false
+    },
+    "service_external_ips_config.enabled": {
+      "description": "When enabled, services with external ips specified will be allowed.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "user_managed_keys_config": {
+      "type": "block",
+      "description": "The custom keys configuration of the cluster.",
+      "required": false
+    },
+    "user_managed_keys_config.aggregation_ca": {
+      "description": "The Certificate Authority Service caPool to use for the aggreation CA in this cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "user_managed_keys_config.cluster_ca": {
+      "description": "The Certificate Authority Service caPool to use for the cluster CA in this cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "user_managed_keys_config.control_plane_disk_encryption_key": {
+      "description": "The Cloud KMS cryptoKey to use for Confidential Hyperdisk on the control plane nodes.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "user_managed_keys_config.etcd_api_ca": {
+      "description": "The Certificate Authority Service caPool to use for the etcd API CA in this cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "user_managed_keys_config.etcd_peer_ca": {
+      "description": "The Certificate Authority Service caPool to use for the etcd peer CA in this cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "user_managed_keys_config.gkeops_etcd_backup_encryption_key": {
+      "description": "Resource path of the Cloud KMS cryptoKey to use for encryption of internal etcd backups.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "user_managed_keys_config.service_account_signing_keys": {
+      "description": "The Cloud KMS cryptoKeyVersions to use for signing service account JWTs issued by this cluster.",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "user_managed_keys_config.service_account_verification_keys": {
+      "description": "The Cloud KMS cryptoKeyVersions to use for verifying service account JWTs issued by this cluster.",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "vertical_pod_autoscaling": {
+      "type": "block",
+      "description": "Vertical Pod Autoscaling automatically adjusts the resources of pods controlled by it.",
+      "required": false
+    },
+    "vertical_pod_autoscaling.enabled": {
+      "description": "Enables vertical pod autoscaling.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "workload_identity_config": {
+      "type": "block",
+      "description": "Configuration for the use of Kubernetes Service Accounts in GCP IAM policies.",
+      "required": false
+    },
+    "workload_identity_config.workload_pool": {
+      "description": "The workload pool to attach all Kubernetes service accounts to.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

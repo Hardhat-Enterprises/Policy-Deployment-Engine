@@ -1,0 +1,102 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "ip_cidr_range": {
+      "description": "The range of internal addresses that follows RFC 4632 notation. Example: '10.132.0.0/28'.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Restricting the IP CIDR range ensures that the connector is deployed within approved network segments."
+    },
+    "machine_type": {
+      "description": "Machine type of VM Instance underlying connector. Default is e2-micro",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Selects the machine type backing the connector's instances. This is a performance/cost sizing choice with no bearing on confidentiality, integrity, or network exposure, so it is not a meaningful platform security policy."
+    },
+    "max_instances": {
+      "description": "Maximum value of instances in autoscaling group underlying the connector. Value must be between 3 and 10, inclusive. Must be\nhigher than the value specified by min_instances. Required alongside 'min_instances' if not using 'min_throughput'/'max_throughput'.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Caps the number of connector instances for autoscaling. This is a capacity/cost control, not a confidentiality, integrity, or access control, and does not map to any security archetype."
+    },
+    "max_throughput": {
+      "description": "Maximum throughput of the connector in Mbps, must be greater than 'min_throughput'. Default is 300. Refers to the expected throughput\nwhen using an e2-micro machine type. Value must be a multiple of 100 from 300 through 1000. Must be higher than the value specified by\nmin_throughput. Only one of 'max_throughput' and 'max_instances' can be specified. The use of max_throughput is discouraged in favor of max_instances.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Caps the connector's throughput, which drives autoscaling. This is a performance/cost control and does not constrain who can reach the network or how data is protected, so it is not a security policy target."
+    },
+    "min_instances": {
+      "description": "Minimum value of instances in autoscaling group underlying the connector. Value must be between 2 and 9, inclusive. Must be\nlower than the value specified by max_instances. Required alongside 'max_instances' if not using 'min_throughput'/'max_throughput'.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Sets the floor on connector instances for autoscaling. This is an availability/cost sizing knob; it does not affect access control, encryption, or exposure, so it is not a useful platform security policy."
+    },
+    "min_throughput": {
+      "description": "Minimum throughput of the connector in Mbps. Default and min is 200. Refers to the expected throughput when using an e2-micro machine type.\nValue must be a multiple of 100 from 200 through 900. Must be lower than the value specified by max_throughput.\nOnly one of 'min_throughput' and 'min_instances' can be specified. The use of min_throughput is discouraged in favor of min_instances.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Sets the connector's minimum throughput/capacity. This is a performance and availability sizing knob with no effect on access control, encryption, or exposure, so it is not a useful platform security policy."
+    },
+    "name": {
+      "description": "The name of the resource (Max 25 characters).",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Resource name generally has no direct security impact."
+    },
+    "network": {
+      "description": "Name or self_link of the VPC network. Required if 'ip_cidr_range' is set.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Names the VPC network the connector attaches to. It is a reference to a team-owned network; enforcing a particular VPC would require hardcoding a specific name, which is overreaching, so it is not a policy target."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Scopes the connector to a GCP project. This is an identifier; enforcing a 'correct' project would require hardcoding a specific project, which is overreaching. Access is governed by project-level IAM, not this field."
+    },
+    "region": {
+      "description": "Region where the VPC Access connector resides. If it is not provided, the provider region is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "subnet": {
+      "type": "block",
+      "description": "The subnet in which to house the connector",
+      "required": false
+    },
+    "subnet.name": {
+      "description": "Subnet name (relative, not fully qualified). E.g. if the full subnet selfLink is\nhttps://compute.googleapis.com/compute/v1/projects/{project}/regions/{region}/subnetworks/{subnetName} the correct input for this field would be {subnetName}\"",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Names the existing subnet the connector attaches to. It is a reference to a team-owned subnet; constraining it would require hardcoding a specific subnet name, which is overreaching. We do not police references to other resources."
+    },
+    "subnet.project_id": {
+      "description": "Project in which the subnet exists. If not set, this project is assumed to be the project for which the connector create request was issued.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifies the host project of the subnet the connector uses. It is a project reference; enforcing a specific project would require hardcoding a value, which is overreaching, so it is not a useful policy target."
+    }
+  }
+}

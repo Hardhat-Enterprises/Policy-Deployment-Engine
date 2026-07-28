@@ -1,0 +1,302 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "authorized_domains": {
+      "description": "List of domains authorized for OAuth redirects.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "autodelete_anonymous_users": {
+      "description": "Whether anonymous users will be auto-deleted after a period of 30 days",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "blocking_functions": {
+      "type": "block",
+      "description": "Configuration related to blocking functions.",
+      "required": false
+    },
+    "blocking_functions.forward_inbound_credentials": {
+      "type": "block",
+      "description": "The user credentials to include in the JWT payload that is sent to the registered Blocking Functions.",
+      "required": false
+    },
+    "blocking_functions.forward_inbound_credentials.access_token": {
+      "description": "Whether to pass the user's OAuth identity provider's access token.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "blocking_functions.forward_inbound_credentials.id_token": {
+      "description": "Whether to pass the user's OIDC identity provider's ID token.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "blocking_functions.forward_inbound_credentials.refresh_token": {
+      "description": "Whether to pass the user's OAuth identity provider's refresh token.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "blocking_functions.triggers": {
+      "type": "block",
+      "description": "Map of Trigger to event type. Key should be one of the supported event types: \"beforeCreate\", \"beforeSignIn\".",
+      "required": true
+    },
+    "blocking_functions.triggers.event_type": {
+      "description": "The identifier for this object. Format specified above.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "blocking_functions.triggers.function_uri": {
+      "description": "HTTP URI trigger for the Cloud Function.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client": {
+      "type": "block",
+      "description": "Options related to how clients making requests on behalf of a project should be configured.",
+      "required": false
+    },
+    "client.permissions": {
+      "type": "block",
+      "description": "Configuration related to restricting a user's ability to affect their account.",
+      "required": false
+    },
+    "client.permissions.disabled_user_deletion": {
+      "description": "When true, end users cannot delete their account on the associated project through any of our API methods",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client.permissions.disabled_user_signup": {
+      "description": "When true, end users cannot sign up for a new account on the associated project through any of our API methods",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mfa": {
+      "type": "block",
+      "description": "Options related to how clients making requests on behalf of a project should be configured.",
+      "required": false
+    },
+    "mfa.enabled_providers": {
+      "description": "A list of usable second factors for this project. Possible values: [\"PHONE_SMS\"]",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mfa.state": {
+      "description": "Whether MultiFactor Authentication has been enabled for this project. Possible values: [\"DISABLED\", \"ENABLED\", \"MANDATORY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mfa.provider_configs": {
+      "type": "block",
+      "description": "A list of usable second factors for this project along with their configurations.\nThis field does not support phone based MFA, for that use the 'enabledProviders' field.",
+      "required": false
+    },
+    "mfa.provider_configs.state": {
+      "description": "Whether MultiFactor Authentication has been enabled for this project. Possible values: [\"DISABLED\", \"ENABLED\", \"MANDATORY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mfa.provider_configs.totp_provider_config": {
+      "type": "block",
+      "description": "TOTP MFA provider config for this project.",
+      "required": false
+    },
+    "mfa.provider_configs.totp_provider_config.adjacent_intervals": {
+      "description": "The allowed number of adjacent intervals that will be used for verification to avoid clock skew.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "monitoring": {
+      "type": "block",
+      "description": "Configuration related to monitoring project activity.",
+      "required": false
+    },
+    "monitoring.request_logging": {
+      "type": "block",
+      "description": "Configuration for logging requests made to this project to Stackdriver Logging",
+      "required": false
+    },
+    "monitoring.request_logging.enabled": {
+      "description": "Whether logging is enabled for this project or not.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "multi_tenant": {
+      "type": "block",
+      "description": "Configuration related to multi-tenant functionality.",
+      "required": false
+    },
+    "multi_tenant.allow_tenants": {
+      "description": "Whether this project can have tenants or not.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "multi_tenant.default_tenant_location": {
+      "description": "The default cloud parent org or folder that the tenant project should be created under.\nThe parent resource name should be in the format of \"/\", such as \"folders/123\" or \"organizations/456\".\nIf the value is not set, the tenant will be created under the same organization or folder as the agent project.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "quota": {
+      "type": "block",
+      "description": "Configuration related to quotas.",
+      "required": false
+    },
+    "quota.sign_up_quota_config": {
+      "type": "block",
+      "description": "Quota for the Signup endpoint, if overwritten. Signup quota is measured in sign ups per project per hour per IP. None of quota, startTime, or quotaDuration can be skipped.",
+      "required": false
+    },
+    "quota.sign_up_quota_config.quota": {
+      "description": "A sign up APIs quota that customers can override temporarily. Value can be in between 1 and 1000.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "quota.sign_up_quota_config.quota_duration": {
+      "description": "How long this quota will be active for. It is measurred in seconds, e.g., Example: \"9.615s\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "quota.sign_up_quota_config.start_time": {
+      "description": "When this quota will take affect.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "sign_in": {
+      "type": "block",
+      "description": "Configuration related to local sign in methods.",
+      "required": false
+    },
+    "sign_in.allow_duplicate_emails": {
+      "description": "Whether to allow more than one account to have the same email.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "sign_in.anonymous": {
+      "type": "block",
+      "description": "Configuration options related to authenticating an anonymous user.",
+      "required": false
+    },
+    "sign_in.anonymous.enabled": {
+      "description": "Whether anonymous user auth is enabled for the project or not.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "sign_in.email": {
+      "type": "block",
+      "description": "Configuration options related to authenticating a user by their email address.",
+      "required": false
+    },
+    "sign_in.email.enabled": {
+      "description": "Whether email auth is enabled for the project or not.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "sign_in.email.password_required": {
+      "description": "Whether a password is required for email auth or not. If true, both an email and\npassword must be provided to sign in. If false, a user may sign in via either\nemail/password or email link.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "sign_in.phone_number": {
+      "type": "block",
+      "description": "Configuration options related to authenticated a user by their phone number.",
+      "required": false
+    },
+    "sign_in.phone_number.enabled": {
+      "description": "Whether phone number auth is enabled for the project or not.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "sign_in.phone_number.test_phone_numbers": {
+      "description": "A map of <test phone number, fake code> that can be used for phone auth testing.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "sms_region_config": {
+      "type": "block",
+      "description": "Configures the regions where users are allowed to send verification SMS for the project or tenant. This is based on the calling code of the destination phone number.",
+      "required": false
+    },
+    "sms_region_config.allow_by_default": {
+      "type": "block",
+      "description": "A policy of allowing SMS to every region by default and adding disallowed regions to a disallow list.",
+      "required": false
+    },
+    "sms_region_config.allow_by_default.disallowed_regions": {
+      "description": "Two letter unicode region codes to disallow as defined by https://cldr.unicode.org/ The full list of these region codes is here: https://github.com/unicode-cldr/cldr-localenames-full/blob/master/main/en/territories.json",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "sms_region_config.allowlist_only": {
+      "type": "block",
+      "description": "A policy of only allowing regions by explicitly adding them to an allowlist.",
+      "required": false
+    },
+    "sms_region_config.allowlist_only.allowed_regions": {
+      "description": "Two letter unicode region codes to allow as defined by https://cldr.unicode.org/ The full list of these region codes is here: https://github.com/unicode-cldr/cldr-localenames-full/blob/master/main/en/territories.json",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

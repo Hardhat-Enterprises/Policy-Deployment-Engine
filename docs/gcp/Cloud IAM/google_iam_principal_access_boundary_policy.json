@@ -1,0 +1,86 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "annotations": {
+      "description": "User defined annotations. See https://google.aip.dev/148#annotations\nfor more details such as format and size limitations\n\n\n**Note**: This field is non-authoritative, and will only manage the annotations present in your configuration.\nPlease refer to the field 'effective_annotations' for all of the annotations present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "The description of the principal access boundary policy. Must be less than or equal to 63 characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The location the principal access boundary policy is in.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "organization": {
+      "description": "The parent organization of the principal access boundary policy.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "principal_access_boundary_policy_id": {
+      "description": "The ID to use to create the principal access boundary policy.\nThis value must start with a lowercase letter followed by up to 62 lowercase letters, numbers, hyphens, or dots. Pattern, /a-z{2,62}/.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "details": {
+      "type": "block",
+      "description": "Principal access boundary policy details",
+      "required": false
+    },
+    "details.enforcement_version": {
+      "description": "The version number that indicates which Google Cloud services\nare included in the enforcement (e.g. \\\"latest\\\", \\\"1\\\", ...). If empty, the\nPAB policy version will be set to the current latest version, and this version\nwon't get updated when new versions are released.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "details.rules": {
+      "type": "block",
+      "description": "A list of principal access boundary policy rules. The number of rules in a policy is limited to 500.",
+      "required": true
+    },
+    "details.rules.description": {
+      "description": "The description of the principal access boundary policy rule. Must be less than or equal to 256 characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "details.rules.effect": {
+      "description": "The access relationship of principals to the resources in this rule.\nPossible values: ALLOW",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "details.rules.resources": {
+      "description": "A list of Cloud Resource Manager resources. The resource\nand all the descendants are included. The number of resources in a policy\nis limited to 500 across all rules.\nThe following resource types are supported:\n* Organizations, such as '//cloudresourcemanager.googleapis.com/organizations/123'.\n* Folders, such as '//cloudresourcemanager.googleapis.com/folders/123'.\n* Projects, such as '//cloudresourcemanager.googleapis.com/projects/123'\nor '//cloudresourcemanager.googleapis.com/projects/my-project-id'.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

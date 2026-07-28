@@ -1,0 +1,234 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "action": {
+      "description": "The Action to perform when the client connection triggers the rule. Valid actions are:\n\"allow\": allow access to target.\n\"deny\": deny access to target.\n\"goto_next\": forward the request to the next hierarchical policy for evaluation.\n\"redirect\": redirect to a different target. Parameters for this action can be configured via redirectOptions. Only EXTERNAL_302 redirect type is supported for organization security policies.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "A description of the rule.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "policy_id": {
+      "description": "The ID of the OrganizationSecurityPolicy this rule applies to.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "preview": {
+      "description": "If set to true, the specified action is not enforced.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "priority": {
+      "description": "An integer indicating the priority of a rule in the list. The priority must be a value\nbetween 0 and 2147483647. Rules are evaluated from highest to lowest priority where 0 is the\nhighest priority and 2147483647 is the lowest prority.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "header_action": {
+      "type": "block",
+      "description": "Optional, additional actions that are performed on headers.",
+      "required": false
+    },
+    "header_action.request_headers_to_adds": {
+      "type": "block",
+      "description": "The list of request headers to add or overwrite if they're already present.",
+      "required": false
+    },
+    "header_action.request_headers_to_adds.header_name": {
+      "description": "The name of the header to set.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "header_action.request_headers_to_adds.header_value": {
+      "description": "The value to set the named header to.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "match": {
+      "type": "block",
+      "description": "A match condition that incoming traffic is evaluated against. If it evaluates to true, the corresponding 'action' is enforced.",
+      "required": true
+    },
+    "match.description": {
+      "description": "A description of the rule.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "match.versioned_expr": {
+      "description": "Preconfigured versioned expression. For organization security policy rules,\nthe only supported type is \"SRC_IPS_V1\".\n**NOTE** : 'FIREWALL' type is deprecated. Please use 'google_compute_firewall_policy_rule' resource instead.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "match.config": {
+      "type": "block",
+      "description": "The configuration options for matching the rule.",
+      "required": false
+    },
+    "match.config.src_ip_ranges": {
+      "description": "Source IP address range in CIDR format. Required for\nINGRESS rules.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "match.expr": {
+      "type": "block",
+      "description": "User defined CEVAL expression. A CEVAL expression is used to specify match criteria such as origin.ip, source.region_code and contents in the request header.",
+      "required": false
+    },
+    "match.expr.expression": {
+      "description": "Textual representation of an expression in Common Expression Language syntax. The application context of the containing message determines which well-known feature set of CEL is supported.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "preconfigured_waf_config": {
+      "type": "block",
+      "description": "Preconfigured WAF configuration to be applied for the rule.\nIf the rule does not evaluate preconfigured WAF rules, i.e., if evaluatePreconfiguredWaf() is not used, this field will have no effect.",
+      "required": false
+    },
+    "preconfigured_waf_config.exclusion": {
+      "type": "block",
+      "description": "An exclusion to apply during preconfigured WAF evaluation.",
+      "required": false
+    },
+    "preconfigured_waf_config.exclusion.target_rule_ids": {
+      "description": "A list of target rule IDs under the WAF rule set to apply the preconfigured WAF exclusion.\nIf omitted, it refers to all the rule IDs under the WAF rule set.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "preconfigured_waf_config.exclusion.target_rule_set": {
+      "description": "Target WAF rule set to apply the preconfigured WAF exclusion.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "preconfigured_waf_config.exclusion.request_cookie": {
+      "type": "block",
+      "description": "Request cookie whose value will be excluded from inspection during preconfigured WAF evaluation.",
+      "required": false
+    },
+    "preconfigured_waf_config.exclusion.request_cookie.operator": {
+      "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "preconfigured_waf_config.exclusion.request_cookie.value": {
+      "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "preconfigured_waf_config.exclusion.request_header": {
+      "type": "block",
+      "description": "Request header whose value will be excluded from inspection during preconfigured WAF evaluation.",
+      "required": false
+    },
+    "preconfigured_waf_config.exclusion.request_header.operator": {
+      "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "preconfigured_waf_config.exclusion.request_header.value": {
+      "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "preconfigured_waf_config.exclusion.request_query_param": {
+      "type": "block",
+      "description": "Request query parameter whose value will be excluded from inspection during preconfigured WAF evaluation.\nNote that the parameter can be in the query string or in the POST body.",
+      "required": false
+    },
+    "preconfigured_waf_config.exclusion.request_query_param.operator": {
+      "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "preconfigured_waf_config.exclusion.request_query_param.value": {
+      "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "preconfigured_waf_config.exclusion.request_uri": {
+      "type": "block",
+      "description": "Request URI from the request line to be excluded from inspection during preconfigured WAF evaluation.\nWhen specifying this field, the query or fragment part should be excluded.",
+      "required": false
+    },
+    "preconfigured_waf_config.exclusion.request_uri.operator": {
+      "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "preconfigured_waf_config.exclusion.request_uri.value": {
+      "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "redirect_options": {
+      "type": "block",
+      "description": "Parameters defining the redirect action. Cannot be specified for any other actions.\nNote: For organization security policies, only EXTERNAL_302 redirect type is supported. GOOGLE_RECAPTCHA is not supported.",
+      "required": false
+    },
+    "redirect_options.target": {
+      "description": "Target for the redirect action. This is required if the type is EXTERNAL_302.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "redirect_options.type": {
+      "description": "Type of the redirect action. For organization security policies, only EXTERNAL_302 is supported.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

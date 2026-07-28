@@ -1,0 +1,126 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "collection_id": {
+      "description": "The collection ID.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier referencing a collection. We do not constrain resource identifiers or references to other resources."
+    },
+    "data_store_ids": {
+      "description": "The data stores associated with this engine. Multiple DataStores in the same Collection can be associated here. All listed DataStores must be 'SOLUTION_TYPE_CHAT'.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "List of identifiers referencing the data stores the chat engine reads from. We do not constrain references to other resources."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "The display name of the engine. Should be human readable. UTF-8 encoded string with limit of 1024 characters.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Just the displayed name"
+    },
+    "engine_id": {
+      "description": "The ID to use for chat engine.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier for the chat engine resource. We do not constrain resource identifiers, so it is not a policy target."
+    },
+    "industry_vertical": {
+      "description": "The industry vertical that the chat engine registers. Vertical on Engine has to match vertical of the DataStore linked to the engine. Default value: \"GENERIC\" Possible values: [\"GENERIC\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Selects the engine's industry vertical (e.g. GENERIC, MEDIA). This is a functional product configuration, not a security control, so it is not a policy target."
+    },
+    "location": {
+      "description": "Location.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Is just the project ID"
+    },
+    "chat_engine_config": {
+      "type": "block",
+      "description": "Configurations for a chat Engine.",
+      "required": true
+    },
+    "chat_engine_config.allow_cross_region": {
+      "description": "If the flag set to true, we allow the agent and engine are in\ndifferent locations, otherwise the agent and engine are required to be\nin the same location. The flag is set to false by default.\nNote that the 'allow_cross_region' are one-time consumed by and passed\nto EngineService.CreateEngine. It means they cannot be retrieved using\nEngineService.GetEngine or EngineService.ListEngines API after engine\ncreation.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Controls whether the agent and engine may reside in different locations. Allowing cross-region placement can move data outside an approved residency boundary, so a policy should keep it disabled (require same-location) as a data-residency control."
+    },
+    "chat_engine_config.dialogflow_agent_to_link": {
+      "description": "The resource name of an existing Dialogflow agent to link to this Chat Engine. Format: 'projects/<Project_ID>/locations/<Location_ID>/agents/<Agent_ID>'.\nExactly one of 'agent_creation_config' or 'dialogflow_agent_to_link' must be set.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Reference to an existing Dialogflow agent to link to the chat engine. Pointing at another resource is the team's choice; we do not constrain such references."
+    },
+    "chat_engine_config.agent_creation_config": {
+      "type": "block",
+      "description": "The configuration to generate the Dialogflow agent that is associated to this Engine.\nExactly one of 'agent_creation_config' or 'dialogflow_agent_to_link' must be set.",
+      "required": false
+    },
+    "chat_engine_config.agent_creation_config.business": {
+      "description": "Name of the company, organization or other entity that the agent represents. Used for knowledge connector LLM prompt and for knowledge search.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "chat_engine_config.agent_creation_config.default_language_code": {
+      "description": "The default language of the agent as a language tag. See [Language Support](https://cloud.google.com/dialogflow/docs/reference/language) for a list of the currently supported language codes.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "chat_engine_config.agent_creation_config.location": {
+      "description": "Agent location for Agent creation, currently supported values: global/us/eu, it needs to be the same region as the Chat Engine.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "chat_engine_config.agent_creation_config.time_zone": {
+      "description": "The time zone of the agent from the [time zone database](https://www.iana.org/time-zones), e.g., America/New_York, Europe/Paris.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "common_config": {
+      "type": "block",
+      "description": "Common config spec that specifies the metadata of the engine.",
+      "required": false
+    },
+    "common_config.company_name": {
+      "description": "The name of the company, business or entity that is associated with the engine. Setting this may help improve LLM related features.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Free-text company name used in the engine's common config. Descriptive metadata with no security effect, so it is not a policy target."
+    }
+  }
+}

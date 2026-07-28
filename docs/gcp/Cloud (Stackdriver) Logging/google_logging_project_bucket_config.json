@@ -1,0 +1,93 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "bucket_id": {
+      "description": "The name of the logging bucket. Logging automatically creates two log buckets: _Required and _Default.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Bucket ID is a unique identifier for the resource. It has no security implications beyond being a reference name."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "An optional description for this bucket.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Description is metadata only and does not affect any security controls, encryption, or access policies."
+    },
+    "enable_analytics": {
+      "description": "Enable log analytics for the bucket. Cannot be disabled once enabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "Enables Log Analytics querying over the bucket (irreversible once on). It changes query/analysis capability, not who can access the data or how it is encrypted, so it is a team data-management choice rather than a security control worth a generic policy."
+    },
+    "location": {
+      "description": "The location of the bucket.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "locked": {
+      "description": "Whether the bucket is locked. The retention period on a locked bucket cannot be changed. Locked buckets may only be deleted if they are empty.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Locking a bucket ensures that retention policies cannot be shortened and the bucket cannot be deleted, which is critical for compliance with legal hold requirements and audit log preservation. Once locked, the setting is permanent and cannot be undone."
+    },
+    "project": {
+      "description": "The parent project that contains the logging bucket.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This identifies which project owns the logging bucket. It has no direct security impact on the bucket's content or access controls."
+    },
+    "retention_days": {
+      "description": "Logs will be retained by default for this amount of time, after which they will automatically be deleted. The minimum retention period is 1 day. If this value is set to zero at bucket creation time, the default time of 30 days will be used.",
+      "required": false,
+      "type": "number",
+      "security_impact": true,
+      "rationale": "Retention period must be sufficient for compliance requirements (CIS GCP Benchmark 2.3 recommends 30+ days for audit logs). Too short retention may result in loss of audit trails required for security investigations and compliance audits."
+    },
+    "cmek_settings": {
+      "type": "block",
+      "description": "The CMEK settings of the log bucket. If present, new log entries written to this log bucket are encrypted using the CMEK key provided in this configuration. If a log bucket has CMEK settings, the CMEK settings cannot be disabled later by updating the log bucket. Changing the KMS key is allowed.",
+      "required": false
+    },
+    "cmek_settings.kms_key_name": {
+      "description": "The resource name for the configured Cloud KMS key.\nKMS key name format:\n\"projects/[PROJECT_ID]/locations/[LOCATION]/keyRings/[KEYRING]/cryptoKeys/[KEY]\"\nTo enable CMEK for the bucket, set this field to a valid kmsKeyName for which the associated service account has the required cloudkms.cryptoKeyEncrypterDecrypter roles assigned for the key.\nThe Cloud KMS key used by the bucket can be updated by changing the kmsKeyName to a new valid key name. Encryption operations that are in progress will be completed with the key that was in use when they started. Decryption operations will be completed using the key that was used at the time of encryption unless access to that key has been revoked.\nSee [Enabling CMEK for Logging Buckets](https://cloud.google.com/logging/docs/routing/managed-encryption-storage) for more information.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "KMS key name determines which customer-managed key encrypts the logs. Using a valid CMEK key is required for compliance. Invalid or missing keys result in Google-managed encryption."
+    },
+    "index_configs": {
+      "type": "block",
+      "description": "A list of indexed fields and related configuration data.",
+      "required": false
+    },
+    "index_configs.field_path": {
+      "description": "The LogEntry field path to index.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Field paths determine which log fields are indexed for faster queries. This has no security implications as indexing does not expose additional data or change access controls."
+    },
+    "index_configs.type": {
+      "description": "The type of data in this index\nNote that some paths are automatically indexed, and other paths are not eligible for indexing. See [indexing documentation]( https://cloud.google.com/logging/docs/view/advanced-queries#indexed-fields) for details.\nFor example: jsonPayload.request.status",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Field type helps optimize indexing and query performance but has no security implications."
+    }
+  }
+}

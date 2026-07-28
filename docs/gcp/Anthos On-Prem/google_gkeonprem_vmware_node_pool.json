@@ -1,0 +1,206 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "annotations": {
+      "description": "Annotations on the node Pool.\nThis field has the same restrictions as Kubernetes annotations.\nThe total size of all keys and values combined is limited to 256k.\nKey can have 2 segments: prefix (optional) and name (required),\nseparated by a slash (/).\nPrefix must be a DNS subdomain.\nName must be 63 characters or less, begin and end with alphanumerics,\nwith dashes (-), underscores (_), dots (.), and alphanumerics between.\n\n\n**Note**: This field is non-authoritative, and will only manage the annotations present in your configuration.\nPlease refer to the field 'effective_annotations' for all of the annotations present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "annotations is not a security sensitive field"
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "The display name for the node pool.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "display_name is not a security sensitive field"
+    },
+    "location": {
+      "description": "The location of the resource.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "name": {
+      "description": "The vmware node pool name.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "name is not a security sensitive field"
+    },
+    "on_prem_version": {
+      "description": "Anthos version for the node pool. Defaults to the user cluster version.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "project is not a security sensitive field"
+    },
+    "vmware_cluster": {
+      "description": "The cluster this node pool belongs to.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "vmware_cluster is not security sensitive enough to require special handling"
+    },
+    "config": {
+      "type": "block",
+      "description": "The node configuration of the node pool.",
+      "required": true
+    },
+    "config.boot_disk_size_gb": {
+      "description": "VMware disk size to be used during creation.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "boot_disk_size_gb is not a security sensitive field"
+    },
+    "config.cpus": {
+      "description": "The number of CPUs for each node in the node pool.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "cpus is not a security sensitive field"
+    },
+    "config.enable_load_balancer": {
+      "description": "Allow node pool traffic to be load balanced. Only works for clusters with\nMetalLB load balancers.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "enable_load_balancer is not a security sensitive field"
+    },
+    "config.image": {
+      "description": "The OS image name in vCenter, only valid when using Windows.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "image does not have significant security implications"
+    },
+    "config.image_type": {
+      "description": "The OS image to be used for each node in a node pool.\nCurrently 'cos', 'cos_cgv2', 'ubuntu', 'ubuntu_cgv2', 'ubuntu_containerd' and 'windows' are supported.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Selects the node OS image family (e.g. cos, ubuntu, windows). This is an operational OS choice with no single 'secure' option, so a generic platform policy cannot meaningfully constrain it; it is not a security archetype."
+    },
+    "config.labels": {
+      "description": "The map of Kubernetes labels (key/value pairs) to be applied to each node.\nThese will added in addition to any default label(s) that\nKubernetes may apply to the node.\nIn case of conflict in label keys, the applied set may differ depending on\nthe Kubernetes version -- it's best to assume the behavior is undefined\nand conflicts should be avoided.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "labels is not a security sensitive field"
+    },
+    "config.memory_mb": {
+      "description": "The megabytes of memory for each node in the node pool.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "memory_mb is not a security sensitive field"
+    },
+    "config.replicas": {
+      "description": "The number of nodes in the node pool.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "replicas is not a security sensitive field"
+    },
+    "config.taints": {
+      "type": "block",
+      "description": "The initial taints assigned to nodes of this node pool.",
+      "required": false
+    },
+    "config.taints.effect": {
+      "description": "Available taint effects. Possible values: [\"EFFECT_UNSPECIFIED\", \"NO_SCHEDULE\", \"PREFER_NO_SCHEDULE\", \"NO_EXECUTE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "effect is not a security sensitive field"
+    },
+    "config.taints.key": {
+      "description": "Key associated with the effect.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "key is not a security sensitive field"
+    },
+    "config.taints.value": {
+      "description": "Value associated with the effect.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "value is not a security sensitive field"
+    },
+    "config.vsphere_config": {
+      "type": "block",
+      "description": "Specifies the vSphere config for node pool.",
+      "required": false
+    },
+    "config.vsphere_config.datastore": {
+      "description": "The name of the vCenter datastore. Inherited from the user cluster.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "datastore is not a security sensitive field"
+    },
+    "config.vsphere_config.host_groups": {
+      "description": "Vsphere host groups to apply to all VMs in the node pool",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "host_groups is not a security sensitive field"
+    },
+    "config.vsphere_config.tags": {
+      "type": "block",
+      "description": "Tags to apply to VMs.",
+      "required": false
+    },
+    "config.vsphere_config.tags.category": {
+      "description": "The Vsphere tag category.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "category is not a security sensitive field"
+    },
+    "config.vsphere_config.tags.tag": {
+      "description": "The Vsphere tag name.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "tag is not a security sensitive field"
+    },
+    "node_pool_autoscaling": {
+      "type": "block",
+      "description": "Node Pool autoscaling config for the node pool.",
+      "required": false
+    },
+    "node_pool_autoscaling.max_replicas": {
+      "description": "Maximum number of replicas in the NodePool.",
+      "required": true,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Sets the upper bound of nodes the node-pool autoscaler may create. This is a capacity/cost sizing choice, not a security control, and any 'reasonable number' is arbitrary and environment-specific."
+    },
+    "node_pool_autoscaling.min_replicas": {
+      "description": "Minimum number of replicas in the NodePool.",
+      "required": true,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Sets the lower bound of nodes the node-pool autoscaler maintains. This is a capacity/cost sizing choice, not a security control, with no structural secure value to enforce."
+    }
+  }
+}

@@ -1,0 +1,243 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "Optional. Human readable description of the generator.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "generator_id": {
+      "description": "Optional. The ID to use for the generator, which will become the final component of the generator's resource name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "desc",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "published_model": {
+      "description": "Optional. The published Large Language Model name. * To use the latest model version, specify the model name without version number. Example: text-bison * To use a stable model version, specify the version number as well. Example: text-bison@002.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "trigger_event": {
+      "description": "Optional. The trigger event of the generator. It defines when the generator is triggered in a conversation. Possible values: [\"END_OF_UTTERANCE\", \"MANUAL_CALL\", \"CUSTOMER_MESSAGE\", \"AGENT_MESSAGE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inference_parameter": {
+      "type": "block",
+      "description": "Optional. Inference parameters for this generator.",
+      "required": false
+    },
+    "inference_parameter.max_output_tokens": {
+      "description": "Optional. Maximum number of the output tokens for the generator.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inference_parameter.temperature": {
+      "description": "Optional. Controls the randomness of LLM predictions. Low temperature = less random. High temperature = more random. If unset (or 0), uses a default value of 0.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inference_parameter.top_k": {
+      "description": "Optional. Top-k changes how the model selects tokens for output. A top-k of 1 means the selected token is the most probable among all tokens in the model's vocabulary (also called greedy decoding), while a top-k of 3 means that the next token is selected from among the 3 most probable tokens (using temperature). For each token selection step, the top K tokens with the highest probabilities are sampled. Then tokens are further filtered based on topP with the final token selected using temperature sampling. Specify a lower value for less random responses and a higher value for more random responses. Acceptable value is [1, 40], default to 40.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inference_parameter.top_p": {
+      "description": "Optional. Top-p changes how the model selects tokens for output. Tokens are selected from most K (see topK parameter) probable to least until the sum of their probabilities equals the top-p value. For example, if tokens A, B, and C have a probability of 0.3, 0.2, and 0.1 and the top-p value is 0.5, then the model will select either A or B as the next token (using temperature) and doesn't consider C. The default top-p value is 0.95. Specify a lower value for less random responses and a higher value for more random responses. Acceptable value is [0.0, 1.0], default to 0.95.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "summarization_context": {
+      "type": "block",
+      "description": "Input of prebuilt Summarization feature.",
+      "required": true
+    },
+    "summarization_context.output_language_code": {
+      "description": "Optional. The target language of the generated summary. The language code for conversation will be used if this field is empty. Supported 2.0 and later versions.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "summarization_context.version": {
+      "description": "Optional. Version of the feature. If not set, default to latest version. Current candidates are [\"1.0\"].",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "summarization_context.few_shot_examples": {
+      "type": "block",
+      "description": "Optional. List of few shot examples.",
+      "required": false
+    },
+    "summarization_context.few_shot_examples.extra_info": {
+      "description": "Optional. Key is the placeholder field name in input, value is the value of the placeholder. E.g. instruction contains \"@price\", and ingested data has <\"price\", \"10\">",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "summarization_context.few_shot_examples.conversation_context": {
+      "type": "block",
+      "description": "Optional. Conversation transcripts.",
+      "required": false
+    },
+    "summarization_context.few_shot_examples.conversation_context.message_entries": {
+      "type": "block",
+      "description": "Optional. List of message transcripts in the conversation.",
+      "required": false
+    },
+    "summarization_context.few_shot_examples.conversation_context.message_entries.create_time": {
+      "description": "Optional. Create time of the message entry.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "summarization_context.few_shot_examples.conversation_context.message_entries.language_code": {
+      "description": "Optional. The language of the text.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "summarization_context.few_shot_examples.conversation_context.message_entries.role": {
+      "description": "Optional. Participant role of the message. Possible values: [\"HUMAN_AGENT\", \"AUTOMATED_AGENT\", \"END_USER\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "summarization_context.few_shot_examples.conversation_context.message_entries.text": {
+      "description": "Optional. Transcript content of the message.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "summarization_context.few_shot_examples.output": {
+      "type": "block",
+      "description": "Required. Example output of the model.",
+      "required": true
+    },
+    "summarization_context.few_shot_examples.output.summary_suggestion": {
+      "type": "block",
+      "description": "Optional. Suggested summary.",
+      "required": false
+    },
+    "summarization_context.few_shot_examples.output.summary_suggestion.summary_sections": {
+      "type": "block",
+      "description": "Required. All the parts of generated summary.",
+      "required": true
+    },
+    "summarization_context.few_shot_examples.output.summary_suggestion.summary_sections.section": {
+      "description": "Required. Name of the section.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "summarization_context.few_shot_examples.output.summary_suggestion.summary_sections.summary": {
+      "description": "Required. Summary text for the section.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "summarization_context.few_shot_examples.summarization_section_list": {
+      "type": "block",
+      "description": "Summarization sections.",
+      "required": false
+    },
+    "summarization_context.few_shot_examples.summarization_section_list.summarization_sections": {
+      "type": "block",
+      "description": "Optional. Summarization sections.",
+      "required": false
+    },
+    "summarization_context.few_shot_examples.summarization_section_list.summarization_sections.definition": {
+      "description": "Optional. Definition of the section, for example, \"what the customer needs help with or has question about.\"",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "summarization_context.few_shot_examples.summarization_section_list.summarization_sections.key": {
+      "description": "Optional. Name of the section, for example, \"situation\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "summarization_context.few_shot_examples.summarization_section_list.summarization_sections.type": {
+      "description": "Optional. Type of the summarization section. Possible values: [\"SITUATION\", \"ACTION\", \"RESOLUTION\", \"REASON_FOR_CANCELLATION\", \"CUSTOMER_SATISFACTION\", \"ENTITIES\", \"CUSTOMER_DEFINED\", \"SITUATION_CONCISE\", \"ACTION_CONCISE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "summarization_context.summarization_sections": {
+      "type": "block",
+      "description": "Optional. List of sections. Note it contains both predefined section sand customer defined sections.",
+      "required": false
+    },
+    "summarization_context.summarization_sections.definition": {
+      "description": "Optional. Definition of the section, for example, \"what the customer needs help with or has question about.\"",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "summarization_context.summarization_sections.key": {
+      "description": "Optional. Name of the section, for example, \"situation\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "summarization_context.summarization_sections.type": {
+      "description": "Optional. Type of the summarization section. Possible values: [\"SITUATION\", \"ACTION\", \"RESOLUTION\", \"REASON_FOR_CANCELLATION\", \"CUSTOMER_SATISFACTION\", \"ENTITIES\", \"CUSTOMER_DEFINED\", \"SITUATION_CONCISE\", \"ACTION_CONCISE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

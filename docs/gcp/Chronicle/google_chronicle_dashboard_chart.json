@@ -1,0 +1,1210 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "instance": {
+      "description": "The ID of the Chronicle instance.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The location of the Chronicle instance.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "native_dashboard": {
+      "description": "The parent NativeDashboard resource name, formatted as projects/{project}/locations/{location}/instances/{instance}/nativeDashboards/{dashboard_id}",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "chart_layout": {
+      "type": "block",
+      "description": "The layout of this chart within the NativeDashboard.",
+      "required": false
+    },
+    "chart_layout.span_x": {
+      "description": "N/A",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "chart_layout.span_y": {
+      "description": "N/A",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "chart_layout.start_x": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "chart_layout.start_y": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart": {
+      "type": "block",
+      "description": "Core configuration details for the DashboardChart.",
+      "required": true
+    },
+    "dashboard_chart.description": {
+      "description": "Description of the dashboardChart.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.display_name": {
+      "description": "Display name/Title of the dashboardChart visible to users.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.tile_type": {
+      "description": "Type of tile (e.g., visualization, button, markdown). Possible values: [\"TILE_TYPE_UNSPECIFIED\", \"TILE_TYPE_VISUALIZATION\", \"TILE_TYPE_BUTTON\", \"TILE_TYPE_MARKDOWN\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.chart_datasource": {
+      "type": "block",
+      "description": "Query and datasource used in the chart.",
+      "required": false
+    },
+    "dashboard_chart.chart_datasource.data_sources": {
+      "description": "Name(s) of the datasource used in the chart. Available values include:\n'UDM', 'ENTITY', 'INGESTION_METRICS', 'RULE_DETECTIONS', 'RULESETS',\n'GLOBAL', 'IOC_MATCHES', 'RULES', 'SOAR_CASES', 'SOAR_PLAYBOOKS',\n'SOAR_CASE_HISTORY', 'DATA_TABLE', 'INVESTIGATION', 'INVESTIGATION_FEEDBACK'.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.drill_down_config": {
+      "type": "block",
+      "description": "Drill down configuration.",
+      "required": false
+    },
+    "dashboard_chart.drill_down_config.left_drill_downs": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "dashboard_chart.drill_down_config.left_drill_downs.display_name": {
+      "description": "Display name/Title of the dashboardChart visible to users.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.drill_down_config.left_drill_downs.id": {
+      "description": "an identifier for the resource with format `projects/{{project}}/locations/{{location}}/instances/{{instance}}/dashboardCharts/{{chart_id}}`",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.drill_down_config.left_drill_downs.custom_settings": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.drill_down_config.left_drill_downs.custom_settings.left_click_column": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.drill_down_config.left_drill_downs.custom_settings.new_tab": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.drill_down_config.left_drill_downs.custom_settings.external_link": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.drill_down_config.left_drill_downs.custom_settings.external_link.description": {
+      "description": "Description of the dashboardChart.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.drill_down_config.left_drill_downs.custom_settings.external_link.link": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.drill_down_config.left_drill_downs.custom_settings.filter": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.drill_down_config.left_drill_downs.custom_settings.filter.dashboard_filters": {
+      "type": "block",
+      "description": "",
+      "required": true
+    },
+    "dashboard_chart.drill_down_config.left_drill_downs.custom_settings.filter.dashboard_filters.dashboard_filter_id": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.drill_down_config.left_drill_downs.custom_settings.filter.dashboard_filters.filter_operator_and_values": {
+      "type": "block",
+      "description": "",
+      "required": true
+    },
+    "dashboard_chart.drill_down_config.left_drill_downs.custom_settings.filter.dashboard_filters.filter_operator_and_values.field_values": {
+      "description": "N/A",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.drill_down_config.left_drill_downs.custom_settings.filter.dashboard_filters.filter_operator_and_values.filter_operator": {
+      "description": " Possible values: [\"EQUAL\", \"NOT_EQUAL\", \"IN\", \"GREATER_THAN\", \"GREATER_THAN_OR_EQUAL_TO\", \"LESS_THAN\", \"LESS_THAN_OR_EQUAL_TO\", \"BETWEEN\", \"PAST\", \"IS_NULL\", \"IS_NOT_NULL\", \"STARTS_WITH\", \"ENDS_WITH\", \"DOES_NOT_STARTS_WITH\", \"DOES_NOT_ENDS_WITH\", \"NOT_IN\", \"CONTAINS\", \"DOES_NOT_CONTAIN\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.drill_down_config.left_drill_downs.custom_settings.query": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.drill_down_config.left_drill_downs.custom_settings.query.query": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.drill_down_config.left_drill_downs.default_settings": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.drill_down_config.left_drill_downs.default_settings.enabled": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.drill_down_config.right_drill_downs": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "dashboard_chart.drill_down_config.right_drill_downs.display_name": {
+      "description": "Display name/Title of the dashboardChart visible to users.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.drill_down_config.right_drill_downs.id": {
+      "description": "an identifier for the resource with format `projects/{{project}}/locations/{{location}}/instances/{{instance}}/dashboardCharts/{{chart_id}}`",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.drill_down_config.right_drill_downs.custom_settings": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.drill_down_config.right_drill_downs.custom_settings.new_tab": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.drill_down_config.right_drill_downs.custom_settings.external_link": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.drill_down_config.right_drill_downs.custom_settings.external_link.description": {
+      "description": "Description of the dashboardChart.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.drill_down_config.right_drill_downs.custom_settings.external_link.link": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.drill_down_config.right_drill_downs.custom_settings.filter": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.drill_down_config.right_drill_downs.custom_settings.filter.dashboard_filters": {
+      "type": "block",
+      "description": "",
+      "required": true
+    },
+    "dashboard_chart.drill_down_config.right_drill_downs.custom_settings.filter.dashboard_filters.dashboard_filter_id": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.drill_down_config.right_drill_downs.custom_settings.filter.dashboard_filters.filter_operator_and_values": {
+      "type": "block",
+      "description": "",
+      "required": true
+    },
+    "dashboard_chart.drill_down_config.right_drill_downs.custom_settings.filter.dashboard_filters.filter_operator_and_values.field_values": {
+      "description": "N/A",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.drill_down_config.right_drill_downs.custom_settings.filter.dashboard_filters.filter_operator_and_values.filter_operator": {
+      "description": " Possible values: [\"EQUAL\", \"NOT_EQUAL\", \"IN\", \"GREATER_THAN\", \"GREATER_THAN_OR_EQUAL_TO\", \"LESS_THAN\", \"LESS_THAN_OR_EQUAL_TO\", \"BETWEEN\", \"PAST\", \"IS_NULL\", \"IS_NOT_NULL\", \"STARTS_WITH\", \"ENDS_WITH\", \"DOES_NOT_STARTS_WITH\", \"DOES_NOT_ENDS_WITH\", \"NOT_IN\", \"CONTAINS\", \"DOES_NOT_CONTAIN\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.drill_down_config.right_drill_downs.custom_settings.query": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.drill_down_config.right_drill_downs.custom_settings.query.query": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.drill_down_config.right_drill_downs.default_settings": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.drill_down_config.right_drill_downs.default_settings.enabled": {
+      "description": "N/A",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization": {
+      "type": "block",
+      "description": "Visualization config for a chart.",
+      "required": true
+    },
+    "dashboard_chart.visualization.grouping_type": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series_column": {
+      "description": "N/A",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.threshold_coloring_enabled": {
+      "description": "N/A",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.button": {
+      "type": "block",
+      "description": "Button config if tileType is TILE_TYPE_BUTTON.",
+      "required": false
+    },
+    "dashboard_chart.visualization.button.description": {
+      "description": "Description of the dashboardChart.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.button.hyperlink": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.button.label": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.button.new_tab": {
+      "description": "N/A",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.button.properties": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.visualization.button.properties.button_style": {
+      "description": " Possible values: [\"BUTTON_STYLE_UNSPECIFIED\", \"BUTTON_STYLE_FILLED\", \"BUTTON_STYLE_OUTLINED\", \"BUTTON_STYLE_TRANSPARENT\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.button.properties.color": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.column_defs": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "dashboard_chart.visualization.column_defs.field": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.column_defs.header": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.google_maps_config": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.visualization.google_maps_config.plot_mode": {
+      "description": " Possible values: [\"PLOT_MODE_UNSPECIFIED\", \"PLOT_MODE_POINTS\", \"PLOT_MODE_HEATMAP\", \"PLOT_MODE_BOTH\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.google_maps_config.data_settings": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.visualization.google_maps_config.data_settings.count_column": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.google_maps_config.data_settings.latitude_column": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.google_maps_config.data_settings.longitude_column": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.google_maps_config.map_position": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.visualization.google_maps_config.map_position.fit_data": {
+      "description": "N/A",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.google_maps_config.map_position.latitude_value": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.google_maps_config.map_position.longitude_value": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.google_maps_config.map_position.zoom_scale_value": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.google_maps_config.point_settings": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.visualization.google_maps_config.point_settings.color": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.google_maps_config.point_settings.point_size_type": {
+      "description": " Possible values: [\"POINT_SIZE_TYPE_UNSPECIFIED\", \"POINT_SIZE_TYPE_FIXED\", \"POINT_SIZE_TYPE_PROPORTIONAL_TO_SIZE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.legends": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "dashboard_chart.visualization.legends.bottom": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.legends.id": {
+      "description": "an identifier for the resource with format `projects/{{project}}/locations/{{location}}/instances/{{instance}}/dashboardCharts/{{chart_id}}`",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.legends.left": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.legends.legend_align": {
+      "description": " Possible values: [\"AUTO\", \"LEFT\", \"RIGHT\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.legends.legend_orient": {
+      "description": " Possible values: [\"VERTICAL\", \"HORIZONTAL\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.legends.padding": {
+      "description": "N/A",
+      "required": false,
+      "type": "list(number)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.legends.right": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.legends.show": {
+      "description": "Whether to show data label.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.legends.top": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.legends.z": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.legends.z_level": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.markdown": {
+      "type": "block",
+      "description": "Markdown config if tileType is TILE_TYPE_MARKDOWN.",
+      "required": false
+    },
+    "dashboard_chart.visualization.markdown.content": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.markdown.properties": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.visualization.markdown.properties.background_color": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "dashboard_chart.visualization.series.field": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.label": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.radius": {
+      "description": "N/A",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.series_name": {
+      "description": "User specified series label.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.series_stack_strategy": {
+      "description": " Possible values: [\"SAMESIGN\", \"ALL\", \"POSITIVE\", \"NEGATIVE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.series_type": {
+      "description": " Possible values: [\"LINE\", \"BAR\", \"PIE\", \"TEXT\", \"MAP\", \"GAUGE\", \"SCATTERPLOT\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.series_unique_value": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.show_background": {
+      "description": "N/A",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.show_symbol": {
+      "description": "N/A",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.stack": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.area_style": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.visualization.series.area_style.color": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.area_style.opacity": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.area_style.origin": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.area_style.shadow_blur": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.area_style.shadow_color": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.area_style.shadow_offset_x": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.area_style.shadow_offset_y": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.data_label": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.visualization.series.data_label.show": {
+      "description": "Whether to show data label.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.encode": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.visualization.series.encode.item_name": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.encode.value": {
+      "description": "A nested object resource. Structure is [documented below](#nested_dashboard_chart_visualization_series_item_colors_colors_value).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.encode.x": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.encode.y": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.gauge_config": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.visualization.series.gauge_config.base_value": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.visualization.series.gauge_config.base_value.color": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.gauge_config.base_value.value": {
+      "description": "A nested object resource. Structure is [documented below](#nested_dashboard_chart_visualization_series_item_colors_colors_value).",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.gauge_config.limit_value": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.visualization.series.gauge_config.limit_value.color": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.gauge_config.limit_value.value": {
+      "description": "A nested object resource. Structure is [documented below](#nested_dashboard_chart_visualization_series_item_colors_colors_value).",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.gauge_config.threshold_values": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "dashboard_chart.visualization.series.gauge_config.threshold_values.color": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.gauge_config.threshold_values.value": {
+      "description": "A nested object resource. Structure is [documented below](#nested_dashboard_chart_visualization_series_item_colors_colors_value).",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.item_colors": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.visualization.series.item_colors.colors": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "dashboard_chart.visualization.series.item_colors.colors.key": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.item_colors.colors.value": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.visualization.series.item_colors.colors.value.color": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.item_colors.colors.value.label": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.item_style": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.visualization.series.item_style.border_color": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.item_style.border_width": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.item_style.color": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.metric_trend_config": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.visualization.series.metric_trend_config.metric_display_trend": {
+      "description": " Possible values: [\"METRIC_DISPLAY_TREND_UNSPECIFIED\", \"METRIC_DISPLAY_TREND_ABSOLUTE_VALUE\", \"METRIC_DISPLAY_TREND_PERCENTAGE\", \"METRIC_DISPLAY_TREND_ABSOLUTE_VALUE_AND_PERCENTAGE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.metric_trend_config.metric_format": {
+      "description": " Possible values: [\"METRIC_FORMAT_UNSPECIFIED\", \"METRIC_FORMAT_NUMBER\", \"METRIC_FORMAT_PLAIN_TEXT\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.metric_trend_config.metric_trend_type": {
+      "description": " Possible values: [\"METRIC_TREND_TYPE_UNSPECIFIED\", \"METRIC_TREND_TYPE_REGULAR\", \"METRIC_TREND_TYPE_INVERSE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.series.metric_trend_config.show_metric_trend": {
+      "description": "N/A",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.table_config": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.visualization.table_config.enable_text_wrap": {
+      "description": "N/A",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.table_config.column_render_type_settings": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "dashboard_chart.visualization.table_config.column_render_type_settings.column_render_type": {
+      "description": " Possible values: [\"RENDER_TYPE_UNSPECIFIED\", \"RENDER_TYPE_TEXT\", \"RENDER_TYPE_ICON\", \"RENDER_TYPE_ICON_AND_TEXT\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.table_config.column_render_type_settings.field": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.table_config.column_tooltip_settings": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "dashboard_chart.visualization.table_config.column_tooltip_settings.cell_tooltip_text": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.table_config.column_tooltip_settings.field": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.table_config.column_tooltip_settings.header_tooltip_text": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.tooltip": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "dashboard_chart.visualization.tooltip.show": {
+      "description": "Whether to show data label.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.tooltip.tooltip_trigger": {
+      "description": " Possible values: [\"TOOLTIP_TRIGGER_UNSPECIFIED\", \"TOOLTIP_TRIGGER_NONE\", \"TOOLTIP_TRIGGER_ITEM\", \"TOOLTIP_TRIGGER_AXIS\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.visual_maps": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "dashboard_chart.visualization.visual_maps.visual_map_type": {
+      "description": " Possible values: [\"VISUAL_MAP_TYPE_UNSPECIFIED\", \"CONTINUOUS\", \"PIECEWISE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.visual_maps.pieces": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "dashboard_chart.visualization.visual_maps.pieces.color": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.visual_maps.pieces.label": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.visual_maps.pieces.max": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.visual_maps.pieces.min": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.x_axes": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "dashboard_chart.visualization.x_axes.axis_type": {
+      "description": " Possible values: [\"VALUE\", \"CATEGORY\", \"TIME\", \"LOG\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.x_axes.display_name": {
+      "description": "Display name/Title of the dashboardChart visible to users.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.x_axes.max": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.x_axes.min": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.y_axes": {
+      "type": "block",
+      "description": "",
+      "required": false
+    },
+    "dashboard_chart.visualization.y_axes.axis_type": {
+      "description": " Possible values: [\"VALUE\", \"CATEGORY\", \"TIME\", \"LOG\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.y_axes.display_name": {
+      "description": "Display name/Title of the dashboardChart visible to users.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.y_axes.max": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_chart.visualization.y_axes.min": {
+      "description": "N/A",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_query": {
+      "type": "block",
+      "description": "The complete specification of the query for this chart. This includes the raw query string, execution parameters (like time windows), and server-generated metadata.",
+      "required": false
+    },
+    "dashboard_query.query": {
+      "description": "The raw query string.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_query.input": {
+      "type": "block",
+      "description": "Input parameters for the query, such as time windows.",
+      "required": false
+    },
+    "dashboard_query.input.relative_time": {
+      "type": "block",
+      "description": "Relative time range.",
+      "required": false
+    },
+    "dashboard_query.input.relative_time.start_time_val": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_query.input.relative_time.time_unit": {
+      "description": "The time unit for the relative range. Possible values: [\"SECOND\", \"MINUTE\", \"HOUR\", \"DAY\", \"WEEK\", \"MONTH\", \"YEAR\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_query.input.time_window": {
+      "type": "block",
+      "description": "Specific start and end times.",
+      "required": false
+    },
+    "dashboard_query.input.time_window.end_time": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dashboard_query.input.time_window.start_time": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

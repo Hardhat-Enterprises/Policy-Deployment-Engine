@@ -1,0 +1,88 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "cluster": {
+      "description": "The canonical Cluster name to connect to. It is in the form of projects/{project}/locations/{location}/clusters/{cluster}.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier referencing the cluster the VPN connection attaches to. This is a reference to another resource and not something a generic platform policy should constrain."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "enable_high_availability": {
+      "description": "Whether this VPN connection has HA enabled on cluster side. If enabled, when creating VPN connection we will attempt to use 2 ANG floating IPs.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "Toggles a highly-available VPN connection. This is an availability/reliability choice for the team; it does not control access, exposure, or encryption and is not a security archetype."
+    },
+    "labels": {
+      "description": "Labels associated with this resource.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Labels are metadata for organisation and billing on the VPN connection; they do not affect access, exposure, or encryption."
+    },
+    "location": {
+      "description": "Google Cloud Platform location.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "name": {
+      "description": "The resource name of VPN connection",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "VPN connection name is an identifier and doesn't directly impact security."
+    },
+    "nat_gateway_ip": {
+      "description": "NAT gateway IP, or WAN IP address. If a customer has multiple NAT IPs, the customer needs to configure NAT such that only one external IP maps to the GMEC Anthos cluster.\nThis is empty if NAT is not used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Specifies the NAT gateway IP used by the VPN connection. The address is a team-specific networking value and cannot be generically constrained without hardcoding it."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Specifies the GCP project the VPN connection belongs to. This is an identifier/reference that does not independently control access or security settings."
+    },
+    "router": {
+      "description": "The VPN connection Cloud Router name.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier referencing the Cloud Router used by the VPN connection. It is a reference to another resource and not something a generic platform policy should constrain."
+    },
+    "vpc": {
+      "description": "The network ID of VPC to connect to.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier referencing the VPC network the VPN connects to. It is a reference to another resource; we don't constrain which network a team points at."
+    },
+    "vpc_project": {
+      "type": "block",
+      "description": "Project detail of the VPC network. Required if VPC is in a different project than the cluster project.",
+      "required": false
+    },
+    "vpc_project.project_id": {
+      "description": "The project of the VPC to connect to. If not specified, it is the same as the cluster project.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier referencing the VPC host project for the VPN connection. It is a reference to another resource and cannot be generically constrained without naming a specific project."
+    }
+  }
+}

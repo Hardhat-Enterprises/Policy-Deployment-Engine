@@ -1,0 +1,245 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "data_governance_type": {
+      "description": "If set to DATA_MASKING, the function is validated and made available as a masking function. For more information, see https://cloud.google.com/bigquery/docs/user-defined-functions#custom-mask Possible values: [\"DATA_MASKING\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Setting this to DATA_MASKING validates the routine as a data-masking function used to obscure sensitive column values. A policy can require it be set on routines intended for masking so sensitive data is consistently protected; this maps to the 'enable a security feature' archetype."
+    },
+    "dataset_id": {
+      "description": "The ID of the dataset containing this routine",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "definition_body": {
+      "description": "The body of the routine. For functions, this is the expression in the AS clause.\nIf language=SQL, it is the substring inside (but excluding) the parentheses.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "The description of the routine if defined.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "determinism_level": {
+      "description": "The determinism level of the JavaScript UDF if defined. Possible values: [\"DETERMINISM_LEVEL_UNSPECIFIED\", \"DETERMINISTIC\", \"NOT_DETERMINISTIC\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "imported_libraries": {
+      "description": "Optional. If language = \"JAVASCRIPT\", this field stores the path of the\nimported JAVASCRIPT libraries.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "language": {
+      "description": "The language of the routine. Possible values: [\"SQL\", \"JAVASCRIPT\", \"PYTHON\", \"JAVA\", \"SCALA\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "return_table_type": {
+      "description": "Optional. Can be set only if routineType = \"TABLE_VALUED_FUNCTION\".\n\nIf absent, the return table type is inferred from definitionBody at query time in each query\nthat references this routine. If present, then the columns in the evaluated table result will\nbe cast to match the column types specificed in return table type, at query time.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "return_type": {
+      "description": "A JSON schema for the return type. Optional if language = \"SQL\"; required otherwise.\nIf absent, the return type is inferred from definitionBody at query time in each query\nthat references this routine. If present, then the evaluated result will be cast to\nthe specified returned type at query time. ~>**NOTE**: Because this field expects a JSON\nstring, any changes to the string will create a diff, even if the JSON itself hasn't\nchanged. If the API returns a different value for the same schema, e.g. it switche\nd the order of values or replaced STRUCT field type with RECORD field type, we currently\ncannot suppress the recurring diff this causes. As a workaround, we recommend using\nthe schema as returned by the API.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routine_id": {
+      "description": "The ID of the the routine. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 256 characters.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routine_type": {
+      "description": "The type of routine. Possible values: [\"SCALAR_FUNCTION\", \"PROCEDURE\", \"TABLE_VALUED_FUNCTION\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "security_mode": {
+      "description": "Optional. The security mode of the routine, if defined. If not defined, the security mode is automatically determined from the routine's configuration. Possible values: [\"DEFINER\", \"INVOKER\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "security_mode defines the privilege level of the routine"
+    },
+    "arguments": {
+      "type": "block",
+      "description": "Input/output argument of a function or a stored procedure.",
+      "required": false
+    },
+    "arguments.argument_kind": {
+      "description": "Defaults to FIXED_TYPE. Default value: \"FIXED_TYPE\" Possible values: [\"FIXED_TYPE\", \"ANY_TYPE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "arguments.data_type": {
+      "description": "A JSON schema for the data type. Required unless argumentKind = ANY_TYPE.\n~>**NOTE**: Because this field expects a JSON string, any changes to the string\nwill create a diff, even if the JSON itself hasn't changed. If the API returns\na different value for the same schema, e.g. it switched the order of values\nor replaced STRUCT field type with RECORD field type, we currently cannot\nsuppress the recurring diff this causes. As a workaround, we recommend using\nthe schema as returned by the API.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "arguments.mode": {
+      "description": "Specifies whether the argument is input or output. Can be set for procedures only. Possible values: [\"IN\", \"OUT\", \"INOUT\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "arguments.name": {
+      "description": "The name of this argument. Can be absent for function return argument.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "remote_function_options": {
+      "type": "block",
+      "description": "Remote function specific options.",
+      "required": false
+    },
+    "remote_function_options.connection": {
+      "description": "Fully qualified name of the user-provided connection object which holds\nthe authentication information to send requests to the remote service.\nFormat: \"projects/{projectId}/locations/{locationId}/connections/{connectionId}\"",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Fully-qualified name of an external connection resource that holds the auth info for the remote function. It is a reference to another resource (projects/.../connections/...); a platform policy should not constrain which connection a team points at, and enforcing a specific one would require hardcoding a name we cannot know."
+    },
+    "remote_function_options.endpoint": {
+      "description": "Endpoint of the user-provided remote service, e.g.\n'https://us-east1-my_gcf_project.cloudfunctions.net/remote_add'",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The URL of the user-provided remote service the routine calls. It points at an external service the team operates; a generic policy cannot constrain which endpoint is valid without hardcoding a specific host, so it is out of scope."
+    },
+    "remote_function_options.max_batching_rows": {
+      "description": "Max number of rows in each batch sent to the remote service. If absent or if 0,\nBigQuery dynamically decides the number of rows in a batch.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "remote_function_options.user_defined_context": {
+      "description": "User-defined context as a set of key/value pairs, which will be sent as function\ninvocation context together with batched arguments in the requests to the remote\nservice. The total number of bytes of keys and values must be less than 8KB.\n\nAn object containing a list of \"key\": value pairs. Example:\n'{ \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }'.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spark_options": {
+      "type": "block",
+      "description": "Optional. If language is one of \"PYTHON\", \"JAVA\", \"SCALA\", this field stores the options for spark stored procedure.",
+      "required": false
+    },
+    "spark_options.archive_uris": {
+      "description": "Archive files to be extracted into the working directory of each executor. For more information about Apache Spark, see Apache Spark.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spark_options.connection": {
+      "description": "Fully qualified name of the user-provided Spark connection object.\nFormat: \"projects/{projectId}/locations/{locationId}/connections/{connectionId}\"",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spark_options.container_image": {
+      "description": "Custom container image for the runtime environment.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spark_options.file_uris": {
+      "description": "Files to be placed in the working directory of each executor. For more information about Apache Spark, see Apache Spark.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spark_options.jar_uris": {
+      "description": "JARs to include on the driver and executor CLASSPATH. For more information about Apache Spark, see Apache Spark.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spark_options.main_class": {
+      "description": "The fully qualified name of a class in jarUris, for example, com.example.wordcount.\nExactly one of mainClass and main_jar_uri field should be set for Java/Scala language type.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spark_options.main_file_uri": {
+      "description": "The main file/jar URI of the Spark application.\nExactly one of the definitionBody field and the mainFileUri field must be set for Python.\nExactly one of mainClass and mainFileUri field should be set for Java/Scala language type.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spark_options.properties": {
+      "description": "Configuration properties as a set of key/value pairs, which will be passed on to the Spark application.\nFor more information, see Apache Spark and the procedure option list.\nAn object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spark_options.py_file_uris": {
+      "description": "Python files to be placed on the PYTHONPATH for PySpark application. Supported file types: .py, .egg, and .zip. For more information about Apache Spark, see Apache Spark.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "spark_options.runtime_version": {
+      "description": "Runtime version. If not specified, the default runtime version is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

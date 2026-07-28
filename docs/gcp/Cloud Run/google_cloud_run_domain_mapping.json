@@ -1,0 +1,86 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The location of the cloud run instance. eg us-central1",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "name": {
+      "description": "Name should be a [verified](https://support.google.com/webmasters/answer/9008080) domain",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The domain name to map to the service. This is an identifier/naming choice; a platform policy cannot know which domains a team legitimately owns, so enforcing specific domains would be overreaching."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier of the GCP project the resource is created in. We do not constrain which project a team deploys into; a platform policy cannot know the approved project for an arbitrary team without hardcoding it."
+    },
+    "metadata": {
+      "type": "block",
+      "description": "Metadata associated with this DomainMapping.",
+      "required": false
+    },
+    "metadata.annotations": {
+      "description": "Annotations is a key value map stored with a resource that\nmay be set by external tools to store and retrieve arbitrary metadata.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations\n\n**Note**: The Cloud Run API may add additional annotations that were not provided in your config.\nIf terraform plan shows a diff where a server-side annotation is added, you can add it to your config\nor apply the lifecycle.ignore_changes rule to the metadata.0.annotations field.\n\n**Note**: This field is non-authoritative, and will only manage the annotations present in your configuration.\nPlease refer to the field 'effective_annotations' for all of the annotations present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Free-form metadata key/value annotations on the domain mapping. They are descriptive metadata that do not control access, networking, or encryption, and a generic policy cannot meaningfully constrain arbitrary annotation content."
+    },
+    "metadata.labels": {
+      "description": "Map of string keys and values that can be used to organize and categorize\n(scope and select) objects. May match selectors of replication controllers\nand routes.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Free-form key/value labels for organization and cost tracking. Labels are descriptive metadata with no effect on the resource's security posture."
+    },
+    "metadata.namespace": {
+      "description": "In Cloud Run the namespace must be equal to either the\nproject ID or project number.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "For Cloud Run the namespace is the project ID/number the resource belongs to. It is an identifier; we do not constrain which project a team deploys into via a generic policy, and the rationale does not name a security risk."
+    },
+    "spec": {
+      "type": "block",
+      "description": "The spec for this DomainMapping.",
+      "required": true
+    },
+    "spec.certificate_mode": {
+      "description": "The mode of the certificate. Default value: \"AUTOMATIC\" Possible values: [\"NONE\", \"AUTOMATIC\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Using AUTOMATIC helps ensure certificates are managed properly. Using NONE can leave the mapped domain without proper certificate handling."
+    },
+    "spec.force_override": {
+      "description": "If set, the mapping will override any mapping set before this spec was set.\nIt is recommended that the user leaves this empty to receive an error\nwarning about a potential conflict and only set it once the respective UI\nhas given such a warning.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "Controls whether Terraform forcibly takes over an existing domain mapping. This is an operational/provisioning convenience that risks disruption but does not weaken the resource's security posture (access, networking, encryption), so it is not a security policy target."
+    },
+    "spec.route_name": {
+      "description": "The name of the Cloud Run Service that this DomainMapping applies to.\nThe route must exist.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier referencing the Cloud Run service the domain mapping points to. Pointing at another resource is the team's business; we do not constrain references to other resources."
+    }
+  }
+}

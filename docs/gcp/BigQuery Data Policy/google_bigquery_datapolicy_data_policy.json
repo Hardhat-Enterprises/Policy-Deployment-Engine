@@ -1,0 +1,67 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "data_policy_id": {
+      "description": "User-assigned (human readable) ID of the data policy that needs to be unique within a project. Used as {dataPolicyId} in part of the resource name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": "Display policy id has no impact on the security of the resource."
+    },
+    "data_policy_type": {
+      "description": "The enrollment level of the service. Possible values: [\"COLUMN_LEVEL_SECURITY_POLICY\", \"DATA_MASKING_POLICY\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": "Ensure data policy type is setting to COLUMN_LEVEL_SECURITY_POLICY because it consists of role-based security."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The name of the location of the data policy.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "policy_tag": {
+      "description": "Policy tag resource name, in the format of projects/{project_number}/locations/{locationId}/taxonomies/{taxonomyId}/policyTags/{policyTag_id}.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": "Display policy id has no impact on the security of the resource."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": "Display policy id has no impact on the security of the resource."
+    },
+    "data_masking_policy": {
+      "type": "block",
+      "description": "The data masking policy that specifies the data masking rule to use.",
+      "required": false
+    },
+    "data_masking_policy.predefined_expression": {
+      "description": "The available masking rules. Learn more here: https://cloud.google.com/bigquery/docs/column-data-masking-intro#masking_options. Possible values: [\"SHA256\", \"ALWAYS_NULL\", \"DEFAULT_MASKING_VALUE\", \"LAST_FOUR_CHARACTERS\", \"FIRST_FOUR_CHARACTERS\", \"EMAIL_MASK\", \"DATE_YEAR_MASK\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": "Ensure predefined expression is setting to SHA256 because it will be "
+    },
+    "data_masking_policy.routine": {
+      "description": "The name of the BigQuery routine that contains the custom masking routine, in the format of projects/{projectNumber}/datasets/{dataset_id}/routines/{routine_id}.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

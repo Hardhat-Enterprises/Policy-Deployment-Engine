@@ -1,0 +1,179 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "An optional description of the security profile. The Max length is 512 characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "A map of key/value label pairs to assign to the resource.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The location of the security profile.\nThe default value is 'global'.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "name": {
+      "description": "The name of the security profile resource.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "parent": {
+      "description": "The name of the parent this security profile belongs to.\nFormat: 'organizations/{organization_id}' or 'projects/{project_id}'.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "type": {
+      "description": "The type of security profile. Possible values: [\"THREAT_PREVENTION\", \"URL_FILTERING\", \"CUSTOM_MIRRORING\", \"CUSTOM_INTERCEPT\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "custom_intercept_profile": {
+      "type": "block",
+      "description": "The configuration for defining the Intercept Endpoint Group used to\nintercept traffic to third-party firewall appliances.",
+      "required": false
+    },
+    "custom_intercept_profile.intercept_endpoint_group": {
+      "description": "The Intercept Endpoint Group to which matching traffic should be intercepted.\nFormat: projects/{project_id}/locations/global/interceptEndpointGroups/{endpoint_group_id}",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "custom_mirroring_profile": {
+      "type": "block",
+      "description": "The configuration for defining the Mirroring Endpoint Group used to\nmirror traffic to third-party collectors.",
+      "required": false
+    },
+    "custom_mirroring_profile.mirroring_deployment_groups": {
+      "description": "The target downstream Mirroring Deployment Groups.\nThis field is used for Packet Broker mirroring endpoint groups to specify\nthe deployment groups that the packet should be mirrored to by the broker.\nFormat: projects/{project_id}/locations/global/mirroringDeploymentGroups/{deployment_group_id}",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "custom_mirroring_profile.mirroring_endpoint_group": {
+      "description": "The target Mirroring Endpoint Group.\nWhen a mirroring rule with this security profile attached matches a packet,\na replica will be mirrored to the location-local target in this group.\nFormat: projects/{project_id}/locations/global/mirroringEndpointGroups/{endpoint_group_id}",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "threat_prevention_profile": {
+      "type": "block",
+      "description": "The threat prevention configuration for the security profile.",
+      "required": false
+    },
+    "threat_prevention_profile.antivirus_overrides": {
+      "type": "block",
+      "description": "Defines what action to take for antivirus threats per protocol.",
+      "required": false
+    },
+    "threat_prevention_profile.antivirus_overrides.action": {
+      "description": "Threat action override. For some threat types, only a subset of actions applies. Possible values: [\"ALERT\", \"ALLOW\", \"DEFAULT_ACTION\", \"DENY\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "threat_prevention_profile.antivirus_overrides.protocol": {
+      "description": "Required protocol to match. Possible values: [\"SMTP\", \"SMB\", \"POP3\", \"IMAP\", \"HTTP2\", \"HTTP\", \"FTP\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "threat_prevention_profile.severity_overrides": {
+      "type": "block",
+      "description": "The configuration for overriding threats actions by severity match.",
+      "required": false
+    },
+    "threat_prevention_profile.severity_overrides.action": {
+      "description": "Threat action override. Possible values: [\"ALERT\", \"ALLOW\", \"DEFAULT_ACTION\", \"DENY\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "threat_prevention_profile.severity_overrides.severity": {
+      "description": "Severity level to match. Possible values: [\"CRITICAL\", \"HIGH\", \"INFORMATIONAL\", \"LOW\", \"MEDIUM\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "threat_prevention_profile.threat_overrides": {
+      "type": "block",
+      "description": "The configuration for overriding threats actions by threat id match.\nIf a threat is matched both by configuration provided in severity overrides\nand threat overrides, the threat overrides action is applied.",
+      "required": false
+    },
+    "threat_prevention_profile.threat_overrides.action": {
+      "description": "Threat action. Possible values: [\"ALERT\", \"ALLOW\", \"DEFAULT_ACTION\", \"DENY\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "threat_prevention_profile.threat_overrides.threat_id": {
+      "description": "Vendor-specific ID of a threat to override.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "url_filtering_profile": {
+      "type": "block",
+      "description": "The url filtering configuration for the security profile.",
+      "required": false
+    },
+    "url_filtering_profile.url_filters": {
+      "type": "block",
+      "description": "The configuration for action to take based on domain name match.\nA domain name would be checked for matching filters through the list in order of highest to lowest priority,\nand the first filter that a domain name matches with is the one whose actions gets applied.",
+      "required": false
+    },
+    "url_filtering_profile.url_filters.filtering_action": {
+      "description": "The action to take when the filter is applied. Possible values: [\"ALLOW\", \"DENY\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "url_filtering_profile.url_filters.priority": {
+      "description": "The priority of the filter within the URL filtering profile.\nMust be an integer from 0 and 2147483647, inclusive. Lower integers indicate higher priorities.\nThe priority of a filter must be unique within a URL filtering profile.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "url_filtering_profile.url_filters.urls": {
+      "description": "A list of domain matcher strings that a domain name gets compared with to determine if the filter is applicable.\nA domain name must match with at least one of the strings in the list for a filter to be applicable.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}
