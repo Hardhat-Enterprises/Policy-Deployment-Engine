@@ -13,8 +13,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Controls whether Terraform is permitted to destroy this rule via IaC (DELETE/ABANDON/PREVENT). This is an infrastructure change-management control over the deployment tooling, not a property of the rule's live security configuration, so a platform-level security policy is not the right lever here."
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can destroy this rule via IaC (DELETE/ABANDON/PREVENT). This maps directly to the prevent-destructive-loss archetype (the same mechanism as force_destroy): PREVENT blocks hard-destroy of the resource, and a policy should enforce that value."
     },
     "description": {
       "description": "An optional description for this resource.",
