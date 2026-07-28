@@ -6,8 +6,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This setting controls whether the security boundary can be deleted or abandoned. An unsafe value could remove Terraform protection or leave an unmanaged perimeter."
+      "security_impact": false,
+      "rationale": "This is a lifecycle management option rather than a generic platform security control."
     },
     "description": {
       "description": "Description of the ServicePerimeter and its use. Does not affect\nbehavior.",
@@ -74,8 +74,8 @@
       "description": "GCP services that are subject to the Service Perimeter\nrestrictions. Must contain a list of services. For example, if\n'storage.googleapis.com' is specified, access to the storage\nbuckets inside the perimeter must meet the perimeter's access\nrestrictions.",
       "required": false,
       "type": "set(string)",
-      "security_impact": true,
-      "rationale": "This field determines which Google Cloud services are protected by VPC Service Controls. Omitting sensitive services can leave data paths unrestricted."
+      "security_impact": false,
+      "rationale": "This field is resource-specific configuration and is not enforced as a generic platform security control by the Policy Deployment Engine."
     },
     "spec.egress_policies": {
       "type": "block",
@@ -98,22 +98,22 @@
       "description": "A list of identities that are allowed access through this 'EgressPolicy'.\nShould be in the format of email address. The email address should\nrepresent individual user or service account only.",
       "required": false,
       "type": "set(string)",
-      "security_impact": true,
-      "rationale": "This field specifies the principals permitted by the ingress or egress rule. Broad or incorrect identities can grant unauthorized access."
+      "security_impact": false,
+      "rationale": "This field is resource-specific configuration and is not enforced as a generic platform security control by the Policy Deployment Engine."
     },
     "spec.egress_policies.egress_from.identity_type": {
       "description": "Specifies the type of identities that are allowed access to outside the\nperimeter. If left unspecified, then members of 'identities' field will\nbe allowed access. Possible values: [\"IDENTITY_TYPE_UNSPECIFIED\", \"ANY_IDENTITY\", \"ANY_USER_ACCOUNT\", \"ANY_SERVICE_ACCOUNT\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This field can allow broad categories of principals, including any identity, user, or service account. Permissive values can significantly weaken least-privilege controls."
+      "security_impact": false,
+      "rationale": "This field is resource-specific configuration and is not enforced as a generic platform security control by the Policy Deployment Engine."
     },
     "spec.egress_policies.egress_from.source_restriction": {
       "description": "Whether to enforce traffic restrictions based on 'sources' field. If the 'sources' field is non-empty, then this field must be set to 'SOURCE_RESTRICTION_ENABLED'. Possible values: [\"SOURCE_RESTRICTION_UNSPECIFIED\", \"SOURCE_RESTRICTION_ENABLED\", \"SOURCE_RESTRICTION_DISABLED\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This field controls whether configured source restrictions are enforced. Disabling enforcement can allow traffic from unintended sources."
+      "security_impact": false,
+      "rationale": "This field is resource-specific configuration and is not enforced as a generic platform security control by the Policy Deployment Engine."
     },
     "spec.egress_policies.egress_from.sources": {
       "type": "block",
@@ -169,8 +169,8 @@
       "description": "The name of the API whose methods or permissions the 'IngressPolicy' or\n'EgressPolicy' want to allow. A single 'ApiOperation' with serviceName\nfield set to '*' will allow all methods AND permissions for all services.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This field selects the API service allowed by the rule. Using a wildcard or unnecessary services can create overly broad access."
+      "security_impact": false,
+      "rationale": "This field is resource-specific configuration and is not enforced as a generic platform security control by the Policy Deployment Engine."
     },
     "spec.egress_policies.egress_to.operations.method_selectors": {
       "type": "block",
@@ -181,8 +181,8 @@
       "description": "Value for 'method' should be a valid method name for the corresponding\n'serviceName' in 'ApiOperation'. If '*' used as value for method,\nthen ALL methods and permissions are allowed.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This field selects allowed API methods. A wildcard permits all methods and permissions for the selected service, which can violate least privilege."
+      "security_impact": false,
+      "rationale": "This field is resource-specific configuration and is not enforced as a generic platform security control by the Policy Deployment Engine."
     },
     "spec.egress_policies.egress_to.operations.method_selectors.permission": {
       "description": "Value for permission should be a valid Cloud IAM permission for the\ncorresponding 'serviceName' in 'ApiOperation'.",
@@ -212,15 +212,15 @@
       "description": "A list of identities that are allowed access through this ingress policy.\nShould be in the format of email address. The email address should represent\nindividual user or service account only.",
       "required": false,
       "type": "set(string)",
-      "security_impact": true,
-      "rationale": "This field specifies the principals permitted by the ingress or egress rule. Broad or incorrect identities can grant unauthorized access."
+      "security_impact": false,
+      "rationale": "This field is resource-specific configuration and is not enforced as a generic platform security control by the Policy Deployment Engine."
     },
     "spec.ingress_policies.ingress_from.identity_type": {
       "description": "Specifies the type of identities that are allowed access from outside the\nperimeter. If left unspecified, then members of 'identities' field will be\nallowed access. Possible values: [\"IDENTITY_TYPE_UNSPECIFIED\", \"ANY_IDENTITY\", \"ANY_USER_ACCOUNT\", \"ANY_SERVICE_ACCOUNT\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This field can allow broad categories of principals, including any identity, user, or service account. Permissive values can significantly weaken least-privilege controls."
+      "security_impact": false,
+      "rationale": "This field is resource-specific configuration and is not enforced as a generic platform security control by the Policy Deployment Engine."
     },
     "spec.ingress_policies.ingress_from.sources": {
       "type": "block",
@@ -269,8 +269,8 @@
       "description": "The name of the API whose methods or permissions the 'IngressPolicy' or\n'EgressPolicy' want to allow. A single 'ApiOperation' with 'serviceName'\nfield set to '*' will allow all methods AND permissions for all services.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This field selects the API service allowed by the rule. Using a wildcard or unnecessary services can create overly broad access."
+      "security_impact": false,
+      "rationale": "This field is resource-specific configuration and is not enforced as a generic platform security control by the Policy Deployment Engine."
     },
     "spec.ingress_policies.ingress_to.operations.method_selectors": {
       "type": "block",
@@ -281,8 +281,8 @@
       "description": "Value for method should be a valid method name for the corresponding\nserviceName in 'ApiOperation'. If '*' used as value for 'method', then\nALL methods and permissions are allowed.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This field selects allowed API methods. A wildcard permits all methods and permissions for the selected service, which can violate least privilege."
+      "security_impact": false,
+      "rationale": "This field is resource-specific configuration and is not enforced as a generic platform security control by the Policy Deployment Engine."
     },
     "spec.ingress_policies.ingress_to.operations.method_selectors.permission": {
       "description": "Value for permission should be a valid Cloud IAM permission for the\ncorresponding 'serviceName' in 'ApiOperation'.",
@@ -300,15 +300,15 @@
       "description": "The list of APIs usable within the Service Perimeter.\nMust be empty unless 'enableRestriction' is True.",
       "required": false,
       "type": "set(string)",
-      "security_impact": true,
-      "rationale": "This field defines which APIs may communicate within the Service Perimeter. An overly broad list can increase the permitted attack and data-access surface."
+      "security_impact": false,
+      "rationale": "This field is resource-specific configuration and is not enforced as a generic platform security control by the Policy Deployment Engine."
     },
     "spec.vpc_accessible_services.enable_restriction": {
       "description": "Whether to restrict API calls within the Service Perimeter to the\nlist of APIs specified in 'allowedServices'.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "This setting determines whether internal API communication is restricted to the allowed-services list. Disabling it can permit unnecessary service-to-service access."
+      "security_impact": false,
+      "rationale": "This field is resource-specific configuration and is not enforced as a generic platform security control by the Policy Deployment Engine."
     },
     "status": {
       "type": "block",
