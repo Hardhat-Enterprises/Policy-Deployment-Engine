@@ -67,8 +67,8 @@
       "description": "The minimum number of replicas that the autoscaler can scale down\nto. This cannot be less than 0. If not provided, autoscaler will\nchoose a default value depending on maximum number of instances\nallowed.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "If min_replicas is set to 0, the autoscaler can scale down to zero running servers, causing a denial-of-service outcome (an availability failure under the CIA triad) even without any attacker involved. policy should require min_replicas to be atleast 1."
     },
     "autoscaling_policy.mode": {
       "description": "Defines operating mode for this policy.",
