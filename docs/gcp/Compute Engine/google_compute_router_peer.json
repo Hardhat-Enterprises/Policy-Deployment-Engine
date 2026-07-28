@@ -34,8 +34,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls whether Terraform is allowed to destroy the BGP peer. If the peer is deleted by accident, VPN/Interconnect routing goes down. A policy should require 'PREVENT' to block accidental destroys."
+      "security_impact": false,
+      "rationale": "backup/retention/deletion protection flags (like force_destroy or deletion_policy) are false unless preventing destructive data loss or state retention; operational routing availability is not a security control."
     },
     "enable": {
       "description": "The status of the BGP peer connection. If set to false, any active session\nwith the peer is terminated and all associated routing information is removed.\nIf set to true, the peer connection can be established with routing information.\nThe default is true.",
@@ -146,8 +146,8 @@
       "description": "Region where the router and BgpPeer reside.\nIf it is not provided, the provider region is used.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "BGP peers are regional sub-resources of a Cloud Router and do not hold customer data or storage buckets; data residency policies do not apply here."
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
     },
     "router": {
       "description": "The name of the Cloud Router in which this BgpPeer will be configured.",
