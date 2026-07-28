@@ -7,21 +7,21 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Backup subnet selection affects network isolation and determines where backup traffic flows."
+      "rationale": "Choosing the wrong backup subnet could route sensitive backup traffic through insecure or shared networks. Policies should enforce use of private, approved subnets to maintain isolation."
     },
     "backup_subnet_cidr": {
       "description": "CIDR range of the backup subnet.",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "CIDR ranges must be restricted to private, non-public IP space to prevent exposure of backup traffic."
+      "rationale": "The CIDR range defines where backup traffic flows. If set to public ranges, backups could be exposed externally. Restricting to private CIDRs prevents leakage of sensitive data."
     },
     "cidr": {
       "description": "Network settings. CIDR to use for cluster IP allocation.",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Cluster IP allocation must use private ranges to avoid public exposure of database nodes."
+      "rationale": "This controls IP allocation for the cluster. Using 0.0.0.0/0 or other public ranges exposes database nodes to the internet. Policies should enforce private ranges only."
     },
     "cloud_vm_cluster_id": {
       "description": "The ID of the VM Cluster to create. This value is restricted\nto (^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$) and must be a maximum of 63\ncharacters in length. The value must start with a letter and end with\na letter or a number.",
@@ -35,14 +35,14 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Deletion policies protect critical infrastructure from accidental removal."
+      "rationale": "Without a deletion policy, Terraform could accidentally destroy critical clusters. Enforcing “PREVENT” or “ABANDON” avoids accidental removal of production resources."
     },
     "deletion_protection": {
       "description": "Whether Terraform will be prevented from destroying the cluster. Deleting this cluster via terraform destroy or terraform apply will only succeed if this field is false in the Terraform state.",
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Deletion protection prevents accidental destruction of production database clusters."
+      "rationale": "Prevents accidental or malicious deletion of the cluster. Essential for production workloads to avoid catastrophic data loss."
     },
     "display_name": {
       "description": "User friendly name for this resource.",
@@ -70,28 +70,28 @@
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+      "rationale": "Determines the region/zone where the cluster is deployed. Wrong regions may violate compliance or data residency requirements. Policies should enforce an approved region whitelist."
     },
     "network": {
       "description": "The name of the VPC network.\nFormat: projects/{project}/global/networks/{network}",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Network selection determines isolation boundaries and must reference private VPCs."
+      "rationale": "The VPC network defines isolation boundaries. Deploying into the wrong network could expose the cluster to untrusted traffic. Policies should enforce private, approved VPCs."
     },
     "odb_network": {
       "description": "The name of the OdbNetwork associated with the VM Cluster.\nFormat:\nprojects/{project}/locations/{location}/odbNetworks/{odb_network}\nIt is optional but if specified, this should match the parent ODBNetwork of\nthe odb_subnet and backup_odb_subnet.",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "ODB network selection affects routing and isolation of database traffic."
+      "rationale": "ODB network selection affects routing of database traffic. Using an insecure or misconfigured network could expose sensitive data. Policies should enforce correct parent ODB networks."
     },
     "odb_subnet": {
       "description": "The name of the OdbSubnet associated with the VM Cluster for\nIP allocation. Format:\nprojects/{project}/locations/{location}/odbNetworks/{odb_network}/odbSubnets/{odb_subnet}",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Subnet selection determines IP allocation and must remain private."
+      "rationale": "Subnet choice determines IP allocation. If misconfigured, nodes could be placed in public or shared subnets. Policies should enforce private subnets only."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
@@ -145,7 +145,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Disk redundancy affects resilience and fault tolerance of stored data."
+      "rationale": "Disk redundancy directly impacts resilience. Low redundancy increases risk of data loss if disks fail. Policies should enforce HIGH or NORMAL redundancy."
     },
     "properties.gi_version": {
       "description": "Grid Infrastructure Version.",
@@ -173,7 +173,7 @@
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Local backups must be controlled to avoid storing sensitive data in insecure locations."
+      "rationale": "Local backups protect against accidental deletion or corruption. If disabled, recovery options are limited. Policies should enforce backups in secure storage locations."
     },
     "properties.memory_size_gb": {
       "description": "Memory allocated in GBs.",
@@ -200,15 +200,15 @@
       "description": "Use exadata sparse snapshots.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Sparse disk groups affect snapshot behaviour and data recovery paths."
+      "security_impact": false,
+      "rationale": "Sparse disk groups are a storage optimisation feature. They don’t weaken or strengthen security."
     },
     "properties.ssh_public_keys": {
       "description": "SSH public keys to be stored with cluster.",
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "SSH keys directly control administrative access to the cluster."
+      "rationale": "SSH keys control administrator access. Weak or unauthorised keys can lead to compromise. Policies should enforce valid, unique keys and disallow insecure values."
     },
     "properties.diagnostics_data_collection_options": {
       "type": "block",
@@ -220,21 +220,21 @@
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Diagnostic event collection may expose operational metadata and must be explicitly controlled."
+      "rationale": "Diagnostic events may capture sensitive metadata. If exposed, attackers could gain insights into system behaviour. Policies should restrict unnecessary collection or enforce secure handling."
     },
     "properties.diagnostics_data_collection_options.health_monitoring_enabled": {
       "description": "Indicates whether health monitoring is enabled for the VM cluster",
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Health monitoring can expose sensitive system metrics and should be enabled only in approved configurations."
+      "rationale": "Health monitoring exposes system metrics. While useful, it can reveal sensitive performance data. Policies should ensure monitoring is enabled only in approved environments."
     },
     "properties.diagnostics_data_collection_options.incident_logs_enabled": {
       "description": "Indicates whether incident logs and trace collection are enabled for the VM\ncluster",
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Incident logs may contain sensitive operational or security information and must be tightly controlled."
+      "rationale": "Incident logs may contain sensitive traces and error details. If exposed, attackers could gain insights into vulnerabilities. Policies should enforce secure storage and limit exposure."
     },
     "properties.time_zone": {
       "type": "block",
