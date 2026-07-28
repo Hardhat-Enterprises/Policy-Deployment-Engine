@@ -1,0 +1,19 @@
+resource "google_dialogflow_cx_tool" "compliant_example_1" {
+  parent       = "projects/compliant-project/locations/global/agents/compliant-agent"
+  display_name = "compliant-tool"
+  description  = "Tool using Secret Manager for its OAuth client secret."
+
+  open_api_spec {
+    text_schema = <<-EOT
+      {"openapi":"3.0.0","info":{"title":"Example","version":"1.0.0"},"paths":{}}
+    EOT
+    authentication {
+      oauth_config {
+        client_id                        = "example-client-id"
+        oauth_grant_type                 = "CLIENT_CREDENTIAL"
+        secret_version_for_client_secret = "projects/compliant-project/secrets/client-secret/versions/1"
+        token_endpoint                   = "https://oauth.example.com/token"
+      }
+    }
+  }
+}
