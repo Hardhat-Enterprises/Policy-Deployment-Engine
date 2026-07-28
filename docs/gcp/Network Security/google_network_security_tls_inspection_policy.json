@@ -6,36 +6,36 @@
       "description": "A CA pool resource used to issue interception certificates.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to another resource (the CA pool used to issue interception certificates). We secure the referenced resource itself, not the pointer to it."
     },
     "custom_tls_features": {
       "description": "List of custom TLS cipher suites selected. This field is valid only if the selected tls_feature_profile is CUSTOM. The compute.SslPoliciesService.ListAvailableFeatures method returns the set of features that can be specified in this list. Note that Secure Web Proxy does not yet honor this field.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Matches the secure-protocol-minimums archetype: when a custom cipher list is used, a generic policy can require it only contain vetted, strong cipher suites and exclude known weak/deprecated ones. This is a structural whitelist shape, not team-specific data."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Matches the prevent-destructive-loss archetype: a generic platform policy can require this be set to 'PREVENT' so a security-enforcing TLS inspection policy cannot be accidentally destroyed via terraform apply/destroy."
     },
     "description": {
       "description": "Free-text description of the resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Cosmetic free-text field with no bearing on enforcement."
     },
     "exclude_public_ca_set": {
       "description": "If FALSE (the default), use our default set of public CAs in addition to any CAs specified in trustConfig. These public CAs are currently based on the Mozilla Root Program and are subject to change over time. If TRUE, do not accept our default set of public CAs. Only CAs specified in trustConfig will be accepted.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether TLS interception trusts the broad, externally-maintained public CA set by default, or only explicit CAs configured in trust_config. Requiring this be true favours explicit, reviewable trust anchors over an externally-controlled default set, reducing reliance on trust decisions outside the organisation's control."
     },
     "location": {
       "description": "The location of the tls inspection policy.",
@@ -48,36 +48,36 @@
       "description": "Minimum TLS version that the firewall should use when negotiating connections with both clients and servers. If this is not set, then the default value is to allow the broadest set of clients and servers (TLS 1.0 or higher). Setting this to more restrictive values may improve security, but may also prevent the firewall from connecting to some clients or servers. Note that Secure Web Proxy does not yet honor this field. Default value: \"TLS_VERSION_UNSPECIFIED\" Possible values: [\"TLS_VERSION_UNSPECIFIED\", \"TLS_1_0\", \"TLS_1_1\", \"TLS_1_2\", \"TLS_1_3\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Directly matches the guidance's enforce-secure-protocol-minimums archetype. A generic policy can require this be TLS_1_2 or higher, excluding the unset default and the deprecated TLS_1_0/TLS_1_1 values."
     },
     "name": {
       "description": "Short name of the TlsInspectionPolicy resource to be created.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier only; naming has no security bearing."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies which project owns the resource. A generic platform policy cannot constrain this without hardcoding a specific project ID, which is team-specific and out of scope."
     },
     "tls_feature_profile": {
       "description": "The selected Profile. If this is not set, then the default value is to allow the broadest set of clients and servers (\\\"PROFILE_COMPATIBLE\\\"). Setting this to more restrictive values may improve security, but may also prevent the TLS inspection proxy from connecting to some clients or servers. Note that Secure Web Proxy does not yet honor this field. Default value: \"PROFILE_UNSPECIFIED\" Possible values: [\"PROFILE_UNSPECIFIED\", \"PROFILE_COMPATIBLE\", \"PROFILE_MODERN\", \"PROFILE_RESTRICTED\", \"PROFILE_CUSTOM\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Matches the secure-protocol-minimums archetype: a generic policy can require PROFILE_MODERN or PROFILE_RESTRICTED, excluding the legacy PROFILE_COMPATIBLE which permits older, weaker cipher suites for broader client compatibility."
     },
     "trust_config": {
       "description": "A TrustConfig resource used when making a connection to the TLS server. This is a relative resource path following the form \\\"projects/{project}/locations/{location}/trustConfigs/{trust_config}\\\". This is necessary to intercept TLS connections to servers with certificates signed by a private CA or self-signed certificates. Trust config and the TLS inspection policy must be in the same region. Note that Secure Web Proxy does not yet honor this field.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to another resource (the trust config used for outbound TLS connections). We secure the referenced resource itself, not the pointer to it."
     }
   }
 }
