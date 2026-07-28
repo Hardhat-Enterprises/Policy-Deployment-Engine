@@ -34,8 +34,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "backup/retention/deletion protection flags (like force_destroy or deletion_policy) are false unless preventing destructive data loss or state retention; operational routing availability is not a security control."
+      "security_impact": true,
+      "rationale": "A policy should require this to be set to PREVENT or ABANDON so that a team cannot accidentally destroy a BGP peer and lose connectivity."
     },
     "enable": {
       "description": "The status of the BGP peer connection. If set to false, any active session\nwith the peer is terminated and all associated routing information is removed.\nIf set to true, the peer connection can be established with routing information.\nThe default is true.",
