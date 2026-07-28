@@ -6,43 +6,43 @@
       "description": "How often (in seconds) to send a health check. The default value is 5\nseconds.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Probe frequency tuning; affects availability detection sensitivity, not security posture."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "ABANDON removes the resource from Terraform management while leaving it live, creating unmanaged drift outside IaC governance; DELETE allows silent destruction of a load-balancing control. Policy should blacklist ABANDON."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "description": {
       "description": "An optional description of this resource. Provide this property when\nyou create the resource.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Free-text metadata with no effect on behaviour or exposure."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "healthy_threshold": {
       "description": "A so-far unhealthy instance will be marked healthy after this many\nconsecutive successes. The default value is 2.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Probe success-count tuning; affects availability detection sensitivity, not security posture."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "name": {
       "description": "Name of the resource. Provided by the client when the resource is\ncreated. The name must be 1-63 characters long, and comply with\nRFC1035.  Specifically, the name must be 1-63 characters long and\nmatch the regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means\nthe first character must be a lowercase letter, and all following\ncharacters must be a dash, lowercase letter, or digit, except the\nlast character, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Resource identifier; format is API-enforced (RFC1035) and naming carries no security control."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Deployment-target reference; access to the project is governed by IAM, not by this argument."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "region": {
       "description": "The Region in which the created health check should reside.\nIf it is not provided, the provider region is used.",
@@ -55,15 +55,15 @@
       "description": "How long (in seconds) to wait before claiming failure.\nThe default value is 5 seconds.  It is invalid for timeoutSec to have\ngreater value than checkIntervalSec.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Probe timeout tuning; affects availability detection sensitivity, not security posture."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "unhealthy_threshold": {
       "description": "A so-far healthy instance will be marked unhealthy after this many\nconsecutive failures. The default value is 2.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Probe failure-count tuning; affects availability detection sensitivity, not security posture."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "grpc_health_check": {
       "type": "block",
@@ -74,29 +74,29 @@
       "description": "The gRPC service name for the health check.\nThe value of grpcServiceName has the following meanings by convention:\n\n* Empty serviceName means the overall status of all services at the backend.\n* Non-empty serviceName means the health of that gRPC service, as defined by the owner of the service.\n\nThe grpcServiceName can only be ASCII.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Defines probe content/matching (what is sent and expected back); affects health-detection accuracy, not security posture."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "grpc_health_check.port": {
       "description": "The port number for the health check request.\nMust be specified if portName and portSpecification are not set\nor if port_specification is USE_FIXED_PORT. Valid values are 1 through 65535.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Selects the port the probe targets. Probes originate from Google's reserved health-check ranges and this argument opens no firewall path, so no exposure is created."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "grpc_health_check.port_name": {
       "description": "Port name as defined in InstanceGroup#NamedPort#name. If both port and\nport_name are defined, port takes precedence.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects the port the probe targets. Probes originate from Google's reserved health-check ranges and this argument opens no firewall path, so no exposure is created."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "grpc_health_check.port_specification": {
       "description": "Specifies how port is selected for health checking, can be one of the\nfollowing values:\n\n  * 'USE_FIXED_PORT': The port number in 'port' is used for health checking.\n\n  * 'USE_NAMED_PORT': The 'portName' is used for health checking.\n\n  * 'USE_SERVING_PORT': For NetworkEndpointGroup, the port specified for each\n  network endpoint is used for health checking. For other backends, the\n  port or named port specified in the Backend Service is used for health\n  checking.\n\nIf not specified, gRPC health check follows behavior specified in 'port' and\n'portName' fields. Possible values: [\"USE_FIXED_PORT\", \"USE_NAMED_PORT\", \"USE_SERVING_PORT\"]",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects how the probe port is chosen (fixed/named/serving); operational port selection with no exposure created."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "grpc_tls_health_check": {
       "type": "block",
@@ -107,22 +107,22 @@
       "description": "The gRPC service name for the health check.\nThe value of grpcServiceName has the following meanings by convention:\n\n* Empty serviceName means the overall status of all services at the backend.\n* Non-empty serviceName means the health of that gRPC service, as defined by the owner of the service.\n\nThe grpcServiceName can only be ASCII.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Defines probe content/matching (what is sent and expected back); affects health-detection accuracy, not security posture."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "grpc_tls_health_check.port": {
       "description": "The port number for the health check request.\nMust be specified if port_specification is USE_FIXED_PORT. Valid values are 1 through 65535.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Selects the port the probe targets. Probes originate from Google's reserved health-check ranges and this argument opens no firewall path, so no exposure is created."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "grpc_tls_health_check.port_specification": {
       "description": "Specifies how port is selected for health checking, can be one of the\nfollowing values:\n\n  * 'USE_FIXED_PORT': The port number in 'port' is used for health checking.\n\n  * 'USE_NAMED_PORT': Not supported for GRPC with TLS health checking.\n\n  * 'USE_SERVING_PORT': For NetworkEndpointGroup, the port specified for each\n  network endpoint is used for health checking. For other backends, the\n  port or named port specified in the Backend Service is used for health\n  checking.\n\nIf not specified, gRPC health check follows behavior specified in the 'port' field. Possible values: [\"USE_FIXED_PORT\", \"USE_NAMED_PORT\", \"USE_SERVING_PORT\"]",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects how the probe port is chosen (fixed/named/serving); operational port selection with no exposure created."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "http2_health_check": {
       "type": "block",
@@ -133,50 +133,50 @@
       "description": "The value of the host header in the HTTP2 health check request.\nIf left empty (default value), the public IP on behalf of which this health\ncheck is performed will be used.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Defines probe content/matching (what is sent and expected back); affects health-detection accuracy, not security posture."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "http2_health_check.port": {
       "description": "The TCP port number for the HTTP2 health check request.\nThe default value is 443.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Selects the port the probe targets. Probes originate from Google's reserved health-check ranges and this argument opens no firewall path, so no exposure is created."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "http2_health_check.port_name": {
       "description": "Port name as defined in InstanceGroup#NamedPort#name. If both port and\nport_name are defined, port takes precedence.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects the port the probe targets. Probes originate from Google's reserved health-check ranges and this argument opens no firewall path, so no exposure is created."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "http2_health_check.port_specification": {
       "description": "Specifies how port is selected for health checking, can be one of the\nfollowing values:\n\n  * 'USE_FIXED_PORT': The port number in 'port' is used for health checking.\n\n  * 'USE_NAMED_PORT': The 'portName' is used for health checking.\n\n  * 'USE_SERVING_PORT': For NetworkEndpointGroup, the port specified for each\n  network endpoint is used for health checking. For other backends, the\n  port or named port specified in the Backend Service is used for health\n  checking.\n\nIf not specified, HTTP2 health check follows behavior specified in 'port' and\n'portName' fields. Possible values: [\"USE_FIXED_PORT\", \"USE_NAMED_PORT\", \"USE_SERVING_PORT\"]",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects how the probe port is chosen (fixed/named/serving); operational port selection with no exposure created."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "http2_health_check.proxy_header": {
       "description": "Specifies the type of proxy header to append before sending data to the\nbackend. Default value: \"NONE\" Possible values: [\"NONE\", \"PROXY_V1\"]",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Chooses NONE or PROXY_V1 framing for probe data; a backend-compatibility feature, not a security control."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "http2_health_check.request_path": {
       "description": "The request path of the HTTP2 health check request.\nThe default value is /.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Defines probe content/matching (what is sent and expected back); affects health-detection accuracy, not security posture."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "http2_health_check.response": {
       "description": "The bytes to match against the beginning of the response data. If left empty\n(the default value), any response will indicate health. The response data\ncan only be ASCII.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Defines probe content/matching (what is sent and expected back); affects health-detection accuracy, not security posture."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "http_health_check": {
       "type": "block",
@@ -187,50 +187,50 @@
       "description": "The value of the host header in the HTTP health check request.\nIf left empty (default value), the public IP on behalf of which this health\ncheck is performed will be used.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Defines probe content/matching (what is sent and expected back); affects health-detection accuracy, not security posture."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "http_health_check.port": {
       "description": "The TCP port number for the HTTP health check request.\nThe default value is 80.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Selects the port the probe targets. Probes originate from Google's reserved health-check ranges and this argument opens no firewall path, so no exposure is created."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "http_health_check.port_name": {
       "description": "Port name as defined in InstanceGroup#NamedPort#name. If both port and\nport_name are defined, port takes precedence.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects the port the probe targets. Probes originate from Google's reserved health-check ranges and this argument opens no firewall path, so no exposure is created."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "http_health_check.port_specification": {
       "description": "Specifies how port is selected for health checking, can be one of the\nfollowing values:\n\n  * 'USE_FIXED_PORT': The port number in 'port' is used for health checking.\n\n  * 'USE_NAMED_PORT': The 'portName' is used for health checking.\n\n  * 'USE_SERVING_PORT': For NetworkEndpointGroup, the port specified for each\n  network endpoint is used for health checking. For other backends, the\n  port or named port specified in the Backend Service is used for health\n  checking.\n\nIf not specified, HTTP health check follows behavior specified in 'port' and\n'portName' fields. Possible values: [\"USE_FIXED_PORT\", \"USE_NAMED_PORT\", \"USE_SERVING_PORT\"]",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects how the probe port is chosen (fixed/named/serving); operational port selection with no exposure created."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "http_health_check.proxy_header": {
       "description": "Specifies the type of proxy header to append before sending data to the\nbackend. Default value: \"NONE\" Possible values: [\"NONE\", \"PROXY_V1\"]",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Chooses NONE or PROXY_V1 framing for probe data; a backend-compatibility feature, not a security control."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "http_health_check.request_path": {
       "description": "The request path of the HTTP health check request.\nThe default value is /.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Defines probe content/matching (what is sent and expected back); affects health-detection accuracy, not security posture."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "http_health_check.response": {
       "description": "The bytes to match against the beginning of the response data. If left empty\n(the default value), any response will indicate health. The response data\ncan only be ASCII.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Defines probe content/matching (what is sent and expected back); affects health-detection accuracy, not security posture."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "https_health_check": {
       "type": "block",
@@ -241,50 +241,50 @@
       "description": "The value of the host header in the HTTPS health check request.\nIf left empty (default value), the public IP on behalf of which this health\ncheck is performed will be used.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Defines probe content/matching (what is sent and expected back); affects health-detection accuracy, not security posture."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "https_health_check.port": {
       "description": "The TCP port number for the HTTPS health check request.\nThe default value is 443.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Selects the port the probe targets. Probes originate from Google's reserved health-check ranges and this argument opens no firewall path, so no exposure is created."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "https_health_check.port_name": {
       "description": "Port name as defined in InstanceGroup#NamedPort#name. If both port and\nport_name are defined, port takes precedence.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects the port the probe targets. Probes originate from Google's reserved health-check ranges and this argument opens no firewall path, so no exposure is created."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "https_health_check.port_specification": {
       "description": "Specifies how port is selected for health checking, can be one of the\nfollowing values:\n\n  * 'USE_FIXED_PORT': The port number in 'port' is used for health checking.\n\n  * 'USE_NAMED_PORT': The 'portName' is used for health checking.\n\n  * 'USE_SERVING_PORT': For NetworkEndpointGroup, the port specified for each\n  network endpoint is used for health checking. For other backends, the\n  port or named port specified in the Backend Service is used for health\n  checking.\n\nIf not specified, HTTPS health check follows behavior specified in 'port' and\n'portName' fields. Possible values: [\"USE_FIXED_PORT\", \"USE_NAMED_PORT\", \"USE_SERVING_PORT\"]",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects how the probe port is chosen (fixed/named/serving); operational port selection with no exposure created."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "https_health_check.proxy_header": {
       "description": "Specifies the type of proxy header to append before sending data to the\nbackend. Default value: \"NONE\" Possible values: [\"NONE\", \"PROXY_V1\"]",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Chooses NONE or PROXY_V1 framing for probe data; a backend-compatibility feature, not a security control."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "https_health_check.request_path": {
       "description": "The request path of the HTTPS health check request.\nThe default value is /.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Defines probe content/matching (what is sent and expected back); affects health-detection accuracy, not security posture."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "https_health_check.response": {
       "description": "The bytes to match against the beginning of the response data. If left empty\n(the default value), any response will indicate health. The response data\ncan only be ASCII.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Defines probe content/matching (what is sent and expected back); affects health-detection accuracy, not security posture."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "log_config": {
       "type": "block",
@@ -295,8 +295,8 @@
       "description": "Indicates whether or not to export logs. This is false by default,\nwhich means no health check logging will be done.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Logging is off by default, leaving no audit trail of health-check activity. Policy should enforce enable = true so probe results are exported for monitoring and incident investigation."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "ssl_health_check": {
       "type": "block",
@@ -307,43 +307,43 @@
       "description": "The TCP port number for the SSL health check request.\nThe default value is 443.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Selects the port the probe targets. Probes originate from Google's reserved health-check ranges and this argument opens no firewall path, so no exposure is created."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "ssl_health_check.port_name": {
       "description": "Port name as defined in InstanceGroup#NamedPort#name. If both port and\nport_name are defined, port takes precedence.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects the port the probe targets. Probes originate from Google's reserved health-check ranges and this argument opens no firewall path, so no exposure is created."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "ssl_health_check.port_specification": {
       "description": "Specifies how port is selected for health checking, can be one of the\nfollowing values:\n\n  * 'USE_FIXED_PORT': The port number in 'port' is used for health checking.\n\n  * 'USE_NAMED_PORT': The 'portName' is used for health checking.\n\n  * 'USE_SERVING_PORT': For NetworkEndpointGroup, the port specified for each\n  network endpoint is used for health checking. For other backends, the\n  port or named port specified in the Backend Service is used for health\n  checking.\n\nIf not specified, SSL health check follows behavior specified in 'port' and\n'portName' fields. Possible values: [\"USE_FIXED_PORT\", \"USE_NAMED_PORT\", \"USE_SERVING_PORT\"]",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects how the probe port is chosen (fixed/named/serving); operational port selection with no exposure created."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "ssl_health_check.proxy_header": {
       "description": "Specifies the type of proxy header to append before sending data to the\nbackend. Default value: \"NONE\" Possible values: [\"NONE\", \"PROXY_V1\"]",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Chooses NONE or PROXY_V1 framing for probe data; a backend-compatibility feature, not a security control."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "ssl_health_check.request": {
       "description": "The application data to send once the SSL connection has been\nestablished (default value is empty). If both request and response are\nempty, the connection establishment alone will indicate health. The request\ndata can only be ASCII.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Probe payload is stored in plain Terraform configuration and state, so embedding credentials, tokens, or keys makes them hardcoded secrets readable by anyone with config/state access. Policy should pattern-blacklist credential-like content (e.g. password=, token=, apikey=, secret=) in the request string"
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "ssl_health_check.response": {
       "description": "The bytes to match against the beginning of the response data. If left empty\n(the default value), any response will indicate health. The response data\ncan only be ASCII.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Defines probe content/matching (what is sent and expected back); affects health-detection accuracy, not security posture."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "tcp_health_check": {
       "type": "block",
@@ -354,43 +354,43 @@
       "description": "The TCP port number for the TCP health check request.\nThe default value is 80.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Selects the port the probe targets. Probes originate from Google's reserved health-check ranges and this argument opens no firewall path, so no exposure is created."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "tcp_health_check.port_name": {
       "description": "Port name as defined in InstanceGroup#NamedPort#name. If both port and\nport_name are defined, port takes precedence.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects the port the probe targets. Probes originate from Google's reserved health-check ranges and this argument opens no firewall path, so no exposure is created."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "tcp_health_check.port_specification": {
       "description": "Specifies how port is selected for health checking, can be one of the\nfollowing values:\n\n  * 'USE_FIXED_PORT': The port number in 'port' is used for health checking.\n\n  * 'USE_NAMED_PORT': The 'portName' is used for health checking.\n\n  * 'USE_SERVING_PORT': For NetworkEndpointGroup, the port specified for each\n  network endpoint is used for health checking. For other backends, the\n  port or named port specified in the Backend Service is used for health\n  checking.\n\nIf not specified, TCP health check follows behavior specified in 'port' and\n'portName' fields. Possible values: [\"USE_FIXED_PORT\", \"USE_NAMED_PORT\", \"USE_SERVING_PORT\"]",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects how the probe port is chosen (fixed/named/serving); operational port selection with no exposure created."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "tcp_health_check.proxy_header": {
       "description": "Specifies the type of proxy header to append before sending data to the\nbackend. Default value: \"NONE\" Possible values: [\"NONE\", \"PROXY_V1\"]",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Chooses NONE or PROXY_V1 framing for probe data; a backend-compatibility feature, not a security control."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "tcp_health_check.request": {
       "description": "The application data to send once the TCP connection has been\nestablished (default value is empty). If both request and response are\nempty, the connection establishment alone will indicate health. The request\ndata can only be ASCII.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Probe payload is stored in plain Terraform configuration and state, so embedding credentials, tokens, or keys makes them hardcoded secrets readable by anyone with config/state access. Policy should pattern-blacklist credential-like content (e.g. password=, token=, apikey=, secret=) in the request string."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "tcp_health_check.response": {
       "description": "The bytes to match against the beginning of the response data. If left empty\n(the default value), any response will indicate health. The response data\ncan only be ASCII.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Defines probe content/matching (what is sent and expected back); affects health-detection accuracy, not security posture."
+      "security_impact": "true/false",
+      "rationale": ""
     }
   }
 }
