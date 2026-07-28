@@ -49,14 +49,14 @@
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "When true, simply deleting this config resource (e.g. an accidental 'terraform destroy' scoped too broadly, or unmanaging this instance's stateful overrides) cascades into destroying the real, running VM instance behind it — turning a config-management action into an irreversible compute-destruction action. The false/unset behaviour is the non-destructive one (the instance keeps running under the MIG as a normal member), so a policy should blacklist true: this resource's own removal should never, by itself, be the thing that deletes a live instance."
+      "rationale": "Deleting this config resource must never, by itself, cascade into destroying the live instance it describes. remove_instance_on_destroy=true collapses removal of a config record into an irreversible compute-destruction action; false keeps the instance running under the MIG untouched. Policy should blacklist true as a structural platform guarantee: removing this resource must not have the side effect of destroying a resource it does not own."
     },
     "remove_instance_state_on_destroy": {
       "description": "When true, deleting this config will immediately remove any specified state from the underlying instance.\nWhen false, deleting this config will *not* immediately remove any state from the underlying instance.\nState will be removed on the next instance recreation or update.",
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Controls whether deleting this config immediately unbinds the instance's preserved disks/external-IPs/metadata, or leaves them attached indefinitely until some future, unscheduled instance recreation or update — which, if minimal_action stays NONE, may never happen. This isn't about the underlying disk data itself (deletion_policy.disk.delete_rule separately governs whether a stateful disk is actually deleted); it's that a team who deletes this config believing a preserved external IP or stale metadata has been detached from the instance can be wrong for an indefinite, unpredictable window. Requiring true makes that detachment deterministic instead of an open-ended no-op."
+      "rationale": "Controls whether deleting this config immediately clears the instance's preserved disks/IPs/metadata, or defers that cleanup to an unscheduled future update. Policy should require true so state cleanup on destroy is deterministic rather than open-ended."
     },
     "zone": {
       "description": "Zone where the containing instance group manager is located",
@@ -76,8 +76,8 @@
       "description": "A value that prescribes what should happen to the stateful disk when the VM instance is deleted.\nThe available options are 'NEVER' and 'ON_PERMANENT_INSTANCE_DELETION'.\n'NEVER' - detach the disk when the VM is deleted, but do not delete the disk.\n'ON_PERMANENT_INSTANCE_DELETION' will delete the stateful disk when the VM is permanently\ndeleted from the instance group. Default value: \"NEVER\" Possible values: [\"NEVER\", \"ON_PERMANENT_INSTANCE_DELETION\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "'ON_PERMANENT_INSTANCE_DELETION' irreversibly deletes the actual stateful disk resource — and its data — the moment the instance is permanently removed from the group; 'NEVER' only detaches it, leaving the disk and its data recoverable. Since a disk was made 'stateful' specifically because its data mattered enough to persist across recreations, a policy should blacklist 'ON_PERMANENT_INSTANCE_DELETION' so that removing an instance from a group can never silently destroy the data on its preserved disk."
+      "security_impact": false,
+      "rationale": "Prescribes what happens to a stateful disk's own lifecycle once the instance it's attached to is permanently removed from the group: detach and keep it ('NEVER') or delete it too ('ON_PERMANENT_INSTANCE_DELETION'). This is a data-retention/cleanup configuration choice — the same kind of call as a backup retention window — not a resource-destruction-blocking flag like deletion_protection: it doesn't guard this per_instance_config resource (or the disk resource itself) against Terraform destroying it, it only decides the disk's own fate after the instance is already gone. Whether stateful disks should be cleaned up automatically or retained is a team data-management preference, not a platform security control."
     },
     "preserved_state.disk.device_name": {
       "description": "A unique device name that is reflected into the /dev/ tree of a Linux operating system running within the instance.",
