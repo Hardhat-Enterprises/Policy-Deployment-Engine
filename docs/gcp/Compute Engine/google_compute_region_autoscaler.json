@@ -60,8 +60,8 @@
       "description": "The maximum number of instances that the autoscaler can scale up\nto. This is required when creating or updating an autoscaler. The\nmaximum number of replicas should not be lower than minimal number\nof replicas.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "If max_replicas is not set to a sensible limit, the autoscaler can keep adding servers indefinitely during a traffic spike, leading to a massive, unexpected cloud bill - an attack known as Denial of Wallet. Policy should require max_replicas to be set to a reasonable, capped value."
     },
     "autoscaling_policy.min_replicas": {
       "description": "The minimum number of replicas that the autoscaler can scale down\nto. This cannot be less than 0. If not provided, autoscaler will\nchoose a default value depending on maximum number of instances\nallowed.",
