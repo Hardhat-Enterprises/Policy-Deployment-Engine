@@ -116,10 +116,8 @@
       "description": "This field is not used for external load balancing.\n\nFor Internal TCP/UDP Load Balancing, this field identifies the network that\nthe load balanced IP should belong to for this Forwarding Rule.\nIf the subnetwork is specified, the network of the subnetwork will be used.\nIf neither subnetwork nor this field is specified, the default network will\nbe used.\n\nFor Private Service Connect forwarding rules that forward traffic to Google\nAPIs, a network must be provided.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the VPC the load-balanced IP belongs to for internal/PSC rules. Rather than blacklisting the literal 'default' network name, the policy should require the field be explicitly set and non-empty — leaving it blank falls back to the auto-created 'default' network, a known GCP anti-pattern (permissive auto-mode firewall rules); it must not pin a specific VPC name, since networks are team/project-specific.",
-      "compliant": "projects/pde/global/networks/prod-vpc",
-      "non_compliant": ""
+      "security_impact": false,
+      "rationale": "A reference to the specific VPC the load-balanced IP should belong to — which network to use is a team/architecture choice, not something a platform policy should pin or constrain. Network segmentation and access control are enforced by the firewall rules attached to that network, not by which network this field points to; we secure the referenced network via its own firewall-rule resources, not by policing this pointer."
     },
     "network_tier": {
       "description": "This signifies the networking tier used for configuring\nthis load balancer and can only take the following values:\n'PREMIUM', 'STANDARD'.\n\nFor regional ForwardingRule, the valid values are 'PREMIUM' and\n'STANDARD'. For GlobalForwardingRule, the valid value is\n'PREMIUM'.\n\nIf this field is not specified, it is assumed to be 'PREMIUM'.\nIf 'IPAddress' is specified, this value must be equal to the\nnetworkTier of the Address. Possible values: [\"PREMIUM\", \"STANDARD\"]",
@@ -183,10 +181,8 @@
       "description": "If not empty, this Forwarding Rule will only forward the traffic when the source IP address matches one of the IP addresses or CIDR ranges set here. Note that a Forwarding Rule can only have up to 64 source IP ranges, and this field can only be used with a regional Forwarding Rule whose scheme is EXTERNAL. Each sourceIpRange entry should be either an IP address (for example, 1.2.3.4) or a CIDR range (for example, 1.2.3.0/24).",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "The allow-list of source IPs/CIDRs permitted to reach an EXTERNAL regional forwarding rule. The specific CIDR ranges/routing topology are a team/routing design choice, not a platform policy target (see docs/ASSESSMENT_GUIDANCE.md §8: network address ranges are team addressing, not something this platform polices). What remains a platform-level exposure control is the wildcard case: explicitly setting an entry to '0.0.0.0/0' removes the source restriction entirely and opens the rule to any source IP, so that specific value stays blacklisted.",
-      "compliant": ["203.0.113.0/24"],
-      "non_compliant": ["0.0.0.0/0"]
+      "security_impact": false,
+      "rationale": "The allow-list of source IPs/CIDRs permitted to reach an EXTERNAL regional forwarding rule. Per ASSESSMENT_GUIDANCE.md §8, network address ranges and CIDR blocks are team addressing/routing design choices, not a platform policy target — including the wildcard '0.0.0.0/0' case: whether to scope sources at all, and how broad to make that scope, is the team's call given their own architecture (e.g. a public-facing rule intentionally accepting traffic from anywhere). Segmentation and exposure control for this resource are enforced by load_balancing_scheme, ip_protocol and the port fields, which are assessed on their own arguments."
     },
     "subnetwork": {
       "description": "This field identifies the subnetwork that the load balanced IP should\nbelong to for this Forwarding Rule, used in internal load balancing and\nnetwork load balancing with IPv6.\n\nIf the network specified is in auto subnet mode, this field is optional.\nHowever, a subnetwork must be specified if the network is in custom subnet\nmode or when creating external forwarding rule with IPv6.",
