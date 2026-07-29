@@ -13,8 +13,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This only tells Terraform whether it may delete the range, and it is checked against Terraform's own state rather than enforced by the API - the range can still be removed with gcloud or by editing the config. None of the three values change who can receive multicast traffic or what gets logged, so it guards against a careless destroy: operational safety, not security."
+      "security_impact": true,
+      "rationale": "The destroy guard, and it defaults to DELETE - removal allowed. If a plan takes the range out, every consumer activation hanging off it stops receiving traffic, so an editing mistake becomes an outage; ABANDON fails differently, leaving the range live with its accept list and logging intact but no longer tracked in code. Policy should pin this to the destroy-blocking value (PREVENT) so that tearing down a live range has to be a deliberate, reviewed change rather than a side effect of a plan. The check sits in Terraform rather than the API, which is exactly where the destructive change would originate."
     },
     "description": {
       "description": "An optional text description of the multicast group range.",
