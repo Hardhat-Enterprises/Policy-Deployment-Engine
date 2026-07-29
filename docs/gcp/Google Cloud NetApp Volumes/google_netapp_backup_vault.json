@@ -6,43 +6,43 @@
       "description": "Region in which backup is stored.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls where the backup data is stored. Using approved regions helps keep data in the correct location."
     },
     "backup_vault_type": {
       "description": "Type of the backup vault to be created. Default is IN_REGION. Possible values: [\"BACKUP_VAULT_TYPE_UNSPECIFIED\", \"IN_REGION\", \"CROSS_REGION\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether backups are stored in the same region or a different region. Choosing the right option helps meet backup and data protection requirements."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether the backup vault can be deleted. Preventing accidental deletion helps protect backup data."
     },
     "description": {
       "description": "An optional description of this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Adds information about the backup vault. It does not affect security."
     },
     "kms_config": {
       "description": "Specifies the Key Management System (KMS) configuration to be used for\nbackup encryption. Format:\n'projects/{{project}}/locations/{{location}}/kmsConfigs/{{kms_config}}'",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls which encryption key is used to protect the backup data. Using an approved key helps keep the backups secure."
     },
     "labels": {
       "description": "Labels as key value pairs. Example: '{ \"owner\": \"Bob\", \"department\": \"finance\", \"purpose\": \"testing\" }'.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Helps organise resources using tags. It does not affect security."
     },
     "location": {
       "description": "Location (region) of the backup vault.",
@@ -55,15 +55,15 @@
       "description": "The resource name of the backup vault. Needs to be unique per location.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Gives the backup vault a name. It does not affect security."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls which Google Cloud project the backup vault belongs to. Using an approved project helps keep resources secure."
     },
     "backup_retention_policy": {
       "type": "block",
@@ -74,36 +74,36 @@
       "description": "Minimum retention duration in days for backups in the backup vault.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls how long backups must be kept. Keeping backups for the required time helps protect against accidental or unwanted deletion."
     },
     "backup_retention_policy.daily_backup_immutable": {
       "description": "Indicates if the daily backups are immutable. At least one of daily_backup_immutable, weekly_backup_immutable, monthly_backup_immutable and manual_backup_immutable must be true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether daily backups can be changed or deleted. Making backups immutable helps protect them from tampering."
     },
     "backup_retention_policy.manual_backup_immutable": {
       "description": "Indicates if the manual backups are immutable. At least one of daily_backup_immutable, weekly_backup_immutable, monthly_backup_immutable and manual_backup_immutable must be true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether manually created backups can be changed or deleted. Making backups immutable helps keep them safe."
     },
     "backup_retention_policy.monthly_backup_immutable": {
       "description": "Indicates if the monthly backups are immutable. At least one of daily_backup_immutable, weekly_backup_immutable, monthly_backup_immutable and manual_backup_immutable must be true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether monthly backups can be changed or deleted. This helps protect important backup data."
     },
     "backup_retention_policy.weekly_backup_immutable": {
       "description": "Indicates if the weekly backups are immutable. At least one of daily_backup_immutable, weekly_backup_immutable, monthly_backup_immutable and manual_backup_immutable must be true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether weekly backups can be changed or deleted. This helps prevent backup data from being altered or removed."
     }
   }
 }

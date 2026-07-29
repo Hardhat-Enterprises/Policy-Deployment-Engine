@@ -6,22 +6,22 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether the backup can be deleted. Preventing accidental deletion helps protect important backup data."
     },
     "description": {
       "description": "A description of the backup with 2048 characters or less. Requests with longer descriptions will be rejected.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Adds information about the backup. It does not affect security."
     },
     "labels": {
       "description": "Labels as key value pairs. Example: '{ \"owner\": \"Bob\", \"department\": \"finance\", \"purpose\": \"testing\" }'.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Helps organise resources using tags. It does not affect security."
     },
     "location": {
       "description": "Location of the backup.",
@@ -34,22 +34,22 @@
       "description": "The resource name of the backup. Needs to be unique per location.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Gives the backup a name. It does not affect security."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls which Google Cloud project the backup belongs to. Using an approved project helps keep resources secure."
     },
     "source_snapshot": {
       "description": "If specified, backup will be created from the given snapshot. If not specified,\nthere will be a new snapshot taken to initiate the backup creation.\nFormat: 'projects/{{projectId}}/locations/{{location}}/volumes/{{volumename}}/snapshots/{{snapshotname}}''",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies which snapshot is used to create the backup. It is a reference to another resource and does not directly affect security."
     },
     "source_volume": {
       "description": "ID of volumes this backup belongs to. Format: 'projects/{{projects_id}}/locations/{{location}}/volumes/{{name}}''",
@@ -74,22 +74,22 @@
       "description": "The UUID of the ONTAP source snapshot.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the ONTAP snapshot used for the backup. It is only a reference and does not affect security."
     },
     "ontap_source.storage_pool": {
       "description": "Name of the storage pool. This must be specified for creating backups for ONTAP mode volumes.\nFormat: 'projects/{{project}}/locations/{{location}}/storagePools/{{storage_pool_id}}'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies which storage pool the backup comes from. It is a reference to another resource and does not directly affect security."
     },
     "ontap_source.volume_uuid": {
       "description": "The UUID of the ONTAP source volume.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the ONTAP source volume. It is only a reference and does not affect security."
     }
   }
 }
