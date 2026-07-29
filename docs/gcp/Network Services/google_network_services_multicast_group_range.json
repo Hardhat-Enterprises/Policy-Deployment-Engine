@@ -6,36 +6,36 @@
       "description": "A list of consumer projects that are allowed to subscribe to the multicast\nIP addresses within the range defined by this MulticastGroupRange. The\nproject can be specified using its project ID or project number. If left\nempty, then all consumer projects are allowed (unless\nrequire_explicit_accept is set to true) once they have VPC networks\nassociated to the multicast domain. The current max length of the accept\nlist is 100.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The guest list for the range: it names the projects allowed to attach a consumer VPC network and start receiving whatever is being sent on these group addresses. It is only read when require_explicit_accept is true. A policy can require that the list is actually filled in and bounded - no catch-all, only projects from an approved (parameterised) set - so a range that looks locked down isn't open in practice."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This only tells Terraform whether it may delete the range, and it is checked against Terraform's own state rather than enforced by the API - the range can still be removed with gcloud or by editing the config. None of the three values change who can receive multicast traffic or what gets logged, so it guards against a careless destroy: operational safety, not security."
     },
     "description": {
       "description": "An optional text description of the multicast group range.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
+      "security_impact": false,
+      "rationale": "A free-text note for humans. Nothing in the multicast service reads it, so no rule about its wording would make the range safer."
+    }, 
     "distribution_scope": {
       "description": "Multicast group range's distribution scope. Intra-zone or intra-region\ncross-zone is supported, with default value being intra-region. Cross\nregion distribution is not supported.\nPossible values:\nINTRA_ZONE\nINTRA_REGION",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Decides how far traffic on this range is copied: one zone only, or every zone in the region (the default). Fixed at creation. It sounds like a containment control, but Google doesn't support multicast across regions at all, so neither value can push traffic outside a region, and neither decides who is allowed to receive it - that is domain access plus the accept settings. Whether a team needs one zone or several depends on where their senders and receivers actually run, so a blanket rule would only break valid designs."
     },
     "labels": {
       "description": "Labels as key-value pairs.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Tags used for grouping, filtering and cost attribution. The multicast service never consults them when deciding who may join a group or what is logged, and Terraform manages only the labels listed here (any set elsewhere are left alone), so they couldn't be relied on for enforcement in any case."
     },
     "location": {
       "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
@@ -48,36 +48,36 @@
       "description": "The resource name of the multicast domain in which to create this\nmulticast group range.\nUse the following format:\n'projects/*/locations/global/multicastDomains/*'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Says which domain this range sits inside - a wiring decision, not a permission. Whether outsiders can reach that domain is controlled on the domain resource itself, and who may use this particular range is controlled by the accept settings here. A rule on this field could only hardcode one team's domain name."
     },
     "multicast_group_range_id": {
       "description": "A unique name for the multicast group range.\nThe name is restricted to letters, numbers, and hyphen, with the first\ncharacter a letter, and the last a letter or a number. The name must not\nexceed 48 characters.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The name. Its format is already constrained by the API, and it plays no part in any access, routing or logging decision - a rule here would be a naming convention."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Which project owns the range and therefore receives its membership logs and its bill. Access is enforced by that project's IAM roles and org policies, not by this string, and a platform-wide rule can't say which project is correct without naming a specific team."
     },
     "require_explicit_accept": {
       "description": "Whether an empty consumer_accept_list will deny all consumer projects.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The open-door/closed-door switch, and it ships open. Left false, any project that already has access to the parent domain can attach a consumer network and start receiving whatever is sent on this range; set true, only projects on the accept list can. Policy should require true together with a populated accept list, applied at creation - turning it on later disconnects existing consumers, who must recreate their activations."
     },
     "reserved_internal_range": {
       "description": "The resource name of the internal range reserved for this\nmulticast group range.\n\nThe internal range must be a Class D address (224.0.0.0 to 239.255.255.255)\nand have a prefix length >= 23.\n\nUse the following format:\n'projects/*/locations/global/internalRanges/*'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Points at the block of multicast IP addresses this range covers. The obvious worry - a team claiming a huge slice of the multicast address space - is already handled: the API accepts only Class D addresses in a /23 or smaller block, and the actual CIDR is defined on the internal range resource, which is where any addressing rule belongs. All that is stored here is a resource name, which says nothing about the addresses behind it."
     },
     "log_config": {
       "type": "block",
@@ -88,8 +88,8 @@
       "description": "Whether to enable logging or not.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Turns on the record of who joined and left the groups in this range, and it is off unless switched on. Enabled, the admin project gets a Cloud Logging entry for every IGMP join, leave, timeout or rejection and for consumer networks being attached or detached, including the receiver's IP, the group IP and the consumer's project and network. Disabled, there is simply no evidence of who was listening. Requiring true needs nothing team-specific; the zonal group range activation has its own copy of this setting that overrides this one, so the rule should cover both."
     }
   }
 }
