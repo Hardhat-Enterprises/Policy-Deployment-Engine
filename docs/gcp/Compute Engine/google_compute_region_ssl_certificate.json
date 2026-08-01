@@ -13,8 +13,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This controls how the resource is managed upon deletion. It does not contain sensitive information."
+      "security_impact": true,
+      "rationale": "Controls whether terraform can delete the resource. This is a security-sensitive setting that can prevent accidental deletion of critical resources."
     },
     "description": {
       "description": "An optional description of this resource.",
@@ -48,8 +48,8 @@
       "description": "The write-only private key in PEM format.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This is a write-only argument used for updating the private key. It does not contain sensitive information."
+      "security_impact": true,
+      "rationale": "This contains write only sensitive information. It is used for creating or updating the SSL certificate and should be protected."
     },
     "private_key_wo_version": {
       "description": "Triggers update of 'private_key_wo' write-only. Increment this value when an update to 'private_key_wo' is needed. For more info see [updating write-only arguments](/docs/providers/google/guides/using_write_only_arguments.html#updating-write-only-arguments)",
