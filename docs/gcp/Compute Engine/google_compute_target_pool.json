@@ -14,7 +14,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Decides whether the resource can be deleted. Enforcing a safe value like PREVENT stops the pool being torn down by accident or on purpose, so it's worth a policy."
+      "rationale": "Controls how the resource gets removed. Allowing ABANDON leaves it orphaned outside Terraform, so the policy blocks ABANDON to stop untracked resources being left behind."
     },
     "description": {
       "description": "Textual description field.",
@@ -48,15 +48,15 @@
       "description": "A unique name for the resource, required by GCE. Changing this forces a new resource to be created.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The name identifies the resource. We can enforce a naming standard here like a set Hardhat-PDE pattern, to keep everything consistent and easy to track."
+      "security_impact": false,
+      "rationale": "The name is just an identifier for the resource, not something you enforce a security rule on. Hardcoding a naming pattern isn't what these policies are for, so this is false."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Sets which GCP project the resource lands in. We can limit it to an approved list of projects so nothing gets deployed where it shouldn't."
+      "security_impact": false,
+      "rationale": "Project just says where the resource lives, it's not a security control on the resource itself. Locking it to specific projects would be overreaching, so this is false."
     },
     "region": {
       "description": "Where the target pool resides. Defaults to project region.",
