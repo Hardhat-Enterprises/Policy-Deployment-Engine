@@ -206,8 +206,8 @@
       "description": "The name of Service Directory service.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the Service Directory service used to resolve the webhook's private endpoint. It is a team-specific resource reference, and constraining it would require pinning a particular project, location, namespace, or service rather than enforcing a generic security property."
     },
     "service_directory.generic_web_service": {
       "type": "block",
@@ -218,50 +218,50 @@
       "description": "Specifies a list of allowed custom CA certificates (in DER format) for\nHTTPS verification. This overrides the default SSL trust store. If this\nis empty or unspecified, Dialogflow will use Google's default trust store\nto verify certificates.\nN.B. Make sure the HTTPS server certificates are signed with \"subject alt\nname\". For instance a certificate can be self-signed using the following\ncommand,\nopenssl x509 -req -days 200 -in example.com.csr \\\n-signkey example.com.key \\\n-out example.com.crt \\\n-extfile <(printf \"\\nsubjectAltName='DNS:www.example.com'\")",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines custom certificate authorities that replace Google's default trust store when validating the Service Directory webhook's HTTPS certificate. A policy should normally require this list to remain empty or restrict custom CA use to approved exceptions so that untrusted or self-signed certificate authorities do not unnecessarily broaden the TLS trust boundary."
     },
     "service_directory.generic_web_service.http_method": {
       "description": "HTTP method for the flexible webhook calls. Standard webhook always uses\nPOST. Possible values: [\"POST\", \"GET\", \"HEAD\", \"PUT\", \"DELETE\", \"PATCH\", \"OPTIONS\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the HTTP verb used for flexible webhook calls. The correct verb is determined by the target API contract, and none of the supported methods is inherently a universally insecure choice, so it is not a generic security policy target."
     },
     "service_directory.generic_web_service.parameter_mapping": {
       "description": "Maps the values extracted from specific fields of the flexible webhook\nresponse into session parameters.\n- Key: session parameter name\n- Value: field path in the webhook response",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Maps fields from a flexible webhook response into Dialogflow session parameters. These application-specific mappings implement the team's conversation logic, and no generic secure mapping can be enforced without knowing that logic."
     },
     "service_directory.generic_web_service.request_body": {
       "description": "Defines a custom JSON object as request body to send to flexible webhook.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the application-specific JSON body sent by a flexible webhook. It is a free-form request document whose required fields and session parameters depend on the target API, so a generic platform policy cannot meaningfully constrain it."
     },
     "service_directory.generic_web_service.request_headers": {
       "description": "The HTTP request headers to send together with webhook requests.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines inline HTTP headers and can contain static authorisation credentials. A policy should reject secret-bearing headers, particularly inline Authorization values, and require sensitive values to use secret_versions_for_request_headers while permitting non-sensitive functional headers."
     },
     "service_directory.generic_web_service.secret_version_for_username_password": {
       "description": "The SecretManager secret version resource storing the username:password\npair for HTTP Basic authentication.\nFormat: 'projects/{project}/secrets/{secret}/versions/{version}'",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables HTTP Basic authentication using a static username and password stored in Secret Manager. Although Secret Manager protects the credential, Basic authentication remains a weak static-auth mechanism, so a policy should require this field to be unset in favour of managed token, service-account, or OAuth authentication where supported."
     },
     "service_directory.generic_web_service.service_agent_auth": {
       "description": "Indicate the auth token type generated from the [Diglogflow service\nagent](https://cloud.google.com/iam/docs/service-agents#dialogflow-service-agent).\nThe generated token is sent in the Authorization header. Possible values: [\"NONE\", \"ID_TOKEN\", \"ACCESS_TOKEN\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects whether Service Directory webhook requests use no service-agent token, an ID token, or an access token. Private network reachability does not by itself authenticate the caller, so a policy should reject NONE where this mechanism is selected and require a supported token type appropriate to the receiving service."
     },
     "service_directory.generic_web_service.uri": {
       "description": "The webhook URI for receiving POST requests. It must use https protocol.",
