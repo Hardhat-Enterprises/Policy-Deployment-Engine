@@ -13,8 +13,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This controls how terraform handles the deletion of the resource. Setting this to PREVENT can help avoid accidental deletions, which is important for maintaining security and stability of the infrastructure."
+      "security_impact": true,
+      "rationale": "This controls whether Terraform will be preventing the instance from being destroyed. Setting this to PREVENT can help avoid accidental deletions, which is important for maintaining security and stability of the infrastructure."
     },
     "description": {
       "description": "An optional description of this resource. Provide this property when you create the resource.",
@@ -41,8 +41,8 @@
       "description": "Projects that are not allowed to connect to this network attachment. The project can be specified using its id or number.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "This controls which projects are not allowed to connect to the network attachment. Restricting this list can help prevent unauthorized access to the network resources."
+      "security_impact": false,
+      "rationale": "This controls which projects are not allowed to connect to the network attachment. While it can help prevent unauthorized access, it is less critical than the accept list, as it is more of a convenience feature."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
