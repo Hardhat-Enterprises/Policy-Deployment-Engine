@@ -6,29 +6,29 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls how the resource gets removed. Allowing ABANDON leaves it orphaned outside Terraform, so this is worth enforcing, so true."
     },
     "description": {
       "description": "An optional description of this resource. Provide this property when you create the resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Just a free text description. It doesn't affect how the resource works or its security, so false."
     },
     "name": {
       "description": "Name of the resource. Provided by the client when the resource is created. The name must be\n1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters\nlong and match the regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the first\ncharacter must be a lowercase letter, and all following characters must be a dash,\nlowercase letter, or digit, except the last character, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The name is just an identifier for the resource, not something you put a security rule on, so this is false."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Project just says where the resource lives, it's not a security control on the resource itself, so false."
     },
     "intent": {
       "type": "block",
@@ -39,8 +39,8 @@
       "description": "The reliability the user intends this group to be capable of, in terms\nof the Interconnect product SLAs. Possible values: [\"PRODUCTION_NON_CRITICAL\", \"PRODUCTION_CRITICAL\", \"NO_SLA\", \"AVAILABILITY_SLA_UNSPECIFIED\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This sets the reliability/SLA level the user intends for the group. It's about availability planning, not a security control, so false."
     },
     "interconnects": {
       "type": "block",
@@ -51,15 +51,15 @@
       "description": "The URL of an Interconnect in this group. All Interconnects in the group are unique.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is the URL of an interconnect in the group. It's a reference to another resource, not a security control, so false."
     },
     "interconnects.name": {
       "description": "N/A",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is just the key/name for an interconnect entry. It's an identifier, not a security control, so false."
     }
   }
 }
