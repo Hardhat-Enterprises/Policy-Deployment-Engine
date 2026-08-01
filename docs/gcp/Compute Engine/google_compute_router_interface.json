@@ -6,29 +6,29 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This contols how terraform handles the deletion and it does not impact security of the resource."
+      "security_impact": true,
+      "rationale": "This controls whether terraform can delete the resource. If an attacker can manipulate this value, they might be able to prevent the resource from being deleted, leading to potential security risks."
     },
     "interconnect_attachment": {
       "description": "The name or resource link to the VLAN interconnect for this interface. Changing this forces a new interface to be created. Only one of interconnect_attachment, subnetwork or vpn_tunnel can be specified.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This specifies the interconnect attachment for the interface, which could have security implications if misconfigured."
+      "security_impact": false,
+      "rationale": "References an existing interconnect attachment for the interface. While important for connectivity, the reference itself does not directly impact security."
     },
     "ip_range": {
       "description": "The IP address and range of the interface. The IP range must be in the RFC3927 link-local IP space. Changing this forces a new interface to be created.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This defines the IP range for the interface, which could have security implications if misconfigured."
+      "security_impact": false,
+      "rationale": "This specifies the IP address and range for the interface. While it can affect connectivity, it does not directly impact security."
     },
     "ip_version": {
       "description": "IP version of this interface.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This specifies the IP version for the interface, which could have security implications if misconfigured."
+      "security_impact": false,
+      "rationale": "This specifies the IP version for the interface. While it can affect connectivity, it does not directly impact security."
     },
     "name": {
       "description": "A unique name for the interface, required by GCE. Changing this forces a new interface to be created.",
@@ -41,8 +41,8 @@
       "description": "The regional private internal IP address that is used to establish BGP sessions to a VM instance acting as a third-party Router Appliance. Changing this forces a new interface to be created.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This defines the private IP address for the interface, which could have security implications if misconfigured."
+      "security_impact": false,
+      "rationale": "This defines the private IP address for the interface, which does not directly impact security."
     },
     "project": {
       "description": "The ID of the project in which this interface's router belongs. If it is not provided, the provider project is used. Changing this forces a new interface to be created.",
@@ -55,8 +55,8 @@
       "description": "The name of the interface that is redundant to this interface. Changing this forces a new interface to be created.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This defines the redundant interface for the interface, which could have security implications if misconfigured."
+      "security_impact": false,
+      "rationale": "This defines the redundant interface for the interface, which does not directly impact security."
     },
     "region": {
       "description": "The region this interface's router sits in. If not specified, the project region will be used. Changing this forces a new interface to be created.",
