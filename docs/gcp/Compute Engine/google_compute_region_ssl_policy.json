@@ -7,14 +7,14 @@
       "required": false,
       "type": "set(string)",
       "security_impact": true,
-      "rationale": "This lists the ciphers enabled under the CUSTOM profile. Ciphers directly affect how strong the TLS is, so this has a real security impact, so true."
+      "rationale": "These are the ciphers turned on under the CUSTOM profile. Weak ciphers can be broken and expose traffic, so the policy should require an approved set of strong ciphers rather than pinning one exact list per team. That's a real security control, so true."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls how the resource gets removed. Allowing ABANDON leaves it orphaned outside Terraform, so this is worth enforcing, so true."
+      "rationale": "This controls whether the resource can be destroyed. Flags that block deletion are always worth enforcing, because an accidental or malicious delete causes destructive loss, so the policy should stop unsafe values like ABANDON that drop the resource. So true."
     },
     "description": {
       "description": "An optional description of this resource.",
@@ -28,7 +28,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "This sets the lowest TLS version clients can use. Allowing old versions like TLS 1.0 or 1.1 is a real weakness, so enforcing a modern minimum has a clear security impact, so true."
+      "rationale": "This sets the lowest TLS version clients can use. Old versions like TLS 1.0 and 1.1 are open to downgrade attacks, so the policy should require a modern floor of at least TLS 1.2, ideally TLS 1.3. That's a clear security control, so true."
     },
     "name": {
       "description": "Name of the resource. Provided by the client when the resource is\ncreated. The name must be 1-63 characters long, and comply with\nRFC1035. Specifically, the name must be 1-63 characters long and match\nthe regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the\nfirst character must be a lowercase letter, and all following\ncharacters must be a dash, lowercase letter, or digit, except the last\ncharacter, which cannot be a dash.",
@@ -49,7 +49,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "This picks the SSL profile (like COMPATIBLE, MODERN, RESTRICTED). It decides which cipher suites are allowed, which directly affects TLS strength, so true."
+      "rationale": "This picks the SSL profile, which decides the cipher suites allowed. COMPATIBLE allows weaker ciphers, so the policy should require a strong profile like MODERN or RESTRICTED and forbid COMPATIBLE. That directly affects TLS strength, so true."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
