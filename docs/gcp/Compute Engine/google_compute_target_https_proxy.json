@@ -56,7 +56,7 @@
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": "This controls how the proxy is bound to the network. While it can affect connectivity, it does not directly impact security."
+      "rationale": "Controls proxy binding behaviour for the load balancer. This is a functional networking configuration rather than a platform security control."
     },
     "quic_override": {
       "description": "Specifies the QUIC override policy for this resource. This determines\nwhether the load balancer will attempt to negotiate QUIC with clients\nor not. Can specify one of NONE, ENABLE, or DISABLE. If NONE is\nspecified, Google manages whether QUIC is used. Default value: \"NONE\" Possible values: [\"NONE\", \"ENABLE\", \"DISABLE\"]",
@@ -76,8 +76,8 @@
       "description": "URLs to SslCertificate resources that are used to authenticate connections between users and the load balancer.\nCurrently, you may specify up to 15 SSL certificates. sslCertificates do not apply when the load balancing scheme is set to INTERNAL_SELF_MANAGED.\nsslCertificates and certificateManagerCertificates can not be defined together.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "References existing SSL certificates for authentication. While important for security, the references themselves do not directly impact security."
+      "security_impact": true,
+      "rationale": "Specifies the SSL certificates used by the proxy for TLS connections. A policy should ensure certificates are explicitly configured to support secure encrypted communication."
     },
     "ssl_policy": {
       "description": "A reference to the SslPolicy resource that will be associated with\nthe TargetHttpsProxy resource. If not set, the TargetHttpsProxy\nresource will not have any SSL policy configured.",
