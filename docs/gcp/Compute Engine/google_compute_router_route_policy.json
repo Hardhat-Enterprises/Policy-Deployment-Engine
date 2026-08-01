@@ -6,8 +6,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Controls how Terraform handles resource deletion. It affects resource lifecycle and state management but does not change the security configuration of the route policy."
+      "security_impact": true,
+      "rationale": "This controls whether terraform can delete the resource. Setting it to PREVENT or ABANDON can help avoid accidental deletion of critical routing policies, which could disrupt network traffic and security."  
     },
     "name": {
       "description": "Name of the route policy. This policy's name, which must be a resource ID segment and unique within all policies owned by the Router",
@@ -41,8 +41,8 @@
       "description": "This is policy's type, which is one of IMPORT or EXPORT Possible values: [\"ROUTE_POLICY_TYPE_IMPORT\", \"ROUTE_POLICY_TYPE_EXPORT\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines whether the policy is applied to imported or exported routes. An incorrect policy type could affect network routing behaviour and security."
+      "security_impact": false,
+      "rationale": "Determines the functional type of the route policy (import or export). It does not directly affect security but influences how routes are processed."
     },
     "terms": {
       "type": "block",
@@ -53,8 +53,8 @@
       "description": "The evaluation priority for this term, which must be between 0 (inclusive) and 2147483648 (exclusive), and unique within the list.",
       "required": true,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Controls the order in which policy terms are evaluated. Incorrect priorities may cause less restrictive rules to be evaluated before more restrictive ones."
+      "security_impact": false,
+      "rationale": "controls the evaluation order of policy trerms. It does not directly affect security but determines which term is applied first when multiple terms match."
     },
     "terms.actions": {
       "type": "block",
@@ -72,8 +72,8 @@
       "description": "Textual representation of an expression in Common Expression\nLanguage syntax.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines the action performed when a route matches the policy. Incorrect or unsafe expressions can change routing behaviour and introduce security risks."
+      "security_impact": false,
+      "rationale": "Defines the action to be taken when the term matches. While it influences route modification, it does not inherently introduce a security risk unless misconfigured."
     },
     "terms.actions.location": {
       "description": "String indicating the location of the expression for error\nreporting, e.g. a file name and a position in the file",
@@ -105,8 +105,8 @@
       "description": "Textual representation of an expression in Common Expression Language syntax.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines the condition used to determine whether the policy term applies. An overly broad or incorrect expression may unintentionally match or exclude routes, affecting network security."
+      "security_impact": false,
+      "rationale": "Defines the condition under which the term applies. While it determines when actions are executed, it does not inherently introduce a security risk unless misconfigured."
     },
     "terms.match.location": {
       "description": "String indicating the location of the expression for error reporting, e.g. a file name and a position in the file",
