@@ -267,15 +267,15 @@
       "description": "The webhook URI for receiving POST requests. It must use https protocol.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Specifies the endpoint used with the Service Directory webhook and may receive sensitive conversation data. Private routing does not replace transport encryption, so a policy should require the https:// scheme while leaving the team-specific host and path unconstrained."
     },
     "service_directory.generic_web_service.webhook_type": {
       "description": "Type of the webhook. Possible values: [\"STANDARD\", \"FLEXIBLE\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects standard or flexible webhook request and response behaviour. Both are supported functional designs, and neither webhook type is inherently a weaker security configuration."
     },
     "service_directory.generic_web_service.oauth_config": {
       "type": "block",
@@ -286,36 +286,36 @@
       "description": "The client ID provided by the 3rd party platform.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the third-party OAuth client. It is a non-secret, team-specific identifier, and a generic policy cannot constrain it without pinning a particular external client."
     },
     "service_directory.generic_web_service.oauth_config.client_secret": {
       "description": "The client secret provided by the 3rd party platform.  If the\n'secret_version_for_client_secret' field is set, this field will be\nignored.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Supplies the OAuth client secret directly in configuration. Google recommends storing this credential in Secret Manager, so a policy should require this inline field to be unset and use secret_version_for_client_secret instead."
     },
     "service_directory.generic_web_service.oauth_config.scopes": {
       "description": "The OAuth scopes to grant.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the permissions requested for the third-party OAuth access token. A policy should require explicit, appropriately narrow scopes and reject empty, wildcard-like, or known overly broad scopes to reduce the privileges available through a compromised token."
     },
     "service_directory.generic_web_service.oauth_config.secret_version_for_client_secret": {
       "description": "The name of the SecretManager secret version resource storing the\nclient secret. If this field is set, the 'client_secret' field will be\nignored.\nFormat: 'projects/{project}/secrets/{secret}/versions/{version}'",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the Secret Manager version containing the OAuth client secret. This is the recommended storage mechanism, but its value is a team-specific resource reference whose protection should be enforced through Secret Manager IAM rather than by constraining the referenced name."
     },
     "service_directory.generic_web_service.oauth_config.token_endpoint": {
       "description": "The token endpoint provided by the 3rd party platform to exchange an\naccess token.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Specifies the endpoint to which OAuth client credentials are sent to obtain an access token. A policy should require an https:// endpoint to protect credentials and returned tokens in transit, without constraining the team-specific identity-provider host."
     },
     "service_directory.generic_web_service.secret_versions_for_request_headers": {
       "type": "block",
@@ -326,15 +326,15 @@
       "description": "The identifier for this object. Format specified above.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the HTTP header whose value is retrieved from Secret Manager for the Service Directory webhook. The correct header name depends on the target service's authentication contract, and the name itself is neither a credential nor a generic security control."
     },
     "service_directory.generic_web_service.secret_versions_for_request_headers.secret_version": {
       "description": "The SecretManager secret version resource storing the header value.\nFormat: 'projects/{project}/secrets/{secret}/versions/{version}'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the Secret Manager version containing the HTTP header value. Using Secret Manager is the secure storage mechanism, but the version path is a team-specific resource reference whose protection is governed by Secret Manager IAM."
     },
     "service_directory.generic_web_service.service_account_auth_config": {
       "type": "block",
@@ -345,8 +345,8 @@
       "description": "The email address of the service account used to authenticate the webhook call.\nDialogflow uses this service account to exchange an access token and the access\ntoken is then sent in the **Authorization** header of the webhook request.\n\nThe service account must have the **roles/iam.serviceAccountTokenCreator** role\ngranted to the\n[Dialogflow service agent](https://cloud.google.com/iam/docs/service-agents?_gl=1*1jsujvh*_ga*NjYxMzU3OTg2LjE3Njc3MzQ4NjM.*_ga_WH2QY8WWF5*czE3Njc3MzQ2MjgkbzIkZzEkdDE3Njc3MzQ3NzQkajYwJGwwJGgw#dialogflow-service-agent).",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects the service account whose access token authenticates the Service Directory webhook request and therefore determines the permissions available to the call. A policy should reject default service accounts and require a dedicated identity, without pinning a specific account, to support least privilege."
     }
   }
 }
