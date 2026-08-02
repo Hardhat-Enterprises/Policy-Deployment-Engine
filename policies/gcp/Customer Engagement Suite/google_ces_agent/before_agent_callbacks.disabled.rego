@@ -1,4 +1,4 @@
-package terraform.gcp.security.customer_engagement_suite.google_ces_agent.after_agent_callbacks_disabled
+package terraform.gcp.security.customer_engagement_suite.google_ces_agent.before_agent_callbacks_disabled
 
 import data.terraform.helpers
 import data.terraform.gcp.security.customer_engagement_suite.google_ces_agent.vars
@@ -7,15 +7,15 @@ import data.terraform.gcp.security.customer_engagement_suite.google_ces_agent.va
 conditions := [
     [
         {
-            "situation_description" : "after-agent callbacks should remain enabled.",
+            "situation_description" : "before-agent callbacks should remain enabled.",
             "remedies":[ 
                 "Set disabled to false."
                 ]
         },
         {
-            "condition": "after-agent callbacks must be enabled.",
+            "condition": "before-agent callbacks must be enabled.",
             "attribute_path" : [
-                "after_agent_callbacks", 
+                "before_agent_callbacks", 
                 "disabled"
                 ],
             "values" : [
