@@ -5,14 +5,23 @@ import data.terraform.gcp.security.customer_engagement_suite.google_ces_agent.va
 
 conditions := [
     [
-    {"situation_description" : "Agent must be deployed in an approved region.",
-    "remedies":["Deploy the resource in an approved region."]},
-    {
-        "condition": "Location must be in the approved region list.",
-        "attribute_path" : ["location"],
-        "values" : ["australia-southeast1"], 
-        "policy_type" : "whitelist" 
-    }
+        {
+            "situation_description" : "Agent must be deployed in an approved region.",
+            "remedies":[
+                "Deploy the resource in an approved region."
+                ]
+        },
+        {
+            "condition": "Location must be in the approved region list.",
+            "attribute_path" : [
+                "location"
+                ],
+            "values" : [
+                "australia-southeast1",
+                "australia-southeast2"
+                ], 
+            "policy_type" : "whitelist" 
+        }
     ]
 ]
  

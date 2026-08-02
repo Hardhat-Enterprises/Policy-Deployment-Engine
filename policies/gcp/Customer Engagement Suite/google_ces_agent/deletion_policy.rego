@@ -5,14 +5,20 @@ import data.terraform.gcp.security.customer_engagement_suite.google_ces_agent.va
 
 conditions := [
     [
-    {"situation_description" : "Customer Engagement Suite agents must be protected from accidental deletion.",
-    "remedies":["Set deletion_policy to PREVENT"]},
-    {
-        "condition": "Deletion policy must be PREVENT.",
-        "attribute_path": ["deletion_policy"],
-        "values": ["PREVENT"],
-        "policy_type" : "whitelist" 
-    }
+        {
+            "situation_description" : "Customer Engagement Suite agents must be protected from accidental deletion.",
+            "remedies":[
+                "Set deletion_policy to PREVENT"
+                ]
+        },
+        {
+            "condition": "Deletion policy must be PREVENT.",
+            "attribute_path": ["deletion_policy"],
+            "values": [
+                "PREVENT"
+                ],
+            "policy_type" : "whitelist" 
+        }
     ]
 ]
  
