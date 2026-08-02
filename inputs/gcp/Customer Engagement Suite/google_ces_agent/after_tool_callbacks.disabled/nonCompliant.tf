@@ -7,6 +7,6 @@ resource "google_ces_agent" "non_compliant_example_1" {
    after_tool_callbacks {
     description = "Example callback"
     disabled    = true
-    python_code = "def callback(callback_context): return None"
+    python_code = "def after_tool_callback(tool, input, callback_context, tool_response): return None"
   }
 }

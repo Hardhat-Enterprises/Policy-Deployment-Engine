@@ -7,7 +7,7 @@ resource "google_ces_agent" "compliant_example_1" {
   after_agent_callbacks {
     description = "Example callback"
     disabled    = false
-    python_code = "def callback(callback_context): return None"
+    python_code = "def after_agent_callback(callback_context): return None"
   }
 }
 
