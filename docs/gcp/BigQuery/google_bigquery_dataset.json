@@ -13,64 +13,64 @@
       "description": "Defines the default collation specification of future tables created\nin the dataset. If a table is created in this dataset without table-level\ndefault collation, then the table inherits the dataset default collation,\nwhich is applied to the string fields that do not have explicit collation\nspecified. A change to this field affects only tables created afterwards,\nand does not alter the existing tables.\n\nThe following values are supported:\n- 'und:ci': undetermined locale, case insensitive.\n- '': empty string. Default to case-sensitive behavior.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls string comparison and sorting behaviour for future tables. It does not directly change access control, encryption, data exposure, retention, or resource availability."
     },
     "default_partition_expiration_ms": {
       "description": "The default partition expiration for all partitioned tables in\nthe dataset, in milliseconds.\nOnce this property is set, all newly-created partitioned tables in\nthe dataset will have an 'expirationMs' property in the 'timePartitioning'\nsettings set to this value, and changing the value will only\naffect new tables, not existing ones. The storage in a partition will\nhave an expiration time of its partition time plus this value.\nSetting this property overrides the use of 'defaultTableExpirationMs'\nfor partitioned tables: only one of 'defaultTableExpirationMs' and\n'defaultPartitionExpirationMs' will be used for any new partitioned\ntable. If you provide an explicit 'timePartitioning.expirationMs' when\ncreating or updating a partitioned table, that value takes precedence\nover the default partition expiration time indicated by this property.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Automatically deletes partitions after the configured period, affecting data retention and availability. A policy can enforce an approved minimum or range to prevent premature deletion and meet retention requirements."
     },
     "default_table_expiration_ms": {
       "description": "The default lifetime of all tables in the dataset, in milliseconds.\nThe minimum value is 3600000 milliseconds (one hour).\nOnce this property is set, all newly-created tables in the dataset\nwill have an 'expirationTime' property set to the creation time plus\nthe value in this property, and changing the value will only affect\nnew tables, not existing ones. When the 'expirationTime' for a given\ntable is reached, that table will be deleted automatically.\nIf a table's 'expirationTime' is modified or removed before the\ntable expires, or if you provide an explicit 'expirationTime' when\ncreating a table, that value takes precedence over the default\nexpiration time indicated by this property.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Automatically deletes newly created tables after the configured lifetime, affecting data retention and availability. A policy can enforce an approved minimum or range to prevent unintended data loss."
     },
     "delete_contents_on_destroy": {
       "description": "If set to 'true', delete all the tables in the\ndataset when destroying the resource; otherwise,\ndestroying the resource will fail if tables are present.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "When true, Terraform can delete the dataset together with all contained tables. A policy should normally require false unless destructive deletion has been explicitly approved."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can delete, abandon, or protect the dataset. Requiring PREVENT for protected environments reduces accidental deletion and loss of Terraform management."
     },
     "description": {
       "description": "A user-friendly description of the dataset",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Human-readable metadata only. It does not alter permissions, encryption, network exposure, retention, or other security controls."
     },
     "friendly_name": {
       "description": "A descriptive name for the dataset",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Display metadata only. It does not affect access control, encryption, data exposure, retention, or resource behaviour."
     },
     "is_case_insensitive": {
       "description": "TRUE if the dataset and its table names are case-insensitive, otherwise FALSE.\nBy default, this is FALSE, which means the dataset and its table names are\ncase-sensitive. This field does not affect routine references.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls name matching for datasets and tables. It does not directly grant access or change a security, compliance, encryption, or retention control."
     },
     "labels": {
       "description": "The labels associated with this dataset. You can use these to\norganize and group your datasets.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels are organisational metadata and this field is non-authoritative. They do not directly enforce access control or another security boundary; organisation-specific labelling requirements are better handled by governance rules."
     },
     "location": {
       "description": "The geographic location where the dataset should reside.\nSee [official docs](https://cloud.google.com/bigquery/docs/dataset-locations).\nThere are two types of locations, regional or multi-regional. A regional\nlocation is a specific geographic place, such as Tokyo, and a multi-regional\nlocation is a large geographic area, such as the United States, that\ncontains at least two geographic places.\nThe default value is multi-regional location 'US'.\nChanging this forces a new resource to be created.",
@@ -83,29 +83,29 @@
       "description": "Defines the time travel window in hours. The value can be from 48 to 168 hours (2 to 7 days).",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines how long historical table data remains recoverable. A policy can require an approved recovery window so that accidental deletion or modification can be restored while meeting retention requirements."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the project that owns the dataset but is not inherently insecure by itself. The approved project list is organisation-specific, and the field does not directly grant dataset access."
     },
     "resource_tags": {
       "description": "The tags attached to this table. Tag keys are globally unique. Tag key is expected to be\nin the namespaced format, for example \"123456789012/environment\" where 123456789012 is the\nID of the parent organization or project resource for this tag key. Tag value is expected\nto be the short name, for example \"Production\". See [Tag definitions](https://cloud.google.com/iam/docs/tags-access-control#definitions)\nfor more details.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Google Cloud resource tags can be referenced by IAM Conditions and governance controls. Missing or unapproved tags can change how conditional access policies apply, so a policy can require approved tag keys and values."
     },
     "storage_billing_model": {
       "description": "Specifies the storage billing model for the dataset.\nSet this flag value to LOGICAL to use logical bytes for storage billing,\nor to PHYSICAL to use physical bytes instead.\n\nLOGICAL is the default if this flag isn't specified.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether storage is billed using logical or physical bytes. It affects cost calculation rather than confidentiality, integrity, access control, encryption, or availability."
     },
     "access": {
       "type": "block",
@@ -116,36 +116,36 @@
       "description": "A domain to grant access to. Any users signed in with the\ndomain specified will be granted the specified access",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Grants dataset access to every signed-in user in a domain, which is broader than a named principal. A policy should restrict domains to an approved allowlist."
     },
     "access.group_by_email": {
       "description": "An email address of a Google Group to grant access to.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies a specific Google Group. Whether that group is authorised is organisation-specific and cannot be determined generically from the email value alone."
     },
     "access.iam_member": {
       "description": "Some other type of member that appears in the IAM Policy but isn't a user,\ngroup, domain, or special group. For example: 'allUsers'",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Can contain broad or public principals such as allUsers or allAuthenticatedUsers. A policy should reject public principals and other prohibited member patterns."
     },
     "access.role": {
       "description": "Describes the rights granted to the user specified by the other\nmember of the access object. Basic, predefined, and custom roles\nare supported. Predefined roles that have equivalent basic roles\nare swapped by the API to their basic counterparts. See\n[official docs](https://cloud.google.com/bigquery/docs/access-control).",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines the permissions granted by the access entry. A policy should enforce least privilege and reject overly privileged roles unless explicitly approved."
     },
     "access.special_group": {
       "description": "A special group to grant access to. Possible values include:\n* 'projectOwners': Owners of the enclosing project.\n* 'projectReaders': Readers of the enclosing project.\n* 'projectWriters': Writers of the enclosing project.\n* 'allAuthenticatedUsers': All authenticated BigQuery users.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Can grant access to broad groups such as allAuthenticatedUsers or project-wide owner, writer, and reader groups. A policy should deny prohibited broad groups or restrict them to an approved set."
     },
     "access.user_by_email": {
       "description": "An email address of a user to grant access to. For example:\nfred@example.com",
@@ -163,29 +163,29 @@
       "description": "Description of the expression. This is a longer text which describes the expression,\ne.g. when hovered over it in a UI.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Descriptive metadata for the access condition. It does not change whether the condition evaluates to true or what permissions are granted."
     },
     "access.condition.expression": {
       "description": "Textual representation of an expression in Common Expression Language syntax.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls when the access binding applies. An empty, unconditional, or overly broad expression can make restricted access effectively unconditional, so a policy should reject clearly unsafe expressions and require an approved condition pattern."
     },
     "access.condition.location": {
       "description": "String indicating the location of the expression for error reporting, e.g. a file\nname and a position in the file.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Used only to identify the source location of the expression for error reporting. It does not affect authorisation decisions."
     },
     "access.condition.title": {
       "description": "Title for the expression, i.e. a short string describing its purpose.\nThis can be used e.g. in UIs which allow to enter the expression.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Human-readable metadata for the condition. It does not affect condition evaluation or granted permissions."
     },
     "access.dataset": {
       "type": "block",
@@ -196,8 +196,8 @@
       "description": "Which resources in the dataset this entry applies to. Currently, only views are supported,\nbut additional target types may be added in the future. Possible values: VIEWS",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the supported authorised-dataset resource type and currently only accepts VIEWS. The provider already constrains the value, so no separate security policy is useful."
     },
     "access.dataset.dataset": {
       "type": "block",
@@ -208,15 +208,15 @@
       "description": "The ID of the dataset containing this table.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the authorised dataset. Whether a particular dataset is trusted is organisation-specific and cannot be determined generically from the identifier alone."
     },
     "access.dataset.dataset.project_id": {
       "description": "The ID of the project containing this table.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the project containing the authorised dataset. Whether the project is trusted requires an organisation-specific allowlist; the identifier is not inherently insecure by itself."
     },
     "access.routine": {
       "type": "block",
@@ -227,22 +227,22 @@
       "description": "The ID of the dataset containing this table.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the dataset containing an authorised routine. Whether that dataset is trusted is organisation-specific and cannot be determined generically from the identifier alone."
     },
     "access.routine.project_id": {
       "description": "The ID of the project containing this table.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the project containing an authorised routine. Whether the project is approved requires organisation-specific context rather than a universal security rule."
     },
     "access.routine.routine_id": {
       "description": "The ID of the routine. The ID must contain only letters (a-z,\nA-Z), numbers (0-9), or underscores (_). The maximum length\nis 256 characters.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies a specific authorised routine. The identifier itself does not describe the routine's behaviour or prove whether it is trusted."
     },
     "access.view": {
       "type": "block",
@@ -253,22 +253,22 @@
       "description": "The ID of the dataset containing this table.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the dataset containing an authorised view. Whether the dataset is trusted is organisation-specific and cannot be inferred from the identifier alone."
     },
     "access.view.project_id": {
       "description": "The ID of the project containing this table.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the project containing an authorised view. Whether the project is approved requires organisation-specific context rather than a universal security rule."
     },
     "access.view.table_id": {
       "description": "The ID of the table. The ID must contain only letters (a-z,\nA-Z), numbers (0-9), or underscores (_). The maximum length\nis 1,024 characters.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the authorised view. The identifier itself does not reveal whether the view exposes sensitive data or is approved."
     },
     "default_encryption_configuration": {
       "type": "block",
@@ -291,15 +291,15 @@
       "description": "The storage location URI for all tables in the dataset. Equivalent to hive metastore's\ndatabase locationUri. Maximum length of 1024 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls the external storage location used by catalog tables. An unapproved URI can place or reference data outside trusted storage and residency boundaries, so a policy should enforce approved URI schemes and locations."
     },
     "external_catalog_dataset_options.parameters": {
       "description": "A map of key value pairs defining the parameters and properties of the open source schema.\nMaximum size of 2Mib.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains implementation-specific catalog metadata. The keys and meanings vary by external catalog, so there is no reliable generic security rule for the map as a whole."
     },
     "external_dataset_reference": {
       "type": "block",
@@ -310,15 +310,15 @@
       "description": "The connection id that is used to access the externalSource.\nFormat: projects/{projectId}/locations/{locationId}/connections/{connectionId}",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects the BigQuery connection used to authenticate to and access the external source. A policy should restrict it to approved projects, locations, and connection identifiers."
     },
     "external_dataset_reference.external_source": {
       "description": "External source that backs this dataset.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Identifies the external system backing the dataset. A policy should restrict source types, accounts, regions, or identifiers to approved external data sources to reduce unauthorised access and data-exposure risk."
     }
   }
 }
