@@ -96,14 +96,14 @@
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Controls whether the callback is enabled or disabled. Disabling important callbacks may remove security checks or validations. A policy can require security-related callbacks to remain enabled."
+      "rationale": "Controls whether the post-turn callback executes. Callbacks are the resource's only mechanism for attaching guardrail/audit logic to the execution path. f it's set to true, the callback never runs. A policy should keep it enabled by default so teams don't accidentally turn off checks without realizing it."
     },
     "after_agent_callbacks.python_code": {
       "description": "The python code to execute for the callback.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Contains the Python code executed after the agent runs. Because this code directly affects the behaviour of the agent, it should follow organisational security requirements. A policy can help reduce the risk of unsafe or unauthorized code execution."
+      "security_impact": false,
+      "rationale": "Contains free-form execuitable Python code which is executed after the agent runs. A generic platform policy cannot reliably inspect or validate arbitrary Python scripts, so this field is not suitable for infrastructure policy enforcement. Security review of the code should be handled through application development and code review processes rather than platform policy."
     },
     "after_model_callbacks": {
       "type": "block",
@@ -122,14 +122,14 @@
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Determines whether the callback is executed. Disabling callbacks may bypass important validation or monitoring logic. A security policy can require these callbacks to remain enabled."
+      "rationale": "Controls whether the post-model-call callback executes. Since it could be doing checks on the model's output, it could be required to stays on unless there's a reason to turn it off. A security policy can check that."
     },
     "after_model_callbacks.python_code": {
       "description": "The python code to execute for the callback.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies executable Python code that runs after model execution. Since the code directly affects the application's behaviour, it should comply with organisational security policies to reduce security risks."
+      "security_impact": false,
+      "rationale": "Specifies free-form executable Python code that runs after model execution. A generic platform policy cannot reliably inspect or validate arbitrary Python scripts, so this field is not suitable for infrastructure policy enforcement. Security review of the code should be handled through application development and code review processes rather than platform policy."
     },
     "after_tool_callbacks": {
       "type": "block",
@@ -148,14 +148,14 @@
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Determines whether the callback is active. Disabling callbacks may remove security controls or monitoring functions. A policy can require critical callbacks to remain enabled."
+      "rationale": "Controls whether the post-tool callback executes. Tool calls are risky because they can do real actions. So, the callback that checks what happened after a tool runs should stay on by default instead of being turned off. A policy can check that."
     },
     "after_tool_callbacks.python_code": {
       "description": "The python code to execute for the callback.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Contains executable Python code that runs after tool execution. Because executable code can affect the security of the agent, a policy can require secure implementation and prevent unsafe code execution."
+      "security_impact": false,
+      "rationale": "Contains free-form executable Python code that runs after tool execution. A generic platform policy cannot reliably inspect or validate arbitrary Python scripts, so this field is not suitable for infrastructure policy enforcement. Security review of the code should be handled through application development and code review processes rather than platform policy."
     },
     "before_agent_callbacks": {
       "type": "block",
@@ -174,14 +174,14 @@
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Controls whether the callback executes before the agent runs. Disabling important validation callbacks may weaken security. A policy can require them to remain enabled."
+      "rationale": "Controls whether the callback executes before the agent runs. Disabling important validation callbacks may weaken security. So it should default to on so nothing gets silently skipped. A policy can check that."
     },
     "before_agent_callbacks.python_code": {
       "description": "The python code to execute for the callback.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Contains executable Python code that runs before the agent executes. This code can influence application behaviour and should follow organisational security standards."
+      "security_impact": false,
+      "rationale": "Contains free-form executable Python code that runs before the agent executes. A generic platform policy cannot reliably inspect or validate arbitrary Python scripts, so this field is not suitable for infrastructure policy enforcement. Security review of the code should be handled through application development and code review processes rather than platform policy."
     },
     "before_model_callbacks": {
       "type": "block",
@@ -206,8 +206,8 @@
       "description": "The python code to execute for the callback.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Contains executable Python code executed before the model runs. Since this code directly affects application behaviour, a security policy can require it to follow secure coding practices."
+      "security_impact": false,
+      "rationale": "Contains free-from executable Python code executed before the model runs. A generic platform policy cannot reliably inspect or validate arbitrary Python scripts, so this field is not suitable for infrastructure policy enforcement. Security review of the code should be handled through application development and code review processes rather than platform policy."
     },
     "before_tool_callbacks": {
       "type": "block",
@@ -232,8 +232,8 @@
       "description": "The python code to execute for the callback.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Contains executable Python code that runs before tool execution. A policy can require secure implementation because the code directly affects application behaviour."
+      "security_impact": false,
+      "rationale": "Contains free-form executable Python code that runs before tool execution. A generic platform policy cannot reliably inspect or validate arbitrary Python scripts, so this field is not suitable for infrastructure policy enforcement. Security review of the code should be handled through application development and code review processes rather than platform policy."
     },
     "llm_agent": {
       "type": "block",
