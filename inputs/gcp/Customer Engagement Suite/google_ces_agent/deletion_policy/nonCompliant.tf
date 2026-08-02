@@ -3,5 +3,5 @@ resource "google_ces_agent" "non_compliant_example_1" {
   display_name     = "example-agent"
   app              = "fake-app"
   location         = "australia-southeast1"
-  deletion_policy  = "PREVENT"
+  deletion_policy  = "DELETE"
 }
