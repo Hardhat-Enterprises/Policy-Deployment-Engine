@@ -14,7 +14,7 @@
             "required": false,
             "type": "string",
             "security_impact": true,
-            "rationale": "Controls whether Terraform is allowed to destroy this rule. Leaving the deletion policy as DELETE allows Terraform to remove the firewall policy rule during infrastructure changes. Accidental deletion in a production environment can remove a live security control and weaken network security."
+            "rationale": "Deletion-blocking control for this firewall policy rule. A platform policy should require PREVENT so Terraform cannot accidentally destroy a live network security control."
         },
         "description": {
             "description": "An optional description for this resource.",
@@ -105,7 +105,7 @@
             "required": false,
             "type": "string",
             "security_impact": false,
-            "rationale": "This parameter defines the architectural layer where the firewall logic is enforced. If misconfigured the rule will fail to protect the intended resources, leading to a complete security bypass for those assets."
+            "rationale": "Architectural/functional enum that selects the enforcement layer (INSTANCES vs INTERNAL_MANAGED_LB). It scopes where the rule applies rather than toggling a security feature, and neither value is inherently insecure."
         },
         "tls_inspect": {
             "description": "Boolean flag indicating if the traffic should be TLS decrypted.\nCan be set only if action = 'apply_security_profile_group' and cannot be set for other actions.",
@@ -180,7 +180,7 @@
             "required": false,
             "type": "list(string)",
             "security_impact": true,
-            "rationale": "This defines exactly which computers or networks are sending traffic to you. If you put the wrong IP addresses here, you could accidentally let hackers from the public internet into your private systems or block your own team from doing their work. So a generic can flag without hoardcoding any team specific ranges."
+            "rationale": "Defines which source addresses can match this firewall rule and therefore controls network exposure. A platform policy should prevent overly broad access (for example disallowing 0.0.0.0/0 on sensitive ingress) rather than pinning team-specific CIDR ranges."
         },
         "match.src_network_context": {
             "description": "Network context of the traffic source. Possible values: [\"UNSPECIFIED\", \"INTERNET\", \"INTRA_VPC\", \"NON_INTERNET\", \"VPC_NETWORKS\"]",
