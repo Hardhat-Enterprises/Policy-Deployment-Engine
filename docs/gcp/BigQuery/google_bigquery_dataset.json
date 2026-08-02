@@ -21,14 +21,14 @@
       "required": false,
       "type": "number",
       "security_impact": true,
-      "rationale": "Automatically deletes partitions after the configured period, affecting data retention and availability. A policy can enforce an approved minimum or range to prevent premature deletion and meet retention requirements."
+      "rationale": "Partition expiration length is an operational data-management and retention choice left to individual teams. It is not a security control that PDE should enforce centrally."
     },
     "default_table_expiration_ms": {
       "description": "The default lifetime of all tables in the dataset, in milliseconds.\nThe minimum value is 3600000 milliseconds (one hour).\nOnce this property is set, all newly-created tables in the dataset\nwill have an 'expirationTime' property set to the creation time plus\nthe value in this property, and changing the value will only affect\nnew tables, not existing ones. When the 'expirationTime' for a given\ntable is reached, that table will be deleted automatically.\nIf a table's 'expirationTime' is modified or removed before the\ntable expires, or if you provide an explicit 'expirationTime' when\ncreating a table, that value takes precedence over the default\nexpiration time indicated by this property.",
       "required": false,
       "type": "number",
       "security_impact": true,
-      "rationale": "Automatically deletes newly created tables after the configured lifetime, affecting data retention and availability. A policy can enforce an approved minimum or range to prevent unintended data loss."
+      "rationale": "The default table lifespan is a team data-management and retention choice. It is separate from destructive resource-protection controls and should not be enforced as a security policy."
     },
     "delete_contents_on_destroy": {
       "description": "If set to 'true', delete all the tables in the\ndataset when destroying the resource; otherwise,\ndestroying the resource will fail if tables are present.",
@@ -83,8 +83,8 @@
       "description": "Defines the time travel window in hours. The value can be from 48 to 168 hours (2 to 7 days).",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines how long historical table data remains recoverable. A policy can require an approved recovery window so that accidental deletion or modification can be restored while meeting retention requirements."
+      "security_impact": false,
+      "rationale": "The time-travel window is a backup-retention and data-recovery choice made by the team. It is an operational setting rather than a centrally enforceable security control."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
@@ -97,8 +97,8 @@
       "description": "The tags attached to this table. Tag keys are globally unique. Tag key is expected to be\nin the namespaced format, for example \"123456789012/environment\" where 123456789012 is the\nID of the parent organization or project resource for this tag key. Tag value is expected\nto be the short name, for example \"Production\". See [Tag definitions](https://cloud.google.com/iam/docs/tags-access-control#definitions)\nfor more details.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Google Cloud resource tags can be referenced by IAM Conditions and governance controls. Missing or unapproved tags can change how conditional access policies apply, so a policy can require approved tag keys and values."
+      "security_impact": false,
+      "rationale": "Resource tags are organisation-specific metadata and reference values. PDE cannot centrally determine the required tag keys or values, so this field should not be a generic policy target."
     },
     "storage_billing_model": {
       "description": "Specifies the storage billing model for the dataset.\nSet this flag value to LOGICAL to use logical bytes for storage billing,\nor to PHYSICAL to use physical bytes instead.\n\nLOGICAL is the default if this flag isn't specified.",
@@ -137,8 +137,8 @@
       "description": "Describes the rights granted to the user specified by the other\nmember of the access object. Basic, predefined, and custom roles\nare supported. Predefined roles that have equivalent basic roles\nare swapped by the API to their basic counterparts. See\n[official docs](https://cloud.google.com/bigquery/docs/access-control).",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines the permissions granted by the access entry. A policy should enforce least privilege and reject overly privileged roles unless explicitly approved."
+      "security_impact": false,
+      "rationale": "Role selection is the responsibility of the team configuring access. Platform policy should police unsafe principals where applicable, but should not centrally restrict which roles teams may grant."
     },
     "access.special_group": {
       "description": "A special group to grant access to. Possible values include:\n* 'projectOwners': Owners of the enclosing project.\n* 'projectReaders': Readers of the enclosing project.\n* 'projectWriters': Writers of the enclosing project.\n* 'allAuthenticatedUsers': All authenticated BigQuery users.",
@@ -291,8 +291,8 @@
       "description": "The storage location URI for all tables in the dataset. Equivalent to hive metastore's\ndatabase locationUri. Maximum length of 1024 characters.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls the external storage location used by catalog tables. An unapproved URI can place or reference data outside trusted storage and residency boundaries, so a policy should enforce approved URI schemes and locations."
+      "security_impact": false,
+      "rationale": "This field is a reference to an external storage URI or endpoint. References to external resources and paths are not generic PDE policy targets because approved locations are organisation-specific."
     },
     "external_catalog_dataset_options.parameters": {
       "description": "A map of key value pairs defining the parameters and properties of the open source schema.\nMaximum size of 2Mib.",
@@ -310,15 +310,15 @@
       "description": "The connection id that is used to access the externalSource.\nFormat: projects/{projectId}/locations/{locationId}/connections/{connectionId}",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Selects the BigQuery connection used to authenticate to and access the external source. A policy should restrict it to approved projects, locations, and connection identifiers."
+      "security_impact": false,
+      "rationale": "This argument identifies another resource, a BigQuery connection. PDE guidance treats references to other resources as non-policy targets and does not pin specific resource identifiers."
     },
     "external_dataset_reference.external_source": {
       "description": "External source that backs this dataset.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the external system backing the dataset. A policy should restrict source types, accounts, regions, or identifiers to approved external data sources to reduce unauthorised access and data-exposure risk."
+      "security_impact": false,
+      "rationale": "This field identifies an external data source or naming pointer. PDE does not constrain external resource references or organisation-specific source identifiers through a generic policy."
     }
   }
 }
