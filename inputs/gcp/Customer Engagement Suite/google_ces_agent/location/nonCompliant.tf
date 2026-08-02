@@ -1,0 +1,6 @@
+resource "google_ces_agent" "non_compliant_example_1" {
+  agent_id     = "agent-1"
+  display_name = "example-agnet"
+  app          = "fake-app"
+  location     = "us-east1"
+}

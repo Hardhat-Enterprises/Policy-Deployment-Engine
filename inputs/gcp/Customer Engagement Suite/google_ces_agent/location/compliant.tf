@@ -3,9 +3,4 @@ resource "google_ces_agent" "compliant_example_1" {
   display_name = "example-agent"
   app          = "fake-app"
   location     = "australia-southeast1"
-
-  guardrails = [
-    "projects/example/locations/australia-southeast1/apps/fake-app/guardrails/default"
-  ]
 }
-
