@@ -6,36 +6,36 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Deletion-blocking flags follow the prevent-destructive-loss archetype: enforcing PREVENT protects against accidental or malicious destruction of the resource, so this is treated as security-relevant."
     },
     "description": {
       "description": "An optional description of this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A free-text label with no functional effect on access, exposure, or data protection."
     },
     "labels": {
       "description": "Labels to apply to this InstantSnapshot.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Metadata used for organisation and filtering; it does not itself change access, exposure, or data protection."
     },
     "name": {
       "description": "Name of the resource; provided by the client when the resource is\ncreated. The name must be 1-63 characters long, and comply with\nRFC1035. Specifically, the name must be 1-63 characters long and match\nthe regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the\nfirst character must be a lowercase letter, and all following\ncharacters must be a dash, lowercase letter, or digit, except the last\ncharacter, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An identifier for the resource; it does not itself change security behaviour."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The project determines resource ownership/location, similar to other identifier fields; it is not itself a security control."
     },
     "region": {
       "description": "A reference to the region where the disk is located.",
@@ -48,8 +48,8 @@
       "description": "The source disk used to create this instant snapshot. You can provide this as a partial or full URL to the resource.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which disk's data is captured into the snapshot. Pointing this at the wrong or unauthorized disk could copy sensitive data into a new artifact with potentially weaker protections than the source."
     },
     "params": {
       "type": "block",
@@ -60,8 +60,8 @@
       "description": "Resource manager tags to be bound to the instant snapshot. Tag keys and values have the\nsame definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id},\nand values are in the format tagValues/456.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Metadata tags bound to the resource for organisational/governance purposes; they do not themselves control access or exposure."
     }
   }
 }
