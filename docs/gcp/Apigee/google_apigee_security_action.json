@@ -6,64 +6,64 @@
       "description": "If unset, this would apply to all proxies in the environment.\nIf set, this action is enforced only if at least one proxy in the repeated\nlist is deployed at the time of enforcement. If set, several restrictions are enforced on SecurityActions.\nThere can be at most 100 enabled actions with proxies set in an env.\nSeveral other restrictions apply on conditions and are detailed later.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Determines which API proxies are protected by the security action. An incorrect or overly narrow list may leave sensitive proxies unprotected."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Controls whether the security action can be deleted. Allowing deletion may unintentionally remove an important API traffic protection control."
     },
     "description": {
       "description": "An optional user provided description of the SecurityAction.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "Provides human-readable documentation only and does not change how the security action evaluates or handles API traffic."
     },
     "env_id": {
       "description": "The Apigee environment that this security action applies to.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "Identifies the deployment environment, and the correct value is organisation-specific."
     },
     "expire_time": {
       "description": "The expiration for this SecurityAction.\nUses RFC 3339, where generated output will always be Z-normalized and uses 0, 3, 6 or 9\nfractional digits. Offsets other than \"Z\" are also accepted.\nExamples: \"2014-10-02T15:01:23Z\", \"2014-10-02T15:01:23.045123456Z\" or \"2014-10-02T15:01:23+05:30\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Determines when the security action stops being enforced. An incorrect or premature expiration could remove protection from the affected APIs."
     },
     "org_id": {
       "description": "The organization that this security action applies to.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "Identifies the Apigee organisation, and the correct value is organisation-specific."
     },
     "security_action_id": {
       "description": "The ID to use for the SecurityAction, which will become the final component of the action's resource name.\nThis value should be 0-61 characters, and valid format is (^a-z?$).",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "Identifies the security action resource and does not directly affect request handling."
     },
     "state": {
       "description": "Only an ENABLED SecurityAction is enforced. An ENABLED SecurityAction past its expiration time will not be enforced. Possible values: [\"ENABLED\", \"DISABLED\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Directly controls whether the security action is enforced. A DISABLED action provides no protection even when its conditions are correctly configured."
     },
     "ttl": {
       "description": "The TTL for this SecurityAction.\nA duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.5s\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Controls how long the security action remains effective. A TTL that is too short may cause the protection to expire prematurely."
     },
     "allow": {
       "type": "block",
@@ -79,78 +79,78 @@
       "description": "A list of accessTokens. Limit 1000 per action.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Selects requests according to their access tokens. Incorrect values could allow malicious token traffic or apply an action to legitimate authenticated requests."
     },
     "condition_config.api_keys": {
       "description": "A list of API keys. Limit 1000 per action.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Selects requests according to API keys. Incorrect configuration could fail to restrict a compromised key or could affect legitimate API clients."
     },
     "condition_config.api_products": {
       "description": "A list of API Products. Limit 1000 per action.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Determines which API product traffic is affected by the action. Incorrect configuration could leave sensitive API products unprotected."
     },
     "condition_config.asns": {
       "description": "A list of ASN numbers to act on, e.g. 23. https://en.wikipedia.org/wiki/Autonomous_system_(Internet)\nThis uses int64 instead of uint32 because of https://linter.aip.dev/141/forbidden-types.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Matches traffic originating from specified autonomous systems. Incorrect ASN values could allow traffic from untrusted networks or block legitimate networks."
     },
     "condition_config.bot_reasons": {
       "description": "A list of Bot Reasons. Current options: Flooder, Brute Guessor, Static Content Scraper,\nOAuth Abuser, Robot Abuser, TorListRule, Advanced Anomaly Detection, Advanced API Scraper,\nSearch Engine Crawlers, Public Clouds, Public Cloud AWS, Public Cloud Azure, and Public Cloud Google.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Determines which categories of detected automated or abusive traffic trigger the action. Missing relevant bot reasons may allow malicious bot activity."
     },
     "condition_config.developer_apps": {
       "description": "A list of developer apps. Limit 1000 per action.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Scopes the action to specified developer applications. Incorrect values may leave an untrusted or compromised application unaffected."
     },
     "condition_config.developers": {
       "description": "A list of developers. Limit 1000 per action.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Scopes the action to traffic associated with specified developers. Incorrect values could fail to control a risky developer account or affect legitimate developers."
     },
     "condition_config.http_methods": {
       "description": "Act only on particular HTTP methods. E.g. A read-only API can block POST/PUT/DELETE methods.\nAccepted values are: GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE and PATCH.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Determines which HTTP operations trigger the action. Incorrect configuration could permit dangerous methods such as POST, PUT, PATCH, or DELETE."
     },
     "condition_config.ip_address_ranges": {
       "description": "A list of IP addresses. This could be either IPv4 or IPv6. Limited to 100 per action.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Controls which source IP addresses or networks trigger the action. Overly broad or incorrect ranges could block legitimate users or allow malicious sources."
     },
     "condition_config.region_codes": {
       "description": "A list of countries/region codes to act on, e.g. US. This follows https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Applies the action according to the request's geographic region. Incorrect region codes could permit traffic from restricted locations or block approved regions."
     },
     "condition_config.user_agents": {
       "description": "A list of user agents to deny. We look for exact matches. Limit 50 per action.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Determines which user-agent values trigger the action. Incorrect values may fail to identify unwanted clients or may affect legitimate clients."
     },
     "deny": {
       "type": "block",
@@ -161,8 +161,8 @@
       "description": "The HTTP response code if the Action = DENY.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "Controls the response code returned after denial but does not determine whether the request is blocked."
     },
     "flag": {
       "type": "block",
@@ -178,15 +178,15 @@
       "description": "The header name to be sent to the target.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "The header name does not directly control access, and the appropriate value depends on the organisation's backend configuration and naming conventions."
     },
     "flag.headers.value": {
       "description": "The header value to be sent to the target.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "The header value does not directly control access, and the appropriate value depends on the organisation."
     }
   }
 }
