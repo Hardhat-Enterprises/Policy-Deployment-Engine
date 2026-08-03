@@ -6,43 +6,43 @@
       "description": "The resource that the security policy is attached to.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines the organization, folder, or project to which the security policy is attached. An incorrect value could leave intended resources unprotected or apply the policy to the wrong resources."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can delete or abandon the security policy association. Removing the association could stop the policy from being enforced on the attached resources."
     },
     "excluded_folders": {
       "description": "A list of folders to exclude from the security policy.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which folders are excluded from the security policy. Incorrect exclusions could allow resources within those folders to bypass required security controls."
     },
     "excluded_projects": {
       "description": "A list of projects to exclude from the security policy.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which projects are excluded from the security policy. Incorrect exclusions could leave project resources outside the intended security policy coverage."
     },
     "name": {
       "description": "The name for an association.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides an identifier for the association and does not directly control the policy rules, attachment target, exclusions, or security enforcement."
     },
     "policy_id": {
       "description": "The security policy ID of the association.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which security policy is used by the association. An incorrect value could apply the wrong security controls or prevent the intended policy from protecting the target."
     }
   }
 }
