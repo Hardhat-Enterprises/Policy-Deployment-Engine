@@ -6,8 +6,8 @@
       "description": "The collection ID. Currently only accepts \"default_collection\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier for the Discovery Engine collection. It does not configure access, encryption, networking, logging, or another security control."
     },
     "control_id": {
       "description": "The unique id of the control.",
@@ -20,15 +20,15 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls protection against unintended deletion or abandonment of the resource. Policy should require an approved deletion setting, such as PREVENT, for production resources."
     },
     "display_name": {
       "description": "The display name of the control. This field must be a UTF-8 encoded\nstring with a length limit of 128 characters.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Human-readable label used to identify the control. It does not change permissions, data protection, networking, or security behaviour."
     },
     "engine_id": {
       "description": "The engine to add the control to.",
@@ -48,8 +48,8 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier of the Google Cloud project containing the resource. Resource identifiers and references are not constrained by this policy framework."
     },
     "solution_type": {
       "description": "The solution type that the control belongs to. Possible values: [\"SOLUTION_TYPE_RECOMMENDATION\", \"SOLUTION_TYPE_SEARCH\", \"SOLUTION_TYPE_CHAT\", \"SOLUTION_TYPE_GENERATIVE_CHAT\"]",
@@ -62,8 +62,8 @@
       "description": "The use cases that the control is used for. Possible values: [\"SEARCH_USE_CASE_SEARCH\", \"SEARCH_USE_CASE_BROWSE\"]",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the functional search or browse contexts in which the control operates. It does not configure a security boundary or access control."
     },
     "boost_action": {
       "type": "block",
@@ -74,22 +74,22 @@
       "description": "The data store to boost.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier of the data store affected by the boost action. Resource references are not policy targets."
     },
     "boost_action.filter": {
       "description": "The filter to apply to the search results.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines which search results receive a relevance boost. It affects result ranking rather than authorization or access to the underlying data."
     },
     "boost_action.fixed_boost": {
       "description": "The fixed boost value to apply to the search results. Positive values will increase the relevance of the results, while negative values will decrease the relevance. The value must be between -100 and 100.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Adjusts the ranking score of matching search results. This is relevance configuration and does not establish a security control."
     },
     "boost_action.interpolation_boost_spec": {
       "type": "block",
@@ -100,22 +100,22 @@
       "description": "The attribute type to be used to determine the boost amount. Possible values: [\"NUMERICAL\", \"FRESHNESS\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the attribute category used for relevance boosting. It does not affect authentication, authorization, encryption, or data access."
     },
     "boost_action.interpolation_boost_spec.field_name": {
       "description": "The name of the field whose value will be used to determine the boost amount.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies a document field used to calculate search ranking. It does not grant access to the field or change a security boundary."
     },
     "boost_action.interpolation_boost_spec.interpolation_type": {
       "description": "The interpolation type to be applied to connect the control points. Possible values: [\"LINEAR\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the mathematical method used to calculate relevance boosts. It is not security-sensitive configuration."
     },
     "boost_action.interpolation_boost_spec.control_point": {
       "type": "block",
@@ -126,15 +126,15 @@
       "description": "The attribute value of the control point.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides an input value for the relevance-boosting curve. It does not configure access or data protection."
     },
     "boost_action.interpolation_boost_spec.control_point.boost_amount": {
       "description": "The value between -1 to 1 by which to boost the score if the attributeValue\nevaluates to the value specified above.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the amount by which a result ranking is adjusted. It affects search relevance only."
     },
     "conditions": {
       "type": "block",
@@ -145,8 +145,8 @@
       "description": "The regular expression that the query must match for this condition to be met.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines when the search control is activated based on query text. It does not provide authorization or protect the underlying data."
     },
     "conditions.active_time_range": {
       "type": "block",
@@ -157,15 +157,15 @@
       "description": "The end time of the active time range.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines when the control stops being active. This is operational scheduling and not a security boundary."
     },
     "conditions.active_time_range.start_time": {
       "description": "The start time of the active time range.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines when the control becomes active. This is operational scheduling and not a security boundary."
     },
     "conditions.query_terms": {
       "type": "block",
@@ -176,15 +176,15 @@
       "description": "If true, the query term must be an exact match. Otherwise, the query term can be a partial match.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls how query terms are matched when activating the control. It affects search behaviour rather than security."
     },
     "conditions.query_terms.value": {
       "description": "The value of the query term.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the query text that activates the control. It does not configure access to resources or data."
     },
     "filter_action": {
       "type": "block",
@@ -195,15 +195,15 @@
       "description": "The data store to filter.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier of the data store affected by the filter action. Resource references are not constrained by policy."
     },
     "filter_action.filter": {
       "description": "The filter to apply to the search results.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls which entries are included in search results. Search filtering should not be treated as an authorization mechanism for the underlying data."
     },
     "promote_action": {
       "type": "block",
@@ -214,8 +214,8 @@
       "description": "The data store to promote.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier of the data store used by the promotion. Resource references are not policy targets."
     },
     "promote_action.search_link_promotion": {
       "type": "block",
@@ -226,43 +226,43 @@
       "description": "The description of the promoted link.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Human-readable descriptive content shown with the promoted link. It does not configure a security control."
     },
     "promote_action.search_link_promotion.document": {
       "description": "The document to promote.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier of the document selected for promotion. Resource identifiers are not constrained by policy."
     },
     "promote_action.search_link_promotion.enabled": {
       "description": "Return promotions for basic site search.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Enables or disables the search promotion feature. The promoted destinations are assessed separately through their URI fields."
     },
     "promote_action.search_link_promotion.image_uri": {
       "description": "The image URI of the promoted link.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Specifies externally loaded image content. Policy should require HTTPS and, where appropriate, restrict images to approved domains to reduce untrusted-content and tracking risks."
     },
     "promote_action.search_link_promotion.title": {
       "description": "The title of the promoted link.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Human-readable title displayed for the promoted link. It does not itself determine the destination or establish a security control."
     },
     "promote_action.search_link_promotion.uri": {
       "description": "The URI to promote.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls the destination presented to users as a promoted link. Policy should require HTTPS and restrict destinations to approved domains to reduce phishing and malicious-redirection risks."
     },
     "redirect_action": {
       "type": "block",
@@ -273,8 +273,8 @@
       "description": "The URI to redirect to.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls where matching users are redirected. Policy should require HTTPS and restrict destinations to approved domains to prevent unsafe or malicious redirects."
     },
     "synonyms_action": {
       "type": "block",
@@ -285,8 +285,8 @@
       "description": "The synonyms to apply to the search results.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines equivalent search terms used to improve query matching. It affects search relevance rather than access control or data protection."
     }
   }
 }
