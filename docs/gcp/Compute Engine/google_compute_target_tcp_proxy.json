@@ -6,50 +6,50 @@
       "description": "A reference to the BackendService resource. This field is optional when\nthe loadBalancingScheme (available in beta) is set to INTERNAL_MANAGED.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines the backend service that receives traffic from the target TCP proxy. A policy should restrict this reference to approved backend services to prevent traffic from being routed to unauthorised or insecure destinations."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether the resource can be deleted, protected from deletion, or abandoned outside Terraform management. A policy should require an approved deletion behaviour to reduce accidental deletion, service disruption, or unmanaged resources."
     },
     "description": {
       "description": "An optional description of this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides descriptive metadata only and does not directly change traffic routing, access control, network exposure, or the security behaviour of the target TCP proxy."
     },
     "name": {
       "description": "Name of the resource. Provided by the client when the resource is\ncreated. The name must be 1-63 characters long, and comply with\nRFC1035. Specifically, the name must be 1-63 characters long and match\nthe regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the\nfirst character must be a lowercase letter, and all following\ncharacters must be a dash, lowercase letter, or digit, except the last\ncharacter, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the resource but does not directly control permissions, traffic handling, backend selection, or network exposure. Naming standards may support administration but are not a direct security control."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines the Google Cloud project that owns the resource and therefore its administrative and trust boundary. A policy should restrict deployment to approved projects to prevent resources from being created in unauthorised environments."
     },
     "proxy_bind": {
       "description": "This field only applies when the forwarding rule that references\nthis target proxy has a loadBalancingScheme set to INTERNAL_SELF_MANAGED.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Envoy proxies intercept inbound traffic and bind to the forwarding rule's IP address and port in INTERNAL_SELF_MANAGED deployments. A policy should restrict this setting because it changes network traffic interception and exposure behaviour."
     },
     "proxy_header": {
       "description": "Specifies the type of proxy header to append before sending data to\nthe backend. Default value: \"NONE\" Possible values: [\"NONE\", \"PROXY_V1\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether client connection information is sent to the backend using the PROXY protocol. A policy should require an approved value because incompatible or untrusted proxy-header handling can affect source identification, logging, and backend trust decisions."
     }
   }
 }
