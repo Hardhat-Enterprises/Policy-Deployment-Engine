@@ -76,7 +76,7 @@
       "type": "block",
       "description": "The properties of a DbSystem.",
       "required": false,
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "The properties block is a container that groups multiple DbSystem configuration attributes. The block itself does not directly implement security controls; security impact depends on the individual attributes defined within this block."
     },
     "properties.compute_count": {
@@ -230,7 +230,7 @@
       "type": "block",
       "description": "Details of the Database resource.\nhttps://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/Database/",
       "required": true,
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "The database block defines the configuration details of the Oracle Database resource. The block itself is used for resource provisioning and management, while specific security-related settings such as authentication, auditing, encryption, and access controls are configured through individual attributes within the block."
     },
     "properties.db_home.database.admin_password": {
@@ -314,7 +314,7 @@
       "type": "block",
       "description": "The properties of a Database.",
       "required": false,
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "The properties block is a container for database configuration attributes. The block itself does not directly implement security controls; security impact depends on the individual attributes defined within this block."
 
     },
@@ -329,14 +329,14 @@
       "type": "block",
       "description": "The configuration of the Database Management service.",
       "required": false,
-      "security_impact": "true",
+      "security_impact": true,
       "rationale": "The database_management_config block controls the configuration of the Oracle Database Management service, which provides monitoring, diagnostics, and management capabilities. These settings can affect security monitoring, visibility, and the handling of database operational information."
     },
     "properties.db_home.database.properties.db_backup_config": {
       "type": "block",
       "description": "Backup Options for the Database.",
       "required": false,
-      "security_impact": "true",
+      "security_impact": true,
       "rationale": "The db_backup_config block manages backup-related settings for the Oracle Database. Backup configuration can affect data availability, data protection, and recovery capabilities. Improper backup configuration may result in data loss, inability to recover from incidents, or exposure of backup data if security controls are not properly applied."
 
     },
@@ -386,20 +386,22 @@
       "type": "block",
       "description": "Details of the database backup destinations.",
       "required": false,
-      "security_impact": "true",
+      "security_impact": true,
       "rationale": "The backup_destination_details parameter defines the destination locations for database backups. Since backups may contain sensitive data and are essential for recovery and incident response, incorrect configuration can affect data confidentiality, availability, and recovery capability."
     },
     "properties.db_home.database.properties.db_backup_config.backup_destination_details.type": {
       "description": "The type of the database backup destination.\nPossible values:\nNFS\nRECOVERY_APPLIANCE\nOBJECT_STORE\nLOCAL\nDBRS",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument determines the type of storage destination used for database backups. The selected backup destination affects data protection, availability, and the security of backup data. An insecure or incorrectly configured backup destination may lead to unauthorized access, data exposure, or loss of recovery capability. Therefore, it has a security impact."
     },
     "properties.db_system_options": {
       "type": "block",
       "description": "Details of the DbSystem Options.",
-      "required": false
+      "required": false,
+      "security_impact": "true",
+      "rationale": "This argument contains configuration options for the database system. The settings within this block may influence database behaviour, availability, and security-related configurations. Incorrect configuration of these options could introduce security risks or affect the protection of database resources. Therefore, it has a security impact."
     },
     "properties.db_system_options.storage_management": {
       "description": "The storage option used in DB system.\nPossible values:\nASM\nLVM",
@@ -412,7 +414,7 @@
       "type": "block",
       "description": "Represents a time zone from the\n[IANA Time Zone Database](https://www.iana.org/time-zones).",
       "required": false,
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "The time_zone parameter defines the time zone configuration used by the Oracle DbSystem. It affects time-related operations, scheduling, and timestamp representation but does not directly configure security controls such as authentication, authorization, encryption, auditing, or network access restrictions."
     },
     "properties.time_zone.id": {
