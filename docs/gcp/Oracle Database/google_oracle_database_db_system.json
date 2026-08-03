@@ -13,64 +13,64 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This setting controls whether the database system can be deleted or removed from Terraform management. Using 'PREVENT' helps protect critical database resources from accidental or unauthorized deletion, supporting resource availability and reducing the risk of data loss."
     },
     "deletion_protection": {
       "description": "Whether or not to allow Terraform to destroy the instance. Unless this field is set to false in Terraform state, a terraform destroy or terraform apply that would delete the instance will fail.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enabling deletion protection helps prevent accidental or unauthorized deletion of the database system through Terraform. This protects the availability of the resource and reduces the risk of service disruption or data loss caused by unintended infrastructure changes."
     },
     "display_name": {
       "description": "The display name for the System db. The name does not have to\nbe unique within your project.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The display name is used only to identify the database system for management purposes. It does not affect authentication, authorization, encryption, network security, or the confidentiality, integrity, or availability of the resource."
     },
     "gcp_oracle_zone": {
       "description": "The GCP Oracle zone where Oracle DbSystem is hosted.\nExample: us-east4-b-r2.\nIf not specified, the system will pick a zone based on availability.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "This argument specifies the deployment zone of the Oracle DbSystem. It determines where the resource is hosted but does not configure security controls such as authentication, authorization, encryption, network protection, or access restrictions."
     },
     "labels": {
       "description": "The labels or tags associated with the DbSystem.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels are metadata used to organize, identify, and manage resources. They do not control authentication, authorization, encryption, network security, or other security settings of the database system."
     },
     "location": {
       "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+      "security_impact": false,
+      "rationale": "The location parameter defines the deployment location of the Oracle DbSystem resource and is primarily used for resource identification and placement. Although the selected location may influence data residency and compliance considerations, it does not directly configure security controls such as access management, encryption, authentication, or network protection."
     },
     "odb_network": {
       "description": "The name of the OdbNetwork associated with the DbSystem.\nFormat: projects/{project}/locations/{location}/odbNetworks/{odb_network}\nIt is optional but if specified, this should match the parent ODBNetwork of\nthe OdbSubnet.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The OdbNetwork defines the network environment where the Oracle DbSystem is deployed. Network configuration can influence the isolation, connectivity, and exposure of the database resource. Incorrect network association may result in unintended access paths or reduced network security controls."
     },
     "odb_subnet": {
       "description": "The name of the OdbSubnet associated with the DbSystem for IP\nallocation. Format:\nprojects/{project}/locations/{location}/odbNetworks/{odb_network}/odbSubnets/{odb_subnet}",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The OdbSubnet determines the network segment and IP allocation used by the Oracle DbSystem. Subnet selection affects network isolation, resource accessibility, and segmentation of the database environment, which can directly impact the security posture of the deployed resource."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The project ID identifies the Google Cloud project where the Oracle DbSystem resource is created. It is used for resource organization and management but does not directly configure security controls such as authentication, authorization, encryption, or network access."
     },
     "properties": {
       "type": "block",
@@ -81,295 +81,311 @@
       "description": "The number of CPU cores to enable for the DbSystem.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The compute_count parameter defines the number of CPU cores allocated to the Oracle DbSystem. It affects resource capacity and performance but does not directly configure security controls such as access management, encryption, authentication, or network protection."
     },
     "properties.compute_model": {
       "description": "The compute model of the DbSystem.\nPossible values:\nECPU\nOCPU",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The compute_model parameter defines the CPU allocation model used by the Oracle DbSystem. It determines how compute resources are provisioned but does not directly configure security controls such as authentication, authorization, encryption, or network access restrictions."
     },
     "properties.data_storage_size_gb": {
       "description": "The data storage size in GB that is currently available to DbSystems.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The data_storage_size_gb parameter controls the amount of storage capacity allocated to the Oracle DbSystem. It affects resource capacity and availability but does not directly configure security controls such as encryption, authentication, authorization, or network protection."
     },
     "properties.database_edition": {
       "description": "The database edition of the DbSystem.\nPossible values:\nSTANDARD_EDITION\nENTERPRISE_EDITION\nENTERPRISE_EDITION_HIGH_PERFORMANCE",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The database_edition parameter specifies the Oracle Database edition deployed for the DbSystem. It determines available database features and performance capabilities but does not directly configure security controls such as authentication, authorization, encryption, or network access restrictions."
     },
     "properties.domain": {
       "description": "The host domain name of the DbSystem.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The domain parameter specifies the host domain name assigned to the Oracle DbSystem. It is used for resource identification and connectivity purposes but does not directly configure security controls such as authentication, authorization, encryption, network access restrictions, or data protection mechanisms."
     },
     "properties.hostname_prefix": {
       "description": "Prefix for DB System host names.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The hostname_prefix parameter is used to define a naming prefix for the Oracle DbSystem host names. It is a resource identification and management setting that does not directly configure security controls such as authentication, authorization, encryption, or network access restrictions."
     },
     "properties.initial_data_storage_size_gb": {
       "description": "The initial data storage size in GB.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The initial_data_storage_size_gb parameter defines the amount of storage allocated when creating the Oracle DbSystem. It affects storage capacity and resource planning but does not directly configure security controls such as encryption, authentication, authorization, or network protection."
     },
     "properties.license_model": {
       "description": "The license model of the DbSystem.\nPossible values:\nLICENSE_INCLUDED\nBRING_YOUR_OWN_LICENSE",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The license_model parameter specifies how the Oracle Database license is provided for the DbSystem. It affects licensing and cost management but does not directly configure security controls such as authentication, authorization, encryption, auditing, or network access restrictions."
     },
     "properties.memory_size_gb": {
       "description": "The memory size in GB.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The memory_size_gb parameter defines the amount of memory allocated to the Oracle DbSystem. It affects system performance and resource capacity but does not directly configure security controls such as authentication, authorization, encryption, or network security settings."
     },
     "properties.node_count": {
       "description": "The number of nodes in the DbSystem.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The node_count parameter defines the number of nodes deployed in the Oracle DbSystem. It primarily affects scalability, availability, and resource capacity but does not directly configure security controls such as authentication, authorization, encryption, or network access restrictions."
     },
     "properties.private_ip": {
       "description": "The private IP address of the DbSystem.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The private_ip parameter defines the private network address assigned to the Oracle DbSystem. The IP address determines the network location and connectivity of the database within the private network, which can affect network isolation, access control, and exposure of the database resource."
     },
     "properties.reco_storage_size_gb": {
       "description": "The reco/redo storage size in GB.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The reco_storage_size_gb parameter defines the storage capacity allocated for Oracle recovery and redo logs. It primarily affects database recovery capability, performance, and storage management but does not directly configure security controls such as authentication, authorization, encryption, or network protection."
     },
     "properties.shape": {
       "description": "Shape of DB System.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The shape parameter defines the compute configuration and resource profile of the Oracle DbSystem, such as the available CPU and memory capacity. It affects performance and resource allocation but does not directly configure security controls such as authentication, authorization, encryption, or network access restrictions."
     },
     "properties.ssh_public_keys": {
       "description": "SSH public keys to be stored with the DbSystem.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The ssh_public_keys parameter defines the SSH public keys that are associated with the DbSystem for authentication purposes. Incorrect or unauthorized key configuration could allow unauthorized users to access the system, making this parameter directly related to access control and system security."
     },
     "properties.data_collection_options": {
       "type": "block",
       "description": "Data collection options for DbSystem.",
-      "required": false
+      "required": false,
+      "security_impact": true,
+      "rationale": "The data_collection_options parameter controls the data collection settings for the Oracle DbSystem. These settings may determine whether operational, diagnostic, or usage-related data is collected and shared, which can affect privacy, information disclosure, and compliance requirements."
     },
     "properties.data_collection_options.is_diagnostics_events_enabled": {
       "description": "Indicates whether to enable data collection for diagnostics.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This parameter controls whether diagnostic data collection is enabled for the Oracle DbSystem. Diagnostic information may contain operational details about the system environment, which can introduce information disclosure and privacy risks if not properly managed."
     },
     "properties.data_collection_options.is_incident_logs_enabled": {
       "description": "Indicates whether to enable incident logs and trace collection.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This parameter controls whether incident logs and trace information are collected for the Oracle DbSystem. Incident logs may contain sensitive operational details, error information, or system configuration data, which can affect information disclosure, monitoring capabilities, and security incident investigation."
     },
     "properties.db_home": {
       "type": "block",
       "description": "Details of the Database Home resource.",
-      "required": false
+      "required": false,
+      "security_impact": "false",
+      "rationale": "The db_home block defines details of the Database Home resource associated with the Oracle DbSystem. It is primarily used for database software configuration and management purposes and does not directly configure security controls such as authentication, authorization, encryption, or network access restrictions."
     },
     "properties.db_home.db_version": {
       "description": "A valid Oracle Database version. For a list of supported versions, use the\nListDbVersions operation.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The db_version parameter specifies the Oracle Database version deployed on the DbSystem. The selected version affects the availability of security patches, vulnerability fixes, and supported security features. Using outdated or unsupported database versions may increase exposure to known vulnerabilities."
     },
     "properties.db_home.display_name": {
       "description": "The display name for the Database Home. The name does not have to\nbe unique within your project.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The display_name parameter is used only as a human-readable identifier for the Database Home resource. It helps with resource organization and management but does not directly configure security controls such as authentication, authorization, encryption, patching, or network access restrictions."
     },
     "properties.db_home.is_unified_auditing_enabled": {
       "description": "Whether unified auditing is enabled for the Database Home.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The is_unified_auditing_enabled parameter controls whether Oracle Unified Auditing is enabled for the Database Home. Auditing is a security control that records database activities, user actions, and security-related events, supporting monitoring, compliance, and incident investigation."
     },
     "properties.db_home.database": {
       "type": "block",
       "description": "Details of the Database resource.\nhttps://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/Database/",
-      "required": true
+      "required": true,
+      "security_impact": "false",
+      "rationale": "The database block defines the configuration details of the Oracle Database resource. The block itself is used for resource provisioning and management, while specific security-related settings such as authentication, auditing, encryption, and access controls are configured through individual attributes within the block."
     },
     "properties.db_home.database.admin_password": {
       "description": "The password for the default ADMIN user.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The admin_password parameter defines the password for the default Oracle ADMIN user. This credential provides privileged access to the database system, and weak or compromised passwords could result in unauthorized access, data exposure, or unauthorized database changes."
     },
     "properties.db_home.database.character_set": {
       "description": "The character set for the database. The default is AL32UTF8.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The character_set parameter defines how characters are encoded and stored within the Oracle Database. It affects data representation and compatibility but does not directly configure security controls such as authentication, authorization, encryption, auditing, or network access restrictions."
     },
     "properties.db_home.database.database_id": {
       "description": "The database ID of the Database.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The database_id parameter is used to uniquely identify the Oracle Database resource. It is a resource identification attribute and does not directly configure security controls such as authentication, authorization, encryption, auditing, or network access restrictions."
     },
     "properties.db_home.database.db_home_name": {
       "description": "The name of the DbHome resource associated with the Database.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The db_home_name parameter identifies the Database Home resource associated with the Oracle Database. It is used for resource referencing and management purposes but does not directly configure security controls such as authentication, authorization, encryption, auditing, or network access restrictions."
     },
     "properties.db_home.database.db_name": {
       "description": "The database name. The name must begin with an alphabetic character and can\ncontain a maximum of eight alphanumeric characters. Special characters are\nnot permitted.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The db_name parameter defines the name of the Oracle Database resource. It is used for identification and management purposes but does not directly configure security controls such as authentication, authorization, encryption, auditing, or network access restrictions."
     },
     "properties.db_home.database.db_unique_name": {
       "description": "The DB_UNIQUE_NAME of the Oracle Database being backed up.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The db_unique_name parameter identifies the Oracle Database instance, particularly for backup and database management purposes. It is a naming and identification attribute that does not directly configure security controls such as authentication, authorization, encryption, auditing, or network access restrictions."
     },
     "properties.db_home.database.gcp_oracle_zone": {
       "description": "The GCP Oracle zone where the Database is created.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The gcp_oracle_zone parameter specifies the Google Cloud Oracle zone where the database is deployed. It determines resource placement and availability but does not directly configure security controls such as authentication, authorization, encryption, or network access restrictions."
     },
     "properties.db_home.database.ncharacter_set": {
       "description": "The national character set for the database. The default is AL16UTF16.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The ncharacter_set parameter defines the national character encoding used by the Oracle Database for storing character data. It affects data representation and compatibility but does not directly configure security controls such as authentication, authorization, encryption, auditing, or network access restrictions."
     },
     "properties.db_home.database.pluggable_database_id": {
       "description": "The ID of the pluggable database associated with Database. The ID must be unique within the project and location.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The pluggable_database_id parameter is used to uniquely identify the pluggable database resource within the project and location. It is a resource identification attribute and does not directly configure security controls such as authentication, authorization, encryption, auditing, or network access restrictions."
     },
     "properties.db_home.database.pluggable_database_name": {
       "description": "The pluggable dataabse associated with the Database. The name must begin with an alphabetic character and can contain a maximum of thirty alphanumeric characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The pluggable_database_name parameter defines the name of the pluggable database associated with the Oracle Database. It is used for identification and management purposes but does not directly configure security controls such as authentication, authorization, encryption, auditing, or network access restrictions."
     },
     "properties.db_home.database.tde_wallet_password": {
       "description": "The TDE wallet password for the database.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The tde_wallet_password parameter protects the Oracle Transparent Data Encryption (TDE) wallet, which is used to manage encryption keys for protecting database data. Compromise of this password could allow unauthorized access to encrypted data, making it directly related to data confidentiality and encryption security."
     },
     "properties.db_home.database.properties": {
       "type": "block",
       "description": "The properties of a Database.",
-      "required": false
+      "required": false,
+      "security_impact": "false",
+      "rationale": "The properties block is a container for database configuration attributes. The block itself does not directly implement security controls; security impact depends on the individual attributes defined within this block."
+
     },
     "properties.db_home.database.properties.db_version": {
       "description": "The Oracle Database version.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The db_version parameter specifies the Oracle Database software version deployed on the system. The selected version affects security patch availability, vulnerability exposure, and support for security updates. Using outdated or unsupported versions may increase the risk of exploitation due to known vulnerabilities."
     },
     "properties.db_home.database.properties.database_management_config": {
       "type": "block",
       "description": "The configuration of the Database Management service.",
-      "required": false
+      "required": false,
+      "security_impact": "true",
+      "rationale": "The database_management_config block controls the configuration of the Oracle Database Management service, which provides monitoring, diagnostics, and management capabilities. These settings can affect security monitoring, visibility, and the handling of database operational information."
     },
     "properties.db_home.database.properties.db_backup_config": {
       "type": "block",
       "description": "Backup Options for the Database.",
-      "required": false
+      "required": false,
+      "security_impact": "true",
+      "rationale": "The db_backup_config block manages backup-related settings for the Oracle Database. Backup configuration can affect data availability, data protection, and recovery capabilities. Improper backup configuration may result in data loss, inability to recover from incidents, or exposure of backup data if security controls are not properly applied."
+
     },
     "properties.db_home.database.properties.db_backup_config.auto_backup_enabled": {
       "description": "If set to true, enables automatic backups on the database.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The auto_backup_enabled parameter controls whether automatic backups are enabled for the Oracle Database. Backups are a critical security and availability control because they support data recovery after accidental deletion, system failures, or security incidents. Disabling automatic backups may increase the risk of data loss and reduce recovery capability."
     },
     "properties.db_home.database.properties.db_backup_config.auto_full_backup_day": {
       "description": "Possible values:\nMONDAY\nTUESDAY\nWEDNESDAY\nTHURSDAY\nFRIDAY\nSATURDAY\nSUNDAY",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The auto_full_backup_day parameter only specifies the scheduled day for performing automatic full backups. It controls backup scheduling but does not directly enable or disable backups, configure backup security, or affect access control, encryption, or authentication mechanisms."
     },
     "properties.db_home.database.properties.db_backup_config.auto_full_backup_window": {
       "description": "The window in which the full backup should be performed on the database.\nIf no value is provided, the default is anytime.\nPossible values:\nSLOT_ONE\nSLOT_TWO\nSLOT_THREE\nSLOT_FOUR\nSLOT_FIVE\nSLOT_SIX\nSLOT_SEVEN\nSLOT_EIGHT\nSLOT_NINE\nSLOT_TEN\nSLOT_ELEVEN\nSLOT_TWELVE",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The auto_full_backup_window parameter specifies the time window during which automatic full backups are performed. It controls backup scheduling and operational timing but does not directly configure security controls such as backup encryption, access permissions, authentication, or authorization."
     },
     "properties.db_home.database.properties.db_backup_config.auto_incremental_backup_window": {
       "description": "The window in which the incremental backup should be performed on the\ndatabase. If no value is provided, the default is anytime except the auto\nfull backup day.\nPossible values:\nSLOT_ONE\nSLOT_TWO\nSLOT_THREE\nSLOT_FOUR\nSLOT_FIVE\nSLOT_SIX\nSLOT_SEVEN\nSLOT_EIGHT\nSLOT_NINE\nSLOT_TEN\nSLOT_ELEVEN\nSLOT_TWELVE",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The auto_incremental_backup_window parameter specifies the time window for performing incremental database backups. It controls the scheduling of backup operations but does not directly configure security controls such as backup encryption, access permissions, authentication, or authorization."
     },
     "properties.db_home.database.properties.db_backup_config.backup_deletion_policy": {
       "description": "This defines when the backups will be deleted after Database termination.\nPossible values:\nDELETE_IMMEDIATELY\nDELETE_AFTER_RETENTION_PERIOD",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The backup_deletion_policy parameter controls the retention and deletion behaviour of database backups after database termination. Incorrect configuration may result in premature deletion of backups, causing loss of recovery capability and affecting data availability and recovery from security incidents."
     },
     "properties.db_home.database.properties.db_backup_config.retention_period_days": {
       "description": "The number of days an automatic backup is retained before being\nautomatically deleted. This value determines the earliest point in time to\nwhich a database can be restored. Min: 1, Max: 60.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The retention_period_days parameter defines how long automatic database backups are preserved before deletion. Backup retention directly affects data recovery capability, business continuity, and the ability to recover from security incidents such as data corruption, accidental deletion, or ransomware attacks."
     },
     "properties.db_home.database.properties.db_backup_config.backup_destination_details": {
       "type": "block",
       "description": "Details of the database backup destinations.",
-      "required": false
+      "required": false,
+      "security_impact": "true",
+      "rationale": "The backup_destination_details parameter defines the destination locations for database backups. Since backups may contain sensitive data and are essential for recovery and incident response, incorrect configuration can affect data confidentiality, availability, and recovery capability."
     },
     "properties.db_home.database.properties.db_backup_config.backup_destination_details.type": {
       "description": "The type of the database backup destination.\nPossible values:\nNFS\nRECOVERY_APPLIANCE\nOBJECT_STORE\nLOCAL\nDBRS",
