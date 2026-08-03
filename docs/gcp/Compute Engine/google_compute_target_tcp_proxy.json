@@ -34,22 +34,22 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines the Google Cloud project that owns the resource and therefore its administrative and trust boundary. A policy should restrict deployment to approved projects to prevent resources from being created in unauthorised environments."
+      "security_impact": false,
+      "rationale": "This is a project identifier or resource reference. It determines resource ownership and location but does not directly configure security behaviour, and project IDs are not constrained by policy."
     },
     "proxy_bind": {
       "description": "This field only applies when the forwarding rule that references\nthis target proxy has a loadBalancingScheme set to INTERNAL_SELF_MANAGED.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls whether Envoy proxies intercept inbound traffic and bind to the forwarding rule's IP address and port in INTERNAL_SELF_MANAGED deployments. A policy should restrict this setting because it changes network traffic interception and exposure behaviour."
+      "security_impact": false,
+      "rationale": "This is an operational and architectural setting that controls how the Envoy proxy binds to an IP address and port. Neither value is inherently insecure, so it is not treated as a security control."
     },
     "proxy_header": {
       "description": "Specifies the type of proxy header to append before sending data to\nthe backend. Default value: \"NONE\" Possible values: [\"NONE\", \"PROXY_V1\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls whether client connection information is sent to the backend using the PROXY protocol. A policy should require an approved value because incompatible or untrusted proxy-header handling can affect source identification, logging, and backend trust decisions."
+      "security_impact": false,
+      "rationale": "This is a protocol and architectural configuration that determines whether NONE or PROXY_V1 is used when sending connection information to the backend. The appropriate value depends on application compatibility, and neither value is inherently insecure."
     }
   }
 }
