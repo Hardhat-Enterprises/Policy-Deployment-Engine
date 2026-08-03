@@ -6,43 +6,43 @@
       "description": "The unique id of the assistant.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier for the assistant resource. Resource identifiers are not constrained because this field does not configure a security control."
     },
     "collection_id": {
       "description": "The unique id of the collection.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier of the Discovery Engine collection. Resource identifiers and references are not policy targets."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls protection against unintended deletion or abandonment of the resource. Policy should require an approved deletion setting, such as PREVENT, for production resources."
     },
     "description": {
       "description": "Description for additional information. Expected to be shown on the\nconfiguration UI, not to the users of the assistant.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Administrative description displayed in the configuration interface. It does not configure access, data protection, or assistant security behaviour."
     },
     "display_name": {
       "description": "The assistant display name.\n\nIt must be a UTF-8 encoded string with a length limit of 128 characters.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Human-readable name used to identify the assistant. It does not configure a security control."
     },
     "engine_id": {
       "description": "The unique id of the engine.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier of the Discovery Engine resource used by the assistant. Resource references are not constrained by policy."
     },
     "location": {
       "description": "The geographic location where the data store should reside. The value can\nonly be one of \"global\", \"us\" and \"eu\".",
@@ -55,15 +55,15 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier of the Google Cloud project containing the resource. Resource identifiers and references are not policy targets."
     },
     "web_grounding_type": {
       "description": "The type of web grounding to use.\nThe supported values: 'WEB_GROUNDING_TYPE_DISABLED', 'WEB_GROUNDING_TYPE_GOOGLE_SEARCH', 'WEB_GROUNDING_TYPE_ENTERPRISE_WEB_SEARCH'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether assistant responses use external or enterprise web search. Policy should restrict grounding to approved sources to reduce untrusted-content and potential data-disclosure risks."
     },
     "customer_policy": {
       "type": "block",
@@ -79,22 +79,22 @@
       "description": "If true, diacritical marks (e.g., accents, umlauts) are ignored when\nmatching banned phrases. For example, \"cafe\" would match \"café\".",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Affects the effectiveness of banned-phrase detection. Policy should require diacritic-insensitive matching where necessary to reduce trivial content-filter bypasses."
     },
     "customer_policy.banned_phrases.match_type": {
       "description": "Match type for the banned phrase.\nThe supported values: 'SIMPLE_STRING_MATCH', 'WORD_BOUNDARY_STRING_MATCH'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines how prohibited content is detected. An inappropriate matching mode could weaken enforcement, so policy should restrict it to an approved value."
     },
     "customer_policy.banned_phrases.phrase": {
       "description": "The raw string content to be banned.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines content that the assistant must block. This directly affects content-safety enforcement and should be governed according to organisational requirements."
     },
     "customer_policy.model_armor_config": {
       "type": "block",
@@ -105,22 +105,22 @@
       "description": "Defines the failure mode for Model Armor sanitization.\nThe supported values: 'FAIL_OPEN', 'FAIL_CLOSED'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines whether requests or responses are allowed when Model Armor sanitization fails. Policy should require FAIL_CLOSED to prevent unsanitized content from bypassing protection."
     },
     "customer_policy.model_armor_config.response_template": {
       "description": "The resource name of the Model Armor template for sanitizing assistant\nresponses. Format:\n'projects/{project}/locations/{location}/templates/{template_id}'\n\nIf not specified, no sanitization will be applied to the assistant\nresponse.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects the Model Armor template that sanitizes assistant responses. Policy should require an approved template so generated responses receive the required security filtering."
     },
     "customer_policy.model_armor_config.user_prompt_template": {
       "description": "The resource name of the Model Armor template for sanitizing user\nprompts. Format:\n'projects/{project}/locations/{location}/templates/{template_id}'\n\nIf not specified, no sanitization will be applied to the user prompt.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects the Model Armor template that sanitizes user prompts. Policy should require an approved template to reduce malicious, unsafe, or prompt-injection content."
     },
     "generation_config": {
       "type": "block",
@@ -131,8 +131,8 @@
       "description": "The default language to use for the generation of the assistant response.\nUse an ISO 639-1 language code such as 'en'.\nIf not specified, the language will be automatically detected.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the default response language. This is functional generation configuration and does not establish a security control."
     },
     "generation_config.system_instruction": {
       "type": "block",
@@ -143,8 +143,8 @@
       "description": "Additional system instruction that will be added to the default system instruction.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Changes the assistant's governing instructions and may affect safety behaviour, information disclosure, or resistance to prompt injection. Policy should restrict its use according to organisational requirements."
     }
   }
 }
