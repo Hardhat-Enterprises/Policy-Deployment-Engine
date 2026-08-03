@@ -5,18 +5,18 @@ import data.terraform.gcp.security.discovery_engine.google_discovery_engine_cont
 #engine_control_redirect_action
 
 conditions := [
-    [
+  [
     {
-        "situation_description": "Is redirect_action configured correctly?",
-        "remedies": ["Ensure that redirect is configured correctly."]
-        },
-      {
-        "condition": "redirect is mis-configured",
-        "attribute_path": ["redirect_action", 0, "redirect_uri"],
-        "values": ["https://goodexample.com/special-landing-page"],
-        "policy_type": "whitelist"
-      }
-    ]
+      "situation_description": "Does the redirect URI use HTTPS?",
+      "remedies": ["Use the HTTPS scheme for the redirect URI."]
+    },
+    {
+      "condition": "redirect URI does not use HTTPS",
+      "attribute_path": ["redirect_action", 0, "redirect_uri"],
+      "values": ["https://*"],
+      "policy_type": "pattern whitelist"
+    }
+  ]
 ]
 
 

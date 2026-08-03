@@ -8,14 +8,14 @@ import data.terraform.gcp.security.discovery_engine.google_discovery_engine_cont
 conditions := [
   [
     {
-      "situation_description": "Does the promoted link use an approved destination URI?",
-      "remedies": ["Use an approved HTTPS destination URI."]
+      "situation_description": "Does the promoted destination URI use HTTPS?",
+      "remedies": ["Use the HTTPS scheme for the promoted destination URI."]
     },
     {
-      "condition": "promoted link URI is not approved",
+      "condition": "promoted destination URI does not use HTTPS",
       "attribute_path": ["promote_action", 0, "search_link_promotion", 0, "uri"],
-      "values": ["https://goodexample.com/promotion"],
-      "policy_type": "whitelist"
+      "values": ["https://*"],
+      "policy_type": "pattern whitelist"
     }
   ]
 ]

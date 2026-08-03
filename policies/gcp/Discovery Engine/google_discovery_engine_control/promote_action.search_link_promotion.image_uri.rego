@@ -8,14 +8,14 @@ import data.terraform.gcp.security.discovery_engine.google_discovery_engine_cont
 conditions := [
   [
     {
-      "situation_description": "Does the promoted link use an approved image URI?",
-      "remedies": ["Use an approved HTTPS image URI."]
+      "situation_description": "Does the promoted image URI use HTTPS?",
+      "remedies": ["Use the HTTPS scheme for the promoted image URI."]
     },
     {
-      "condition": "promoted image URI is not approved",
+      "condition": "promoted image URI does not use HTTPS",
       "attribute_path": ["promote_action", 0, "search_link_promotion", 0, "image_uri"],
-      "values": ["https://images.goodexample.com/promotion.png"],
-      "policy_type": "whitelist"
+      "values": ["https://*"],
+      "policy_type": "pattern whitelist"
     }
   ]
 ]
