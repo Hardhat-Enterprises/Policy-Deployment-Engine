@@ -6,29 +6,29 @@
       "description": "The CIDR range of the subnet.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument defines the IP address range assigned to the subnet. Incorrect CIDR configuration can expose resources to unauthorized network access, cause improper network segmentation, or affect communication between resources. Restricting subnet ranges helps maintain network security boundaries and prevents unintended exposure. Therefore, it has a security impact."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument controls the deletion behavior of the resource managed by Terraform. Setting the policy to \"PREVENT\" can protect against accidental or unauthorized deletion, while \"ABANDON\" may result in unmanaged resources and configuration drift. Since it affects resource availability, protection, and infrastructure governance, it has a security impact."
     },
     "deletion_protection": {
       "description": "Whether or not to allow Terraform to destroy the instance. Unless this field is set to false in Terraform state, a terraform destroy or terraform apply that would delete the instance will fail.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument controls whether the resource can be deleted through Terraform operations. Enabling deletion protection helps prevent accidental or unauthorized removal of resources, supporting resource availability and protecting critical infrastructure. Therefore, it has a security impact."
     },
     "labels": {
       "description": "Labels or tags associated with the resource.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument is used to assign labels or tags to the resource for identification, organization, and resource management purposes. It does not directly control access permissions, authentication, encryption, or other security configurations. Therefore, it does not have a direct security impact."
     },
     "location": {
       "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
@@ -41,29 +41,29 @@
       "description": "The ID of the OdbSubnet to create. This value is restricted\nto (^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$) and must be a maximum of 63\ncharacters in length. The value must start with a letter and end with\na letter or a number.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument specifies the unique identifier of the OdbSubnet resource. It is primarily used for resource naming and identification and does not directly control network access, permissions, encryption, or other security-related configurations. Therefore, it does not have a security impact."
     },
     "odbnetwork": {
       "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument identifies the OdbNetwork resource associated with the subnet. The selected network determines the connectivity and network boundary for the resource, which can affect isolation, access control, and communication between resources. Incorrect network assignment may expose resources to unauthorized access or insecure network configurations. Therefore, it has a security impact."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument determines the Google Cloud project where the resource is created and managed. The selected project affects resource isolation, access control boundaries, and organizational security management. Deploying resources in an unintended project may result in unauthorized access or improper resource management. Therefore, it has a security impact."
     },
     "purpose": {
       "description": "Purpose of the subnet.\nPossible values:\nCLIENT_SUBNET\nBACKUP_SUBNET",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument defines the intended purpose of the subnet and determines how the subnet is used within the infrastructure. Incorrectly assigning the subnet purpose may result in improper network segmentation, exposure of sensitive resources, or disruption of backup and client connectivity. Therefore, it has a security impact."
     }
   }
 }
