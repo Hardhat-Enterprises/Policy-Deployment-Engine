@@ -1,4 +1,4 @@
-package terraform.gcp.security.apigee.google_apige_app_group.vars
+package terraform.gcp.security.apigee.google_apigee_app_group.vars
 
 variables := {
     "friendly_resource_name": "",
