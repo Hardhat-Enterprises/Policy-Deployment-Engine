@@ -6,50 +6,50 @@
       "description": "Channel identifier identifies the owner maintaining this grouping.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "It is metadata and does not grant privileges or expose sensitive configuration"
     },
     "channel_uri": {
       "description": "A reference to the associated storefront/marketplace.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "It is informational and does not affect security controls"
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Determines whether Terraform can delete or abandon the resource. Misconfiguration can impact resource integrity or availability by preventing or allowing deletion."
     },
     "display_name": {
       "description": "App group name displayed in the UI",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "It has no effect on authentication, authorisation, or resource security."
     },
     "name": {
       "description": "Name of the AppGroup. Characters you can use in the name are restricted to: A-Z0-9._-$ %.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "Resource identifier only. While important for uniqueness, it does not itself affect security"
     },
     "org_id": {
       "description": "The Apigee Organization associated with the Apigee app group,\nin the format 'organizations/{{org_name}}'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "An incorrect value could result in resources being created or managed in the wrong security boundary or tenant"
     },
     "status": {
       "description": "Valid values are active or inactive. Note that the status of the AppGroup should be updated via UpdateAppGroupRequest by setting the action as active or inactive. Possible values: [\"active\", \"inactive\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Changing this affects whether the AppGroup can be used, impacting access and availability"
     },
     "attributes": {
       "type": "block",
@@ -60,15 +60,15 @@
       "description": "Key of the attribute",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "The attribute key itself is descriptive and does not have a direct security impact"
     },
     "attributes.value": {
       "description": "Value of the attribute",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "The value may contain sensitive information or influence application behaviour, so it has potenional security implications"
     }
   }
 }
