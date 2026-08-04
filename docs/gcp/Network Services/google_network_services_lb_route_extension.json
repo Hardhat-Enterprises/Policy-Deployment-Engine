@@ -6,36 +6,36 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The destroy guard, and it defaults to DELETE. Destroying this resource does not break the load balancer; it quietly removes the extension from the request path, so traffic reverts to plain URL map routing and whatever the extension was doing stops happening, with no error anywhere to notice. ABANDON fails the other way, leaving the extension live in the data path but no longer tracked in code. Policy should pin this to the value that blocks destroys (PREVENT) so that pulling an extension out of a live load balancer is a deliberate, reviewed change rather than a side effect of a plan."
     },
     "description": {
       "description": "A human-readable description of the resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A human readable note. Nothing in the request path reads it, so constraining its wording would not change how the extension behaves."
     },
     "forwarding_rules": {
       "description": "A list of references to the forwarding rules to which this service extension is attached to.\nAt least one forwarding rule is required. There can be only one LbRouteExtension resource per forwarding rule.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
+      "security_impact": false,
+      "rationale": "The load balancer forwarding rules this extension attaches to, and in effect which traffic it covers. Coverage gaps are a real risk, but any rule about them has to name a specific team's forwarding rules, which fails the generic test, and the one structural constraint that exists (a single route extension per forwarding rule) is already enforced by the API."
+    }, 
     "labels": {
       "description": "Set of labels associated with the LbRouteExtension resource.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Tags for grouping, filtering and cost attribution. Nothing in the data path consults them, and the field is not authoritative, since it manages only the labels listed in the configuration, so it could not serve as an enforcement point in any case."
     },
     "load_balancing_scheme": {
       "description": "All backend services and forwarding rules referenced by this extension must share the same load balancing scheme.\nFor more information, refer to [Choosing a load balancer](https://cloud.google.com/load-balancing/docs/backend-service) and\n[Supported application load balancers](https://cloud.google.com/service-extensions/docs/callouts-overview#supported-lbs). Possible values: [\"INTERNAL_MANAGED\", \"EXTERNAL_MANAGED\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Declares which scheme the referenced forwarding rules and backend services use, and they must all match or the API rejects the configuration. It does not decide whether the load balancer is exposed to the internet, since the forwarding rule does that, so pinning it cannot reduce exposure, and both accepted values are legitimate designs that a platform has no basis to choose between."
     },
     "location": {
       "description": "The location of the route extension",
@@ -48,15 +48,15 @@
       "description": "Name of the LbRouteExtension resource in the following format: projects/{project}/locations/{location}/lbRouteExtensions/{lbRouteExtension}",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The resource identifier, in a fixed projects/locations/lbRouteExtensions path format. It plays no part in matching, routing, or the call to the extension."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Which project owns the extension, defaulting to the provider project. Who may change it is enforced by that project's IAM and org policies rather than by this string, and no generic rule can name the correct project without being specific to one team."
     },
     "extension_chains": {
       "type": "block",
@@ -67,8 +67,8 @@
       "description": "The name for this extension chain. The name is logged as part of the HTTP request logs.\nThe name must conform with RFC-1034, is restricted to lower-cased letters, numbers and hyphens,\nand can have a maximum length of 63 characters. Additionally, the first character must be a letter\nand the last character must be a letter or a number.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An identifier for the chain, constrained in format by the API and written into the HTTP request logs. Useful for tracing which chain handled a request, but a naming rule is a convention rather than a security control."
     },
     "extension_chains.extensions": {
       "type": "block",
@@ -79,71 +79,64 @@
       "description": "The :authority header in the gRPC request sent from Envoy to the extension service.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The :authority (host) header on the gRPC call the proxy makes to the callout service, required in practice for callout extensions, and effectively the hostname the extension backend sees. The correct value is whatever a team's own extension service expects, so no generic rule can supply it, and it grants nothing by itself: the trustworthiness of that hop comes from the callout backend service's own configuration."
     },
     "extension_chains.extensions.fail_open": {
       "description": "Determines how the proxy behaves if the call to the extension fails or times out.\nWhen set to TRUE, request or response processing continues without error.\nAny subsequent extensions in the extension chain are also executed.\nWhen set to FALSE: * If response headers have not been delivered to the downstream client,\na generic 500 error is returned to the client. The error response can be tailored by\nconfiguring a custom error response in the load balancer.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The switch between failing open and failing closed on the extension call, and it defaults to closed. Left false, an extension that fails or times out stops the request and the client gets a 500; set true, the request carries on as though the extension had never run and the rest of the chain executes anyway. Google's own guidance presents this as a trade off between security or integrity on one side and availability on the other, with closed as the preferred setting. Policy should require false, so an extension sitting in the request path cannot be bypassed simply by making it fail, and exceptions driven by availability should be documented exemptions."
     },
     "extension_chains.extensions.forward_headers": {
       "description": "List of the HTTP headers to forward to the extension (from the client or backend).\nIf omitted, all headers are sent. Each element is a string indicating the header name.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Chooses which HTTP headers are handed to the extension service, and if it is left unset every header goes, including Authorization, Cookie and anything else the client sent. That is a decision about minimising the data given to a request path component that may be a callout backend, a Wasm plugin, or an endpoint managed by Google. Policy should require the list to be set explicitly rather than relying on the default that sends everything; which headers are needed stays a team decision."
     },
     "extension_chains.extensions.metadata": {
       "description": "The metadata provided here is included as part of the 'metadata_context' (of type 'google.protobuf.Struct')\nin the 'ProcessingRequest' message sent to the extension server.\nThe metadata is available under the namespace 'com.google.lb_route_extension.<resource_name>.<chain_name>.<extension_name>'.\nThe following variables are supported in the metadata: '{forwarding_rule_id}' - substituted with the forwarding rule's fully qualified resource name.\nThis field must not be set for plugin extensions. Setting it results in a validation error.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operator defined configuration delivered to the team's own extension server inside the ProcessingRequest. Google's published example uses it to pass Model Armor template IDs. The contents are inherently specific to a workload, and it changes nothing about who can reach the load balancer or the extension. The one structural rule worth having, that it must not be set for plugin extensions, is already enforced by the API as a validation error."
     },
     "extension_chains.extensions.name": {
       "description": "The name for this extension. The name is logged as part of the HTTP request logs.\nThe name must conform with RFC-1034, is restricted to lower-cased letters, numbers and hyphens,\nand can have a maximum length of 63 characters. Additionally, the first character must be a letter\nand the last a letter or a number.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An identifier for the extension, constrained in format by the API and logged with the HTTP request logs. It takes no part in matching, routing, or the extension call."
     },
     "extension_chains.extensions.observability_mode": {
       "description": "When set to 'TRUE', enables 'observability_mode' on the 'ext_proc' filter.\nThis makes 'ext_proc' calls asynchronous. Envoy doesn't check for the response from 'ext_proc' calls.\nFor more information about the filter, see: https://www.envoyproxy.io/docs/envoy/v1.32.3/api-v3/extensions/filters/http/ext_proc/v3/ext_proc.proto\nThis field is helpful when you want to try out the extension in async log-only mode.\nSupported by regional 'LbTrafficExtension' and 'LbRouteExtension' resources.\nOnly 'STREAMED' (default) body processing mode is supported.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "extension_chains.extensions.request_body_send_mode": {
-      "description": "Configures the send mode for request body processing.\nThe field can only be set if 'supported_events' includes 'REQUEST_BODY'.\nIf 'supported_events' includes 'REQUEST_BODY', but 'request_body_send_mode' is unset, the default value 'STREAMED' is used.\nWhen this field is set to 'FULL_DUPLEX_STREAMED', 'supported_events' must include both 'REQUEST_BODY' and 'REQUEST_TRAILERS'.\nThis field can be set only when the 'service' field of the extension points to a 'BackendService'.\nOnly 'FULL_DUPLEX_STREAMED' mode is supported for 'LbRouteExtension' resources. Possible values: [\"BODY_SEND_MODE_UNSPECIFIED\", \"BODY_SEND_MODE_STREAMED\", \"BODY_SEND_MODE_FULL_DUPLEX_STREAMED\"]",
-      "required": false,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+       "security_impact": false,
+      "rationale": "The wire mode for streaming request bodies to the extension, and the platform has already narrowed the choice to almost nothing on this resource: it can only be set when supported_events includes REQUEST_BODY and the service points at a backend service, and only FULL_DUPLEX_STREAMED is supported for route extensions. No accepted value is safer than another, since this is a streaming protocol detail rather than an exposure control."
     },
     "extension_chains.extensions.service": {
       "description": "The reference to the service that runs the extension.\n\n* To configure a callout extension, service must be a fully-qualified reference to a backend service.\n* To configure a plugin extension, service must be a reference to a WasmPlugin resource.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The component the load balancer hands matched requests to, and whose response influences which backend service the request is routed to, all of it happening before the URL map is evaluated and therefore before the Cloud Armor and IAP policies attached to the selected backend apply. The reference can be a backend service, a WasmPlugin, or an endpoint managed by Google, so it can point outside the team's own project entirely. Policy should require it to resolve inside an approved trust boundary, either the same project or a parameterised allowlist of projects and Google services, so that request data and influence over routing are not handed to a service the organisation does not control."
     },
     "extension_chains.extensions.supported_events": {
       "description": "A set of events during request or response processing for which this extension is called.\nThis field is optional for the LbRouteExtension resource. If unspecified, 'REQUEST_HEADERS' event is assumed as supported.\nPossible values: 'REQUEST_HEADERS', 'REQUEST_BODY', 'REQUEST_TRAILERS'.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects which processing phases invoke the extension. Unlike forward_headers, the default here is the minimal one, headers only when unset, and only request side events exist on this resource, so leaving it alone exposes nothing extra. Adding body events does share more with the extension, but whether an extension needs the body is a workload decision the platform cannot make on a team's behalf."
     },
     "extension_chains.extensions.timeout": {
       "description": "Specifies the timeout for each individual message on the stream. The timeout must be between 10-1000 milliseconds.\nA duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.5s\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "How long the proxy waits for each message on the ext_proc stream, already bounded by the API to between 10 and 1000 milliseconds. It is a knob for tuning latency against completeness; the question that matters for security, what happens when the timeout is hit, is answered by fail_open rather than here."
     },
     "extension_chains.match_condition": {
       "type": "block",
@@ -154,8 +147,8 @@
       "description": "A Common Expression Language (CEL) expression that is used to match requests for which the extension chain is executed.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The CEL expression that decides which requests the chain runs on; the first chain whose condition matches executes and no later chain does. Too narrow an expression means traffic skips the extension entirely, which is a genuine coverage risk, but judging it requires knowing a team's hosts, paths and headers, so it cannot be written as a generic rule and belongs in design review instead."
     }
   }
 }
