@@ -63,21 +63,21 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This argument points to the disk used to create the image. It is a reference to another specific resource selected by the team, so it should not be constrained by a generic platform policy."
+      "rationale": "This argument is an identifier that points to another disk resource used as the image source. References to other resources are team choices and are not platform-level policy targets."
     },
     "source_image": {
       "description": "URL of the source image used to create this image. In order to create an image, you must provide the full or partial\nURL of one of the following:\n\n* The selfLink URL\n* This property\n* The rawDisk.source URL\n* The sourceDisk URL",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This argument identifies the base image used to create the new image. As it is a reference to another resource chosen by the team, it is not a suitable platform-level policy target."
+      "rationale": "This argument is a pointer to an existing image resource. Platform policy does not constrain which specific resource a team chooses to reference."
     },
     "source_snapshot": {
       "description": "URL of the source snapshot used to create this image.\n\nIn order to create an image, you must provide the full or partial URL of one of the following:\n\n* The selfLink URL\n* This property\n* The sourceImage URL\n* The rawDisk.source URL\n* The sourceDisk URL",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field points to the snapshot used as the source for the image. The snapshot is a team-specific resource choice, so a generic policy should not restrict its value."
+      "rationale": "This argument identifies the snapshot resource used as the source. It is a team-selected resource reference and is outside generic platform policy enforcement."
     },
     "storage_locations": {
       "description": "Cloud Storage bucket storage location of the image\n(regional or multi-regional).\nReference link: https://cloud.google.com/compute/docs/reference/rest/v1/images",
@@ -129,7 +129,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This argument contains a specific encrypted key blob supplied by the user. A generic policy cannot validate or constrain the contents of team-specific encrypted key material."
+      "rationale": "This argument contains a specific RSA-encrypted key value supplied by the team. A generic platform policy cannot validate or constrain the contents of arbitrary secret key material."
     },
     "params": {
       "type": "block",
@@ -160,14 +160,14 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field contains the checksum of a particular imported disk image. It is specific to the team's image file and is not a structural security control that a generic platform policy can enforce."
+      "rationale": "This argument stores the checksum of a specific source file. File hashes are team-managed data values rather than structural security configurations that a platform policy can enforce."
     },
     "raw_disk.source": {
       "description": "The full Google Cloud Storage URL where disk storage is stored\nYou must provide either this property or the sourceDisk property\nbut not both.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This argument points to the Cloud Storage object used as the disk source. It is an external resource reference selected by the team and should not be constrained by platform policy."
+      "rationale": "This argument is a URL pointing to a specific Cloud Storage object used as the import source. References to external objects or paths are team choices and are not platform policy targets."
     },
     "shielded_instance_initial_state": {
       "type": "block",
@@ -210,7 +210,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field only specifies the file format used for the forbidden key database. It is an operational parsing detail rather than an enforceable security control."
+      "rationale": "This argument only specifies the format of the forbidden-key database file. It is a functional parsing detail and does not represent a generic platform security control."
     },
     "shielded_instance_initial_state.keks": {
       "type": "block",
@@ -222,7 +222,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This argument contains the actual Key Exchange Key content. The value is team-specific cryptographic material and cannot be safely required or validated by a generic platform policy."
+      "rationale": "This argument contains the raw Key Exchange Key content. It is custom cryptographic key material unique to the team and cannot be meaningfully constrained by a generic platform policy."
     },
     "shielded_instance_initial_state.keks.file_type": {
       "description": "The file type of source file.",
@@ -241,7 +241,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This argument contains the actual Platform Key content. Since it is specific cryptographic key material supplied by the team, a generic policy cannot meaningfully constrain its value."
+      "rationale": "This argument contains the raw Platform Key content for a specific image build. Enforcing it would require validating or hardcoding team-specific key material, so it is not a suitable policy target."
     },
     "shielded_instance_initial_state.pk.file_type": {
       "description": "The file type of source file.",
@@ -274,14 +274,14 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This argument accepts raw customer-supplied encryption key material. The value is secret and team-specific, so it cannot be inspected or constrained by a generic platform policy."
+      "rationale": "This argument contains a raw customer-supplied encryption key used for a specific operation. A platform policy cannot validate a particular secret key value without hardcoding sensitive material."
     },
     "source_disk_encryption_key.rsa_encrypted_key": {
       "description": "Specifies an RFC 4648 base64 encoded, RSA-wrapped 2048-bit\ncustomer-supplied encryption key to either encrypt or decrypt\nthis resource. You can provide either the rawKey or the rsaEncryptedKey.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field contains a wrapped encryption key supplied for the source disk. It is a specific secret input rather than a structural configuration that a generic policy can validate."
+      "rationale": "This argument contains an RSA-wrapped secret key specific to the source disk. It is an unconstrainable secret value rather than a structural platform configuration."
     },
     "source_image_encryption_key": {
       "type": "block",
@@ -293,7 +293,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This argument points to the specific KMS key used for the source image. References to individual resources are team choices and should not be pinned by a generic platform policy."
+      "rationale": "This argument points to a specific KMS key resource. References to other resources are team-selected identifiers and should not be constrained by generic platform policy."
     },
     "source_image_encryption_key.kms_key_service_account": {
       "description": "The service account being used for the encryption request for the\ngiven KMS key. If absent, the Compute Engine default service\naccount is used.",
@@ -307,14 +307,14 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field contains raw encryption key material for the source image. It is a sensitive team-specific secret value and is outside the scope of generic platform policy."
+      "rationale": "This argument contains raw key material supplied for a specific source image. Secret values are team-specific and cannot be meaningfully validated by generic platform policy."
     },
     "source_image_encryption_key.rsa_encrypted_key": {
       "description": "Specifies an RFC 4648 base64 encoded, RSA-wrapped 2048-bit\ncustomer-supplied encryption key to either encrypt or decrypt\nthis resource. You can provide either the rawKey or the rsaEncryptedKey.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This argument contains a specific RSA-wrapped encryption key used for the source image. It is secret input data rather than a structural setting that a generic policy can constrain."
+      "rationale": "This argument contains a wrapped secret key payload for a specific source image. Such secret values are outside the scope of generic platform policy enforcement."
     },
     "source_snapshot_encryption_key": {
       "type": "block",
@@ -326,7 +326,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field is a reference to the KMS key used for the source snapshot. The selection of a particular key resource belongs to the team and should not be restricted by platform policy."
+      "rationale": "This argument is a reference to a specific external KMS key. Platform policy does not constrain which individual key resource a team chooses to reference."
     },
     "source_snapshot_encryption_key.kms_key_service_account": {
       "description": "The service account being used for the encryption request for the\ngiven KMS key. If absent, the Compute Engine default service\naccount is used.",
@@ -340,14 +340,14 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This argument supplies raw encryption key material for the source snapshot. It is a sensitive team-specific value that cannot be validated as a generic platform policy requirement."
+      "rationale": "This argument contains raw encryption key material supplied for a specific snapshot operation. It is a sensitive team-specific secret value that cannot be targeted by generic policy."
     },
     "source_snapshot_encryption_key.rsa_encrypted_key": {
       "description": "Specifies an RFC 4648 base64 encoded, RSA-wrapped 2048-bit\ncustomer-supplied encryption key to either encrypt or decrypt\nthis resource. You can provide either the rawKey or the rsaEncryptedKey.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field contains RSA-encrypted key material used for the source snapshot. It is a specific credential value, so a generic platform policy should not inspect or constrain it."
+      "rationale": "This argument contains an RSA-wrapped customer-supplied encryption key blob. Arbitrary wrapped key material cannot be structurally validated or constrained by a generic platform-level policy."
     }
   }
 }
