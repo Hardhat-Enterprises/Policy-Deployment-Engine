@@ -6,36 +6,36 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "A policy should be set for this to either be PREVENT or ABANDON as this will prevent a user from accidentally deleting and any firewall policy that may be protecting the network. "
     },
     "description": {
       "description": "An optional description of this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "No security impact as its purley for the developers to note anything down."
     },
     "name": {
       "description": "User-provided name of the Network firewall policy.\nThe name should be unique in the project in which the firewall policy is created.\nThe name must be 1-63 characters long, and comply with RFC1035. Specifically,\nthe name must be 1-63 characters long and match the regular expression [a-z]([-a-z0-9]*[a-z0-9])?\nwhich means the first character must be a lowercase letter, and all following characters must be a dash,\nlowercase letter, or digit, except the last character, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a user provided name for the firewall policy, we dont constrain names with their resources (too overreaching) "
     },
     "policy_type": {
       "description": "Policy type is used to determine which resources (networks) the policy can be associated with.\nA policy can be associated with a network only if the network has the matching policyType in its network profile.\nDifferent policy types may support some of the Firewall Rules features. Possible values: [\"VPC_POLICY\", \"RDMA_ROCE_POLICY\", \"RDMA_FALCON_POLICY\", \"ULL_POLICY\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "There are four possible policy type values: 'VPC_POLICY' 'RDMA_ROCE_POLICY' 'RDMA_FALCON_POLICY' 'ULL_POLICY', These are design considerations and not security related, if we restrict these we are restricting the developers ability to design their firewall policies."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies the Google Cloud project which contains this resource. A platform policy should not restrict such project identiifiers."
     },
     "region": {
       "description": "The region of this resource.",
@@ -53,71 +53,71 @@
       "description": "The Action to perform when the client connection triggers the rule. Can currently be either\n\"allow\", \"deny\", \"apply_security_profile_group\" or \"goto_next\".",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This sets what happens when a rule matches. By restricting this with a security policy we are making it hard for teams to write rules."
     },
     "rule.description": {
       "description": "A description of the rule.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Descriptive only and has no impact on security."
     },
     "rule.direction": {
       "description": "The direction in which this rule applies. If unspecified an INGRESS rule is created. Possible values: [\"INGRESS\", \"EGRESS\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This sets the direction of the rule (inbound/outbound) traffic, we cant restrict this using a policy as there is no security impact at all. Developers should have the ability to write firewall rules freely (too overreaching)."
     },
     "rule.disabled": {
       "description": "Denotes whether the firewall policy rule is disabled. When set to true,\nthe firewall policy rule is not enforced and traffic behaves as if it did\nnot exist. If this is unspecified, the firewall policy rule will be\nenabled.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "When this is set to true, the rule can still exist in the configuration but is not inforced. Policy should require rules to be enabled."
     },
     "rule.enable_logging": {
       "description": "Denotes whether to enable logging for a particular rule.\nIf logging is enabled, logs will be exported to the\nconfigured export destination in Stackdriver.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This ensures that any permitted/blocked traffic that triggers the rule is logged allowing us to have an audit trail for detection, forensics and incident response. A policy should be written to ensure that it is enabled for logging and auditing."
     },
     "rule.priority": {
       "description": "An integer indicating the priority of a rule in the list. The priority must be a value\nbetween 0 and 2147483647. Rules are evaluated from highest to lowest priority where 0 is the\nhighest priority and 2147483647 is the lowest priority.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Ordering the value of the rule does not impact security and this should be a design choice by the developer. We have no effective way of telling if a rule is of a higher priority than another which therefore this has no security impact."
     },
     "rule.rule_name": {
       "description": "An optional name for the rule. This field is not a unique identifier\nand can be updated.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "No security impact as this is purley descriptive."
     },
     "rule.security_profile_group": {
       "description": "A fully-qualified URL of a SecurityProfile resource instance.\nExample:\nhttps://networksecurity.googleapis.com/v1/projects/{project}/locations/{location}/securityProfileGroups/my-security-profile-group\nMust be specified if action is 'apply_security_profile_group'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A security profile group is an great addition to a firewall rule but we cannot enforce a policy as some rules dont require a security profile at all. For example if you are just blocking an IP, you typically dont need to include a security profile for malware/url filtering. This therefore should be left for the developer to choose if they should impliment it. This has no security impact."
     },
     "rule.target_service_accounts": {
       "description": "A list of service accounts indicating the sets of\ninstances that are applied with this rule.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This allows the developer to set which instances the rules applies to by the service account they run as. If we use security policy to constrain this, this will restirct how teams can scope their rules and therefore is too overreaching."
     },
     "rule.tls_inspect": {
       "description": "Boolean flag indicating if the traffic should be TLS decrypted.\nIt can be set only if action = 'apply_security_profile_group' and cannot be set for other actions.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "TLS Inspection should be used when a security profile group is attached, otherwise the firewall will have no way to enforce any security profiles that may be present. If there isnt a security profile group set, then TLS inspection shouldent be required. The policy should check if there is a security profile group and force this to be turned on."
     },
     "rule.match": {
       "type": "block",
@@ -128,71 +128,71 @@
       "description": "Address groups which should be matched against the traffic destination.\nMaximum number of destination address groups is 10.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This matches the rule to the address group, a policy has no way of determining if an address group has a security implication and therefore enforcement is not possible. Restricting this would hinder developers. "
     },
     "rule.match.dest_fqdns": {
       "description": "Fully Qualified Domain Name (FQDN) which should be matched against\ntraffic destination. Maximum number of destination fqdn allowed is 100.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This matches the rule to fully qualified domain name, a policy has no way of determining if an domain has a security implication and therefore enforcement is not possible. Restricting this would hinder developers. "
     },
     "rule.match.dest_ip_ranges": {
       "description": "Destination IP address range in CIDR format. Required for\nEGRESS rules.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "A rule should restrict 0.0.0.0/0 to prevent unrestricted outbound traffic. By having a security policy here, it significantly reduces the attack surface."
     },
     "rule.match.dest_region_codes": {
       "description": "Region codes whose IP addresses will be used to match for destination\nof traffic. Should be specified as 2 letter country code defined as per\nISO 3166 alpha-2 country codes. ex.\"US\"\nMaximum number of destination region codes allowed is 5000.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This rule controls the IP Country of the traffic destination. We shoulden't need to restrict this as communications with foreign servers shouldent have an impact on data residency as this only controls communications and not data storage. This has no security impact."
     },
     "rule.match.dest_threat_intelligences": {
       "description": "Names of Network Threat Intelligence lists.\nThe IPs in these lists will be matched against traffic destination.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This is very useful as it checks and prevents a connection to a malicious IP address. A security policy should require this to ensure that there are no communications to malicious IPs, this policy would also ensure if an developer makes a critical error by accidentally entering a malicious IP."
     },
     "rule.match.src_address_groups": {
       "description": "Address groups which should be matched against the traffic source.\nMaximum number of source address groups is 10.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This matches the rule to the address group, a policy has no way of determining if an address group has a security implication and therefore enforcement is not possible. Restricting this would hinder developers."
     },
     "rule.match.src_fqdns": {
       "description": "Fully Qualified Domain Name (FQDN) which should be matched against\ntraffic source. Maximum number of source fqdn allowed is 100.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This matches the rule to fully qualified domain name, a policy has no way of determining if an domain has a security implication and therefore enforcement is not possible. Restricting this would hinder developers."
     },
     "rule.match.src_ip_ranges": {
       "description": "Source IP address range in CIDR format. Required for\nINGRESS rules.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "A rule should restrict 0.0.0.0/0 to prevent unrestricted inbound traffic. By having a security policy here, it significantly reduces the attack surface."
     },
     "rule.match.src_region_codes": {
       "description": "Region codes whose IP addresses will be used to match for source\nof traffic. Should be specified as 2 letter country code defined as per\nISO 3166 alpha-2 country codes. ex.\"US\"\nMaximum number of source region codes allowed is 5000.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This rule controls the IP Country of the traffic soruce. We shoulden't need to restrict this as communications with foreign servers shouldent have an impact on data residency as this only controls communications and not data storage. This has no security impact."
     },
     "rule.match.src_threat_intelligences": {
       "description": "Names of Network Threat Intelligence lists.\nThe IPs in these lists will be matched against traffic source.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This is very useful as it checks and prevents a connection to a malicious IP address. A security policy should require this to ensure that there are no communications to malicious IPs, this policy would also ensure if an developer makes a critical error by accidentally entering a malicious IP."
     },
     "rule.match.layer4_config": {
       "type": "block",
@@ -203,15 +203,15 @@
       "description": "The IP protocol to which this rule applies. The protocol\ntype is required when creating a firewall rule.\nThis value can either be one of the following well\nknown protocol strings (tcp, udp, icmp, esp, ah, ipip, sctp),\nor the IP protocol number.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This names the protocol that hte rule matches, this is up to the developer to configure and no security policy is going to be able to tell which known protocol strings a rule will use. This therefore has no security impact."
     },
     "rule.match.layer4_config.ports": {
       "description": "An optional list of ports to which this rule applies. This field\nis only applicable for UDP or TCP protocol. Each entry must be\neither an integer or a range. If not specified, this rule\napplies to connections through any port.\nExample inputs include: [\"22\"], [\"80\",\"443\"], and\n[\"12345-12349\"].",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "By allowing access to every port, this significantly increases the attack surface. A policy should require rules to not have non-empty port list allowing access to every port, policy could also restirct high risk ports like SMBv1 or RDC."
     },
     "rule.match.src_secure_tag": {
       "type": "block",
@@ -222,8 +222,8 @@
       "description": "Name of the secure tag, created with TagManager's TagValue API.\n@pattern tagValues/[0-9]+",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The tag name is created in tag manager used to identify workloads. We have no way of using policy to control what the tag name can be and this therefore is too overreaching and unable to be written as policy."
     },
     "rule.target_secure_tag": {
       "type": "block",
@@ -234,8 +234,8 @@
       "description": "Name of the secure tag, created with TagManager's TagValue API.\n@pattern tagValues/[0-9]+",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The tag name is created in tag manager used to identify workloads. We have no way of using policy to control what the tag name can be and this therefore is too overreaching and unable to be written as policy."
     }
   }
 }
