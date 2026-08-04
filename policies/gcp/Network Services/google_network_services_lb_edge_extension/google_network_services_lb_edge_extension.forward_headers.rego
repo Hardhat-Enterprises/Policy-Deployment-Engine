@@ -1,4 +1,4 @@
-package terraform.gcp.security.network_services.google_network_services_lb_edge_extension.forward_headers
+package terraform.gcp.security.google_network_services_lb_edge_extension.forward_headers
 
 import data.terraform.helpers
 import data.terraform.gcp.security.network_services.google_network_services_lb_edge_extension.vars
@@ -33,3 +33,4 @@ result := helpers.get_multi_summary(conditions, vars.variables)
 
 message := result.message
 details := result.details
+
