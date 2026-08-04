@@ -13,85 +13,85 @@
       "description": "The ID of the dataset containing this routine",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the dataset that contains the routine. It is a resource identifier and does not itself control access, privileges, encryption, or another security setting."
     },
     "definition_body": {
       "description": "The body of the routine. For functions, this is the expression in the AS clause.\nIf language=SQL, it is the substring inside (but excluding) the parentheses.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains free-form routine implementation code. Its security depends on the code's meaning and requires code review or specialised analysis rather than a generic configuration-value policy."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform may delete, abandon, or protect the routine. A policy can require PREVENT where destructive deletion must be blocked."
     },
     "description": {
       "description": "The description of the routine if defined.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Human-readable metadata only. It does not alter permissions, execution privileges, data protection, or resource exposure."
     },
     "determinism_level": {
       "description": "The determinism level of the JavaScript UDF if defined. Possible values: [\"DETERMINISM_LEVEL_UNSPECIFIED\", \"DETERMINISTIC\", \"NOT_DETERMINISTIC\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Describes whether a JavaScript routine is deterministic. This is an execution and correctness characteristic rather than a centrally enforceable security control."
     },
     "imported_libraries": {
       "description": "Optional. If language = \"JAVASCRIPT\", this field stores the path of the\nimported JAVASCRIPT libraries.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains paths to external JavaScript libraries. These are external resource references, and the approved libraries or locations are team-specific rather than generic PDE policy targets."
     },
     "language": {
       "description": "The language of the routine. Possible values: [\"SQL\", \"JAVASCRIPT\", \"PYTHON\", \"JAVA\", \"SCALA\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the implementation language for the routine. This is a team design choice and does not by itself define an insecure configuration."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the project that owns the routine. It is a reference value, and approved project identifiers are organisation-specific rather than universal policy targets."
     },
     "return_table_type": {
       "description": "Optional. Can be set only if routineType = \"TABLE_VALUED_FUNCTION\".\n\nIf absent, the return table type is inferred from definitionBody at query time in each query\nthat references this routine. If present, then the columns in the evaluated table result will\nbe cast to match the column types specificed in return table type, at query time.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the schema of a table-valued function's result. It affects typing and query behaviour rather than access control or another security control."
     },
     "return_type": {
       "description": "A JSON schema for the return type. Optional if language = \"SQL\"; required otherwise.\nIf absent, the return type is inferred from definitionBody at query time in each query\nthat references this routine. If present, then the evaluated result will be cast to\nthe specified returned type at query time. ~>**NOTE**: Because this field expects a JSON\nstring, any changes to the string will create a diff, even if the JSON itself hasn't\nchanged. If the API returns a different value for the same schema, e.g. it switche\nd the order of values or replaced STRUCT field type with RECORD field type, we currently\ncannot suppress the recurring diff this causes. As a workaround, we recommend using\nthe schema as returned by the API.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the routine's returned data type. It is an interface and type-checking setting rather than a security control."
     },
     "routine_id": {
       "description": "The ID of the the routine. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 256 characters.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the routine. The identifier does not itself grant access, change execution privileges, or expose data."
     },
     "routine_type": {
       "description": "The type of routine. Possible values: [\"SCALAR_FUNCTION\", \"PROCEDURE\", \"TABLE_VALUED_FUNCTION\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects whether the routine is a function, procedure, or table-valued function. This is a functional design choice rather than a generic security policy target."
     },
     "security_mode": {
       "description": "Optional. The security mode of the routine, if defined. If not defined, the security mode is automatically determined from the routine's configuration. Possible values: [\"DEFINER\", \"INVOKER\"]",
@@ -109,29 +109,29 @@
       "description": "Defaults to FIXED_TYPE. Default value: \"FIXED_TYPE\" Possible values: [\"FIXED_TYPE\", \"ANY_TYPE\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether an argument uses a fixed or polymorphic type. This is part of the routine interface and does not directly enforce a security control."
     },
     "arguments.data_type": {
       "description": "A JSON schema for the data type. Required unless argumentKind = ANY_TYPE.\n~>**NOTE**: Because this field expects a JSON string, any changes to the string\nwill create a diff, even if the JSON itself hasn't changed. If the API returns\na different value for the same schema, e.g. it switched the order of values\nor replaced STRUCT field type with RECORD field type, we currently cannot\nsuppress the recurring diff this causes. As a workaround, we recommend using\nthe schema as returned by the API.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines an argument's data schema. It affects type validation and routine behaviour rather than access or security enforcement."
     },
     "arguments.mode": {
       "description": "Specifies whether the argument is input or output. Can be set for procedures only. Possible values: [\"IN\", \"OUT\", \"INOUT\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines whether a procedure argument is IN, OUT, or INOUT. This is an interface and data-flow design choice, not a generic security control."
     },
     "arguments.name": {
       "description": "The name of this argument. Can be absent for function return argument.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names a routine argument. It is metadata for the routine interface and has no direct security effect."
     },
     "remote_function_options": {
       "type": "block",
@@ -156,15 +156,15 @@
       "description": "Max number of rows in each batch sent to the remote service. If absent or if 0,\nBigQuery dynamically decides the number of rows in a batch.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls request batching for a remote function. It is a performance and operational setting rather than a security control."
     },
     "remote_function_options.user_defined_context": {
       "description": "User-defined context as a set of key/value pairs, which will be sent as function\ninvocation context together with batched arguments in the requests to the remote\nservice. The total number of bytes of keys and values must be less than 8KB.\n\nAn object containing a list of \"key\": value pairs. Example:\n'{ \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }'.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains application-specific key-value context sent to the remote service. The valid keys and values are team-defined, so PDE cannot apply a reliable generic allowlist or restriction."
     },
     "spark_options": {
       "type": "block",
@@ -175,71 +175,71 @@
       "description": "Archive files to be extracted into the working directory of each executor. For more information about Apache Spark, see Apache Spark.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains external archive file references used by Spark. References to team-selected external resources or paths are not generic PDE policy targets."
     },
     "spark_options.connection": {
       "description": "Fully qualified name of the user-provided Spark connection object.\nFormat: \"projects/{projectId}/locations/{locationId}/connections/{connectionId}\"",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies another resource, the Spark connection. PDE guidance does not pin organisation-specific resource identifiers through a generic policy."
     },
     "spark_options.container_image": {
       "description": "Custom container image for the runtime environment.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References a team-selected container image. Approved registries and image names are organisation-specific, so this resource reference is not a generic policy target."
     },
     "spark_options.file_uris": {
       "description": "Files to be placed in the working directory of each executor. For more information about Apache Spark, see Apache Spark.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains external file references placed in the Spark working directory. The approved files and locations are team-specific resource references."
     },
     "spark_options.jar_uris": {
       "description": "JARs to include on the driver and executor CLASSPATH. For more information about Apache Spark, see Apache Spark.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains external JAR references used by the Spark application. The approved artefacts and locations are team-specific rather than universal policy targets."
     },
     "spark_options.main_class": {
       "description": "The fully qualified name of a class in jarUris, for example, com.example.wordcount.\nExactly one of mainClass and main_jar_uri field should be set for Java/Scala language type.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the application's entry-point class. It is an implementation identifier and does not itself provide a security control."
     },
     "spark_options.main_file_uri": {
       "description": "The main file/jar URI of the Spark application.\nExactly one of the definitionBody field and the mainFileUri field must be set for Python.\nExactly one of mainClass and mainFileUri field should be set for Java/Scala language type.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the main application file or JAR. It is an external resource path whose approved value depends on the team's application."
     },
     "spark_options.properties": {
       "description": "Configuration properties as a set of key/value pairs, which will be passed on to the Spark application.\nFor more information, see Apache Spark and the procedure option list.\nAn object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains application-specific Spark configuration values. The valid properties depend on the workload and are operational choices rather than a single generic security control."
     },
     "spark_options.py_file_uris": {
       "description": "Python files to be placed on the PYTHONPATH for PySpark application. Supported file types: .py, .egg, and .zip. For more information about Apache Spark, see Apache Spark.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains external Python dependency references. The approved files and locations are team-specific resource paths and cannot be centrally fixed by a generic policy."
     },
     "spark_options.runtime_version": {
       "description": "Runtime version. If not specified, the default runtime version is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the Spark runtime version. Version selection and upgrade timing are operational lifecycle choices, and a fixed central allowlist would be environment-specific and quickly become outdated."
     }
   }
 }
