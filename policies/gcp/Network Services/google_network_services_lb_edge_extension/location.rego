@@ -27,4 +27,3 @@ result := helpers.get_multi_summary(conditions, vars.variables)
 
 message := result.message
 details := result.details
-
