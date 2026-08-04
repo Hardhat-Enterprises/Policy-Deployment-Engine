@@ -20,8 +20,8 @@
       "description": "Headers that the HTTP/S load balancer should add to proxied responses.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "This argument can add HTTP response headers such as security headers. Incorrect or missing headers could weaken browser-side protections or expose information."
+      "security_impact": false,
+      "rationale": "This argument allows teams to add application-specific HTTP response headers. Header selection depends on application behaviour, compatibility, and caching requirements, so it is a team configuration choice rather than a mandatory platform security control."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
@@ -48,15 +48,15 @@
       "description": "If true, enable Cloud CDN for this BackendBucket.\nNote: This cannot be set to true when loadBalancingScheme is set to INTERNAL_MANAGED.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "This argument enables Cloud CDN and changes how content is cached and delivered from edge locations. Misconfiguration could expose or retain content inappropriately."
+      "security_impact": false,
+      "rationale": "This argument enables or disables Cloud CDN for content delivery and caching. It is mainly a performance and architecture choice, while decisions about whether content is suitable for caching remain the responsibility of the team."
     },
     "load_balancing_scheme": {
       "description": "The value can only be INTERNAL_MANAGED for cross-region internal layer 7 load balancer.\nIf loadBalancingScheme is not specified, the backend bucket can be used by classic global external load balancers, or global application external load balancers, or both.\nImportant: CDN cannot be enabled (enableCdn cannot be set to true) when loadBalancingScheme is set to INTERNAL_MANAGED. Possible values: [\"INTERNAL_MANAGED\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This argument determines whether the backend bucket is used with an internal or external load-balancing setup. It can affect network exposure and who can reach the service."
+      "security_impact": false,
+      "rationale": "This argument defines the load-balancing topology used by the application. Choosing an internal or external architecture depends on the team's functional and deployment requirements and is outside generic platform security enforcement."
     },
     "name": {
       "description": "Name of the resource. Provided by the client when the resource is\ncreated. The name must be 1-63 characters long, and comply with\nRFC1035.  Specifically, the name must be 1-63 characters long and\nmatch the regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means\nthe first character must be a lowercase letter, and all following\ncharacters must be a dash, lowercase letter, or digit, except the\nlast character, which cannot be a dash.",
@@ -81,29 +81,29 @@
       "description": "Specifies the cache setting for all responses from this backend.\nThe possible values are: USE_ORIGIN_HEADERS, FORCE_CACHE_ALL and CACHE_ALL_STATIC Possible values: [\"USE_ORIGIN_HEADERS\", \"FORCE_CACHE_ALL\", \"CACHE_ALL_STATIC\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This argument controls which responses Cloud CDN caches. An unsafe cache mode could store and serve content that should not be cached, affecting confidentiality and content correctness."
+      "security_impact": false,
+      "rationale": "This argument controls how Cloud CDN decides which responses to cache. It is a functional content-delivery and data-management setting rather than a platform-level security control."
     },
     "cdn_policy.client_ttl": {
       "description": "Specifies the maximum allowed TTL for cached content served by this origin. When the\n'cache_mode' is set to \"USE_ORIGIN_HEADERS\", you must omit this field.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "This argument controls how long clients may treat cached content as fresh. An excessive value could cause outdated or sensitive content to remain available longer than intended."
+      "security_impact": false,
+      "rationale": "This argument sets how long clients may treat cached content as fresh. The duration is a team-defined caching and data-management preference rather than a security control."
     },
     "cdn_policy.default_ttl": {
       "description": "Specifies the default TTL for cached content served by this origin for responses\nthat do not have an existing valid TTL (max-age or s-max-age). When the 'cache_mode'\nis set to \"USE_ORIGIN_HEADERS\", you must omit this field.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "This argument sets the default caching duration when the origin does not provide a valid TTL. A poor value could keep outdated or sensitive responses cached."
+      "security_impact": false,
+      "rationale": "This argument defines the default caching duration when the origin does not provide a valid TTL. It is a performance and cache-management setting rather than a security mechanism."
     },
     "cdn_policy.max_ttl": {
       "description": "Specifies the maximum allowed TTL for cached content served by this origin. When the\n'cache_mode' is set to \"USE_ORIGIN_HEADERS\", you must omit this field.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "This argument limits how long content may remain fresh in the cache. An excessive value could increase the risk of stale or sensitive content being served."
+      "security_impact": false,
+      "rationale": "This argument limits the maximum duration that content may remain fresh in the cache. Cache duration is an operational data-management choice and not a generic platform security control."
     },
     "cdn_policy.negative_caching": {
       "description": "Negative caching allows per-status code TTLs to be set, in order to apply fine-grained caching for common errors or redirects.",
@@ -123,8 +123,8 @@
       "description": "Serve existing content from the cache (if available) when revalidating content with the origin, or when an error is encountered when refreshing the cache.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "This argument allows stale cached content to be served during revalidation or origin errors. A long duration could cause outdated content to be delivered, affecting integrity and freshness."
+      "security_impact": false,
+      "rationale": "This argument controls how long stale cached content may be served during revalidation or origin errors. Data freshness and stale-content handling are operational choices made by the team rather than security controls."
     },
     "cdn_policy.signed_url_cache_max_age_sec": {
       "description": "Maximum number of seconds the response to a signed URL request will\nbe considered fresh. After this time period,\nthe response will be revalidated before being served.\nWhen serving responses to signed URL requests,\nCloud CDN will internally behave as though\nall responses from this backend had a \"Cache-Control: public,\nmax-age=[TTL]\" header, regardless of any existing Cache-Control\nheader. The actual headers served in responses will not be altered.",
@@ -142,8 +142,8 @@
       "description": "The header field name to match on when bypassing cache. Values are case-insensitive.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This argument selects request headers that cause Cloud CDN to bypass the cache. Correctly handling headers such as Authorization can prevent private or user-specific content from being cached."
+      "security_impact": false,
+      "rationale": "This argument specifies the request header names that cause the cache to be bypassed. The chosen headers depend on application behaviour and are team-defined configuration values rather than platform security policy targets."
     },
     "cdn_policy.cache_key_policy": {
       "type": "block",
@@ -154,15 +154,15 @@
       "description": "Allows HTTP request headers (by name) to be used in the\ncache key.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "This argument controls which HTTP headers separate cached responses. Omitting relevant headers could cause one user's or client's response to be served to another."
+      "security_impact": false,
+      "rationale": "This argument selects which HTTP headers are included in the cache key. It controls functional caching behaviour and is based on application-specific response variation rather than a generic security requirement."
     },
     "cdn_policy.cache_key_policy.query_string_whitelist": {
       "description": "Names of query string parameters to include in cache keys.\nDefault parameters are always included. '&' and '=' will\nbe percent encoded and not treated as delimiters.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "This argument controls which query parameters are included in the cache key. Excluding parameters that change response content could cause incorrect or sensitive cached responses to be shared."
+      "security_impact": false,
+      "rationale": "This argument selects which query parameters are included in cache keys. The choice depends on how the application generates content, making it an operational caching decision rather than a platform security control."
     },
     "cdn_policy.negative_caching_policy": {
       "type": "block",
