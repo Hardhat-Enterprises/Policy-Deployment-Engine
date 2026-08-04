@@ -123,15 +123,15 @@
       "description": "Region codes whose IP addresses will be used to match for destination of traffic. Should be specified as 2 letter country code defined as per ISO 3166 alpha-2 country codes. ex.\"US\" Maximum number of dest region codes allowed is 5000.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Restricts destination matching by country. Relevant for geo-based access control and limiting exposure to unexpected regions."
+      "security_impact": false,
+      "rationale": "Optional list restricting destination matching to specific country codes. This is a supplementary, team-specific traffic-filtering choice, not the resource's own required location \u2014 same reasoning as dest_ip_ranges/src_ip_ranges. There is no single universal correct country set a platform policy can enforce without either pinning specific countries or being vacuous."
     },
     "match.dest_threat_intelligences": {
       "description": "Names of Network Threat Intelligence lists. The IPs in these lists will be matched against traffic destination.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Matches destination traffic against known-malicious-IP threat lists. This is a direct threat-blocking control."
+      "security_impact": false,
+      "rationale": "References named Google-managed threat-intelligence lists (e.g. iplist-known-malicious-ips) to match against destination IPs. This is a reference to another resource; we secure the referenced list itself, not this pointer to it."
     },
     "match.src_address_groups": {
       "description": "Address groups which should be matched against the traffic source. Maximum number of source address groups is 10.",
@@ -172,15 +172,15 @@
       "description": "Region codes whose IP addresses will be used to match for source of traffic. Should be specified as 2 letter country code defined as per ISO 3166 alpha-2 country codes. ex.\"US\" Maximum number of source region codes allowed is 5000.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Restricts source matching by country. Relevant to geo-fencing and mitigating traffic from unexpected regions."
+      "security_impact": false,
+      "rationale": "Optional list restricting source matching to specific country codes. Same reasoning as dest_region_codes: a supplementary, team-specific traffic-filtering choice, not a universal data-residency requirement."
     },
     "match.src_threat_intelligences": {
       "description": "Names of Network Threat Intelligence lists. The IPs in these lists will be matched against traffic source.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Matches source traffic against known-malicious-IP threat lists. This is a direct threat-blocking control."
+      "security_impact": false,
+      "rationale": "References named Google-managed threat-intelligence lists to match against source IPs. Same reasoning as dest_threat_intelligences: a reference to another resource, not a generically constrainable property."
     },
     "match.layer4_configs": {
       "type": "block",

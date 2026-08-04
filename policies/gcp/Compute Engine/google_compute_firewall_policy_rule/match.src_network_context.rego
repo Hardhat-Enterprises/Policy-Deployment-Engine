@@ -1,4 +1,4 @@
-package terraform.gcp.security.compute_engine.google_compute_firewall_policy_rule.src_network_context
+package terraform.gcp.security.compute_engine.google_compute_firewall_policy_rule.match_src_network_context
 import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_firewall_policy_rule.vars
 
