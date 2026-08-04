@@ -6,49 +6,49 @@
       "description": "Flag that specifies whether execution should continue if the flow hook throws an exception. Set to true to continue execution. Set to false to stop execution if the flow hook throws an exception. Defaults to true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true",
+      "security_impact": true,
       "rationale": "Controls whether API processing continues when the shared flow fails. Continuing execution could bypass security controls implemented by the shared flow."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true",
+      "security_impact": true,
       "rationale": "Controls whether the flow hook can be unintentionally deleted or removed from Terraform management, potentially removing security controls applied across the environment."
     },
     "description": {
       "description": "Description of the flow hook.",
       "required": false,
       "type": "string",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Provides human-readable information and does not affect flow-hook execution or security behaviour."
     },
     "environment": {
       "description": "The resource ID of the environment.",
       "required": true,
       "type": "string",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Identifies the Apigee environment where the flow hook is attached, and the correct value is organisation-specific."
     },
     "flow_hook_point": {
       "description": "Where in the API call flow the flow hook is invoked. Must be one of PreProxyFlowHook, PostProxyFlowHook, PreTargetFlowHook, or PostTargetFlowHook.",
       "required": true,
       "type": "string",
-      "security_impact": "true",
+      "security_impact": true,
       "rationale": "Determines when the shared flow executes during API processing, affecting when its security controls are applied."
     },
     "org_id": {
       "description": "The Apigee Organization associated with the environment",
       "required": true,
       "type": "string",
-      "security_impact": "false",
+      "security_impact": false,
       "rationale": "Identifies the Apigee organisation and does not directly configure security behaviour."
     },
     "sharedflow": {
       "description": "Id of the Sharedflow attaching to a flowhook point.",
       "required": true,
       "type": "string",
-      "security_impact": "true",
+      "security_impact": true,
       "rationale": "Determines which shared flow is executed and therefore which validation, authentication, threat-protection, or other security controls are applied."
     }
   }
