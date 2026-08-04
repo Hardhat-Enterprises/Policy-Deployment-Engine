@@ -6,36 +6,36 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether the store can be deleted, requires PREVENT to guard against accidental deletion."
     },
     "force_destroy": {
       "description": "If set to true, any FeatureViews and Features for this FeatureOnlineStore will also be deleted.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "If true, deleting the store also destroys all FeatureViews and Features; should be false to guard against accidental deletion."
     },
     "labels": {
       "description": "The labels with user-defined metadata to organize your feature online stores.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "It is a user defined metadata for organizing stores and has no impact on security or data."
     },
     "name": {
       "description": "The resource name of the Feature Online Store. This value may be up to 60 characters, and valid characters are [a-z0-9_]. The first character cannot be a number.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The resource name is a cosmetic identifier with no security impact."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier of the owning project - no security impact."
     },
     "region": {
       "description": "The region of feature online store. eg us-central1",
@@ -53,15 +53,15 @@
       "description": "Optional. If true, enable direct access to the Bigtable instance.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "It enables direct access to the backing Bigtable instance and is a functional option."
     },
     "bigtable.zone": {
       "description": "The zone where the Bigtable instance will be created.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The zone where the Bigtable instance is created. It does not require a separate policy since region is enforced via the region policy."
     },
     "bigtable.auto_scaling": {
       "type": "block",
@@ -72,22 +72,22 @@
       "description": "A percentage of the cluster's CPU capacity. Can be from 10% to 80%. When a cluster's CPU utilization exceeds the target that you have set, Bigtable immediately adds nodes to the cluster. When CPU utilization is substantially lower than the target, Bigtable removes nodes. If not set will default to 50%.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "It is a performance-tuning value with no insecure setting."
     },
     "bigtable.auto_scaling.max_node_count": {
       "description": "The maximum number of nodes to scale up to. Must be greater than or equal to minNodeCount, and less than or equal to 10 times of 'minNodeCount'.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Autoscaling upper node limit - no security impact."
     },
     "bigtable.auto_scaling.min_node_count": {
       "description": "The minimum number of nodes to scale down to. Must be greater than or equal to 1.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Autoscaling lower node count - no security impact."
     },
     "dedicated_serving_endpoint": {
       "type": "block",
@@ -103,15 +103,15 @@
       "description": "If set to true, customers will use private service connection to send request. Otherwise, the connection will set to public endpoint.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "It controls whether the endpoint uses Private Service Connect instead of a public endpoint and a policy should require private access to avoid public network."
     },
     "dedicated_serving_endpoint.private_service_connect_config.project_allowlist": {
       "description": "A list of Projects from which the forwarding rule will target the service attachment.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "It lists the projects allowed to reach the private serving endpoint - a policy should restrict the allowlist shape  as a network-exposure control "
     },
     "encryption_spec": {
       "type": "block",
@@ -122,8 +122,8 @@
       "description": "The Cloud KMS resource identifier of the customer managed encryption key used to protect a resource. Has the form: projects/my-project/locations/my-region/keyRings/my-kr/cryptoKeys/my-key. The key needs to be in the same region as where the compute resource is created.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "it sets the encryption key managed by the customer that protects both online and offline data storage - a policy should enforce it to be non-empty so data is always encrypted."
     },
     "optimized": {
       "type": "block",
