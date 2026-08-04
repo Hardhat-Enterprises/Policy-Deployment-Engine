@@ -6,43 +6,43 @@
       "description": "The ID of the Exadata Infrastructure to create. This value is restricted\nto (^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$) and must be a maximum of 63\ncharacters in length. The value must start with a letter and end with\na letter or a number.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is just the identifier for the infrastructure. It enforces naming rules but does not affect access, encryption, or network exposure"
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can delete the infrastructure. Without restrictions, accidental terraform destroy could wipe critical systems. Policies should enforce “PREVENT” or “ABANDON” for production."
     },
     "deletion_protection": {
       "description": "Whether or not to allow Terraform to destroy the instance. Unless this field is set to false in Terraform state, a terraform destroy or terraform apply that would delete the instance will fail.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Prevents accidental or malicious deletion of the Exadata infrastructure. Essential safeguard for production workloads."
     },
     "display_name": {
       "description": "User friendly name for this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A user‑friendly label only. It doesn’t influence access control, networking, or encryption."
     },
     "gcp_oracle_zone": {
       "description": "GCP location where Oracle Exadata is hosted.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines the physical zone where Exadata is hosted. Wrong zones may violate compliance or data residency requirements. Policies should enforce approved zones."
     },
     "labels": {
       "description": "Labels or tags associated with the resource. \n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Metadata tags for organisation. They don’t control access, networking, or data protection."
     },
     "location": {
       "description": "Resource ID segment making up resource 'name'. See documentation for resource type 'oracledatabase.googleapis.com/DbServer'.",
@@ -55,8 +55,8 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the GCP project. While projects have IAM boundaries, this field alone doesn’t alter security posture."
     },
     "properties": {
       "type": "block",
@@ -67,29 +67,29 @@
       "description": "The number of compute servers for the Exadata Infrastructure.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the number of compute servers. Impacts performance and capacity, not security."
     },
     "properties.shape": {
       "description": "The shape of the Exadata Infrastructure. The shape determines the\namount of CPU, storage, and memory resources allocated to the instance.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines CPU, memory, and storage sizing. This is a performance parameter, not a security control."
     },
     "properties.storage_count": {
       "description": "The number of Cloud Exadata storage servers for the Exadata Infrastructure.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the number of storage servers. Affects capacity, not security."
     },
     "properties.total_storage_size_gb": {
       "description": "The total storage allocated to the Exadata Infrastructure\nresource, in gigabytes (GB).",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets total storage allocation. Impacts capacity only, not access or encryption."
     },
     "properties.customer_contacts": {
       "type": "block",
@@ -100,8 +100,8 @@
       "description": "The email address used by Oracle to send notifications regarding databases\nand infrastructure.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Email addresses are used for notifications. If misconfigured, sensitive alerts could be sent to unauthorised recipients. Policies should enforce valid, approved contacts."
     },
     "properties.maintenance_window": {
       "type": "block",
@@ -112,64 +112,64 @@
       "description": "Determines the amount of time the system will wait before the start of each\ndatabase server patching operation. Custom action timeout is in minutes and\nvalid value is between 15 to 120 (inclusive).",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines patching wait times. Operational only, no direct security impact."
     },
     "properties.maintenance_window.days_of_week": {
       "description": "Days during the week when maintenance should be performed.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies maintenance days. Operational scheduling parameter, not a security control."
     },
     "properties.maintenance_window.hours_of_day": {
       "description": "The window of hours during the day when maintenance should be performed.\nThe window is a 4 hour slot. Valid values are:\n  0 - represents time slot 0:00 - 3:59 UTC\n  4 - represents time slot 4:00 - 7:59 UTC\n  8 - represents time slot 8:00 - 11:59 UTC\n  12 - represents time slot 12:00 - 15:59 UTC\n  16 - represents time slot 16:00 - 19:59 UTC\n  20 - represents time slot 20:00 - 23:59 UTC",
       "required": false,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines maintenance hours. Operational scheduling parameter, not a security control."
     },
     "properties.maintenance_window.is_custom_action_timeout_enabled": {
       "description": "If true, enables the configuration of a custom action timeout (waiting\nperiod) between database server patching operations.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Enables custom patching wait times. Operational, not security‑related."
     },
     "properties.maintenance_window.lead_time_week": {
       "description": "Lead time window allows user to set a lead time to prepare for a down time.\nThe lead time is in weeks and valid value is between 1 to 4.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines lead time for maintenance. Operational scheduling parameter, not a security control."
     },
     "properties.maintenance_window.months": {
       "description": "Months during the year when maintenance should be performed.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies maintenance months. Operational scheduling parameter, not a security control."
     },
     "properties.maintenance_window.patching_mode": {
       "description": "Cloud CloudExadataInfrastructure node patching method, either \"ROLLING\"\n or \"NONROLLING\". Default value is ROLLING. \n Possible values:\n PATCHING_MODE_UNSPECIFIED\nROLLING\nNON_ROLLING",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines whether patching is rolling or non‑rolling. Non‑rolling patching can cause downtime and increase exposure risk. Policies should enforce rolling patching for resilience."
     },
     "properties.maintenance_window.preference": {
       "description": "The maintenance window scheduling preference. \n Possible values:\n MAINTENANCE_WINDOW_PREFERENCE_UNSPECIFIED\nCUSTOM_PREFERENCE\nNO_PREFERENCE",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines maintenance window scheduling preference. Operational scheduling parameter, not a security control."
     },
     "properties.maintenance_window.weeks_of_month": {
       "description": "Weeks during the month when maintenance should be performed. Weeks start on\nthe 1st, 8th, 15th, and 22nd days of the month, and have a duration of 7\ndays. Weeks start and end based on calendar dates, not days of the week.",
       "required": false,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies weeks for maintenance. Operational scheduling parameter, not a security control."
     }
   }
 }
