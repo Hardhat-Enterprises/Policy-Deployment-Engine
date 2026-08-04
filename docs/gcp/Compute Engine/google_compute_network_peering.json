@@ -6,71 +6,71 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Governs Terraform's lifecycle behaviour on destroy (DELETE/PREVENT/ABANDON). This is an operational/state-management control rather than a cloud security control; it does not change how traffic or routes are exchanged across the peering."
     },
     "export_custom_routes": {
       "description": "Whether to export the custom routes to the peer network. Defaults to false.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether this network's custom (non-subnet) routes — such as static routes and routes to on-prem via VPN/Interconnect — are advertised to the peer network. Enabling it can extend reachability into the peer, expanding the network attack surface and potentially exposing paths to sensitive internal or hybrid-connected ranges. Policy should default this to false and require explicit justification/approval before custom routes are exported to a peer."
     },
     "export_subnet_routes_with_public_ip": {
-      "description": "N/A",
+      "description": "Whether subnet routes with public IP range are exported to the peer network. Defaults to true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines whether subnet routes that use public IP ranges are advertised to the peer network. Exporting public-IP subnet routes across a peering can widen exposure of externally-addressable ranges and complicate egress/ingress controls. Policy can require this to be explicitly reviewed (and disabled where public-IP subnet ranges should not be reachable via the peer) to limit the advertised surface."
     },
     "import_custom_routes": {
-      "description": "Whether to export the custom routes from the peer network. Defaults to false.",
+      "description": "Whether to import the custom routes from the peer network. Defaults to false.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether custom (non-subnet) routes advertised by the peer network are accepted into this network's routing table. Importing custom routes lets a peer influence where this network sends traffic, creating a route-injection / traffic-redirection risk if the peer is less trusted or compromised. Policy should default this to false and permit import only from explicitly trusted peers under approval."
     },
     "import_subnet_routes_with_public_ip": {
-      "description": "N/A",
+      "description": "Whether subnet routes with public IP range are imported from the peer network. Defaults to true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines whether subnet routes using public IP ranges advertised by the peer are accepted into this network. Importing public-IP subnet routes can pull externally-addressable ranges into local routing and broaden the paths reachable from this network. Policy can require this to be explicitly reviewed and disabled where the peer's public-IP ranges should not be routable locally."
     },
     "name": {
       "description": "Name of the peering.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The identifier for the peering connection. Naming may aid governance, but the name itself does not affect confidentiality, integrity, or the routes/traffic exchanged, so it is non-security-relevant."
     },
     "network": {
       "description": "The primary network of the peering.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the local VPC network that owns this peering. It selects which existing network the peering attaches to rather than configuring a security control on the connection; the security-relevant behaviour is governed by the route import/export flags and the peer selection."
     },
     "peer_network": {
       "description": "The peer network in the peering. The peer network may belong to a different project.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Identifies the remote VPC being peered with, which may live in a different project or organisation. The choice of peer directly determines the trust boundary being crossed and which external network gains routed reachability into this one. Policy should restrict peering to an approved allowlist of peer networks/projects to prevent connections to untrusted or unmanaged VPCs."
     },
     "stack_type": {
       "description": "Which IP version(s) of traffic and routes are allowed to be imported or exported between peer networks. The default value is IPV4_ONLY. Possible values: [\"IPV4_ONLY\", \"IPV4_IPV6\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects whether the peering exchanges IPv4 only or both IPv4 and IPv6 traffic and routes. Enabling IPV4_IPV6 widens the exchanged address families and, if IPv6 controls are less mature in the environment, can open reachability that firewall rules do not yet fully cover. Policy can require IPV4_ONLY unless dual-stack is explicitly needed and the corresponding IPv6 firewall controls are in place."
     },
     "update_strategy": {
       "description": "The update strategy determines the semantics for updates and deletes to the peering connection configuration. The default value is INDEPENDENT. Possible values: [\"INDEPENDENT\", \"CONSENSUS\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines the semantics for how updates and deletes to the peering configuration are coordinated between the two sides (INDEPENDENT vs CONSENSUS). This is a change-management/operational behaviour rather than a control over the traffic or routes exchanged, so it is treated as non-security-relevant."
     }
   }
 }
