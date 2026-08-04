@@ -6,43 +6,43 @@
       "description": "URLs to certificate manager certificate resources that are used to authenticate connections between users and the load balancer.\nsslCertificates and certificateManagerCertificates can't be defined together.\nAccepted format is '//certificatemanager.googleapis.com/projects/{project}/locations/{location}/certificates/{resourceName}' or just the self_link 'projects/{project}/locations/{location}/certificates/{resourceName}'",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Certificate Manager certificate(s) that terminate TLS and authenticate connections between clients and the load balancer. The certificate presented to users is a core confidentiality/authenticity control; a missing, wrong, or untrusted certificate breaks the TLS trust chain. Policy should ensure the proxy references a valid managed certificate (either this or ssl_certificates) so that connections are served over properly authenticated TLS, and that the two certificate sources are not defined together."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Governs Terraform's lifecycle behaviour on destroy (DELETE/PREVENT/ABANDON). This is an operational/state-management control rather than a cloud security control; it does not change how the proxy terminates TLS or routes traffic."
     },
     "description": {
       "description": "An optional description of this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A free-text description for human reference. It has no effect on the resource's security configuration."
     },
     "http_keep_alive_timeout_sec": {
       "description": "Specifies how long to keep a connection open, after completing a response,\nwhile there is no matching traffic (in seconds). If an HTTP keepalive is\nnot specified, a default value (600 seconds) will be used. For Regioanl\nHTTP(S) load balancer, the minimum allowed value is 5 seconds and the\nmaximum allowed value is 600 seconds.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Tunes how long idle keep-alive connections are held open. This is a performance/resource-management setting; while extreme values have minor availability implications, it does not govern encryption, authentication, or access, so it is treated as non-security-relevant."
     },
     "name": {
       "description": "Name of the resource. Provided by the client when the resource is\ncreated. The name must be 1-63 characters long, and comply with\nRFC1035. Specifically, the name must be 1-63 characters long and match\nthe regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the\nfirst character must be a lowercase letter, and all following\ncharacters must be a dash, lowercase letter, or digit, except the last\ncharacter, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The resource identifier. Naming conventions may aid governance, but the name itself does not affect confidentiality, integrity, or access control of the proxy."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the owning project. Project placement affects organisation and IAM boundaries at a higher level, but as a proxy argument it selects an existing project rather than configuring any security control on the resource, so it is treated as non-security-relevant."
     },
     "region": {
       "description": "The Region in which the created target https proxy should reside.\nIf it is not provided, the provider region is used.",
@@ -55,29 +55,29 @@
       "description": "A URL referring to a networksecurity.ServerTlsPolicy\nresource that describes how the proxy should authenticate inbound\ntraffic. serverTlsPolicy only applies to a global TargetHttpsProxy\nattached to globalForwardingRules with the loadBalancingScheme\nset to INTERNAL_SELF_MANAGED or EXTERNAL or EXTERNAL_MANAGED.\nFor details which ServerTlsPolicy resources are accepted with\nINTERNAL_SELF_MANAGED and which with EXTERNAL, EXTERNAL_MANAGED\nloadBalancingScheme consult ServerTlsPolicy documentation.\nIf left blank, communications are not encrypted.\n\nIf you remove this field from your configuration at the same time as\ndeleting or recreating a referenced ServerTlsPolicy resource, you will\nreceive a resourceInUseByAnotherResource error. Use lifecycle.create_before_destroy\nwithin the ServerTlsPolicy resource to avoid this.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References a ServerTlsPolicy that defines how the proxy authenticates inbound traffic (including mTLS). The provider documentation explicitly notes that if left blank, communications are not encrypted for the applicable load-balancing schemes, making this a direct confidentiality control. Policy should require a ServerTlsPolicy where the load-balancing scheme depends on it for encryption/authentication, so that inbound traffic is not left unencrypted or unauthenticated."
     },
     "ssl_certificates": {
       "description": "URLs to SslCertificate resources that are used to authenticate connections between users and the load balancer.\nAt least one SSL certificate must be specified. Currently, you may specify up to 15 SSL certificates.\nsslCertificates do not apply when the load balancing scheme is set to INTERNAL_SELF_MANAGED.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the SslCertificate resource(s) presented to clients to terminate and authenticate TLS connections. This is a core confidentiality/authenticity control — the certificate is what proves the endpoint's identity and secures the channel. Policy should ensure at least one valid certificate is configured (via this or certificate_manager_certificates) so connections are served over authenticated TLS, and that the two certificate sources are not defined together."
     },
     "ssl_policy": {
       "description": "A reference to the Region SslPolicy resource that will be associated with\nthe TargetHttpsProxy resource. If not set, the TargetHttpsProxy\nresource will not have any SSL policy configured.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Associates an SslPolicy that controls the minimum TLS version and permitted cipher suites for client connections. Without it, the proxy falls back to the default profile, which may permit older TLS versions or weaker ciphers than the organisation allows. Policy should require an SslPolicy that enforces a modern minimum TLS version (e.g. TLS 1.2+) and a restrictive/MODERN or custom cipher profile, so connections cannot negotiate weak cryptography."
     },
     "url_map": {
       "description": "A reference to the RegionUrlMap resource that defines the mapping from URL\nto the RegionBackendService.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the RegionUrlMap that routes matched URLs to backend services. It defines request routing rather than a confidentiality or access control on the proxy itself; the security posture of the destinations is governed by the backend services and their own policies, so this reference is treated as non-security-relevant here."
     }
   }
 }

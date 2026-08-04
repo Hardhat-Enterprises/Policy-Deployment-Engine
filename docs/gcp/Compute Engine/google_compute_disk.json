@@ -6,155 +6,155 @@
       "description": "The access mode of the disk.\nFor example:\n  * READ_WRITE_SINGLE: The default AccessMode, means the disk can be attached to single instance in RW mode.\n  * READ_WRITE_MANY: The AccessMode means the disk can be attached to multiple instances in RW mode.\n  * READ_ONLY_SINGLE: The AccessMode means the disk can be attached to multiple instances in RO mode.\nThe AccessMode is only valid for Hyperdisk disk types.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls how many instances can attach the disk and in which mode. READ_WRITE_MANY allows concurrent read-write attachment across instances, widening the surface for data tampering or corruption if any attached instance is compromised. Policy can restrict multi-writer access modes to approved workloads, defaulting to single-attach where shared access is not required."
     },
     "architecture": {
       "description": "The architecture of the disk. Values include 'X86_64', 'ARM64'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies CPU architecture (X86_64 or ARM64) for compatibility. It does not affect encryption, access control, or data exposure, so it carries no direct security impact."
     },
     "create_snapshot_before_destroy": {
       "description": "If set to true, a snapshot of the disk will be created before it is destroyed.\nIf your disk is encrypted with customer managed encryption keys these will be reused for the snapshot creation.\nThe name of the snapshot by default will be '{{disk-name}}-YYYYMMDD-HHmm'",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A data-preservation convenience that captures a snapshot before deletion. It supports availability/recovery but does not itself weaken or strengthen the disk's security posture, and encryption keys are inherited from the disk, so it is treated as non-security-relevant."
     },
     "create_snapshot_before_destroy_prefix": {
       "description": "This will set a custom name prefix for the snapshot that's created when the disk is deleted.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets a naming prefix for the pre-deletion snapshot. Purely a naming/organisational convenience with no bearing on confidentiality, integrity, or access control."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Governs Terraform's lifecycle behaviour on destroy (DELETE/PREVENT/ABANDON). This is an operational/state-management control rather than a cloud security control; it does not change how the disk protects data or restricts access."
     },
     "description": {
       "description": "An optional description of this resource. Provide this property when\nyou create the resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A free-text description for human reference. It has no effect on the resource's security configuration."
     },
     "enable_confidential_compute": {
       "description": "Whether this disk is using confidential compute mode.\nNote: Only supported on hyperdisk skus, disk_encryption_key is required when setting to true",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables Confidential Compute mode, which protects data in use by keeping it encrypted while being processed, extending protection beyond encryption at rest and in transit. Enabling it requires a customer-managed disk_encryption_key. Policy can require this for workloads handling highly sensitive data where memory-level confidentiality is mandated, and verify the required encryption key is present when it is set to true."
     },
     "image": {
       "description": "The image from which to initialize this disk. This can be\none of: the image's 'self_link', 'projects/{project}/global/images/{image}',\n'projects/{project}/global/images/family/{family}', 'global/images/{image}',\n'global/images/family/{family}', 'family/{family}', '{project}/{family}',\n'{project}/{image}', '{family}', or '{image}'. If referred by family, the\nimages names must include the family name. If they don't, use the\n[google_compute_image data source](/docs/providers/google/d/compute_image.html).\nFor instance, the image 'centos-6-v20180104' includes its family name 'centos-6'.\nThese images can be referred by family name here.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the source image to initialise the disk. While image provenance matters operationally, the source of a boot/data image is better governed at the image/organisation-policy level (trusted image projects) than on the disk resource itself, so it is marked non-security-relevant here."
     },
     "labels": {
       "description": "Labels to apply to this disk.  A list of key->value pairs.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Key/value metadata for organisation, billing, and filtering. Labels do not enforce access or encryption; they are informational and non-authoritative, so they carry no direct security impact."
     },
     "licenses": {
       "description": "Any applicable license URI.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Associates software license URIs with the disk for billing/compliance tracking. It does not influence the disk's security controls."
     },
     "name": {
       "description": "Name of the resource. Provided by the client when the resource is\ncreated. The name must be 1-63 characters long, and comply with\nRFC1035. Specifically, the name must be 1-63 characters long and match\nthe regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the\nfirst character must be a lowercase letter, and all following\ncharacters must be a dash, lowercase letter, or digit, except the last\ncharacter, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The resource identifier. Naming conventions may aid governance, but the name itself does not affect confidentiality, integrity, or access control of the disk."
     },
     "physical_block_size_bytes": {
       "description": "Physical block size of the persistent disk, in bytes. If not present\nin a request, a default value is used. Currently supported sizes\nare 4096 and 16384, other sizes may be added in the future.\nIf an unsupported value is requested, the error message will list\nthe supported values for the caller's project.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A performance/formatting parameter for the disk's physical block size. It has no security relevance."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the owning project. Project placement affects organisation and IAM boundaries at a higher level, but as a disk argument it selects an existing project rather than configuring any security control on the disk, so it is treated as non-security-relevant."
     },
     "provisioned_iops": {
       "description": "Indicates how many IOPS must be provisioned for the disk.\nNote: Updating currently is only supported by hyperdisk skus without the need to delete and recreate the disk, hyperdisk\nallows for an update of IOPS every 4 hours. To update your hyperdisk more frequently, you'll need to manually delete and recreate it",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A performance tuning parameter (provisioned IOPS). It affects throughput/cost, not the security posture of the disk."
     },
     "provisioned_throughput": {
       "description": "Indicates how much Throughput must be provisioned for the disk.\nNote: Updating currently is only supported by hyperdisk skus without the need to delete and recreate the disk, hyperdisk\nallows for an update of Throughput every 4 hours. To update your hyperdisk more frequently, you'll need to manually delete and recreate it",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A performance tuning parameter (provisioned throughput). It affects performance/cost, not security."
     },
     "size": {
       "description": "Size of the persistent disk, specified in GB. You can specify this\nfield when creating a persistent disk using the 'image' or\n'snapshot' parameter, or specify it alone to create an empty\npersistent disk.\n\nIf you specify this field along with 'image' or 'snapshot',\nthe value must not be less than the size of the image\nor the size of the snapshot.\n\n~>**NOTE** If you change the size, Terraform updates the disk size\nif upsizing is detected but recreates the disk if downsizing is requested.\nYou can add 'lifecycle.prevent_destroy' in the config to prevent destroying\nand recreating.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets disk capacity in GB. A sizing/cost parameter with no effect on encryption or access control, so it is non-security-relevant."
     },
     "snapshot": {
       "description": "The source snapshot used to create this disk. You can provide this as\na partial or full URL to the resource. If the snapshot is in another\nproject than this disk, you must supply a full URL. For example, the\nfollowing are valid values:\n\n* 'https://www.googleapis.com/compute/v1/projects/project/global/snapshots/snapshot'\n* 'projects/project/global/snapshots/snapshot'\n* 'global/snapshots/snapshot'\n* 'snapshot'",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References a source snapshot to initialise the disk. It selects existing data rather than configuring a security control; snapshot access is governed at the snapshot/IAM level, so this argument is treated as non-security-relevant. (Note: source_snapshot_encryption_key handles the encryption aspect separately.)"
     },
     "source_disk": {
       "description": "The source disk used to create this disk. You can provide this as a partial or full URL to the resource.\nFor example, the following are valid values:\n\n* https://www.googleapis.com/compute/v1/projects/{project}/zones/{zone}/disks/{disk}\n* https://www.googleapis.com/compute/v1/projects/{project}/regions/{region}/disks/{disk}\n* projects/{project}/zones/{zone}/disks/{disk}\n* projects/{project}/regions/{region}/disks/{disk}\n* zones/{zone}/disks/{disk}\n* regions/{region}/disks/{disk}",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References an existing source disk to clone from. It selects a data source rather than configuring a security control on the new disk; access to the source is governed by that disk's own IAM, so this is non-security-relevant."
     },
     "source_instant_snapshot": {
       "description": "The source instant snapshot used to create this disk. You can provide this as a partial or full URL to the resource.\nFor example, the following are valid values:\n\n* 'https://www.googleapis.com/compute/v1/projects/project/zones/zone/instantSnapshots/instantSnapshot'\n* 'projects/project/zones/zone/instantSnapshots/instantSnapshot'\n* 'zones/zone/instantSnapshots/instantSnapshot'",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References a source instant snapshot to initialise the disk. Like other source references, it selects existing data rather than configuring a security control, so it is non-security-relevant."
     },
     "source_storage_object": {
       "description": "The full Google Cloud Storage URI where the disk image is stored.\nThis file must be a gzip-compressed tarball whose name ends in .tar.gz or virtual machine disk whose name ends in vmdk.\nValid URIs may start with gs:// or https://storage.googleapis.com/.\nThis flag is not optimized for creating multiple disks from a source storage object.\nTo create many disks from a source storage object, use gcloud compute images import instead.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Points to a Cloud Storage URI holding a disk image to import. It selects a data source; the security of that object is governed by the bucket's own IAM and encryption settings, not by this disk argument, so it is non-security-relevant here."
     },
     "storage_pool": {
       "description": "The URL or the name of the storage pool in which the new disk is created.\nFor example:\n* https://www.googleapis.com/compute/v1/projects/{project}/zones/{zone}/storagePools/{storagePool}\n* /projects/{project}/zones/{zone}/storagePools/{storagePool}\n* /zones/{zone}/storagePools/{storagePool}\n* /{storagePool}",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Places the disk into a storage pool for capacity/performance management. A resource-placement parameter with no effect on the disk's encryption or access control."
     },
     "type": {
       "description": "URL of the disk type resource describing which disk type to use to\ncreate the disk. Provide this when creating the disk.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the disk SKU/type (e.g. pd-ssd, hyperdisk). A performance/cost choice that does not affect the disk's security posture."
     },
     "zone": {
       "description": "A reference to the zone where the disk resides.",
@@ -172,8 +172,8 @@
       "description": "Primary disk for asynchronous disk replication.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the primary disk in an async replication pair. It configures replication topology (availability/DR) rather than a confidentiality or access control, so it is non-security-relevant."
     },
     "disk_encryption_key": {
       "type": "block",
@@ -184,29 +184,29 @@
       "description": "The self link of the encryption key used to encrypt the disk. Also called KmsKeyName\nin the cloud console. Your project's Compute Engine System service account\n('service-{{PROJECT_NUMBER}}@compute-system.iam.gserviceaccount.com') must have\n'roles/cloudkms.cryptoKeyEncrypterDecrypter' to use this feature.\nSee https://cloud.google.com/compute/docs/disks/customer-managed-encryption#encrypt_a_new_persistent_disk_with_your_own_keys",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects a Cloud KMS (CMEK) key to encrypt the disk at rest, giving the organisation control over key lifecycle, rotation and revocation instead of relying solely on Google-managed keys. Policy should require CMEK for disks holding sensitive data and, where the key ring is parameterised, verify the key belongs to an approved project/region for data-residency and key-sovereignty requirements."
     },
     "disk_encryption_key.kms_key_service_account": {
       "description": "The service account used for the encryption request for the given KMS key.\nIf absent, the Compute Engine Service Agent service account is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Designates which service account performs the KMS encrypt/decrypt operation. Using a dedicated least-privilege service account rather than the default Compute Engine service agent narrows the blast radius and supports separation-of-duties. Policy can check that, when CMEK is in use, a non-default service account is specified where the organisation's key-access model requires it."
     },
     "disk_encryption_key.raw_key": {
       "description": "Specifies a 256-bit customer-supplied encryption key, encoded in\nRFC 4648 base64 to either encrypt or decrypt this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Supplies a customer-supplied encryption key (CSEK) as raw base64. While it gives full customer key ownership, the value is persisted in Terraform state as plaintext, creating a secret-sprawl and key-exposure risk. Policy should discourage raw_key in favour of kms_key_self_link (CMEK); if raw CSEK is used, it must be paired with protected/encrypted remote state."
     },
     "disk_encryption_key.rsa_encrypted_key": {
       "description": "Specifies an RFC 4648 base64 encoded, RSA-wrapped 2048-bit\ncustomer-supplied encryption key to either encrypt or decrypt\nthis resource. You can provide either the rawKey or the rsaEncryptedKey.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "An RSA-wrapped CSEK — safer than raw_key because the key material is wrapped in transit, but it is still a customer-managed secret that appears in Terraform state. Policy should treat it like raw_key: prefer CMEK (kms_key_self_link), and where CSEK is required, ensure the wrapped key is handled through protected state rather than committed in plaintext configuration."
     },
     "guest_os_features": {
       "type": "block",
@@ -217,8 +217,8 @@
       "description": "The type of supported feature. Read [Enabling guest operating system features](https://cloud.google.com/compute/docs/images/create-delete-deprecate-private-images#guest-os-features) to see a list of available options.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables guest OS features, some of which are security controls — notably SECURE_BOOT, which validates boot components against trusted signatures to block rootkits and unsigned/tampered boot code. Policy can require security-relevant features (e.g. SECURE_BOOT, and where applicable UEFI_COMPATIBLE for Shielded VM support) on bootable disks that run sensitive workloads."
     },
     "params": {
       "type": "block",
@@ -229,8 +229,8 @@
       "description": "Resource manager tags to be bound to the disk. Tag keys and values have the\nsame definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id},\nand values are in the format tagValues/456.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Binds Resource Manager tags to the disk. Tags can drive IAM conditions and organisation-policy enforcement, so they participate directly in access-control decisions. Policy can require governance-mandated tags (e.g. data-classification) to be present where the organisation uses tag-based conditional access."
     },
     "source_image_encryption_key": {
       "type": "block",
@@ -241,22 +241,22 @@
       "description": "The self link of the encryption key used to encrypt the disk. Also called KmsKeyName\nin the cloud console. Your project's Compute Engine System service account\n('service-{{PROJECT_NUMBER}}@compute-system.iam.gserviceaccount.com') must have\n'roles/cloudkms.cryptoKeyEncrypterDecrypter' to use this feature.\nSee https://cloud.google.com/compute/docs/disks/customer-managed-encryption#encrypt_a_new_persistent_disk_with_your_own_keys",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Specifies the Cloud KMS (CMEK) key protecting the source image from which this disk is created. When the source image is CMEK-protected, this key is required to read it, and its use keeps the encryption chain under customer key control. Policy can verify that CMEK-protected source images are referenced with an approved KMS key rather than falling back to unmanaged keys."
     },
     "source_image_encryption_key.kms_key_service_account": {
       "description": "The service account used for the encryption request for the given KMS key.\nIf absent, the Compute Engine Service Agent service account is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Designates the service account performing KMS operations for the source image key. A dedicated least-privilege service account limits which identity can decrypt the source image, supporting separation-of-duties. Policy can require a non-default service account where the organisation's key-access model mandates it."
     },
     "source_image_encryption_key.raw_key": {
       "description": "Specifies a 256-bit customer-supplied encryption key, encoded in\nRFC 4648 base64 to either encrypt or decrypt this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Supplies a raw customer-supplied encryption key (CSEK) for the source image. Like the disk-level raw_key, it gives full customer key ownership but is persisted in Terraform state as plaintext, creating a key-exposure risk. Policy should prefer kms_key_self_link (CMEK) over raw CSEK and, where raw CSEK is used, require protected/encrypted remote state."
     },
     "source_snapshot_encryption_key": {
       "type": "block",
@@ -267,22 +267,22 @@
       "description": "The self link of the encryption key used to encrypt the disk. Also called KmsKeyName\nin the cloud console. Your project's Compute Engine System service account\n('service-{{PROJECT_NUMBER}}@compute-system.iam.gserviceaccount.com') must have\n'roles/cloudkms.cryptoKeyEncrypterDecrypter' to use this feature.\nSee https://cloud.google.com/compute/docs/disks/customer-managed-encryption#encrypt_a_new_persistent_disk_with_your_own_keys",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Specifies the Cloud KMS (CMEK) key protecting the source snapshot from which this disk is created. When the source snapshot is CMEK-protected, this key is required to read it, keeping the encryption chain under customer key control. Policy can verify that CMEK-protected source snapshots are referenced with an approved KMS key rather than an unmanaged key."
     },
     "source_snapshot_encryption_key.kms_key_service_account": {
       "description": "The service account used for the encryption request for the given KMS key.\nIf absent, the Compute Engine Service Agent service account is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Designates the service account performing KMS operations for the source snapshot key. A dedicated least-privilege service account limits which identity can decrypt the source snapshot, supporting separation-of-duties. Policy can require a non-default service account where the organisation's key-access model mandates it."
     },
     "source_snapshot_encryption_key.raw_key": {
       "description": "Specifies a 256-bit customer-supplied encryption key, encoded in\nRFC 4648 base64 to either encrypt or decrypt this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Supplies a raw customer-supplied encryption key (CSEK) for the source snapshot. Like the disk-level raw_key, it gives full customer key ownership but is persisted in Terraform state as plaintext, creating a key-exposure risk. Policy should prefer kms_key_self_link (CMEK) over raw CSEK and, where raw CSEK is used, require protected/encrypted remote state."
     }
   }
 }
