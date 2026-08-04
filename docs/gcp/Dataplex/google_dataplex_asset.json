@@ -6,43 +6,43 @@
       "description": "The zone for the resource",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "This does not have a security_impact as it only references an existing Dataplex zone and does not control security or access."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "This does have a security_impact as it protects critical assets from accidental deletion through Terraform."
     },
     "description": {
       "description": "Optional. Description of the asset.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "This does not have a security_impact as it is descriptive metadata used for documentation only."
     },
     "display_name": {
       "description": "Optional. User friendly display name.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "This does not have a security impact as it is a user-friendly identifier and does not affect security or permissions."
     },
     "labels": {
       "description": "Optional. User defined labels for the asset.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field `effective_labels` for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "This does have a security_impact as it supports governance, auditing, and ownership tracking."
     },
     "lake": {
       "description": "The lake for the resource",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "This does not have a security_impact as it only references the Dataplex lake that contains the asset."
     },
     "location": {
       "description": "The location for the resource",
@@ -55,15 +55,15 @@
       "description": "The name of the asset.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "This does not have a security_impact as it is only used to uniquely identify the asset."
     },
     "project": {
       "description": "The project for the resource",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "This does have a security_impact as it prevents resources being created in unauthorized or personal projects."
     },
     "discovery_spec": {
       "type": "block",
@@ -74,29 +74,29 @@
       "description": "Required. Whether discovery is enabled.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "This does have a security_impact as it ensures all assets are automatically discovered and catalogued for governance and auditing."
     },
     "discovery_spec.exclude_patterns": {
       "description": "Optional. The list of patterns to apply for selecting data to exclude during discovery. For Cloud Storage bucket assets, these are interpreted as glob patterns used to match object names. For BigQuery dataset assets, these are interpreted as patterns to match table names.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "This does not have a security_impact as it only controls which data is excluded from discovery and does not affect access control or resource security."
     },
     "discovery_spec.include_patterns": {
       "description": "Optional. The list of patterns to apply for selecting data to include during discovery if only a subset of the data should considered. For Cloud Storage bucket assets, these are interpreted as glob patterns used to match object names. For BigQuery dataset assets, these are interpreted as patterns to match table names.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "This does not have a security_impact as it only controls which data is included in discovery and does not grant or restrict permissions."
     },
     "discovery_spec.schedule": {
       "description": "Optional. Cron schedule (https://en.wikipedia.org/wiki/Cron) for running discovery periodically. Successive discovery runs must be scheduled at least 60 minutes apart. The default value is to run discovery every 60 minutes. To explicitly set a timezone to the cron tab, apply a prefix in the cron tab: \"CRON_TZ=${IANA_TIME_ZONE}\" or TZ=${IANA_TIME_ZONE}\". The ${IANA_TIME_ZONE} may only be a valid string from IANA time zone database. For example, \"CRON_TZ=America/New_York 1 * * * *\", or \"TZ=America/New_York 1 * * * *\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "This is a security_impact as it ensures metadata is refreshed regularly rather than becoming stale."
     },
     "discovery_spec.csv_options": {
       "type": "block",
@@ -107,29 +107,29 @@
       "description": "Optional. The delimiter being used to separate values. This defaults to ','.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "This does not have a security_impact as it only specifies how CSV data is parsed."
     },
     "discovery_spec.csv_options.disable_type_inference": {
       "description": "Optional. Whether to disable the inference of data type for CSV data. If true, all columns will be registered as strings.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "This does not have a security_impact as it only controls how CSV data types are inferred during discovery."
     },
     "discovery_spec.csv_options.encoding": {
       "description": "Optional. The character encoding of the data. The default is UTF-8.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "This does not have a security_impact as it only specifies the character encoding used to read CSV files."
     },
     "discovery_spec.csv_options.header_rows": {
       "description": "Optional. The number of rows to interpret as header rows that should be skipped when reading data rows.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "This does not have a security_impact as it only specifies the number of header rows in CSV files."
     },
     "discovery_spec.json_options": {
       "type": "block",
@@ -140,15 +140,15 @@
       "description": "Optional. Whether to disable the inference of data type for Json data. If true, all columns will be registered as their primitive types (strings, number or boolean).",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "This does not have a security_impact as it only controls how JSON data types are inferred during discovery."
     },
     "discovery_spec.json_options.encoding": {
       "description": "Optional. The character encoding of the data. The default is UTF-8.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "This does not have a security_impact as it only specifies the character encoding used to read JSON files."
     },
     "resource_spec": {
       "type": "block",
@@ -159,22 +159,22 @@
       "description": "Immutable. Relative name of the cloud resource that contains the data that is being managed within a lake. For example: `projects/{project_number}/buckets/{bucket_id}` `projects/{project_number}/datasets/{dataset_id}`",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "This does not have a security_impact as it only identifies the referenced storage bucket or BigQuery dataset."
     },
     "resource_spec.read_access_mode": {
       "description": "Optional. Determines how read permissions are handled for each asset and their associated tables. Only available to storage buckets assets. Possible values: DIRECT, MANAGED",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "this is a security_impact as it ensures Dataplex centrally manages read access instead of relying on direct bucket permissions."
     },
     "resource_spec.type": {
       "description": "Required. Immutable. Type of resource. Possible values: STORAGE_BUCKET, BIGQUERY_DATASET",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "This does not have a security_impact as it only specifies the type of resource being referenced and does not control security settings."
     }
   }
 }
