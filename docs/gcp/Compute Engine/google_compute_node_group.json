@@ -6,49 +6,49 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This setting controls whether the node group can be deleted. Allowing deletion could remove dedicated infrastructure and disrupt the systems that depend on it."
     },
     "description": {
       "description": "An optional textual description of the resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
+      "security_impact": false,
       "rationale": ""
     },
     "initial_size": {
       "description": "The initial number of nodes in the node group. One of 'initial_size' or 'autoscaling_policy' must be configured on resource creation.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
+      "security_impact": false,
       "rationale": ""
     },
     "maintenance_policy": {
       "description": "Specifies how to handle instances when a node in the group undergoes maintenance. Set to one of: DEFAULT, RESTART_IN_PLACE, or MIGRATE_WITHIN_NODE_GROUP. The default value is DEFAULT.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
+      "security_impact": false,
       "rationale": ""
     },
     "name": {
       "description": "Name of the resource.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
+      "security_impact": false,
       "rationale": ""
     },
     "node_template": {
       "description": "The URL of the node template to which this node group belongs.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
+      "security_impact": false,
       "rationale": ""
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
+      "security_impact": false,
       "rationale": ""
     },
     "zone": {
@@ -67,21 +67,21 @@
       "description": "Maximum size of the node group. Set to a value less than or equal\nto 100 and greater than or equal to min-nodes.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
+      "security_impact": false,
       "rationale": ""
     },
     "autoscaling_policy.min_nodes": {
       "description": "Minimum size of the node group. Must be less\nthan or equal to max-nodes. The default value is 0.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
+      "security_impact": false,
       "rationale": ""
     },
     "autoscaling_policy.mode": {
       "description": "The autoscaling mode. Set to one of the following:\n  - OFF: Disables the autoscaler.\n  - ON: Enables scaling in and scaling out.\n  - ONLY_SCALE_OUT: Enables only scaling out.\n  You must use this mode if your node groups are configured to\n  restart their hosted VMs on minimal servers. Possible values: [\"OFF\", \"ON\", \"ONLY_SCALE_OUT\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
+      "security_impact": false,
       "rationale": ""
     },
     "maintenance_window": {
@@ -93,7 +93,7 @@
       "description": "instances.start time of the window. This must be in UTC format that resolves to one of 00:00, 04:00, 08:00, 12:00, 16:00, or 20:00. For example, both 13:00-5 and 08:00 are valid.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
+      "security_impact": false,
       "rationale": ""
     },
     "share_settings": {
@@ -105,8 +105,8 @@
       "description": "Node group sharing type. Possible values: [\"ORGANIZATION\", \"SPECIFIC_PROJECTS\", \"LOCAL\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This setting controls who can use the node group. Sharing it too broadly could give unintended projects access to dedicated computing resources."
     },
     "share_settings.project_map": {
       "type": "block",
@@ -117,14 +117,14 @@
       "description": "N/A",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
+      "security_impact": false,
       "rationale": ""
     },
     "share_settings.project_map.project_id": {
       "description": "The project id/number should be the same as the key of this project config in the project map.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
+      "security_impact": false,
       "rationale": ""
     }
   }
