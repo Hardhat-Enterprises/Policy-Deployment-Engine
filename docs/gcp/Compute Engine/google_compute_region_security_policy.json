@@ -27,8 +27,8 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines the Google Cloud project in which the policy is created; an incorrect project can leave the intended workload unprotected."
+      "security_impact": false,
+      "rationale": "References the GCP project for the resource; project selection is not a generic policy target"
     },
     "region": {
       "description": "The Region in which the created Region Security Policy should reside.\nIf it is not provided, the provider region is used.",
@@ -124,8 +124,8 @@
       "description": "An integer indicating the priority of a rule in the list.\nThe priority must be a positive value between 0 and 2147483647.\nRules are evaluated from highest to lowest priority where 0 is the highest priority and 2147483647 is the lowest priority.",
       "required": true,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Determines rule evaluation order; an incorrect priority can cause allow rules to override deny, WAF, or rate-limit rules."
+      "security_impact": false,
+      "rationale": "Defines rule order as part of rule design, not a standalone policy target."
     },
     "rules.match": {
       "type": "block",
@@ -136,8 +136,8 @@
       "description": "Preconfigured versioned expression. If this field is specified, config must also be specified.\nAvailable preconfigured expressions along with their requirements are: SRC_IPS_V1 - must specify the corresponding srcIpRange field in config. Possible values: [\"SRC_IPS_V1\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines the predefined matching method, such as source-IP matching, that determines which traffic a rule applies to"
+      "security_impact": false,
+      "rationale": "Selects a matching framework, not a generic security policy target."
     },
     "rules.match.config": {
       "type": "block",
@@ -149,7 +149,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "Defines allowed or blocked source IP ranges. Broad or wildcard ranges can weaken IP-based controls."
+      "rationale": "Defines source IP ranges used by the rule's security match."
     },
     "rules.match.expr": {
       "type": "block",
@@ -161,7 +161,7 @@
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "CEL expression directly defines which HTTP requests match a rule; an incorrect expression can bypass or over-apply protection."
+      "rationale": "Defines the request-matching logic for the rule."
     },
     "rules.network_match": {
       "type": "block",
@@ -173,14 +173,14 @@
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "Restricts network rules by destination address; broad ranges can expose unintended targets."
+      "rationale": "Defines destination IP ranges used by a network rule."
     },
     "rules.network_match.dest_ports": {
       "description": "Destination port numbers for TCP/UDP/SCTP. Each element can be a 16-bit unsigned decimal number (e.g. \"80\") or range (e.g. \"0-1023\").",
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "Restricts exposed destination ports; unsafe ports or broad ranges can increase attack surface."
+      "rationale": "Defines destination ports used by a network rule."
     },
     "rules.network_match.ip_protocols": {
       "description": "IPv4 protocol / IPv6 next header (after extension headers). Each element can be an 8-bit unsigned decimal number (e.g. \"6\"), range (e.g. \"253-254\"), or one of the following protocol names: \"tcp\", \"udp\", \"icmp\", \"esp\", \"ah\", \"ipip\", or \"sctp\".",
@@ -194,21 +194,21 @@
       "required": false,
       "type": "list(number)",
       "security_impact": true,
-      "rationale": "Restricts or permits traffic by source autonomous system; incorrect values can allow untrusted networks or block legitimate traffic."
+      "rationale": "Defines source ASNs used by a network rule."
     },
     "rules.network_match.src_ip_ranges": {
       "description": "Source IPv4/IPv6 addresses or CIDR prefixes, in standard text format.",
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "Defines permitted or denied network source ranges; overly broad ranges weaken network filtering."
+      "rationale": "Defines source IP ranges used by a network rule."
     },
     "rules.network_match.src_ports": {
       "description": "Source port numbers for TCP/UDP/SCTP. Each element can be a 16-bit unsigned decimal number (e.g. \"80\") or range (e.g. \"0-1023\").",
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "Limits source ports when needed for packet filtering; incorrect ranges can weaken the intended network control."
+      "rationale": "Defines source ports used by a network rule."
     },
     "rules.network_match.src_region_codes": {
       "description": "Two-letter ISO 3166-1 alpha-2 country code associated with the source IP address.",
@@ -276,8 +276,8 @@
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the cookie whose value is excluded from WAF inspection"
+      "security_impact": false,
+      "rationale": "Application-specific exclusion setting; it cannot be assessed against a generic platform baseline."
     },
     "rules.preconfigured_waf_config.exclusion.request_header": {
       "type": "block",
@@ -295,8 +295,8 @@
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the request header whose value is excluded from WAF inspection."
+      "security_impact": false,
+      "rationale": "Application-specific exclusion setting; it cannot be assessed against a generic platform baseline."
     },
     "rules.preconfigured_waf_config.exclusion.request_query_param": {
       "type": "block",
@@ -307,15 +307,15 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value. Possible values: [\"CONTAINS\", \"ENDS_WITH\", \"EQUALS\", \"EQUALS_ANY\", \"STARTS_WITH\"]",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls how broadly query parameters are excluded from WAF inspection."
+      "security_impact": false,
+      "rationale": "Application-specific exclusion setting; it cannot be assessed against a generic platform baseline."
     },
     "rules.preconfigured_waf_config.exclusion.request_query_param.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the query parameter whose value is excluded from WAF inspection."
+      "security_impact": false,
+      "rationale": "Application-specific exclusion setting; it cannot be assessed against a generic platform baseline."
     },
     "rules.preconfigured_waf_config.exclusion.request_uri": {
       "type": "block",
@@ -326,15 +326,15 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value. Possible values: [\"CONTAINS\", \"ENDS_WITH\", \"EQUALS\", \"EQUALS_ANY\", \"STARTS_WITH\"]",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls how broadly request URIs are excluded from WAF inspection."
+      "security_impact": false,
+      "rationale": "Application-specific exclusion setting; it cannot be assessed against a generic platform baseline."
     },
     "rules.preconfigured_waf_config.exclusion.request_uri.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the request URI excluded from WAF inspection."
+      "security_impact": false,
+      "rationale": "Application-specific exclusion setting; it cannot be assessed against a generic platform baseline."
     },
     "rules.rate_limit_options": {
       "type": "block",
@@ -385,15 +385,15 @@
       "description": "Number of HTTP(S) requests for calculating the threshold.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Sets the volume of excessive requests required before a client is banned."
+      "security_impact": false,
+      "rationale": "Application-specific rate-limit tuning; no universal secure value exists."
     },
     "rules.rate_limit_options.ban_threshold.interval_sec": {
       "description": "Interval over which the threshold is computed.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Sets the time window used to assess whether excessive traffic should cause a ban."
+      "security_impact": false,
+      "rationale": "Application-specific rate-limit tuning; no universal secure value exists."
     },
     "rules.rate_limit_options.enforce_on_key_configs": {
       "type": "block",
@@ -423,15 +423,15 @@
       "description": "Number of HTTP(S) requests for calculating the threshold.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Defines the request count that triggers rate limiting."
+      "security_impact": false,
+      "rationale": "Application-specific rate-limit tuning; no universal secure value exists."
     },
     "rules.rate_limit_options.rate_limit_threshold.interval_sec": {
       "description": "Interval over which the threshold is computed.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Defines the time window used for rate limiting."
+      "security_impact": false,
+      "rationale": "Application-specific rate-limit tuning; no universal secure value exists."
     },
     "user_defined_fields": {
       "type": "block",
@@ -442,15 +442,15 @@
       "description": "The base relative to which 'offset' is measured. Possible values are:\n- IPV4: Points to the beginning of the IPv4 header.\n- IPV6: Points to the beginning of the IPv6 header.\n- TCP: Points to the beginning of the TCP header, skipping over any IPv4 options or IPv6 extension headers. Not present for non-first fragments.\n- UDP: Points to the beginning of the UDP header, skipping over any IPv4 options or IPv6 extension headers. Not present for non-first fragments. Possible values: [\"IPV4\", \"IPV6\", \"TCP\", \"UDP\"]",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Selects the packet header used for custom field extraction; it determines what network data is inspected."
+      "security_impact": false,
+      "rationale": "Packet-parsing configuration; it is not a generic platform security policy target."
     },
     "user_defined_fields.mask": {
       "description": "If specified, apply this mask (bitwise AND) to the field to ignore bits before matching.\nEncoded as a hexadecimal number (starting with \"0x\").\nThe last byte of the field (in network byte order) corresponds to the least significant byte of the mask.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines which bits are evaluated in the extracted packet field and can change network-rule matching."
+      "security_impact": false,
+      "rationale": "Packet-parsing configuration; it is not a generic platform security policy target."
     },
     "user_defined_fields.name": {
       "description": "The name of this field. Must be unique within the policy.",
@@ -463,15 +463,15 @@
       "description": "Offset of the first byte of the field (in network byte order) relative to 'base'.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Determines the packet byte position inspected by a custom field."
+      "security_impact": false,
+      "rationale": "Packet-parsing configuration; it is not a generic platform security policy target."
     },
     "user_defined_fields.size": {
       "description": "Size of the field in bytes. Valid values: 1-4.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Determines how much packet data is extracted and evaluated."
+      "security_impact": false,
+      "rationale": "Packet-parsing configuration; it is not a generic platform security policy target."
     }
   }
 }
