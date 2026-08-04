@@ -1,22 +1,24 @@
-package terraform.gcp.security.network_security.google_network_security_client_tls_policy.client_certificate_certificate_provider_instance_plugin_instance
+package terraform.gcp.security.network_security.google_network_security_client_tls_policy.client_certificate.certificate_provider_instance.plugin_instance
 import data.terraform.helpers
 import data.terraform.gcp.security.network_security.google_network_security_client_tls_policy.vars
 
 conditions := [
-    [
-        {
-            "situation_description": "Only allow the approved certificate provider plugin for the client certificate",
-            "remedies": ["Set server_certificate.certificate_provider_instance.plugin_instance to google_cloud_private_spiffe"]
-        },
-        {
-            "condition": "Client TLS policy certificate provider instance must use google_cloud_private_spiffe",
-            "attribute_path": ["client_certificate", 0, "certificate_provider_instance", 0, "plugin_instance"],
-            "values": ["google_cloud_private_spiffe"],
-            "policy_type": "whitelist"
-        }
-    ]
+  [
+    {
+      "situation_description" : "Client mTLS identity certificate should be provisioned via the managed Certificate Authority Service provider",
+      "remedies":[
+        "Set client_certificate.certificate_provider_instance.plugin_instance to google_cloud_private_spiffe"
+      ]
+    },
+    {
+      "condition": "c1 plugin_instance is google_cloud_private_spiffe",
+      "attribute_path" : ["client_certificate", 0, "certificate_provider_instance", 0, "plugin_instance"],
+      "values" : ["google_cloud_private_spiffe"],
+      "policy_type" : "whitelist"
+    }
+  ]
 ]
 
-result := helpers.get_multi_summary(conditions, vars.variables)
-message := result.message
-details := result.details
+summary := helpers.get_multi_summary(conditions, vars.variables)
+message := summary.message
+details := helpers.get_multi_summary(conditions, vars.variables).details
