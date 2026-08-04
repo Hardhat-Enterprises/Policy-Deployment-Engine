@@ -1,4 +1,4 @@
-package terraform.gcp.security.dataproc.google_dataproc_autoscaling_policy.location_policy
+package terraform.gcp.security.dataproc.google_dataproc_autoscaling_policy.location
 
 import data.terraform.helpers
 import data.terraform.gcp.security.dataproc.google_dataproc_autoscaling_policy.vars
