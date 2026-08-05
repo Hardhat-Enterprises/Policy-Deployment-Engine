@@ -1,4 +1,4 @@
-package terraform.gcp.security.google_network_services_lb_edge_extension.forward_headers
+package terraform.gcp.security.google_network_services_lb_edge_extension.estension_chains.extensions.forward_headers
 
 import data.terraform.helpers
 import data.terraform.gcp.security.network_services.google_network_services_lb_edge_extension.vars
