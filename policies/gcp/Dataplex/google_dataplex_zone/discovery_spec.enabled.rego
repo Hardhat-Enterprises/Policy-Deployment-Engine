@@ -1,4 +1,4 @@
-package terraform.gcp.security.dataplex.google_dataplex_zone.discovery_spec.enabled
+package terraform.gcp.security.dataplex.google_dataplex_zone.discovery_spec_enabled
 
 import data.terraform.helpers
 import data.terraform.gcp.security.dataplex.google_dataplex_zone.vars
