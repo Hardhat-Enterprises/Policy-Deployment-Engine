@@ -6,36 +6,36 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether the resource can be deleted through Terraform. Policies should require PREVENT to reduce the risk of accidental or unauthorized deletion."
     },
     "description": {
       "description": "Optional. Description of the zone.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Human-readable description only. Does not affect security or resource behavior."
     },
     "display_name": {
       "description": "Optional. User friendly display name.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Friendly display name only. Does not impact security or permissions."
     },
     "labels": {
       "description": "Optional. User defined labels for the zone.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field `effective_labels` for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels are organizational metadata and do not enforce security controls."
     },
     "lake": {
       "description": "The lake for the resource",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the parent Dataplex Lake. It determines resource placement rather than security configuration."
     },
     "location": {
       "description": "The location for the resource",
@@ -48,22 +48,22 @@
       "description": "The name of the zone.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Resource identifier only. Naming is not a security control."
     },
     "project": {
       "description": "The project for the resource",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the GCP project that owns the resource. It is a resource reference rather than a configurable security control."
     },
     "type": {
       "description": "Required. Immutable. The type of the zone. Possible values: TYPE_UNSPECIFIED, RAW, CURATED",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines whether the zone is RAW or CURATED. This is a functional configuration rather than a security setting and has no inherently secure or insecure value."
     },
     "discovery_spec": {
       "type": "block",
@@ -74,29 +74,29 @@
       "description": "Required. Whether discovery is enabled.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether automatic discovery is enabled. Policies can require discovery to ensure assets are inventoried and governed."
     },
     "discovery_spec.exclude_patterns": {
       "description": "Optional. The list of patterns to apply for selecting data to exclude during discovery. For Cloud Storage bucket assets, these are interpreted as glob patterns used to match object names. For BigQuery dataset assets, these are interpreted as patterns to match table names.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls which objects are excluded from discovery. This affects discovery scope rather than access control or security posture."
     },
     "discovery_spec.include_patterns": {
       "description": "Optional. The list of patterns to apply for selecting data to include during discovery if only a subset of the data should considered. For Cloud Storage bucket assets, these are interpreted as glob patterns used to match object names. For BigQuery dataset assets, these are interpreted as patterns to match table names.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls which objects are included in discovery. This determines discovery behavior rather than enforcing security."
     },
     "discovery_spec.schedule": {
       "description": "Optional. Cron schedule (https://en.wikipedia.org/wiki/Cron) for running discovery periodically. Successive discovery runs must be scheduled at least 60 minutes apart. The default value is to run discovery every 60 minutes. To explicitly set a timezone to the cron tab, apply a prefix in the cron tab: \"CRON_TZ=${IANA_TIME_ZONE}\" or TZ=${IANA_TIME_ZONE}\". The ${IANA_TIME_ZONE} may only be a valid string from IANA time zone database. For example, \"CRON_TZ=America/New_York 1 * * * *\", or \"TZ=America/New_York 1 * * * *\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies when discovery runs. Scheduling affects operational frequency rather than resource security."
     },
     "discovery_spec.csv_options": {
       "type": "block",
@@ -107,29 +107,29 @@
       "description": "Optional. The delimiter being used to separate values. This defaults to ','.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Parsing configuration only. No security impact."
     },
     "discovery_spec.csv_options.disable_type_inference": {
       "description": "Optional. Whether to disable the inference of data type for CSV data. If true, all columns will be registered as strings.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls schema inference during discovery. Does not affect permissions or data protection."
     },
     "discovery_spec.csv_options.encoding": {
       "description": "Optional. The character encoding of the data. The default is UTF-8.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Character encoding configuration only."
     },
     "discovery_spec.csv_options.header_rows": {
       "description": "Optional. The number of rows to interpret as header rows that should be skipped when reading data rows.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Parsing configuration only."
     },
     "discovery_spec.json_options": {
       "type": "block",
@@ -140,15 +140,15 @@
       "description": "Optional. Whether to disable the inference of data type for Json data. If true, all columns will be registered as their primitive types (strings, number or boolean).",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls JSON schema inference only."
     },
     "discovery_spec.json_options.encoding": {
       "description": "Optional. The character encoding of the data. The default is UTF-8.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Character encoding configuration only."
     },
     "resource_spec": {
       "type": "block",
@@ -159,8 +159,8 @@
       "description": "Required. Immutable. The location type of the resources that are allowed to be attached to the assets within this zone. Possible values: LOCATION_TYPE_UNSPECIFIED, SINGLE_REGION, MULTI_REGION",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Restricts assets to single-region or multi-region resources. This is an architectural constraint rather than a direct security control and has no universally secure value.Restricts assets to single-region or multi-region resources. This is an architectural constraint rather than a direct security control and has no universally secure value."
     }
   }
 }
