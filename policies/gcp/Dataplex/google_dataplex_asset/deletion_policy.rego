@@ -1,7 +1,7 @@
 package terraform.gcp.security.dataplex.google_dataplex_asset.deletion_policy
 
 import data.terraform.helpers
-import data.terraform.gcp.security.dataplex.google_dataplex_asset.deletion_policy.vars
+import data.terraform.gcp.security.dataplex.google_dataplex_asset.vars
 
 conditions := [
     [

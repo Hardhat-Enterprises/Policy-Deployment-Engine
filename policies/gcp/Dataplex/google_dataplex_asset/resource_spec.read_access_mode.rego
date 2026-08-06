@@ -1,7 +1,7 @@
 package terraform.gcp.security.dataplex.google_dataplex_asset.resource_spec_read_access_mode
 
 import data.terraform.helpers
-import data.terraform.gcp.security.dataplex.google_dataplex_asset.resource_spec_read_access_mode.vars
+import data.terraform.gcp.security.dataplex.google_dataplex_asset.vars
 
 conditions := [
     [

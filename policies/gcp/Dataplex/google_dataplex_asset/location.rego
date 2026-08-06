@@ -1,8 +1,8 @@
 package terraform.gcp.security.dataplex.google_dataplex_asset.location
 
 import data.terraform.helpers
-import data.terraform.gcp.security.dataplex.google_dataplex_asset.location.vars
-
+import data.terraform.gcp.security.dataplex.google_dataplex_asset.vars
+s
 conditions := [
     [
         {

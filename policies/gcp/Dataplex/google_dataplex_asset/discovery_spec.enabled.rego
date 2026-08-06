@@ -1,7 +1,7 @@
 package terraform.gcp.security.dataplex.google_dataplex_asset.discovery_spec_enabled
 
 import data.terraform.helpers
-import data.terraform.gcp.security.dataplex.google_dataplex_asset.discovery_spec_enabled.vars
+import data.terraform.gcp.security.dataplex.google_dataplex_asset.vars
 
 conditions := [
     [
