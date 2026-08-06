@@ -6,36 +6,36 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether the resource can be deleted through Terraform. Policies should require a protective value such as PREVENT to reduce the risk of accidental or unauthorized deletion of metadata resources."
     },
     "entry_group_id": {
       "description": "The entry group id of the entry group the entry will be created in.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies which entry group the entry belongs to. It determines resource organization rather than affecting security controls, permissions, or data exposure."
     },
     "entry_id": {
       "description": "The entry id of the entry.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the entry resource. It is a naming attribute and does not affect access control, security posture, or data protection."
     },
     "entry_type": {
       "description": "The relative resource name of the entry type that was used to create this entry, in the format projects/{project_number}/locations/{locationId}/entryTypes/{entryTypeId}.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines the entry type used when creating the entry. While it affects metadata structure, it does not directly control permissions, access, or exposure of resources."
     },
     "fully_qualified_name": {
       "description": "A name for the entry that can be referenced by an external system. For more information, see https://cloud.google.com/dataplex/docs/fully-qualified-names.\nThe maximum size of the field is 4000 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides a reference name for external systems. It is an identifier rather than a security control and does not affect authorization or access."
     },
     "location": {
       "description": "The location where entry will be created.",
@@ -48,15 +48,15 @@
       "description": "The resource name of the parent entry, in the format projects/{project_number}/locations/{locationId}/entryGroups/{entryGroupId}/entries/{entryId}.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Establishes the hierarchy between entries. It affects organization only and does not influence security controls or permissions."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the GCP project that owns the resource. Project selection alone is not a security control and should not be enforced by this resource policy."
     },
     "aspects": {
       "type": "block",
@@ -67,8 +67,8 @@
       "description": "Depending on how the aspect is attached to the entry, the format of the aspect key can be one of the following:\n\nIf the aspect is attached directly to the entry: {project_number}.{locationId}.{aspectTypeId}\nIf the aspect is attached to an entry's path: {project_number}.{locationId}.{aspectTypeId}@{path}",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the attached aspect. It is metadata used for identification and does not affect security configuration or access control."
     },
     "aspects.aspect": {
       "type": "block",
@@ -79,8 +79,8 @@
       "description": "The content of the aspect in JSON form, according to its aspect type schema. The maximum size of the field is 120KB (encoded as UTF-8).",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Stores metadata associated with an aspect. Although the contents may be sensitive depending on usage, this field itself does not configure security or access controls."
     },
     "entry_source": {
       "type": "block",
@@ -91,57 +91,57 @@
       "description": "The time when the resource was created in the source system.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Informational timestamp only. It has no effect on security, permissions, or exposure."
     },
     "entry_source.description": {
       "description": "A description of the data resource. Maximum length is 2,000 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Human-readable description only. It does not influence security behaviour or authorization."
     },
     "entry_source.display_name": {
       "description": "A user-friendly display name. Maximum length is 500 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Friendly display name only. It has no impact on security or access control."
     },
     "entry_source.labels": {
       "description": "User-defined labels. The maximum size of keys and values is 128 characters each.\nAn object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels are used for organization and filtering. They do not enforce permissions or protect resources."
     },
     "entry_source.platform": {
       "description": "The platform containing the source system. Maximum length is 64 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Describes the source platform. It is informational metadata and does not affect security posture."
     },
     "entry_source.resource": {
       "description": "The name of the resource in the source system. Maximum length is 4,000 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the source resource. It does not control authorization or resource protection."
     },
     "entry_source.system": {
       "description": "The name of the source system. Maximum length is 64 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the originating system. It is descriptive metadata rather than a security control."
     },
     "entry_source.update_time": {
       "description": "The time when the resource was last updated in the source system.\nIf the entry exists in the system and its EntrySource has updateTime populated,\nfurther updates to the EntrySource of the entry must provide incremental updates to its updateTime.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Informational timestamp only. It has no effect on security or authorization."
     },
     "entry_source.ancestors": {
       "type": "block",
@@ -152,15 +152,15 @@
       "description": "The name of the ancestor resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies an ancestor resource for metadata purposes. It does not affect access control or data exposure."
     },
     "entry_source.ancestors.type": {
       "description": "The type of the ancestor resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Describes the type of an ancestor resource. It is informational only and does not influence security."
     }
   }
 }
