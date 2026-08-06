@@ -82,7 +82,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "Controls which objects are excluded from discovery. This affects discovery scope rather than access control or security posture."
+      "rationale": "Controls which file paths or resource naming patterns are skipped during automated discovery. These patterns define discovery scope but do not enforce permissions, access control, or platform security."
     },
     "discovery_spec.include_patterns": {
       "description": "Optional. The list of patterns to apply for selecting data to include during discovery if only a subset of the data should considered. For Cloud Storage bucket assets, these are interpreted as glob patterns used to match object names. For BigQuery dataset assets, these are interpreted as patterns to match table names.",
@@ -159,8 +159,8 @@
       "description": "Required. Immutable. The location type of the resources that are allowed to be attached to the assets within this zone. Possible values: LOCATION_TYPE_UNSPECIFIED, SINGLE_REGION, MULTI_REGION",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Determines whether assets are limited to single-region or multi-region locations. This is an architectural and data management choice rather than a security control."
+      "security_impact": true,
+      "rationale": "Determines the permitted location type for resources in the zone. Policies should restrict this to approved location types to support data residency and organizational governance requirements."
     }
   }
 }
