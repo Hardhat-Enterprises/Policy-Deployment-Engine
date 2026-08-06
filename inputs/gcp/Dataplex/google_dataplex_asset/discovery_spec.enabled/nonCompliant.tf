@@ -2,7 +2,7 @@ resource "google_dataplex_asset" "non_compliant_example_1" {
   name              = "asset"
   location          = "us-west1"
   project           = "my-project-name"
-  deletion_policy   = "PREVENT"
+  deletion_policy   = "DELETE"
 
   lake          = "google_dataplex_lake.basic_lake.name"
   dataplex_zone = "google_dataplex_zone.basic_zone.name"
