@@ -2,61 +2,61 @@
   "last_updated": "2026-06-23T08:26:44Z",
   "provider_version": "7.37.0",
   "arguments": {
-    "deletion_policy": {
+ "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can destroy the resource on 'destroy'/'apply'. Setting to 'PREVENT' guards against accidental route deletion; policy should whitelist 'PREVENT' for production routes."
     },
-    "description": {
+  "description": {
       "description": "A free-text description of the resource. Max length 1024 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Free-text field with no functional or access-control impact; purely descriptive metadata."
     },
-    "gateways": {
+   "gateways": {
       "description": "Gateways defines a list of gateways this HttpRoute is attached to, as one of the routing rules to route the requests served by the gateway.\nEach gateway reference should match the pattern: projects/*/locations/global/gateways/<gateway_name>",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls which Gateway resources this route is attached to; attaching to an unapproved or overly permissive gateway can expose routing to unintended external traffic."
     },
     "hostnames": {
       "description": "Set of hosts that should match against the HTTP host header to select a HttpRoute to process the request.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which HTTP Host headers this route matches. An overly broad or wildcard hostname can cause traffic to be routed unexpectedly, a common source of misrouting and security exposure."
     },
-    "labels": {
+   "labels": {
       "description": "Set of label tags associated with the HttpRoute resource.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Labels support governance controls like environment classification, cost tracking, and label-based compliance automation. Policy should require a baseline set of mandatory keys (e.g. environment, owner)."
     },
-    "meshes": {
+   "meshes": {
       "description": "Meshes defines a list of meshes this HttpRoute is attached to, as one of the routing rules to route the requests served by the mesh.\nEach mesh reference should match the pattern: projects/*/locations/global/meshes/<mesh_name>.\nThe attached Mesh should be of a type SIDECAR.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls which service mesh resources this route is attached to; an unapproved or overly permissive mesh binding can expose internal service traffic incorrectly."
     },
-    "name": {
+   "name": {
       "description": "Name of the HttpRoute resource.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Resource identifier only; naming has no functional security impact beyond optional org naming conventions."
     },
-    "project": {
+   "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which GCP project the resource is created in; an unpinned or incorrect project can place resources outside intended security boundaries or monitoring scope."
     },
     "rules": {
       "type": "block",
