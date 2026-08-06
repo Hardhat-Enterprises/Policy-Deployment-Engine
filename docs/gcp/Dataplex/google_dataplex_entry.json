@@ -14,28 +14,28 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Specifies which entry group the entry belongs to. It determines resource organization rather than affecting security controls, permissions, or data exposure."
+      "rationale": "References the parent EntryGroup where the entry is created. It is a resource reference rather than a security control, so platform policy does not need to constrain its value."
     },
     "entry_id": {
       "description": "The entry id of the entry.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Identifies the entry resource. It is a naming attribute and does not affect access control, security posture, or data protection."
+      "rationale": "Defines the identifier of the entry resource. It is a naming attribute used for identification and does not configure permissions, access, or security behaviour."
     },
     "entry_type": {
       "description": "The relative resource name of the entry type that was used to create this entry, in the format projects/{project_number}/locations/{locationId}/entryTypes/{entryTypeId}.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Determines the entry type used when creating the entry. While it affects metadata structure, it does not directly control permissions, access, or exposure of resources."
+      "rationale": "Specifies the entry type used to create the resource. It determines the resource's classification rather than enforcing security controls, and there are no inherently secure or insecure values to enforce through policy."
     },
     "fully_qualified_name": {
       "description": "A name for the entry that can be referenced by an external system. For more information, see https://cloud.google.com/dataplex/docs/fully-qualified-names.\nThe maximum size of the field is 4000 characters.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Provides a reference name for external systems. It is an identifier rather than a security control and does not affect authorization or access."
+      "rationale": "Provides an external reference name for the entry. It is an identifier used for integration and lookup rather than a security setting, so policy should not constrain its value."
     },
     "location": {
       "description": "The location where entry will be created.",
@@ -49,14 +49,14 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Establishes the hierarchy between entries. It affects organization only and does not influence security controls or permissions."
+      "rationale": "References another entry to establish hierarchy. It affects resource relationships only and does not configure permissions, access control, or data protection."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Specifies the GCP project that owns the resource. Project selection alone is not a security control and should not be enforced by this resource policy."
+      "rationale": "Specifies the Google Cloud project containing the resource. It is a resource reference rather than a configurable security control, so project governance is enforced through IAM and organization policies instead of this argument."
     },
     "aspects": {
       "type": "block",
@@ -68,7 +68,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Identifies the attached aspect. It is metadata used for identification and does not affect security configuration or access control."
+      "rationale": "Identifies the attached aspect. It is a metadata reference and does not configure security or access controls."
     },
     "aspects.aspect": {
       "type": "block",
@@ -80,7 +80,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Stores metadata associated with an aspect. Although the contents may be sensitive depending on usage, this field itself does not configure security or access controls."
+      "rationale": "Stores user-defined aspect metadata. It is a free-form metadata field rather than a configuration that controls permissions, access, or resource security."
     },
     "entry_source": {
       "type": "block",
