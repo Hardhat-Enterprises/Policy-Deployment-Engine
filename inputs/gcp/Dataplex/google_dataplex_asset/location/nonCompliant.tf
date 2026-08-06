@@ -1,4 +1,4 @@
-resource "google_dataplex_asset" "nc" {
+resource "google_dataplex_asset" "non_compliant_example_1" {
   name              = "asset"
   location          = "us-west1"
   project           = "my-project-name"
