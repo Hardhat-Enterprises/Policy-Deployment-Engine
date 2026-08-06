@@ -1,4 +1,4 @@
-package terraform.gcp.security.Dataplex.google_dataplex_asset.vars
+package terraform.gcp.security.dataplex.google_dataplex_asset.vars
 
 variables := {
     "friendly_resource_name": "Dataplex Asset",
