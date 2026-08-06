@@ -1,7 +1,7 @@
-import data.terraform.gcp.security.dataplex.google_dataplex_zone.vars
+package terraform.gcp.security.dataplex.google_dataplex_zone.vars
 
 variables := {
     "friendly_resource_name": "Dataplex Zone",
-    "resource_type":  "google_dataplex_zone",
-    "resource_value_name" : "name"
+    "resource_type": "google_dataplex_zone",
+    "resource_value_name": "name"
 }
