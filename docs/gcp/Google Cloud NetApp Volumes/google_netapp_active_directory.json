@@ -7,7 +7,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "Controls which users or groups receive administrative privileges. Platform policy can prevent overly broad or unauthorized administrator assignments without hardcoding specific team names."
+      "rationale": "Accepts a list of administrator principals or accounts. Platform policy can reject wildcards, overly broad groups, or other principal patterns that could grant excessive administrative access."
     },
     "aes_encryption": {
       "description": "Enables AES-128 and AES-256 encryption for Kerberos-based communication with Active Directory.",
@@ -21,7 +21,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "Controls assignment of privileged backup operator roles. Platform policy can prevent overly broad or unauthorized privilege assignments without hardcoding specific team names."
+      "rationale": "Accepts a list of principals or accounts assigned the Backup Operators role. Platform policy can restrict overly broad or wildcard principal assignments to reduce unnecessary privileged access."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
@@ -41,15 +41,15 @@
       "description": "Comma separated list of DNS server IP addresses for the Active Directory domain.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "References DNS server addresses specific to the team's infrastructure. These are external infrastructure identifiers and are not generic platform security policy targets."
+      "security_impact": true,
+      "rationale": "Specifies DNS servers used for Active Directory name resolution. Platform policy can require trusted internal resolvers and prevent use of unapproved public or insecure DNS endpoints for authentication-related traffic."
     },
     "domain": {
       "description": "Fully qualified domain name for the Active Directory domain.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Identifies the Active Directory domain used by the deployment. It is a team-specific identifier/reference and is not a platform security policy target."
+      "security_impact": true,
+      "rationale": "Defines the Active Directory domain used by the configuration. Platform policy can enforce structural validity and require use of an approved enterprise-managed domain space without hardcoding a specific domain name."
     },
     "encrypt_dc_connections": {
       "description": "If enabled, traffic between the SMB server to Domain Controller (DC) will be encrypted.",
@@ -62,8 +62,8 @@
       "description": "Hostname of the Active Directory server used as Kerberos Key Distribution Center. Only required for volumes using kerberized NFSv4.1",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "References the hostname of an external Key Distribution Center. It is an external server identifier and is not a platform security policy target."
+      "security_impact": true,
+      "rationale": "Specifies the hostname of the Kerberos Key Distribution Center used for authentication. Platform policy can require trusted authentication endpoints and secure communication to reduce interception or redirection risks."
     },
     "kdc_ip": {
       "description": "IP address of the Active Directory server used as Kerberos Key Distribution Center.",
