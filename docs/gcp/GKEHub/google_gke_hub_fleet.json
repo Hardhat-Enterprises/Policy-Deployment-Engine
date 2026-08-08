@@ -6,8 +6,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This controls whether the fleet can be deleted. A policy can require PREVENT for important fleets to reduce the risk of accidental deletion and service disruption."
+      "security_impact": false,
+      "rationale": "This controls what happens to the Fleet resource when it is deleted. The suitable option depends on the team's retention and recovery requirements, so one general security rule would not apply to every Fleet."
     },
     "display_name": {
       "description": "A user-assigned display name of the Fleet. When present, it must be between 4 to 30 characters.\nAllowed characters are: lowercase and uppercase letters, numbers, hyphen, single-quote, double-quote, space, and exclamation point.",
@@ -37,8 +37,8 @@
       "description": "Mode of operation for binauthz policy evaluation. Possible values: [\"DISABLED\", \"POLICY_BINDINGS\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This controls whether Binary Authorization policy bindings are evaluated. A policy can prevent DISABLED so that only trusted and approved container images are deployed."
+      "security_impact": false,
+      "rationale": "This sets the default Binary Authorization mode for clusters added to the Fleet. The required mode depends on the workload and the policies managed by each team, so it should not be enforced as one common value here."
     },
     "default_cluster_config.binary_authorization_config.policy_bindings": {
       "type": "block",
@@ -61,15 +61,15 @@
       "description": "Sets which mode to use for Security Posture features. Possible values: [\"DISABLED\", \"BASIC\", \"ENTERPRISE\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This controls whether GKE security posture monitoring is enabled. A policy can prevent DISABLED so that security risks and configuration issues remain visible."
+      "security_impact": false,
+      "rationale": "This controls the default security posture mode for Fleet clusters. Teams may need different modes based on their environment and security setup, so one fixed rule would not suit every Fleet."
     },
     "default_cluster_config.security_posture_config.vulnerability_mode": {
       "description": "Sets which mode to use for vulnerability scanning. Possible values: [\"VULNERABILITY_DISABLED\", \"VULNERABILITY_BASIC\", \"VULNERABILITY_ENTERPRISE\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This controls vulnerability scanning for fleet workloads. A policy can prevent VULNERABILITY_DISABLED so that known software vulnerabilities can be detected."
+      "security_impact": false,
+      "rationale": "This controls the default vulnerability scanning mode for Fleet clusters. The suitable setting depends on the team's scanning process and operational requirements, so it is not suitable for one general policy."
     }
   }
 }
