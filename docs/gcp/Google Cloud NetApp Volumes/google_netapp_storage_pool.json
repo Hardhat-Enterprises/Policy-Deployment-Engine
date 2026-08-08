@@ -7,28 +7,28 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Specifies the Active Directory domain used for user authentication and access. Using a trusted domain helps prevent unauthorised access to the storage pool."
+      "rationale": "Ensures an Active Directory reference is configured where domain-joined storage is required, without restricting the policy to a specific domain."
     },
     "allow_auto_tiering": {
       "description": "Optional. True if the storage pool supports Auto Tiering enabled volumes. Default is false.\nAuto-tiering can be enabled after storage pool creation but it can't be disabled once enabled.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Controls how data is moved between storage tiers. It improves storage management but does not affect security."
+      "security_impact": true,
+      "rationale": "Controls automatic data movement between storage tiers. Policies can require or restrict auto-tiering based on organizational data sensitivity and lifecycle requirements."
     },
     "capacity_gib": {
       "description": "Capacity of the storage pool (in GiB).",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Controls how much data can a storage pool hold."
+      "security_impact": true,
+      "rationale": "Controls the storage capacity allocated to the pool. Policies can enforce organizational capacity limits to prevent excessive resource provisioning or denial-of-service through over-allocation."
     },
     "custom_performance_enabled": {
       "description": "Optional. True if using Independent Scaling of capacity and performance (Hyperdisk). Default is false.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Controls the performace of storage pool."
+      "security_impact": true,
+      "rationale": "Controls whether custom performance scaling is enabled. Policies can restrict this setting to approved performance configurations that align with the organization's secure baseline."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
@@ -42,42 +42,42 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Gives more information or context about the storage pool. Does not affect security."
+      "rationale": "Provides descriptive information about the storage pool and does not affect its security configuration."
     },
     "enable_hot_tier_auto_resize": {
       "description": "Flag indicating that the hot-tier threshold will be auto-increased by 10% of the hot-tier when it hits 100%. Default is true.\nThe increment will kick in only if the new size after increment is still less than or equal to storage pool size.",
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": "Increases storage space automatically when the hot-tier threshold is reached. Helps to prevent running out of space but does not affect security.Doesn't impact security."
+      "rationale": "Controls automatic resizing of the hot storage tier and is an operational capacity-management setting rather than a security control."
     },
     "hot_tier_size_gib": {
       "description": "Total hot tier capacity for the Storage Pool. It is applicable only to Flex service level.\nIt should be less than the minimum storage pool size and cannot be more than the current storage pool size. It cannot be decreased once set.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Sets the size of hot storage area and it only affects the storage capacity."
+      "rationale": "Defines the size of the hot storage tier and is an operational storage-allocation choice rather than a security control."
     },
     "kms_config": {
       "description": "Specifies the CMEK policy to be used for volume encryption. Format: 'projects/{{project}}/locations/{{location}}/kmsConfigs/{{name}}'.\nThe policy needs to be in the same location as the storage pool.",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls which encryption key is used to protect the stored data. Using an approved key helps keep the data safe."
+      "rationale": "Configures customer-managed encryption keys (CMEK) for the storage pool. Policies can require a non-empty KMS configuration to ensure customer-managed encryption is used without pinning a specific key."
     },
     "labels": {
       "description": "Labels as key value pairs. Example: '{ \"owner\": \"Bob\", \"department\": \"finance\", \"purpose\": \"testing\" }'.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
       "security_impact": false,
-      "rationale": "Helps organise resources using tags. It does not control security."
+      "rationale": "Provides descriptive metadata for organizing resources and does not directly affect the security configuration of the storage pool."
     },
     "ldap_enabled": {
       "description": "When enabled, the volumes uses Active Directory as LDAP name service for UID/GID lookups. Required to enable extended group support for NFSv3,\nusing security identifiers for NFSv4.1 or principal names for kerberized NFSv4.1.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls whether the Active Directory domain is used to look up users and groups. Using a trusted domain helps ensure only the right people can access the storage pool."
+      "security_impact": false,
+      "rationale": "Controls whether LDAP functionality is enabled for the storage pool and is an operational directory-service feature rather than a security policy enforcement control."
     },
     "location": {
       "description": "Name of the location. For zonal Flex pools specify a zone name, in all other cases a region name.",
@@ -90,29 +90,29 @@
       "description": "Mode of the storage pool.\nThe operational mode of the storage pool. ONTAP mode enables operations\nvia ONTAP Mode APIs, while DEFAULT mode enables operations via NetApp Volumes APIs.\nIf not specified during creation, the mode defaults to DEFAULT. Possible values: [\"MODE_UNSPECIFIED\", \"DEFAULT\", \"ONTAP\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines how the storage pool is managed. Using the correct mode helps reduce unnecessary access."
+      "security_impact": false,
+      "rationale": "Defines the operational mode of the storage pool, such as service-managed or flexible mode, and represents an architectural choice rather than a security control."
     },
     "name": {
       "description": "The resource name of the storage pool. Needs to be unique per location/region.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Provides the storage pool a name. It does not affect security."
+      "rationale": "Specifies the name of the storage pool and is an identifier that does not directly affect its security posture."
     },
     "network": {
       "description": "VPC network name with format: 'projects/{{project}}/global/networks/{{network}}'",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls which network the storage pool connects to. Using an approved network helps prevent unwanted access."
+      "security_impact": false,
+      "rationale": "References the VPC network used by the storage pool. Resource references are not policy targets because the policy should not restrict specific resource names or identifiers."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines the project to which the storage pool belongs. Using an approved project helps ensure data is managed within the correct organizational boundaries."
+      "security_impact": false,
+      "rationale": "Identifies the Google Cloud project containing the resource. Project identifiers are reference fields and are not security policy targets."
     },
     "qos_type": {
       "description": "QoS (Quality of Service) type of the storage pool.\nPossible values are: AUTO, MANUAL. Possible values: [\"QOS_TYPE_UNSPECIFIED\", \"AUTO\", \"MANUAL\"]",
@@ -126,7 +126,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls where the backup copy of the data is stored. Using approved zones helps protect important data."
+      "rationale": "Determines the zone used for storage replication and can affect data residency. Policies can restrict replica zones to approved locations that meet organizational or regulatory requirements."
     },
     "scale_type": {
       "description": "The scale type of the storage pool. Defaults to 'SCALE_TYPE_DEFAULT' if not specified. Possible values: [\"SCALE_TYPE_UNSPECIFIED\", \"SCALE_TYPE_DEFAULT\", \"SCALE_TYPE_SCALEOUT\"]",
@@ -160,15 +160,15 @@
       "description": "Type of the storage pool.\nThis field is used to control whether the pool supports FILE based volumes only or UNIFIED (both FILE and BLOCK) volumes.\nIf not specified during creation, it defaults to FILE. Possible values: [\"STORAGE_POOL_TYPE_UNSPECIFIED\", \"FILE\", \"UNIFIED\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls what kind of storage the pool supports. Limiting the storage type can reduce unnecessary access methods."
+      "security_impact": false,
+      "rationale": "Defines the storage pool type or protocol and represents a functional architectural choice rather than a security control."
     },
     "zone": {
       "description": "Specifies the active zone for regional Flex pools. 'zone' and 'replica_zone' values can be swapped to initiate a\n[zone switch](https://cloud.google.com/netapp/volumes/docs/configure-and-use/storage-pools/edit-or-delete-storage-pool#switch_active_and_replica_zones).\nIf you want to create a zonal Flex pool, specify a zone name for 'location' and omit 'zone'.",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Determines which zone the storage pool is created in. Using approved zones helps keep data in the right location."
+      "rationale": "Determines the zone where the storage pool is deployed and therefore affects data residency. Policies can restrict deployment to approved regions or zones to meet organizational and regulatory requirements."
     }
   }
 }
