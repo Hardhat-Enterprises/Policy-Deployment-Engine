@@ -13,8 +13,8 @@
       "description": "Type of the backup vault to be created. Default is IN_REGION. Possible values: [\"BACKUP_VAULT_TYPE_UNSPECIFIED\", \"IN_REGION\", \"CROSS_REGION\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls whether backups are stored in the same region or a different region. Choosing the right option helps meet backup and data protection requirements."
+      "security_impact": false,
+      "rationale": "Defines the backup vault storage type and is an architectural data-management choice rather than a platform security control."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
@@ -35,7 +35,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls which encryption key is used to protect the backup data. Using an approved key helps keep the backups secure."
+      "rationale": "Configures customer-managed encryption for the backup vault. Platform policy can require a non-empty CMEK configuration without hardcoding a specific key or resource name."
     },
     "labels": {
       "description": "Labels as key value pairs. Example: '{ \"owner\": \"Bob\", \"department\": \"finance\", \"purpose\": \"testing\" }'.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
@@ -62,8 +62,8 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls which Google Cloud project the backup vault belongs to. Using an approved project helps keep resources secure."
+      "security_impact": false,
+      "rationale": "Identifies the Google Cloud project containing the resource. It is a resource identifier/reference and is not a platform security policy target."
     },
     "backup_retention_policy": {
       "type": "block",
@@ -74,8 +74,8 @@
       "description": "Minimum retention duration in days for backups in the backup vault.",
       "required": true,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Controls how long backups must be kept. Keeping backups for the required time helps protect against accidental or unwanted deletion."
+      "security_impact": false,
+      "rationale": "Defines the minimum backup retention period and is an operational data-management setting rather than a platform security control."
     },
     "backup_retention_policy.daily_backup_immutable": {
       "description": "Indicates if the daily backups are immutable. At least one of daily_backup_immutable, weekly_backup_immutable, monthly_backup_immutable and manual_backup_immutable must be true.",
