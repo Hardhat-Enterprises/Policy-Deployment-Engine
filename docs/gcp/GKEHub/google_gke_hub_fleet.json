@@ -6,22 +6,22 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This controls whether the fleet can be deleted. A policy can require PREVENT for important fleets to reduce the risk of accidental deletion and service disruption."
     },
     "display_name": {
       "description": "A user-assigned display name of the Fleet. When present, it must be between 4 to 30 characters.\nAllowed characters are: lowercase and uppercase letters, numbers, hyphen, single-quote, double-quote, space, and exclamation point.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is only a display name used to identify the fleet. Restricting the name would not improve the security of the resource."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the Google Cloud project where the fleet is created. The correct project depends on the team and environment, so one general policy cannot safely choose it."
     },
     "default_cluster_config": {
       "type": "block",
@@ -37,8 +37,8 @@
       "description": "Mode of operation for binauthz policy evaluation. Possible values: [\"DISABLED\", \"POLICY_BINDINGS\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This controls whether Binary Authorization policy bindings are evaluated. A policy can prevent DISABLED so that only trusted and approved container images are deployed."
     },
     "default_cluster_config.binary_authorization_config.policy_bindings": {
       "type": "block",
@@ -49,8 +49,8 @@
       "description": "The relative resource name of the binauthz platform policy to audit. GKE\nplatform policies have the following format:\n'projects/{project_number}/platforms/gke/policies/{policy_id}'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This points to a specific Binary Authorization policy. The correct policy name depends on the project and organisation, so it cannot be enforced as one common value for every team."
     },
     "default_cluster_config.security_posture_config": {
       "type": "block",
@@ -61,15 +61,15 @@
       "description": "Sets which mode to use for Security Posture features. Possible values: [\"DISABLED\", \"BASIC\", \"ENTERPRISE\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This controls whether GKE security posture monitoring is enabled. A policy can prevent DISABLED so that security risks and configuration issues remain visible."
     },
     "default_cluster_config.security_posture_config.vulnerability_mode": {
       "description": "Sets which mode to use for vulnerability scanning. Possible values: [\"VULNERABILITY_DISABLED\", \"VULNERABILITY_BASIC\", \"VULNERABILITY_ENTERPRISE\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This controls vulnerability scanning for fleet workloads. A policy can prevent VULNERABILITY_DISABLED so that known software vulnerabilities can be detected."
     }
   }
 }
