@@ -7,35 +7,35 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Controls resource lifecycle behavior during deletion. While it helps prevent accidental removal, it does not directly affect the resource's security configuration, access control, or compliance posture."
+      "rationale": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\" This setting depends on workload or operational context, and the resource does not provide enough information to define a single organisation-independent constraint that would always improve security."
     },
     "labels": {
       "description": "GCP labels for this Feature.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
       "security_impact": false,
-      "rationale": "Labels provide metadata for organisation, ownership, and resource management. They do not directly change access controls, encryption, authentication, or network exposure."
+      "rationale": "GCP labels for this Feature This setting depends on workload or operational context, and the resource does not provide enough information to define a single organisation-independent constraint that would always improve security."
     },
     "location": {
       "description": "The location for the resource",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+      "security_impact": false,
+      "rationale": "Selects the deployment location. Approved locations depend on organisational residency, latency, service availability, and legal requirements, so this resource cannot define one universally secure location policy."
     },
     "name": {
       "description": "The full, unique name of this Feature resource",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "The name uniquely identifies the resource and supports organisation and management, but it does not directly affect access control, encryption, authentication, or network exposure."
+      "rationale": "The full, unique name of this Feature resource This setting depends on workload or operational context, and the resource does not provide enough information to define a single organisation-independent constraint that would always improve security."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The project ID determines the GCP project to which the resource belongs, impacting resource isolation and access control."
+      "security_impact": false,
+      "rationale": "Selects the owning GCP project. The correct project is specific to each team and environment; access to projects should be governed through IAM and provisioning controls rather than a generic value constraint on this resource."
     },
     "fleet_default_member_config": {
       "type": "block",
@@ -51,15 +51,15 @@
       "description": "Set this field to MANAGEMENT_AUTOMATIC to enable Config Sync auto-upgrades, and set this field to MANAGEMENT_MANUAL or MANAGEMENT_UNSPECIFIED to disable Config Sync auto-upgrades. Possible values: [\"MANAGEMENT_UNSPECIFIED\", \"MANAGEMENT_AUTOMATIC\", \"MANAGEMENT_MANUAL\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls whether Config Sync receives automatic upgrades. Enabling automatic management helps ensure security patches and supported versions are applied consistently, reducing the risk of running outdated or vulnerable components."
+      "security_impact": false,
+      "rationale": "Chooses automatic or manual component management. Both modes can be operated securely, and the appropriate choice depends on the organisation's release and maintenance process rather than a universal security rule."
     },
     "fleet_default_member_config.configmanagement.version": {
       "description": "Version of Config Sync installed",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies the version of Config Sync to install, impacting the features and security posture of the deployment."
+      "security_impact": false,
+      "rationale": "Selects a component or upgrade version. Secure versions change over time and depend on compatibility and support requirements, so a static generic constraint in this resource would quickly become inaccurate; version governance belongs in the release process."
     },
     "fleet_default_member_config.configmanagement.config_sync": {
       "type": "block",
@@ -70,29 +70,29 @@
       "description": "Enables the installation of ConfigSync. If set to true, ConfigSync resources will be created and the other ConfigSync fields will be applied if exist. If set to false, all other ConfigSync fields will be ignored, ConfigSync resources will be deleted. If omitted, ConfigSync resources will be managed depends on the presence of the git or oci field.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls whether Config Sync is enabled, directly affecting the deployment's configuration management capabilities and security posture."
+      "security_impact": false,
+      "rationale": "Enables an optional platform capability. Whether it is required depends on the team's architecture and operating model, and disabling it does not by itself create an insecure configuration that can be prevented by a universal policy on this resource."
     },
     "fleet_default_member_config.configmanagement.config_sync.metrics_gcp_service_account_email": {
       "description": "The Email of the Google Cloud Service Account (GSA) used for exporting Config Sync metrics to Cloud Monitoring. The GSA should have the Monitoring Metric Writer(roles/monitoring.metricWriter) IAM role. The Kubernetes ServiceAccount 'default' in the namespace 'config-management-monitoring' should be bound to the GSA.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies the Google Cloud service account used to export Config Sync metrics. Correct service account configuration helps enforce least-privilege access and ensures only authorized identities can write monitoring metrics."
+      "security_impact": false,
+      "rationale": "Identifies a service account used by this integration. The correct identity and its least-privilege permissions are environment-specific, so a generic policy cannot safely prescribe an email value; IAM controls should govern the account itself."
     },
     "fleet_default_member_config.configmanagement.config_sync.prevent_drift": {
       "description": "Set to true to enable the Config Sync admission webhook to prevent drifts. If set to 'false', disables the Config Sync admission webhook and does not prevent drifts.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls whether Config Sync prevents configuration drift through the admission webhook. Enabling drift prevention helps enforce approved configurations, reducing the risk of unauthorized or non-compliant changes."
+      "security_impact": false,
+      "rationale": "Controls Config Sync drift prevention. Enabling the webhook can strengthen enforcement, but its suitability depends on workload compatibility and the team's change-management model, so it is not a safe universal constraint for every fleet."
     },
     "fleet_default_member_config.configmanagement.config_sync.source_format": {
       "description": "Specifies whether the Config Sync Repo is in hierarchical or unstructured mode",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Specifies the repository structure used by Config Sync. This affects configuration organization and management but does not directly impact authentication, authorization, encryption, or the security posture of the deployed resources."
+      "rationale": "Specifies whether the Config Sync Repo is in hierarchical or unstructured mode This setting depends on workload or operational context, and the resource does not provide enough information to define a single organisation-independent constraint that would always improve security."
     },
     "fleet_default_member_config.configmanagement.config_sync.git": {
       "type": "block",
@@ -103,57 +103,57 @@
       "description": "The Google Cloud Service Account Email used for auth when secretType is gcpServiceAccount",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies the Google Cloud Service Account used to authenticate to the Git repository. Correct service account configuration helps enforce secure authentication and least-privilege access to repository resources."
+      "security_impact": false,
+      "rationale": "Identifies a service account used by this integration. The correct identity and its least-privilege permissions are environment-specific, so a generic policy cannot safely prescribe an email value; IAM controls should govern the account itself."
     },
     "fleet_default_member_config.configmanagement.config_sync.git.https_proxy": {
       "description": "URL for the HTTPS Proxy to be used when communicating with the Git repo",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies the HTTPS proxy used for communication with the Git repository. Correct proxy configuration helps ensure secure network routing, enforces organizational network policies, and reduces the risk of unauthorized traffic interception or bypass of security controls."
+      "security_impact": false,
+      "rationale": "Specifies an environment-specific HTTPS proxy endpoint. A policy cannot identify one universally trusted proxy without team or network context; proxy trust and egress restrictions should be enforced by network controls."
     },
     "fleet_default_member_config.configmanagement.config_sync.git.policy_dir": {
       "description": "The path within the Git repository that represents the top level of the repo to sync",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This Specifies the directory within the Git repository that Config Sync synchronizes. This affects configuration organization and repository structure but does not directly control authentication, authorization, encryption, or network security."
+      "rationale": "The path within the Git repository that represents the top level of the repo to sync This setting depends on workload or operational context, and the resource does not provide enough information to define a single organisation-independent constraint that would always improve security."
     },
     "fleet_default_member_config.configmanagement.config_sync.git.secret_type": {
       "description": "Type of secret configured for access to the Git repo",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines the authentication method used to access the Git repository. Selecting an appropriate secret type helps ensure secure authentication and protects repository access from unauthorized use."
+      "security_impact": false,
+      "rationale": "Selects a supported repository authentication mechanism. The secure choice depends on repository type and the organisation's credential architecture, so no single value is universally appropriate; credential permissions and storage should be governed separately."
     },
     "fleet_default_member_config.configmanagement.config_sync.git.sync_branch": {
       "description": "The branch of the repository to sync from. Default: master",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies the Git branch used as the source of synchronized configurations. Restricting synchronization to approved and protected branches helps prevent deployment of unauthorized, unreviewed, or non-compliant configurations."
+      "security_impact": false,
+      "rationale": "Selects the repository branch used by Config Sync. The trusted value is team-specific and cannot be derived generically from this resource; repository protection and deployment approval controls should establish trust."
     },
     "fleet_default_member_config.configmanagement.config_sync.git.sync_repo": {
       "description": "The URL of the Git repository to use as the source of truth",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This field defines the trusted source of configuration. If the repository URL is changed to an unauthorized repository, Config Sync could deploy malicious or unapproved configurations."
+      "security_impact": false,
+      "rationale": "Selects the repository repo used by Config Sync. The trusted value is team-specific and cannot be derived generically from this resource; repository protection and deployment approval controls should establish trust."
     },
     "fleet_default_member_config.configmanagement.config_sync.git.sync_rev": {
       "description": "Git revision (tag or hash) to check out. Default HEAD",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies the Git revision (tag or commit hash) used as the source of synchronized configurations. Restricting synchronization to approved revisions helps prevent deployment of unauthorized, unreviewed, or insecure configuration changes."
+      "security_impact": false,
+      "rationale": "Selects the repository rev used by Config Sync. The trusted value is team-specific and cannot be derived generically from this resource; repository protection and deployment approval controls should establish trust."
     },
     "fleet_default_member_config.configmanagement.config_sync.git.sync_wait_secs": {
       "description": "Period in seconds between consecutive syncs. Default: 15",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "A shorter synchronization interval ensures approved security policies and configuration changes are enforced more quickly, minimizing the window during which outdated or non-compliant configurations remain active."
+      "security_impact": false,
+      "rationale": "Sets the synchronization interval. This is primarily an operational trade-off involving rollout speed, load, and cost; there is no single interval that universally improves security for every fleet."
     },
     "fleet_default_member_config.configmanagement.config_sync.oci": {
       "type": "block",
@@ -164,43 +164,43 @@
       "description": "The Google Cloud Service Account Email used for auth when secretType is gcpServiceAccount",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies the Google Cloud Service Account used to authenticate to the OCI repository. Proper service account configuration helps enforce secure authentication and least-privilege access to configuration artifacts."
+      "security_impact": false,
+      "rationale": "Identifies a service account used by this integration. The correct identity and its least-privilege permissions are environment-specific, so a generic policy cannot safely prescribe an email value; IAM controls should govern the account itself."
     },
     "fleet_default_member_config.configmanagement.config_sync.oci.policy_dir": {
       "description": "The absolute path of the directory that contains the local resources. Default: the root directory of the image",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Specifies the directory within the OCI image that contains the configuration resources to synchronize. This affects the organization and location of configuration files but does not directly impact authentication, authorization, encryption, or network security."
+      "rationale": "The absolute path of the directory that contains the local resources. Default: the root directory of the image This setting depends on workload or operational context, and the resource does not provide enough information to define a single organisation-independent constraint that would always improve security."
     },
     "fleet_default_member_config.configmanagement.config_sync.oci.secret_type": {
       "description": "Type of secret configured for access to the Git repo",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines the type of secret used to authenticate when accessing the repository. Proper secret configuration helps ensure secure authentication and protects repository access from unauthorized use."
+      "security_impact": false,
+      "rationale": "Selects a supported repository authentication mechanism. The secure choice depends on repository type and the organisation's credential architecture, so no single value is universally appropriate; credential permissions and storage should be governed separately."
     },
     "fleet_default_member_config.configmanagement.config_sync.oci.sync_repo": {
       "description": "The OCI image repository URL for the package to sync from",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifing the OCI repository used as the trusted source of synchronized configuration packages. Ensuring the repository URL points to an authorized and trusted source helps prevent synchronization of unauthorized or malicious configurations."
+      "security_impact": false,
+      "rationale": "Selects the repository repo used by Config Sync. The trusted value is team-specific and cannot be derived generically from this resource; repository protection and deployment approval controls should establish trust."
     },
     "fleet_default_member_config.configmanagement.config_sync.oci.sync_wait_secs": {
       "description": "Period in seconds between consecutive syncs. Default: 15",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies the interval between synchronization operations. Appropriate synchronization frequency helps ensure security and configuration updates are applied promptly, reducing configuration drift and the risk of outdated or non-compliant configurations."
+      "security_impact": false,
+      "rationale": "Sets the synchronization interval. This is primarily an operational trade-off involving rollout speed, load, and cost; there is no single interval that universally improves security for every fleet."
     },
     "fleet_default_member_config.configmanagement.config_sync.oci.version": {
       "description": "Version of Config Sync installed",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies the installed version of Config Sync. Using supported and up-to-date versions helps ensure security patches, bug fixes, and protection against known vulnerabilities are applied."
+      "security_impact": false,
+      "rationale": "Selects a component or upgrade version. Secure versions change over time and depend on compatibility and support requirements, so a static generic constraint in this resource would quickly become inaccurate; version governance belongs in the release process."
     },
     "fleet_default_member_config.mesh": {
       "type": "block",
@@ -211,8 +211,8 @@
       "description": "Whether to automatically manage Service Mesh Possible values: [\"MANAGEMENT_UNSPECIFIED\", \"MANAGEMENT_AUTOMATIC\", \"MANAGEMENT_MANUAL\"]",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines whether Service Mesh is managed automatically or manually. The selected management mode influences the timely application of security updates, maintenance, and the overall security posture of the Service Mesh deployment."
+      "security_impact": false,
+      "rationale": "Chooses automatic or manual component management. Both modes can be operated securely, and the appropriate choice depends on the organisation's release and maintenance process rather than a universal security rule."
     },
     "fleet_default_member_config.policycontroller": {
       "type": "block",
@@ -223,8 +223,8 @@
       "description": "Configures the version of Policy Controller",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies the installed version of Policy Controller. Using supported and up-to-date versions helps ensure security patches, bug fixes, and protection against known vulnerabilities are applied while maintaining effective policy enforcement."
+      "security_impact": false,
+      "rationale": "Selects a component or upgrade version. Secure versions change over time and depend on compatibility and support requirements, so a static generic constraint in this resource would quickly become inaccurate; version governance belongs in the release process."
     },
     "fleet_default_member_config.policycontroller.policy_controller_hub_config": {
       "type": "block",
@@ -235,50 +235,50 @@
       "description": "Interval for Policy Controller Audit scans (in seconds). When set to 0, this disables audit functionality altogether.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Controls the frequency of Policy Controller audit scans. Appropriate audit intervals help detect policy violations promptly, while disabling or excessively delaying audits may allow insecure or non-compliant configurations to remain undetected."
+      "security_impact": false,
+      "rationale": "Sets the Policy Controller audit interval. A value of zero disables audit, but an appropriate non-zero frequency depends on fleet size, performance, and monitoring requirements, so this assessment does not prescribe a universal value constraint."
     },
     "fleet_default_member_config.policycontroller.policy_controller_hub_config.constraint_violation_limit": {
       "description": "The maximum number of audit violations to be stored in a constraint. If not set, the internal default of 20 will be used.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Controls the maximum number of policy violations retained for each constraint. Appropriate limits help maintain visibility into compliance issues and support effective security auditing and incident investigation."
+      "security_impact": false,
+      "rationale": "Limits how many audit violations are retained per constraint. The suitable value depends on fleet scale and observability capacity; it affects reporting volume rather than whether policy enforcement itself is secure."
     },
     "fleet_default_member_config.policycontroller.policy_controller_hub_config.exemptable_namespaces": {
       "description": "The set of namespaces that are excluded from Policy Controller checks. Namespaces do not need to currently exist on the cluster.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Specifies namespaces that are excluded from Policy Controller enforcement. Exempting namespaces can bypass security and compliance checks, increasing the risk of unauthorized or non-compliant workloads."
+      "security_impact": false,
+      "rationale": "Lists namespaces exempted from policy checks. Exemptions can affect coverage, but legitimate namespaces are organisation- and workload-specific, so a generic policy cannot determine an approved list without external context."
     },
     "fleet_default_member_config.policycontroller.policy_controller_hub_config.install_spec": {
       "description": "Configures the mode of the Policy Controller installation Possible values: [\"INSTALL_SPEC_UNSPECIFIED\", \"INSTALL_SPEC_NOT_INSTALLED\", \"INSTALL_SPEC_ENABLED\", \"INSTALL_SPEC_SUSPENDED\", \"INSTALL_SPEC_DETACHED\"]",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines the installation and operational state of Policy Controller. Disabling, suspending, or detaching Policy Controller can prevent security and compliance policies from being enforced, increasing the risk of unauthorized or non-compliant workloads."
+      "security_impact": false,
+      "rationale": "Selects the Policy Controller installation state. Some fleets intentionally suspend, detach, or omit this component under other control models, so one installation state cannot be required securely across every team."
     },
     "fleet_default_member_config.policycontroller.policy_controller_hub_config.log_denies_enabled": {
       "description": "Logs all denies and dry run failures.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls whether Policy Controller logs denied requests and dry-run policy violations. Enabling logging improves security monitoring, auditing, and incident investigation by providing visibility into policy enforcement events."
+      "security_impact": false,
+      "rationale": "Controls logging of denials and dry-run failures. Logging supports visibility, but mandatory enablement depends on the organisation's monitoring, privacy, retention, and cost controls rather than a universal constraint on this resource."
     },
     "fleet_default_member_config.policycontroller.policy_controller_hub_config.mutation_enabled": {
       "description": "Enables the ability to mutate resources using Policy Controller.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls whether Policy Controller can automatically modify resources to enforce security and compliance policies. Enabling mutation helps ensure workloads conform to approved security requirements before deployment."
+      "security_impact": false,
+      "rationale": "Enables resource mutation by Policy Controller. Mutation can enforce defaults but also changes submitted resources, so its use depends on approved policy design and cannot be considered universally safer when enabled."
     },
     "fleet_default_member_config.policycontroller.policy_controller_hub_config.referential_rules_enabled": {
       "description": "Enables the ability to use Constraint Templates that reference to objects other than the object currently being evaluated.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls whether Policy Controller can evaluate policies that reference related Kubernetes resources. Enabling referential rules supports more comprehensive security and compliance validation across multiple resources."
+      "security_impact": false,
+      "rationale": "Enables policies that reference other Kubernetes objects. This expands policy capability but is only needed by particular constraint templates; enabling or disabling it is not inherently secure without knowing the deployed policy set."
     },
     "fleet_default_member_config.policycontroller.policy_controller_hub_config.deployment_configs": {
       "type": "block",
@@ -290,21 +290,21 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Identifies the Policy Controller deployment component associated with the configuration. This serves as a logical identifier and does not directly affect authentication, authorization, encryption, or policy enforcement."
+      "rationale": "The identifier for this object. Format specified above This setting depends on workload or operational context, and the resource does not provide enough information to define a single organisation-independent constraint that would always improve security."
     },
     "fleet_default_member_config.policycontroller.policy_controller_hub_config.deployment_configs.pod_affinity": {
       "description": "Pod affinity configuration. Possible values: [\"AFFINITY_UNSPECIFIED\", \"NO_AFFINITY\", \"ANTI_AFFINITY\"]",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Configures pod scheduling preferences for Policy Controller components. This affects workload placement and availability but does not directly impact authentication, authorization, encryption, or policy enforcement."
+      "rationale": "Pod affinity configuration. Possible values: [\"AFFINITY_UNSPECIFIED\", \"NO_AFFINITY\", \"ANTI_AFFINITY\"] This setting depends on workload or operational context, and the resource does not provide enough information to define a single organisation-independent constraint that would always improve security."
     },
     "fleet_default_member_config.policycontroller.policy_controller_hub_config.deployment_configs.replica_count": {
       "description": "Pod replica count.",
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "Specifies the number of Policy Controller pod replicas. This influences service availability and scalability but does not directly affect authentication, authorization, encryption, or security policy enforcement."
+      "rationale": "Pod replica count This setting depends on workload or operational context, and the resource does not provide enough information to define a single organisation-independent constraint that would always improve security."
     },
     "fleet_default_member_config.policycontroller.policy_controller_hub_config.deployment_configs.container_resources": {
       "type": "block",
@@ -320,15 +320,15 @@
       "description": "CPU requirement expressed in Kubernetes resource units.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines the maximum CPU available to the Policy Controller container. Inadequate limits may throttle policy evaluation and reduce the reliability of security enforcement, while excessive allocation may affect overall cluster resource availability."
+      "security_impact": false,
+      "rationale": "Configures container cpu allocation for Policy Controller. Safe sizing depends on fleet scale and workload demand, so a generic value could cause either resource pressure or unnecessary reservation rather than universally improving security."
     },
     "fleet_default_member_config.policycontroller.policy_controller_hub_config.deployment_configs.container_resources.limits.memory": {
       "description": "Memory requirement expressed in Kubernetes resource units.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines the maximum memory available to the Policy Controller container. Insufficient memory limits may cause container termination and interrupt security policy auditing or enforcement."
+      "security_impact": false,
+      "rationale": "Configures container memory allocation for Policy Controller. Safe sizing depends on fleet scale and workload demand, so a generic value could cause either resource pressure or unnecessary reservation rather than universally improving security."
     },
     "fleet_default_member_config.policycontroller.policy_controller_hub_config.deployment_configs.container_resources.requests": {
       "type": "block",
@@ -339,15 +339,15 @@
       "description": "CPU requirement expressed in Kubernetes resource units.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines the CPU requested for the Policy Controller container. Insufficient CPU allocation can cause performance degradation or delayed policy evaluation, potentially allowing non-compliant resources to remain undetected."
+      "security_impact": false,
+      "rationale": "Configures container cpu allocation for Policy Controller. Safe sizing depends on fleet scale and workload demand, so a generic value could cause either resource pressure or unnecessary reservation rather than universally improving security."
     },
     "fleet_default_member_config.policycontroller.policy_controller_hub_config.deployment_configs.container_resources.requests.memory": {
       "description": "Memory requirement expressed in Kubernetes resource units.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines the memory requested for the Policy Controller container. Insufficient memory allocation can cause instability or service disruption, reducing the availability and reliability of policy enforcement."
+      "security_impact": false,
+      "rationale": "Configures container memory allocation for Policy Controller. Safe sizing depends on fleet scale and workload demand, so a generic value could cause either resource pressure or unnecessary reservation rather than universally improving security."
     },
     "fleet_default_member_config.policycontroller.policy_controller_hub_config.deployment_configs.pod_toleration": {
       "type": "block",
@@ -358,29 +358,29 @@
       "description": "Matches a taint effect.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines which taint effect the Policy Controller pod can tolerate. An overly permissive or incorrect value could allow the pod to run on unsuitable or security-sensitive nodes, affecting workload isolation and availability."
+      "security_impact": false,
+      "rationale": "Defines the toleration effect used for pod scheduling. Valid taints and intended nodes are cluster-specific, so a generic constraint cannot determine the secure value without the cluster's scheduling policy."
     },
     "fleet_default_member_config.policycontroller.policy_controller_hub_config.deployment_configs.pod_toleration.key": {
       "description": "Matches a taint key (not necessarily unique).",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the node taint that the Policy Controller pod can tolerate. Incorrect configuration could permit scheduling on restricted nodes or prevent scheduling on intended nodes, affecting workload isolation and policy enforcement availability."
+      "security_impact": false,
+      "rationale": "Defines the toleration key used for pod scheduling. Valid taints and intended nodes are cluster-specific, so a generic constraint cannot determine the secure value without the cluster's scheduling policy."
     },
     "fleet_default_member_config.policycontroller.policy_controller_hub_config.deployment_configs.pod_toleration.operator": {
       "description": "Matches a taint operator.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines how the toleration matches a node taint, such as Equal or Exists. An overly permissive operator could allow the Policy Controller pod to run on restricted or unsuitable nodes, affecting workload isolation and security."
+      "security_impact": false,
+      "rationale": "Defines the toleration operator used for pod scheduling. Valid taints and intended nodes are cluster-specific, so a generic constraint cannot determine the secure value without the cluster's scheduling policy."
     },
     "fleet_default_member_config.policycontroller.policy_controller_hub_config.deployment_configs.pod_toleration.value": {
       "description": "Matches a taint value.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies the taint value that the Policy Controller pod can tolerate. An incorrect or overly broad value could allow scheduling on unintended nodes or prevent scheduling on approved nodes, affecting isolation and policy enforcement availability."
+      "security_impact": false,
+      "rationale": "Defines the toleration value used for pod scheduling. Valid taints and intended nodes are cluster-specific, so a generic constraint cannot determine the secure value without the cluster's scheduling policy."
     },
     "fleet_default_member_config.policycontroller.policy_controller_hub_config.monitoring": {
       "type": "block",
@@ -391,8 +391,8 @@
       "description": "Specifies the list of backends Policy Controller will export to. An empty list would effectively disable metrics export. Possible values: [\"MONITORING_BACKEND_UNSPECIFIED\", \"PROMETHEUS\", \"CLOUD_MONITORING\"]",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Controls where Policy Controller metrics are exported. Disabling monitoring or selecting an unsuitable backend could reduce visibility into policy violations, enforcement failures, and abnormal behaviour, delaying the detection and investigation of security issues."
+      "security_impact": false,
+      "rationale": "Selects metrics-export backends. The suitable backend depends on the organisation's observability platform, and each supported option can be operated securely; monitoring requirements should be enforced through platform-level controls."
     },
     "fleet_default_member_config.policycontroller.policy_controller_hub_config.policy_content": {
       "type": "block",
@@ -408,15 +408,15 @@
       "description": "The identifier for this object. Format specified above.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the policy bundle installed on the cluster. Selecting an incorrect, unapproved, or insufficient bundle could result in required security controls not being enforced, increasing the risk of non-compliant resources being deployed."
+      "security_impact": false,
+      "rationale": "Identifies a policy bundle to install. Required bundles depend on the organisation's workloads and compliance baseline, so this resource alone cannot define a universally approved bundle identifier."
     },
     "fleet_default_member_config.policycontroller.policy_controller_hub_config.policy_content.bundles.exempted_namespaces": {
       "description": "The set of namespaces to be exempted from the bundle.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Defines namespaces that are excluded from the policy bundle. Exempting unnecessary or security-sensitive namespaces could allow workloads to bypass required policy controls; exemptions should therefore be limited to explicitly approved namespaces."
+      "security_impact": false,
+      "rationale": "Lists namespaces exempted from policy checks. Exemptions can affect coverage, but legitimate namespaces are organisation- and workload-specific, so a generic policy cannot determine an approved list without external context."
     },
     "fleet_default_member_config.policycontroller.policy_controller_hub_config.policy_content.template_library": {
       "type": "block",
@@ -427,8 +427,8 @@
       "description": "Configures the manner in which the template library is installed on the cluster. Possible values: [\"INSTALLATION_UNSPECIFIED\", \"NOT_INSTALLED\", \"ALL\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls whether the Policy Controller Template Library is installed on the cluster. Selecting NOT_INSTALLED or leaving the configuration unspecified could prevent required constraint templates from being available, reducing the coverage and effectiveness of security policy enforcement."
+      "security_impact": false,
+      "rationale": "Controls installation of the Policy Controller template library. Some teams use custom templates or another delivery mechanism, so installing the full library is not universally required for secure policy enforcement."
     },
     "spec": {
       "type": "block",
@@ -444,8 +444,8 @@
       "description": "Specified if other fleet should be considered as a source of upgrades. Currently, at most one upstream fleet is allowed. The fleet name should be either fleet project number or id.",
       "required": true,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Identifies the upstream fleet used as the source of cluster upgrades. Referencing an unauthorised or incorrect fleet could introduce unapproved upgrade configurations or versions, affecting cluster integrity, compatibility, and availability. Only explicitly trusted fleet project IDs or numbers should be allowed."
+      "security_impact": false,
+      "rationale": "Identifies an upstream fleet used for upgrades. Trusted fleet identifiers are organisation-specific and cannot be safely hardcoded by a generic policy; fleet trust and access should be governed outside this resource."
     },
     "spec.clusterupgrade.gke_upgrade_overrides": {
       "type": "block",
@@ -461,8 +461,8 @@
       "description": "Amount of time to \"soak\" after a rollout has been finished before marking it COMPLETE. Cannot exceed 30 days.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines the observation period after an upgrade rollout before it is marked complete. An insufficient soaking period may allow security, stability, or compatibility issues to go undetected, while an excessive period could delay subsequent critical upgrades. The duration should follow an organisation-approved range and must not exceed 30 days."
+      "security_impact": false,
+      "rationale": "Sets the observation period after an upgrade. The appropriate duration depends on release risk, testing, and operational urgency, so no single value universally improves security across all fleets."
     },
     "spec.clusterupgrade.gke_upgrade_overrides.upgrade": {
       "type": "block",
@@ -473,15 +473,15 @@
       "description": "Name of the upgrade, e.g., \"k8s_control_plane\". It should be a valid upgrade name. It must not exceet 99 characters.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the cluster component whose upgrade configuration is overridden. An invalid or unauthorised upgrade name could apply the override to an unintended component or prevent required security upgrades. The value should be restricted to valid, organisation-approved upgrade names."
+      "security_impact": false,
+      "rationale": "Identifies the upgrade receiving an override. Valid choices depend on the active upgrade campaign, making this an operational selection rather than a stable target for a generic security policy."
     },
     "spec.clusterupgrade.gke_upgrade_overrides.upgrade.version": {
       "description": "Version of the upgrade, e.g., \"1.22.1-gke.100\". It should be a valid version. It must not exceet 99 characters.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies the target version for the cluster upgrade override. Selecting an outdated, unsupported, or unapproved version could expose the cluster to known vulnerabilities and compatibility issues. Only supported and organisation-approved versions should be permitted."
+      "security_impact": false,
+      "rationale": "Selects a component or upgrade version. Secure versions change over time and depend on compatibility and support requirements, so a static generic constraint in this resource would quickly become inaccurate; version governance belongs in the release process."
     },
     "spec.clusterupgrade.post_conditions": {
       "type": "block",
@@ -492,8 +492,8 @@
       "description": "Amount of time to \"soak\" after a rollout has been finished before marking it COMPLETE. Cannot exceed 30 days.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines the observation period after a cluster upgrade rollout before it is marked complete. A period that is too short may allow security, stability, or compatibility problems to remain undetected, while an excessive period could delay subsequent critical upgrades. The duration should follow an organisation-approved range and must not exceed 30 days."
+      "security_impact": false,
+      "rationale": "Sets the observation period after an upgrade. The appropriate duration depends on release risk, testing, and operational urgency, so no single value universally improves security across all fleets."
     },
     "spec.fleetobservability": {
       "type": "block",
@@ -526,8 +526,8 @@
       "description": "Specified if fleet logging feature is enabled. Possible values: [\"MODE_UNSPECIFIED\", \"COPY\", \"MOVE\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls how logs from all fleet scopes are routed to the fleet host project. MODE_UNSPECIFIED can disable fleet-wide logging and reduce visibility into security events, while COPY or MOVE affects where logs remain available. The mode should comply with approved central logging and retention requirements."
+      "security_impact": false,
+      "rationale": "Controls routing of fleet-scope logs. COPY, MOVE, or disabled routing can each be appropriate depending on retention, residency, duplication, and cost requirements, so there is no universal secure mode for every organisation."
     },
     "spec.multiclusteringress": {
       "type": "block",
@@ -538,8 +538,8 @@
       "description": "Fully-qualified Membership name which hosts the MultiClusterIngress CRD. Example: 'projects/foo-proj/locations/global/memberships/bar'",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the fleet membership that hosts the MultiClusterIngress configuration. Referencing an incorrect or unauthorised membership could direct ingress configuration through an unintended cluster, affecting traffic routing, exposure, availability, and administrative control. Only explicitly approved membership resource names should be permitted."
+      "security_impact": false,
+      "rationale": "Identifies the membership hosting MultiClusterIngress configuration. The authorised membership is environment-specific, so a generic policy cannot prescribe its resource name; membership access should be protected through IAM and fleet governance."
     },
     "spec.rbacrolebindingactuation": {
       "type": "block",
@@ -550,8 +550,8 @@
       "description": "The list of allowed custom roles (ClusterRoles). If a custom role is not part of this list, it cannot be used in a fleet scope RBACRoleBinding. If a custom role in this list is in use, it cannot be removed from the list until the scope RBACRolebindings using it are deleted.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Controls which custom ClusterRoles can be assigned through fleet-scope RBAC role bindings. Allowing unapproved or overly privileged roles could grant excessive permissions and enable unauthorised access or changes across clusters. The list should be restricted to explicitly approved least-privilege roles."
+      "security_impact": false,
+      "rationale": "Lists custom ClusterRoles allowed in fleet-scope bindings. Least-privilege role names and permissions are organisation-specific, so this resource cannot supply a universal allow-list without external role and workload context."
     },
     "spec.workloadidentity": {
       "type": "block",
@@ -562,8 +562,8 @@
       "description": "Pool to be used for Workload Identity. This pool in trust-domain mode is used with Fleet Tenancy, so that sameness can be enforced. ex: projects/example/locations/global/workloadidentitypools/custompool",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the Workload Identity Pool used as the fleet tenancy trust domain. Referencing an incorrect or unauthorised pool could allow workloads to assume unintended identities or access resources across trust boundaries. Only an explicitly approved Workload Identity Pool resource should be permitted."
+      "security_impact": false,
+      "rationale": "Identifies the Workload Identity pool used as the tenancy trust domain. The trusted pool is organisation-specific and should be protected through IAM and trust configuration; a generic policy cannot prescribe its resource name."
     }
   }
 }
