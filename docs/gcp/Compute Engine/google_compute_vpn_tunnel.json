@@ -111,8 +111,8 @@
       "description": "Shared secret used to set the secure session between the Cloud VPN\ngateway and the peer VPN gateway.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Write-only variant of the shared secret credential; carries the same security relevance as shared_secret."
+      "security_impact": false,
+      "rationale": "Write-only variant of the IKE pre-shared key. Because the value is write-only it is never persisted to state and never appears in the Terraform plan, so a policy has nothing to evaluate. The secret itself is also an un-constrainable value: a generic platform rule cannot meaningfully judge the strength of an arbitrary credential, and secret material belongs in Secret Manager rather than being validated here."
     },
     "shared_secret_wo_version": {
       "description": "Triggers update of 'shared_secret_wo' write-only. Increment this value when an update to 'shared_secret_wo' is needed. For more info see [updating write-only arguments](/docs/providers/google/guides/using_write_only_arguments.html#updating-write-only-arguments)",
@@ -215,8 +215,8 @@
       "description": "Resource manager tags to be bound to the Vpn Tunnel. Tag keys and values have the\nsame definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id},\nand values are in the format tagValues/456.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Binds resource manager tags to the tunnel, which are used for tag-based IAM conditions and org policy enforcement, supporting governance controls."
+      "security_impact": false,
+      "rationale": "Binds resource manager tags to the tunnel at creation time. The params block is passed with the API request but is not persisted as part of the resource payload, so the tag values never appear in the Terraform plan and cannot be evaluated. Which tags a team applies is also a governance labelling choice specific to their org hierarchy rather than a value a generic platform policy could constrain."
     }
   }
 }
