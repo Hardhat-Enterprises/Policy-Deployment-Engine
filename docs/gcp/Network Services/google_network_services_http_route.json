@@ -337,22 +337,22 @@
       "description": "Specifies the allowed number of retries.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+     "security_impact": true,
+  "rationale": "An excessive retry count can amplify load against a struggling backend during outages (a self-inflicted retry-storm/DoS pattern). Policy should cap num_retries to a safe upper bound."
     },
     "rules.action.retry_policy.per_try_timeout": {
       "description": "Specifies a non-zero timeout per retry attempt. A duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.5s\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+  "rationale": "Controls retry timing/latency behavior only; a purely operational reliability tuning parameter with no access-control or data-exposure implications."
     },
     "rules.action.retry_policy.retry_conditions": {
       "description": "Specifies one or more conditions when this retry policy applies.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+  "rationale": "Specifies which response conditions trigger a retry (e.g. 5xx, deadline-exceeded); operational resiliency configuration with no direct security control."
     },
     "rules.action.url_rewrite": {
       "type": "block",
