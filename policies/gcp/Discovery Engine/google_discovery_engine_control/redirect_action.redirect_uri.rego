@@ -13,8 +13,8 @@ conditions := [
     {
       "condition": "redirect URI does not use HTTPS",
       "attribute_path": ["redirect_action", 0, "redirect_uri"],
-      "values": ["https://*"],
-      "policy_type": "pattern whitelist"
+      "values": ["*://", [["https"]]],
+"policy_type": "pattern whitelist"
     }
   ]
 ]

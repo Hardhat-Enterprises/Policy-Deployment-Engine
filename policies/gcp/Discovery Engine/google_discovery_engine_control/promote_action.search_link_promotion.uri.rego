@@ -14,8 +14,8 @@ conditions := [
     {
       "condition": "promoted destination URI does not use HTTPS",
       "attribute_path": ["promote_action", 0, "search_link_promotion", 0, "uri"],
-      "values": ["https://*"],
-      "policy_type": "pattern whitelist"
+     "values": ["*://", [["https"]]],
+"policy_type": "pattern whitelist"
     }
   ]
 ]
