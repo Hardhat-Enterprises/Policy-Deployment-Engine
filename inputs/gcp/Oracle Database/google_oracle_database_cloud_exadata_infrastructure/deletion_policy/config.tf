@@ -9,5 +9,5 @@ terraform {
 
 provider "google" {
   project = "example-project"
-  region  = "us-east4"
+  region  = "australia-southeast2"
 }
