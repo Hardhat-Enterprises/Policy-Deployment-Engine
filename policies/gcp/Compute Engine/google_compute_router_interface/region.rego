@@ -1,0 +1,29 @@
+package terraform.gcp.security.compute_engine.google_compute_router_interface.region
+
+import data.terraform.gcp.security.compute_engine.google_compute_router_interface.vars
+import data.terraform.helpers
+
+conditions := [
+  [
+    {
+      "situation_description": "Router interface region is outside the approved Australian regions.",
+      "remedies": [
+        "Set region to australia-southeast1 for Sydney or australia-southeast2 for Melbourne.",
+      ],
+    },
+    {
+      "condition": "region must be one of the approved Australian regions.",
+      "attribute_path": ["region"],
+      "values": [
+        "australia-southeast1",
+        "australia-southeast2",
+      ],
+      "policy_type": "whitelist",
+    },
+  ],
+]
+
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details
