@@ -48,8 +48,8 @@
       "description": "The write-only private key in PEM format.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The private key is highly sensitive information and must be protected to prevent unauthorized access to the SSL certificate."
+      "security_impact": false,
+      "rationale": "This is a write-only argument, and Terraform deliberately excludes write-only argument values from planned_values/state output. As a result, its content cannot be inspected by a plan-based OPA policy at all, so no generic platform security control can be enforced on it. Use of the write-only mechanism itself (over the plain private_key argument) is the security-positive choice, which is why private_key remains security_impact: true and is checked instead."
     },
     "private_key_wo_version": {
       "description": "Triggers update of 'private_key_wo' write-only. Increment this value when an update to 'private_key_wo' is needed. For more info see [updating write-only arguments](/docs/providers/google/guides/using_write_only_arguments.html#updating-write-only-arguments)",
