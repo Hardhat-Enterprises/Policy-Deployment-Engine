@@ -6,106 +6,106 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform is allowed to destroy the firewall rule. Deleting a rule silently removes the traffic controls it enforced, so a policy should require PREVENT to block accidental or unreviewed removal of network protections."
     },
     "description": {
       "description": "An optional description of this resource. Provide this property when\nyou create the resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Free-text description of the firewall rule shown in the console and API. It is documentation only and has no effect on which traffic is permitted, so there is no secure value to enforce."
     },
     "destination_ranges": {
       "description": "If destination ranges are specified, the firewall will apply only to\ntraffic that has destination IP address in these ranges. These ranges\nmust be expressed in CIDR format. IPv4 or IPv6 ranges are supported.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Lists the destination CIDR ranges the rule applies to. Network address ranges are a team addressing choice reflecting their own network design, and per the assessment guidance range sizing is not a platform policy target."
     },
     "direction": {
       "description": "Direction of traffic to which this firewall applies; default is\nINGRESS. Note: For INGRESS traffic, one of 'source_ranges',\n'source_tags' or 'source_service_accounts' is required. Possible values: [\"INGRESS\", \"EGRESS\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects whether the rule applies to inbound or outbound traffic. Neither value is inherently insecure; it is a functional choice about what the rule is for, so there is no direction a platform policy should mandate."
     },
     "disabled": {
       "description": "Denotes whether the firewall rule is disabled, i.e not applied to the\nnetwork it is associated with. When set to true, the firewall rule is\nnot enforced and the network behaves as if it did not exist. If this\nis unspecified, the firewall rule will be enabled.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Turns the firewall rule off without deleting it, so the traffic controls it defines stop applying while the resource still appears to exist. A policy should require it to be false so rules are not silently deactivated."
     },
     "enable_logging": {
       "description": "This field denotes whether to enable logging for a particular firewall rule. If logging is enabled, logs will be exported to Stackdriver.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether connections matched by this rule are logged. Without logging there is no record of what traffic the rule permitted or blocked, so a policy should require it to be enabled for auditability and incident investigation."
     },
     "name": {
       "description": "Name of the resource. Provided by the client when the resource is\ncreated. The name must be 1-63 characters long, and comply with\nRFC1035. Specifically, the name must be 1-63 characters long and match\nthe regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the\nfirst character must be a lowercase letter, and all following\ncharacters must be a dash, lowercase letter, or digit, except the last\ncharacter, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier assigned to the firewall rule. We do not constrain what teams name their resources; the name has no bearing on the traffic the rule allows or denies."
     },
     "network": {
       "description": "The name or self_link of the network to attach this firewall to.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Reference to the VPC network the firewall rule attaches to. We secure the referenced network through its own policies rather than constraining which network a team points a rule at."
     },
     "priority": {
       "description": "Priority for this rule. This is an integer between 0 and 65535, both\ninclusive. When not specified, the value assumed is 1000. Relative\npriorities determine precedence of conflicting rules. Lower value of\npriority implies higher precedence (eg, a rule with priority 0 has\nhigher precedence than a rule with priority 1). DENY rules take\nprecedence over ALLOW rules having equal priority.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the evaluation order of this rule relative to others in the network. Correct ordering depends on the team's full rule set, which a generic policy cannot know, so no single value is more secure than another."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the project the firewall rule belongs to. This is a reference to where the resource lives rather than a configurable security control, and a platform policy cannot assume any specific project."
     },
     "source_ranges": {
       "description": "If source ranges are specified, the firewall will apply only to\ntraffic that has source IP address in these ranges. These ranges must\nbe expressed in CIDR format. One or both of sourceRanges and\nsourceTags may be set. If both properties are set, the firewall will\napply to traffic that has source IP address within sourceRanges OR the\nsource IP that belongs to a tag listed in the sourceTags property. The\nconnection does not need to match both properties for the firewall to\napply. IPv4 or IPv6 ranges are supported. For INGRESS traffic, one of\n'source_ranges', 'source_tags' or 'source_service_accounts' is required.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Lists the source CIDR ranges the rule applies to. As with destination ranges, address ranges are team addressing decisions that vary per deployment, so a generic policy cannot meaningfully constrain them."
     },
     "source_service_accounts": {
       "description": "If source service accounts are specified, the firewall will apply only\nto traffic originating from an instance with a service account in this\nlist. Source service accounts cannot be used to control traffic to an\ninstance's external IP address because service accounts are associated\nwith an instance, not an IP address. sourceRanges can be set at the\nsame time as sourceServiceAccounts. If both are set, the firewall will\napply to traffic that has source IP address within sourceRanges OR the\nsource IP belongs to an instance with service account listed in\nsourceServiceAccount. The connection does not need to match both\nproperties for the firewall to apply. sourceServiceAccounts cannot be\nused at the same time as sourceTags or targetTags. For INGRESS traffic,\none of 'source_ranges', 'source_tags' or 'source_service_accounts' is required.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects source instances by the service account they run as, as an alternative to source tags. It is used here to identify which instances the rule matches, not to grant or restrict any permission, and the accounts referenced are team-specific."
     },
     "source_tags": {
       "description": "If source tags are specified, the firewall will apply only to traffic\nwith source IP that belongs to a tag listed in source tags. Source\ntags cannot be used to control traffic to an instance's external IP\naddress. Because tags are associated with an instance, not an IP\naddress. One or both of sourceRanges and sourceTags may be set. If\nboth properties are set, the firewall will apply to traffic that has\nsource IP address within sourceRanges OR the source IP that belongs to\na tag listed in the sourceTags property. The connection does not need\nto match both properties for the firewall to apply. For INGRESS traffic,\none of 'source_ranges', 'source_tags' or 'source_service_accounts' is required.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects source instances by network tag so the rule applies to traffic from them. The tags a team uses to group their own instances are a naming and architecture choice specific to their deployment, so a generic policy cannot say which tags belong here."
     },
     "target_service_accounts": {
       "description": "A list of service accounts indicating sets of instances located in the\nnetwork that may make network connections as specified in allowed[].\ntargetServiceAccounts cannot be used at the same time as targetTags or\nsourceTags. If neither targetServiceAccounts nor targetTags are\nspecified, the firewall rule applies to all instances on the specified\nnetwork.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects which instances the rule applies to by the service account they run as. As with target tags, this scopes the rule to part of the team's fleet and references accounts a platform policy cannot know in advance."
     },
     "target_tags": {
       "description": "A list of instance tags indicating sets of instances located in the\nnetwork that may make network connections as specified in allowed[].\nIf no targetTags are specified, the firewall rule applies to all\ninstances on the specified network.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects which instances the rule applies to by network tag. This scopes the rule to part of the team's fleet rather than configuring any security control on the rule itself, and the tag names are specific to each deployment."
     },
     "allow": {
       "type": "block",
@@ -116,15 +116,15 @@
       "description": "An optional list of ports to which this rule applies. This field\nis only applicable for UDP or TCP protocol. Each entry must be\neither an integer or a range. If not specified, this rule\napplies to connections through any port.\n\nExample inputs include: [22], [80, 443], and\n[\"12345-12349\"].",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Lists the ports the allow rule applies to. A port number alone does not determine who can reach the service; exposure depends on the source ranges paired with it, which are themselves a team addressing choice. Which ports a workload legitimately needs open varies entirely by application, so there is no set a generic policy could mandate."
     },
     "allow.protocol": {
       "description": "The IP protocol to which this rule applies. The protocol type is\nrequired when creating a firewall rule. This value can either be\none of the following well known protocol strings (tcp, udp,\nicmp, esp, ah, sctp, ipip, all), or the IP protocol number.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets which IP protocol the allow rule covers. The protocol a rule targets follows from what the workload actually runs, and no single protocol is more secure than another in isolation, so this is a functional choice rather than a security control."
     },
     "deny": {
       "type": "block",
@@ -135,15 +135,15 @@
       "description": "An optional list of ports to which this rule applies. This field\nis only applicable for UDP or TCP protocol. Each entry must be\neither an integer or a range. If not specified, this rule\napplies to connections through any port.\n\nExample inputs include: [22], [80, 443], and\n[\"12345-12349\"].",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Lists the ports the deny rule applies to. Denying traffic restricts rather than exposes, so there is no insecure value here for a policy to block."
     },
     "deny.protocol": {
       "description": "The IP protocol to which this rule applies. The protocol type is\nrequired when creating a firewall rule. This value can either be\none of the following well known protocol strings (tcp, udp,\nicmp, esp, ah, sctp, ipip, all), or the IP protocol number.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets which IP protocol the deny rule covers. As with deny ports, this narrows what is permitted rather than widening it, so no value weakens the security posture."
     },
     "log_config": {
       "type": "block",
@@ -154,8 +154,8 @@
       "description": "This field denotes whether to include or exclude metadata for firewall logs. Possible values: [\"EXCLUDE_ALL_METADATA\", \"INCLUDE_ALL_METADATA\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines how much detail is captured in firewall logs. Including metadata gives investigators the context needed to trace a connection, so a policy should require the more complete option rather than the stripped-down one."
     },
     "params": {
       "type": "block",
@@ -166,8 +166,8 @@
       "description": "Resource manager tags to be bound to the firewall. Tag keys and values have the\nsame definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id},\nand values are in the format tagValues/456. The field is ignored when empty.\nThe field is immutable and causes resource replacement when mutated. This field is only\nset at create time and modifying this field after creation will trigger recreation.\nTo apply tags to an existing resource, see the google_tags_tag_binding resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Binds resource manager tags to the firewall at creation time. The params block is passed with the API request but is not persisted as part of the resource payload, so the values never appear in the Terraform plan and cannot be evaluated. Which tags a team applies is also specific to their own org hierarchy."
     }
   }
 }
