@@ -6,78 +6,78 @@
       "description": "The network tier to use when automatically reserving NAT IP addresses.\nMust be one of: PREMIUM, STANDARD. If not specified, then the current\nproject-level default tier is used. Possible values: [\"PREMIUM\", \"STANDARD\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "Determines which Google network tier is used when routing traffic. Premium uses Google's private network which can provide higher speeds and reduced latency, while Standard defaults to using the public internet. Primarily impacts network performance and has no direct impact on security."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Is a precautionary argument preventing the accidental or unauthorised removal of the entire NAT instance. The NAT is a central network gateway that coordinates traffic throughout the network. Deleting it can interrupt critical security protocols that require network connectivity."
     },
     "drain_nat_ips": {
       "description": "A list of URLs of the IP resources to be drained. These IPs must be\nvalid static external IPs that have been assigned to the NAT.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "A list of inactive IPs that cannot take on new connections. Is used during the transition to new IP addresses and has no direct security impact."
     },
     "enable_dynamic_port_allocation": {
       "description": "Enable Dynamic Port Allocation.\nIf minPortsPerVm is set, minPortsPerVm must be set to a power of two greater than or equal to 32.\nIf minPortsPerVm is not set, a minimum of 32 ports will be allocated to a VM from this NAT config.\nIf maxPortsPerVm is set, maxPortsPerVm must be set to a power of two greater than minPortsPerVm.\nIf maxPortsPerVm is not set, a maximum of 65536 ports will be allocated to a VM from this NAT config.\n\nMutually exclusive with enableEndpointIndependentMapping.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Determines how NAT ports are shared within the network. It is used to monitor, log, and trace outbound traffic passing through assigned NAT ports. This argument upholds visibility and accountability by tracking and recording traffic behaviour."
     },
     "enable_endpoint_independent_mapping": {
       "description": "Enable endpoint independent mapping.\nFor more information see the [official documentation](https://docs.cloud.google.com/nat/docs/public-nat#specs-rfcs).",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Determines whether an internal IP port uses the same external IP port when routing traffic. This can hinder attacker reconnaissence by making the NATs IP port mapping unpredictable."
     },
     "endpoint_types": {
       "description": "Specifies the endpoint Types supported by the NAT Gateway.\nSupported values include:\n      'ENDPOINT_TYPE_VM', 'ENDPOINT_TYPE_SWG',\n      'ENDPOINT_TYPE_MANAGED_PROXY_LB'.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Determines what resource types can use the NAT gateway. Controls gateway routing which can introduce vulnerabilities and an attack surface."
     },
     "icmp_idle_timeout_sec": {
       "description": "Timeout (in seconds) for ICMP connections. Defaults to 30s if not set.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "Drops inactive ICMP connections after a set amount of time. Can prevent excessively long connections from draining network bandwidth. Primarily boosts network performance with very no direct impact on security."
     },
     "initial_nat_ips": {
       "description": "Self-links of NAT IPs to be used as initial value for creation alongside a RouterNatAddress resource.\nConflicts with natIps and drainNatIps. Only valid if natIpAllocateOption is set to MANUAL_ONLY.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "true",
+      "rationale": "Sets the public-facing IPs to be used by the NAT. Influences internal resource outbound traffic permissions to third party networks as the NAT IP will be used in the allowlist."
     },
     "max_ports_per_vm": {
       "description": "Maximum number of ports allocated to a VM from this NAT.\nThis field can only be set when enableDynamicPortAllocation is enabled.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "Set the maxiumum number of ports that can be allocated to a VM when dynamic allocation is enabled. Affects how many connections a VM can have simultaneously and primarily impacts performance rather than security."
     },
     "min_ports_per_vm": {
       "description": "Minimum number of ports allocated to a VM from this NAT. Defaults to 64 for static port allocation and 32 dynamic port allocation if not set.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "Set the minimum number of ports that can be allocated to a VM when dynamic allocation is enabled. Affects the minimum baseline connections a VM needs to have and primarily impacts performance rather than security."
     },
     "name": {
       "description": "Name of the NAT service. The name must be 1-63 characters long and\ncomply with RFC1035.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": "false",
+      "rationale": "This is the name used to identify the NAT service. Has no security or performance impact and is primarily a reference."
     },
     "nat_ip_allocate_option": {
       "description": "How external IPs should be allocated for this NAT. Valid values are\n'AUTO_ONLY' for only allowing NAT IPs allocated by Google Cloud\nPlatform, or 'MANUAL_ONLY' for only user-allocated NAT IP addresses. Possible values: [\"MANUAL_ONLY\", \"AUTO_ONLY\"]",
