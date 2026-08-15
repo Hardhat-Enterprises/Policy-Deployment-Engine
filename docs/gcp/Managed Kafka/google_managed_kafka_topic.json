@@ -14,7 +14,7 @@
       "required": false,
       "type": "map(string)",
       "security_impact": true,
-      "rationale": "Certain configs (e.g., `retention.ms`, `cleanup.policy`, `compression.type`) may leak data or allow unbounded data growth if misconfigured."
+      "rationale": "Certain configs (e.g., `retention.ms`, `cleanup.policy`, `compression.type`) may leak data or allow unbounded data growth if misconfigured. However, the policy engine can only check for forbidden keys inside a map(string) field when the keys are fixed and known in advance (e.g. labels.environment), or for list/scalar membership — it cannot generically flag arbitrary risky keys inside an unconstrained map. No .rego written; this needs new shared-helper logic and is out of scope for a single-field policy."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
