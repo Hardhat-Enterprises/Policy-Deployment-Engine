@@ -242,15 +242,15 @@
       "description": "The HTTP Status code to use for the redirect.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The correct redirect status code depends entirely on the intended semantics of the specific redirect (method/body preservation vs. permanence); there is no universally unsafe value, so this is not something a standalone policy can meaningfully enforce."
     },
     "rules.action.redirect.strip_query": {
       "description": "If set to true, any accompanying query portion of the original URL is removed prior to redirecting the request.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Whether preserving the query string on redirect is risky depends entirely on what a specific route's query parameters contain; the default (preserving) exists for legitimate functional reasons (analytics, pagination state), so this is not something a standalone policy can meaningfully enforce without false positives."
     },
     "rules.action.request_header_modifier": {
       "type": "block",
@@ -261,15 +261,15 @@
       "description": "Add the headers with given map where key is the name of the header, value is the value of the header.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+     "security_impact": true,
+    "rationale": "Allowing arbitrary header injection (e.g. spoofing trust headers like Authorization, X-Forwarded-For, or Cookie) is security-relevant, but the current policy engine has no mechanism to check for forbidden keys within a map(string) field - only fixed, known keys (as used in labels.rego) or list/scalar membership are supported. Flagging for reviewer: this needs new shared-helper logic to enforce, out of scope for a single-field policy."
     },
     "rules.action.request_header_modifier.remove": {
       "description": "Remove headers (matching by header names) specified in the list.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Removing headers before forwarding to the backend more commonly causes functional failures (e.g. stripped auth headers being rejected by the backend) than security exposure; there is no clear set of forbidden values to enforce here."
     },
     "rules.action.request_header_modifier.set": {
       "description": "Completely overwrite/replace the headers with given map where key is the name of the header, value is the value of the header.",
@@ -299,8 +299,8 @@
       "description": "Specifies the proportion of requests forwarded to the backend referenced by the serviceName field. This is computed as: weight/Sum(weights in this destination list). For non-zero values, there may be some epsilon from the exact proportion defined here depending on the precision an implementation supports.\nIf only one serviceName is specified and it has a weight greater than 0, 100% of the traffic is forwarded to that backend.\nIf weights are specified for any one service name, they need to be specified for all of them.\nIf weights are unspecified for all services, then, traffic is distributed in equal proportions to all of them.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines the proportion of traffic mirrored, not whether mirroring occurs or where; purely a load-distribution configuration value with no inherent safe/unsafe threshold, consistent with destinations.weight."
     },
     "rules.action.response_header_modifier": {
       "type": "block",
@@ -318,8 +318,8 @@
       "description": "Remove headers (matching by header names) specified in the list.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Removing browser-security response headers (e.g. Content-Security-Policy, Strict-Transport-Security, X-Frame-Options, X-Content-Type-Options) before they reach the client strips real defenses against XSS, clickjacking, and downgrade attacks."
     },
     "rules.action.response_header_modifier.set": {
       "description": "Completely overwrite/replace the headers with given map where key is the name of the header, value is the value of the header.",
