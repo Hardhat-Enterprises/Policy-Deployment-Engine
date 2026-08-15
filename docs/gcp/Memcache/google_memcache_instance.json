@@ -13,15 +13,15 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can destroy the resource on 'destroy'/'apply'. Setting to 'PREVENT' guards against accidental instance deletion; policy should whitelist 'PREVENT' for production instances."
     },
     "deletion_protection": {
       "description": "Whether Terraform will be prevented from destroying the instance.\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is not set to false in Terraform state.\nWhen the field is set to true or unset in Terraform state, a 'terraform apply'\nor 'terraform destroy' that would delete the instance will fail.\nWhen the field is set to false, deleting the instance is allowed.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Boolean deletion-protection flag; when true (or unset), Terraform blocks destroying the instance. Policy should require this be true for production instances to prevent accidental deletion."
     },
     "display_name": {
       "description": "A user-visible name for the instance.",
@@ -48,8 +48,8 @@
       "description": "The resource name of the instance.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Resource name is a free-text identifier used for naming and reference; it does not control access, encryption, or exposure."
     },
     "node_count": {
       "description": "Number of nodes in the memcache instance.",
@@ -62,8 +62,8 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+     "security_impact": false,
+      "rationale": "Non-secret project identifier scoping the instance. We don't constrain project references, and a generic policy cannot know the correct project."
     },
     "region": {
       "description": "The region of the Memcache instance. If it is not provided, the provider region is used.",
@@ -107,8 +107,8 @@
       "description": "Required. The day of week that maintenance updates occur.\n- DAY_OF_WEEK_UNSPECIFIED: The day of the week is unspecified.\n- MONDAY: Monday\n- TUESDAY: Tuesday\n- WEDNESDAY: Wednesday\n- THURSDAY: Thursday\n- FRIDAY: Friday\n- SATURDAY: Saturday\n- SUNDAY: Sunday Possible values: [\"DAY_OF_WEEK_UNSPECIFIED\", \"MONDAY\", \"TUESDAY\", \"WEDNESDAY\", \"THURSDAY\", \"FRIDAY\", \"SATURDAY\", \"SUNDAY\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": "Selecting an appropriate day ensures maintenance does not disrupt peak traffic periods."
+      "security_impact": false,
+      "rationale": "Selecting an appropriate day avoids disrupting peak traffic periods; this is an availability/scheduling choice, not a security control."
     },
     "maintenance_policy.weekly_maintenance_window.duration": {
       "description": "Required. The length of the maintenance window, ranging from 3 hours to 8 hours.\nA duration in seconds with up to nine fractional digits,\nterminated by 's'. Example: \"3.5s\".",
@@ -126,7 +126,7 @@
       "description": "Hours of day in 24 hour format. Should be from 0 to 23.\nAn API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
+      "security_impact": false,
       "rationale": "Correct hour selection ensures updates align with expected downtime periods."
     },
     "maintenance_policy.weekly_maintenance_window.start_time.minutes": {
@@ -159,8 +159,8 @@
       "description": "User-defined set of parameters to use in the memcache process.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "User-defined Memcached runtime tuning parameters (e.g. item size limits); these affect performance and behaviour, not access control or data exposure."
     },
     "node_config": {
       "type": "block",
