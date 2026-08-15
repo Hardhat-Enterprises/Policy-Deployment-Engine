@@ -6,29 +6,29 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can destroy the resource on 'destroy'/'apply'. Setting to 'PREVENT' guards against accidental key deletion; policy should whitelist 'PREVENT' for production keys."
     },
     "display_name": {
       "description": "Human-readable display name of this key. Modifiable by user.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Human-readable display name; it is cosmetic metadata and does not control access or exposure."
     },
     "labels": {
       "description": "See [Creating and managing labels](https://cloud.google.com/recaptcha-enterprise/docs/labels).\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field `effective_labels` for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Key/value metadata labels for organisation; they do not affect access control or key behaviour."
     },
     "project": {
       "description": "The project for the resource",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Non-secret project identifier scoping the key. We don't constrain project references, and a generic policy cannot know the correct project."
     },
     "android_settings": {
       "type": "block",
@@ -39,15 +39,15 @@
       "description": "If set to true, it means allowed_package_names will not be enforced.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "When true, allowed_package_names is not enforced, letting any Android app use the key. This bypasses app-origin allowlisting and can expose the key to abuse."
     },
     "android_settings.allowed_package_names": {
       "description": "Android package names of apps allowed to use the key. Example: 'com.companyname.appname'",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the actual approved package names, which are team-specific; a generic policy cannot judge the correct list."
     },
     "ios_settings": {
       "type": "block",
@@ -58,15 +58,15 @@
       "description": "If set to true, it means allowed_bundle_ids will not be enforced.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "When true, allowed_bundle_ids is not enforced, letting any iOS app use the key. This bypasses app-origin allowlisting and can expose the key to abuse."
     },
     "ios_settings.allowed_bundle_ids": {
       "description": "iOS bundle ids of apps allowed to use the key. Example: 'com.companyname.productname.appname'",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the actual approved bundle IDs, which are team-specific; a generic policy cannot judge the correct list."
     },
     "testing_options": {
       "type": "block",
@@ -77,15 +77,15 @@
       "description": "For challenge-based keys only (CHECKBOX, INVISIBLE), all challenge requests for this site will return nocaptcha if NOCAPTCHA, or an unsolvable challenge if UNSOLVABLE_CHALLENGE. Possible values: TESTING_CHALLENGE_UNSPECIFIED, NOCAPTCHA, UNSOLVABLE_CHALLENGE",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Setting this to NOCAPTCHA makes every challenge request auto-pass, silently disabling bot detection for the key. Policy should blacklist NOCAPTCHA."
     },
     "testing_options.testing_score": {
       "description": "All assessments for this Key will return this score. Must be between 0 (likely not legitimate) and 1 (likely legitimate) inclusive.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Setting this to 1 forces every assessment to appear legitimate, silently disabling bot detection for the key. Policy should blacklist 1."
     },
     "waf_settings": {
       "type": "block",
@@ -96,15 +96,15 @@
       "description": "Supported WAF features. For more information, see https://cloud.google.com/recaptcha-enterprise/docs/usecase#comparison_of_features. Possible values: CHALLENGE_PAGE, SESSION_TOKEN, ACTION_TOKEN, EXPRESS",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects which WAF integration feature is used; a functional/vendor configuration choice, not a security posture setting a generic policy can judge."
     },
     "waf_settings.waf_service": {
       "description": "The WAF service that uses this key. Possible values: CA, FASTLY",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the WAF vendor (CA or FASTLY) the key integrates with; a vendor choice, not a security posture setting."
     },
     "web_settings": {
       "type": "block",
@@ -129,8 +129,8 @@
       "description": "Domains or subdomains of websites allowed to use the key. All subdomains of an allowed domain are automatically allowed. A valid domain requires a host and must not include any path, port, query or fragment. Examples: 'example.com' or 'subdomain.example.com'",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the actual approved domains, which are team-specific; a generic policy cannot judge the correct list."
     },
     "web_settings.challenge_security_preference": {
       "description": "Settings for the frequency and difficulty at which this key triggers captcha challenges. This should only be specified for IntegrationTypes CHECKBOX and INVISIBLE. Possible values: CHALLENGE_SECURITY_PREFERENCE_UNSPECIFIED, USABILITY, BALANCE, SECURITY",
@@ -160,15 +160,15 @@
       "description": "The action name.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The action name is a free-text identifier matched against the site's data-action attribute; it is business-specific and not itself a security control."
     },
     "web_settings.challenge_settings.action_settings.score_threshold": {
       "description": "A challenge is triggered if the end-user score is below that threshold. Value must be between 0 and 1 (inclusive).",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Per-action score thresholds are business-specific tuning (how aggressively to challenge a given action); a generic policy cannot judge the correct value for an unknown action."
     },
     "web_settings.challenge_settings.default_settings": {
       "type": "block",
@@ -179,8 +179,8 @@
       "description": "A challenge is triggered if the end-user score is below that threshold. Value must be between 0 and 1 (inclusive).",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This is the default score threshold applied when no per-action override matches. Setting it too low lets risky traffic pass unchallenged; policy should require a reasonably protective minimum."
     }
   }
 }
