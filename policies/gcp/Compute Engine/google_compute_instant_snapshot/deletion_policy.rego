@@ -5,7 +5,7 @@ import data.terraform.gcp.security.compute_engine.google_compute_instant_snapsho
 
 conditions := [[
   {
-    "situation_description": Instant Snapshot Instance must be protected from accidental deletion.",
+    "situation_description": "Instant Snapshot Instance must be protected from accidental deletion.",
     "remedies": ["Set deletion_policy = PREVENT (recommended)."],
   },
   {

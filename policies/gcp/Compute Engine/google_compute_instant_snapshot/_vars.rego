@@ -1,7 +1,7 @@
-terraform.gcp.security.compute_engine.google_compute_instant_snapshot.vars
+package terraform.gcp.security.compute_engine.google_compute_instant_snapshot.vars
 
 variables := {
-	"friendly_resource_name": "Google Compute Instant Snapshot",
+	"friendly_resource_name": "Compute Instant Snapshot",
 	"resource_type": "google_compute_instant_snapshot",
-	"resource_value_name": "name"
+	"resource_value_name": "name",
 }
