@@ -6,29 +6,29 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can destroy the fulfillment resource. A policy can require deletion protection to reduce accidental destructive loss and prevent the resource from being unintentionally removed."
     },
     "display_name": {
       "description": "The human-readable name of the fulfillment, unique within the agent.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides a human-readable name for the fulfillment. It is a descriptive identifier, and constraining its value would not improve resource security."
     },
     "enabled": {
       "description": "Whether fulfillment is enabled.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether the fulfillment functionality is enabled. This is a functional configuration choice rather than a security feature, so platform policy should not dictate whether teams enable it."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the project in which the fulfillment resource is created. Platform policy should not constrain team-specific project identifiers or resource references."
     },
     "features": {
       "type": "block",
@@ -39,8 +39,8 @@
       "description": "The type of the feature that enabled for fulfillment.\n* SMALLTALK: Fulfillment is enabled for SmallTalk. Possible values: [\"SMALLTALK\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the feature for which fulfillment is enabled. SMALLTALK is a functional feature choice and does not represent a secure or insecure platform configuration."
     },
     "generic_web_service": {
       "type": "block",
@@ -51,29 +51,29 @@
       "description": "The password for HTTP Basic authentication.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Configures a static password for HTTP Basic authentication. A policy can require this field to be unset to discourage weak static authentication; it must not attempt to enforce or hardcode a specific password."
     },
     "generic_web_service.request_headers": {
       "description": "The HTTP request headers to send together with fulfillment requests.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines free-form HTTP headers sent with fulfillment requests. The header names and values are team-specific and may contain arbitrary authentication data, so a generic platform policy cannot meaningfully constrain this map without overreaching."
     },
     "generic_web_service.uri": {
       "description": "The fulfillment URI for receiving POST requests. It must use https protocol.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the endpoint that receives fulfillment requests. A policy should require the URI to use HTTPS so data is encrypted in transit, while leaving the team-specific hostname unrestricted."
     },
     "generic_web_service.username": {
       "description": "The user name for HTTP Basic authentication.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Configures the username used for HTTP Basic authentication. A policy can require this field to be unset to discourage static Basic Authentication without enforcing any team-specific username."
     }
   }
 }
