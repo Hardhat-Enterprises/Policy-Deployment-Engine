@@ -14,14 +14,14 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Free-text description field; no functional or access-control effect."
     },
     "instance_description": {
       "description": "A description of the instance.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Free-text description for the created instances; no functional or access-control effect."
     },
     "key_revocation_action_type": {
       "description": "Action to be taken when a customer's encryption key is revoked. Supports \"STOP\" and \"NONE\", with \"NONE\" being the default.",
@@ -35,14 +35,14 @@
       "required": false,
       "type": "map(string)",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Metadata key/value tags for organization/billing; no direct security control."
     },
     "machine_type": {
       "description": "The machine type to create. To create a machine with a custom type (such as extended memory), format the value like custom-VCPUS-MEM_IN_MB like custom-6-20480 for 6 vCPU and 20GB of RAM.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Determines compute/memory sizing only; no access-control or exposure implications."
     },
     "metadata": {
       "description": "Metadata key/value pairs to make available from within instances created from this template.",
@@ -63,28 +63,28 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Selects a minimum CPU platform for compatibility/performance; no security relevance."
     },
     "name": {
       "description": "The name of the instance template. If you leave this blank, Terraform will auto-generate a unique name.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Resource identifier only; no security implications."
     },
     "name_prefix": {
       "description": "Creates a unique name beginning with the specified prefix. Conflicts with name. Max length is 54 characters. Prefixes with lengths longer than 37 characters will use a shortened UUID that will be more prone to collisions.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Generates a resource name prefix; no security implications."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Specifies the hosting GCP project; placement detail, not itself an enforceable control here."
     },
     "region": {
       "description": "An instance template is a global resource that is not bound to a zone or a region. However, you can still specify some regional resources in an instance template, which restricts the template to the region where that resource resides. For example, a custom subnetwork resource is tied to a specific region. Defaults to the region of the Provider if no value is given.",
@@ -105,7 +105,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Attaches operational resource policies (e.g. snapshot schedules); administrative/operational, not a security control."
     },
     "tags": {
       "description": "Tags to attach to the instance.",
@@ -131,35 +131,35 @@
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Enables UEFI-based networking boot behavior; a compatibility/performance setting, not a security control on its own."
     },
     "advanced_machine_features.performance_monitoring_unit": {
       "description": "The PMU is a hardware component within the CPU core that monitors how the processor runs code. Valid values for the level of PMU are \"STANDARD\", \"ENHANCED\", and \"ARCHITECTURAL\".",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Selects CPU performance-monitoring granularity for profiling; no security relevance."
     },
     "advanced_machine_features.threads_per_core": {
       "description": "The number of threads per physical core. To disable simultaneous multithreading (SMT) set this to 1. If unset, the maximum number of threads supported per core by the underlying processor is assumed.",
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Controls SMT/hyperthreading width for performance tuning; no direct security relevance."
     },
     "advanced_machine_features.turbo_mode": {
       "description": "Turbo frequency mode to use for the instance. Currently supported modes is \"ALL_CORE_MAX\".",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Controls CPU turbo frequency behavior; a performance setting, not a security control."
     },
     "advanced_machine_features.visible_core_count": {
       "description": "The number of physical cores to expose to an instance. Multiply by the number of threads per core to compute the total number of virtual CPUs to expose to the instance. If unset, the number of cores is inferred from the instance\\'s nominal CPU count and the underlying platform\\'s SMT width.",
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Controls the number of physical cores exposed to the instance for performance/licensing purposes; no direct security relevance."
     },
     "confidential_instance_config": {
       "type": "block",
@@ -190,49 +190,49 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Specifies CPU architecture compatibility (ARM64/X86_64) for the image; no security relevance."
     },
     "disk.auto_delete": {
       "description": "Whether or not the disk should be auto-deleted. This defaults to true.",
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Controls whether the disk is deleted with the instance; a lifecycle/cost setting, not an access-control mechanism."
     },
     "disk.boot": {
       "description": "Indicates that this is a boot disk.",
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Marks which disk is the boot disk; a configuration detail, not itself a security control."
     },
     "disk.device_name": {
       "description": "A unique device name that is reflected into the /dev/ tree of a Linux operating system running within the instance. If not specified, the server chooses a default device name to apply to this disk.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Sets the /dev/ device name exposed inside the OS; cosmetic naming with no access-control effect."
     },
     "disk.disk_name": {
       "description": "Name of the disk. When not provided, this defaults to the name of the instance.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Sets the disk's resource name; no security implications."
     },
     "disk.disk_size_gb": {
       "description": "The size of the image in gigabytes. If not specified, it will inherit the size of its base image. For SCRATCH disks, the size must be one of 375 or 3000 GB, with a default of 375 GB.",
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Controls disk capacity sizing; an operational/cost setting, not a security control."
     },
     "disk.disk_type": {
       "description": "The Google Compute Engine disk type. Such as \"pd-ssd\", \"local-ssd\", \"pd-balanced\" or \"pd-standard\".",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Selects disk performance tier (e.g. pd-ssd, pd-balanced); a performance/cost setting, not a security control."
     },
     "disk.guest_os_features": {
       "description": "A list of features to enable on the guest operating system. Applicable only for bootable images.",
@@ -246,35 +246,35 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Selects the disk's attachment interface (e.g. SCSI, NVME); a compatibility setting, not a security control."
     },
     "disk.labels": {
       "description": "A set of key/value label pairs to assign to disks,",
       "required": false,
       "type": "map(string)",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Metadata key/value tags on the disk for organization/billing; no direct security control."
     },
     "disk.mode": {
       "description": "The mode in which to attach this disk, either READ_WRITE or READ_ONLY. If you are attaching or creating a boot disk, this must read-write mode.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Sets READ_WRITE vs READ_ONLY attachment mode; a functional multi-attach setting rather than an access-control boundary (access itself is governed by IAM)."
     },
     "disk.provisioned_iops": {
       "description": "Indicates how many IOPS to provision for the disk. This sets the number of I/O operations per second that the disk can handle. For more details, see the [Extreme persistent disk documentation](https://cloud.google.com/compute/docs/disks/extreme-persistent-disk) or the [Hyperdisk documentation](https://cloud.google.com/compute/docs/disks/hyperdisks) depending on the selected disk_type.",
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Sets provisioned IOPS for performance-tier disks; a performance/cost tuning parameter, not a security control."
     },
     "disk.provisioned_throughput": {
       "description": "Indicates how much throughput to provision for the disk, in MB/s. This sets the amount of data that can be read or written from the disk per second. Values must greater than or equal to 1. For more details, see the [Hyperdisk documentation](https://cloud.google.com/compute/docs/disks/hyperdisks).",
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Sets provisioned throughput for performance-tier disks; a performance/cost tuning parameter, not a security control."
     },
     "disk.resource_manager_tags": {
       "description": "A map of resource manager tags. Resource manager tag keys and values have the same definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id}, and values are in the format tagValues/456. The field is ignored (both PUT & PATCH) when empty.",
@@ -288,7 +288,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Attaches operational resource policies (e.g. snapshot schedules) to the disk; administrative, not a security control."
     },
     "disk.source": {
       "description": "The name (not self_link) of the disk (such as those managed by google_compute_disk) to attach. ~> Note: Either source or source_image is required when creating a new instance except for when creating a local SSD.",
@@ -316,14 +316,14 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Specifies which Storage Pool the disk is created in; a capacity/placement detail, not a security control."
     },
     "disk.type": {
       "description": "The type of Google Compute Engine disk, can be either \"SCRATCH\" or \"PERSISTENT\".",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Selects disk resource type (PERSISTENT vs SCRATCH); a performance/durability setting, not a security control."
     },
     "disk.disk_encryption_key": {
       "type": "block",
@@ -420,14 +420,14 @@
       "required": true,
       "type": "number",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Specifies the number of attached GPU/accelerator cards; a hardware sizing detail, not a security control."
     },
     "guest_accelerator.type": {
       "description": "The accelerator type resource to expose to this instance. E.g. nvidia-tesla-k80.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Specifies which accelerator model to attach; a hardware selection detail, not a security control."
     },
     "network_interface": {
       "type": "block",
@@ -439,7 +439,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Enables IGMP multicast query support on the interface; a networking feature toggle, not a security control."
     },
     "network_interface.network": {
       "description": "The name or self_link of the network to attach this interface to. Use network attribute for Legacy or Auto subnetted networks and subnetwork for custom subnetted networks.",
@@ -460,21 +460,21 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Assigns a specific private IP address to the interface; an addressing detail, not itself an access-control boundary (segmentation is governed by network/subnetwork)."
     },
     "network_interface.nic_type": {
       "description": "The type of vNIC to be used on this interface. Possible values:GVNIC, VIRTIO_NET, MRDMA, IRDMA and IDPF",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Selects the virtual NIC driver (e.g. GVNIC, VIRTIO_NET); a performance/compatibility setting, not a security control."
     },
     "network_interface.queue_count": {
       "description": "The networking queue count that's specified by users for the network interface. Both Rx and Tx queues will be set to this number. It will be empty if not specified.",
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Tunes the number of Rx/Tx queues for network performance; no security relevance."
     },
     "network_interface.stack_type": {
       "description": "The stack type for this network interface to identify whether the IPv6 feature is enabled or not. If not specified, IPV4_ONLY will be used.",
@@ -495,14 +495,14 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Specifies the project hosting a shared VPC subnetwork; placement detail, not itself an enforceable control here."
     },
     "network_interface.vlan": {
       "description": "VLAN tag of a dynamic network interface, must be an integer in the range from 2 to 255 inclusively.",
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Sets a VLAN tag for a dynamic network interface; a network segmentation detail governed elsewhere, not a control on its own."
     },
     "network_interface.access_config": {
       "type": "block",
@@ -514,14 +514,14 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Assigns a specific reserved external IP for 1:1 NAT; an addressing detail (external reachability itself is governed by the presence of access_config, not this field)."
     },
     "network_interface.access_config.network_tier": {
       "description": "The networking tier used for configuring this instance template. This field can take the following values: PREMIUM, STANDARD, FIXED_STANDARD. If this field is not specified, it is assumed to be PREMIUM.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Selects network service tier (PREMIUM/STANDARD); a performance/cost setting, not a security control."
     },
     "network_interface.alias_ip_range": {
       "type": "block",
@@ -533,14 +533,14 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Specifies an alias IP CIDR range for the interface; an addressing detail within the already-approved subnetwork's range."
     },
     "network_interface.alias_ip_range.subnetwork_range_name": {
       "description": "The subnetwork secondary range name specifying the secondary range from which to allocate the IP CIDR range for this alias IP range. If left unspecified, the primary range of the subnetwork will be used.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "References a named secondary subnetwork range for aliasing; an addressing detail, not a standalone control."
     },
     "network_interface.ipv6_access_config": {
       "type": "block",
@@ -552,7 +552,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Selects network service tier for IPv6 traffic; a performance/cost setting, not a security control."
     },
     "network_performance_config": {
       "type": "block",
@@ -564,7 +564,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Selects network egress bandwidth tier; a performance setting, not a security control."
     },
     "reservation_affinity": {
       "type": "block",
@@ -576,7 +576,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Controls which capacity reservation the instance consumes from; a capacity/cost setting, not a security control."
     },
     "reservation_affinity.specific_reservation": {
       "type": "block",
@@ -588,14 +588,14 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Identifies the target reservation by label key; a capacity-targeting detail, not a security control."
     },
     "reservation_affinity.specific_reservation.values": {
       "description": "Corresponds to the label values of a reservation resource.",
       "required": true,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Identifies the target reservation by label value; a capacity-targeting detail, not a security control."
     },
     "scheduling": {
       "type": "block",
@@ -607,21 +607,21 @@
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Controls whether the instance restarts automatically after a host-initiated termination; an availability/resiliency setting, not a security control."
     },
     "scheduling.availability_domain": {
       "description": "Specifies the availability domain, which this instance should be scheduled on.",
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Specifies which availability domain to schedule the instance in; a placement/resiliency detail, not a security control."
     },
     "scheduling.instance_termination_action": {
       "description": "Specifies the action GCE should take when SPOT VM is preempted.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Specifies what happens when a SPOT VM is preempted (e.g. STOP/DELETE); a cost/availability setting, not a security control."
     },
     "scheduling.on_host_maintenance": {
       "description": "Defines the maintenance behavior for this instance.",
@@ -635,21 +635,21 @@
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Allows the instance to be preempted for cost savings; an availability/cost trade-off, not a security control."
     },
     "scheduling.provisioning_model": {
       "description": "Whether the instance is spot. If this is set as SPOT.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Selects SPOT vs standard provisioning; a cost/availability setting, not a security control."
     },
     "scheduling.termination_time": {
       "description": "Specifies the timestamp, when the instance will be terminated,\nin RFC3339 text format. If specified, the instance termination action\nwill be performed at the termination time.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Schedules a future automatic termination time; an operational lifecycle setting, not a security control."
     },
     "scheduling.local_ssd_recovery_timeout": {
       "type": "block",
@@ -661,14 +661,14 @@
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Sub-second component of the Local SSD recovery timeout; a resiliency tuning parameter, not a security control."
     },
     "scheduling.local_ssd_recovery_timeout.seconds": {
       "description": "Span of time at a resolution of a second.\nMust be from 0 to 315,576,000,000 inclusive.",
       "required": true,
       "type": "number",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Whole-second component of the Local SSD recovery timeout; a resiliency tuning parameter, not a security control."
     },
     "scheduling.max_run_duration": {
       "type": "block",
@@ -680,14 +680,14 @@
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Sub-second component of the maximum instance run duration; a cost/lifecycle control, not a security control."
     },
     "scheduling.max_run_duration.seconds": {
       "description": "Span of time at a resolution of a second.\nMust be from 0 to 315,576,000,000 inclusive.",
       "required": true,
       "type": "number",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Whole-second component of the maximum instance run duration; a cost/lifecycle control, not a security control."
     },
     "scheduling.node_affinities": {
       "type": "block",
@@ -699,21 +699,21 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Identifies a target sole-tenant node group by label key; a placement-targeting detail, not a security control."
     },
     "scheduling.node_affinities.operator": {
       "description": "N/A",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Sets the match operator (IN/NOT_IN) for node affinity targeting; a placement-targeting detail, not a security control."
     },
     "scheduling.node_affinities.values": {
       "description": "Corresponds to the label values of a reservation resource.",
       "required": true,
       "type": "set(string)",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Identifies target sole-tenant node group(s) by label value; a placement-targeting detail, not a security control."
     },
     "scheduling.on_instance_stop_action": {
       "type": "block",
@@ -725,7 +725,7 @@
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Controls whether Local SSD contents are discarded on stop; a data-lifecycle setting relevant to retention expectations rather than access control."
     },
     "service_account": {
       "type": "block",
