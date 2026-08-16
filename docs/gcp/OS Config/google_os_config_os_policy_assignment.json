@@ -222,8 +222,8 @@
       "description": "A local path within the VM to use.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Path-safety control: this references a source file already on the VM, so it must sit under an approved directory to keep an OS policy from sourcing content out of sensitive locations (e.g. /root, /etc, credential stores), whether by misconfiguration or tampering. Enforced by a whitelist on the top-level source directory (pattern whitelist \"/*\"); \"opt\" is shown as a parameterised example approved root. Sound: absent (remote/Cloud Storage sources) is not flagged."
+      "security_impact": false,
+      "rationale": "A path reference to a file already on the VM — a file/path location, not a security control."
     },
     "os_policies.resource_groups.resources.exec.enforce.file.gcs": {
       "type": "block",
@@ -235,7 +235,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Names the Cloud Storage bucket a source is fetched from. Constraining it to approved buckets is a reasonable supply-chain goal, but a bare bucket name has no delimiter to anchor a naming-convention/prefix check with the available helpers, and an exact-name whitelist is impractical across an organisation; left unenforced, consistently across every source block."
+      "rationale": "Names an external Cloud Storage bucket — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.exec.enforce.file.gcs.generation": {
       "description": "Generation number of the Cloud Storage object.",
@@ -249,7 +249,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Names a specific Cloud Storage object to fetch — a pointer/reference to another resource, not a value the platform policy constrains; object naming is governed outside this policy."
+      "rationale": "Names a specific Cloud Storage object — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.exec.enforce.file.remote": {
       "type": "block",
@@ -319,8 +319,8 @@
       "description": "A local path within the VM to use.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Path-safety control: this references a source file already on the VM, so it must sit under an approved directory to keep an OS policy from sourcing content out of sensitive locations (e.g. /root, /etc, credential stores), whether by misconfiguration or tampering. Enforced by a whitelist on the top-level source directory (pattern whitelist \"/*\"); \"opt\" is shown as a parameterised example approved root. Sound: absent (remote/Cloud Storage sources) is not flagged."
+      "security_impact": false,
+      "rationale": "A path reference to a file already on the VM — a file/path location, not a security control."
     },
     "os_policies.resource_groups.resources.exec.validate.file.gcs": {
       "type": "block",
@@ -332,7 +332,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Names the Cloud Storage bucket a source is fetched from. Constraining it to approved buckets is a reasonable supply-chain goal, but a bare bucket name has no delimiter to anchor a naming-convention/prefix check with the available helpers, and an exact-name whitelist is impractical across an organisation; left unenforced, consistently across every source block."
+      "rationale": "Names an external Cloud Storage bucket — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.exec.validate.file.gcs.generation": {
       "description": "Generation number of the Cloud Storage object.",
@@ -346,7 +346,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Names a specific Cloud Storage object to fetch — a pointer/reference to another resource, not a value the platform policy constrains; object naming is governed outside this policy."
+      "rationale": "Names a specific Cloud Storage object — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.exec.validate.file.remote": {
       "type": "block",
@@ -377,14 +377,14 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Inline content written to the managed file. This can carry credential-hygiene risk (e.g. plaintext secrets embedded directly in a policy), but detecting arbitrary secrets requires content/regex scanning that the whitelist/blacklist/pattern-segment helpers cannot perform soundly; recorded as a known gap rather than enforced with a token check."
+      "rationale": "Arbitrary inline file content; a generic platform policy cannot meaningfully validate free-form strings, so this is not a policy target."
     },
     "os_policies.resource_groups.resources.file.path": {
       "description": "The absolute path of the file within the VM.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Path-safety control: the destination path determines where a file is written on the VM; writing under an approved top-level directory keeps managed files out of obviously-sensitive roots such as /root and /tmp. Enforced by a whitelist on the top-level directory (pattern whitelist \"/*\"); \"etc/opt/var/usr\" is a parameterised example approved set. Note: a first-component whitelist cannot block a sensitive subdirectory under an otherwise-approved root (e.g. /etc/cron.d)."
+      "security_impact": false,
+      "rationale": "The destination path for the managed file — a location/reference string, not a security configuration toggle or access control."
     },
     "os_policies.resource_groups.resources.file.state": {
       "description": "Desired state of the file. Possible values: [\"DESIRED_STATE_UNSPECIFIED\", \"PRESENT\", \"ABSENT\", \"CONTENTS_MATCH\"]",
@@ -409,8 +409,8 @@
       "description": "A local path within the VM to use.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Path-safety control: this references a source file already on the VM, so it must sit under an approved directory to keep an OS policy from sourcing content out of sensitive locations (e.g. /root, /etc, credential stores), whether by misconfiguration or tampering. Enforced by a whitelist on the top-level source directory (pattern whitelist \"/*\"); \"opt\" is shown as a parameterised example approved root. Sound: absent (remote/Cloud Storage sources) is not flagged."
+      "security_impact": false,
+      "rationale": "A path reference to a file already on the VM — a file/path location, not a security control."
     },
     "os_policies.resource_groups.resources.file.file.gcs": {
       "type": "block",
@@ -422,7 +422,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Names the Cloud Storage bucket a source is fetched from. Constraining it to approved buckets is a reasonable supply-chain goal, but a bare bucket name has no delimiter to anchor a naming-convention/prefix check with the available helpers, and an exact-name whitelist is impractical across an organisation; left unenforced, consistently across every source block."
+      "rationale": "Names an external Cloud Storage bucket — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.file.file.gcs.generation": {
       "description": "Generation number of the Cloud Storage object.",
@@ -436,7 +436,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Names a specific Cloud Storage object to fetch — a pointer/reference to another resource, not a value the platform policy constrains; object naming is governed outside this policy."
+      "rationale": "Names a specific Cloud Storage object — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.file.file.remote": {
       "type": "block",
@@ -491,7 +491,7 @@
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": "Controls whether the package manager also resolves and installs dependencies during install — an operational install behaviour, not a security or exposure control."
+      "rationale": "Controls whether dependencies are also installed — an operational package-installation choice, not a security control."
     },
     "os_policies.resource_groups.resources.pkg.deb.source": {
       "type": "block",
@@ -509,8 +509,8 @@
       "description": "A local path within the VM to use.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Path-safety control: this references a source file already on the VM, so it must sit under an approved directory to keep an OS policy from sourcing content out of sensitive locations (e.g. /root, /etc, credential stores), whether by misconfiguration or tampering. Enforced by a whitelist on the top-level source directory (pattern whitelist \"/*\"); \"opt\" is shown as a parameterised example approved root. Sound: absent (remote/Cloud Storage sources) is not flagged."
+      "security_impact": false,
+      "rationale": "A path reference to a file already on the VM — a file/path location, not a security control."
     },
     "os_policies.resource_groups.resources.pkg.deb.source.gcs": {
       "type": "block",
@@ -522,7 +522,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Names the Cloud Storage bucket a source is fetched from. Constraining it to approved buckets is a reasonable supply-chain goal, but a bare bucket name has no delimiter to anchor a naming-convention/prefix check with the available helpers, and an exact-name whitelist is impractical across an organisation; left unenforced, consistently across every source block."
+      "rationale": "Names an external Cloud Storage bucket — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.pkg.deb.source.gcs.generation": {
       "description": "Generation number of the Cloud Storage object.",
@@ -536,7 +536,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Names a specific Cloud Storage object to fetch — a pointer/reference to another resource, not a value the platform policy constrains; object naming is governed outside this policy."
+      "rationale": "Names a specific Cloud Storage object — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.pkg.deb.source.remote": {
       "type": "block",
@@ -597,8 +597,8 @@
       "description": "A local path within the VM to use.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Path-safety control: this references a source file already on the VM, so it must sit under an approved directory to keep an OS policy from sourcing content out of sensitive locations (e.g. /root, /etc, credential stores), whether by misconfiguration or tampering. Enforced by a whitelist on the top-level source directory (pattern whitelist \"/*\"); \"opt\" is shown as a parameterised example approved root. Sound: absent (remote/Cloud Storage sources) is not flagged."
+      "security_impact": false,
+      "rationale": "A path reference to a file already on the VM — a file/path location, not a security control."
     },
     "os_policies.resource_groups.resources.pkg.msi.source.gcs": {
       "type": "block",
@@ -610,7 +610,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Names the Cloud Storage bucket a source is fetched from. Constraining it to approved buckets is a reasonable supply-chain goal, but a bare bucket name has no delimiter to anchor a naming-convention/prefix check with the available helpers, and an exact-name whitelist is impractical across an organisation; left unenforced, consistently across every source block."
+      "rationale": "Names an external Cloud Storage bucket — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.pkg.msi.source.gcs.generation": {
       "description": "Generation number of the Cloud Storage object.",
@@ -624,7 +624,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Names a specific Cloud Storage object to fetch — a pointer/reference to another resource, not a value the platform policy constrains; object naming is governed outside this policy."
+      "rationale": "Names a specific Cloud Storage object — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.pkg.msi.source.remote": {
       "type": "block",
@@ -655,7 +655,7 @@
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": "Controls whether the package manager also resolves and installs dependencies during install — an operational install behaviour, not a security or exposure control."
+      "rationale": "Controls whether dependencies are also installed — an operational package-installation choice, not a security control."
     },
     "os_policies.resource_groups.resources.pkg.rpm.source": {
       "type": "block",
@@ -673,8 +673,8 @@
       "description": "A local path within the VM to use.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Path-safety control: this references a source file already on the VM, so it must sit under an approved directory to keep an OS policy from sourcing content out of sensitive locations (e.g. /root, /etc, credential stores), whether by misconfiguration or tampering. Enforced by a whitelist on the top-level source directory (pattern whitelist \"/*\"); \"opt\" is shown as a parameterised example approved root. Sound: absent (remote/Cloud Storage sources) is not flagged."
+      "security_impact": false,
+      "rationale": "A path reference to a file already on the VM — a file/path location, not a security control."
     },
     "os_policies.resource_groups.resources.pkg.rpm.source.gcs": {
       "type": "block",
@@ -686,7 +686,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Names the Cloud Storage bucket a source is fetched from. Constraining it to approved buckets is a reasonable supply-chain goal, but a bare bucket name has no delimiter to anchor a naming-convention/prefix check with the available helpers, and an exact-name whitelist is impractical across an organisation; left unenforced, consistently across every source block."
+      "rationale": "Names an external Cloud Storage bucket — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.pkg.rpm.source.gcs.generation": {
       "description": "Generation number of the Cloud Storage object.",
@@ -700,7 +700,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Names a specific Cloud Storage object to fetch — a pointer/reference to another resource, not a value the platform policy constrains; object naming is governed outside this policy."
+      "rationale": "Names a specific Cloud Storage object — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.pkg.rpm.source.remote": {
       "type": "block",
@@ -903,8 +903,8 @@
       "description": "Specifies the relative value defined as a percentage, which will be multiplied by a reference value.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Availability/resiliency control: the disruption budget caps how many VMs are updated at once during a rollout. Blacklisting 100 prevents a percent budget that disrupts every VM simultaneously, which would remove all availability protection and risk cascading failure. (A tighter numeric range is not used because it would false-positive when a fixed budget is set instead of a percent.)"
+      "security_impact": false,
+      "rationale": "Caps how many VMs are updated at once during a rollout — an operational availability/resiliency concern, not a security control."
     }
   }
 }
