@@ -2,21 +2,21 @@
   "last_updated": "2026-06-23T08:26:44Z",
   "provider_version": "7.37.0",
   "arguments": {
- "deletion_policy": {
+    "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
       "security_impact": true,
       "rationale": "Controls whether Terraform can destroy the resource on 'destroy'/'apply'. Setting to 'PREVENT' guards against accidental route deletion; policy should whitelist 'PREVENT' for production routes."
     },
-  "description": {
+    "description": {
       "description": "A free-text description of the resource. Max length 1024 characters.",
       "required": false,
       "type": "string",
       "security_impact": false,
       "rationale": "Free-text field with no functional or access-control impact; purely descriptive metadata."
     },
-   "gateways": {
+    "gateways": {
       "description": "Gateways defines a list of gateways this HttpRoute is attached to, as one of the routing rules to route the requests served by the gateway.\nEach gateway reference should match the pattern: projects/*/locations/global/gateways/<gateway_name>",
       "required": false,
       "type": "list(string)",
@@ -30,28 +30,28 @@
       "security_impact": true,
       "rationale": "Determines which HTTP Host headers this route matches. An overly broad or wildcard hostname can cause traffic to be routed unexpectedly, a common source of misrouting and security exposure."
     },
-   "labels": {
+    "labels": {
       "description": "Set of label tags associated with the HttpRoute resource.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
       "security_impact": true,
       "rationale": "Labels support governance controls like environment classification, cost tracking, and label-based compliance automation. Policy should require a baseline set of mandatory keys (e.g. environment, owner)."
     },
-   "meshes": {
+    "meshes": {
       "description": "Meshes defines a list of meshes this HttpRoute is attached to, as one of the routing rules to route the requests served by the mesh.\nEach mesh reference should match the pattern: projects/*/locations/global/meshes/<mesh_name>.\nThe attached Mesh should be of a type SIDECAR.",
       "required": false,
       "type": "list(string)",
       "security_impact": true,
       "rationale": "Controls which service mesh resources this route is attached to; an unapproved or overly permissive mesh binding can expose internal service traffic incorrectly."
     },
-   "name": {
+    "name": {
       "description": "Name of the HttpRoute resource.",
       "required": true,
       "type": "string",
       "security_impact": false,
       "rationale": "Resource identifier only; naming has no functional security impact beyond optional org naming conventions."
     },
-   "project": {
+    "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
@@ -91,22 +91,22 @@
       "description": "Specifies the content for Access-Control-Allow-Headers header.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "A wildcard or overly broad header allowlist can expose internal/debug headers to cross-origin callers; policy should blacklist the wildcard and require an explicit, approved header list."
     },
     "rules.action.cors_policy.allow_methods": {
       "description": "Specifies the content for Access-Control-Allow-Methods header.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "An overly permissive method list (e.g. allowing PUT/DELETE cross-origin) widens the CORS attack surface for state-changing requests; policy should whitelist only the methods the route actually needs (typically GET/HEAD/OPTIONS)."
     },
     "rules.action.cors_policy.allow_origin_regexes": {
       "description": "Specifies the regular expression patterns that match allowed origins.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "A loosely-anchored origin regex (e.g. missing start/end anchors) can unintentionally match attacker-controlled domains, defeating the purpose of CORS restriction; policy should require fully-anchored, reviewed regex patterns."
     },
     "rules.action.cors_policy.allow_origins": {
       "description": "Specifies the list of origins that will be allowed to do CORS requests.",
@@ -126,15 +126,15 @@
       "description": "Specifies the content for Access-Control-Expose-Headers header.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Exposing sensitive response headers to cross-origin JavaScript can leak internal tokens or metadata to untrusted origins; policy should blacklist known-sensitive header names (e.g. Authorization, Set-Cookie) from being exposed."
     },
     "rules.action.cors_policy.max_age": {
       "description": "Specifies how long result of a preflight request can be cached in seconds.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls preflight cache duration only; does not itself change the effective CORS policy."
     },
     "rules.action.destinations": {
       "type": "block",
@@ -145,15 +145,15 @@
       "description": "The URL of a BackendService to route traffic to.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines the backend service traffic is routed to. A misconfigured or attacker-influenced value can redirect traffic to an unintended or malicious backend; policy should whitelist approved BackendService references."
     },
     "rules.action.destinations.weight": {
       "description": "Specifies the proportion of requests forwarded to the backend referenced by the serviceName field. This is computed as: weight/Sum(weights in this destination list). For non-zero values, there may be some epsilon from the exact proportion defined here depending on the precision an implementation supports.\nIf only one serviceName is specified and it has a weight greater than 0, 100% of the traffic is forwarded to that backend.\nIf weights are specified for any one service name, they need to be specified for all of them.\nIf weights are unspecified for all services, then, traffic is distributed in equal proportions to all of them.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls traffic-splitting ratio between backends for canary/blue-green rollout; an operational tuning value rather than a security control."
     },
     "rules.action.fault_injection_policy": {
       "type": "block",
@@ -169,8 +169,8 @@
       "description": "The HTTP status code used to abort the request.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Testing parameter for resiliency validation; no direct exploitable security effect."
     },
     "rules.action.fault_injection_policy.abort.percentage": {
       "description": "The percentage of traffic which will be aborted.",
@@ -188,15 +188,15 @@
       "description": "Specify a fixed delay before forwarding the request.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Testing parameter for injected latency; no direct security effect."
     },
     "rules.action.fault_injection_policy.delay.percentage": {
       "description": "The percentage of traffic on which delay will be injected.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Testing parameter controlling injected-delay rate; no direct security effect."
     },
     "rules.action.redirect": {
       "type": "block",
@@ -207,8 +207,8 @@
       "description": "The host that will be used in the redirect response instead of the one that was supplied in the request.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "An attacker-influenced or misconfigured redirect host enables an open-redirect, sending legitimate users to a malicious external site; policy should whitelist approved redirect-target hosts."
     },
     "rules.action.redirect.https_redirect": {
       "description": "If set to true, the URL scheme in the redirected request is set to https.",
@@ -221,22 +221,22 @@
       "description": "The path that will be used in the redirect response instead of the one that was supplied in the request. pathRedirect can not be supplied together with prefixRedirect. Supply one alone or neither. If neither is supplied, the path of the original request will be used for the redirect.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls only the path portion of the redirect target; open-redirect risk is governed primarily by host_redirect."
     },
     "rules.action.redirect.port_redirect": {
       "description": "The port that will be used in the redirected request instead of the one that was supplied in the request.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the redirect target port; low direct security relevance on its own."
     },
     "rules.action.redirect.prefix_rewrite": {
       "description": "Indicates that during redirection, the matched prefix (or path) should be swapped with this value.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Cosmetic path-rewrite behavior for redirects; no direct security control."
     },
     "rules.action.redirect.response_code": {
       "description": "The HTTP Status code to use for the redirect.",
@@ -261,8 +261,8 @@
       "description": "Add the headers with given map where key is the name of the header, value is the value of the header.",
       "required": false,
       "type": "map(string)",
-     "security_impact": true,
-    "rationale": "Allowing arbitrary header injection (e.g. spoofing trust headers like Authorization, X-Forwarded-For, or Cookie) is security-relevant, but the current policy engine has no mechanism to check for forbidden keys within a map(string) field - only fixed, known keys (as used in labels.rego) or list/scalar membership are supported. Flagging for reviewer: this needs new shared-helper logic to enforce, out of scope for a single-field policy."
+      "security_impact": true,
+      "rationale": "Allowing arbitrary header injection (e.g. spoofing trust headers like Authorization, X-Forwarded-For, or Cookie) is security-relevant, but the current policy engine has no mechanism to check for forbidden keys within a map(string) field - only fixed, known keys (as used in labels.rego) or list/scalar membership are supported. Flagging for reviewer: this needs new shared-helper logic to enforce, out of scope for a single-field policy."
     },
     "rules.action.request_header_modifier.remove": {
       "description": "Remove headers (matching by header names) specified in the list.",
@@ -275,8 +275,8 @@
       "description": "Completely overwrite/replace the headers with given map where key is the name of the header, value is the value of the header.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "FLAGGED - NOT YET BUILDABLE: like request_header_modifier.add, this is a map(string) field where keys are arbitrary header names. Overwriting headers on the upstream request carries the same trust-header spoofing risk (e.g. faking Authorization/X-Forwarded-For), but the policy engine has no mechanism to check for forbidden keys within a map(string) - only fixed known keys (as in labels.rego) or list/scalar membership are supported. Needs new shared-helper logic; out of scope for a single-field policy."
     },
     "rules.action.request_mirror_policy": {
       "type": "block",
@@ -292,8 +292,8 @@
       "description": "The URL of a BackendService to route traffic to.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Mirrored request traffic, which may contain sensitive data, is sent to this backend. Routing mirror traffic to an unintended or insecure service leaks that data; policy should whitelist approved mirror-destination services."
     },
     "rules.action.request_mirror_policy.destination.weight": {
       "description": "Specifies the proportion of requests forwarded to the backend referenced by the serviceName field. This is computed as: weight/Sum(weights in this destination list). For non-zero values, there may be some epsilon from the exact proportion defined here depending on the precision an implementation supports.\nIf only one serviceName is specified and it has a weight greater than 0, 100% of the traffic is forwarded to that backend.\nIf weights are specified for any one service name, they need to be specified for all of them.\nIf weights are unspecified for all services, then, traffic is distributed in equal proportions to all of them.",
@@ -311,8 +311,8 @@
       "description": "Add the headers with given map where key is the name of the header, value is the value of the header.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "FLAGGED - NOT YET BUILDABLE: map(string) field where keys are arbitrary header names. Injecting response headers can add misleading security headers or leak internal metadata to clients, but the policy engine cannot check for forbidden keys within a map(string) field - only fixed known keys or list/scalar membership are supported. Needs new shared-helper logic; out of scope for a single-field policy."
     },
     "rules.action.response_header_modifier.remove": {
       "description": "Remove headers (matching by header names) specified in the list.",
@@ -325,8 +325,8 @@
       "description": "Completely overwrite/replace the headers with given map where key is the name of the header, value is the value of the header.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "FLAGGED - NOT YET BUILDABLE: map(string) field where keys are arbitrary header names. Overwriting response headers can strip or replace legitimate security-relevant headers with weaker values, but the policy engine cannot check for forbidden keys within a map(string) field - only fixed known keys or list/scalar membership are supported. Needs new shared-helper logic; out of scope for a single-field policy."
     },
     "rules.action.retry_policy": {
       "type": "block",
@@ -337,22 +337,22 @@
       "description": "Specifies the allowed number of retries.",
       "required": false,
       "type": "number",
-     "security_impact": true,
-  "rationale": "An excessive retry count can amplify load against a struggling backend during outages (a self-inflicted retry-storm/DoS pattern). Policy should cap num_retries to a safe upper bound."
+      "security_impact": true,
+      "rationale": "An excessive retry count can amplify load against a struggling backend during outages (a self-inflicted retry-storm/DoS pattern). Policy should cap num_retries to a safe upper bound."
     },
     "rules.action.retry_policy.per_try_timeout": {
       "description": "Specifies a non-zero timeout per retry attempt. A duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.5s\".",
       "required": false,
       "type": "string",
       "security_impact": false,
-  "rationale": "Controls retry timing/latency behavior only; a purely operational reliability tuning parameter with no access-control or data-exposure implications."
+      "rationale": "Controls retry timing/latency behavior only; a purely operational reliability tuning parameter with no access-control or data-exposure implications."
     },
     "rules.action.retry_policy.retry_conditions": {
       "description": "Specifies one or more conditions when this retry policy applies.",
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-  "rationale": "Specifies which response conditions trigger a retry (e.g. 5xx, deadline-exceeded); operational resiliency configuration with no direct security control."
+      "rationale": "Specifies which response conditions trigger a retry (e.g. 5xx, deadline-exceeded); operational resiliency configuration with no direct security control."
     },
     "rules.action.url_rewrite": {
       "type": "block",
@@ -364,7 +364,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-       "rationale": "Rewriting the Host header sent to the backend can enable host-header-confusion or SSRF-adjacent misconfigurations if set to an untrusted or overly permissive value, so its use should be reviewed and constrained."
+      "rationale": "Rewriting the Host header sent to the backend can enable host-header-confusion or SSRF-adjacent misconfigurations if set to an untrusted or overly permissive value, so its use should be reviewed and constrained."
     },
     "rules.action.url_rewrite.path_prefix_rewrite": {
       "description": "Prior to forwarding the request to the selected destination, the matching portion of the requests path is replaced by this value.",
@@ -382,29 +382,29 @@
       "description": "The HTTP request path value should exactly match this value.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Match criterion used to select this rule; not itself an enforceable control."
     },
     "rules.matches.ignore_case": {
       "description": "Specifies if prefixMatch and fullPathMatch matches are case sensitive. The default value is false.",
       "required": false,
       "type": "bool",
-     "security_impact": true,
-    "rationale": "Enabling case-insensitive path matching can allow requests to bypass rules that rely on exact-case path segments (e.g. a rule targeting '/Admin' could be matched by '/admin'), weakening path-based access controls." 
+      "security_impact": true,
+      "rationale": "Enabling case-insensitive path matching can allow requests to bypass rules that rely on exact-case path segments (e.g. a rule targeting '/Admin' could be matched by '/admin'), weakening path-based access controls."
     },
     "rules.matches.prefix_match": {
       "description": "The HTTP request path value must begin with specified prefixMatch. prefixMatch must begin with a /.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Match criterion used to select this rule; not itself an enforceable control."
     },
     "rules.matches.regex_match": {
       "description": "The HTTP request path value must satisfy the regular expression specified by regexMatch after removing any query parameters and anchor supplied with the original URL. For regular expression grammar, please see https://github.com/google/re2/wiki/Syntax",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "A loosely-anchored or overly broad path regex can unintentionally match unauthorized paths, exposing unintended routes; policy should require fully-anchored, reviewed regex patterns."
     },
     "rules.matches.headers": {
       "type": "block",
@@ -415,15 +415,15 @@
       "description": "The value of the header should match exactly the content of exactMatch.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Match value used for header comparison; not itself a control."
     },
     "rules.matches.headers.header": {
       "description": "The name of the HTTP header to match against.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies which header to inspect; not itself a control."
     },
     "rules.matches.headers.invert_match": {
       "description": "If specified, the match result will be inverted before checking. Default value is set to false.",
@@ -436,29 +436,29 @@
       "description": "The value of the header must start with the contents of prefixMatch.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Match value used for header comparison; not itself a control."
     },
     "rules.matches.headers.present_match": {
       "description": "A header with headerName must exist. The match takes place whether or not the header has a value.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Match value used for header comparison; not itself a control."
     },
     "rules.matches.headers.regex_match": {
       "description": "The value of the header must match the regular expression specified in regexMatch.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "A loosely-anchored header value regex can unintentionally match unauthorized values, same bypass risk as path regex_match; policy should require fully-anchored, reviewed regex patterns."
     },
     "rules.matches.headers.suffix_match": {
       "description": "The value of the header must end with the contents of suffixMatch.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Match value used for header comparison; not itself a control."
     },
     "rules.matches.headers.range_match": {
       "type": "block",
@@ -469,15 +469,15 @@
       "description": "End of the range (exclusive).",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Numeric bound for header-value range matching; not itself a control."
     },
     "rules.matches.headers.range_match.start": {
       "description": "Start of the range (inclusive).",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Numeric bound for header-value range matching; not itself a control."
     },
     "rules.matches.query_parameters": {
       "type": "block",
@@ -488,29 +488,29 @@
       "description": "The value of the query parameter must exactly match the contents of exactMatch.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Match value used for query-parameter comparison; not itself a control."
     },
     "rules.matches.query_parameters.present_match": {
       "description": "Specifies that the QueryParameterMatcher matches if request contains query parameter, irrespective of whether the parameter has a value or not.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Match value used for query-parameter comparison; not itself a control."
     },
     "rules.matches.query_parameters.query_parameter": {
       "description": "The name of the query parameter to match.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies which query parameter to inspect; not itself a control."
     },
     "rules.matches.query_parameters.regex_match": {
       "description": "The value of the query parameter must match the regular expression specified by regexMatch.For regular expression grammar, please see https://github.com/google/re2/wiki/Syntax",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "A loosely-anchored query-parameter regex can unintentionally match unauthorized values, same bypass risk as other regex matches; policy should require fully-anchored, reviewed regex patterns."
     }
   }
 }
