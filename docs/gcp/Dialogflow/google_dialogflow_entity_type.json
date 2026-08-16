@@ -6,36 +6,36 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can destroy the entity type resource. A policy can require deletion protection to reduce accidental destructive loss and prevent the resource from being unintentionally removed."
     },
     "display_name": {
       "description": "The name of this entity type to be displayed on the console.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides the human-readable name of the entity type. It is a descriptive identifier, and constraining team-specific resource names would not improve security."
     },
     "enable_fuzzy_extraction": {
       "description": "Enables fuzzy entity extraction during classification.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether approximate matching is used when extracting entities. This affects classification behaviour and accuracy rather than providing a platform-level security control."
     },
     "kind": {
       "description": "Indicates the kind of entity type.\n* KIND_MAP: Map entity types allow mapping of a group of synonyms to a reference value.\n* KIND_LIST: List entity types contain a set of entries that do not map to reference values. However, list entity\ntypes can contain references to other entity types (with or without aliases).\n* KIND_REGEXP: Regexp entity types allow to specify regular expressions in entries values. Possible values: [\"KIND_MAP\", \"KIND_LIST\", \"KIND_REGEXP\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects how the entity type represents and matches entity values. The available kinds are functional configuration choices and none represents a generally insecure setting that should be restricted by platform policy."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the project in which the entity type is created. Platform policy should not constrain team-specific project identifiers or resource references."
     },
     "entities": {
       "type": "block",
@@ -46,15 +46,15 @@
       "description": "A collection of value synonyms. For example, if the entity type is vegetable, and value is scallions, a synonym\ncould be green onions.\nFor KIND_LIST entity types:\n* This collection must contain exactly one synonym equal to value.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines team-provided alternative values used to match an entity. These values are application data rather than security controls, and a generic platform policy cannot meaningfully constrain their content."
     },
     "entities.value": {
       "description": "The primary value associated with this entity entry. For example, if the entity type is vegetable, the value\ncould be scallions.\nFor KIND_MAP entity types:\n* A reference value to be used in place of synonyms.\nFor KIND_LIST entity types:\n* A string that can contain references to other entity types (with or without aliases).",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the primary application-specific value for an entity entry and may reference other entity types. Platform policy should not constrain team-defined entity data or references to other resources."
     }
   }
 }
