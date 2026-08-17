@@ -6,50 +6,50 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Prevents destructive loss of the Dialogflow CX flow. Policy should require a deletion-protection setting such as PREVENT."
     },
     "description": {
       "description": "The description of the flow. The maximum length is 500 characters. If exceeded, the request is rejected.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "display_name": {
       "description": "The human-readable name of the flow.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "is_default_start_flow": {
       "description": "Marks this as the [Default Start Flow](https://cloud.google.com/dialogflow/cx/docs/concept/flow#start) for an agent. When you create an agent, the Default Start Flow is created automatically.\nThe Default Start Flow cannot be deleted; deleting the 'google_dialogflow_cx_flow' resource does nothing to the underlying GCP resources.\n\n~> Avoid having multiple 'google_dialogflow_cx_flow' resources linked to the same agent with 'is_default_start_flow = true' because they will compete to control a single Default Start Flow resource in GCP.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "language_code": {
       "description": "The language of the following fields in flow:\nFlow.event_handlers.trigger_fulfillment.messages\nFlow.event_handlers.trigger_fulfillment.conditional_cases\nFlow.transition_routes.trigger_fulfillment.messages\nFlow.transition_routes.trigger_fulfillment.conditional_cases\nIf not specified, the agent's default language is used. Many languages are supported. Note: languages must be enabled in the agent before they can be used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "parent": {
       "description": "The agent to create a flow for.\nFormat: projects/<Project ID>/locations/<Location ID>/agents/<Agent ID>.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "transition_route_groups": {
       "description": "A flow's transition route group serve two purposes:\nThey are responsible for matching the user's first utterances in the flow.\nThey are inherited by every page's [transition route groups][Page.transition_route_groups]. Transition route groups defined in the page have higher priority than those defined in the flow.\nFormat:projects/<Project ID>/locations/<Location ID>/agents/<Agent ID>/flows/<Flow ID>/transitionRouteGroups/<TransitionRouteGroup ID>.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "advanced_settings": {
       "type": "block",
@@ -65,8 +65,8 @@
       "description": "The Google Cloud Storage URI for the exported objects. Whether a full object name, or just a prefix, its usage depends on the Dialogflow operation.\nFormat: gs://bucket/object-name-or-prefix",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls the Cloud Storage destination used for exported audio. A generic security policy can constrain exports to an approved GCS destination pattern."
     },
     "advanced_settings.dtmf_settings": {
       "type": "block",
@@ -77,22 +77,22 @@
       "description": "If true, incoming audio is processed for DTMF (dual tone multi frequency) events. For example, if the caller presses a button on their telephone keypad and DTMF processing is enabled, Dialogflow will detect the event (e.g. a \"3\" was pressed) in the incoming audio and pass the event to the bot to drive business logic (e.g. when 3 is pressed, return the account balance).",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "advanced_settings.dtmf_settings.finish_digit": {
       "description": "The digit that terminates a DTMF digit sequence.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "advanced_settings.dtmf_settings.max_digits": {
       "description": "Max length of DTMF digits.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "advanced_settings.logging_settings": {
       "type": "block",
@@ -103,22 +103,22 @@
       "description": "Enables consent-based end-user input redaction, if true, a pre-defined session parameter **$session.params.conversation-redaction** will be used to determine if the utterance should be redacted.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables consent-based redaction of end-user input, reducing exposure of sensitive conversation data."
     },
     "advanced_settings.logging_settings.enable_interaction_logging": {
       "description": "Enables DF Interaction logging.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables Dialogflow interaction logging, improving auditability, monitoring, and incident investigation."
     },
     "advanced_settings.logging_settings.enable_stackdriver_logging": {
       "description": "Enables Google Cloud Logging.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables Google Cloud Logging, providing security-relevant visibility and audit records."
     },
     "advanced_settings.speech_settings": {
       "type": "block",
@@ -129,29 +129,29 @@
       "description": "Sensitivity of the speech model that detects the end of speech. Scale from 0 to 100.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "advanced_settings.speech_settings.models": {
       "description": "Mapping from language to Speech-to-Text model. The mapped Speech-to-Text model will be selected for requests from its corresponding language. For more information, see [Speech models](https://cloud.google.com/dialogflow/cx/docs/concept/speech-models).\nAn object containing a list of **\"key\": value** pairs. Example: **{ \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }**.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "advanced_settings.speech_settings.no_speech_timeout": {
       "description": "Timeout before detecting no speech.\nA duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.5s\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "advanced_settings.speech_settings.use_timeout_based_endpointing": {
       "description": "Use timeout based endpointing, interpreting endpointer sensitivity as seconds of timeout value.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "event_handlers": {
       "type": "block",
@@ -162,22 +162,22 @@
       "description": "The name of the event to handle.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "event_handlers.target_flow": {
       "description": "The target flow to transition to.\nFormat: projects/<Project ID>/locations/<Location ID>/agents/<Agent ID>/flows/<Flow ID>.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "event_handlers.target_page": {
       "description": "The target page to transition to.\nFormat: projects/<Project ID>/locations/<Location ID>/agents/<Agent ID>/flows/<Flow ID>/pages/<Page ID>.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "event_handlers.trigger_fulfillment": {
       "type": "block",
@@ -188,29 +188,29 @@
       "description": "If the flag is true, the agent will utilize LLM to generate a text response.\nIf LLM generation fails, the defined responses in the fulfillment will be respected.\nThis flag is only useful for fulfillments associated with no-match event handlers.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "event_handlers.trigger_fulfillment.return_partial_responses": {
       "description": "Whether Dialogflow should return currently queued fulfillment response messages in streaming APIs. If a webhook is specified, it happens before Dialogflow invokes webhook. Warning: 1) This flag only affects streaming API. Responses are still queued and returned once in non-streaming API. 2) The flag can be enabled in any fulfillment but only the first 3 partial responses will be returned. You may only want to apply it to fulfillments that have slow webhooks.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "event_handlers.trigger_fulfillment.tag": {
       "description": "The tag used by the webhook to identify which fulfillment is being called. This field is required if webhook is specified.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "event_handlers.trigger_fulfillment.webhook": {
       "description": "The webhook to call. Format: projects/<Project ID>/locations/<Location ID>/agents/<Agent ID>/webhooks/<Webhook ID>.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "event_handlers.trigger_fulfillment.conditional_cases": {
       "type": "block",
@@ -221,8 +221,8 @@
       "description": "A JSON encoded list of cascading if-else conditions. Cases are mutually exclusive. The first one with a matching condition is selected, all the rest ignored.\nSee [Case](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/Fulfillment#case) for the schema.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "event_handlers.trigger_fulfillment.messages": {
       "type": "block",
@@ -233,15 +233,15 @@
       "description": "The channel which the response is associated with. Clients can specify the channel via QueryParameters.channel, and only associated channel response will be returned.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "event_handlers.trigger_fulfillment.messages.payload": {
       "description": "A custom, platform-specific payload.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "event_handlers.trigger_fulfillment.messages.conversation_success": {
       "type": "block",
@@ -252,8 +252,8 @@
       "description": "Custom metadata. Dialogflow doesn't impose any structure on this.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "event_handlers.trigger_fulfillment.messages.live_agent_handoff": {
       "type": "block",
@@ -264,8 +264,8 @@
       "description": "Custom metadata. Dialogflow doesn't impose any structure on this.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "event_handlers.trigger_fulfillment.messages.output_audio_text": {
       "type": "block",
@@ -276,15 +276,15 @@
       "description": "The SSML text to be synthesized. For more information, see SSML.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "event_handlers.trigger_fulfillment.messages.output_audio_text.text": {
       "description": "The raw text to be synthesized.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "event_handlers.trigger_fulfillment.messages.play_audio": {
       "type": "block",
@@ -295,8 +295,8 @@
       "description": "URI of the audio clip. Dialogflow does not impose any validation on this value. It is specific to the client that reads it.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "event_handlers.trigger_fulfillment.messages.telephony_transfer_call": {
       "type": "block",
@@ -307,8 +307,8 @@
       "description": "Transfer the call to a phone number in E.164 format.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "event_handlers.trigger_fulfillment.messages.text": {
       "type": "block",
@@ -319,8 +319,8 @@
       "description": "A collection of text responses.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "event_handlers.trigger_fulfillment.set_parameter_actions": {
       "type": "block",
@@ -331,15 +331,15 @@
       "description": "Display name of the parameter.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "event_handlers.trigger_fulfillment.set_parameter_actions.value": {
       "description": "The new JSON-encoded value of the parameter. A null value clears the parameter.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings": {
       "type": "block",
@@ -350,22 +350,22 @@
       "description": "Whether Knowledge Connector is enabled or not.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.target_flow": {
       "description": "The target flow to transition to. Format: projects/<ProjectID>/locations/<LocationID>/agents/<AgentID>/flows/<FlowID>.\nThis field is part of a union field 'target': Only one of 'targetPage' or 'targetFlow' may be set.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.target_page": {
       "description": "The target page to transition to. Format: projects/<ProjectID>/locations/<LocationID>/agents/<AgentID>/flows/<FlowID>/pages/<PageID>.\nThe page must be in the same host flow (the flow that owns this 'KnowledgeConnectorSettings').\nThis field is part of a union field 'target': Only one of 'targetPage' or 'targetFlow' may be set.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.data_store_connections": {
       "type": "block",
@@ -376,22 +376,22 @@
       "description": "The full name of the referenced data store. Formats: projects/{project}/locations/{location}/collections/{collection}/dataStores/{dataStore} projects/{project}/locations/{location}/dataStores/{dataStore}",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.data_store_connections.data_store_type": {
       "description": "The type of the connected data store.\n* PUBLIC_WEB: A data store that contains public web content.\n* UNSTRUCTURED: A data store that contains unstructured private data.\n* STRUCTURED: A data store that contains structured data (for example FAQ). Possible values: [\"PUBLIC_WEB\", \"UNSTRUCTURED\", \"STRUCTURED\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.data_store_connections.document_processing_mode": {
       "description": "The document processing mode for the data store connection. Should only be set for PUBLIC_WEB and UNSTRUCTURED data stores. If not set it is considered as DOCUMENTS, as this is the legacy mode.\n* DOCUMENTS: Documents are processed as documents.\n* CHUNKS: Documents are converted to chunks. Possible values: [\"DOCUMENTS\", \"CHUNKS\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment": {
       "type": "block",
@@ -402,29 +402,29 @@
       "description": "If the flag is true, the agent will utilize LLM to generate a text response. If LLM generation fails, the defined responses in the fulfillment will be respected. This flag is only useful for fulfillments associated with no-match event handlers.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.return_partial_responses": {
       "description": "Whether Dialogflow should return currently queued fulfillment response messages in streaming APIs. If a webhook is specified, it happens before Dialogflow invokes webhook. Warning: 1) This flag only affects streaming API. Responses are still queued and returned once in non-streaming API. 2) The flag can be enabled in any fulfillment but only the first 3 partial responses will be returned. You may only want to apply it to fulfillments that have slow webhooks.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.tag": {
       "description": "The tag used by the webhook to identify which fulfillment is being called. This field is required if webhook is specified.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.webhook": {
       "description": "The webhook to call. Format: projects/<Project ID>/locations/<Location ID>/agents/<Agent ID>/webhooks/<Webhook ID>.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.advanced_settings": {
       "type": "block",
@@ -440,36 +440,36 @@
       "description": "If true, incoming audio is processed for DTMF (dual tone multi frequtectency) events. For example, if the caller presses a button on their telephone keypad and DTMF processing is enabled, Dialogflow will de the event (e.g. a \"3\" was pressed) in the incoming audio and pass the event to the bot to drive business logic (e.g. when 3 is pressed, return the account balance).",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.advanced_settings.dtmf_settings.endpointing_timeout_duration": {
       "description": "Endpoint timeout setting for matching dtmf input to regex.\nA duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.500s\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.advanced_settings.dtmf_settings.finish_digit": {
       "description": "The digit that terminates a DTMF digit sequence.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.advanced_settings.dtmf_settings.interdigit_timeout_duration": {
       "description": "Interdigit timeout setting for matching dtmf input to regex.\nA duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.500s\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.advanced_settings.dtmf_settings.max_digits": {
       "description": "Max length of DTMF digits.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.advanced_settings.logging_settings": {
       "type": "block",
@@ -480,22 +480,22 @@
       "description": "Enables consent-based end-user input redaction, if true, a pre-defined session parameter **$session.params.conversation-redaction** will be used to determine if the utterance should be redacted.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables consent-based redaction of end-user input at the fulfillment level, reducing exposure of sensitive conversation data."
     },
     "knowledge_connector_settings.trigger_fulfillment.advanced_settings.logging_settings.enable_interaction_logging": {
       "description": "Enables DF Interaction logging.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables Dialogflow interaction logging at the fulfillment level, improving auditability and monitoring."
     },
     "knowledge_connector_settings.trigger_fulfillment.advanced_settings.logging_settings.enable_stackdriver_logging": {
       "description": "Enables Google Cloud Logging.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables Google Cloud Logging at the fulfillment level, improving security visibility and auditability."
     },
     "knowledge_connector_settings.trigger_fulfillment.advanced_settings.speech_settings": {
       "type": "block",
@@ -506,29 +506,29 @@
       "description": "Sensitivity of the speech model that detects the end of speech. Scale from 0 to 100.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.advanced_settings.speech_settings.models": {
       "description": "Mapping from language to Speech-to-Text model. The mapped Speech-to-Text model will be selected for requests from its corresponding language. For more information, see [Speech models](https://cloud.google.com/dialogflow/cx/docs/concept/speech-models).\nAn object containing a list of **\"key\": value** pairs. Example: **{ \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }**.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.advanced_settings.speech_settings.no_speech_timeout": {
       "description": "Timeout before detecting no speech.\nA duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.500s\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.advanced_settings.speech_settings.use_timeout_based_endpointing": {
       "description": "Use timeout based endpointing, interpreting endpointer sensitivity as seconds of timeout value.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.conditional_cases": {
       "type": "block",
@@ -539,8 +539,8 @@
       "description": "A JSON encoded list of cascading if-else conditions. Cases are mutually exclusive. The first one with a matching condition is selected, all the rest ignored.\nSee [Case](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/Fulfillment#case) for the schema.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.messages": {
       "type": "block",
@@ -551,15 +551,15 @@
       "description": "The channel which the response is associated with. Clients can specify the channel via QueryParameters.channel, and only associated channel response will be returned.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.messages.payload": {
       "description": "Returns a response containing a custom, platform-specific payload.\nThis field is part of a union field 'message': Only one of 'text', 'payload', 'conversationSuccess', 'outputAudioText', 'liveAgentHandoff', 'endInteraction', 'playAudio', 'mixedAudio', 'telephonyTransferCall', or 'knowledgeInfoCard' may be set.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.messages.conversation_success": {
       "type": "block",
@@ -570,8 +570,8 @@
       "description": "Custom metadata. Dialogflow doesn't impose any structure on this.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.messages.knowledge_info_card": {
       "type": "block",
@@ -587,8 +587,8 @@
       "description": "Custom metadata. Dialogflow doesn't impose any structure on this.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.messages.output_audio_text": {
       "type": "block",
@@ -599,15 +599,15 @@
       "description": "The SSML text to be synthesized. For more information, see SSML.\nThis field is part of a union field 'source': Only one of 'text' or 'ssml' may be set.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.messages.output_audio_text.text": {
       "description": "The raw text to be synthesized.\nThis field is part of a union field 'source': Only one of 'text' or 'ssml' may be set.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.messages.play_audio": {
       "type": "block",
@@ -618,8 +618,8 @@
       "description": "URI of the audio clip. Dialogflow does not impose any validation on this value. It is specific to the client that reads it.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.messages.telephony_transfer_call": {
       "type": "block",
@@ -630,8 +630,8 @@
       "description": "Transfer the call to a phone number in E.164 format.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.messages.text": {
       "type": "block",
@@ -642,8 +642,8 @@
       "description": "A collection of text response variants. If multiple variants are defined, only one text response variant is returned at runtime.\nrequired: true",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.set_parameter_actions": {
       "type": "block",
@@ -654,15 +654,15 @@
       "description": "Display name of the parameter.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "knowledge_connector_settings.trigger_fulfillment.set_parameter_actions.value": {
       "description": "The new JSON-encoded value of the parameter. A null value clears the parameter.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "nlu_settings": {
       "type": "block",
@@ -673,22 +673,22 @@
       "description": "To filter out false positive results and still get variety in matched natural language inputs for your agent, you can tune the machine learning classification threshold.\nIf the returned score value is less than the threshold value, then a no-match event will be triggered. The score values range from 0.0 (completely uncertain) to 1.0 (completely certain). If set to 0.0, the default of 0.3 is used.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "nlu_settings.model_training_mode": {
       "description": "Indicates NLU model training mode.\n* MODEL_TRAINING_MODE_AUTOMATIC: NLU model training is automatically triggered when a flow gets modified. User can also manually trigger model training in this mode.\n* MODEL_TRAINING_MODE_MANUAL: User needs to manually trigger NLU model training. Best for large flows whose models take long time to train. Possible values: [\"MODEL_TRAINING_MODE_AUTOMATIC\", \"MODEL_TRAINING_MODE_MANUAL\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "nlu_settings.model_type": {
       "description": "Indicates the type of NLU model.\n* MODEL_TYPE_STANDARD: Use standard NLU model.\n* MODEL_TYPE_ADVANCED: Use advanced NLU model. Possible values: [\"MODEL_TYPE_STANDARD\", \"MODEL_TYPE_ADVANCED\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "transition_routes": {
       "type": "block",
@@ -699,29 +699,29 @@
       "description": "The condition to evaluate against form parameters or session parameters.\nAt least one of intent or condition must be specified. When both intent and condition are specified, the transition can only happen when both are fulfilled.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "transition_routes.intent": {
       "description": "The unique identifier of an Intent.\nFormat: projects/<Project ID>/locations/<Location ID>/agents/<Agent ID>/intents/<Intent ID>. Indicates that the transition can only happen when the given intent is matched. At least one of intent or condition must be specified. When both intent and condition are specified, the transition can only happen when both are fulfilled.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "transition_routes.target_flow": {
       "description": "The target flow to transition to.\nFormat: projects/<Project ID>/locations/<Location ID>/agents/<Agent ID>/flows/<Flow ID>.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "transition_routes.target_page": {
       "description": "The target page to transition to.\nFormat: projects/<Project ID>/locations/<Location ID>/agents/<Agent ID>/flows/<Flow ID>/pages/<Page ID>.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "transition_routes.trigger_fulfillment": {
       "type": "block",
@@ -732,22 +732,22 @@
       "description": "Whether Dialogflow should return currently queued fulfillment response messages in streaming APIs. If a webhook is specified, it happens before Dialogflow invokes webhook. Warning: 1) This flag only affects streaming API. Responses are still queued and returned once in non-streaming API. 2) The flag can be enabled in any fulfillment but only the first 3 partial responses will be returned. You may only want to apply it to fulfillments that have slow webhooks.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "transition_routes.trigger_fulfillment.tag": {
       "description": "The tag used by the webhook to identify which fulfillment is being called. This field is required if webhook is specified.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "transition_routes.trigger_fulfillment.webhook": {
       "description": "The webhook to call. Format: projects/<Project ID>/locations/<Location ID>/agents/<Agent ID>/webhooks/<Webhook ID>.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "transition_routes.trigger_fulfillment.conditional_cases": {
       "type": "block",
@@ -758,8 +758,8 @@
       "description": "A JSON encoded list of cascading if-else conditions. Cases are mutually exclusive. The first one with a matching condition is selected, all the rest ignored.\nSee [Case](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/Fulfillment#case) for the schema.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "transition_routes.trigger_fulfillment.messages": {
       "type": "block",
@@ -770,15 +770,15 @@
       "description": "The channel which the response is associated with. Clients can specify the channel via QueryParameters.channel, and only associated channel response will be returned.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "transition_routes.trigger_fulfillment.messages.payload": {
       "description": "A custom, platform-specific payload.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "transition_routes.trigger_fulfillment.messages.conversation_success": {
       "type": "block",
@@ -789,8 +789,8 @@
       "description": "Custom metadata. Dialogflow doesn't impose any structure on this.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "transition_routes.trigger_fulfillment.messages.live_agent_handoff": {
       "type": "block",
@@ -801,8 +801,8 @@
       "description": "Custom metadata. Dialogflow doesn't impose any structure on this.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "transition_routes.trigger_fulfillment.messages.output_audio_text": {
       "type": "block",
@@ -813,15 +813,15 @@
       "description": "The SSML text to be synthesized. For more information, see SSML.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "transition_routes.trigger_fulfillment.messages.output_audio_text.text": {
       "description": "The raw text to be synthesized.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "transition_routes.trigger_fulfillment.messages.play_audio": {
       "type": "block",
@@ -832,8 +832,8 @@
       "description": "URI of the audio clip. Dialogflow does not impose any validation on this value. It is specific to the client that reads it.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "transition_routes.trigger_fulfillment.messages.telephony_transfer_call": {
       "type": "block",
@@ -844,8 +844,8 @@
       "description": "Transfer the call to a phone number in E.164 format.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "transition_routes.trigger_fulfillment.messages.text": {
       "type": "block",
@@ -856,8 +856,8 @@
       "description": "A collection of text responses.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "transition_routes.trigger_fulfillment.set_parameter_actions": {
       "type": "block",
@@ -868,15 +868,15 @@
       "description": "Display name of the parameter.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     },
     "transition_routes.trigger_fulfillment.set_parameter_actions.value": {
       "description": "The new JSON-encoded value of the parameter. A null value clears the parameter.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not define a reusable platform-level security control. It is primarily an identifier, reference, descriptive value, application behaviour, routing configuration, content value, or team-specific setting."
     }
   }
 }
