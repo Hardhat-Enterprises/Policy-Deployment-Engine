@@ -7,7 +7,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "just picks columns to speed up queries does not change who can read the table"
+      "rationale": "Clustering selects up to four columns to co-locate related rows in table storage so BigQuery can skip more data during queries. It is a query performance and storage layout feature and does not change who can access the table or how data is protected"
     },
     "dataset_id": {
       "description": "The dataset ID to create the table in. Changing this forces a new resource to be created.",
@@ -91,7 +91,7 @@
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": "makes queries use a partition filter that saves cost not a security control"
+      "rationale": "When enabled this requires every query to include a partition filter so BigQuery can eliminate partitions before scanning data. That scopes how much data is read per query which helps cost and performance but does not control access encryption or exposure"
     },
     "resource_tags": {
       "description": "The tags attached to this table. Tag keys are globally unique. Tag key is expected to be in the namespaced format, for example \"123456789012/environment\" where 123456789012 is the ID of the parent organization or project resource for this tag key. Tag value is expected to be the short name, for example \"Production\".",
@@ -449,7 +449,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "bigquery type for one bigtable column"
+      "rationale": "This sets the BigQuery data type used when reading values from an individual Bigtable column in an external table configuration. It is schema mapping for external source data and does not enforce any access or encryption control on the table"
     },
     "external_data_configuration.csv_options": {
       "type": "block",
@@ -515,7 +515,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "which sheet range to read team specific spreadsheet"
+      "rationale": "This specifies the cell range within a Google Sheet that backs the external table such as a sheet name and cell bounds. It points to a team owned data source and the correct range cannot be constrained by a generic platform policy"
     },
     "external_data_configuration.google_sheets_options.skip_leading_rows": {
       "description": "The number of rows at the top of the sheet that BigQuery will skip when reading the data. At least one of range or skip_leading_rows must be set.",
@@ -541,14 +541,14 @@
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": "requires partition filter on hive tables saves query cost not security"
+      "rationale": "When enabled this requires queries against hive partitioned external data to include a partition filter so BigQuery can prune partitions before scanning files in external storage. It limits bytes scanned for cost and performance and is not an access or encryption control"
     },
     "external_data_configuration.hive_partitioning_options.source_uri_prefix": {
       "description": "When hive partition detection is requested, a common for all source uris must be required. The prefix must end immediately before the partition key encoding begins.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "common prefix for hive partition paths team specific"
+      "rationale": "This sets the shared URI prefix that all hive partitioned source paths must share before the partition key segment begins. It points to team specific external storage locations and those paths are outside generic platform policy scope"
     },
     "external_data_configuration.json_options": {
       "type": "block",
@@ -591,28 +591,28 @@
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": "allows non incremental view definition refresh choice not security"
+      "rationale": "This allows a materialized view to use a non incremental SQL definition that may require a full recompute rather than an incremental refresh when base data changes. It affects how the view is maintained operationally and does not change table access or data protection"
     },
     "materialized_view.enable_refresh": {
       "description": "Specifies if BigQuery should automatically refresh materialized view when the base table is updated. The default is true.",
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": "whether bigquery auto refreshes the materialized view"
+      "rationale": "This controls whether BigQuery automatically refreshes the materialized view when its base tables are updated. It governs background refresh behaviour for data freshness and performance rather than who can query the view or how data is secured"
     },
     "materialized_view.query": {
       "description": "A query whose result is persisted.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "sql for the materialized view each app writes its own query"
+      "rationale": "This is the SQL statement whose result is stored as the materialized view. The query defines the view logic and data definition for each workload and that free form SQL cannot be generically constrained by a platform level security policy"
     },
     "materialized_view.refresh_interval_ms": {
       "description": "Specifies maximum frequency at which this materialized view will be refreshed. The default is 1800000.",
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "how often the view can refresh scheduling only"
+      "rationale": "This sets the minimum interval in milliseconds between automatic refreshes of the materialized view. It is a scheduling and performance parameter for how often cached results are rebuilt and has no effect on access control or encryption"
     },
     "range_partitioning": {
       "type": "block",
@@ -624,7 +624,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "column used for integer range partitions design choice"
+      "rationale": "This names the integer column used as the partition key when creating range based partitions on the table. It is a schema and data organisation choice for how rows are grouped in storage and is not a security policy target"
     },
     "range_partitioning.range": {
       "type": "block",
@@ -636,21 +636,21 @@
       "required": true,
       "type": "number",
       "security_impact": false,
-      "rationale": "end value for integer range partitions"
+      "rationale": "This sets the exclusive upper bound for integer range partitioning on the chosen partition field. It defines partition boundary layout as a data modelling decision and has no security implications"
     },
     "range_partitioning.range.interval": {
       "description": "The width of each range within the partition.",
       "required": true,
       "type": "number",
       "security_impact": false,
-      "rationale": "size of each integer range partition"
+      "rationale": "This sets the width of each integer range partition bucket on the partition field. Partition sizing is an operational storage layout choice for query performance and is not a security control"
     },
     "range_partitioning.range.start": {
       "description": "Start of the range partitioning, inclusive.",
       "required": true,
       "type": "number",
       "security_impact": false,
-      "rationale": "start value for integer range partitions"
+      "rationale": "This sets the inclusive lower bound for integer range partitioning on the partition field. It defines where partitioning begins as a data structuring parameter and does not affect access or encryption"
     },
     "schema_foreign_type_info": {
       "type": "block",
@@ -662,7 +662,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "foreign type system name for schema metadata"
+      "rationale": "This names the external type system used for foreign type metadata attached to schema fields. It is interoperability metadata for how external types are represented and does not enforce any security boundary on the table"
     },
     "table_constraints": {
       "type": "block",
@@ -679,7 +679,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "optional name for foreign key metadata"
+      "rationale": "This optionally assigns a display name to a foreign key constraint entry in table metadata. Naming schema constraints is an organisational labelling choice and is not something a generic platform security policy would constrain"
     },
     "table_constraints.foreign_keys.column_references": {
       "type": "block",
@@ -691,14 +691,14 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "referenced primary key column in fk metadata"
+      "rationale": "This identifies the primary key column in the referenced table that the foreign key points to. It is an identifier referencing another schema object and platform policies do not centrally constrain such cross table column references"
     },
     "table_constraints.foreign_keys.column_references.referencing_column": {
       "description": "The column that composes the foreign key.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "foreign key column in this table metadata"
+      "rationale": "This names the column in this table that participates in the foreign key relationship in table metadata. It defines schema structure and relational metadata for data modelling and falls outside platform security policy scope"
     },
     "table_constraints.foreign_keys.referenced_table": {
       "type": "block",
