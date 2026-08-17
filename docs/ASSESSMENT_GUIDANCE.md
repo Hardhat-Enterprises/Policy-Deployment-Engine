@@ -6,7 +6,7 @@ in the `docs/` resource files — and how to review student PRs that do the same
 > `security_impact: true` means **"this argument is worth a platform-level security
 > policy"** — a generic rule that constrains its value to make the resource more secure.
 > `false` means it is not a useful policy target. The goal is to build a large library of
-> *optional* policies an enterprise client may choose to adopt — so we add a policy
+> _optional_ policies an enterprise client may choose to adopt — so we add a policy
 > wherever enforcing it would make the resource more secure, and skip it otherwise.
 
 ---
@@ -21,20 +21,20 @@ mistake.
 A policy is only valid if it is **generic and structural** — true for any team, any
 project, without naming anything specific:
 
-- ✅ *"encryption key must not be blank/null"* — structural, applies everywhere.
-- ❌ *"encryption key must equal `projects/acme/keys/foo`"* — assumes a specific key we
+- ✅ _"encryption key must not be blank/null"_ — structural, applies everywhere.
+- ❌ _"encryption key must equal `projects/acme/keys/foo`"_ — assumes a specific key we
   cannot know. **Overreaching — invalid.**
-- ✅ *"region must be in an approved set (whitelist)"* — **region / data residency is a
+- ✅ _"region must be in an approved set (whitelist)"_ — **region / data residency is a
   sanctioned exception**: enforcing it is explicitly wanted. Ideally the allowed set is
   parameterised, but a **hardcoded** example whitelist (e.g. `australia-southeast1/2`) is
   acceptable — the policy shape is fully repurposable by swapping the list.
-- ❌ *"bucket name must be `prod-data`"* — naming a specific resource. Invalid.
+- ❌ _"bucket name must be `prod-data`"_ — naming a specific resource. Invalid.
 
 Region is the one place a concrete value (even hardcoded) is fine; keys, projects,
 emails, and resource names are not.
 
 We are ensuring **this resource is cleanly/securely configured** — we are **not** policing
-the names of *other* resources it references (other buckets, projects, datasets). Pointing
+the names of _other_ resources it references (other buckets, projects, datasets). Pointing
 at another resource is the team's business; constraining that reference is not our job.
 
 ---
@@ -45,19 +45,19 @@ Mark `true` when a **generic** policy on the argument would improve security —
 matches one of the **policy archetypes** below. These archetypes are platform-agnostic;
 they were distilled from real Azure platform policies and apply equally to GCP:
 
-| Archetype | Pattern | Example args |
-|---|---|---|
-| **Disable public exposure** | force private/no-public-access | `public_access_prevention`, "disable public network access" |
-| **Require encryption / CMEK** | key must be **set** (not blank); enable infra/double encryption | `kms_key_name`, `encryption.default_kms_key_name` |
-| **Enforce secure protocol minimums** | min TLS ≥ 1.2, etc. | TLS/version fields |
-| **Whitelist secure tiers/SKUs** | require tiers that *have* the security features (evidence-based, not arbitrary) | `sku`/`tier` fields |
-| **Disable weak/static auth** | prefer managed identity / IAM over local/basic auth, SAS, shared keys | local-auth toggles, SAS/HMAC keys |
-| **Require logging / audit** | logging/diagnostics enabled and routed | `logging.log_bucket`, diagnostic settings |
-| **Data residency** | region/location must be in an approved **whitelist** | `location`, `zone`, `region` |
-| **Prevent destructive loss** | block hard-destroy; require retention lock, soft-delete, purge protection | `force_destroy` (→false), `retention_policy.is_locked`, `soft_delete_policy` |
-| **Require managed identity** | identity assigned to the resource | identity blocks |
-| **Credential hygiene** | enforce rotation / max age; disable static keys | key rotation, SAS expiry |
-| **Enable any security feature / disable anything that weakens security** | the catch-all | various |
+| Archetype                                                                | Pattern                                                                         | Example args                                                                 |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| **Disable public exposure**                                              | force private/no-public-access                                                  | `public_access_prevention`, "disable public network access"                  |
+| **Require encryption / CMEK**                                            | key must be **set** (not blank); enable infra/double encryption                 | `kms_key_name`, `encryption.default_kms_key_name`                            |
+| **Enforce secure protocol minimums**                                     | min TLS ≥ 1.2, etc.                                                             | TLS/version fields                                                           |
+| **Whitelist secure tiers/SKUs**                                          | require tiers that _have_ the security features (evidence-based, not arbitrary) | `sku`/`tier` fields                                                          |
+| **Disable weak/static auth**                                             | prefer managed identity / IAM over local/basic auth, SAS, shared keys           | local-auth toggles, SAS/HMAC keys                                            |
+| **Require logging / audit**                                              | logging/diagnostics enabled and routed                                          | `logging.log_bucket`, diagnostic settings                                    |
+| **Data residency**                                                       | region/location must be in an approved **whitelist**                            | `location`, `zone`, `region`                                                 |
+| **Prevent destructive loss**                                             | block hard-destroy; require retention lock, soft-delete, purge protection       | `force_destroy` (→false), `retention_policy.is_locked`, `soft_delete_policy` |
+| **Require managed identity**                                             | identity assigned to the resource                                               | identity blocks                                                              |
+| **Credential hygiene**                                                   | enforce rotation / max age; disable static keys                                 | key rotation, SAS expiry                                                     |
+| **Enable any security feature / disable anything that weakens security** | the catch-all                                                                   | various                                                                      |
 
 Rule of thumb: **enable security features; disable or constrain things that weaken
 security.** If an argument toggles or sizes one of those, it is almost always `true`.
@@ -66,12 +66,12 @@ security.** If an argument toggles or sizes one of those, it is almost always `t
 
 ## 3. When is `security_impact = false`?
 
-- **Identifiers & references** — names, IDs, and pointers to *other* resources
+- **Identifiers & references** — names, IDs, and pointers to _other_ resources
   (`bucket`, `project`, `*_id`, "references existing X", policy `data` sources). We don't
   constrain what something is named or what it points at.
 - **Cosmetic / descriptive** — `display_name`, `description`, `labels`, annotations.
 - **Team data-management choices** that aren't security controls — e.g. `versioning`,
-  cache `ttl`, autoclass. We don't dictate how teams manage their data *unless* the field
+  cache `ttl`, autoclass. We don't dictate how teams manage their data _unless_ the field
   clearly prevents destructive loss or exposure.
 - **Free-form policy documents** — e.g. IAM `policy_data` (a whole JSON policy). Writing a
   generic platform policy that meaningfully constrains an arbitrary embedded document is
@@ -87,19 +87,21 @@ IAM needs a careful, consistent line. Teams must stay free to assign access; we 
 the clearly dangerous.
 
 **Good IAM policy (`true`, worth enforcing):**
+
 - Block **public** principals: `allUsers`, `allAuthenticatedUsers`.
 - Block **wildcards** and obviously over-broad principal patterns.
 - Block dangerous mixtures / overly-sensitive grants (e.g. public + privileged).
 - → applies to `members` / `member`.
 
 **Overreaching (don't enforce):**
+
 - Dictating **which roles** a team may assign (teams need freedom to grant roles). → `role`
   is generally **not** a policy target.
 - Controlling the embedded **`policy_data`** document. → out of scope.
 
-*(Open for refinement: whether to block specific primitive roles like `roles/owner` on
+_(Open for refinement: whether to block specific primitive roles like `roles/owner` on
 public-facing resources. Default stance: leave role assignment to teams; police the
-principals, not the role catalog.)*
+principals, not the role catalog.)_
 
 ---
 
@@ -108,28 +110,28 @@ principals, not the role catalog.)*
 A rationale must **demonstrate understanding of what the argument controls** and give a
 **reasonable justification** for why a policy is (or isn't) warranted.
 
-- For a **`true`** arg: name the *risk if mis-set* and the *secure direction/shape* of the
+- For a **`true`** arg: name the _risk if mis-set_ and the _secure direction/shape_ of the
   policy (without hardcoding specifics).
 - For a **`false`** arg: briefly say what it controls and why constraining it doesn't
   improve security (or would be overreaching).
 - Simple fields (`display_name`, `description`) → one short sentence is fine.
 - Vague or complex fields → explain what they actually control before judging.
-- Be specific and correct (no typos, no hand-wave like *"not security related"* without
+- Be specific and correct (no typos, no hand-wave like _"not security related"_ without
   saying what it is).
 
 **Model rationales**
 
-- `public_access_prevention` (true): *"Controls whether the bucket can be exposed
+- `public_access_prevention` (true): _"Controls whether the bucket can be exposed
   publicly. Enforcing it 'enforced' prevents accidental public data exposure — a core
-  platform guarantee."*
-- `encryption.default_kms_key_name` (true): *"Sets the CMEK used to encrypt objects. A
+  platform guarantee."_
+- `encryption.default_kms_key_name` (true): _"Sets the CMEK used to encrypt objects. A
   policy should require it to be non-empty so data is always customer-managed-key
-  encrypted; it must **not** pin a specific key, since keys are team/project-specific."*
-- `role` (false): *"Specifies the IAM role granted. Platform policy should not dictate
+  encrypted; it must **not** pin a specific key, since keys are team/project-specific."_
+- `role` (false): _"Specifies the IAM role granted. Platform policy should not dictate
   which roles teams may assign; we constrain the principals (`members`) against public/
-  wildcard grants instead."*
-- `bucket` (false): *"Identifier referencing the target bucket. We don't constrain
-  resource names or references to other resources."*
+  wildcard grants instead."_
+- `bucket` (false): _"Identifier referencing the target bucket. We don't constrain
+  resource names or references to other resources."_
 
 ---
 
@@ -139,7 +141,7 @@ When reviewing a student's assessment of an argument, **reject** if any of these
 
 1. **Generic, not specific** — does the implied policy avoid hardcoding any specific name,
    key, project, region, or email? (whitelists/structural shapes are fine)
-2. **Scoped to this resource** — it secures *this* resource, not the names/config of
+2. **Scoped to this resource** — it secureaustralia-southeast2s _this_ resource, not the names/config of
    resources it merely references.
 3. **Real security gain** — enforcing it would genuinely make the resource more secure
    (maps to an archetype in §2). If not, it should be `false`.
@@ -149,8 +151,8 @@ When reviewing a student's assessment of an argument, **reject** if any of these
    reasonable why/why-not; correct and specific (§5).
 
 If you simply disagree that enforcing a policy here improves security, that's a valid
-rejection — the bar is *"does a platform-level policy here make the resource more
-secure?"*
+rejection — the bar is _"does a platform-level policy here make the resource more
+secure?"_
 
 ---
 
@@ -165,7 +167,7 @@ Applying the principles to the real args:
   `predefined_acl`/`default_acl`.
 - **Encryption (true):** `encryption.default_kms_key_name` (bucket) and
   `storage_bucket_object.kms_key_name` — require **non-blank** CMEK; never pin a key.
-  *(The bucket-level one is currently unassessed — a coverage gap to fill later.)*
+  _(The bucket-level one is currently unassessed — a coverage gap to fill later.)_
 - **Destructive loss (true):** `force_destroy` (disable), `retention_policy.is_locked` /
   `retention_period`, `soft_delete_policy` (enable).
 - **Data residency (true):** `location` / `zone` — region **whitelist**.
@@ -184,7 +186,7 @@ encryption/logging/soft-delete).
 
 Rulings established while reviewing every service — apply these consistently:
 
-- **Run-as service accounts → `true`.** The account a *workload* executes as (e.g.
+- **Run-as service accounts → `true`.** The account a _workload_ executes as (e.g.
   Dataflow/Workflows/Application Integration `service_account`) is a least-privilege
   control: require an explicit, **non-default** account (the default Compute Engine SA is
   over-privileged). Enforce "set and not the default" — never pin a specific account. (A
@@ -195,13 +197,14 @@ Rulings established while reviewing every service — apply these consistently:
   secure-protocol archetype. Constrain the scheme only; never pin the host. (A URL that is
   purely a reference to a team-specific system — e.g. an SCM `host_uri` — stays `false`.)
 - **Monitoring / observability → `true`.** Treat enable-monitoring like logging: require
-  it on so activity is visible. For log-*level* fields, require logging enabled (not OFF)
+  it on so activity is visible. For log-_level_ fields, require logging enabled (not OFF)
   for auditability — favour capturing security events over silencing logs.
 - **Exposure allowlists → `true`.** A list that gates who can reach a private resource
   (e.g. `allowed_projects` on a private cluster) is a network-exposure control: constrain
-  the allowlist *shape* (non-empty, not overly broad); don't pin specific entries.
+  the allowlist _shape_ (non-empty, not overly broad); don't pin specific entries.
 
 Confirmed **`false`** (not policy targets):
+
 - Network **address ranges / CIDR blocks** — team addressing; segmentation is enforced by
   firewall/network-policy resources, not range sizing.
 - **Functional / architectural enums** with no insecure value (serving scope, hosting
@@ -217,4 +220,4 @@ Confirmed **`false`** (not policy targets):
 
 ---
 
-*Add a new `### <Service>` subsection here as each service is reviewed.*
+_Add a new `### <Service>` subsection here as each service is reviewed._

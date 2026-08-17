@@ -1,4 +1,4 @@
-package terraform.gcp.security.<service>.<resource_type>.<policy_name> # Edit here 
+package terraform.gcp.security.<service>.<resource_type>.<policy_name> # Edit here
 import data.terraform.helpers
 import data.terraform.gcp.security.<service>.<resource_type>.vars
 
@@ -29,7 +29,7 @@ conditions := [
         "condition": "Test if an OS is not Linux",
         "attribute_path" : ["parent"],
         "values" : ["Linux"],
-        "policy_type" : "whitelist" 
+        "policy_type" : "whitelist"
     }
     ]
 
@@ -42,13 +42,13 @@ conditions := [
         "condition": "Test if an OS is Linux",
         "attribute_path" : ["parent"],
         "values" : ["Linux"],
-        "policy_type" : "blacklist" 
+        "policy_type" : "blacklist"
     }
     ]
 
     Range - Use with numeric data to set a minimum, maximum or range
 
-    Minimum 
+    Minimum
     [
     {"situation_description" : "Check if key is over 1000 bits",
     "remedies":[ "Enforce a key over 1000 bits"]},
@@ -56,11 +56,11 @@ conditions := [
         "condition": "Test if key size is over 1000 bits",
         "attribute_path" : ["rsa",0,"key"],
         "values" : [1000,null],
-        "policy_type" : "range" 
+        "policy_type" : "range"
     }
     ]
 
-    Maximum  
+    Maximum
     [
     {"situation_description" : "Check if key is under 1000 bits",
     "remedies":[ "Enforce a key under 1000 bits"]},
@@ -68,11 +68,11 @@ conditions := [
         "condition": "Test if key size is under 1000 bits",
         "attribute_path" : ["rsa",0,"key"],
         "values" : [null,1000],
-        "policy_type" : "range" 
+        "policy_type" : "range"
     }
     ]
 
-    Range 
+    Range
     [
     {"situation_description" : "Check if key is between 1000 and 2000 bits",
     "remedies":[ "Ensure key is 1000 to 2000 bits"]},
@@ -80,7 +80,7 @@ conditions := [
         "condition": "Test if key size is within 1000 to 2000 bits",
         "attribute_path" : ["rsa",0,"key"],
         "values" : [1000,2000],
-        "policy_type" : "range" 
+        "policy_type" : "range"
     }
     ]
 
