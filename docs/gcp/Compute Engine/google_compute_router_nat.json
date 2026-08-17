@@ -111,57 +111,57 @@
       "description": "The name of the Cloud Router in which this NAT will be configured.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Configures the NAT and its network to a Cloud Router. This configuration influences the capabilities and limitations of a network by the router type chosen."
     },
     "source_subnetwork_ip_ranges_to_nat": {
       "description": "How NAT should be configured per Subnetwork.\nIf 'ALL_SUBNETWORKS_ALL_IP_RANGES', all of the\nIP ranges in every Subnetwork are allowed to Nat.\nIf 'ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES', all of the primary IP\nranges in every Subnetwork are allowed to Nat.\n'LIST_OF_SUBNETWORKS': A list of Subnetworks are allowed to Nat\n(specified in the field subnetwork below). Note that if this field\ncontains ALL_SUBNETWORKS_ALL_IP_RANGES or\nALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES, then there should not be any\nother RouterNat section in any Router for this network in this region. Possible values: [\"ALL_SUBNETWORKS_ALL_IP_RANGES\", \"ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES\", \"LIST_OF_SUBNETWORKS\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines where the NAT is applied in the network. This configures the extent to which internal resources can access the internet."
     },
     "source_subnetwork_ip_ranges_to_nat64": {
       "description": "Specify the Nat option for NAT64, which can take one of the following values:\nALL_IPV6_SUBNETWORKS: All of the IP ranges in every Subnetwork are allowed to Nat.\nLIST_OF_IPV6_SUBNETWORKS: A list of Subnetworks are allowed to Nat (specified in the field nat64Subnetwork below).\nNote that if this field contains NAT64_ALL_V6_SUBNETWORKS no other Router.Nat section in this region can also enable NAT64 for any Subnetworks in this network.\nOther Router.Nat sections can still be present to enable NAT44 only. Possible values: [\"ALL_IPV6_SUBNETWORKS\", \"LIST_OF_IPV6_SUBNETWORKS\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether all or select IPv6 and NAT64 internal resources can access the internet. This has security impacts on the exposure of internal IPv6 traffic while transmitting through the public internet."
     },
     "tcp_established_idle_timeout_sec": {
       "description": "Timeout (in seconds) for TCP established connections.\nDefaults to 1200s if not set.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines the time in which inactive TCP connections remain established in NAT before they are dropped. This is primarily a performance configuration and has no direct security impacts."
     },
     "tcp_time_wait_timeout_sec": {
       "description": "Timeout (in seconds) for TCP connections that are in TIME_WAIT state.\nDefaults to 120s if not set.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines the time in which TCP connections are retained in the TIME_WAIT state within the NAT. This is primarily a performance configuration and has no direct security impacts."
     },
     "tcp_transitory_idle_timeout_sec": {
       "description": "Timeout (in seconds) for TCP transitory connections.\nDefaults to 30s if not set.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines the time before TCP transitory connections in NAT are dropped. Primarily a performance configuration to remove inactive connections."
     },
     "type": {
       "description": "Indicates whether this NAT is used for public or private IP translation.\nIf unspecified, it defaults to PUBLIC.\nIf 'PUBLIC' NAT used for public IP translation.\nIf 'PRIVATE' NAT used for private IP translation. Default value: \"PUBLIC\" Possible values: [\"PUBLIC\", \"PRIVATE\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets NAT type to public or private IP translation. Determines whether the NAT can share internal resources to the public internet."
     },
     "udp_idle_timeout_sec": {
       "description": "Timeout (in seconds) for UDP connections. Defaults to 30s if not set.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Drops inactive UDP connections after a set amount of time. Primarily for performance tuning."
     },
     "log_config": {
       "type": "block",
@@ -203,8 +203,8 @@
       "description": "An optional description of this rule.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Plain text documenting the NAT rules. Has no impact on NAT configurations."
     },
     "rules.match": {
       "description": "CEL expression that specifies the match condition that egress traffic from a VM is evaluated against.\nIf it evaluates to true, the corresponding action is enforced.\n\nThe following examples are valid match expressions for public NAT:\n\n\"inIpRange(destination.ip, '1.1.0.0/16') || inIpRange(destination.ip, '2.2.0.0/16')\"\n\n\"destination.ip == '1.1.0.1' || destination.ip == '8.8.8.8'\"\n\nThe following example is a valid match expression for private NAT:\n\n\"nexthop.hub == 'https://networkconnectivity.googleapis.com/v1alpha1/projects/my-project/global/hub/hub-1'\"",
@@ -243,15 +243,15 @@
       "description": "A list of URLs of the IP resources to be drained.\nThese IPs must be valid static external IPs that have been assigned to the NAT.\nThese IPs should be used for updating/patching a NAT rule only.\nThis field is used for public NAT.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A list of IPs being made inactive and is used as reference for IP rotations."
     },
     "rules.action.source_nat_drain_ranges": {
       "description": "A list of URLs of subnetworks representing source ranges to be drained.\nThis is only supported on patch/update, and these subnetworks must have previously been used as active ranges in this NAT Rule.\nThis field is used for private NAT.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A list of subnetwork range being made inactive and is used as reference for range rotations."
     },
     "subnetwork": {
       "type": "block",
