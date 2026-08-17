@@ -1,8 +1,0 @@
-resource "google_netapp_backup_policy" "compliant_example_1" {
-  project       = "deakin-lab-123"
-  name                = "compliant_example_1"
-  location            = "australia-southeast2"  # Melbourne
-  daily_backup_limit  = 2
-  weekly_backup_limit = 1
-  monthly_backup_limit = 1
-}

@@ -1,7 +1,0 @@
-package terraform.gcp.security.BigQuery.google_bigquery_dataset_access.vars
-
-variables := {
-    "friendly_resource_name": "BigQuery Dataset Access",
-    "resource_type": "google_bigquery_dataset_access",
-    "resource_value_name": "dataset_id"
-}
