@@ -142,7 +142,7 @@
       "description": "Destination IP address range in CIDR format. Required for\nEGRESS rules.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
+      "security_impact": true,
       "rationale": "A rule that restricts destination IP ranges like 0.0.0.0/0 would be to overreaching as developers should have the ability to handle firewall rules themselves. "
     },
     "rule.match.dest_region_codes": {
@@ -150,7 +150,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "This rule controls the IP Country of the traffic destination. We shoulden't need to restrict this as communications with foreign servers shouldent have an impact on data residency as this only controls communications and not data storage. This has no security impact."
+      "rationale": "This rule matches traffic sources by ISO 3166 Country code, restricting connections that may originate from the region. Policy should be able to require destination region codes to be constrained to an approved country rather than accepting traffic from anywhere."
     },
     "rule.match.dest_threat_intelligences": {
       "description": "Names of Network Threat Intelligence lists.\nThe IPs in these lists will be matched against traffic destination.",
@@ -178,14 +178,14 @@
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "A rule that restricts destination IP ranges like 0.0.0.0/0 would be to overreaching as developers should have the ability to handle firewall rules themselves. "
+      "rationale": "A rule that restricts source IP ranges like 0.0.0.0/0 would be to overreaching as developers should have the ability to handle firewall rules themselves. "
     },
     "rule.match.src_region_codes": {
       "description": "Region codes whose IP addresses will be used to match for source\nof traffic. Should be specified as 2 letter country code defined as per\nISO 3166 alpha-2 country codes. ex.\"US\"\nMaximum number of source region codes allowed is 5000.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "This rule controls the IP Country of the traffic soruce. We shoulden't need to restrict this as communications with foreign servers shouldent have an impact on data residency as this only controls communications and not data storage. This has no security impact."
+      "security_impact": true,
+      "rationale": "This rule matches traffic sources by ISO 3166 Country code, restricting connections that may originate from the region. Policy should be able to require source region codes to be constrained to an approved country rather than accepting traffic from anywhere."
     },
     "rule.match.src_threat_intelligences": {
       "description": "Names of Network Threat Intelligence lists.\nThe IPs in these lists will be matched against traffic source.",
@@ -211,7 +211,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "By allowing access to every port, this significantly increases the attack surface. A policy should require rules to not have non-empty port list allowing access to every port or to limit wildcard port ranges."
+      "rationale": "If no port is provided, the default rule applies to every port which siginificantly increases the attack surface. Policy should enforce structual limits such as require an explicit, non empty port list or prevent overley broad port ranges. This should not hardcode any specific ports as that would constrain how developers can build their firewall architecture."
     },
     "rule.match.src_secure_tag": {
       "type": "block",
