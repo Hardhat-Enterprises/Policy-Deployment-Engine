@@ -506,29 +506,29 @@
       "description": "Sensitivity of the speech model that detects the end of speech. Scale from 0 to 100.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "This setting controls how aggressively speech endpoint detection occurs within the knowledge fulfillment path. Incorrectly permissive detection behaviour may allow audio processing to remain active unnecessarily, affecting service availability and resource consumption, so the value should be security-governed."
+      "security_impact": false,
+      "rationale": "This setting tunes how sensitively speech endpoint detection responds during knowledge fulfillment. It primarily affects conversational responsiveness and user experience, making it an operational tuning parameter rather than a platform security control."
     },
     "knowledge_connector_settings.trigger_fulfillment.advanced_settings.speech_settings.models": {
       "description": "Mapping from language to Speech-to-Text model. The mapped Speech-to-Text model will be selected for requests from its corresponding language. For more information, see [Speech models](https://cloud.google.com/dialogflow/cx/docs/concept/speech-models).\nAn object containing a list of **\"key\": value** pairs. Example: **{ \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }**.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "This setting determines which Speech-to-Text processing model is used for each language within knowledge fulfillment. Restricting model selection to approved processing engines supports secure architecture and prevents use of unapproved speech-processing configurations."
+      "security_impact": false,
+      "rationale": "This setting maps languages to Speech-to-Text models used during knowledge fulfillment. Model selection is a functional and architectural choice, and no documented insecure model option is identified that would justify a generic security policy."
     },
     "knowledge_connector_settings.trigger_fulfillment.advanced_settings.speech_settings.no_speech_timeout": {
       "description": "Timeout before detecting no speech.\nA duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.500s\".",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This setting limits how long the fulfillment waits when no speech is detected. Enforcing an appropriate timeout helps prevent unnecessarily long or hung audio-processing sessions that could consume resources and contribute to denial-of-service conditions."
+      "security_impact": false,
+      "rationale": "This setting determines how long Dialogflow waits before considering that no speech was received. It is an operational timeout used to tune conversation behaviour and performance rather than a platform-level security control."
     },
     "knowledge_connector_settings.trigger_fulfillment.advanced_settings.speech_settings.use_timeout_based_endpointing": {
       "description": "Use timeout based endpointing, interpreting endpointer sensitivity as seconds of timeout value.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "This setting enables timeout-based speech endpoint detection. Controlling endpointing behaviour helps ensure audio-processing sessions terminate predictably and reduces the risk of resource exhaustion from excessively long-running speech input."
+      "security_impact": false,
+      "rationale": "This setting selects timeout-based speech endpoint detection behaviour. It is a functional processing configuration for the conversational experience rather than a security boundary."
     },
     "knowledge_connector_settings.trigger_fulfillment.conditional_cases": {
       "type": "block",
@@ -539,8 +539,8 @@
       "description": "A JSON encoded list of cascading if-else conditions. Cases are mutually exclusive. The first one with a matching condition is selected, all the rest ignored.\nSee [Case](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/Fulfillment#case) for the schema.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This field defines conditional routing logic used during knowledge fulfillment. Because these conditions can determine which execution path and downstream actions are reached, controlling permitted routing logic can help prevent unintended access paths or security-sensitive flow transitions."
+      "security_impact": false,
+      "rationale": "This field contains application-defined conditional cases used to control conversational routing and fulfillment behaviour. These conditions represent business and application logic rather than a reusable platform-level security control."
     },
     "knowledge_connector_settings.trigger_fulfillment.messages": {
       "type": "block",
@@ -551,8 +551,8 @@
       "description": "The channel which the response is associated with. Clients can specify the channel via QueryParameters.channel, and only associated channel response will be returned.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This setting determines the communication channel through which the fulfillment response is delivered. Restricting responses to approved channels helps maintain defined data-delivery and exfiltration boundaries."
+      "security_impact": false,
+      "rationale": "This field specifies the delivery channel associated with a conversational response. Channel selection is determined by application design and client requirements rather than representing a generic platform security control."
     },
     "knowledge_connector_settings.trigger_fulfillment.messages.payload": {
       "description": "Returns a response containing a custom, platform-specific payload.\nThis field is part of a union field 'message': Only one of 'text', 'payload', 'conversationSuccess', 'outputAudioText', 'liveAgentHandoff', 'endInteraction', 'playAudio', 'mixedAudio', 'telephonyTransferCall', or 'knowledgeInfoCard' may be set.",
@@ -570,8 +570,8 @@
       "description": "Custom metadata. Dialogflow doesn't impose any structure on this.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This field contains custom metadata associated with successful conversations. Metadata can unintentionally include sensitive or identifying information, so security controls should prevent confidential data from being exposed through response metadata or subsequent logging."
+      "security_impact": false,
+      "rationale": "This field contains custom metadata associated with a successful conversation. Its structure and contents are application-defined operational data, so it cannot be generically constrained as a platform-level security policy."
     },
     "knowledge_connector_settings.trigger_fulfillment.messages.knowledge_info_card": {
       "type": "block",
