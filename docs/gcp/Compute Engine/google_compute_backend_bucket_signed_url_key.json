@@ -6,36 +6,36 @@
       "description": "The backend bucket this signed URL key belongs.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This identifies the specific backend bucket associated with the signed URL key. Resource references are team-specific and should not be constrained by a general platform-wide security policy."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can delete or abandon the resource. Preventing unintended destruction can help preserve infrastructure and associated security controls."
     },
     "key_value": {
       "description": "128-bit key value used for signing the URL. The key value must be a\nvalid RFC 4648 Section 5 base64url encoded string.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Contains cryptographic key material used to sign URLs and authorize access to protected content. Exposure or insecure handling of this value could allow unauthorized signed URLs to be generated, so it has direct security impact."
     },
     "name": {
       "description": "Name of the signed URL key.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The name is an identifier for the signed URL key and does not directly control its security behaviour or access permissions."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This identifies the project containing the resource. Project identifiers are team-specific scope references and cannot be generalised into a platform-wide security policy."
     }
   }
 }
