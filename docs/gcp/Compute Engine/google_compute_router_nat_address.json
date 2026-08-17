@@ -6,29 +6,29 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can delete or abandon the resource. Preventing unintended destruction can help preserve infrastructure and associated security controls."
     },
     "drain_nat_ips": {
       "description": "A list of URLs of the IP resources to be drained. These IPs must be\nvalid static external IPs that have been assigned to the NAT.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies references to particular IP resources to be drained. These are resource-specific references and cannot be generalised into a platform-wide security policy."
     },
     "nat_ips": {
       "description": "Self-links of NAT IPs to be used in a Nat service. Only valid if the referenced RouterNat\nnatIpAllocateOption is set to MANUAL_ONLY.",
       "required": true,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies references to particular NAT IP resources. Resource references are not considered security-impacting because policy should not constrain which specific IP resources teams reference."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This identifies the project containing the resource. Project identifiers are team-specific scope references and cannot be generalised into a platform-wide security policy."
     },
     "region": {
       "description": "Region where the NAT service reside.",
@@ -41,15 +41,15 @@
       "description": "The name of the Cloud Router in which the referenced NAT service is configured.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the specific Cloud Router containing the NAT service. This is a resource-specific reference and should not be constrained by a general platform-wide security policy."
     },
     "router_nat": {
       "description": "The name of the Nat service in which this address will be configured.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the specific NAT service where the address is configured. This is a resource-specific reference and cannot be generalised into a platform-wide security policy."
     }
   }
 }
