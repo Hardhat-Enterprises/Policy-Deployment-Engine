@@ -54,7 +54,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This sets what happens when a rule matches. By restricting this with a security policy we are making it hard for teams to write rules."
+      "rationale": "This action determines if matched traffic is permitted, blocked, inspected or passed on. This shoulden't be restricted as it hinders how a team can build their firewall. A policy that requires a particular action will be dictating how access works and therefore this is out of the scope of security."
     },
     "rule.description": {
       "description": "A description of the rule.",
@@ -102,15 +102,15 @@
       "description": "A fully-qualified URL of a SecurityProfile resource instance.\nExample:\nhttps://networksecurity.googleapis.com/v1/projects/{project}/locations/{location}/securityProfileGroups/my-security-profile-group\nMust be specified if action is 'apply_security_profile_group'.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "A security profile group is an great addition to a firewall rule but we cannot enforce a policy as some rules dont require a security profile at all. For example if you are just blocking an IP, you typically dont need to include a security profile for malware/url filtering. This therefore should be left for the developer to choose if they should impliment it. This has no security impact."
+      "security_impact": true,
+      "rationale": "A security profile group is an great addition to a firewall rule as it allows advanced traffic inspection (IDS, Anti-Malware and URL Filtering) to be implimented."
     },
     "rule.target_service_accounts": {
       "description": "A list of service accounts indicating the sets of\ninstances that are applied with this rule.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "This allows the developer to set which instances the rules applies to by the service account they run as. If we use security policy to constrain this, this will restirct how teams can scope their rules and therefore is too overreaching."
+      "security_impact": true,
+      "rationale": "This allows the developer to set which instances the rules applies to by the service account they run as. This enforces least-privilage using targeted control. A policy should be set that rules be scoped specifically to the target service accounts."
     },
     "rule.tls_inspect": {
       "description": "Boolean flag indicating if the traffic should be TLS decrypted.\nIt can be set only if action = 'apply_security_profile_group' and cannot be set for other actions.",
@@ -129,21 +129,21 @@
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "This matches the rule to the address group, a policy has no way of determining if an address group has a security implication and therefore enforcement is not possible. Restricting this would hinder developers. "
+      "rationale": "These values are identifiers referencing separate firewall address group resources. We cannot contrain references or identifiers that point to other resources. Therefore no policy is written here. "
     },
     "rule.match.dest_fqdns": {
       "description": "Fully Qualified Domain Name (FQDN) which should be matched against\ntraffic destination. Maximum number of destination fqdn allowed is 100.",
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "This matches the rule to fully qualified domain name, a policy has no way of determining if an domain has a security implication and therefore enforcement is not possible. Restricting this would hinder developers. "
+      "rationale": "Destination FQDN point the rule at a specific external domain. Which domain a team decideds to route to or allow/block is an architecture choice, This therefore means no security policy can be written here. "
     },
     "rule.match.dest_ip_ranges": {
       "description": "Destination IP address range in CIDR format. Required for\nEGRESS rules.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "A rule should restrict 0.0.0.0/0 to prevent unrestricted outbound traffic. By having a security policy here, it significantly reduces the attack surface."
+      "security_impact": false,
+      "rationale": "A rule that restricts destination IP ranges like 0.0.0.0/0 would be to overreaching as developers should have the ability to handle firewall rules themselves. "
     },
     "rule.match.dest_region_codes": {
       "description": "Region codes whose IP addresses will be used to match for destination\nof traffic. Should be specified as 2 letter country code defined as per\nISO 3166 alpha-2 country codes. ex.\"US\"\nMaximum number of destination region codes allowed is 5000.",
@@ -171,14 +171,14 @@
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "This matches the rule to fully qualified domain name, a policy has no way of determining if an domain has a security implication and therefore enforcement is not possible. Restricting this would hinder developers."
+      "rationale": "Source FQDN point the rule at a specific external domain. Which domain a team decideds to route to or allow/block is an architecture choice, This therefore means no security policy can be written here. "
     },
     "rule.match.src_ip_ranges": {
       "description": "Source IP address range in CIDR format. Required for\nINGRESS rules.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "A rule should restrict 0.0.0.0/0 to prevent unrestricted inbound traffic. By having a security policy here, it significantly reduces the attack surface."
+      "security_impact": false,
+      "rationale": "A rule that restricts destination IP ranges like 0.0.0.0/0 would be to overreaching as developers should have the ability to handle firewall rules themselves. "
     },
     "rule.match.src_region_codes": {
       "description": "Region codes whose IP addresses will be used to match for source\nof traffic. Should be specified as 2 letter country code defined as per\nISO 3166 alpha-2 country codes. ex.\"US\"\nMaximum number of source region codes allowed is 5000.",
@@ -211,7 +211,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "By allowing access to every port, this significantly increases the attack surface. A policy should require rules to not have non-empty port list allowing access to every port, policy could also restirct high risk ports like SMBv1 or RDC."
+      "rationale": "By allowing access to every port, this significantly increases the attack surface. A policy should require rules to not have non-empty port list allowing access to every port or to limit wildcard port ranges."
     },
     "rule.match.src_secure_tag": {
       "type": "block",
