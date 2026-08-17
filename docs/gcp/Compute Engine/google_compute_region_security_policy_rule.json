@@ -6,8 +6,8 @@
       "description": "The Action to perform when the rule is matched. The following are the valid actions:\n\n* allow: allow access to target.\n\n* deny(STATUS): deny access to target, returns the HTTP response code specified. Valid values for STATUS are 403, 404, and 502.\n\n* rate_based_ban: limit client traffic to the configured threshold and ban the client if the traffic exceeds the threshold. Configure parameters for this action in RateLimitOptions. Requires rateLimitOptions to be set.\n\n* redirect: redirect to a different target. This can either be an internal reCAPTCHA redirect, or an external URL-based redirect via a 302 response. Parameters for this action can be configured via redirectOptions. This action is only supported in Global Security Policies of type CLOUD_ARMOR.\n\n* throttle: limit client traffic to the configured threshold. Configure parameters for this action in rateLimitOptions. Requires rateLimitOptions to be set for this.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This setting decides what happens when traffic matches the rule. Choosing the wrong action could allow harmful traffic through or block legitimate users."
+      "security_impact": false,
+      "rationale": "This field defines what the rule does when traffic matches, such as allow, deny or rate limit. The correct action depends on what the rule is meant to achieve, so it is a functional configuration rather than a general security policy target."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
@@ -21,7 +21,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field is only used to describe the rule. Changing the description does not affect how the rule works or how it protects the service."
+      "rationale": "This field is only used to describe the resource. It does not affect the behaviour or security of the rule."
     },
     "preview": {
       "description": "If set to true, the specified action is not enforced.",
@@ -35,14 +35,14 @@
       "required": true,
       "type": "number",
       "security_impact": false,
-      "rationale": "This field only decides the order in which security rules are checked. It does not change what the rule allows or blocks by itself."
+      "rationale": "This field controls the order in which rules are evaluated. The correct order depends on how the team has designed the rule set, so it is an architectural choice rather than a general security policy target."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field identifies which Google Cloud project the rule belongs to. It does not change how the security rule behaves or protects the service."
+      "rationale": "This field identifies the Google Cloud project that the resource belongs to. It is a resource reference rather than a security setting that should be constrained."
     },
     "region": {
       "description": "The Region in which the created Region Security Policy rule should reside.",
@@ -56,7 +56,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field identifies which security policy the rule belongs to. It does not change how the rule works or how it protects the service."
+      "rationale": "This field identifies the parent security policy that the rule belongs to. It is a resource reference rather than a security setting that should be constrained."
     },
     "match": {
       "type": "block",
@@ -139,14 +139,14 @@
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "This field specifies which source ports the rule matches. Source ports can vary between systems, so there is no single secure value that applies to every environment."
+      "rationale": "This field controls which source ports the rule matches. Very broad or wildcard port matching could include traffic that was not intended and expose internal services, but the required source ports depend on the application's network design, so a generic port value cannot be enforced."
     },
     "network_match.src_region_codes": {
       "description": "Two-letter ISO 3166-1 alpha-2 country code associated with the source IP address.",
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "This field matches traffic based on the country it comes from. Which countries should be allowed or restricted depends on the organisation, so there is no universal security rule for this field."
+      "rationale": "This field can restrict traffic based on its geographic source and can therefore support geo-fencing and perimeter security. However, the approved countries or regions depend on the organisation's access requirements, so a generic region list cannot be enforced."
     },
     "network_match.user_defined_fields": {
       "type": "block",
@@ -158,14 +158,14 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field identifies a custom packet field created by the organisation. The correct field name depends on how their network is configured, so there is no single security rule that applies to everyone."
+      "rationale": "This field is the name of a custom packet field defined elsewhere in the configuration. It is a metadata identifier or reference, and resource names or identifiers are not constrained by a general security policy."
     },
     "network_match.user_defined_fields.values": {
       "description": "Matching values of the field. Each element can be a 32-bit unsigned decimal or hexadecimal (starting with \"0x\") number (e.g. \"64\") or range (e.g. \"0x400-0x7ff\").",
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "his field contains the values that the custom packet field should match. These values depend on the organisation's network setup, so there is no universal secure value for this field."
+      "rationale": "This field contains custom values used to match application traffic. The required values depend on the custom field and the application's traffic, so they are not suitable for generic policy enforcement."
     },
     "preconfigured_waf_config": {
       "type": "block",
@@ -189,7 +189,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field identifies which WAF rule set the exclusion belongs to. The correct rule set depends on the application, so there is no single security value that works for every environment."
+      "rationale": "This field identifies the WAF rule set that the exclusion applies to. It is a reference to another configuration rather than a security value that should be generically constrained."
     },
     "preconfigured_waf_config.exclusion.request_cookie": {
       "type": "block",
@@ -219,15 +219,15 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value. Possible values: [\"CONTAINS\", \"ENDS_WITH\", \"EQUALS\", \"EQUALS_ANY\", \"STARTS_WITH\"]",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This setting controls how broadly a request header is excluded from security inspection. A broad option could allow unsafe header values to bypass important checks."
+      "security_impact": false,
+      "rationale": "This field defines how a request header is matched, such as EQUALS or STARTS_WITH. It controls matching logic rather than a security level, so the correct operator depends on the application's exclusion requirements."
     },
     "preconfigured_waf_config.exclusion.request_header.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field specifies the header value that is excluded from inspection. The correct value depends on the application, so there is no single security rule that applies to every environment."
+      "rationale": "This field contains the application-specific header value to be excluded from inspection. The required value depends on the application, so it cannot be generically enforced as a security policy."
     },
     "preconfigured_waf_config.exclusion.request_query_param": {
       "type": "block",
@@ -238,8 +238,8 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value. Possible values: [\"CONTAINS\", \"ENDS_WITH\", \"EQUALS\", \"EQUALS_ANY\", \"STARTS_WITH\"]",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This setting controls how broadly a query parameter is excluded from security inspection. A broad option could allow unsafe values to bypass important checks."
+      "security_impact": false,
+      "rationale": "This field defines how a query parameter is matched for an exclusion. It is a functional matching option rather than a security control, so the correct operator depends on the application's exclusion requirements."
     },
     "preconfigured_waf_config.exclusion.request_query_param.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
@@ -257,8 +257,8 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value. Possible values: [\"CONTAINS\", \"ENDS_WITH\", \"EQUALS\", \"EQUALS_ANY\", \"STARTS_WITH\"]",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This setting controls how broadly a web address is excluded from security inspection. A broad option could allow unsafe requests to skip important security checks."
+      "security_impact": false,
+      "rationale": "This field defines how a request URI is matched for an exclusion. It controls matching behaviour rather than security posture, so the correct operator depends on the application's routing and exclusion requirements."
     },
     "preconfigured_waf_config.exclusion.request_uri.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
@@ -291,7 +291,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field decides how requests are grouped when applying rate limits. Different services may need to group traffic by IP address, cookie, header, path or another value, so there is no single option that is secure for every environment."
+      "rationale": "This field decides how requests are grouped for rate limiting, such as by IP address, cookie or header. The appropriate grouping method depends on the application's architecture and traffic model, so it is an architectural choice rather than a general security control."
     },
     "rate_limit_options.enforce_on_key_name": {
       "description": "Rate limit key name applicable only for the following key types:\nHTTP_HEADER -- Name of the HTTP header whose value is taken as the key value.\nHTTP_COOKIE -- Name of the HTTP cookie whose value is taken as the key value.",
@@ -304,8 +304,8 @@
       "description": "Action to take for requests that are above the configured rate limit threshold, to deny with a specified HTTP response code.\nValid options are deny(STATUS), where valid values for STATUS are 403, 404, 429, and 502.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This setting decides what happens when the rate limit is exceeded. An incorrect action could fail to stop abusive traffic."
+      "security_impact": false,
+      "rationale": "This field defines what happens when the configured rate limit is exceeded. The response depends on the intended application behaviour, so choosing the action is an operational configuration rather than a general platform security policy target."
     },
     "rate_limit_options.ban_threshold": {
       "type": "block",
@@ -343,7 +343,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field decides how requests are grouped when applying rate limits. Different services may need to group traffic in different ways, so there is no single option that is secure for every environment."
+      "rationale": "This field selects the type of value used to group requests for rate limiting, such as an IP address, cookie or header. This is an architectural traffic-grouping choice rather than a general security policy target."
     },
     "rate_limit_options.rate_limit_threshold": {
       "type": "block",
