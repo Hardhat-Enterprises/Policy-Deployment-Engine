@@ -7,7 +7,4 @@ terraform {
   }
 }
 
-provider "google" {
-  project = "example-project"
-  region  = "australia-southeast2"
-}
+provider "google" {}

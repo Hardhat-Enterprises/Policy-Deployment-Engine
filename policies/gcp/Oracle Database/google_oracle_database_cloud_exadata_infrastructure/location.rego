@@ -1,8 +1,16 @@
-package hardhat.gcp.oracle_database.cloud_exadata_infrastructure.location
+package terraform.gcp.security.oracle_database.cloud_exadata_infrastructure.location
+import data.terraform.helpers
+import data.terraform.gcp.security.oracle_database.cloud_exadata_infrastructure.vars
 
-approved_locations := {"australia-southeast1", "australia-southeast2"}
-
-deny[msg] {
-    not approved_locations[input.resource.location]
-    msg := sprintf("Location %s is not approved for Exadata deployment.", [input.resource.location])
-}
+conditions := [
+    [
+    {"situation_description" : "The Cloud Exadata Infrastructure is deployed outside the approved Australian regions",
+    "remedies":[ "Deploy the infrastructure in an approved region (australia-southeast1 or australia-southeast2) to meet data residency requirements"]},
+    {
+        "condition": "Test if location is not an approved Australian region",
+        "attribute_path" : ["location"],
+        "values" : ["australia-southeast1", "australia-southeast2"],
+        "policy_type" : "whitelist"
+    }
+    ]
+]

@@ -1,6 +1,16 @@
-package hardhat.gcp.oracle_database.cloud_exadata_infrastructure.deletion_protection
+package terraform.gcp.security.oracle_database.cloud_exadata_infrastructure.deletion_protection
+import data.terraform.helpers
+import data.terraform.gcp.security.oracle_database.cloud_exadata_infrastructure.vars
 
-deny[msg] {
-    input.resource.deletion_protection == false
-    msg := "Deletion protection must be enabled to prevent accidental destruction."
-}
+conditions := [
+    [
+    {"situation_description" : "The Cloud Exadata Infrastructure can be destroyed by Terraform without an explicit safeguard",
+    "remedies":[ "Set deletion_protection to true so a terraform destroy or a destructive apply against this instance will fail"]},
+    {
+        "condition": "Test if deletion_protection is not set to true",
+        "attribute_path" : ["deletion_protection"],
+        "values" : [true],
+        "policy_type" : "whitelist"
+    }
+    ]
+]

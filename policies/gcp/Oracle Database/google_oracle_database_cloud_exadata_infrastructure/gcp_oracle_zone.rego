@@ -1,8 +1,16 @@
-package hardhat.gcp.oracle_database.cloud_exadata_infrastructure.gcp_oracle_zone
+package terraform.gcp.security.oracle_database.cloud_exadata_infrastructure.gcp_oracle_zone
+import data.terraform.helpers
+import data.terraform.gcp.security.oracle_database.cloud_exadata_infrastructure.vars
 
-allowed_zones := {"us-east4-b-r2", "us-central1-b-r1", "europe-west4-b-r2"}
-
-deny[msg] {
-    not allowed_zones[input.resource.gcp_oracle_zone]
-    msg := sprintf("Zone %s is not approved for Exadata infrastructure.", [input.resource.gcp_oracle_zone])
-}
+conditions := [
+    [
+    {"situation_description" : "The Oracle Exadata hardware is hosted in a GCP zone outside the approved Australian regions",
+    "remedies":[ "Host the Exadata hardware in an approved region (australia-southeast1 or australia-southeast2) to meet data residency requirements"]},
+    {
+        "condition": "Test if gcp_oracle_zone is not an approved Australian region",
+        "attribute_path" : ["gcp_oracle_zone"],
+        "values" : ["australia-southeast1", "australia-southeast2"],
+        "policy_type" : "whitelist"
+    }
+    ]
+]
