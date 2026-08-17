@@ -103,7 +103,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "A security profile group is an great addition to a firewall rule as it allows advanced traffic inspection (IDS, Anti-Malware and URL Filtering) to be implimented."
+      "rationale": "A security profile group attaches advanced traffic inspection (IDS, anti-malware and URL filtering) to the rule, which is a higher-assurance feature tier rather than a plain allow/deny decision. This falls under the whitelist secure tiers/features archetype: where traffic inspection is mandated, policy should require rules to reference a security profile group (and correspondingly use the 'apply_security_profile_group' action). The set of approved profile groups is parameterised rather than hardcoded."
     },
     "rule.target_service_accounts": {
       "description": "A list of service accounts indicating the sets of\ninstances that are applied with this rule.",
@@ -143,14 +143,14 @@
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "A rule that restricts destination IP ranges like 0.0.0.0/0 would be to overreaching as developers should have the ability to handle firewall rules themselves. "
+      "rationale": "Destination CIDR blocks are network address ranges, which per the service-wide guidelines are team addressing and architectural choices. Segmentation is delivered by the firewall rules themselves rather than by constraining range size, and flagging broad ranges such as 0.0.0.0/0 would overreach because many egress rules legitimately require broad or internet-bound destinations."
     },
     "rule.match.dest_region_codes": {
       "description": "Region codes whose IP addresses will be used to match for destination\nof traffic. Should be specified as 2 letter country code defined as per\nISO 3166 alpha-2 country codes. ex.\"US\"\nMaximum number of destination region codes allowed is 5000.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "This rule matches traffic sources by ISO 3166 Country code, restricting connections that may originate from the region. Policy should be able to require destination region codes to be constrained to an approved country rather than accepting traffic from anywhere."
+      "security_impact": true,
+      "rationale": "This matches traffic destinations by ISO 3166 country code, making it a geolocation control. Data residency and geo-restriction are sanctioned policy targets regardless of whether the resource itself stores data, so restricting which countries workloads may send traffic to is in scope. Policy should require destination region codes to fall within an approved country whitelist, with the allowed set parameterised."
     },
     "rule.match.dest_threat_intelligences": {
       "description": "Names of Network Threat Intelligence lists.\nThe IPs in these lists will be matched against traffic destination.",
@@ -178,7 +178,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "A rule that restricts source IP ranges like 0.0.0.0/0 would be to overreaching as developers should have the ability to handle firewall rules themselves. "
+      "rationale": "Source CIDR blocks are network address ranges used for team segmentation and architectural design, which the service-wide guidelines place outside policy scope. Constraining range size here would substitute platform opinion for the team's own addressing and firewall design "
     },
     "rule.match.src_region_codes": {
       "description": "Region codes whose IP addresses will be used to match for source\nof traffic. Should be specified as 2 letter country code defined as per\nISO 3166 alpha-2 country codes. ex.\"US\"\nMaximum number of source region codes allowed is 5000.",
@@ -211,7 +211,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "If no port is provided, the default rule applies to every port which siginificantly increases the attack surface. Policy should enforce structual limits such as require an explicit, non empty port list or prevent overley broad port ranges. This should not hardcode any specific ports as that would constrain how developers can build their firewall architecture."
+      "rationale": "If no port list is supplied the rule applies to connections through every port, which significantly increases the attack surface. Policy should enforce structural limits: require an explicit, non-empty port list on TCP/UDP rules and reject wildcard or excessively broad port ranges. It should not hardcode which specific ports a team may open, as that would constrain their architecture."
     },
     "rule.match.src_secure_tag": {
       "type": "block",
