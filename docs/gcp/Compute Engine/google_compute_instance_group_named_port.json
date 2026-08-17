@@ -6,36 +6,36 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can delete or abandon the resource. Preventing unintended destruction can help preserve infrastructure and associated security configuration."
     },
     "group": {
       "description": "The name of the instance group.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the specific instance group to which the named port applies. This is a resource-specific reference and cannot be generalised into a platform-wide security policy."
     },
     "name": {
       "description": "The name for this named port. The name must be 1-63 characters\nlong, and comply with RFC1035.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides the service name associated with the port. The appropriate name is application-specific and cannot be meaningfully constrained through a general platform-wide security policy."
     },
     "port": {
       "description": "The port number, which can be a value between 1 and 65535.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Specifies the service port associated with the instance group and used by load-balancing configurations for backend traffic. Policy can constrain this value to approved service ports or ranges to reduce unintended exposure of sensitive services."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This identifies the project containing the resource. Project identifiers are team-specific scope references and cannot be generalised into a platform-wide security policy."
     },
     "zone": {
       "description": "The zone of the instance group.",
