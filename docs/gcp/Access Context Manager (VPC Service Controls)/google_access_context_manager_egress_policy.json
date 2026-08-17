@@ -3,25 +3,25 @@
   "provider_version": "7.37.0",
   "arguments": {
     "deletion_policy": {
-      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
-      "required": false,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "egress_policy_name": {
-      "description": "The name of the Service Perimeter to add this resource to.",
-      "required": true,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "resource": {
-      "description": "A GCP resource that is inside of the service perimeter.",
-      "required": true,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    }
+  "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+  "required": false,
+  "type": "string",
+  "security_impact": false,
+  "rationale": "Controls Terraform lifecycle behaviour for the resource rather than the security conditions enforced by the egress policy."
+},
+"egress_policy_name": {
+  "description": "The name of the Service Perimeter to add this resource to.",
+  "required": true,
+  "type": "string",
+  "security_impact": false,
+  "rationale": "Identifies the target service perimeter for the resource and is environment-specific configuration rather than a generic security control enforced by the Policy Deployment Engine."
+},
+"resource": {
+  "description": "A GCP resource that is inside of the service perimeter.",
+  "required": true,
+  "type": "string",
+  "security_impact": false,
+  "rationale": "Specifies a workload-specific GCP resource inside the perimeter. The Policy Deployment Engine should not prescribe which individual resources an organisation must include."
+}
   }
 }
