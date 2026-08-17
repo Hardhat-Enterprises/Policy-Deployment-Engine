@@ -67,15 +67,15 @@
       "description": "Maximum size of the node group. Set to a value less than or equal\nto 100 and greater than or equal to min-nodes.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "This field sets the maximum size the node group can grow to. It is an operational resource-sizing choice based on workload needs rather than a security policy target."
+      "security_impact": true,
+      "rationale": "This field limits how large the node group can grow. Setting a maximum helps reduce the risk of uncontrolled resource growth, capacity exhaustion and excessive infrastructure cost."
     },
     "autoscaling_policy.min_nodes": {
       "description": "Minimum size of the node group. Must be less\nthan or equal to max-nodes. The default value is 0.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "This field sets the minimum number of nodes the group can scale down to. It is an operational capacity choice rather than a security policy target."
+      "security_impact": true,
+      "rationale": "This field sets the minimum number of nodes that must remain available. A minimum floor can help maintain redundancy and prevent the group from scaling down too far during normal operation."
     },
     "autoscaling_policy.mode": {
       "description": "The autoscaling mode. Set to one of the following:\n  - OFF: Disables the autoscaler.\n  - ON: Enables scaling in and scaling out.\n  - ONLY_SCALE_OUT: Enables only scaling out.\n  You must use this mode if your node groups are configured to\n  restart their hosted VMs on minimal servers. Possible values: [\"OFF\", \"ON\", \"ONLY_SCALE_OUT\"]",
@@ -93,8 +93,8 @@
       "description": "instances.start time of the window. This must be in UTC format that resolves to one of 00:00, 04:00, 08:00, 12:00, 16:00, or 20:00. For example, both 13:00-5 and 08:00 are valid.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This field controls when infrastructure maintenance can begin. It is an operational scheduling choice used to manage service disruption rather than a security policy target."
+      "security_impact": true,
+      "rationale": "This field controls when maintenance can begin. Keeping maintenance within an approved window helps ensure security updates and patches are applied without leaving infrastructure exposed for longer than necessary."
     },
     "share_settings": {
       "type": "block",
@@ -117,15 +117,15 @@
       "description": "N/A",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This field is an internal identifier for an entry in the sharing configuration. It is a structural reference and resource identifiers are not constrained by a general security policy."
+      "security_impact": true,
+      "rationale": "This field identifies an entry in the sharing configuration. Because the sharing map controls which projects can use the node group, it forms part of the access boundary for shared compute resources."
     },
     "share_settings.project_map.project_id": {
       "description": "The project id/number should be the same as the key of this project config in the project map.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This field references a specific Google Cloud project in the sharing configuration. Project names and IDs are environment-specific references rather than platform-wide security policy targets."
+      "security_impact": true,
+      "rationale": "This field identifies a project that is allowed to use the shared node group. Restricting the allowed project IDs helps prevent unintended or unauthorized cross-project access."
     }
   }
 }
