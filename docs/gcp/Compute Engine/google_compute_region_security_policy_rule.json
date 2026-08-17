@@ -6,8 +6,8 @@
       "description": "The Action to perform when the rule is matched. The following are the valid actions:\n\n* allow: allow access to target.\n\n* deny(STATUS): deny access to target, returns the HTTP response code specified. Valid values for STATUS are 403, 404, and 502.\n\n* rate_based_ban: limit client traffic to the configured threshold and ban the client if the traffic exceeds the threshold. Configure parameters for this action in RateLimitOptions. Requires rateLimitOptions to be set.\n\n* redirect: redirect to a different target. This can either be an internal reCAPTCHA redirect, or an external URL-based redirect via a 302 response. Parameters for this action can be configured via redirectOptions. This action is only supported in Global Security Policies of type CLOUD_ARMOR.\n\n* throttle: limit client traffic to the configured threshold. Configure parameters for this action in rateLimitOptions. Requires rateLimitOptions to be set for this.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This field defines what the rule does when traffic matches, such as allow, deny or rate limit. The correct action depends on what the rule is meant to achieve, so it is a functional configuration rather than a general security policy target."
+      "security_impact": true,
+      "rationale": "This field controls what happens when traffic matches the rule. An overly permissive action such as allow can weaken the rule, so restrictive defaults can be enforced where appropriate."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
@@ -145,8 +145,8 @@
       "description": "Two-letter ISO 3166-1 alpha-2 country code associated with the source IP address.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "This field can restrict traffic based on its geographic source and can therefore support geo-fencing and perimeter security. However, the approved countries or regions depend on the organisation's access requirements, so a generic region list cannot be enforced."
+      "security_impact": true,
+      "rationale": "This field can restrict traffic to approved geographic regions. Requiring geographic restrictions can support perimeter security and data residency controls."
     },
     "network_match.user_defined_fields": {
       "type": "block",
@@ -165,7 +165,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "This field contains custom values used to match application traffic. The required values depend on the custom field and the application's traffic, so they are not suitable for generic policy enforcement."
+      "rationale": "This field defines application-specific traffic matching values, so it is not suitable for generic platform policy."
     },
     "preconfigured_waf_config": {
       "type": "block",
@@ -189,7 +189,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field identifies the WAF rule set that the exclusion applies to. It is a reference to another configuration rather than a security value that should be generically constrained."
+      "rationale": "This field references a specific WAF rule set rather than an enforceable security standard."
     },
     "preconfigured_waf_config.exclusion.request_cookie": {
       "type": "block",
@@ -305,7 +305,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field defines what happens when the configured rate limit is exceeded. The response depends on the intended application behaviour, so choosing the action is an operational configuration rather than a general platform security policy target."
+      "rationale": "This field defines an operational response when rate limits are exceeded, so it is an application choice rather than a platform-wide policy target."
     },
     "rate_limit_options.ban_threshold": {
       "type": "block",
@@ -336,7 +336,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale":"This field names the header or cookie used to group requests for rate limiting. The correct name depends on the application, so there is no single security value that works for every environment."
+      "rationale": "This field names the header or cookie used to group requests for rate limiting. The correct name depends on the application, so there is no single security value that works for every environment."
     },
     "rate_limit_options.enforce_on_key_configs.enforce_on_key_type": {
       "description": "Determines the key to enforce the rateLimitThreshold on. Possible values are:\n* ALL: A single rate limit threshold is applied to all the requests matching this rule. This is the default value if \"enforceOnKeyConfigs\" is not configured.\n* IP: The source IP address of the request is the key. Each IP has this limit enforced separately.\n* HTTP_HEADER: The value of the HTTP header whose name is configured under \"enforceOnKeyName\". The key value is truncated to the first 128 bytes of the header value. If no such header is present in the request, the key type defaults to ALL.\n* XFF_IP: The first IP address (i.e. the originating client IP address) specified in the list of IPs under X-Forwarded-For HTTP header. If no such header is present or the value is not a valid IP, the key defaults to the source IP address of the request i.e. key type IP.\n* HTTP_COOKIE: The value of the HTTP cookie whose name is configured under \"enforceOnKeyName\". The key value is truncated to the first 128 bytes of the cookie value. If no such cookie is present in the request, the key type defaults to ALL.\n* HTTP_PATH: The URL path of the HTTP request. The key value is truncated to the first 128 bytes.\n* SNI: Server name indication in the TLS session of the HTTPS request. The key value is truncated to the first 128 bytes. The key type defaults to ALL on a HTTP session.\n* REGION_CODE: The country/region from which the request originates.\n* TLS_JA3_FINGERPRINT: JA3 TLS/SSL fingerprint if the client connects using HTTPS, HTTP/2 or HTTP/3. If not available, the key type defaults to ALL.\n* TLS_JA4_FINGERPRINT: JA4 TLS/SSL fingerprint if the client connects using HTTPS, HTTP/2 or HTTP/3. If not available, the key type defaults to ALL.\n* USER_IP: The IP address of the originating client, which is resolved based on \"userIpRequestHeaders\" configured with the security policy. If there is no \"userIpRequestHeaders\" configuration or an IP address cannot be resolved from it, the key type defaults to IP. Possible values: [\"ALL\", \"IP\", \"HTTP_HEADER\", \"XFF_IP\", \"HTTP_COOKIE\", \"HTTP_PATH\", \"SNI\", \"REGION_CODE\", \"TLS_JA3_FINGERPRINT\", \"TLS_JA4_FINGERPRINT\", \"USER_IP\"]",
