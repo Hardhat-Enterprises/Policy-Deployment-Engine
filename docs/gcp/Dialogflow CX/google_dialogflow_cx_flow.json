@@ -77,22 +77,22 @@
       "description": "If true, incoming audio is processed for DTMF (dual tone multi frequency) events. For example, if the caller presses a button on their telephone keypad and DTMF processing is enabled, Dialogflow will detect the event (e.g. a \"3\" was pressed) in the incoming audio and pass the event to the bot to drive business logic (e.g. when 3 is pressed, return the account balance).",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Enabling DTMF allows telephone keypad input to be processed by the flow. Controlling this feature can reduce unintended touch-tone input handling, including sensitive credential or account data entered through voice channels."
+      "security_impact": false,
+      "rationale": "This setting enables or disables DTMF processing for the voice flow. It is an operational interaction feature that controls how users provide touch-tone input, rather than a platform-level security boundary."
     },
     "advanced_settings.dtmf_settings.finish_digit": {
       "description": "The digit that terminates a DTMF digit sequence.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This value defines the digit that terminates a DTMF input sequence. Constraining the terminator supports predictable input parsing and reduces ambiguity in processing touch-tone sequences."
+      "security_impact": false,
+      "rationale": "This value defines the digit used to terminate a DTMF input sequence. The appropriate terminator depends on voice application design and is therefore an operational input-handling setting rather than a reusable security control."
     },
     "advanced_settings.dtmf_settings.max_digits": {
       "description": "Max length of DTMF digits.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "This value limits the maximum length of a DTMF sequence. Bounding input length reduces the risk of excessive or malformed digit sequences consuming processing resources or disrupting input parsing."
+      "security_impact": false,
+      "rationale": "This setting limits the number of DTMF digits accepted by the conversational flow. The appropriate length is determined by application requirements, making it an operational input configuration rather than a generic platform security policy."
     },
     "advanced_settings.logging_settings": {
       "type": "block",
@@ -129,15 +129,15 @@
       "description": "Sensitivity of the speech model that detects the end of speech. Scale from 0 to 100.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "This controls how aggressively Dialogflow detects the end of spoken input. Inappropriate values can prolong or prematurely terminate audio sessions, affecting resource availability and resistance to audio-session abuse."
+      "security_impact": false,
+      "rationale": "This value tunes how sensitively the flow detects the end of spoken input. It primarily affects conversational responsiveness and user experience rather than enforcing a platform-level security control."
     },
     "advanced_settings.speech_settings.models": {
       "description": "Mapping from language to Speech-to-Text model. The mapped Speech-to-Text model will be selected for requests from its corresponding language. For more information, see [Speech models](https://cloud.google.com/dialogflow/cx/docs/concept/speech-models).\nAn object containing a list of **\"key\": value** pairs. Example: **{ \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }**.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "This maps languages to Speech-to-Text models used to process voice data. Model selection affects how voice input is processed and therefore warrants oversight to ensure approved speech-processing models are used."
+      "security_impact": false,
+      "rationale": "This setting maps languages to Speech-to-Text models. Model selection is a functional and architectural choice based on language and recognition requirements rather than a generic security policy target."
     },
     "advanced_settings.speech_settings.no_speech_timeout": {
       "description": "Timeout before detecting no speech.\nA duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.5s\".",
@@ -339,7 +339,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This assigns application-specific values to conversational parameters. The correct value depends on runtime business logic and cannot be generically constrained as a security policy."
+      "rationale": "This field assigns an arbitrary application-defined value to a conversational parameter during fulfillment. Because the value depends on runtime business logic and application state, it cannot be generically constrained by a platform security policy."
     },
     "knowledge_connector_settings": {
       "type": "block",
@@ -410,7 +410,7 @@
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": "This controls streaming response timing for the fulfillment. It affects response behaviour and latency rather than platform security."
+      "rationale": "This setting controls whether queued fulfillment responses are returned early when using streaming APIs. It affects response timing and application behaviour rather than access control, data protection, or another platform security boundary."
     },
     "knowledge_connector_settings.trigger_fulfillment.tag": {
       "description": "The tag used by the webhook to identify which fulfillment is being called. This field is required if webhook is specified.",
@@ -506,29 +506,29 @@
       "description": "Sensitivity of the speech model that detects the end of speech. Scale from 0 to 100.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "This adjusts speech endpoint detection sensitivity for this fulfillment. It is a speech-recognition tuning value tied to interaction behaviour rather than a generic security requirement."
+      "security_impact": true,
+      "rationale": "This setting controls how aggressively speech endpoint detection occurs within the knowledge fulfillment path. Incorrectly permissive detection behaviour may allow audio processing to remain active unnecessarily, affecting service availability and resource consumption, so the value should be security-governed."
     },
     "knowledge_connector_settings.trigger_fulfillment.advanced_settings.speech_settings.models": {
       "description": "Mapping from language to Speech-to-Text model. The mapped Speech-to-Text model will be selected for requests from its corresponding language. For more information, see [Speech models](https://cloud.google.com/dialogflow/cx/docs/concept/speech-models).\nAn object containing a list of **\"key\": value** pairs. Example: **{ \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }**.",
       "required": false,
       "type": "map(string)",
-      "security_impact": false,
-      "rationale": "This maps languages to Speech-to-Text models for this fulfillment. Model selection is application and language dependent, so there is no single generic value that can be enforced across deployments."
+      "security_impact": true,
+      "rationale": "This setting determines which Speech-to-Text processing model is used for each language within knowledge fulfillment. Restricting model selection to approved processing engines supports secure architecture and prevents use of unapproved speech-processing configurations."
     },
     "knowledge_connector_settings.trigger_fulfillment.advanced_settings.speech_settings.no_speech_timeout": {
       "description": "Timeout before detecting no speech.\nA duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.500s\".",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This specifies how long the fulfillment waits before detecting no speech. The appropriate timeout is based on conversation design and operational requirements rather than a universal security threshold."
+      "security_impact": true,
+      "rationale": "This setting limits how long the fulfillment waits when no speech is detected. Enforcing an appropriate timeout helps prevent unnecessarily long or hung audio-processing sessions that could consume resources and contribute to denial-of-service conditions."
     },
     "knowledge_connector_settings.trigger_fulfillment.advanced_settings.speech_settings.use_timeout_based_endpointing": {
       "description": "Use timeout based endpointing, interpreting endpointer sensitivity as seconds of timeout value.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "This selects timeout-based speech endpoint detection for the fulfillment. It changes speech-processing behaviour rather than establishing a platform security boundary."
+      "security_impact": true,
+      "rationale": "This setting enables timeout-based speech endpoint detection. Controlling endpointing behaviour helps ensure audio-processing sessions terminate predictably and reduces the risk of resource exhaustion from excessively long-running speech input."
     },
     "knowledge_connector_settings.trigger_fulfillment.conditional_cases": {
       "type": "block",
@@ -539,8 +539,8 @@
       "description": "A JSON encoded list of cascading if-else conditions. Cases are mutually exclusive. The first one with a matching condition is selected, all the rest ignored.\nSee [Case](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/Fulfillment#case) for the schema.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This contains conditional application logic controlling how the fulfillment behaves. The conditions are business-specific conversational routing rules and cannot be generically constrained as security policy."
+      "security_impact": true,
+      "rationale": "This field defines conditional routing logic used during knowledge fulfillment. Because these conditions can determine which execution path and downstream actions are reached, controlling permitted routing logic can help prevent unintended access paths or security-sensitive flow transitions."
     },
     "knowledge_connector_settings.trigger_fulfillment.messages": {
       "type": "block",
@@ -551,15 +551,15 @@
       "description": "The channel which the response is associated with. Clients can specify the channel via QueryParameters.channel, and only associated channel response will be returned.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This chooses which communication channel receives the fulfillment response. It is an application-delivery configuration rather than a reusable platform security control."
+      "security_impact": true,
+      "rationale": "This setting determines the communication channel through which the fulfillment response is delivered. Restricting responses to approved channels helps maintain defined data-delivery and exfiltration boundaries."
     },
     "knowledge_connector_settings.trigger_fulfillment.messages.payload": {
       "description": "Returns a response containing a custom, platform-specific payload.\nThis field is part of a union field 'message': Only one of 'text', 'payload', 'conversationSuccess', 'outputAudioText', 'liveAgentHandoff', 'endInteraction', 'playAudio', 'mixedAudio', 'telephonyTransferCall', or 'knowledgeInfoCard' may be set.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This contains a free-form, platform-specific response payload. Its structure and content are controlled by the application and cannot be meaningfully constrained by a generic security policy."
+      "security_impact": true,
+      "rationale": "This field contains a free-form platform-specific response payload. Because arbitrary payload content may introduce injection risks or expose credentials and sensitive data, it requires security controls for payload sanitisation and secure content handling."
     },
     "knowledge_connector_settings.trigger_fulfillment.messages.conversation_success": {
       "type": "block",
@@ -570,8 +570,8 @@
       "description": "Custom metadata. Dialogflow doesn't impose any structure on this.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This contains custom metadata associated with conversation success. It is team-defined application data and Dialogflow does not assign it a platform security meaning."
+      "security_impact": true,
+      "rationale": "This field contains custom metadata associated with successful conversations. Metadata can unintentionally include sensitive or identifying information, so security controls should prevent confidential data from being exposed through response metadata or subsequent logging."
     },
     "knowledge_connector_settings.trigger_fulfillment.messages.knowledge_info_card": {
       "type": "block",
@@ -674,7 +674,7 @@
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "This controls the confidence threshold used for NLU intent matching. It tunes conversational model behaviour and accuracy rather than enforcing an infrastructure security boundary."
+      "rationale": "This value controls the confidence threshold used by the NLU model when matching user input to intents. Appropriate confidence levels depend on each conversational application's accuracy and fallback requirements, so a platform security policy should not impose a universal threshold."
     },
     "nlu_settings.model_training_mode": {
       "description": "Indicates NLU model training mode.\n* MODEL_TRAINING_MODE_AUTOMATIC: NLU model training is automatically triggered when a flow gets modified. User can also manually trigger model training in this mode.\n* MODEL_TRAINING_MODE_MANUAL: User needs to manually trigger NLU model training. Best for large flows whose models take long time to train. Possible values: [\"MODEL_TRAINING_MODE_AUTOMATIC\", \"MODEL_TRAINING_MODE_MANUAL\"]",
