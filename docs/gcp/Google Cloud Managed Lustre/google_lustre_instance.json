@@ -13,15 +13,15 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This just tells Terraform 'can you delete this or not' — it's a Terraform safety switch, not something that changes who can access the data."
     },
     "description": {
       "description": "A user-readable description of the instance.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides descriptive metadata for the resource."
     },
     "filesystem": {
       "description": "The filesystem name for this instance. This name is used by client-side\ntools, including when mounting the instance. Must be eight characters or\nless and can only contain letters and numbers.",
@@ -35,28 +35,28 @@
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Toggles whether GKE clients can discover and mount the Lustre instance. Enabling it broadens which workloads can reach the filesystem, so a policy can govern this exposure toggle to ensure GKE access is only enabled deliberately and disabled when not needed."
+      "rationale": "Enables GKE workloads to access the Lustre filesystem, increasing the potential access surface."
     },
     "instance_id": {
       "description": "The name of the Managed Lustre instance.\n\n* Must contain only lowercase letters, numbers, and hyphens.\n* Must start with a letter.\n* Must be between 1-63 characters.\n* Must end with a number or a letter.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides a unique identifier for the Lustre instance."
     },
     "kms_key": {
       "description": "The Cloud KMS key name to use for data encryption.\nIf not set, the instance will use Google-managed encryption keys.\nIf set, the instance will use customer-managed encryption keys.\nThe key must be in the same region as the instance.\nThe key format is:\nprojects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{key}",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Specifies the encryption key used to protect data at rest."
     },
     "labels": {
       "description": "Labels as key value pairs.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides metadata for resource organization and management."
     },
     "location": {
       "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
@@ -70,28 +70,28 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "References the VPC network the Lustre instance attaches to. This is a pointer to a team-owned network resource; we do not constrain which network a resource references, and the full-resource-name format is provider-enforced, so there is no generic secure value to apply."
+      "rationale": "Determines the VPC network used to connect the Lustre instance and affects network isolation."
     },
     "per_unit_storage_throughput": {
       "description": "The throughput of the instance in MBps per TiB. Valid values are 125, 250,\n500, 1000.\nSee [Performance tiers and maximum storage\ncapacities](https://cloud.google.com/managed-lustre/docs/create-instance#performance-tiers)\nfor more information.\n\nIf the instance is using the Dynamic tier, this field must not be set or\nmust be set to zero.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": "GCP supports specific throughput tiers for predictable performance and resource allocation."
+      "security_impact":false,
+      "rationale": "Defines the storage performance level of the instance."
     },
     "placement_policy": {
       "description": "The placement policy name for the instance in the format of\nprojects/{project}/locations/{location}/resourcePolicies/{resource_policy}",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls resource placement for infrastructure and availability purposes."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the Google Cloud project in which the resource is created."
     },
     "access_rules_options": {
       "type": "block",
@@ -102,22 +102,22 @@
       "description": "The user squash GID for the default access rule.\nThis user squash GID applies to all root users connecting from clients\nthat are not matched by any of the access rules. If not set, the default\nis 0 (no GID squash).",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the GID mapping applied when root-user squashing is used."
     },
     "access_rules_options.default_squash_mode": {
       "description": "The squash mode for the default access rule.\nPossible values:\nNO_SQUASH\nROOT_SQUASH",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether root privileges are retained or restricted for unmatched clients."
     },
     "access_rules_options.default_squash_uid": {
       "description": "The user squash UID for the default access rule.\nThis user squash UID applies to all root users connecting from clients\nthat are not matched by any of the access rules. If not set, the default\nis 0 (no UID squash).",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the UID mapping applied when root-user squashing is used."
     },
     "access_rules_options.access_rules": {
       "type": "block",
@@ -128,22 +128,22 @@
       "description": "The IP address ranges to which to apply this access rule. Accepts\nnon-overlapping CIDR ranges (e.g., '192.168.1.0/24') and IP addresses\n(e.g., '192.168.1.0').",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies application-specific IP ranges to which an access rule applies."
     },
     "access_rules_options.access_rules.name": {
       "description": "The name of the access rule policy group.\nMust be 16 characters or less and include only alphanumeric characters\nor '_'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides an identifier for the access-rule group."
     },
     "access_rules_options.access_rules.squash_mode": {
       "description": "Squash mode for the access rule.\nPossible values:\nNO_SQUASH\nROOT_SQUASH",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls root-user privilege handling for clients matching the access rule."
     },
     "dynamic_tier_options": {
       "type": "block",
@@ -154,8 +154,8 @@
       "description": "The dynamic tier mode of the instance.\nPossible values:\nDISABLED\nDEFAULT_CACHE",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the operating mode of the Dynamic storage tier."
     },
     "maintenance_policy": {
       "type": "block",
@@ -176,22 +176,22 @@
       "description": "Day of a month. Must be from 1 to 31 and valid for the year and month, or 0\nto specify a year by itself or a year and month where the day isn't\nsignificant.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Day component of the exclusion window's end date. A scheduling value with no security implication."
     },
     "maintenance_policy.maintenance_exclusion_window.end_date.month": {
       "description": "Month of a year. Must be from 1 to 12, or 0 to specify a year without a\nmonth and day.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Month component of the exclusion window's end date. Same reasoning as day."
     },
     "maintenance_policy.maintenance_exclusion_window.end_date.year": {
       "description": "Year of the date. Must be from 1 to 9999, or 0 to specify a date without\na year.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Year component of the exclusion window's end date. Same reasoning as day."
     },
     "maintenance_policy.maintenance_exclusion_window.start_date": {
       "type": "block",
@@ -202,22 +202,22 @@
       "description": "Day of a month. Must be from 1 to 31 and valid for the year and month, or 0\nto specify a year by itself or a year and month where the day isn't\nsignificant.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Day component of the exclusion window's start date. Scheduling only."
     },
     "maintenance_policy.maintenance_exclusion_window.start_date.month": {
       "description": "Month of a year. Must be from 1 to 12, or 0 to specify a year without a\nmonth and day.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Month component of the exclusion window's start date. Scheduling only."
     },
     "maintenance_policy.maintenance_exclusion_window.start_date.year": {
       "description": "Year of the date. Must be from 1 to 9999, or 0 to specify a date without\na year.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Year component of the exclusion window's start date. Scheduling only."
     },
     "maintenance_policy.maintenance_exclusion_window.time": {
       "type": "block",
@@ -228,29 +228,29 @@
       "description": "Hours of a day in 24 hour format. Must be greater than or equal to 0 and\ntypically must be less than or equal to 23. An API may choose to allow the\nvalue \"24:00:00\" for scenarios like business closing time.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Hour value within the exclusion window's time-of-day. No security relevance."
     },
     "maintenance_policy.maintenance_exclusion_window.time.minutes": {
       "description": "Minutes of an hour. Must be greater than or equal to 0 and less than or\nequal to 59.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Minute value within the exclusion window's time-of-day. No security relevance."
     },
     "maintenance_policy.maintenance_exclusion_window.time.nanos": {
       "description": "Fractions of seconds, in nanoseconds. Must be greater than or equal to 0\nand less than or equal to 999,999,999.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sub-second precision for the exclusion window's time-of-day. No security relevance."
     },
     "maintenance_policy.maintenance_exclusion_window.time.seconds": {
       "description": "Seconds of a minute. Must be greater than or equal to 0 and typically must\nbe less than or equal to 59. An API may allow the value 60 if it allows\nleap-seconds.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Second value within the exclusion window's time-of-day. No security relevance."
     },
     "maintenance_policy.weekly_maintenance_windows": {
       "type": "block",
@@ -261,8 +261,8 @@
       "description": "Possible values:\nMONDAY\nTUESDAY\nWEDNESDAY\nTHURSDAY\nFRIDAY\nSATURDAY\nSUNDAY",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Day of the week on which the maintenance window occurs. Scheduling value only."
     },
     "maintenance_policy.weekly_maintenance_windows.start_time": {
       "type": "block",
@@ -273,29 +273,29 @@
       "description": "Hours of a day in 24 hour format. Must be greater than or equal to 0 and\ntypically must be less than or equal to 23. An API may choose to allow the\nvalue \"24:00:00\" for scenarios like business closing time.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Hour value for the weekly maintenance window's start time. No security relevance."
     },
     "maintenance_policy.weekly_maintenance_windows.start_time.minutes": {
       "description": "Minutes of an hour. Must be greater than or equal to 0 and less than or\nequal to 59.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Minute value for the weekly maintenance window's start time. No security relevance."
     },
     "maintenance_policy.weekly_maintenance_windows.start_time.nanos": {
       "description": "Fractions of seconds, in nanoseconds. Must be greater than or equal to 0\nand less than or equal to 999,999,999.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sub-second precision for the weekly maintenance window's start time. No security relevance."
     },
     "maintenance_policy.weekly_maintenance_windows.start_time.seconds": {
       "description": "Seconds of a minute. Must be greater than or equal to 0 and typically must\nbe less than or equal to 59. An API may allow the value 60 if it allows\nleap-seconds.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Second value for the weekly maintenance window's start time. No security relevance."
     }
   }
 }
