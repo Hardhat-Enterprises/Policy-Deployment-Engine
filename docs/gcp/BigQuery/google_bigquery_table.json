@@ -6,113 +6,113 @@
       "description": "Specifies column names to use for data clustering. Up to four top-level columns are allowed, and should be specified in descending priority order.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "just picks columns to speed up queries does not change who can read the table"
     },
     "dataset_id": {
       "description": "The dataset ID to create the table in. Changing this forces a new resource to be created.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "tells which dataset the table goes in each team picks their own dataset so we cannot set one rule for everyone"
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "controls if terraform can delete the table policy should require PREVENT so data is not lost by mistake"
     },
     "deletion_protection": {
       "description": "Whether Terraform will be prevented from destroying the instance. When the field is set to true or unset in Terraform state, a terraform apply or terraform destroy that would delete the table will fail. When the field is set to false, deleting the table is allowed.",
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "deletion_protection prevents accidental deletion of the table"
+      "rationale": "when false terraform can delete the table policy should keep this true so the table is not removed by mistake"
     },
     "description": {
       "description": "The field description.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "just a text note about the table does not affect access or encryption"
     },
     "expiration_time": {
       "description": "The time when this table expires, in milliseconds since the epoch. If not present, the table will persist indefinitely. Expired tables will be deleted and their storage reclaimed.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "sets when the table auto deletes that is a lifecycle choice not a security setting"
     },
     "friendly_name": {
       "description": "A descriptive name for the table.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "display name only does not change security"
     },
     "ignore_auto_generated_schema": {
       "description": "Whether Terraform will prevent implicitly added columns in schema from showing diff.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "terraform diff setting only does not change table access in bigquery"
     },
     "ignore_schema_changes": {
       "description": "Mention which fields in schema are to be ignored",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "terraform diff setting only does not change who can use the table"
     },
     "labels": {
       "description": "A mapping of labels to assign to the resource.\n\n\t\t\t\t**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\n\t\t\t\tPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "optional tags for organisation each team uses different labels so no generic rule fits"
     },
     "max_staleness": {
       "description": "The maximum staleness of data that could be returned when the table (or stale MV) is queried. Staleness encoded as a string encoding of [SQL IntervalValue type](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#interval_type).",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Controls the maximum staleness (cache freshness) of data returned from the table/materialized view. This is a data-management/performance choice, not a security control, so there is no generic security policy worth enforcing."
+      "rationale": "controls how fresh cached data can be that is about performance not security"
     },
     "project": {
       "description": "The ID of the project in which the resource belongs.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "which gcp project owns the table each team has their own project so we cannot hardcode one"
     },
     "require_partition_filter": {
       "description": "If set to true, queries over this table require a partition filter that can be used for partition elimination to be specified.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "makes queries use a partition filter that saves cost not a security control"
     },
     "resource_tags": {
       "description": "The tags attached to this table. Tag keys are globally unique. Tag key is expected to be in the namespaced format, for example \"123456789012/environment\" where 123456789012 is the ID of the parent organization or project resource for this tag key. Tag value is expected to be the short name, for example \"Production\".",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "iam tags for governance tag values differ per org so no generic rule fits"
     },
     "schema": {
       "description": "A JSON schema for the table.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "defines table columns that is app design not a platform security rule"
     },
     "table_id": {
       "description": "A unique ID for the resource. Changing this forces a new resource to be created.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "table name inside the dataset naming is up to the team does not affect security"
     },
     "biglake_configuration": {
       "type": "block",
@@ -123,29 +123,29 @@
       "description": "The connection specifying the credentials to be used to read and write to external storage, such as Cloud Storage. The connection_id can have the form \"&lt;project\\_id&gt;.&lt;location\\_id&gt;.&lt;connection\\_id&gt;\" or \"projects/&lt;project\\_id&gt;/locations/&lt;location\\_id&gt;/connections/&lt;connection\\_id&gt;\".",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "points to a connection for external storage each team picks their own"
     },
     "biglake_configuration.file_format": {
       "description": "The file format the data is stored in.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "file type like parquet does not control who can access the table"
     },
     "biglake_configuration.storage_uri": {
       "description": "The fully qualified location prefix of the external folder where table data is stored. The '*' wildcard character is not allowed. The URI should be in the format \"gs://bucket/path_to_table/\"",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "gcs path where data lives each team has their own paths"
     },
     "biglake_configuration.table_format": {
       "description": "The table format the metadata only snapshots are stored in.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "metadata format for biglake does not change encryption or access"
     },
     "encryption_configuration": {
       "type": "block",
@@ -157,7 +157,7 @@
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "kms_key_name specifies the encryption key for the table"
+      "rationale": "picks the kms key for encryption policy should require cmek so data is not only google managed encrypted"
     },
     "external_catalog_table_options": {
       "type": "block",
@@ -168,15 +168,15 @@
       "description": "The connection specifying the credentials to be used to read external storage, such as Azure Blob, Cloud Storage, or S3. The connection is needed to read the open source table from BigQuery Engine. The connection_id can have the form <project_id>.<location_id>.<connection_id> or projects/<project_id>/locations/<location_id>/connections/<connection_id>.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "connection for reading external catalog data team specific choice"
     },
     "external_catalog_table_options.parameters": {
       "description": "A map of key value pairs defining the parameters and properties of the open source table. Corresponds with hive meta store table parameters. Maximum size of 4Mib.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "extra config for open source catalog tables not a security control"
     },
     "external_catalog_table_options.storage_descriptor": {
       "type": "block",
@@ -187,22 +187,22 @@
       "description": "Specifies the fully qualified class name of the InputFormat (e.g. \"org.apache.hadoop.hive.ql.io.orc.OrcInputFormat\"). The maximum length is 128 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "hadoop input format class name only affects how data is read"
     },
     "external_catalog_table_options.storage_descriptor.location_uri": {
       "description": "The physical location of the table (e.g. 'gs://spark-dataproc-data/pangea-data/case_sensitive/' or 'gs://spark-dataproc-data/pangea-data/*'). The maximum length is 2056 bytes.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "where external data files live team specific path"
     },
     "external_catalog_table_options.storage_descriptor.output_format": {
       "description": "Specifies the fully qualified class name of the OutputFormat (e.g. \"org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat\"). The maximum length is 128 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "hadoop output format class does not affect access"
     },
     "external_catalog_table_options.storage_descriptor.serde_info": {
       "type": "block",
@@ -213,22 +213,22 @@
       "description": "Name of the SerDe. The maximum length is 256 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "serde name for catalog tables just metadata"
     },
     "external_catalog_table_options.storage_descriptor.serde_info.parameters": {
       "description": "Key-value pairs that define the initialization parameters for the serialization library. Maximum size 10 Kib.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "serde settings for the workload not security"
     },
     "external_catalog_table_options.storage_descriptor.serde_info.serialization_library": {
       "description": "Specifies a fully-qualified class name of the serialization library that is responsible for the translation of data between table representation and the underlying low-level input and output format structures. The maximum length is 256 characters.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "which library reads the bytes does not control access"
     },
     "external_data_configuration": {
       "type": "block",
@@ -239,99 +239,99 @@
       "description": "Let BigQuery try to autodetect the schema and format of the table.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "lets bigquery guess schema from files convenience only not security"
     },
     "external_data_configuration.compression": {
       "description": "The compression type of the data source. Valid values are \"NONE\" or \"GZIP\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "compression type for source files does not change iam or encryption"
     },
     "external_data_configuration.connection_id": {
       "description": "The connection specifying the credentials to be used to read external storage, such as Azure Blob, Cloud Storage, or S3. The connectionId can have the form \"<project>.<location>.<connection_id>\" or \"projects/<project>/locations/<location>/connections/<connection_id>\".",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Identifier of the external-storage connection used to read external data (form <project>.<location>.<connection_id>). It is a reference to another resource; constraining which connection is used is the team's choice and any specific value would have to be hardcoded."
+      "rationale": "which connection reads external data each team picks their own connection"
     },
     "external_data_configuration.decimal_target_types": {
       "description": "The data types that could be used as a target type when converting decimal values.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "how decimals map to bigquery types not a security setting"
     },
     "external_data_configuration.file_set_spec_type": {
       "description": "Specifies how source URIs are interpreted for constructing the file set to load.  By default source URIs are expanded against the underlying storage.  Other options include specifying manifest files. Only applicable to object storage systems.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "how source uris are expanded load behaviour only"
     },
     "external_data_configuration.ignore_unknown_values": {
       "description": "Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "whether extra columns in files are ignored data quality not access control"
     },
     "external_data_configuration.json_extension": {
       "description": "Load option to be used together with sourceFormat newline-delimited JSON to indicate that a variant of JSON is being loaded. To load newline-delimited GeoJSON, specify GEOJSON (and sourceFormat must be set to NEWLINE_DELIMITED_JSON).",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "json variant like geojson parsing hint only"
     },
     "external_data_configuration.max_bad_records": {
       "description": "The maximum number of bad records that BigQuery can ignore when reading data.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "how many bad rows to tolerate during load operational setting"
     },
     "external_data_configuration.metadata_cache_mode": {
       "description": "Metadata Cache Mode for the table. Set this to enable caching of metadata from external data source.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "caches external metadata for speed not access or encryption"
     },
     "external_data_configuration.object_metadata": {
       "description": "Object Metadata is used to create Object Tables. Object Tables contain a listing of objects (with their metadata) found at the sourceUris. If ObjectMetadata is set, sourceFormat should be omitted.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "creates an object listing table type choice not security"
     },
     "external_data_configuration.reference_file_schema_uri": {
       "description": "When creating an external table, the user can provide a reference file with the table schema. This is enabled for the following formats: AVRO, PARQUET, ORC.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "uri of a schema file team specific reference"
     },
     "external_data_configuration.schema": {
       "description": "A JSON schema for the external table. Schema is required for CSV and JSON formats and is disallowed for Google Cloud Bigtable, Cloud Datastore backups, and Avro formats when using external tables.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "json schema for external columns app design not platform security"
     },
     "external_data_configuration.source_format": {
       "description": "Please see sourceFormat under ExternalDataConfiguration in Bigquery's public API documentation (https://cloud.google.com/bigquery/docs/reference/rest/v2/tables#externaldataconfiguration) for supported formats. To use \"GOOGLE_SHEETS\" the scopes must include \"googleapis.com/auth/drive.readonly\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "file format like csv or parquet does not control table access"
     },
     "external_data_configuration.source_uris": {
       "description": "A list of the fully-qualified URIs that point to your data in Google Cloud.",
       "required": true,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "URIs pointing to the team's external data (e.g. in Cloud Storage) backing the external table. These are references to other resources/locations the team owns; a generic policy cannot constrain which URIs are allowed without hardcoding paths it cannot know."
+      "rationale": "uris to external data in cloud storage each team owns different paths"
     },
     "external_data_configuration.avro_options": {
       "type": "block",
@@ -342,8 +342,8 @@
       "description": "If sourceFormat is set to \"AVRO\", indicates whether to interpret logical types as the corresponding BigQuery data type (for example, TIMESTAMP), instead of using the raw type (for example, INTEGER).",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "how avro types map to bigquery types only"
     },
     "external_data_configuration.bigtable_options": {
       "type": "block",
@@ -354,22 +354,22 @@
       "description": "If field is true, then the column families that are not specified in columnFamilies list are not exposed in the table schema. Otherwise, they are read with BYTES type values. The default value is false.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "bigtable schema option does not change iam or encryption"
     },
     "external_data_configuration.bigtable_options.output_column_families_as_json": {
       "description": "If field is true, then each column family will be read as a single JSON column. Otherwise they are read as a repeated cell structure containing timestamp/value tuples. The default value is false.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "how bigtable columns show up when read format only"
     },
     "external_data_configuration.bigtable_options.read_rowkey_as_string": {
       "description": "If field is true, then the rowkey column families will be read and converted to string. Otherwise they are read with BYTES type values and users need to manually cast them with CAST if necessary. The default value is false.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "whether row keys read as strings type choice not access"
     },
     "external_data_configuration.bigtable_options.column_family": {
       "type": "block",
@@ -380,29 +380,29 @@
       "description": "The encoding of the values when the type is not STRING. Acceptable encoding values are: TEXT - indicates values are alphanumeric text strings. BINARY - indicates values are encoded using HBase Bytes.toBytes family of functions. This can be overridden for a specific column by listing that column in 'columns' and specifying an encoding for it.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "encoding for bigtable column values representation only"
     },
     "external_data_configuration.bigtable_options.column_family.family_id": {
       "description": "Identifier of the column family.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "bigtable column family name source config only"
     },
     "external_data_configuration.bigtable_options.column_family.only_read_latest": {
       "description": "If this is set only the latest version of value are exposed for all columns in this column family. This can be overridden for a specific column by listing that column in 'columns' and specifying a different setting for that column.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "whether to read only latest bigtable cell version"
     },
     "external_data_configuration.bigtable_options.column_family.type": {
       "description": "The type to convert the value in cells of this column family. The values are expected to be encoded using HBase Bytes.toBytes function when using the BINARY encoding value. Following BigQuery types are allowed (case-sensitive): \"BYTES\", \"STRING\", \"INTEGER\", \"FLOAT\", \"BOOLEAN\", \"JSON\". Default type is BYTES. This can be overridden for a specific column by listing that column in 'columns' and specifying a type for it.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "bigquery type for a bigtable column family mapping only"
     },
     "external_data_configuration.bigtable_options.column_family.column": {
       "type": "block",
@@ -413,43 +413,43 @@
       "description": "The encoding of the values when the type is not STRING. Acceptable encoding values are: TEXT - indicates values are alphanumeric text strings. BINARY - indicates values are encoded using HBase Bytes.toBytes family of functions. 'encoding' can also be set at the column family level. However, the setting at this level takes precedence if 'encoding' is set at both levels.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "per column encoding for bigtable data"
     },
     "external_data_configuration.bigtable_options.column_family.column.field_name": {
       "description": "If the qualifier is not a valid BigQuery field identifier i.e. does not match [a-zA-Z][a-zA-Z0-9_]*, a valid identifier must be provided as the column field name and is used as field name in queries.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "bigquery name for a bigtable column alias only"
     },
     "external_data_configuration.bigtable_options.column_family.column.only_read_latest": {
       "description": "If this is set, only the latest version of value in this column are exposed. 'onlyReadLatest' can also be set at the column family level. However, the setting at this level takes precedence if 'onlyReadLatest' is set at both levels.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "per column latest version setting for bigtable"
     },
     "external_data_configuration.bigtable_options.column_family.column.qualifier_encoded": {
       "description": "Qualifier of the column. Columns in the parent column family that has this exact qualifier are exposed as . field. If the qualifier is valid UTF-8 string, it can be specified in the qualifierString field. Otherwise, a base-64 encoded value must be set to qualifierEncoded. The column field name is the same as the column qualifier. However, if the qualifier is not a valid BigQuery field identifier i.e. does not match [a-zA-Z][a-zA-Z0-9_]*, a valid identifier must be provided as fieldName.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "base64 bigtable column name mapping detail"
     },
     "external_data_configuration.bigtable_options.column_family.column.qualifier_string": {
       "description": "Qualifier string.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "bigtable column name as string mapping detail"
     },
     "external_data_configuration.bigtable_options.column_family.column.type": {
       "description": "The type to convert the value in cells of this column. The values are expected to be encoded using HBase Bytes.toBytes function when using the BINARY encoding value. Following BigQuery types are allowed (case-sensitive): \"BYTES\", \"STRING\", \"INTEGER\", \"FLOAT\", \"BOOLEAN\", \"JSON\", Default type is \"BYTES\". 'type' can also be set at the column family level. However, the setting at this level takes precedence if 'type' is set at both levels.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "bigquery type for one bigtable column"
     },
     "external_data_configuration.csv_options": {
       "type": "block",
@@ -460,50 +460,50 @@
       "description": "Indicates if BigQuery should accept rows that are missing trailing optional columns.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "csv parsing option for rows with missing columns"
     },
     "external_data_configuration.csv_options.allow_quoted_newlines": {
       "description": "Indicates if BigQuery should allow quoted data sections that contain newline characters in a CSV file. The default value is false.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "csv parsing option for newlines inside quotes"
     },
     "external_data_configuration.csv_options.encoding": {
       "description": "The character encoding of the data. The supported values are UTF-8 or ISO-8859-1.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "character encoding for csv files"
     },
     "external_data_configuration.csv_options.field_delimiter": {
       "description": "The separator for fields in a CSV file.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "csv column separator character"
     },
     "external_data_configuration.csv_options.quote": {
       "description": "The value that is used to quote data sections in a CSV file. If your data does not contain quoted sections, set the property value to an empty string. If your data contains quoted newline characters, you must also set the allow_quoted_newlines property to true. The API-side default is \", specified in Terraform escaped as \\\". Due to limitations with Terraform default values, this value is required to be explicitly set.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "csv quote character for parsing"
     },
     "external_data_configuration.csv_options.skip_leading_rows": {
       "description": "The number of rows at the top of a CSV file that BigQuery will skip when reading the data.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "how many header rows to skip in csv"
     },
     "external_data_configuration.csv_options.source_column_match": {
       "description": "Specifies how source columns are matched to the table schema. Valid values are POSITION (columns matched by position, assuming same ordering) or NAME (columns matched by name, reads header row and reorders columns to align with schema field names).",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "match csv columns by name or position"
     },
     "external_data_configuration.google_sheets_options": {
       "type": "block",
@@ -514,15 +514,15 @@
       "description": "Range of a sheet to query from. Only used when non-empty. At least one of range or skip_leading_rows must be set. Typical format: \"sheet_name!top_left_cell_id:bottom_right_cell_id\" For example: \"sheet1!A1:B20",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "which sheet range to read team specific spreadsheet"
     },
     "external_data_configuration.google_sheets_options.skip_leading_rows": {
       "description": "The number of rows at the top of the sheet that BigQuery will skip when reading the data. At least one of range or skip_leading_rows must be set.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "rows to skip at top of google sheet"
     },
     "external_data_configuration.hive_partitioning_options": {
       "type": "block",
@@ -533,22 +533,22 @@
       "description": "When set, what mode of hive partitioning to use when reading data.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "how hive partitions are detected on uris"
     },
     "external_data_configuration.hive_partitioning_options.require_partition_filter": {
       "description": "If set to true, queries over this table require a partition filter that can be used for partition elimination to be specified.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "requires partition filter on hive tables saves query cost not security"
     },
     "external_data_configuration.hive_partitioning_options.source_uri_prefix": {
       "description": "When hive partition detection is requested, a common for all source uris must be required. The prefix must end immediately before the partition key encoding begins.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "common prefix for hive partition paths team specific"
     },
     "external_data_configuration.json_options": {
       "type": "block",
@@ -559,8 +559,8 @@
       "description": "The character encoding of the data. The supported values are UTF-8, UTF-16BE, UTF-16LE, UTF-32BE, and UTF-32LE. The default value is UTF-8.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "character encoding for json source files"
     },
     "external_data_configuration.parquet_options": {
       "type": "block",
@@ -571,15 +571,15 @@
       "description": "Indicates whether to use schema inference specifically for Parquet LIST logical type.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "parquet list type inference option"
     },
     "external_data_configuration.parquet_options.enum_as_string": {
       "description": "Indicates whether to infer Parquet ENUM logical type as STRING instead of BYTES by default.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "whether parquet enums load as string or bytes"
     },
     "materialized_view": {
       "type": "block",
@@ -590,29 +590,29 @@
       "description": "Allow non incremental materialized view definition. The default value is false.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "allows non incremental view definition refresh choice not security"
     },
     "materialized_view.enable_refresh": {
       "description": "Specifies if BigQuery should automatically refresh materialized view when the base table is updated. The default is true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "whether bigquery auto refreshes the materialized view"
     },
     "materialized_view.query": {
       "description": "A query whose result is persisted.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "sql for the materialized view each app writes its own query"
     },
     "materialized_view.refresh_interval_ms": {
       "description": "Specifies maximum frequency at which this materialized view will be refreshed. The default is 1800000.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "how often the view can refresh scheduling only"
     },
     "range_partitioning": {
       "type": "block",
@@ -623,8 +623,8 @@
       "description": "The field used to determine how to create a range-based partition.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "column used for integer range partitions design choice"
     },
     "range_partitioning.range": {
       "type": "block",
@@ -635,22 +635,22 @@
       "description": "End of the range partitioning, exclusive.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "end value for integer range partitions"
     },
     "range_partitioning.range.interval": {
       "description": "The width of each range within the partition.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "size of each integer range partition"
     },
     "range_partitioning.range.start": {
       "description": "Start of the range partitioning, inclusive.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "start value for integer range partitions"
     },
     "schema_foreign_type_info": {
       "type": "block",
@@ -661,8 +661,8 @@
       "description": "Specifies the system which defines the foreign data type.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "foreign type system name for schema metadata"
     },
     "table_constraints": {
       "type": "block",
@@ -678,8 +678,8 @@
       "description": "Set only if the foreign key constraint is named.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "optional name for foreign key metadata"
     },
     "table_constraints.foreign_keys.column_references": {
       "type": "block",
@@ -690,15 +690,15 @@
       "description": "The column in the primary key that are referenced by the referencingColumn.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "referenced primary key column in fk metadata"
     },
     "table_constraints.foreign_keys.column_references.referencing_column": {
       "description": "The column that composes the foreign key.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "foreign key column in this table metadata"
     },
     "table_constraints.foreign_keys.referenced_table": {
       "type": "block",
@@ -709,22 +709,22 @@
       "description": "The ID of the dataset containing this table.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "dataset of referenced table in fk metadata team specific"
     },
     "table_constraints.foreign_keys.referenced_table.project_id": {
       "description": "The ID of the project containing this table.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "project of referenced table in fk metadata team specific"
     },
     "table_constraints.foreign_keys.referenced_table.table_id": {
       "description": "The ID of the table. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters. Certain operations allow suffixing of the table ID with a partition decorator, such as sample_table$20190123.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "referenced table name in fk metadata team specific"
     },
     "table_constraints.primary_key": {
       "type": "block",
@@ -735,8 +735,8 @@
       "description": "The columns that are composed of the primary key constraint.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "primary key columns in metadata bigquery does not enforce these for access"
     },
     "table_replication_info": {
       "type": "block",
@@ -747,29 +747,29 @@
       "description": "The interval at which the source materialized view is polled for updates. The default is 300000.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "how often to poll the source view for replication"
     },
     "table_replication_info.source_dataset_id": {
       "description": "The ID of the source dataset.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "source dataset for replica table team specific"
     },
     "table_replication_info.source_project_id": {
       "description": "The ID of the source project.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "source project for replica table team specific"
     },
     "table_replication_info.source_table_id": {
       "description": "The ID of the source materialized view.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "source materialized view for replica team specific"
     },
     "time_partitioning": {
       "type": "block",
@@ -780,29 +780,29 @@
       "description": "Number of milliseconds for which to keep the storage for a partition.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "how long partition data is kept lifecycle setting not security"
     },
     "time_partitioning.field": {
       "description": "The field used to determine how to create a time-based partition. If time-based partitioning is enabled without this value, the table is partitioned based on the load time.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "column used for time partitions table design choice"
     },
     "time_partitioning.require_partition_filter": {
       "description": "If set to true, queries over this table require a partition filter that can be used for partition elimination to be specified.",
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": "Forces queries to include a partition filter so they scan only relevant partitions. This is a cost/performance guardrail (limits bytes scanned), not an access, encryption, or exposure control, so it is not a security policy target."
+      "rationale": "forces queries to filter partitions saves cost not a security control"
     },
     "time_partitioning.type": {
       "description": "The supported types are DAY, HOUR, MONTH, and YEAR, which will generate one partition per day, hour, month, and year, respectively.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "partition granularity like day or month layout only"
     },
     "view": {
       "type": "block",
@@ -813,15 +813,15 @@
       "description": "A query that BigQuery executes when the view is referenced.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "sql for the view each team writes their own logic"
     },
     "view.use_legacy_sql": {
       "description": "Specifies whether to use BigQuery's legacy SQL for this view. If set to false, the view will use BigQuery's standard SQL",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "legacy vs standard sql dialect choice not security"
     }
   }
 }
