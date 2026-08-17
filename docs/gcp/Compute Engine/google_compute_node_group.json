@@ -7,7 +7,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "This setting controls whether the node group can be deleted. Preventing accidental deletion helps keep important infrastructure available."
+      "rationale": "This setting controls whether the node group can be deleted. Preventing deletion helps protect important infrastructure from accidental or destructive loss."
     },
     "description": {
       "description": "An optional textual description of the resource.",
@@ -68,21 +68,21 @@
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "This field sets the largest size the node group can grow to. The right limit depends on the workload and available capacity, so there is no single secure value for every environment."
+      "rationale": "This field sets the maximum size the node group can grow to. It is an operational resource-sizing choice based on workload needs rather than a security policy target."
     },
     "autoscaling_policy.min_nodes": {
       "description": "Minimum size of the node group. Must be less\nthan or equal to max-nodes. The default value is 0.",
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "This field sets the smallest size the node group can shrink to. The right number depends on the workload, so there is no single secure value for every environment."
+      "rationale": "This field sets the minimum number of nodes the group can scale down to. It is an operational capacity choice rather than a security policy target."
     },
     "autoscaling_policy.mode": {
       "description": "The autoscaling mode. Set to one of the following:\n  - OFF: Disables the autoscaler.\n  - ON: Enables scaling in and scaling out.\n  - ONLY_SCALE_OUT: Enables only scaling out.\n  You must use this mode if your node groups are configured to\n  restart their hosted VMs on minimal servers. Possible values: [\"OFF\", \"ON\", \"ONLY_SCALE_OUT\"]",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field controls whether the node group grows or shrinks automatically. The correct mode depends on how the service is operated, so there is no single secure option for every environment."
+      "rationale": "This field controls how the node group scales, such as whether autoscaling is enabled or disabled. The correct mode depends on workload and operational requirements rather than security policy."
     },
     "maintenance_window": {
       "type": "block",
@@ -94,7 +94,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field sets when planned maintenance can begin. The best time depends on the organisation's operating hours, so there is no single secure time for every environment."
+      "rationale": "This field controls when infrastructure maintenance can begin. It is an operational scheduling choice used to manage service disruption rather than a security policy target."
     },
     "share_settings": {
       "type": "block",
@@ -107,7 +107,6 @@
       "type": "string",
       "security_impact": true,
       "rationale": "This setting controls how widely the node group is shared. Sharing it too broadly could allow more projects to use the infrastructure than intended."
-
     },
     "share_settings.project_map": {
       "type": "block",
@@ -119,14 +118,14 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field identifies an entry in the sharing configuration. The correct value depends on the organisation's projects, so there is no single security value that applies to every environment."
+      "rationale": "This field is an internal identifier for an entry in the sharing configuration. It is a structural reference and resource identifiers are not constrained by a general security policy."
     },
     "share_settings.project_map.project_id": {
       "description": "The project id/number should be the same as the key of this project config in the project map.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field identifies which project can use the shared node group. Approved project IDs are different for every organisation, so there is no universal security value for this field."
-}
+      "rationale": "This field references a specific Google Cloud project in the sharing configuration. Project names and IDs are environment-specific references rather than platform-wide security policy targets."
     }
   }
+}
