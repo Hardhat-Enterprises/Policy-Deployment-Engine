@@ -6,8 +6,8 @@
       "description": "The Action to perform when the rule is matched. The following are the valid actions:\n\n* allow: allow access to target.\n\n* deny(STATUS): deny access to target, returns the HTTP response code specified. Valid values for STATUS are 403, 404, and 502.\n\n* rate_based_ban: limit client traffic to the configured threshold and ban the client if the traffic exceeds the threshold. Configure parameters for this action in RateLimitOptions. Requires rateLimitOptions to be set.\n\n* redirect: redirect to a different target. This can either be an internal reCAPTCHA redirect, or an external URL-based redirect via a 302 response. Parameters for this action can be configured via redirectOptions. This action is only supported in Global Security Policies of type CLOUD_ARMOR.\n\n* throttle: limit client traffic to the configured threshold. Configure parameters for this action in rateLimitOptions. Requires rateLimitOptions to be set for this.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This field controls what happens when traffic matches the rule. An overly permissive action such as allow can weaken the rule, so restrictive defaults can be enforced where appropriate."
+      "security_impact": false,
+      "rationale": "This field controls whether the rule allows, denies or redirects matching traffic. The correct action depends on the purpose of the rule, so it is an architectural choice rather than a generic security policy target."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
@@ -164,8 +164,8 @@
       "description": "Matching values of the field. Each element can be a 32-bit unsigned decimal or hexadecimal (starting with \"0x\") number (e.g. \"64\") or range (e.g. \"0x400-0x7ff\").",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "This field defines application-specific traffic matching values, so it is not suitable for generic platform policy."
+      "security_impact": true,
+      "rationale": "This field defines custom traffic matching values used to inspect packets. Restricting these values can help prevent overly broad matching and support filtering of suspicious or unwanted traffic."
     },
     "preconfigured_waf_config": {
       "type": "block",
