@@ -35,7 +35,7 @@
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Controls whether GKE clients are permitted to discover and mount the instance. Enabling broader client access without justification widens the resource's attack surface; policy should constrain this toggle so it's only enabled deliberately and disabled by default, rather than left universally open."
+      "rationale": "Controls whether GKE client integration is structurally enabled for the instance. This falls under the feature-enablement archetype: policy should evaluate whether container workload integration is explicitly required and approved, rather than treating the toggle itself as a generic exposure risk."
     },
     "instance_id": {
       "description": "The name of the Managed Lustre instance.\n\n* Must contain only lowercase letters, numbers, and hyphens.\n* Must start with a letter.\n* Must be between 1-63 characters.\n* Must end with a number or a letter.",
@@ -70,7 +70,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Determines the VPC network used to connect the Lustre instance and affects network isolation."
+      "rationale": "References the VPC network the Lustre instance attaches to. This is an identifier/reference to another resource and a team architectural choice; we do not constrain which network a resource references, so there is no generic secure value to apply."
     },
     "per_unit_storage_throughput": {
       "description": "The throughput of the instance in MBps per TiB. Valid values are 125, 250,\n500, 1000.\nSee [Performance tiers and maximum storage\ncapacities](https://cloud.google.com/managed-lustre/docs/create-instance#performance-tiers)\nfor more information.\n\nIf the instance is using the Dynamic tier, this field must not be set or\nmust be set to zero.",
@@ -128,15 +128,15 @@
       "description": "The IP address ranges to which to apply this access rule. Accepts\nnon-overlapping CIDR ranges (e.g., '192.168.1.0/24') and IP addresses\n(e.g., '192.168.1.0').",
       "required": true,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Defines the CIDR ranges/IPs permitted to mount the instance under this rule — functionally a network exposure allowlist. Policy should constrain the allowlist shape (e.g. prohibiting 0.0.0.0/0 or other overly broad ranges) rather than permitting unrestricted network exposure."
+      "security_impact": false,
+      "rationale": "Specific CIDR ranges/IP addresses are a team addressing choice, not a generic platform policy target — consistent with service-wide guidance that address ranges are not constrained by policy."
     },
     "access_rules_options.access_rules.name": {
       "description": "The name of the access rule policy group.\nMust be 16 characters or less and include only alphanumeric characters\nor '_'.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifier label for the access rule, used only to distinguish rules from one another. As a naming/reference value it has no bearing on who can access the instance."
+      "security_impact": false,
+      "rationale": "Identifier label for the access rule, used only to distinguish rules from one another. As a naming/reference value, it has no bearing on who can access the instance."
     },
     "access_rules_options.access_rules.squash_mode": {
       "description": "Squash mode for the access rule.\nPossible values:\nNO_SQUASH\nROOT_SQUASH",
@@ -154,8 +154,8 @@
       "description": "The dynamic tier mode of the instance.\nPossible values:\nDISABLED\nDEFAULT_CACHE",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Toggles the dynamic tier's caching behavior (DISABLED vs DEFAULT_CACHE). Enabling a caching layer changes where and how data is staged, affecting the resource's overall data-handling footprint; policy should constrain this to the organization's approved mode rather than allowing it to be set arbitrarily."
+      "security_impact": false,
+      "rationale": "Selects the caching behavior for the dynamic tier (DISABLED vs DEFAULT_CACHE). This is a functional/architectural choice with no insecure value — a team operational decision, not a security control."
     },
     "maintenance_policy": {
       "type": "block",
