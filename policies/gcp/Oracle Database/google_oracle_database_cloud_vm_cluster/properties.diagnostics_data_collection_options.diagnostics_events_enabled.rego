@@ -1,6 +1,6 @@
-package terraform.gcp.security.google_oracle_database_cloud_vm_cluster.properties_diagnostics_data_collection_options_diagnostics_events_enabled
+package terraform.gcp.security.oracle_database.google_oracle_database_cloud_vm_cluster.properties_diagnostics_data_collection_options_diagnostics_events_enabled
 import data.terraform.helpers
-import data.terraform.gcp.security.google_oracle_database_cloud_vm_cluster.vars
+import data.terraform.gcp.security.oracle_database.google_oracle_database_cloud_vm_cluster.vars
 
 conditions := [
     [
@@ -8,7 +8,7 @@ conditions := [
     "remedies":[ "Set properties.diagnostics_data_collection_options.diagnostics_events_enabled to false unless diagnostic event collection is explicitly required and its output is securely handled"]},
     {
         "condition": "Test if diagnostics_events_enabled is not set to false",
-        "attribute_path" : ["properties", "diagnostics_data_collection_options", "diagnostics_events_enabled"],
+        "attribute_path" : ["properties", "0", "diagnostics_data_collection_options", "0", "diagnostics_events_enabled"],
         "values" : [false],
         "policy_type" : "whitelist"
     }
