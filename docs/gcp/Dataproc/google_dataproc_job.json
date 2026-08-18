@@ -95,8 +95,8 @@
       "description": "A mapping of property names to values, used to configure Spark. Properties that conflict with values set by the Cloud Dataproc API may be overwritten. Can include properties set in /etc/spark/conf/spark-defaults.conf and classes in user code.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Free-form property map used to configure the Hadoop engine. Property maps can be used to pass configuration values that weaken security posture (e.g. disabling encryption, enabling insecure features) or contain credential material, making this a configuration/credential-hygiene control."
+      "security_impact": false,
+      "rationale": "A generic, free-form engine-config map. This project's established pattern for credential exposure targets specific named fields (e.g. sensitive_labels), not generic maps that could theoretically hold anything - a whitelist/blacklist policy cannot meaningfully validate arbitrary key/value content."
     },
     "hadoop_config.logging_config": {
       "type": "block",
@@ -107,8 +107,8 @@
       "description": "Optional. The per-package log levels for the driver. This may include 'root' package name to configure rootLogger. Examples: 'com.google = FATAL', 'root = INFO', 'org.apache = DEBUG'.",
       "required": true,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Controls whether driver logging is silenced or reduced. Logging visibility and auditability are a core security requirement, so this is treated as a security control to ensure logging cannot be disabled to hide security-relevant events."
+      "security_impact": false,
+      "rationale": "Controls the verbosity/format of driver log output per package (e.g. DEBUG vs INFO), not whether logging occurs. This is an operational tuning setting, not a binary security control - consistent with 'severity' being ruled non-security elsewhere in this project for the same reason (display/tuning, not enforcement)."
     },
     "hive_config": {
       "type": "block",
@@ -213,8 +213,8 @@
       "description": "Optional. The per-package log levels for the driver. This may include 'root' package name to configure rootLogger. Examples: 'com.google = FATAL', 'root = INFO', 'org.apache = DEBUG'.",
       "required": true,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Controls whether driver logging is silenced or reduced. Logging visibility and auditability are a core security requirement, so this is treated as a security control to ensure logging cannot be disabled to hide security-relevant events."
+      "security_impact": false,
+      "rationale": "Controls the verbosity/format of driver log output per package, not whether logging occurs. An operational tuning setting, not a binary security control."
     },
     "placement": {
       "type": "block",
@@ -284,8 +284,8 @@
       "description": "Optional. The per-package log levels for the driver. This may include 'root' package name to configure rootLogger. Examples: 'com.google = FATAL', 'root = INFO', 'org.apache = DEBUG'.",
       "required": true,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Controls whether driver logging is silenced or reduced. Logging visibility and auditability are a core security requirement, so this is treated as a security control to ensure logging cannot be disabled to hide security-relevant events."
+      "security_impact": false,
+      "rationale": "Controls the verbosity/format of driver log output per package, not whether logging occurs. An operational tuning setting, not a binary security control."
     },
     "pyspark_config": {
       "type": "block",
@@ -332,14 +332,14 @@
       "required": false,
       "type": "map(string)",
       "security_impact": false,
-      "rationale": "Engine configuration/tuning values, not a security control."
+      "rationale": "A generic, free-form engine-config map, consistent with the same field on every other job-type block in this resource (hadoop_config.properties, spark_config.properties, sparksql_config.properties) being non-security."
     },
     "pyspark_config.python_file_uris": {
       "description": "Optional. HCFS file URIs of Python files to pass to the PySpark framework. Supported file types: .py, .egg, and .zip",
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "Functional job dependency location. No established precedent in this project for treating source-file locations as a security control."
+      "rationale": "A reference to external Python file locations, consistent with every other *_file_uris field in this resource being treated as an out-of-scope resource reference."
     },
     "pyspark_config.logging_config": {
       "type": "block",
@@ -350,8 +350,8 @@
       "description": "Optional. The per-package log levels for the driver. This may include 'root' package name to configure rootLogger. Examples: 'com.google = FATAL', 'root = INFO', 'org.apache = DEBUG'.",
       "required": true,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Controls whether driver logging is silenced or reduced. Logging visibility and auditability are a core security requirement, so this is treated as a security control to ensure logging cannot be disabled to hide security-relevant events."
+      "security_impact": false,
+      "rationale": "Controls the verbosity/format of driver log output per package, not whether logging occurs. An operational tuning setting, not a binary security control."
     },
     "reference": {
       "type": "block",
@@ -394,14 +394,14 @@
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "Functional job dependency location. No established precedent in this project for treating source-file locations as a security control."
+      "rationale": "A reference to external archive file locations, consistent with every other *_uris field in this resource being treated as an out-of-scope resource reference."
     },
     "spark_config.args": {
       "description": "The arguments to pass to the driver.",
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "Functional driver input, not a security setting."
+      "rationale": "Command-line arguments passed to the driver, consistent with the identical pyspark_config.args field being treated as a team functional choice, not a security control."
     },
     "spark_config.file_uris": {
       "description": "HCFS URIs of files to be copied to the working directory of Spark drivers and distributed tasks. Useful for naively parallel tasks.",
@@ -435,8 +435,8 @@
       "description": "A mapping of property names to values, used to configure Spark. Properties that conflict with values set by the Cloud Dataproc API may be overwritten. Can include properties set in /etc/spark/conf/spark-defaults.conf and classes in user code.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Free-form property map used to configure the Spark engine. Property maps can contain sensitive settings or credentials, making this a candidate for credential-hygiene policy to discourage plaintext secrets."
+      "security_impact": false,
+      "rationale": "A generic, free-form engine-config map. This project's established pattern for credential exposure targets specific named fields (e.g. sensitive_labels), not generic maps that could theoretically hold anything."
     },
     "spark_config.logging_config": {
       "type": "block",
@@ -447,8 +447,8 @@
       "description": "Optional. The per-package log levels for the driver. This may include 'root' package name to configure rootLogger. Examples: 'com.google = FATAL', 'root = INFO', 'org.apache = DEBUG'.",
       "required": true,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Controls whether driver logging is silenced or reduced. Logging visibility and auditability are a core security requirement, so this is treated as a security control to ensure logging cannot be disabled to hide security-relevant events."
+      "security_impact": false,
+      "rationale": "Controls the verbosity/format of driver log output per package, not whether logging occurs. An operational tuning setting, not a binary security control."
     },
     "sparksql_config": {
       "type": "block",
@@ -466,8 +466,8 @@
       "description": "A mapping of property names to values, used to configure Spark SQL's SparkConf. Properties that conflict with values set by the Cloud Dataproc API may be overwritten.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Free-form property map used to configure Spark SQL's SparkConf. Like other engine property maps, this can expose configuration risks or credential material."
+      "security_impact": false,
+      "rationale": "A generic, free-form engine-config map, distinct from credential-specific fields like sensitive_labels. This project's established pattern targets specific named fields, not generic config maps that could theoretically hold anything."
     },
     "sparksql_config.query_file_uri": {
       "description": "The HCFS URI of the script that contains SQL queries. Conflicts with query_list",
@@ -499,8 +499,8 @@
       "description": "Optional. The per-package log levels for the driver. This may include 'root' package name to configure rootLogger. Examples: 'com.google = FATAL', 'root = INFO', 'org.apache = DEBUG'.",
       "required": true,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Controls whether driver logging is silenced or reduced. Logging visibility and auditability are a core security requirement, so this is treated as a security control to ensure logging cannot be disabled to hide security-relevant events."
+      "security_impact": false,
+      "rationale": "Controls the verbosity/format of driver log output per package, not whether logging occurs. An operational tuning setting, not a binary security control."
     }
   }
 }
