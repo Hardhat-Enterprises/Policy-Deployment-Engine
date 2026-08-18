@@ -54,7 +54,7 @@
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": "This hides the type label in the result, but it does not remove the finding itself. I would not treat that as a security control."
+      "rationale": "This hides the type label in the result, but it does not remove the finding itself. It does not create a platform security control."
     },
     "inspect_config.include_quote": {
       "description": "When true, a contextual quote from the data that triggered a finding is included in the response.",
@@ -87,7 +87,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This is the confidence assigned to the custom detector. The right value depends on how reliable that detector is, so it needs to be chosen as part of the detection logic."
+      "rationale": "This is the confidence assigned to the custom detector. The right value depends on how reliable that detector is, so it is part of detection tuning rather than a platform security control."
     },
     "inspect_config.custom_info_types.dictionary": {
       "type": "block",
@@ -135,7 +135,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This chooses the InfoType version. Pinning a version can help consistency, but there is no single version that is always the secure choice."
+      "rationale": "This chooses the InfoType version. Version choice depends on the team's detector setup and compatibility needs rather than a platform security requirement."
     },
     "inspect_config.custom_info_types.info_type.sensitivity_score": {
       "type": "block",
@@ -159,7 +159,7 @@
       "required": false,
       "type": "list(number)",
       "security_impact": false,
-      "rationale": "This just picks which capture groups from the custom regex are returned. The right indexes depend on how that regex is written."
+      "rationale": "This selects which capture groups from the custom regex are returned. The indexes only make sense with the regex the team has written."
     },
     "inspect_config.custom_info_types.regex.pattern": {
       "description": "Pattern defining the regular expression.\nIts syntax (https://github.com/google/re2/wiki/Syntax) can be found under the google/re2 repository on GitHub.",
@@ -190,7 +190,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This points to an existing StoredInfoType chosen for the scan. Which one to use depends on the team's detection needs."
+      "rationale": "This is a reference to an existing StoredInfoType used by the scan. Which resource a team uses depends on its detection setup, so there is no general value to enforce."
     },
     "inspect_config.custom_info_types.surrogate_type": {
       "type": "block",
@@ -214,7 +214,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This chooses the detector version. It can change behaviour, but there is no one version that is always the secure choice."
+      "rationale": "This chooses the detector version. Version choice is part of the team's scanner setup rather than a general platform security control."
     },
     "inspect_config.info_types.sensitivity_score": {
       "type": "block",
@@ -269,14 +269,14 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This only says which InfoType the limit applies to. Which InfoType needs a separate limit depends on the team's scan."
+      "rationale": "This is a reference to the InfoType that the findings limit applies to. Which InfoType a team uses depends on its scan, so there is no general value for security to enforce."
     },
     "inspect_config.limits.max_findings_per_info_type.info_type.version": {
       "description": "Version name for this InfoType.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This only chooses the version of the InfoType that the limit applies to. It is part of the scan configuration."
+      "rationale": "This chooses the version of the InfoType that the limit applies to. Version choice is part of the team's scan configuration rather than a security control."
     },
     "inspect_config.limits.max_findings_per_info_type.info_type.sensitivity_score": {
       "type": "block",
@@ -288,7 +288,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This is still a profiling label. The right score depends on the data, not on the findings limit."
+      "rationale": "This is a profiling classification for the InfoType. The right score depends on how the team classifies its data, not on a platform security rule."
     },
     "inspect_config.rule_set": {
       "type": "block",
@@ -312,7 +312,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This picks the InfoType version used by the rule set. It is part of the rule setup, not a general security control."
+      "rationale": "This chooses the InfoType version used by the rule set. Software version choice is part of the team's detector setup rather than a platform security control."
     },
     "inspect_config.rule_set.info_types.sensitivity_score": {
       "type": "block",
@@ -324,7 +324,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This is a profiling sensitivity label for the InfoType. The right value depends on the data being classified."
+      "rationale": "This is a profiling sensitivity label for the InfoType. The right value depends on how the team classifies the data."
     },
     "inspect_config.rule_set.rules": {
       "type": "block",
@@ -358,7 +358,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This only points to the dictionary file used by the exclusion rule. The right file is specific to the team's rule, and the file's own security belongs in Cloud Storage."
+      "rationale": "This points to the dictionary file used by the exclusion rule. The right file is specific to the team's rule, and the file's security should be handled in Cloud Storage."
     },
     "inspect_config.rule_set.rules.exclusion_rule.dictionary.word_list": {
       "type": "block",
@@ -387,14 +387,14 @@
       "required": false,
       "type": "list(number)",
       "security_impact": false,
-      "rationale": "These just select capture groups from the hotword regex. There is no useful organisation-wide value because the indexes only make sense with the regex the team wrote."
+      "rationale": "These select capture groups from the hotword regex. The indexes are implementation details of the team's regex and have no useful organisation-wide security value."
     },
     "inspect_config.rule_set.rules.exclusion_rule.exclude_by_hotword.hotword_regex.pattern": {
       "description": "Pattern defining the regular expression. Its syntax\n(https://github.com/google/re2/wiki/Syntax) can be found under the google/re2 repository on GitHub.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This pattern defines the context where the team's hotword exclusion applies. Whether that pattern is appropriate depends on the data and the specific false positives the team is trying to remove."
+      "rationale": "This pattern defines the context where the team's hotword exclusion applies. The correct pattern depends on the data and the false positives the team is trying to remove."
     },
     "inspect_config.rule_set.rules.exclusion_rule.exclude_by_hotword.proximity": {
       "type": "block",
@@ -406,14 +406,14 @@
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "This says how far after the finding the exclusion rule should look. The useful distance depends on the layout of the data and the hotword being used."
+      "rationale": "This controls how far after a finding DLP looks for the exclusion hotword. It is a text-scanning distance, and the useful value depends on the layout of the team's data."
     },
     "inspect_config.rule_set.rules.exclusion_rule.exclude_by_hotword.proximity.window_before": {
       "description": "Number of characters before the finding to consider.",
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "This says how far before the finding the exclusion rule should look. There is no single distance that makes sense for every kind of data."
+      "rationale": "This controls how far before a finding DLP looks for the hotword. The window affects how the rule matches context, but the right distance depends on the data being scanned rather than a security requirement."
     },
     "inspect_config.rule_set.rules.exclusion_rule.exclude_info_types": {
       "type": "block",
@@ -430,14 +430,14 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This chooses which InfoTypes are part of the team's exclusion logic. Security cannot know which exclusions are valid without knowing why the rule exists."
+      "rationale": "This is a reference to the InfoType used by the exclusion rule. The value identifies a detector chosen by the team, so there is no common InfoType name that a platform policy should require."
     },
     "inspect_config.rule_set.rules.exclusion_rule.exclude_info_types.info_types.version": {
       "description": "Version name for this InfoType.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This only chooses the detector version used by the exclusion rule. The right version depends on the InfoType the team is using."
+      "rationale": "This chooses the version of the InfoType used by the exclusion rule. Software versions are team choices based on detector setup and compatibility, not platform security controls."
     },
     "inspect_config.rule_set.rules.exclusion_rule.exclude_info_types.info_types.sensitivity_score": {
       "type": "block",
@@ -449,7 +449,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This score is only used for data profiling. It does not decide whether the exclusion matches, and the right score depends on how the team classifies that InfoType."
+      "rationale": "This sets a sensitivity score used for data profiling. The score is part of how the team classifies its data, so a platform policy should not decide that operational classification for them."
     },
     "inspect_config.rule_set.rules.exclusion_rule.regex": {
       "type": "block",
@@ -461,14 +461,14 @@
       "required": false,
       "type": "list(number)",
       "security_impact": false,
-      "rationale": "This just selects capture groups from the exclusion regex. The correct indexes depend on how that particular regex is written."
+      "rationale": "This selects which capture groups from the exclusion regex are used. The indexes only make sense with the regex the team has written, so they are part of the rule's implementation."
     },
     "inspect_config.rule_set.rules.exclusion_rule.regex.pattern": {
       "description": "Pattern defining the regular expression.\nIts syntax (https://github.com/google/re2/wiki/Syntax) can be found under the google/re2 repository on GitHub.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This pattern defines when the team's exclusion rule applies. Whether the pattern is correct depends on the data and the false positives the team is trying to remove."
+      "rationale": "This regex defines when the team's exclusion rule matches. The correct pattern depends on the data and the false positives the team is trying to remove, so it cannot be set by a general security policy."
     },
     "inspect_config.rule_set.rules.hotword_rule": {
       "type": "block",
@@ -485,14 +485,14 @@
       "required": false,
       "type": "list(number)",
       "security_impact": false,
-      "rationale": "These only choose capture groups from the hotword regex. The right indexes depend on the pattern the team has written, so there is no common value to enforce."
+      "rationale": "This selects capture groups from the hotword regex. The indexes are internal details of the team's regex and do not have a useful organisation-wide security value."
     },
     "inspect_config.rule_set.rules.hotword_rule.hotword_regex.pattern": {
       "description": "Pattern defining the regular expression. Its syntax\n(https://github.com/google/re2/wiki/Syntax) can be found under the google/re2 repository on GitHub.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This defines what context counts as a hotword. The right pattern depends on the team's detection logic and can be used to either raise or lower confidence."
+      "rationale": "This defines what context counts as a hotword. The pattern depends on the team's detection logic and the type of data being scanned, so there is no general pattern for security to enforce."
     },
     "inspect_config.rule_set.rules.hotword_rule.likelihood_adjustment": {
       "type": "block",
@@ -504,14 +504,14 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This is part of tuning how confident a finding should be when a hotword matches. The right value depends on the rule and the team's detection needs."
+      "rationale": "This sets the confidence score used when a hotword matches. It is an operational tuning setting for the scanner, not a platform security boundary."
     },
     "inspect_config.rule_set.rules.hotword_rule.likelihood_adjustment.relative_likelihood": {
       "description": "Increase or decrease the likelihood by the specified number of levels. For example,\nif a finding would be POSSIBLE without the detection rule and relativeLikelihood is 1,\nthen it is upgraded to LIKELY, while a value of -1 would downgrade it to UNLIKELY.\nLikelihood may never drop below VERY_UNLIKELY or exceed VERY_LIKELY, so applying an\nadjustment of 1 followed by an adjustment of -1 when base likelihood is VERY_LIKELY\nwill result in a final likelihood of LIKELY. Either this or fixed_likelihood can be set.",
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "This adjusts the confidence of a finding when a hotword matches. How much to raise or lower it depends on how reliable that context is for the team's use case."
+      "rationale": "This raises or lowers the confidence score when a hotword matches. It tunes the scanner's detection behaviour rather than enforcing a platform security control."
     },
     "inspect_config.rule_set.rules.hotword_rule.proximity": {
       "type": "block",
@@ -523,14 +523,14 @@
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "This controls how far after a finding DLP looks for the hotword. Short structured fields and longer free-text documents need different windows, so there is no sensible organisation-wide number."
+      "rationale": "This controls how far after a possible finding DLP looks for the hotword. The right search distance depends on the format of the data and how the team's rule is designed."
     },
     "inspect_config.rule_set.rules.hotword_rule.proximity.window_before": {
       "description": "Number of characters before the finding to consider. Either this or window_after must be specified",
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "This controls how far before a finding DLP looks for the hotword. The useful distance depends on the shape of the data, so a fixed policy value would not work well across teams."
+      "rationale": "This controls how far before a possible finding DLP looks for the hotword. It is a text-scanning distance used to tune the rule, and the right value depends on the team's data."
     }
   }
 }
