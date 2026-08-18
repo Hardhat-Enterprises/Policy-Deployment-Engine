@@ -13,8 +13,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Only controls whether Terraform is allowed to delete the resource. It's a safety switch for the deployment tool, not a security setting on the resource itself."
+      "security_impact": true,
+      "rationale": "Controls whether Terraform is allowed to delete the resource. A policy should require 'PREVENT' so the group can't be destroyed by an accidental 'terraform destroy'/'apply'."
     },
     "description": {
       "description": "An optional textual description of the instance group manager.",
@@ -129,7 +129,7 @@
       "required": true,
       "type": "number",
       "security_impact": false,
-      "rationale": "Just a timing delay before autohealing kicks in. Not a security setting."
+      "rationale": "Sets the grace period before the group starts acting on an instance that's failing its health check. It's an availability tuning knob (how quickly to react to a bad instance), not a security control."
     },
     "instance_lifecycle_policy": {
       "type": "block",
@@ -141,14 +141,14 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Just decides how failures are handled. No option here is more or less secure."
+      "rationale": "Decides how the group recovers an instance after it or its health check fails. This is about keeping the app running (availability), not about securing it."
     },
     "instance_lifecycle_policy.force_update_on_repair": {
       "description": "Specifies whether to apply the group's latest configuration when repairing a VM. Valid options are: YES, NO. If YES and you updated the group's instance template or per-instance configurations after the VM was created, then these changes are applied when VM is repaired. If NO (default), then updates are applied in accordance with the group's update policy type.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Just decides if repairs pick up the latest config. Not a security setting."
+      "rationale": "Decides whether a VM repair rebuilds the instance from the group's latest template/config, or keeps whatever it already had. It's an operational lifecycle choice about staying up to date, not a security control."
     },
     "named_port": {
       "type": "block",
@@ -160,14 +160,14 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Just a label for the port. No security impact."
+      "rationale": "Just a label naming a port mapping for the load balancer. It's descriptive only and doesn't enforce anything, so no security impact."
     },
     "named_port.port": {
       "description": "The port number.",
       "required": true,
       "type": "number",
       "security_impact": false,
-      "rationale": "Just maps a name to a port number for the load balancer. Actual network exposure is controlled by firewall rules, not this mapping."
+      "rationale": "Sets the port number the load balancer routes traffic to on each instance. Which ports can actually be reached from outside is governed by firewall rules, not this mapping."
     },
     "resource_policies": {
       "type": "block",
@@ -179,7 +179,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Just points to a workload policy. We'd secure that policy on its own, not which one is linked here."
+      "rationale": "Points to a workload policy resource. We'd secure that referenced policy's own settings directly, not police which policy this group happens to point at."
     },
     "standby_policy": {
       "type": "block",
@@ -191,14 +191,14 @@
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "Just a timing delay before scaling out. Not a security setting."
+      "rationale": "A timeout delay before a standby VM is suspended or stopped, giving its startup script time to finish. It's purely about scale-out timing, not security."
     },
     "standby_policy.mode": {
       "description": "Defines how a MIG resumes or starts VMs from a standby pool when the group scales out. The default mode is \"MANUAL\".",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Just decides how standby instances resume. Not a security setting."
+      "rationale": "Decides how standby VMs come back into service during a scale-out (manually or automatically). It's an operational choice about managing capacity, not a security setting."
     },
     "stateful_disk": {
       "type": "block",
@@ -286,49 +286,49 @@
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "Just what percentage of extra instances to create during a rollout. Not a security setting."
+      "rationale": "The percentage of extra instances allowed to be created during a rollout, so updates can proceed without dropping capacity. It's a rollout-pacing knob for availability, not something that affects security."
     },
     "update_policy.max_unavailable_fixed": {
       "description": "Specifies a fixed number of VM instances. This must be a positive integer.",
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "Just how many instances can be down during a rollout. Not a security setting."
+      "rationale": "The fixed number of instances allowed to be offline at once during an update. This trades off rollout speed against app availability - it doesn't touch security."
     },
     "update_policy.max_unavailable_percent": {
       "description": "Specifies a percentage of instances between 0 to 100%, inclusive. For example, specify 80 for 80%.",
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "Just what percentage of instances can be down during a rollout. Not a security setting."
+      "rationale": "The percentage of instances allowed to be offline at once during an update. Same tradeoff as the fixed version - rollout speed vs. app availability, not a security concern."
     },
     "update_policy.minimal_action": {
       "description": "Minimal action to be taken on an instance. You can specify either NONE to forbid any actions, REFRESH to update without stopping instances, RESTART to restart existing instances or REPLACE to delete and create new instances from the target template. If you specify a REFRESH, the Updater will attempt to perform that action only. However, if the Updater determines that the minimal action you specify is not enough to perform the update, it might perform a more disruptive action.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Just the minimum action taken during an update. Not a security setting."
+      "rationale": "Sets the gentlest action Terraform will try first when updating instances (e.g. a config refresh instead of a full restart/replace). Choosing how gently updates are applied doesn't change the resource's security posture."
     },
     "update_policy.most_disruptive_allowed_action": {
       "description": "Most disruptive action that is allowed to be taken on an instance. You can specify either NONE to forbid any actions, REFRESH to allow actions that do not need instance restart, RESTART to allow actions that can be applied without instance replacing or REPLACE to allow all possible actions. If the Updater determines that the minimal update action needed is more disruptive than most disruptive allowed action you specify it will not perform the update at all.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Just caps how disruptive an update is allowed to be. Not a security setting."
+      "rationale": "Caps how disruptive an update is allowed to get (e.g. never fully replace an instance). It's a change-management/availability preference, not a security mechanism."
     },
     "update_policy.replacement_method": {
       "description": "The instance replacement method for managed instance groups. Valid values are: \"RECREATE\", \"SUBSTITUTE\". If SUBSTITUTE (default), the group replaces VM instances with new instances that have randomly generated names. If RECREATE, instance names are preserved.  You must also set max_unavailable_fixed or max_unavailable_percent to be greater than 0.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Just decides whether replaced instances keep their original names. Not a security setting."
+      "rationale": "Decides whether a replaced instance keeps its original name or gets a new randomly-generated one. It's a naming/rollout detail with no security implications."
     },
     "update_policy.type": {
       "description": "The type of update process. You can specify either PROACTIVE so that the instance group manager proactively executes actions in order to bring instances to their target versions or OPPORTUNISTIC so that no action is proactively executed but the update will be performed as part of other actions (for example, resizes or recreateInstances calls).",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Just decides how updates are scheduled (proactive vs opportunistic). Not a security setting."
+      "rationale": "Decides whether updates roll out proactively on their own, or only piggyback on other changes like a resize. It's about deployment pacing/scheduling, not security."
     },
     "version": {
       "type": "block",
