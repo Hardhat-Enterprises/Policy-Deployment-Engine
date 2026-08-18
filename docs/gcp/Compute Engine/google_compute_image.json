@@ -124,13 +124,12 @@
       "security_impact": true,
       "rationale": "This field contains the customer-supplied encryption key used for the image. If it is exposed, an unauthorised party may gain access to the encrypted data; if it is lost, the image may become unusable."
     },
-    "image_encryption_key.rsa_encrypted_key": {
-      "description": "Specifies a 256-bit customer-supplied encryption key, encoded in\nRFC 4648 base64 to either encrypt or decrypt this resource.",
-      "required": false,
-      "type": "string",
-      "security_impact": true,
-      "rationale": "This field contains an RSA-encrypted customer-supplied encryption key used to protect the image. Although the key material is encrypted, it is still security-sensitive because it is part of the cryptographic mechanism controlling access to the encrypted image."
-
+   "image_encryption_key.rsa_encrypted_key": {
+     "description": "Specifies a 256-bit customer-supplied encryption key, encoded in\nRFC 4648 base64 to either encrypt or decrypt this resource.",
+     "required": false,
+     "type": "string",
+     "security_impact": false,
+     "rationale": "This field contains an RSA-encrypted customer-supplied key value. Because it is team-specific cryptographic material, a generic platform policy cannot meaningfully validate or constrain the encrypted key contents without pinning a specific secret value."
     },
     "params": {
       "type": "block",
@@ -238,11 +237,11 @@
       "required": false
     },
     "shielded_instance_initial_state.pk.content": {
-      "description": "The raw content in the secure keys file.\n\nA base64-encoded string.",
-      "required": true,
-      "type": "string",
-      "security_impact": false,
-      "rationale": "This field contains the Platform Key used to establish the custom trust chain for Shielded Instance Secure Boot. The specific key value is team-specific cryptographic material and should not be pinned by a generic platform policy. A structural policy could instead require that Platform Key material is supplied when a custom trust chain is configured and prevent it from being left blank or using an insecure/default value."
+     "description": "The raw content in the secure keys file.\n\nA base64-encoded string.",
+     "required": true,
+     "type": "string",
+     "security_impact": false,
+     "rationale": "This field contains the Platform Key used as part of the custom trust chain for Shielded Instance Secure Boot. The specific key content is team-specific cryptographic material, so a generic platform policy cannot validate or pin the exact value without hardcoding a particular key."
     },
     "shielded_instance_initial_state.pk.file_type": {
       "description": "The file type of source file.",
