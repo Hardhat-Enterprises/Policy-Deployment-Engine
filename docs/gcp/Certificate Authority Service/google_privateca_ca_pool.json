@@ -6,15 +6,15 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can destroy the CA pool. A generic policy can require deletion protection to reduce accidental loss of certificate infrastructure and the resulting availability disruption, although it does not prevent deletions performed outside Terraform."
     },
     "labels": {
       "description": "Labels with user-defined metadata.\n\nAn object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\":\n\"1.3kg\", \"count\": \"3\" }.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels add user-defined metadata to the CA pool for identification and organisation. Restricting their values would require team-specific conventions and would not directly change certificate issuance, access control or encryption, so they are not a suitable generic security-policy target."
     },
     "location": {
       "description": "Location of the CaPool. A full list of valid locations can be found by\nrunning 'gcloud privateca locations list'.",
@@ -27,15 +27,15 @@
       "description": "The name for this CaPool.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument sets the identifier used to distinguish the CA pool. Although Google Cloud does not allow a deleted pool name to be reused in the same project and location, restricting the name would not directly improve access control, encryption or certificate issuance security."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument specifies the Google Cloud project that owns the CA pool, or uses the provider project when omitted. Although project placement can affect inherited controls, a generic policy cannot prescribe a particular project ID without team-specific information, so this field is not a suitable policy target for this resource."
     },
     "tier": {
       "description": "The Tier of this CaPool. Possible values: [\"ENTERPRISE\", \"DEVOPS\"]",
@@ -53,8 +53,8 @@
       "description": "The resource name for an existing Cloud KMS key in the format\n'projects/*/locations/*/keyRings/*/cryptoKeys/*'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument selects the customer-managed Cloud KMS key used to encrypt sensitive certificate data at rest. A generic policy can require a CMEK to give the organisation control over key access, rotation, lifecycle and auditing without prescribing a particular team's key."
     },
     "issuance_policy": {
       "type": "block",
@@ -65,8 +65,8 @@
       "description": "The duration to backdate all certificates issued from this CaPool. If not set, the\ncertificates will be issued with a not_before_time of the issuance time (i.e. the current\ntime). If set, the certificates will be issued with a not_before_time of the issuance\ntime minus the backdate_duration. The not_after_time will be adjusted to preserve the\nrequested lifetime. The backdate_duration must be less than or equal to 48 hours.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument controls how far before its actual issuance time a certificate is considered valid while preserving its requested lifetime. A generic policy can limit or prohibit excessive backdating to reduce the retroactive trust window and potential misuse while still allowing a small approved allowance for clock differences."
     },
     "issuance_policy.maximum_lifetime": {
       "description": "The maximum lifetime allowed for issued Certificates. Note that if the issuing CertificateAuthority\nexpires before a Certificate's requested maximumLifetime, the effective lifetime will be explicitly truncated to match it.",
@@ -84,8 +84,8 @@
       "description": "When true, allows callers to create Certificates by specifying a CertificateConfig.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument controls whether callers can request certificates by directly supplying a CertificateConfig instead of a CSR. A generic policy can disable configuration-based issuance because it does not require proof that the requester possesses the associated private key, reducing the risk of incorrectly bound certificates."
     },
     "issuance_policy.allowed_issuance_modes.allow_csr_based_issuance": {
       "description": "When true, allows callers to create Certificates by specifying a CSR.",
@@ -120,15 +120,15 @@
       "description": "The maximum allowed RSA modulus size, in bits. If this is not set, or if set to zero, the\nservice will not enforce an explicit upper bound on RSA modulus sizes.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument sets the inclusive upper limit for RSA modulus sizes accepted in certificate requests. A generic policy can cap RSA keys at an approved maximum to avoid excessive computational cost and compatibility problems that could affect service availability."
     },
     "issuance_policy.allowed_key_types.rsa.min_modulus_size": {
       "description": "The minimum allowed RSA modulus size, in bits. If this is not set, or if set to zero, the\nservice-level min RSA modulus size will continue to apply.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument sets the inclusive minimum RSA modulus size accepted in certificate requests. A generic policy can enforce an approved minimum of at least 2048 bits to prevent weaker RSA keys from being explicitly allowed and reduce the risk of cryptographic compromise."
     },
     "issuance_policy.baseline_values": {
       "type": "block",
@@ -139,8 +139,8 @@
       "description": "Describes Online Certificate Status Protocol (OCSP) endpoint addresses that appear in the\n\"Authority Information Access\" extension in the certificate.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument specifies the OCSP server URLs embedded in issued certificates so clients can check revocation status. Reliable OCSP endpoints are important, but the correct URLs depend on each organisation's responder infrastructure and some deployments use CRLs instead, so a generic policy cannot prescribe their values."
     },
     "issuance_policy.baseline_values.additional_extensions": {
       "type": "block",
@@ -151,15 +151,15 @@
       "description": "Indicates whether or not this extension is critical (i.e., if the client does not know how to\nhandle this extension, the client should consider this to be an error).",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument determines whether clients must reject a certificate when they cannot process the custom X.509 extension. The safe value depends on the meaning and intended enforcement of that specific extension, so a generic policy cannot require all custom extensions to be either critical or non-critical."
     },
     "issuance_policy.baseline_values.additional_extensions.value": {
       "description": "The value of this X.509 extension. A base64-encoded string.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument contains the Base64-encoded data stored in a custom X.509 extension. Its meaning and safe value depend on the extension's object identifier and organisation-specific purpose, so a generic policy cannot determine or enforce an appropriate value."
     },
     "issuance_policy.baseline_values.additional_extensions.object_id": {
       "type": "block",
@@ -170,8 +170,8 @@
       "description": "An ObjectId specifies an object identifier (OID). These provide context and describe types in ASN.1 messages.",
       "required": true,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument identifies the type and meaning of a custom X.509 extension using an object identifier path. The correct OID depends on the specific extension and its organisation-defined purpose, so a generic policy cannot prescribe one universally safe value."
     },
     "issuance_policy.baseline_values.ca_options": {
       "type": "block",
@@ -182,8 +182,8 @@
       "description": "When true, the \"CA\" in Basic Constraints extension will be set to true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument determines whether certificates issued by the CA pool can act as certificate authorities and sign additional certificates. A generic policy can require this value to be false for end-entity issuance pools, preventing unintended delegation of certificate-signing authority."
     },
     "issuance_policy.baseline_values.ca_options.max_issuer_path_length": {
       "description": "Refers to the \"path length constraint\" in Basic Constraints extension. For a CA certificate, this value describes the depth of\nsubordinate CA certificates that are allowed. If this value is less than 0, the request will fail.",
