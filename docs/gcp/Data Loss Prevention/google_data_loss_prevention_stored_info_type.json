@@ -1,41 +1,41 @@
 {
-  "last_updated": "2026-06-23T08:26:44Z",
-  "provider_version": "7.37.0",
+  "last_updated": "2026-08-14T17:45:41Z",
+  "provider_version": "7.44.0",
   "arguments": {
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This can stop Terraform from deleting the StoredInfoType. That is a useful safeguard for detectors that should not be removed by mistake."
     },
     "description": {
       "description": "A description of the info type.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is just descriptive text for people reading the resource. Changing it does not make the detector more secure."
     },
     "display_name": {
       "description": "User set display name of the info type.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is only the name shown to users. A naming rule can help with organisation, but it does not add a security control."
     },
     "parent": {
       "description": "The parent of the info type in any of the following formats:\n\n* 'projects/{{project}}'\n* 'projects/{{project}}/locations/{{location}}'\n* 'organizations/{{organization_id}}'\n* 'organizations/{{organization_id}}/locations/{{location}}'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The parent can include the resource location. We can use that to make sure StoredInfoTypes are only created in approved regions."
     },
     "stored_info_type_id": {
       "description": "The storedInfoType ID can contain uppercase and lowercase letters, numbers, and hyphens;\nthat is, it must match the regular expression: [a-zA-Z\\d-_]+. The maximum length is 100\ncharacters. Can be empty to allow the system to generate one.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is just the resource identifier. A naming standard can be useful, but the ID itself does not make the detector safer."
     },
     "dictionary": {
       "type": "block",
@@ -51,8 +51,8 @@
       "description": "A url representing a file or path (no wildcards) in Cloud Storage. Example: 'gs://[BUCKET_NAME]/dictionary.txt'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This points to the dictionary file the team wants to use. The path will vary by use case, and the file itself should be protected in Cloud Storage."
     },
     "dictionary.word_list": {
       "type": "block",
@@ -63,8 +63,8 @@
       "description": "Words or phrases defining the dictionary. The dictionary must contain at least one\nphrase and every phrase must contain at least 2 characters that are letters or digits.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "These are the actual words or phrases the team wants to detect. There is no common list that would make sense for every detector."
     },
     "large_custom_dictionary": {
       "type": "block",
@@ -85,8 +85,8 @@
       "description": "Name describing the field.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This chooses the column that contains the dictionary values. The right column depends on the table the team is using."
     },
     "large_custom_dictionary.big_query_field.table": {
       "type": "block",
@@ -97,22 +97,22 @@
       "description": "The dataset ID of the table.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This identifies the BigQuery dataset that holds the dictionary source. The correct dataset depends on the workload, and its security should be handled in BigQuery."
     },
     "large_custom_dictionary.big_query_field.table.project_id": {
       "description": "The Google Cloud Platform project ID of the project containing the table.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This tells the resource which project contains the source table. The right project depends on where the team keeps that data."
     },
     "large_custom_dictionary.big_query_field.table.table_id": {
       "description": "The name of the table.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This chooses the table that contains the dictionary entries. The table name is specific to the team's setup, while the table's security belongs in BigQuery."
     },
     "large_custom_dictionary.cloud_storage_file_set": {
       "type": "block",
@@ -123,8 +123,8 @@
       "description": "The url, in the format 'gs://<bucket>/<path>'. Trailing wildcard in the path is allowed.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This tells DLP which Cloud Storage files contain the dictionary data. The path depends on the team's setup, and the files should be secured in Cloud Storage."
     },
     "large_custom_dictionary.output_path": {
       "type": "block",
@@ -135,8 +135,8 @@
       "description": "A url representing a file or path (no wildcards) in Cloud Storage. Example: 'gs://[BUCKET_NAME]/dictionary.txt'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The artifacts have their own access and integrity protections, but this field only chooses where they are stored. The path itself does not set those protections."
     },
     "regex": {
       "type": "block",
@@ -147,15 +147,15 @@
       "description": "The index of the submatch to extract as findings. When not specified, the entire match is returned. No more than 3 may be included.",
       "required": false,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This only chooses which part of the regex match is returned. The right indexes depend on how the team's regex is written."
     },
     "regex.pattern": {
       "description": "Pattern defining the regular expression.\nIts syntax (https://github.com/google/re2/wiki/Syntax) can be found under the google/re2 repository on GitHub.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This pattern defines what the detector looks for. Whether it is correct depends on the data the team is trying to find."
     }
   }
 }
