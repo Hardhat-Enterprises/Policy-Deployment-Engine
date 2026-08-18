@@ -34,8 +34,8 @@
       "description": "If true, replaces other deployed revisions of this proxy in the environment.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Replacing deployed revisions may disrupt service or unintentionally replace a secure, stable revision."
+      "security_impact": false,
+      "rationale": "Controls the functional deployment behaviour for replacing an existing API proxy revision. It does not directly configure access, data protection, encryption, exposure, or another security control, making it unsuitable as a generic platform-level security policy target."
     },
     "revision": {
       "description": "API proxy revision number to deploy.",
@@ -48,15 +48,15 @@
       "description": "If true, enables sequenced rollout for safe traffic switching.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls safe traffic switching and can reduce availability risks during deployment."
+      "security_impact": false,
+      "rationale": "Controls the deployment strategy used to switch traffic between API proxy revisions. Although it may improve service availability during deployment, it is an operational rollout setting rather than a security control or destructive-loss safeguard."
     },
     "service_account": {
       "description": "Optional service account the deployed proxy runs as.",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls safe traffic switching and can reduce availability risks during deployment."
+      "rationale": "Determines the workload identity and permissions used by the deployed API proxy at runtime. Enforcing an appropriate, dedicated service account supports least-privilege access and reduces the risk of the proxy receiving excessive permissions or accessing unauthorised resources."
     }
   }
 }
