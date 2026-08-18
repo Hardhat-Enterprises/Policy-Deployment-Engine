@@ -13,8 +13,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This just tells Terraform 'can you delete this or not' — it's a Terraform safety switch, not something that changes who can access the data."
+      "security_impact": true,
+      "rationale": "Controls whether Terraform is blocked from destroying the resource. Enforcing this as PREVENT (or an equivalent protective value) via policy guards against accidental or malicious destruction of the file system and its data — this is a prevent-destructive-loss control."
     },
     "description": {
       "description": "A user-readable description of the instance.",
@@ -35,7 +35,7 @@
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Enables GKE workloads to access the Lustre filesystem, increasing the potential access surface."
+      "rationale": "Controls whether GKE clients are permitted to discover and mount the instance. Enabling broader client access without justification widens the resource's attack surface; policy should constrain this toggle so it's only enabled deliberately and disabled by default, rather than left universally open."
     },
     "instance_id": {
       "description": "The name of the Managed Lustre instance.\n\n* Must contain only lowercase letters, numbers, and hyphens.\n* Must start with a letter.\n* Must be between 1-63 characters.\n* Must end with a number or a letter.",
@@ -49,7 +49,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Specifies the encryption key used to protect data at rest."
+      "rationale": "Determines whether the instance uses Google-managed or customer-managed encryption keys. Policy should require this field be set to a non-empty value to mandate CMEK — giving the organization control over key lifecycle and revocation — without hardcoding a specific key resource in the policy itself."
     },
     "labels": {
       "description": "Labels as key value pairs.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
@@ -103,21 +103,21 @@
       "required": false,
       "type": "number",
       "security_impact": true,
-      "rationale": "Defines the GID mapping applied when root-user squashing is used."
+      "rationale": "Defines the GID applied to root users from clients that don't match any explicit rule. Leaving root unmapped grants full root privileges over the file system to any unrecognized client. Policy should require this be set to a restricted, non-root GID to enforce credential hygiene by default."
     },
     "access_rules_options.default_squash_mode": {
       "description": "The squash mode for the default access rule.\nPossible values:\nNO_SQUASH\nROOT_SQUASH",
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls whether root privileges are retained or restricted for unmatched clients."
+      "rationale": "Determines whether root users from unmatched clients retain full privileges (NO_SQUASH) or are mapped to a restricted identity (ROOT_SQUASH). Leaving this as NO_SQUASH exposes the file system to a full root takeover from any unrecognized client. Policy should enforce ROOT_SQUASH as the required value."
     },
     "access_rules_options.default_squash_uid": {
       "description": "The user squash UID for the default access rule.\nThis user squash UID applies to all root users connecting from clients\nthat are not matched by any of the access rules. If not set, the default\nis 0 (no UID squash).",
       "required": false,
       "type": "number",
       "security_impact": true,
-      "rationale": "Defines the UID mapping applied when root-user squashing is used."
+      "rationale": "Defines the UID applied to root users from clients that don't match any explicit rule. An unmapped root UID allows unauthorized access to files owned by root or other privileged accounts. Policy should require a restricted, non-privileged UID."
     },
     "access_rules_options.access_rules": {
       "type": "block",
@@ -128,15 +128,15 @@
       "description": "The IP address ranges to which to apply this access rule. Accepts\nnon-overlapping CIDR ranges (e.g., '192.168.1.0/24') and IP addresses\n(e.g., '192.168.1.0').",
       "required": true,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Specifies application-specific IP ranges to which an access rule applies."
+      "security_impact": true,
+      "rationale": "Defines the CIDR ranges/IPs permitted to mount the instance under this rule — functionally a network exposure allowlist. Policy should constrain the allowlist shape (e.g. prohibiting 0.0.0.0/0 or other overly broad ranges) rather than permitting unrestricted network exposure."
     },
     "access_rules_options.access_rules.name": {
       "description": "The name of the access rule policy group.\nMust be 16 characters or less and include only alphanumeric characters\nor '_'.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Provides an identifier for the access-rule group."
+      "security_impact": true,
+      "rationale": "Identifier label for the access rule, used only to distinguish rules from one another. As a naming/reference value it has no bearing on who can access the instance."
     },
     "access_rules_options.access_rules.squash_mode": {
       "description": "Squash mode for the access rule.\nPossible values:\nNO_SQUASH\nROOT_SQUASH",
@@ -154,8 +154,8 @@
       "description": "The dynamic tier mode of the instance.\nPossible values:\nDISABLED\nDEFAULT_CACHE",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Controls the operating mode of the Dynamic storage tier."
+      "security_impact": true,
+      "rationale": "Toggles the dynamic tier's caching behavior (DISABLED vs DEFAULT_CACHE). Enabling a caching layer changes where and how data is staged, affecting the resource's overall data-handling footprint; policy should constrain this to the organization's approved mode rather than allowing it to be set arbitrarily."
     },
     "maintenance_policy": {
       "type": "block",
@@ -210,14 +210,14 @@
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "Month component of the exclusion window's start date. Scheduling only."
+      "rationale": "Month component of the exclusion window's start date — part of a calendar scheduling configuration with no effect on access control, encryption, or exposure."
     },
     "maintenance_policy.maintenance_exclusion_window.start_date.year": {
       "description": "Year of the date. Must be from 1 to 9999, or 0 to specify a date without\na year.",
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "Year component of the exclusion window's start date. Scheduling only."
+      "rationale": "Year component of the exclusion window's start date — a scheduling value with no security or threat-posture relevance."
     },
     "maintenance_policy.maintenance_exclusion_window.time": {
       "type": "block",
@@ -229,28 +229,28 @@
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "Hour value within the exclusion window's time-of-day. No security relevance."
+      "rationale": "Hour component of the exclusion window's time-of-day — an operational scheduling preference, not a security boundary."
     },
     "maintenance_policy.maintenance_exclusion_window.time.minutes": {
       "description": "Minutes of an hour. Must be greater than or equal to 0 and less than or\nequal to 59.",
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "Minute value within the exclusion window's time-of-day. No security relevance."
+      "rationale": "Minute component of the exclusion window's time-of-day — no security relevance, outside the scope of platform policy."
     },
     "maintenance_policy.maintenance_exclusion_window.time.nanos": {
       "description": "Fractions of seconds, in nanoseconds. Must be greater than or equal to 0\nand less than or equal to 999,999,999.",
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "Sub-second precision for the exclusion window's time-of-day. No security relevance."
+      "rationale": "Sub-second precision for the exclusion window's time-of-day — purely operational, not a policy target."
     },
     "maintenance_policy.maintenance_exclusion_window.time.seconds": {
       "description": "Seconds of a minute. Must be greater than or equal to 0 and typically must\nbe less than or equal to 59. An API may allow the value 60 if it allows\nleap-seconds.",
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "Second value within the exclusion window's time-of-day. No security relevance."
+      "rationale": "Second component of the exclusion window's time-of-day — scheduling precision only, no security impact."
     },
     "maintenance_policy.weekly_maintenance_windows": {
       "type": "block",
@@ -262,7 +262,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Day of the week on which the maintenance window occurs. Scheduling value only."
+      "rationale": "Day of the week for the recurring maintenance window — an operational availability choice, not a security control."
     },
     "maintenance_policy.weekly_maintenance_windows.start_time": {
       "type": "block",
@@ -274,7 +274,7 @@
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "Hour value for the weekly maintenance window's start time. No security relevance."
+      "rationale": "Hour at which the weekly maintenance window begins — governs operational availability scheduling, no effect on security posture."
     },
     "maintenance_policy.weekly_maintenance_windows.start_time.minutes": {
       "description": "Minutes of an hour. Must be greater than or equal to 0 and less than or\nequal to 59.",
