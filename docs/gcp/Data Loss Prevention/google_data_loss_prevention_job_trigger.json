@@ -6,43 +6,43 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The destroy guard, and it defaults to DELETE. The trigger is the scanning control itself, so destroying it silently ends all scheduled inspection of the configured data, leaving sensitive content unscanned with nothing in the configuration to show that detection stopped. ABANDON fails the other way, leaving a live trigger running against production data but no longer tracked in code. Policy should pin this to the value that blocks destroys (PREVENT) so that removing a data protection scan is a deliberate, reviewed change."
     },
     "description": {
       "description": "A description of the job trigger.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A free text note for operators. Nothing in the inspection or action path reads it, so constraining its wording would not change what is scanned or reported."
     },
     "display_name": {
       "description": "User set display name of the job trigger.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A label shown in the console. It takes no part in detection, in the actions taken on completion, or in access to findings."
     },
     "parent": {
       "description": "The parent of the trigger, either in the format 'projects/{{project}}'\nor 'projects/{{project}}/locations/{{location}}'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Carries both the owning project and, in the longer form, the location the trigger and its jobs run in. The project segment is not policeable, since no generic rule can name a team's project, but the location segment determines where inspection of the data takes place and is therefore a residency decision. Policy should require the location form and restrict it to an approved region set, with the allowed set parameterised rather than hardcoded."
     },
     "status": {
       "description": "Whether the trigger is currently active. Default value: \"HEALTHY\" Possible values: [\"PAUSED\", \"HEALTHY\", \"CANCELLED\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Decides whether the trigger actually runs. Set to PAUSED or CANCELLED the resource still exists and still looks configured, but no scan is ever started, so the control is silently inert while continuing to appear in the estate as coverage. The safe value is unambiguous and needs nothing specific to any team, so policy should require the active state and treat any paused trigger as a documented exemption with an expiry."
     },
     "trigger_id": {
       "description": "The trigger id can contain uppercase and lowercase letters, numbers, and hyphens;\nthat is, it must match the regular expression: [a-zA-Z\\d-_]+.\nThe maximum length is 100 characters. Can be empty to allow the system to generate one.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The identifier, already constrained in format by the API and generated automatically when left empty. It plays no part in detection, in the actions taken, or in who can read the findings."
     },
     "inspect_job": {
       "type": "block",
@@ -53,8 +53,8 @@
       "description": "The name of the template to run when this job is triggered.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to an inspect template that supplies the detection configuration. Platform policy does not police references to other resources: the detection settings that matter live on the template, which is itself an assessable resource type, and a rule here could only hardcode one team's template name."
     },
     "inspect_job.actions": {
       "type": "block",
@@ -70,15 +70,15 @@
       "description": "User settable Cloud Storage bucket and folders to store de-identified files.\n\nThis field must be set for cloud storage deidentification.\n\nThe output Cloud Storage bucket must be different from the input bucket.\n\nDe-identified files will overwrite files in the output path.\n\nForm of: gs://bucket/folder/ or gs://bucket",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to the bucket that receives the deidentified copy. Platform policy does not police references to other storage: the protection of that bucket comes from its own IAM and configuration, and no generic rule can name it. The one structural risk worth noting, that output could be written back over the source, is already prevented by the API requiring the output bucket to differ from the input bucket."
     },
     "inspect_job.actions.deidentify.file_types_to_transform": {
       "description": "List of user-specified file type groups to transform. If specified, only the files with these filetypes will be transformed.\n\nIf empty, all supported files will be transformed. Supported types may be automatically added over time.\n\nIf a file type is set in this field that isn't supported by the Deidentify action then the job will fail and will not be successfully created/started. Possible values: [\"IMAGE\", \"TEXT_FILE\", \"CSV\", \"TSV\"]",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Narrows which file types are deidentified. Left empty every supported type is transformed, including types added by the service over time; naming a subset means files of every other type are copied through untransformed, so sensitive content survives in the output while the job still reports success. Policy should require this to be left empty so that coverage tracks the service, and treat any explicit subset as an exception that has to be justified."
     },
     "inspect_job.actions.deidentify.transformation_config": {
       "type": "block",
@@ -89,22 +89,22 @@
       "description": "If this template is specified, it will serve as the default de-identify template.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to a deidentify template. Platform policy does not police references to other resources: the transformations that determine how thoroughly data is masked are configured on the template itself, which is separately assessable, and a rule here could only pin one team's template name."
     },
     "inspect_job.actions.deidentify.transformation_config.image_redact_template": {
       "description": "If this template is specified, it will serve as the de-identify template for images.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to a deidentify template. Platform policy does not police references to other resources: the transformations that determine how thoroughly data is masked are configured on the template itself, which is separately assessable, and a rule here could only pin one team's template name."
     },
     "inspect_job.actions.deidentify.transformation_config.structured_deidentify_template": {
       "description": "If this template is specified, it will serve as the de-identify template for structured content such as delimited files and tables.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to a deidentify template. Platform policy does not police references to other resources: the transformations that determine how thoroughly data is masked are configured on the template itself, which is separately assessable, and a rule here could only pin one team's template name."
     },
     "inspect_job.actions.deidentify.transformation_details_storage_config": {
       "type": "block",
@@ -120,22 +120,22 @@
       "description": "The ID of the dataset containing this table.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of a reference to the BigQuery table that receives transformation details. Platform policy does not police references to other resources, and access to that table is governed by its own dataset and project IAM rather than by this identifier."
     },
     "inspect_job.actions.deidentify.transformation_details_storage_config.table.project_id": {
       "description": "The ID of the project containing this table.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of a reference to the BigQuery table that receives transformation details. Platform policy does not police references to other resources, and access to that table is governed by its own dataset and project IAM rather than by this identifier."
     },
     "inspect_job.actions.deidentify.transformation_details_storage_config.table.table_id": {
       "description": "The ID of the table. The ID must contain only letters (a-z,\nA-Z), numbers (0-9), or underscores (_). The maximum length\nis 1,024 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of a reference to the BigQuery table that receives transformation details. Platform policy does not police references to other resources, and access to that table is governed by its own dataset and project IAM rather than by this identifier."
     },
     "inspect_job.actions.job_notification_emails": {
       "type": "block",
@@ -151,8 +151,8 @@
       "description": "Cloud Pub/Sub topic to send notifications to.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to the topic that receives the completion notification. Platform policy does not police references to other resources: who can subscribe to that topic is decided by the topic's own IAM, and no generic rule can name the correct topic for a team."
     },
     "inspect_job.actions.publish_findings_to_cloud_data_catalog": {
       "type": "block",
@@ -188,8 +188,8 @@
       "description": "Schema used for writing the findings for Inspect jobs. This field is only used for\nInspect and must be unspecified for Risk jobs. Columns are derived from the Finding\nobject. If appending to an existing table, any columns from the predefined schema\nthat are missing will be added. No columns in the existing table will be deleted.\n\nIf unspecified, then all available columns will be used for a new table or an (existing)\ntable with no schema, and no changes will be made to an existing table that has a schema.\nOnly for use with external storage. Possible values: [\"BASIC_COLUMNS\", \"GCS_COLUMNS\", \"DATASTORE_COLUMNS\", \"BIG_QUERY_COLUMNS\", \"ALL_COLUMNS\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Chooses which columns of the Finding object are written to the findings table. The column sets differ in how much locational and contextual detail a finding carries, not in whether the sensitive value itself is written: that is decided by include_quote. No accepted value is safer than another, and which set a team needs depends on the storage backend and how they triage findings."
     },
     "inspect_job.actions.save_findings.output_config.storage_path": {
       "type": "block",
@@ -200,8 +200,8 @@
       "description": "A URL representing a file or path (no wildcards) in Cloud Storage.\nExample: 'gs://[BUCKET_NAME]/dictionary.txt'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to the Cloud Storage location that receives the findings. Platform policy does not police references to other storage, and the API already prevents the one structural mistake available here by requiring the findings bucket to differ from the bucket being inspected."
     },
     "inspect_job.actions.save_findings.output_config.table": {
       "type": "block",
@@ -212,22 +212,22 @@
       "description": "Dataset ID of the table.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of a reference to the BigQuery table that stores findings. Findings can be sensitive, but their protection comes from that table's own dataset and project IAM, which platform policy addresses on the storage resource rather than through an identifier recorded here."
     },
     "inspect_job.actions.save_findings.output_config.table.project_id": {
       "description": "The Google Cloud Platform project ID of the project containing the table.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of a reference to the BigQuery table that stores findings. Findings can be sensitive, but their protection comes from that table's own dataset and project IAM, which platform policy addresses on the storage resource rather than through an identifier recorded here."
     },
     "inspect_job.actions.save_findings.output_config.table.table_id": {
       "description": "Name of the table. If is not set a new one will be generated for you with the following format:\n'dlp_googleapis_yyyy_mm_dd_[dlp_job_id]'. Pacific timezone will be used for generating the date details.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of a reference to the BigQuery table that stores findings. Findings can be sensitive, but their protection comes from that table's own dataset and project IAM, which platform policy addresses on the storage resource rather than through an identifier recorded here."
     },
     "inspect_job.inspect_config": {
       "type": "block",
@@ -238,22 +238,22 @@
       "description": "When true, excludes type information of the findings.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Strips the infoType from every finding the job produces, and type information is included by default. With it on, the output records that something matched but not what matched, so a reviewer cannot tell a test string from a credit card number and cannot triage or prioritise. That degrades the security signal the scan exists to produce, the safe value is the default, and the rule needs nothing specific to any team, so policy should require it to stay false."
     },
     "inspect_job.inspect_config.include_quote": {
       "description": "When true, a contextual quote from the data that triggered a finding is included in the response.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Copies the matched string itself into the finding. Google treats quotes as potentially sensitive and omits them by default, returning only the location of the match, and when this is enabled together with BigQuery findings storage the quotes are written into that table. Enabling it therefore duplicates the very data the scan was meant to protect into a second store with its own, usually broader, access. Policy should require it to stay false, so that findings carry location rather than content unless a documented investigative need says otherwise."
     },
     "inspect_job.inspect_config.min_likelihood": {
       "description": "Only returns findings equal or above this threshold. See https://cloud.google.com/dlp/docs/likelihood for more info Default value: \"POSSIBLE\" Possible values: [\"VERY_UNLIKELY\", \"UNLIKELY\", \"POSSIBLE\", \"LIKELY\", \"VERY_LIKELY\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The reporting threshold for the whole scan: matches below it are discarded and never appear as findings. Raising it to LIKELY or VERY_LIKELY makes a scan quietly report less while still completing successfully, which is indistinguishable from clean data at the point where anyone looks. Policy should cap how strict this may be set, keeping it at or below the default so that a team cannot tune real sensitive data out of its own results."
     },
     "inspect_job.inspect_config.custom_info_types": {
       "type": "block",
@@ -264,15 +264,15 @@
       "description": "If set to EXCLUSION_TYPE_EXCLUDE this infoType will not cause a finding to be returned. It still can be used for rules matching. Possible values: [\"EXCLUSION_TYPE_EXCLUDE\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Turns a detector into one that matches but never reports. The single accepted value suppresses findings for the infoType entirely, which is a deliberate blind spot expressed in one field, and it is invisible in the results because the scan simply returns nothing for that type. Policy should require exclusion to be absent by default and treat its use as a reviewed exception, since the same effect achieved by removing the detector at least leaves no impression that it is being scanned for."
     },
     "inspect_job.inspect_config.custom_info_types.likelihood": {
       "description": "Likelihood to return for this CustomInfoType. This base value can be altered by a detection rule if the finding meets the criteria\nspecified by the rule. Default value: \"VERY_LIKELY\" Possible values: [\"VERY_UNLIKELY\", \"UNLIKELY\", \"POSSIBLE\", \"LIKELY\", \"VERY_LIKELY\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets the confidence every match from this custom detector is reported with, defaulting to the highest value. Because findings are filtered against min_likelihood, setting this low is equivalent to switching the detector off: it will match and then be discarded before anyone sees it. Policy should require the value to sit at or above the scan's reporting threshold so a custom detector cannot be defined and then silently neutralised."
     },
     "inspect_job.inspect_config.custom_info_types.dictionary": {
       "type": "block",
@@ -288,8 +288,8 @@
       "description": "A url representing a file or path (no wildcards) in Cloud Storage. Example: 'gs://[BUCKET_NAME]/dictionary.txt'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to the Cloud Storage object holding the dictionary terms. Platform policy does not police references to other storage, and the detection value here rests on the words in the file, which are specific to what a team is looking for."
     },
     "inspect_job.inspect_config.custom_info_types.dictionary.word_list": {
       "type": "block",
@@ -300,8 +300,8 @@
       "description": "Words or phrases defining the dictionary. The dictionary must contain at least one\nphrase and every phrase must contain at least 2 characters that are letters or digits.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The terms a custom detector looks for. This adds detection rather than removing it, and what a team needs to detect depends entirely on their own data, so there is no direction a generic rule could push it in."
     },
     "inspect_job.inspect_config.custom_info_types.info_type": {
       "type": "block",
@@ -312,15 +312,15 @@
       "description": "Name of the information type. Either a name of your choosing when creating a CustomInfoType, or one of the names\nlisted at https://cloud.google.com/dlp/docs/infotypes-reference when specifying a built-in type.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The label a team gives its own custom detector, or the built in name it extends. It identifies the detector rather than deciding what is scanned for, which is set by the dictionary, regex or stored type beneath it."
     },
     "inspect_job.inspect_config.custom_info_types.info_type.version": {
       "description": "Version of the information type to use. By default, the version is set to stable.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects a detector version, defaulting to stable. Versions are published by the service rather than chosen for their security properties, so there is no generically safer value to enforce."
     },
     "inspect_job.inspect_config.custom_info_types.info_type.sensitivity_score": {
       "type": "block",
@@ -331,8 +331,8 @@
       "description": "The sensitivity score applied to the resource. Possible values: [\"SENSITIVITY_LOW\", \"SENSITIVITY_MODERATE\", \"SENSITIVITY_HIGH\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A classification weight that the documentation states applies only to data profiling. It has no effect on what this job detects, reports or stores, and the correct score depends on what the infoType represents to the team that defined it."
     },
     "inspect_job.inspect_config.custom_info_types.regex": {
       "type": "block",
@@ -343,15 +343,15 @@
       "description": "The index of the submatch to extract as findings. When not specified, the entire match is returned. No more than 3 may be included.",
       "required": false,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Chooses which capture group becomes the reported finding, defaulting to the whole match. It shapes how a detector expresses its result rather than whether anything is detected, and the right group depends on the pattern a team wrote."
     },
     "inspect_job.inspect_config.custom_info_types.regex.pattern": {
       "description": "Pattern defining the regular expression.\nIts syntax (https://github.com/google/re2/wiki/Syntax) can be found under the google/re2 repository on GitHub.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The expression a custom detector matches on. It adds detection coverage, and its correct content is entirely specific to the data a team holds, so no generic rule could constrain it without knowing what they are looking for."
     },
     "inspect_job.inspect_config.custom_info_types.sensitivity_score": {
       "type": "block",
@@ -362,8 +362,8 @@
       "description": "The sensitivity score applied to the resource. Possible values: [\"SENSITIVITY_LOW\", \"SENSITIVITY_MODERATE\", \"SENSITIVITY_HIGH\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "As above, a data profiling classification weight. It does not influence detection, reporting or storage for this job, so constraining it would change nothing about the scan."
     },
     "inspect_job.inspect_config.custom_info_types.stored_type": {
       "type": "block",
@@ -374,8 +374,8 @@
       "description": "Resource name of the requested StoredInfoType, for example 'organizations/433245324/storedInfoTypes/432452342'\nor 'projects/project-id/storedInfoTypes/432452342'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to a stored infoType resource. Platform policy does not police references to other resources: what that stored type detects is configured on the resource itself, and a rule here could only hardcode one organisation's or team's identifier."
     },
     "inspect_job.inspect_config.custom_info_types.surrogate_type": {
       "type": "block",
@@ -391,15 +391,15 @@
       "description": "Name of the information type. Either a name of your choosing when creating a CustomInfoType, or one of the names listed\nat https://cloud.google.com/dlp/docs/infotypes-reference when specifying a built-in type.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This is the list that decides what the scan actually looks for. Left unspecified the service chooses detectors itself and may run all of them; naming a short list restricts detection to exactly those types, so anything outside it is never reported no matter how much of it the data contains. The names come from a published vendor reference rather than from a team's own naming, so a baseline set can be required generically. Policy should enforce a minimum baseline of detectors, held as a parameterised list, that every scan must include."
     },
     "inspect_job.inspect_config.info_types.version": {
       "description": "Version of the information type to use. By default, the version is set to stable",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects a published detector version, defaulting to stable. The versions are the vendor's, not a security choice a platform could rank."
     },
     "inspect_job.inspect_config.info_types.sensitivity_score": {
       "type": "block",
@@ -410,8 +410,8 @@
       "description": "The sensitivity score applied to the resource. Possible values: [\"SENSITIVITY_LOW\", \"SENSITIVITY_MODERATE\", \"SENSITIVITY_HIGH\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A data profiling classification weight, stated by the documentation as applying only to profiling. It changes nothing about what this job detects or where its findings go."
     },
     "inspect_job.inspect_config.limits": {
       "type": "block",
@@ -422,15 +422,15 @@
       "description": "Max number of findings that will be returned for each item scanned. The maximum returned is 2000.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Caps findings per item scanned. This looks like a way to hide results, but the service documentation is explicit that inside an inspect job these are not hard limits: the job ends gradually rather than abruptly and the number of findings actually returned can be several times higher than the value set. A policy constraining it would therefore not reliably guarantee coverage, and the field behaves as volume and cost guidance rather than an enforceable cap."
     },
     "inspect_job.inspect_config.limits.max_findings_per_request": {
       "description": "Max number of findings that will be returned per request/job. The maximum returned is 2000.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The same soft cap applied per job rather than per item, and subject to the same documented behaviour of ending the job gradually and returning more findings than the stated maximum. It bounds output volume rather than detection, and the reporting threshold and detector list are where scan completeness is genuinely decided."
     },
     "inspect_job.inspect_config.limits.max_findings_per_info_type": {
       "type": "block",
@@ -441,8 +441,8 @@
       "description": "Max findings limit for the given infoType.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A per detector version of the same soft finding cap. It shapes how much output a single infoType contributes rather than whether that infoType is detected, and the limits are not enforced strictly within an inspect job."
     },
     "inspect_job.inspect_config.limits.max_findings_per_info_type.info_type": {
       "type": "block",
@@ -453,15 +453,15 @@
       "description": "Name of the information type. Either a name of your choosing when creating a CustomInfoType, or one of the names listed\nat https://cloud.google.com/dlp/docs/infotypes-reference when specifying a built-in type.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies which detector a findings limit applies to. It selects the target of a limit rather than deciding what is scanned, and the limit itself is not an enforceable cap inside an inspect job."
     },
     "inspect_job.inspect_config.limits.max_findings_per_info_type.info_type.version": {
       "description": "Version of the information type to use. By default, the version is set to stable",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A published detector version, defaulting to stable, used here only to identify which detector the limit targets."
     },
     "inspect_job.inspect_config.limits.max_findings_per_info_type.info_type.sensitivity_score": {
       "type": "block",
@@ -472,8 +472,8 @@
       "description": "The sensitivity score applied to the resource. Possible values: [\"SENSITIVITY_LOW\", \"SENSITIVITY_MODERATE\", \"SENSITIVITY_HIGH\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A profiling only classification weight with no effect on this job's detection or output."
     },
     "inspect_job.inspect_config.rule_set": {
       "type": "block",
@@ -489,15 +489,15 @@
       "description": "Name of the information type. Either a name of your choosing when creating a CustomInfoType, or one of the names listed\nat https://cloud.google.com/dlp/docs/infotypes-reference when specifying a built-in type.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names which detectors the rule set applies to. It scopes the rules rather than deciding detection itself, and the suppression risk in a rule set sits in the exclusion rules beneath it, which is where a policy has something to constrain."
     },
     "inspect_job.inspect_config.rule_set.info_types.version": {
       "description": "Version of the information type to use. By default, the version is set to stable.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A published detector version used to identify the scope of the rule set, defaulting to stable."
     },
     "inspect_job.inspect_config.rule_set.info_types.sensitivity_score": {
       "type": "block",
@@ -508,8 +508,8 @@
       "description": "The sensitivity score applied to the resource. Possible values: [\"SENSITIVITY_LOW\", \"SENSITIVITY_MODERATE\", \"SENSITIVITY_HIGH\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A profiling only classification weight with no bearing on the rules applied by this job."
     },
     "inspect_job.inspect_config.rule_set.rules": {
       "type": "block",
@@ -523,10 +523,10 @@
     },
     "inspect_job.inspect_config.rule_set.rules.exclusion_rule.matching_type": {
       "description": "How the rule is applied. See the documentation for more information: https://cloud.google.com/dlp/docs/reference/rest/v2/InspectConfig#MatchingType Possible values: [\"MATCHING_TYPE_FULL_MATCH\", \"MATCHING_TYPE_PARTIAL_MATCH\", \"MATCHING_TYPE_INVERSE_MATCH\"]",
-      "required": true,
+      "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Decides how broadly an exclusion rule removes findings, and the values are not equivalent in reach. A partial match drops any finding containing the excluded term, and an inverse match drops everything that does not match, which turns an exclusion into a blanket suppression of the rule set's detectors. Policy should constrain exclusions to the narrowest matching type by default, so that removing findings is precise rather than sweeping."
     },
     "inspect_job.inspect_config.rule_set.rules.exclusion_rule.dictionary": {
       "type": "block",
@@ -542,8 +542,8 @@
       "description": "A url representing a file or path (no wildcards) in Cloud Storage. Example: 'gs://[BUCKET_NAME]/dictionary.txt'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to a Cloud Storage object supplying exclusion terms. Platform policy does not police references to other storage. It is worth noting that the terms then live outside the configuration and can be changed without any change to this resource, which is a review concern rather than something a rule on this string could fix."
     },
     "inspect_job.inspect_config.rule_set.rules.exclusion_rule.dictionary.word_list": {
       "type": "block",
@@ -554,8 +554,8 @@
       "description": "Words or phrases defining the dictionary. The dictionary must contain at least one\nphrase and every phrase must contain at least 2 characters that are letters or digits.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The terms whose presence causes a finding to be dropped. Unlike a detection dictionary this removes results, so a broad or generic entry silently suppresses real matches, and combined with partial matching a single common word can hollow out a detector. Policy should require exclusion dictionaries to be bounded and reviewable rather than open ended, so that suppression is deliberate and can be audited."
     },
     "inspect_job.inspect_config.rule_set.rules.exclusion_rule.exclude_by_hotword": {
       "type": "block",
@@ -571,15 +571,15 @@
       "description": "The index of the submatch to extract as findings. When not specified,\nthe entire match is returned. No more than 3 may be included.",
       "required": false,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects a capture group within the hotword expression. It refines how the hotword is read rather than how much the exclusion removes, which is governed by the pattern and the proximity window."
     },
     "inspect_job.inspect_config.rule_set.rules.exclusion_rule.exclude_by_hotword.hotword_regex.pattern": {
       "description": "Pattern defining the regular expression. Its syntax\n(https://github.com/google/re2/wiki/Syntax) can be found under the google/re2 repository on GitHub.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the context whose presence causes nearby findings to be discarded. A loose pattern here suppresses genuine detections wherever it happens to appear near sensitive data, and because the suppression is contextual it is far harder to notice than a missing detector. Policy should require exclusion hotword patterns to be specific and reviewed, since this field removes findings rather than producing them."
     },
     "inspect_job.inspect_config.rule_set.rules.exclusion_rule.exclude_by_hotword.proximity": {
       "type": "block",
@@ -590,15 +590,15 @@
       "description": "Number of characters after the finding to consider. Either this or window_before must be specified",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets how far from a finding the hotword may sit, within a window the API caps at 1000 characters in total. It tunes the precision of an exclusion rather than deciding whether findings are suppressed, and the useful size depends on the shape of a team's data."
     },
     "inspect_job.inspect_config.rule_set.rules.exclusion_rule.exclude_by_hotword.proximity.window_before": {
       "description": "Number of characters before the finding to consider. Either this or window_after must be specified",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets how far from a finding the hotword may sit, within a window the API caps at 1000 characters in total. It tunes the precision of an exclusion rather than deciding whether findings are suppressed, and the useful size depends on the shape of a team's data."
     },
     "inspect_job.inspect_config.rule_set.rules.exclusion_rule.exclude_info_types": {
       "type": "block",
@@ -614,15 +614,15 @@
       "description": "Name of the information type. Either a name of your choosing when creating a CustomInfoType, or one of the names listed\nat https://cloud.google.com/dlp/docs/infotypes-reference when specifying a built-in type.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Names the detectors whose matches remove a finding from the results. Listing a broad or common detector here quietly cancels detection for anything it also matches, so the scan reports clean while the data is not. Because the names come from a published vendor reference, policy can generically forbid the exclusion of a baseline set of high sensitivity detectors, held as a parameterised list."
     },
     "inspect_job.inspect_config.rule_set.rules.exclusion_rule.exclude_info_types.info_types.version": {
       "description": "Version of the information type to use. By default, the version is set to stable.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A published detector version, defaulting to stable, used to identify the detector referenced by the exclusion."
     },
     "inspect_job.inspect_config.rule_set.rules.exclusion_rule.exclude_info_types.info_types.sensitivity_score": {
       "type": "block",
@@ -633,8 +633,8 @@
       "description": "The sensitivity score applied to the resource. Possible values: [\"SENSITIVITY_LOW\", \"SENSITIVITY_MODERATE\", \"SENSITIVITY_HIGH\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A profiling only classification weight. It does not affect whether the exclusion applies or what this job reports."
     },
     "inspect_job.inspect_config.rule_set.rules.exclusion_rule.regex": {
       "type": "block",
@@ -645,15 +645,15 @@
       "description": "The index of the submatch to extract as findings. When not specified, the entire match is returned. No more than 3 may be included.",
       "required": false,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects a capture group within the exclusion expression. It refines how the match is read rather than the breadth of what is suppressed, which the pattern and matching type decide."
     },
     "inspect_job.inspect_config.rule_set.rules.exclusion_rule.regex.pattern": {
       "description": "Pattern defining the regular expression.\nIts syntax (https://github.com/google/re2/wiki/Syntax) can be found under the google/re2 repository on GitHub.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The expression whose matches are removed from results. An over broad pattern here is the most direct way to disable detection while leaving every detector apparently configured, and nothing in the job output reveals how much was dropped. Policy should require exclusion patterns to be narrow and reviewed, and should reject catch all expressions, which is a rule about the shape of the value rather than its team specific content."
     },
     "inspect_job.inspect_config.rule_set.rules.hotword_rule": {
       "type": "block",
@@ -669,15 +669,15 @@
       "description": "The index of the submatch to extract as findings. When not specified,\nthe entire match is returned. No more than 3 may be included.",
       "required": false,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects a capture group within a detection hotword expression. It shapes how the hotword is read and adds nothing that could suppress a finding on its own."
     },
     "inspect_job.inspect_config.rule_set.rules.hotword_rule.hotword_regex.pattern": {
       "description": "Pattern defining the regular expression. Its syntax\n(https://github.com/google/re2/wiki/Syntax) can be found under the google/re2 repository on GitHub.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The context pattern that qualifies a hotword in a detection rule. Unlike the exclusion hotword it feeds a likelihood adjustment rather than removing findings, and the pattern that is useful depends entirely on a team's own data, so there is no generic direction to enforce. The suppression risk in this rule sits in the adjustment beneath it."
     },
     "inspect_job.inspect_config.rule_set.rules.hotword_rule.likelihood_adjustment": {
       "type": "block",
@@ -688,15 +688,15 @@
       "description": "Set the likelihood of a finding to a fixed value. Either this or relative_likelihood can be set. Possible values: [\"VERY_UNLIKELY\", \"UNLIKELY\", \"POSSIBLE\", \"LIKELY\", \"VERY_LIKELY\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Overrides the confidence of every finding the rule matches. Because results are filtered against the scan's reporting threshold, pinning matched findings to a low value removes them from the output entirely, which is suppression achieved through a detection rule rather than an exclusion. Policy should require any fixed value to sit at or above the reporting threshold so that a rule cannot be used to make findings disappear."
     },
     "inspect_job.inspect_config.rule_set.rules.hotword_rule.likelihood_adjustment.relative_likelihood": {
       "description": "Increase or decrease the likelihood by the specified number of levels. For example,\nif a finding would be POSSIBLE without the detection rule and relativeLikelihood is 1,\nthen it is upgraded to LIKELY, while a value of -1 would downgrade it to UNLIKELY.\nLikelihood may never drop below VERY_UNLIKELY or exceed VERY_LIKELY, so applying an\nadjustment of 1 followed by an adjustment of -1 when base likelihood is VERY_LIKELY\nwill result in a final likelihood of LIKELY. Either this or fixed_likelihood can be set.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The same override expressed as a shift in levels, and a negative value has the same effect: findings downgraded past the reporting threshold are discarded before anyone sees them. Policy should constrain the adjustment to be non negative, so that a detection rule can raise confidence but not be used to quietly bury matches."
     },
     "inspect_job.inspect_config.rule_set.rules.hotword_rule.proximity": {
       "type": "block",
@@ -707,15 +707,15 @@
       "description": "Number of characters after the finding to consider. Either this or window_before must be specified",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets how far from a finding the hotword may sit, inside a window the API caps at 1000 characters. It tunes the precision of a detection rule, and the useful size depends on the structure of a team's data rather than on any security property."
     },
     "inspect_job.inspect_config.rule_set.rules.hotword_rule.proximity.window_before": {
       "description": "Number of characters before the finding to consider. Either this or window_after must be specified",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets how far from a finding the hotword may sit, inside a window the API caps at 1000 characters. It tunes the precision of a detection rule, and the useful size depends on the structure of a team's data rather than on any security property."
     },
     "inspect_job.storage_config": {
       "type": "block",
@@ -731,22 +731,22 @@
       "description": "Max number of rows to scan. If the table has more rows than this value, the rest of the rows are omitted.\nIf not set, or if set to 0, all rows will be scanned. Only one of rowsLimit and rowsLimitPercent can be\nspecified. Cannot be used in conjunction with TimespanConfig.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Stops the scan after a fixed number of rows and omits the rest. Unset or zero scans the whole table, so any other value creates a permanent unscanned remainder that grows as the table grows, while the job still completes and reports findings only from the portion it read. Policy should require full coverage by default, leaving this unset, and treat sampling as an exception with a stated reason."
     },
     "inspect_job.storage_config.big_query_options.rows_limit_percent": {
-      "description": "Max percentage of rows to scan. The rest are omitted. The number of rows scanned is rounded down.\nMust be between 0 and 100, inclusively. Both 0 and 100 means no limit. Defaults to 0. Only one of\nrowsLimit and rowsLimitPercent can be specified. Cannot be used in conjunction with TimespanConfig.",
+      "description": "Max percentage of rows to scan. The rest are omitted. The number of rows scanned is rounded down.\nMust be between 0 and 100, inclusively. Both 0 and 100 means no limit. Only one of\nrowsLimit and rowsLimitPercent can be specified. Cannot be used in conjunction with TimespanConfig.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The proportional form of the same restriction, where anything other than 0 or 100 leaves part of the table unscanned. It has the same effect on assurance, since a partial scan that finds nothing is indistinguishable from a clean table. Policy should require the no limit setting unless sampling is explicitly justified."
     },
     "inspect_job.storage_config.big_query_options.sample_method": {
-      "description": "How to sample rows if not all rows are scanned. Meaningful only when used in conjunction with either\nrowsLimit or rowsLimitPercent. If not specified, rows are scanned in the order BigQuery reads them.\nIf TimespanConfig is set, set this to an empty string to avoid using the default value. Default value: \"TOP\" Possible values: [\"TOP\", \"RANDOM_START\"]",
+      "description": "How to sample rows if not all rows are scanned. Meaningful only when used in conjunction with either\nrowsLimit or rowsLimitPercent. If TimespanConfig is set, set this to an empty string to avoid using the default value. Default value: \"TOP\" Possible values: [\"TOP\", \"RANDOM_START\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Chooses which part of the table a partial scan reads, and it only has meaning when a row limit is already set. Neither value scans more data than the other, so no accepted value is safer: the coverage decision belongs to the row limits, which is where a policy has something to enforce."
     },
     "inspect_job.storage_config.big_query_options.excluded_fields": {
       "type": "block",
@@ -757,8 +757,8 @@
       "description": "Name describing the field excluded from scanning.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Removes an entire column from inspection. The exclusion rests on an assumption that the column holds nothing sensitive, and that assumption is never rechecked as the schema and the data change, so this is a durable blind spot recorded as a convenience. Policy should require excluded columns to be declared and justified rather than accepted silently, treating any exclusion as a reviewable exception."
     },
     "inspect_job.storage_config.big_query_options.identifying_fields": {
       "type": "block",
@@ -769,8 +769,8 @@
       "description": "Name of a BigQuery field to be returned with the findings.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Copies the value of a source column into every finding so a match can be traced back to its row. Nothing is returned when it is unset, so populating it moves real column values out of the inspected table and into the findings output, which usually has broader access than the source. Policy should keep identifying fields to the minimum needed for traceability and require that the chosen columns are not themselves sensitive."
     },
     "inspect_job.storage_config.big_query_options.included_fields": {
       "type": "block",
@@ -781,8 +781,8 @@
       "description": "Name describing the field to which scanning is limited.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Restricts inspection to a named set of columns, so every column not listed goes unscanned. This is the more dangerous form of narrowing, because coverage is defined by what was remembered at configuration time and new columns are excluded by default as the schema evolves. Policy should require scanning to default to the whole table, with any inclusion list treated as a justified exception."
     },
     "inspect_job.storage_config.big_query_options.table_reference": {
       "type": "block",
@@ -793,22 +793,22 @@
       "description": "The dataset ID of the table.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of the reference identifying which BigQuery table is inspected. Platform policy does not police references to other resources, and no generic rule can name the table a team should be scanning."
     },
     "inspect_job.storage_config.big_query_options.table_reference.project_id": {
       "description": "The Google Cloud Platform project ID of the project containing the table.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of the reference identifying which BigQuery table is inspected. Platform policy does not police references to other resources, and no generic rule can name the table a team should be scanning."
     },
     "inspect_job.storage_config.big_query_options.table_reference.table_id": {
       "description": "The name of the table.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of the reference identifying which BigQuery table is inspected. Platform policy does not police references to other resources, and no generic rule can name the table a team should be scanning."
     },
     "inspect_job.storage_config.cloud_storage_options": {
       "type": "block",
@@ -819,36 +819,36 @@
       "description": "Max number of bytes to scan from a file. If a scanned file's size is bigger than this value\nthen the rest of the bytes are omitted.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Stops reading a file after a set number of bytes and omits the remainder. Sensitive content is not distributed evenly through a file, so a byte cap means large files are only ever partially inspected while still being reported as scanned. Policy should require full file inspection by default and treat any cap as an exception with a stated reason."
     },
     "inspect_job.storage_config.cloud_storage_options.bytes_limit_per_file_percent": {
       "description": "Max percentage of bytes to scan from a file. The rest are omitted. The number of bytes scanned is rounded down.\nMust be between 0 and 100, inclusively. Both 0 and 100 means no limit.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The proportional form of the same restriction, leaving part of every large file unread unless set to the no limit values. The assurance problem is identical: a partial read that finds nothing looks the same as a clean file. Policy should require the no limit setting by default."
     },
     "inspect_job.storage_config.cloud_storage_options.file_types": {
       "description": "List of file type groups to include in the scan. If empty, all files are scanned and available data\nformat processors are applied. In addition, the binary content of the selected files is always scanned as well.\nImages are scanned only as binary if the specified region does not support image inspection and no fileTypes were specified. Possible values: [\"BINARY_FILE\", \"TEXT_FILE\", \"IMAGE\", \"WORD\", \"PDF\", \"AVRO\", \"CSV\", \"TSV\", \"POWERPOINT\", \"EXCEL\"]",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects which file types are inspected. Left empty every file in the set is scanned and the available format processors are applied; naming a subset means files of every other type pass through untouched, which is exactly where sensitive content tends to hide, in the format nobody thought to list. Policy should require this to be left empty so coverage follows the service as new processors are added."
     },
     "inspect_job.storage_config.cloud_storage_options.files_limit_percent": {
       "description": "Limits the number of files to scan to this percentage of the input FileSet. Number of files scanned is rounded down.\nMust be between 0 and 100, inclusively. Both 0 and 100 means no limit.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Scans only a proportion of the files in the set and omits the rest entirely. Unlike the byte limits this skips whole files, so a file containing nothing but sensitive data can be passed over completely while the job reports success. Policy should require the no limit setting unless sampling is explicitly justified."
     },
     "inspect_job.storage_config.cloud_storage_options.sample_method": {
       "description": "How to sample bytes if not all bytes are scanned. Meaningful only when used in conjunction with bytesLimitPerFile.\nIf not specified, scanning would start from the top. Possible values: [\"TOP\", \"RANDOM_START\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Chooses where a partial read of a file begins, and it only applies when a byte limit is already set. Neither value reads more of the file, so the coverage decision sits with the byte limits rather than here."
     },
     "inspect_job.storage_config.cloud_storage_options.file_set": {
       "type": "block",
@@ -859,8 +859,8 @@
       "description": "The Cloud Storage url of the file(s) to scan, in the format 'gs://<bucket>/<path>'. Trailing wildcard\nin the path is allowed.\n\nIf the url ends in a trailing slash, the bucket or directory represented by the url will be scanned\nnon-recursively (content in sub-directories will not be scanned). This means that 'gs://mybucket/' is\nequivalent to 'gs://mybucket/*', and 'gs://mybucket/directory/' is equivalent to 'gs://mybucket/directory/*'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Points at the bucket or path being inspected. Platform policy does not police references to other storage, and no generic rule can name the location a team should scan. It is worth flagging in review that a trailing slash scans only the top level and leaves subdirectories untouched, which is a coverage trap in the syntax rather than something a policy on this string could catch."
     },
     "inspect_job.storage_config.cloud_storage_options.file_set.regex_file_set": {
       "type": "block",
@@ -871,22 +871,22 @@
       "description": "The name of a Cloud Storage bucket.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the bucket the filtered file set is drawn from. This is a reference to other storage, which platform policy does not constrain, and the bucket a team scans is theirs to choose."
     },
     "inspect_job.storage_config.cloud_storage_options.file_set.regex_file_set.exclude_regex": {
       "description": "A list of regular expressions matching file paths to exclude. All files in the bucket that match at\nleast one of these regular expressions will be excluded from the scan.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Removes matching file paths from the scan entirely, and a file matching any one expression is skipped. A loose expression here silently carves a hole in coverage that nothing in the job output reveals, and exclusions written for one directory layout tend to outlive it. Policy should require exclusions to be specific and reviewable and should reject catch all expressions, which is a constraint on the shape of the value rather than on a team's paths."
     },
     "inspect_job.storage_config.cloud_storage_options.file_set.regex_file_set.include_regex": {
       "description": "A list of regular expressions matching file paths to include. All files in the bucket\nthat match at least one of these regular expressions will be included in the set of files,\nexcept for those that also match an item in excludeRegex. Leaving this field empty will\nmatch all files by default (this is equivalent to including .* in the list)",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines which paths are in scope, and leaving it empty matches everything. Once populated it becomes an allowlist, so any path not anticipated when it was written is never scanned, and new directories are excluded by default rather than included. Policy should prefer the empty default, with narrowing treated as an exception that has to be justified and revisited."
     },
     "inspect_job.storage_config.datastore_options": {
       "type": "block",
@@ -902,8 +902,8 @@
       "description": "The name of the Datastore kind.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the Datastore entity kind being inspected. It identifies the target of the scan, which is a team's own data model, and no generic rule can say which kind is the right one."
     },
     "inspect_job.storage_config.datastore_options.partition_id": {
       "type": "block",
@@ -914,15 +914,15 @@
       "description": "If not empty, the ID of the namespace to which the entities belong.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the namespace whose entities are inspected. It is part of the reference to the data being scanned and is entirely specific to a team's own partitioning."
     },
     "inspect_job.storage_config.datastore_options.partition_id.project_id": {
       "description": "The ID of the project to which the entities belong.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the project holding the entities. Platform policy does not police references to other projects, and access to that data is governed by its own IAM rather than by this identifier."
     },
     "inspect_job.storage_config.hybrid_options": {
       "type": "block",
@@ -933,22 +933,22 @@
       "description": "A short description of where the data is coming from. Will be stored once in the job. 256 max length.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A note recording the origin of hybrid content, stored once on the job. It is documentation for humans and takes no part in inspection or in the handling of findings."
     },
     "inspect_job.storage_config.hybrid_options.labels": {
       "description": "To organize findings, these labels will be added to each finding.\n\nLabel keys must be between 1 and 63 characters long and must conform to the following regular expression: '[a-z]([-a-z0-9]*[a-z0-9])?'.\n\nLabel values must be between 0 and 63 characters long and must conform to the regular expression '([a-z]([-a-z0-9]*[a-z0-9])?)?'.\n\nNo more than 10 labels can be associated with a given finding.\n\nExamples:\n* '\"environment\" : \"production\"'\n* '\"pipeline\" : \"etl\"'",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Static labels attached to each finding for organisation. They are operator supplied metadata rather than content drawn from the inspected data, they change nothing about detection or where findings go, and the API already bounds their number and format."
     },
     "inspect_job.storage_config.hybrid_options.required_finding_label_keys": {
       "description": "These are labels that each inspection request must include within their 'finding_labels' map. Request\nmay contain others, but any missing one of these will be rejected.\n\nLabel keys must be between 1 and 63 characters long and must conform to the following regular expression: '[a-z]([-a-z0-9]*[a-z0-9])?'.\n\nNo more than 10 keys can be required.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Requires inbound hybrid inspection requests to carry particular label keys, rejecting those that do not. It enforces metadata hygiene on submissions rather than controlling what is scanned or who can see findings, and the keys a team needs come from their own pipeline conventions."
     },
     "inspect_job.storage_config.hybrid_options.table_options": {
       "type": "block",
@@ -964,8 +964,8 @@
       "description": "Name describing the field.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Nominates columns whose cell values are copied and stored beside every finding for traceability. That is source data leaving the inspected system and landing in findings storage, so choosing a column that is itself sensitive turns the findings table into a second copy of it. Policy should require identifying fields to be limited to non sensitive keys and to the minimum needed to trace a row."
     },
     "inspect_job.storage_config.timespan_config": {
       "type": "block",
@@ -976,22 +976,22 @@
       "description": "When the job is started by a JobTrigger we will automatically figure out a valid startTime to avoid\nscanning files that have not been modified since the last time the JobTrigger executed. This will\nbe based on the time of the execution of the last run of the JobTrigger or the timespan endTime\nused in the last run of the JobTrigger.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Makes each scheduled run start from the last run's point so that unmodified items are not scanned again. The items it skips are ones a previous run already inspected, so live coverage of new and changed data is unaffected and this is an efficiency setting rather than a blind spot. The one caveat, that data already scanned is not revisited when detectors or rules change, is a reason to rescan after a configuration change rather than a reason to constrain the field."
     },
     "inspect_job.storage_config.timespan_config.end_time": {
       "description": "Exclude files, tables, or rows newer than this value. If not set, no upper time limit is applied.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Excludes everything newer than a fixed point in time. Left unset there is no upper bound, so setting it freezes the scan's view of the data: every item created after that timestamp is permanently outside the scan, and the gap widens with each run while the trigger continues to report success. Policy should require it to remain unset on scheduled triggers, so that recurring scans always reach current data."
     },
     "inspect_job.storage_config.timespan_config.start_time": {
       "description": "Exclude files, tables, or rows older than this value. If not set, no lower time limit is applied.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Excludes everything older than a fixed point, leaving historical data permanently uninspected unless another scan covers it. Unset applies no lower bound, so the safe default is to scan everything. Policy should require an explicit justification for any lower bound, since sensitive data does not stop being sensitive because it is old."
     },
     "inspect_job.storage_config.timespan_config.timestamp_field": {
       "type": "block",
@@ -1002,8 +1002,8 @@
       "description": "Specification of the field containing the timestamp of scanned items. Used for data sources like Datastore and BigQuery.\n\nFor BigQuery: Required to filter out rows based on the given start and end times. If not specified and the table was\nmodified between the given start and end times, the entire table will be scanned. The valid data types of the timestamp\nfield are: INTEGER, DATE, TIMESTAMP, or DATETIME BigQuery column.\n\nFor Datastore. Valid data types of the timestamp field are: TIMESTAMP. Datastore entity will be scanned if the\ntimestamp property does not exist or its value is empty or invalid.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the column the timespan filter is evaluated against, which is specific to a team's schema. The failure modes both fall safe: without it BigQuery scans the whole table, and a Datastore entity whose timestamp is missing or invalid is scanned rather than skipped. The coverage decision therefore sits with the start and end times, not with this field."
     },
     "triggers": {
       "type": "block",
@@ -1024,8 +1024,8 @@
       "description": "With this option a job is started a regular periodic basis. For example: every day (86400 seconds).\n\nA scheduled start time will be skipped if the previous execution has not ended when its scheduled time occurs.\n\nThis value must be set to a time duration greater than or equal to 1 day and can be no longer than 60 days.\n\nA duration in seconds with up to nine fractional digits, terminated by 's'. Example: \"3.5s\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets how often the scan runs, and the API allows anything from one day up to sixty. At the loose end of that band sensitive data can sit undetected for two months, so the value is really the detection latency of the control, and the outer bound is available by default. Policy should enforce a maximum interval so that every scheduled scan revisits its data within a defined window."
     }
   }
 }
