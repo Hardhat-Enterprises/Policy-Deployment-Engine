@@ -72,8 +72,8 @@
       "description": "A percentage of the cluster's CPU capacity. Can be from 10% to 80%. When a cluster's CPU utilization exceeds the target that you have set, Bigtable immediately adds nodes to the cluster. When CPU utilization is substantially lower than the target, Bigtable removes nodes. If not set will default to 50%.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "It sets the CPU level at which Bigtable adds or removes nodes. This is an operational tuning choice and is out of scope for security policy."
+      "security_impact": true,
+      "rationale": "It sets the CPU level at which Bigtable adds or removes nodes. If the target is set too high, the cluster scales up too late and can run out of capacity under load. A policy should keep the target within a safe range so the store stays available."
     },
     "bigtable.auto_scaling.max_node_count": {
       "description": "The maximum number of nodes to scale up to. Must be greater than or equal to minNodeCount, and less than or equal to 10 times of 'minNodeCount'.",
