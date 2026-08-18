@@ -53,8 +53,8 @@
       "description": "Optional. If true, enable direct access to the Bigtable instance.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "It enables direct access to the backing Bigtable instance and is a functional option."
+      "security_impact": true,
+      "rationale": "It enables direct access to the backing Bigtable instance. This can bypass the controlled serving path, so a policy should require it to stay off."
     },
     "bigtable.zone": {
       "description": "The zone where the Bigtable instance will be created.",
@@ -73,7 +73,7 @@
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "It sets the CPU level at which Bigtable adds or removes nodes. This controls resource sizing, not security posture. There is no unsafe value to block."
+      "rationale": "It sets the CPU level at which Bigtable adds or removes nodes. This is an operational tuning choice and is out of scope for security policy."
     },
     "bigtable.auto_scaling.max_node_count": {
       "description": "The maximum number of nodes to scale up to. Must be greater than or equal to minNodeCount, and less than or equal to 10 times of 'minNodeCount'.",
