@@ -6,15 +6,15 @@
       "description": "If set to DATA_MASKING, the function is validated and made available as a masking function. For more information, see https://cloud.google.com/bigquery/docs/user-defined-functions#custom-mask Possible values: [\"DATA_MASKING\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Setting this to DATA_MASKING validates the routine as a data-masking function used to obscure sensitive column values. A policy can require it be set on routines intended for masking so sensitive data is consistently protected; this maps to the 'enable a security feature' archetype."
+      "security_impact": false,
+      "rationale": "This field is an optional functional classification used when a routine is intended for data masking. Not every routine performs masking, so requiring DATA_MASKING would incorrectly restrict valid SQL, JavaScript, or other routines."
     },
     "dataset_id": {
       "description": "The ID of the dataset containing this routine",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Identifies the dataset that contains the routine. It is a resource identifier and does not itself control access, privileges, encryption, or another security setting."
+      "rationale": "This argument is a reference identifier pointing to the dataset that contains the routine. PDE platform policies do not constrain organisation-specific resource identifiers."
     },
     "definition_body": {
       "description": "The body of the routine. For functions, this is the expression in the AS clause.\nIf language=SQL, it is the substring inside (but excluding) the parentheses.",
@@ -98,7 +98,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "security_mode defines the privilege level of the routine"
+      "rationale": "This setting controls whether the routine executes with DEFINER or INVOKER privileges. Policy should require INVOKER where appropriate so the routine executes with the caller's permissions rather than elevated definer privileges, reducing the risk of unauthorised privilege escalation."
     },
     "arguments": {
       "type": "block",
@@ -149,8 +149,8 @@
       "description": "Endpoint of the user-provided remote service, e.g.\n'https://us-east1-my_gcf_project.cloudfunctions.net/remote_add'",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "The URL of the user-provided remote service the routine calls. It points at an external service the team operates; a generic policy cannot constrain which endpoint is valid without hardcoding a specific host, so it is out of scope."
+      "security_impact": true,
+      "rationale": "The remote function endpoint determines the URL used to send requests to an external service. Policy should require the endpoint to use the HTTPS scheme to protect data in transit, without restricting the specific hostname."
     },
     "remote_function_options.max_batching_rows": {
       "description": "Max number of rows in each batch sent to the remote service. If absent or if 0,\nBigQuery dynamically decides the number of rows in a batch.",
@@ -190,7 +190,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "References a team-selected container image. Approved registries and image names are organisation-specific, so this resource reference is not a generic policy target."
+      "rationale": "Container image registry restrictions can support supply-chain hardening, such as allowing only approved corporate registries. However, the approved registry is organisation-specific and is outside the scope of a generic PDE policy for this resource."
     },
     "spark_options.file_uris": {
       "description": "Files to be placed in the working directory of each executor. For more information about Apache Spark, see Apache Spark.",
