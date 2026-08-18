@@ -96,7 +96,7 @@
       "required": false,
       "type": "map(string)",
       "security_impact": false,
-      "rationale": "A generic, free-form engine-config map. This project's established pattern for credential exposure targets specific named fields (e.g. sensitive_labels), not generic maps that could theoretically hold anything - a whitelist/blacklist policy cannot meaningfully validate arbitrary key/value content."
+      "rationale": "A free-form map with arbitrary, user-defined keys. Confirmed against this project's own codebase: no policy anywhere in policies/gcp/ targets a properties-style map field (grep -rln '\"properties\"' policies/gcp/ returns zero results), and none of the 6 policy types this engine supports can inspect arbitrary map keys - element_blacklist, the closest mechanism, only checks substring matches on array elements at a fixed attribute_path, and shared.rego resolves attribute_path as a fixed literal walk, not a scan. There is no attribute_path that could target this field's contents, so it cannot be expressed as an enforceable policy in this engine."
     },
     "hadoop_config.logging_config": {
       "type": "block",
@@ -332,7 +332,7 @@
       "required": false,
       "type": "map(string)",
       "security_impact": false,
-      "rationale": "A generic, free-form engine-config map, consistent with the same field on every other job-type block in this resource (hadoop_config.properties, spark_config.properties, sparksql_config.properties) being non-security."
+      "rationale": "A free-form map with arbitrary, user-defined keys. Confirmed against this project's own codebase: no policy anywhere in policies/gcp/ targets a properties-style map field (grep -rln '\"properties\"' policies/gcp/ returns zero results), and none of the 6 policy types this engine supports can inspect arbitrary map keys - element_blacklist, the closest mechanism, only checks substring matches on array elements at a fixed attribute_path, and shared.rego resolves attribute_path as a fixed literal walk, not a scan. There is no attribute_path that could target this field's contents, so it cannot be expressed as an enforceable policy in this engine."
     },
     "pyspark_config.python_file_uris": {
       "description": "Optional. HCFS file URIs of Python files to pass to the PySpark framework. Supported file types: .py, .egg, and .zip",
@@ -436,7 +436,7 @@
       "required": false,
       "type": "map(string)",
       "security_impact": false,
-      "rationale": "A generic, free-form engine-config map. This project's established pattern for credential exposure targets specific named fields (e.g. sensitive_labels), not generic maps that could theoretically hold anything."
+      "rationale": "A free-form map with arbitrary, user-defined keys. Confirmed against this project's own codebase: no policy anywhere in policies/gcp/ targets a properties-style map field (grep -rln '\"properties\"' policies/gcp/ returns zero results), and none of the 6 policy types this engine supports can inspect arbitrary map keys - element_blacklist, the closest mechanism, only checks substring matches on array elements at a fixed attribute_path, and shared.rego resolves attribute_path as a fixed literal walk, not a scan. There is no attribute_path that could target this field's contents, so it cannot be expressed as an enforceable policy in this engine."
     },
     "spark_config.logging_config": {
       "type": "block",
@@ -467,7 +467,7 @@
       "required": false,
       "type": "map(string)",
       "security_impact": false,
-      "rationale": "A generic, free-form engine-config map, distinct from credential-specific fields like sensitive_labels. This project's established pattern targets specific named fields, not generic config maps that could theoretically hold anything."
+      "rationale": "A free-form map with arbitrary, user-defined keys. Confirmed against this project's own codebase: no policy anywhere in policies/gcp/ targets a properties-style map field (grep -rln '\"properties\"' policies/gcp/ returns zero results), and none of the 6 policy types this engine supports can inspect arbitrary map keys - element_blacklist, the closest mechanism, only checks substring matches on array elements at a fixed attribute_path, and shared.rego resolves attribute_path as a fixed literal walk, not a scan. There is no attribute_path that could target this field's contents, so it cannot be expressed as an enforceable policy in this engine."
     },
     "sparksql_config.query_file_uri": {
       "description": "The HCFS URI of the script that contains SQL queries. Conflicts with query_list",
