@@ -34,8 +34,8 @@
       "description": "Indicates whether you want to enable support for GKE clients. By default,\nGKE clients are not supported.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls whether GKE client integration is structurally enabled for the instance. This falls under the feature-enablement archetype: policy should evaluate whether container workload integration is explicitly required and approved, rather than treating the toggle itself as a generic exposure risk."
+      "security_impact": false,
+      "rationale": "Enables GKE clients to discover and mount the filesystem — this is an architectural feature toggle for enabling specific container workloads, not a security control. It doesn't close public exposure, mandate encryption, or block static authentication, so it doesn't fit any security policy archetype and is out of scope for platform policy."
     },
     "instance_id": {
       "description": "The name of the Managed Lustre instance.\n\n* Must contain only lowercase letters, numbers, and hyphens.\n* Must start with a letter.\n* Must be between 1-63 characters.\n* Must end with a number or a letter.",
@@ -77,14 +77,14 @@
       "required": false,
       "type": "string",
       "security_impact":false,
-      "rationale": "Defines the storage performance level of the instance."
+      "rationale": "Sets the storage performance tier (throughput per TiB). This is a team operational/capacity choice made based on workload performance needs, not a security control — it has no bearing on access, encryption, or exposure."
     },
     "placement_policy": {
       "description": "The placement policy name for the instance in the format of\nprojects/{project}/locations/{location}/resourcePolicies/{resource_policy}",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Controls resource placement for infrastructure and availability purposes."
+      "rationale": "References a placement policy governing physical resource placement for availability and resiliency purposes. This is an operational and availability choice made by the team, not a security control."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
