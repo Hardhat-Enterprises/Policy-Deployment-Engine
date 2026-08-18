@@ -129,7 +129,8 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "This argument is part of the image encryption configuration and uses an RSA-wrapped customer-supplied key. A platform policy can require secure handling of wrapped key material, such as preventing exposure in plaintext and ensuring encryption requirements are followed when protecting the image at rest."
+      "rationale": "This field contains an RSA-encrypted customer-supplied encryption key used to protect the image. Although the key material is encrypted, it is still security-sensitive because it is part of the cryptographic mechanism controlling access to the encrypted image."
+
     },
     "params": {
       "type": "block",
@@ -241,7 +242,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This argument supplies the raw Platform Key used to establish ownership of the Secure Boot or Verified Boot trust chain. Because the value is team-specific cryptographic material, a generic platform policy cannot validate or enforce the exact key bytes without hardcoding a particular key or certificate, so it is not a suitable policy target."
+      "rationale": "This field contains the Platform Key used to establish the custom trust chain for Shielded Instance Secure Boot. The specific key value is team-specific cryptographic material and should not be pinned by a generic platform policy. A structural policy could instead require that Platform Key material is supplied when a custom trust chain is configured and prevent it from being left blank or using an insecure/default value."
     },
     "shielded_instance_initial_state.pk.file_type": {
       "description": "The file type of source file.",
