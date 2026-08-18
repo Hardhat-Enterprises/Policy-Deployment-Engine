@@ -89,7 +89,7 @@ def copy_files(files, src_dir, dest_dir):
 
 def create_policy_files(cloud, service, resource, policy_name):
     paths = get_cloud_paths(cloud)
-    base_folder = service.replace(" ", "_")
+    base_folder = service
     subfolder = resource
     input_dir = os.path.join(paths["input_dir"], base_folder, subfolder, policy_name)
     policy_dir = os.path.join(paths["policy_dir"], base_folder, subfolder, policy_name)
