@@ -1,6 +1,6 @@
-package terraform.gcp.security.google_oracle_database.cloud_vm_cluster.location
+package terraform.gcp.security.google_oracle_database_cloud_vm_cluster.location
 import data.terraform.helpers
-import data.terraform.gcp.security.google_oracle_database.cloud_vm_cluster.vars
+import data.terraform.gcp.security.google_oracle_database_cloud_vm_cluster.vars
 
 conditions := [
     [

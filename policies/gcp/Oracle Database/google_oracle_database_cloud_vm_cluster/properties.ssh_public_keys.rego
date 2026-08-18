@@ -1,6 +1,6 @@
-package terraform.gcp.security.google_oracle_database.cloud_vm_cluster.properties_ssh_public_keys
+package terraform.gcp.security.google_oracle_database_cloud_vm_cluster.properties_ssh_public_keys
 import data.terraform.helpers
-import data.terraform.gcp.security.google_oracle_database.cloud_vm_cluster.vars
+import data.terraform.gcp.security.google_oracle_database_cloud_vm_cluster.vars
 
 conditions := [
     [
