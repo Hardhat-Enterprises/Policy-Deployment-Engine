@@ -53,36 +53,36 @@
       "description": "The number of seconds that the autoscaler should wait before it\nstarts collecting information from a new instance. This prevents\nthe autoscaler from collecting information when the instance is\ninitializing, during which the collected usage would not be\nreliable. The default time autoscaler waits is 60 seconds.\n\nVirtual machine initialization times might vary because of\nnumerous factors. We recommend that you test how long an\ninstance may take to initialize. To do this, create an instance\nand time the startup process.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Dictates the period of time for the collection of data from instances, thus too low of a cooldown period can lead to resource stability issues and compromise data"
+      "security_impact": false,
+      "rationale": "Dictates the period of time for the collection of data from instances which is configuration and not related to security controls"
     },
     "autoscaling_policy.max_replicas": {
       "description": "The maximum number of instances that the autoscaler can scale up\nto. This is required when creating or updating an autoscaler. The\nmaximum number of replicas should not be lower than minimal number\nof replicas.",
       "required": true,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Too large of a max replicas value can negatively affect stability of service or can cause resource to crash thus comprimised the security"
+      "security_impact": false,
+      "rationale": "Controls the maximum capacity thus is a configuration setting and would not affect the security of the resource"
     },
     "autoscaling_policy.min_replicas": {
       "description": "The minimum number of replicas that the autoscaler can scale down\nto. This cannot be less than 0. If not provided, autoscaler will\nchoose a default value depending on maximum number of instances\nallowed.",
       "required": true,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Setting the minimum replicas to 0 would prevent the use of this service, thus this setting can be used maliciously"
+      "security_impact": false,
+      "rationale": "Only used for the configuration of the minimum amount of replicas which makes it a configuration control and does not have an effect on the security controls of the resource"
     },
     "autoscaling_policy.mode": {
       "description": "Defines operating mode for this policy.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Must be set intentionally and blacklist OFF as it can be used to maliciously stop the service from working."
+      "security_impact": false,
+      "rationale": "Designates the operation mode which would not affect the security of the resource as it is an operational management configuration control"
     },
     "autoscaling_policy.stabilization_period": {
       "description": "The number of seconds that the autoscaler waits for load stabilization\nbefore making scale-in decisions.\n\nThis might appear as a delay in scaling in but it is an important mechanism\nfor your application to not have fluctuating size due to short term load\nfluctuations.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Value chooses the period of time for load stabilization thus must be set to a resonable value to prevent stability issues and malicious attacks"
+      "security_impact": false,
+      "rationale": "Purpose is to designate a time frame before deciding scaling decisions thus would make it an operational control and not a security control"
     },
     "autoscaling_policy.cpu_utilization": {
       "type": "block",
@@ -165,7 +165,7 @@
       "required": false,
       "type": "number",
       "security_impact": true,
-      "rationale": "Must be set to a resonably higher value to prevent a window in which the resource can crash and be vunerable due to too short of a scale down window"
+      "rationale": "Must be set to a resonably higher value to prevent a scaling down and too fast of a pace which can negatively affect the resources stability and availability"
     },
     "autoscaling_policy.scale_in_control.max_scaled_in_replicas": {
       "type": "block",
@@ -177,14 +177,14 @@
       "required": false,
       "type": "number",
       "security_impact": true,
-      "rationale": "Must be configured as without configuration it can be used maliciously to remove instances during scale in events thus impact security of resource"
+      "rationale": "Must be configured as without configuration it can be susceptible to too aggressive of a scale-in which would negatively affect the stability of the resource and cause service capacity issues"
     },
     "autoscaling_policy.scale_in_control.max_scaled_in_replicas.percent": {
       "description": "Specifies a percentage of instances between 0 to 100%, inclusive.\nFor example, specify 80 for 80%.",
       "required": false,
       "type": "number",
       "security_impact": true,
-      "rationale": "Chooses the perctage of instances that can be scaled in thus to improve stabily and prevent resource security vunerability it must not be set to too high of a percentage to prevent too agressive of a scale in"
+      "rationale": "Chooses the percentages of instances that can be scaled in, thus to ensure stability and service availability it must be set the minimum capacity percentage to prevent too agressive of a scale in"
     },
     "autoscaling_policy.scaling_schedules": {
       "type": "block",
@@ -216,8 +216,8 @@
       "description": "Minimum number of VM instances that autoscaler will recommend in time intervals starting according to schedule.",
       "required": true,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Configuring the value to 0 would stop service from working thus, must be prevented in order to improve the services security from a malicious attack"
+      "security_impact": false,
+      "rationale": "Only a configuration control that designates minimum amount of replicas during scaling events thus is a configuration control and not related to security controls"
     },
     "autoscaling_policy.scaling_schedules.name": {
       "description": "The identifier for this object. Format specified above.",
