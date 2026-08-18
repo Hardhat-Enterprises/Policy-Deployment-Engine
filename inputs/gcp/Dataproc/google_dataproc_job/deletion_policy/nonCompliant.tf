@@ -1,0 +1,13 @@
+resource "google_dataproc_job" "non_compliant_example_1" {
+  project         = "ecstatic-device-491708-g4"
+  region          = "us-central1"
+  deletion_policy = "ABANDON"
+
+  placement {
+    cluster_name = "pde-example-cluster"
+  }
+
+  pyspark_config {
+    main_python_file_uri = "gs://pde-example-bucket/jobs/example.py"
+  }
+}
