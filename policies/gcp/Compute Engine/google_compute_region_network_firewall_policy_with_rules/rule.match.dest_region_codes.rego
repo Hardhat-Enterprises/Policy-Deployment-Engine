@@ -4,22 +4,21 @@ import data.terraform.gcp.security.compute_engine.google_compute_region_network_
 
 
 conditions := [
-  [
-    {
-      "situation_description": "INCLUDE SITUATION DESCRIPTION",
-      "remedies": [
-        "INCLUDE remedies DESCRIPTION"
-      ]
-    },
-    {
-      "condition": "CONDITIONS",
-      "attribute_path": ["PATH", 0, "TO_ATTRIBUTE"],
-      "values": ["EXAMPLE_VALUE"],
-      "policy_type": "whitelist"
-    }
-  ]
+    [
+        {
+            "situation_description": "Destination region codes must be in Australia",
+            "remedies": [
+                "Ensure that only approved countires are selected."
+            ]
+        },
+        {
+            "condition": "An approved country must be used.",
+            "attribute_path": ["rule", 0, "match", 0, "dest_region_codes"],
+            "values": ["AU","NZ"],
+            "policy_type": "whitelist"
+        }
+    ]
 ]
-
    
 result := helpers.get_multi_summary(conditions, vars.variables)
   

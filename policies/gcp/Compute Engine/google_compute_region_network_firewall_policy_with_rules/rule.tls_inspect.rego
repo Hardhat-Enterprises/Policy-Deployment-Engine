@@ -6,15 +6,15 @@ import data.terraform.gcp.security.compute_engine.google_compute_region_network_
 conditions := [
   [
     {
-      "situation_description": "INCLUDE SITUATION DESCRIPTION",
+      "situation_description": "TLS Inspection needs to be set to true so that IDS (Intrusion Detection Systems) and Firewall rules matching on Network Threat Intelligence can inspect the traffic.",
       "remedies": [
-        "INCLUDE remedies DESCRIPTION"
+        "Ensure that tls_inspect is set to TRUE when Network Threat Intelligence is used."
       ]
     },
     {
-      "condition": "CONDITIONS",
-      "attribute_path": ["PATH", 0, "TO_ATTRIBUTE"],
-      "values": ["EXAMPLE_VALUE"],
+      "condition": "TLS Inspection must be set to true.",
+      "attribute_path": ["rule", 0, "tls_inspect"],
+      "values": [TRUE],
       "policy_type": "whitelist"
     }
   ]

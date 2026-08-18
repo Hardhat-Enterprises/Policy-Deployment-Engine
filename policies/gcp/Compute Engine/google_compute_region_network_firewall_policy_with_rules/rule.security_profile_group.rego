@@ -6,15 +6,20 @@ import data.terraform.gcp.security.compute_engine.google_compute_region_network_
 conditions := [
   [
     {
-      "situation_description": "INCLUDE SITUATION DESCRIPTION",
+      "situation_description": "Firewall rules applying a security profile group must reference a centrally managed, approved group.",
       "remedies": [
-        "INCLUDE remedies DESCRIPTION"
+        "Reference a security profile group from the approved central security project",
+        "Never point a security profile group created from the workloads own proejct",
+        "tls_inspect must be set to true so that encrypted payloads can be inspected."
       ]
     },
     {
-      "condition": "CONDITIONS",
-      "attribute_path": ["PATH", 0, "TO_ATTRIBUTE"],
-      "values": ["EXAMPLE_VALUE"],
+      "condition": "Security profile group must be one of the approved centrally managed groups",
+      "attribute_path": ["rule", 0, "security_profile_group"],
+      "values": [
+        "https://networksecurity.googleapis.com/v1/projects/APPROVED_SECURITY_PROJECT/locations/global/securityProfileGroups/standard-threat-prevention",
+        "https://networksecurity.googleapis.com/v1/projects/APPROVED_SECURITY_PROJECT/locations/global/securityProfileGroups/strict-threat-prevention"
+      ],
       "policy_type": "whitelist"
     }
   ]
@@ -25,3 +30,5 @@ result := helpers.get_multi_summary(conditions, vars.variables)
   
 message := result.message
 details := result.details
+
+

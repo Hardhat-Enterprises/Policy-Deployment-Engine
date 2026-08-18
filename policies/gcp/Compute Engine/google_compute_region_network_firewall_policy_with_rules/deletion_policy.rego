@@ -6,21 +6,17 @@ import data.terraform.gcp.security.compute_engine.google_compute_region_network_
 conditions := [
   [
     {
-      "situation_description": "DatasetConfig should use a dedicated per-config identity",
-      "remedies": [
-        "Use IDENTITY_TYPE_PER_CONFIG to reduce shared identity risk"
-      ]
+      "situation_description": "Firewall policy must enable deletion protection.",
+      "remedies": ["Set deletion_policy to PREVENT to avoid accidental deletion of firewall rules."]
     },
     {
-      "condition": "Identity type must be per config",
-      "attribute_path": ["identity", 0, "type"],
-      "values": ["IDENTITY_TYPE_PER_CONFIG"],
+      "condition": "Deletion protection not enabled",
+      "attribute_path": ["deletion_policy"],
+      "values": ["PREVENT"],
       "policy_type": "whitelist"
     }
   ]
 ]
-
-   
    
 result := helpers.get_multi_summary(conditions, vars.variables)
   

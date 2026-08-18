@@ -4,22 +4,21 @@ import data.terraform.gcp.security.compute_engine.google_compute_region_network_
 
 
 conditions := [
-  [
-    {
-      "situation_description": "INCLUDE SITUATION DESCRIPTION",
-      "remedies": [
-        "INCLUDE remedies DESCRIPTION"
-      ]
-    },
-    {
-      "condition": "CONDITIONS",
-      "attribute_path": ["PATH", 0, "TO_ATTRIBUTE"],
-      "values": ["EXAMPLE_VALUE"],
-      "policy_type": "whitelist"
-    }
-  ]
+    [
+        {
+            "situation_description": "Firewall rule is disabled, traffic are not being filtered.",
+            "remedies": [
+                "Change or delete the rule and don't create firewall rule with the default state being disabled."
+            ]
+        },
+        {
+            "condition": "Firewall Rule must NOT be disabled.",
+            "attribute_path": ["rule", 0, "disabled"],
+            "values": [TRUE],
+            "policy_type": "blacklist"
+        }
+    ]
 ]
-
    
 result := helpers.get_multi_summary(conditions, vars.variables)
   
