@@ -7,6 +7,7 @@ resource "google_compute_region_network_firewall_policy_with_rules" "compliant_e
 
     match {
       src_ip_ranges            = ["0.0.0.0/0"]
+      src_region_codes         = ["AU", "NZ"]
 
       layer4_config {
         ip_protocol = "all"
