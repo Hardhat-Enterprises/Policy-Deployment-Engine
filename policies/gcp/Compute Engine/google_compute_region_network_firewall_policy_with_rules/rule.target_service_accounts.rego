@@ -1,4 +1,4 @@
-package terraform.gcp.security.compute_engine.google_compute_region_network_firewall_policy_with_rules.rule.target_service_accounts
+package terraform.gcp.security.compute_engine.google_compute_region_network_firewall_policy_with_rules.rule_target_service_accounts
 import data.terraform.gcp.security.compute_engine.google_compute_region_network_firewall_policy_with_rules.vars
 
 

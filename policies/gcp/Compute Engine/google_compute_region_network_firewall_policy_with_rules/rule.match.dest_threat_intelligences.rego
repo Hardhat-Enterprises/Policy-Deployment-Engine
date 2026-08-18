@@ -1,4 +1,4 @@
-package terraform.gcp.security.compute_engine.google_compute_region_network_firewall_policy_with_rules.rule.match.dest_threat_intelligences
+package terraform.gcp.security.compute_engine.google_compute_region_network_firewall_policy_with_rules.rule_match_dest_threat_intelligences
 import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_region_network_firewall_policy_with_rules.vars
 

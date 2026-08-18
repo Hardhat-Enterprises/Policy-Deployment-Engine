@@ -1,4 +1,4 @@
-package terraform.gcp.security.compute_engine.google_compute_region_network_firewall_policy_with_rules.rule.enable_logging
+package terraform.gcp.security.compute_engine.google_compute_region_network_firewall_policy_with_rules.rule_enable_logging
 import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_region_network_firewall_policy_with_rules.vars
 

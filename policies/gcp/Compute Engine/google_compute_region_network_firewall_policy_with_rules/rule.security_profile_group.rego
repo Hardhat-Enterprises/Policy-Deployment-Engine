@@ -1,4 +1,4 @@
-package terraform.gcp.security.compute_engine.google_compute_region_network_firewall_policy_with_rules.rule.security_profile_group
+package terraform.gcp.security.compute_engine.google_compute_region_network_firewall_policy_with_rules.rule_security_profile_group
 import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_region_network_firewall_policy_with_rules.vars
 

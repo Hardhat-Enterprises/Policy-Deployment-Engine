@@ -1,4 +1,4 @@
-package terraform.gcp.security.compute_engine.google_compute_region_network_firewall_policy_with_rules.rule.tls_inspect
+package terraform.gcp.security.compute_engine.google_compute_region_network_firewall_policy_with_rules.rule_tls_inspect
 import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_region_network_firewall_policy_with_rules.vars
 
