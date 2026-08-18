@@ -1,0 +1,53 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "catalog": {
+      "description": "The parent catalog.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier referencing the parent BigLake catalog the database belongs to. It is a reference to another resource; we do not constrain resource names or references, so it is not a security policy target."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "name": {
+      "description": "The name of the database.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier/name of the table, database, or catalog resource. We do not constrain resource names, so it has no platform security policy."
+    },
+    "type": {
+      "description": "The database type.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Declares the object type (e.g. table/database type such as HIVE). This is a structural/compatibility descriptor, not a security control, so no policy is warranted."
+    },
+    "hive_options": {
+      "type": "block",
+      "description": "Options of a Hive database.",
+      "required": true
+    },
+    "hive_options.location_uri": {
+      "description": "Cloud Storage folder URI where the database data is stored, starting with \"gs://\".",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "A gs:// Cloud Storage path pointing at where the database/table data lives. This is a reference to another resource (a bucket/folder); we secure the bucket itself elsewhere and do not constrain references to it, and a generic policy can't validate an arbitrary path without hardcoding. Exposure/residency is enforced on the bucket's own public-access and location controls, not this pointer."
+    },
+    "hive_options.parameters": {
+      "description": "Stores user supplied Hive database parameters. An object containing a\nlist of\"key\": value pairs.\nExample: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Free-form key/value Hive metadata parameters for the table or database. This is an arbitrary metadata map; a generic policy cannot meaningfully constrain free-form parameters, so it is not a useful policy target."
+    }
+  }
+}

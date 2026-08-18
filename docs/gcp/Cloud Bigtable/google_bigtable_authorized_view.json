@@ -1,0 +1,86 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_protection": {
+      "description": "A field to make the authorized view protected against data loss i.e. when set to PROTECTED, deleting the authorized view, the table containing the authorized view, and the instance containing the authorized view would be prohibited.\nIf not provided, currently deletion protection will be set to UNPROTECTED as it is the API default value. Note this field configs the deletion protection provided by the API in the backend, and should not be confused with Terraform-side deletion protection.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Backend deletion protection reduces accidental or malicious removal of the view configuration that enforces least-privilege data access."
+    },
+    "instance_name": {
+      "description": "The name of the Bigtable instance in which the authorized view belongs.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Points at an instance by name only; names are not credentials and access still depends on IAM and client identity."
+    },
+    "name": {
+      "description": "The name of the authorized view. Must be 1-50 characters and must only contain hyphens, underscores, periods, letters and numbers.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "A resource name/identifier in config; it is not a service account key or password and does not, by itself, add principals to IAM."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Project IDs are non-secret scope metadata; they do not replace authentication or table IAM when reading data."
+    },
+    "table_name": {
+      "description": "The name of the Bigtable table in which the authorized view belongs.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifies which table backs the view; it does not list who may read rows—that remains IAM plus the effective subset_view filters."
+    },
+    "subset_view": {
+      "type": "block",
+      "description": "An AuthorizedView permitting access to an explicit subset of a Table.",
+      "required": false
+    },
+    "subset_view.row_prefixes": {
+      "description": "Base64-encoded row prefixes to be included in the authorized view. To provide access to all rows, include the empty string as a prefix (\"\").",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": true,
+      "rationale": "Defines which row-key prefixes the authorized view exposes; an empty-string prefix matches every row and turns a scoped view into full-table exposure. A policy should structurally reject the empty-string prefix so authorized views preserve row-level least privilege, without pinning any specific prefix value."
+    },
+    "subset_view.family_subsets": {
+      "type": "block",
+      "description": "Subsets of column families to be included in the authorized view.",
+      "required": false
+    },
+    "subset_view.family_subsets.family_name": {
+      "description": "Name of the column family to be included in the authorized view.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Non-secret schema identifier; narrowing which family is included does not by itself authenticate callers."
+    },
+    "subset_view.family_subsets.qualifier_prefixes": {
+      "description": "Base64-encoded prefixes for qualifiers of the column family to be included in the authorized view. Every qualifier starting with one of these prefixes is included in the authorized view. To provide access to all qualifiers, include the empty string as a prefix (\"\").",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": true,
+      "rationale": "Defines which column-qualifier prefixes the authorized view exposes; an empty-string prefix matches every qualifier in the family and widens column exposure. A policy should structurally reject the empty-string prefix to preserve column-level least privilege, without pinning any specific qualifier value."
+    },
+    "subset_view.family_subsets.qualifiers": {
+      "description": "Base64-encoded individual exact column qualifiers of the column family to be included in the authorized view.",
+      "required": false,
+      "type": "set(string)",
+      "security_impact": false,
+      "rationale": "Declares which column qualifiers may appear in the view configuration; it shapes column visibility but does not add IAM members or expose stored row payloads without authorized reads."
+    }
+  }
+}

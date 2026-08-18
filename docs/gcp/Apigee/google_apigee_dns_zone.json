@@ -1,0 +1,60 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "Description for the zone.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "It is the metadata used to describe zone and has no security impact"
+    },
+    "dns_zone_id": {
+      "description": "ID of the dns zone.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "It acts as the key for a DNS peering configuration that tells Apigee how to resolve hostnames within a specific private DNS zone and does not necessary have security impact."
+    },
+    "domain": {
+      "description": "Doamin for the zone.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The domain name for the DNS peering zone, identifying which private DNS records Apigee resolves. This is an identifier/reference to a team-owned DNS namespace; we do not constrain resource names or pointers to other resources, and there is no generic secure value to enforce."
+    },
+    "org_id": {
+      "description": "The Apigee Organization associated with the Apigee instance,\nin the format 'organizations/{{org_name}}'.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "It sets organization name and has no security impact"
+    },
+    "peering_config": {
+      "type": "block",
+      "description": "Peering zone config",
+      "required": true
+    },
+    "peering_config.target_network_id": {
+      "description": "The name of the producer VPC network.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "peering_config.target_project_id": {
+      "description": "The ID of the project that contains the producer VPC network.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

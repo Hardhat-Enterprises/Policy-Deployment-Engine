@@ -1,0 +1,62 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "An optional description of the endpoint.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Providing a description improves clarity and documentation."
+    },
+    "location": {
+      "description": "The location for the endpoint.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "name": {
+      "description": "Name of the endpoint in the format projects/{project_id}/locations/{locationId}/endpoints/{endpointId}.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Consistent naming improves resource management and identification."
+    },
+    "network": {
+      "description": "Name of the VPC network that is connected to the IDS endpoint. This can either contain the VPC network name itself (like \"src-net\") or the full URL to the network (like \"projects/{project_id}/global/networks/src-net\").",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier referencing the VPC network the IDS endpoint monitors. It is a reference to another resource (the team's chosen network); we don't constrain references to other resources."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Specifying the project ensures proper organization and access control."
+    },
+    "severity": {
+      "description": "The minimum alert severity level that is reported by the endpoint. Possible values: [\"INFORMATIONAL\", \"LOW\", \"MEDIUM\", \"HIGH\", \"CRITICAL\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Sets the minimum threat severity the IDS endpoint inspects and reports. A policy can require a sufficiently low threshold (e.g. include INFORMATIONAL/LOW upward) so lower-severity threats are not silently ignored, supporting detection coverage."
+    },
+    "threat_exceptions": {
+      "description": "Configuration for threat IDs excluded from generating alerts. Limit: 99 IDs.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": true,
+      "rationale": "Lists threat IDs excluded from IDS detection. Each exception is a blind spot, so a policy can require this list be empty or tightly bounded to avoid silently suppressing real threats, supporting detection coverage."
+    }
+  }
+}

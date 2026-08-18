@@ -1,0 +1,612 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "connection_profile_id": {
+      "description": "The ID of the connection profile.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Connection Profile ID has no impact on the security of the resource or data contained"
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "The connection profile display name.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Display name has no impact on the security of the resource or data contained"
+    },
+    "labels": {
+      "description": "The resource labels for connection profile to use to annotate any related underlying resources such as Compute Engine VMs.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Labels have no impact on the security of the resource or data contained"
+    },
+    "location": {
+      "description": "The location where the connection profile should reside.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "role": {
+      "description": "The connection profile role. Possible values: [\"SOURCE\", \"DESTINATION\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "alloydb": {
+      "type": "block",
+      "description": "Specifies required connection parameters, and the parameters required to create an AlloyDB destination cluster.",
+      "required": false
+    },
+    "alloydb.cluster_id": {
+      "description": "Required. The AlloyDB cluster ID that this connection profile is associated with.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "alloydb.settings": {
+      "type": "block",
+      "description": "Immutable. Metadata used to create the destination AlloyDB cluster.",
+      "required": false
+    },
+    "alloydb.settings.labels": {
+      "description": "Labels for the AlloyDB cluster created by DMS.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "alloydb.settings.vpc_network": {
+      "description": "Required. The resource link for the VPC network in which cluster resources are created and from which they are accessible via Private IP. The network must belong to the same project as the cluster.\nIt is specified in the form: 'projects/{project_number}/global/networks/{network_id}'. This is required to create a cluster.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "References the VPC network the AlloyDB cluster peers with. This is a pointer to another resource chosen by the team; we do not constrain the names of networks the resource merely references, so it is not a policy target."
+    },
+    "alloydb.settings.initial_user": {
+      "type": "block",
+      "description": "Required. Input only. Initial user to setup during cluster creation.",
+      "required": true
+    },
+    "alloydb.settings.initial_user.password": {
+      "description": "The initial password for the user.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "alloydb.settings.initial_user.user": {
+      "description": "The database username.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "alloydb.settings.primary_instance_settings": {
+      "type": "block",
+      "description": "Settings for the cluster's primary instance",
+      "required": false
+    },
+    "alloydb.settings.primary_instance_settings.database_flags": {
+      "description": "Database flags to pass to AlloyDB when DMS is creating the AlloyDB cluster and instances. See the AlloyDB documentation for how these can be used.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "alloydb.settings.primary_instance_settings.id": {
+      "description": "The database username.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "alloydb.settings.primary_instance_settings.labels": {
+      "description": "Labels for the AlloyDB primary instance created by DMS.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "alloydb.settings.primary_instance_settings.machine_config": {
+      "type": "block",
+      "description": "Configuration for the machines that host the underlying database engine.",
+      "required": true
+    },
+    "alloydb.settings.primary_instance_settings.machine_config.cpu_count": {
+      "description": "The number of CPU's in the VM instance.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cloudsql": {
+      "type": "block",
+      "description": "Specifies required connection parameters, and, optionally, the parameters required to create a Cloud SQL destination database instance.",
+      "required": false
+    },
+    "cloudsql.settings": {
+      "type": "block",
+      "description": "Immutable. Metadata used to create the destination Cloud SQL database.",
+      "required": false
+    },
+    "cloudsql.settings.activation_policy": {
+      "description": "The activation policy specifies when the instance is activated; it is applicable only when the instance state is 'RUNNABLE'. Possible values: [\"ALWAYS\", \"NEVER\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "cloudsql.settings.auto_storage_increase": {
+      "description": "If you enable this setting, Cloud SQL checks your available storage every 30 seconds. If the available storage falls below a threshold size, Cloud SQL automatically adds additional storage capacity.\nIf the available storage repeatedly falls below the threshold size, Cloud SQL continues to add storage until it reaches the maximum of 30 TB.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "cloudsql.settings.cmek_key_name": {
+      "description": "The KMS key name used for the csql instance.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "CloudSQL connection profiles must use CMEK encryption."
+    },
+    "cloudsql.settings.collation": {
+      "description": "The Cloud SQL default instance level collation.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "cloudsql.settings.data_disk_size_gb": {
+      "description": "The storage capacity available to the database, in GB. The minimum (and default) size is 10GB.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "cloudsql.settings.data_disk_type": {
+      "description": "The type of storage. Possible values: [\"PD_SSD\", \"PD_HDD\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "cloudsql.settings.database_flags": {
+      "description": "The database flags passed to the Cloud SQL instance at startup.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cloudsql.settings.database_version": {
+      "description": "The database engine type and version.\nCurrently supported values located at https://cloud.google.com/database-migration/docs/reference/rest/v1/projects.locations.connectionProfiles#sqldatabaseversion",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "cloudsql.settings.edition": {
+      "description": "The edition of the given Cloud SQL instance. Possible values: [\"ENTERPRISE\", \"ENTERPRISE_PLUS\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "cloudsql.settings.root_password": {
+      "description": "Input only. Initial root password.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "cloudsql.settings.source_id": {
+      "description": "The Database Migration Service source connection profile ID, in the format: projects/my_project_name/locations/us-central1/connectionProfiles/connection_profile_ID",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "cloudsql.settings.storage_auto_resize_limit": {
+      "description": "The maximum size to which storage capacity can be automatically increased. The default value is 0, which specifies that there is no limit.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "cloudsql.settings.tier": {
+      "description": "The tier (or machine type) for this instance, for example: db-n1-standard-1 (MySQL instances) or db-custom-1-3840 (PostgreSQL instances).\nFor more information, see https://cloud.google.com/sql/docs/mysql/instance-settings",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "cloudsql.settings.user_labels": {
+      "description": "The resource labels for a Cloud SQL instance to use to annotate any related underlying resources such as Compute Engine VMs.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "cloudsql.settings.zone": {
+      "description": "The Google Cloud Platform zone where your Cloud SQL datdabse instance is located.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "cloudsql.settings.ip_config": {
+      "type": "block",
+      "description": "The settings for IP Management. This allows to enable or disable the instance IP and manage which external networks can connect to the instance. The IPv4 address cannot be disabled.",
+      "required": false
+    },
+    "cloudsql.settings.ip_config.enable_ipv4": {
+      "description": "Whether the instance should be assigned an IPv4 address or not.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "Not Security Related"
+    },
+    "cloudsql.settings.ip_config.private_network": {
+      "description": "The resource link for the VPC network from which the Cloud SQL instance is accessible for private IP. For example, projects/myProject/global/networks/default.\nThis setting can be updated, but it cannot be removed after it is set.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Private networks restrict connectivity to internal VPCs, preventing exposure over the public internet."
+    },
+    "cloudsql.settings.ip_config.require_ssl": {
+      "description": "Whether SSL connections over IP should be enforced or not.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Enforcing SSL ensures that all traffic between clients and the database is encrypted"
+    },
+    "cloudsql.settings.ip_config.authorized_networks": {
+      "type": "block",
+      "description": "The list of external networks that are allowed to connect to the instance using the IP.",
+      "required": false
+    },
+    "cloudsql.settings.ip_config.authorized_networks.expire_time": {
+      "description": "The time when this access control entry expires in RFC 3339 format.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cloudsql.settings.ip_config.authorized_networks.label": {
+      "description": "A label to identify this entry.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cloudsql.settings.ip_config.authorized_networks.ttl": {
+      "description": "Input only. The time-to-leave of this access control entry.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cloudsql.settings.ip_config.authorized_networks.value": {
+      "description": "The allowlisted value for the access control list.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mysql": {
+      "type": "block",
+      "description": "Specifies connection parameters required specifically for MySQL databases.",
+      "required": false
+    },
+    "mysql.cloud_sql_id": {
+      "description": "If the connection profile is a Cloud SQL database, use this field to provide the Cloud SQL instance ID.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "cloud_sql_id has no impact on the security of the resource or data contained"
+    },
+    "mysql.host": {
+      "description": "The IP or hostname of the source MySQL database.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "host value itself does not impact security since networking and SSL enforcement are controlled by other parameters such as private_network and require_ssl."
+    },
+    "mysql.password": {
+      "description": "Input only. The password for the user that Database Migration Service will be using to connect to the database.\nThis field is not returned on request, and the value is encrypted when stored in Database Migration Service.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Holds the source-database credential for the connection profile. It is a free-form secret value supplied per team/database; a platform policy cannot enforce strength or rotation on it and must never pin a specific value, so it is not a useful policy target."
+    },
+    "mysql.port": {
+      "description": "The network port of the source MySQL database.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Port has no impact on the security since the host will be private"
+    },
+    "mysql.username": {
+      "description": "The username that Database Migration Service will use to connect to the database. The value is encrypted when stored in Database Migration Service.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Username has no impact on the security of the resource or data contained"
+    },
+    "mysql.ssl": {
+      "type": "block",
+      "description": "SSL configuration for the destination to connect to the source database.",
+      "required": false
+    },
+    "mysql.ssl.ca_certificate": {
+      "description": "Input only. The x509 PEM-encoded certificate of the CA that signed the source database server's certificate.\nThe replica will use this certificate to verify it's connecting to the right host.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mysql.ssl.client_certificate": {
+      "description": "Input only. The x509 PEM-encoded certificate that will be used by the replica to authenticate against the source database server.\nIf this field is used then the 'clientKey' field is mandatory",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mysql.ssl.client_key": {
+      "description": "Input only. The unencrypted PKCS#1 or PKCS#8 PEM-encoded private key associated with the Client Certificate.\nIf this field is used then the 'clientCertificate' field is mandatory.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mysql.ssl.type": {
+      "description": "The current connection profile state. Possible values: [\"SERVER_ONLY\", \"SERVER_CLIENT\", \"REQUIRED\", \"NONE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "oracle": {
+      "type": "block",
+      "description": "Specifies connection parameters required specifically for Oracle databases.",
+      "required": false
+    },
+    "oracle.database_service": {
+      "description": "Required. Database service for the Oracle connection.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Database service has no impact on the security of the resource or data contained"
+    },
+    "oracle.host": {
+      "description": "Required. The IP or hostname of the source Oracle database.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "host value itself does not impact security since networking and SSL enforcement are controlled by other parameters."
+    },
+    "oracle.password": {
+      "description": "Required. Input only. The password for the user that Database Migration Service will be using to connect to the database.\nThis field is not returned on request, and the value is encrypted when stored in Database Migration Service.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Password is handled securely by GCP. Policy cannot enforce complexity."
+    },
+    "oracle.port": {
+      "description": "Required. The network port of the source Oracle database.",
+      "required": true,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Port has no impact on the security since the host will be private"
+    },
+    "oracle.username": {
+      "description": "Required. The username that Database Migration Service will use to connect to the database. The value is encrypted when stored in Database Migration Service.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Username alone has no security effect unless paired with weak roles."
+    },
+    "oracle.forward_ssh_connectivity": {
+      "type": "block",
+      "description": "SSL configuration for the destination to connect to the source database.",
+      "required": false
+    },
+    "oracle.forward_ssh_connectivity.hostname": {
+      "description": "Required. Hostname for the SSH tunnel.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "oracle.forward_ssh_connectivity.password": {
+      "description": "Input only. SSH password. Only one of 'password' and 'private_key' can be configured.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "oracle.forward_ssh_connectivity.port": {
+      "description": "Port for the SSH tunnel, default value is 22.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "oracle.forward_ssh_connectivity.private_key": {
+      "description": "Input only. SSH private key. Only one of 'password' and 'private_key' can be configured.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "oracle.forward_ssh_connectivity.username": {
+      "description": "Required. Username for the SSH tunnel.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "oracle.private_connectivity": {
+      "type": "block",
+      "description": "Configuration for using a private network to communicate with the source database",
+      "required": false
+    },
+    "oracle.private_connectivity.private_connection": {
+      "description": "Required. The resource name (URI) of the private connection.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "oracle.ssl": {
+      "type": "block",
+      "description": "SSL configuration for the destination to connect to the source database.",
+      "required": false
+    },
+    "oracle.ssl.ca_certificate": {
+      "description": "Input only. The x509 PEM-encoded certificate of the CA that signed the source database server's certificate.\nThe replica will use this certificate to verify it's connecting to the right host.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "oracle.ssl.client_certificate": {
+      "description": "Input only. The x509 PEM-encoded certificate that will be used by the replica to authenticate against the source database server.\nIf this field is used then the 'clientKey' field is mandatory",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "oracle.ssl.client_key": {
+      "description": "Input only. The unencrypted PKCS#1 or PKCS#8 PEM-encoded private key associated with the Client Certificate.\nIf this field is used then the 'clientCertificate' field is mandatory.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "oracle.static_service_ip_connectivity": {
+      "type": "block",
+      "description": "This object has no nested fields.\n\nStatic IP address connectivity configured on service project.",
+      "required": false
+    },
+    "postgresql": {
+      "type": "block",
+      "description": "Specifies connection parameters required specifically for PostgreSQL databases.",
+      "required": false
+    },
+    "postgresql.alloydb_cluster_id": {
+      "description": "If the connection profile is an AlloyDB instance, use this field to provide the AlloyDB cluster ID.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Alloydb cluster ID has no impact on the security of the resource or data contained"
+    },
+    "postgresql.cloud_sql_id": {
+      "description": "If the connection profile is a Cloud SQL database, use this field to provide the Cloud SQL instance ID.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "cloud_sql_id has no impact on the security of the resource or data contained"
+    },
+    "postgresql.database": {
+      "description": "The name of the specific database within the host.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "postgresql.host": {
+      "description": "The IP or hostname of the source MySQL database.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "host value itself does not impact security since networking and SSL enforcement are controlled by other parameters such as private_network and require_ssl."
+    },
+    "postgresql.password": {
+      "description": "Input only. The password for the user that Database Migration Service will be using to connect to the database.\nThis field is not returned on request, and the value is encrypted when stored in Database Migration Service.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Password is handled securely by GCP. Policy cannot enforce complexity."
+    },
+    "postgresql.port": {
+      "description": "The network port of the source MySQL database.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Port number itself does not impact security if host is private."
+    },
+    "postgresql.username": {
+      "description": "The username that Database Migration Service will use to connect to the database. The value is encrypted when stored in Database Migration Service.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Username alone has no security effect unless paired with weak roles."
+    },
+    "postgresql.private_connectivity": {
+      "type": "block",
+      "description": "Private connectivity.",
+      "required": false
+    },
+    "postgresql.private_connectivity.private_connection": {
+      "description": "Required. The resource name (URI) of the private connection.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "postgresql.ssl": {
+      "type": "block",
+      "description": "SSL configuration for the destination to connect to the source database.",
+      "required": false
+    },
+    "postgresql.ssl.ca_certificate": {
+      "description": "Input only. The x509 PEM-encoded certificate of the CA that signed the source database server's certificate.\nThe replica will use this certificate to verify it's connecting to the right host.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "postgresql.ssl.client_certificate": {
+      "description": "Input only. The x509 PEM-encoded certificate that will be used by the replica to authenticate against the source database server.\nIf this field is used then the 'clientKey' field is mandatory",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "postgresql.ssl.client_key": {
+      "description": "Input only. The unencrypted PKCS#1 or PKCS#8 PEM-encoded private key associated with the Client Certificate.\nIf this field is used then the 'clientCertificate' field is mandatory.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "postgresql.ssl.type": {
+      "description": "The current connection profile state. Possible values: [\"SERVER_ONLY\", \"SERVER_CLIENT\", \"REQUIRED\", \"NONE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

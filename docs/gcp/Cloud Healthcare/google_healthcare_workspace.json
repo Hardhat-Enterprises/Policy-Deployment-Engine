@@ -1,0 +1,46 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "dataset": {
+      "description": "Identifies the dataset addressed by this request. Must be in the format\n'projects/{project}/locations/{location}/datasets/{dataset}'",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The dataset field is a required reference to the parent dataset and does not directly affect security posture."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "The user labels. An object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Free-form key/value metadata for organisation and billing. Labels do not enforce authentication, authorization, or data protection, so constraining them is not a meaningful platform security policy."
+    },
+    "name": {
+      "description": "The name of the workspace, in the format 'projects/{projectId}/locations/{location}/datasets/{datasetId}/dataMapperWorkspaces/{workspaceId}'",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The name is a resource identifier only and does not affect security posture."
+    },
+    "settings": {
+      "type": "block",
+      "description": "Settings associated with this workspace.",
+      "required": true
+    },
+    "settings.data_project_ids": {
+      "description": "Project IDs for data projects hosted in a workspace.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "The data_project_ids field defines which projects are associated with the workspace. Access control for those projects is governed by their own IAM policies, not this field directly."
+    }
+  }
+}

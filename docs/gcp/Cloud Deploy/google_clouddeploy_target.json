@@ -1,0 +1,292 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "annotations": {
+      "description": "Optional. User annotations. These attributes can only be set and used by the user, and not by Google Cloud Deploy. See https://google.aip.dev/128#annotations for more details such as format and size limitations.\n\n**Note**: This field is non-authoritative, and will only manage the annotations present in your configuration.\nPlease refer to the field `effective_annotations` for all of the annotations present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Key-value pairs for user-defined metadata. While secrets should not be stored here, the annotations themselves do not influence the target's security configuration or connectivity."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deploy_parameters": {
+      "description": "Optional. The deploy parameters to use for this target.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Environment-specific deployment parameters are typically configuration values, not security controls. Validation should be handled at the application level."
+    },
+    "description": {
+      "description": "Optional. Description of the `Target`. Max length is 255 characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Purely descriptive metadata for human readers. Has no functional impact on the target's security or operation."
+    },
+    "labels": {
+      "description": "Optional. Labels are attributes that can be set and used by both the user and by Google Cloud Deploy. Labels must meet the following constraints: * Keys and values can contain only lowercase letters, numeric characters, underscores, and dashes. * All characters must use UTF-8 encoding, and international characters are allowed. * Keys must start with a lowercase letter or international character. * Each resource is limited to a maximum of 64 labels. Both keys and values are additionally constrained to be <= 128 bytes.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field `effective_labels` for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Used for organizing and filtering resources. They do not affect the target's security or operational behavior."
+    },
+    "location": {
+      "description": "The location for the resource",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "name": {
+      "description": "Name of the `Target`. Format is `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "An identifier for the target resource. It has no bearing on the target's security posture or access controls."
+    },
+    "project": {
+      "description": "The project for the resource",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Specifies the project that will contain the target resource. The project's IAM policies control who can manage the target, but this argument itself is just an identifier."
+    },
+    "require_approval": {
+      "description": "Optional. Whether or not the `Target` requires approval.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "This is a governance control that enforces a manual approval step before any deployment can proceed to this target. For critical environments like production, setting this to 'false' could allow unauthorized or unreviewed deployments to proceed automatically, bypassing a key safety check."
+    },
+    "anthos_cluster": {
+      "type": "block",
+      "description": "Information specifying an Anthos Cluster.",
+      "required": false
+    },
+    "anthos_cluster.membership": {
+      "description": "Membership of the GKE Hub-registered cluster to which to apply the Skaffold configuration. Format is `projects/{project}/locations/{location}/memberships/{membership_name}`.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "associated_entities": {
+      "type": "block",
+      "description": "Optional. Map of entity IDs to their associated entities. Associated entities allows specifying places other than the deployment target for specific features. For example, the Gateway API canary can be configured to deploy the HTTPRoute to a different cluster(s) than the deployment cluster using associated entities. An entity ID must consist of lower-case letters, numbers, and hyphens, start with a letter and end with a letter or a number, and have a max length of 63 characters. In other words, it must match the following regex: `^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$`.",
+      "required": false
+    },
+    "associated_entities.entity_id": {
+      "description": "The name for the key in the map for which this object is mapped to in the API",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "associated_entities.anthos_clusters": {
+      "type": "block",
+      "description": "Optional. Information specifying Anthos clusters as associated entities.",
+      "required": false
+    },
+    "associated_entities.anthos_clusters.membership": {
+      "description": "Optional. Membership of the GKE Hub-registered cluster to which to apply the Skaffold configuration. Format is `projects/{project}/locations/{location}/memberships/{membership_name}`.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "associated_entities.gke_clusters": {
+      "type": "block",
+      "description": "Optional. Information specifying GKE clusters as associated entities.",
+      "required": false
+    },
+    "associated_entities.gke_clusters.cluster": {
+      "description": "Optional. Information specifying a GKE Cluster. Format is `projects/{project_id}/locations/{location_id}/clusters/{cluster_id}`.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "associated_entities.gke_clusters.internal_ip": {
+      "description": "Optional. If true, `cluster` is accessed using the private IP address of the control plane endpoint. Otherwise, the default IP address of the control plane endpoint is used. The default IP address is the private IP address for clusters with private control-plane endpoints and the public IP address otherwise. Only specify this option when `cluster` is a [private GKE cluster](https://cloud.google.com/kubernetes-engine/docs/concepts/private-cluster-concept).",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "associated_entities.gke_clusters.proxy_url": {
+      "description": "Optional. If set, used to configure a [proxy](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#proxy) to the Kubernetes server.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "custom_target": {
+      "type": "block",
+      "description": "Optional. Information specifying a Custom Target.",
+      "required": false
+    },
+    "custom_target.custom_target_type": {
+      "description": "Required. The name of the CustomTargetType. Format must be `projects/{project}/locations/{location}/customTargetTypes/{custom_target_type}`.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "execution_configs": {
+      "type": "block",
+      "description": "Configurations for all execution that relates to this `Target`. Each `ExecutionEnvironmentUsage` value may only be used in a single configuration; using the same value multiple times is an error. When one or more configurations are specified, they must include the `RENDER` and `DEPLOY` `ExecutionEnvironmentUsage` values. When no configurations are specified, execution will use the default specified in `DefaultPool`.",
+      "required": false
+    },
+    "execution_configs.artifact_storage": {
+      "description": "Optional. Cloud Storage location in which to store execution outputs. This can either be a bucket (\"gs://my-bucket\") or a path within a bucket (\"gs://my-bucket/my-dir\"). If unspecified, a default bucket located in the same region will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "execution_configs.execution_timeout": {
+      "description": "Optional. Execution timeout for a Cloud Build Execution. This must be between 10m and 24h in seconds format. If unspecified, a default timeout of 1h is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "execution_configs.service_account": {
+      "description": "Optional. Google service account to use for execution. If unspecified, the project execution service account (-compute@developer.gserviceaccount.com) is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "execution_configs.usages": {
+      "description": "Required. Usages when this configuration should be applied.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "execution_configs.verbose": {
+      "description": "Optional. If true, additional logging will be enabled when running builds in this execution environment.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "execution_configs.worker_pool": {
+      "description": "Optional. The resource name of the `WorkerPool`, with the format `projects/{project}/locations/{location}/workerPools/{worker_pool}`. If this optional field is unspecified, the default Cloud Build pool will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "execution_configs.default_pool": {
+      "type": "block",
+      "description": "Optional. Use default Cloud Build pool.",
+      "required": false
+    },
+    "execution_configs.default_pool.artifact_storage": {
+      "description": "Optional. Cloud Storage location where execution outputs should be stored. This can either be a bucket (\"gs://my-bucket\") or a path within a bucket (\"gs://my-bucket/my-dir\"). If unspecified, a default bucket located in the same region will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "execution_configs.default_pool.service_account": {
+      "description": "Optional. Google service account to use for execution. If unspecified, the project execution service account (-compute@developer.gserviceaccount.com) will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "execution_configs.private_pool": {
+      "type": "block",
+      "description": "Optional. Use private Cloud Build pool.",
+      "required": false
+    },
+    "execution_configs.private_pool.artifact_storage": {
+      "description": "Optional. Cloud Storage location where execution outputs should be stored. This can either be a bucket (\"gs://my-bucket\") or a path within a bucket (\"gs://my-bucket/my-dir\"). If unspecified, a default bucket located in the same region will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "execution_configs.private_pool.service_account": {
+      "description": "Optional. Google service account to use for execution. If unspecified, the project execution service account (-compute@developer.gserviceaccount.com) will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "execution_configs.private_pool.worker_pool": {
+      "description": "Required. Resource name of the Cloud Build worker pool to use. The format is `projects/{project}/locations/{location}/workerPools/{pool}`.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "gke": {
+      "type": "block",
+      "description": "Information specifying a GKE Cluster.",
+      "required": false
+    },
+    "gke.cluster": {
+      "description": "Information specifying a GKE Cluster. Format is `projects/{project_id}/locations/{location_id}/clusters/{cluster_id}.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "gke.dns_endpoint": {
+      "description": "Optional. If set, the cluster will be accessed using the DNS endpoint. Note that both `dns_endpoint` and `internal_ip` cannot be set to true.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "gke.internal_ip": {
+      "description": "Optional. If true, `cluster` is accessed using the private IP address of the control plane endpoint. Otherwise, the default IP address of the control plane endpoint is used. The default IP address is the private IP address for clusters with private control-plane endpoints and the public IP address otherwise. Only specify this option when `cluster` is a [private GKE cluster](https://cloud.google.com/kubernetes-engine/docs/concepts/private-cluster-concept).",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "This block defines connectivity to a GKE cluster. The security of the connection is critical. Using a public endpoint (`internal_ip = false`) is a security risk"
+    },
+    "gke.proxy_url": {
+      "description": "Optional. If set, used to configure a [proxy](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#proxy) to the Kubernetes server.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "multi_target": {
+      "type": "block",
+      "description": "Information specifying a multiTarget.",
+      "required": false
+    },
+    "multi_target.target_ids": {
+      "description": "Required. The target_ids of this multiTarget.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "run": {
+      "type": "block",
+      "description": "Information specifying a Cloud Run deployment target.",
+      "required": false
+    },
+    "run.location": {
+      "description": "Required. The location where the Cloud Run Service should be located. Format is `projects/{project}/locations/{location}`.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The physical location of the Cloud Run service has implications for data sovereignty, compliance, and latency. Deploying to unapproved regions may violate organizational policy or regulatory requirements."
+    }
+  }
+}

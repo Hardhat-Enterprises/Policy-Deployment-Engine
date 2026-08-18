@@ -1,0 +1,248 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "name": {
+      "description": "The resource name of the IAP protected resource. Name can have below resources:\n* organizations/{organization_id}\n* folders/{folder_id}\n* projects/{project_id}\n* projects/{project_id}/iap_web\n* projects/{project_id}/iap_web/compute\n* projects/{project_id}/iap_web/compute-{region}\n* projects/{project_id}/iap_web/compute/services/{service_id}\n* projects/{project_id}/iap_web/compute-{region}/services/{service_id}\n* projects/{project_id}/iap_web/appengine-{app_id}\n* projects/{project_id}/iap_web/appengine-{app_id}/services/{service_id}\n* projects/{project_id}/iap_web/appengine-{app_id}/services/{service_id}/version/{version_id}",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Resource name of the IAP-protected resource the settings attach to (org/folder/project/iap_web path). It is an identifier/reference; we don't constrain resource names, and the security comes from the settings' values, not from which target is named."
+    },
+    "access_settings": {
+      "type": "block",
+      "description": "Top level wrapper for all access related setting in IAP.",
+      "required": false
+    },
+    "access_settings.identity_sources": {
+      "description": "Identity sources that IAP can use to authenticate the end user. Only one identity source\ncan be configured. The possible values are:\n\n* 'WORKFORCE_IDENTITY_FEDERATION': Use external identities set up on Google Cloud Workforce\n  \t\t\t\t     Identity Federation. Possible values: [\"WORKFORCE_IDENTITY_FEDERATION\"]",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "access_settings.allowed_domains_settings": {
+      "type": "block",
+      "description": "Settings to configure and enable allowed domains.",
+      "required": false
+    },
+    "access_settings.allowed_domains_settings.domains": {
+      "description": "List of trusted domains.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "List of trusted sign-in domains for IAP allowed-domains. The specific domains are a team/tenant-specific choice; a generic platform policy cannot enumerate the correct domains without hardcoding them, so constraining the values is overreaching."
+    },
+    "access_settings.allowed_domains_settings.enable": {
+      "description": "Configuration for customers to opt in for the feature.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Toggles whether IAP's allowed-domains restriction is enforced. A policy requiring it 'true' enables the domain allow-list access control so sign-in is constrained to trusted domains rather than left unrestricted; it enables a security feature without hardcoding which domains."
+    },
+    "access_settings.cors_settings": {
+      "type": "block",
+      "description": "Configuration to allow cross-origin requests via IAP.",
+      "required": false
+    },
+    "access_settings.cors_settings.allow_http_options": {
+      "description": "Configuration to allow HTTP OPTIONS calls to skip authorization.\nIf undefined, IAP will not apply any special logic to OPTIONS requests.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "access_settings.gcip_settings": {
+      "type": "block",
+      "description": "GCIP claims and endpoint configurations for 3p identity providers.\n* Enabling gcipSetting significantly changes the way IAP authenticates users. Identity Platform does not support IAM, so IAP will not enforce any IAM policies for requests to your application.",
+      "required": false
+    },
+    "access_settings.gcip_settings.login_page_uri": {
+      "description": "Login page URI associated with the GCIP tenants. Typically, all resources within\nthe same project share the same login page, though it could be overridden at the\nsub resource level.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "access_settings.gcip_settings.tenant_ids": {
+      "description": "GCIP tenant ids that are linked to the IAP resource. tenantIds could be a string\nbeginning with a number character to indicate authenticating with GCIP tenant flow,\nor in the format of _ to indicate authenticating with GCIP agent flow. If agent flow\nis used, tenantIds should only contain one single element, while for tenant flow,\ntenantIds can contain multiple elements.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "access_settings.oauth_settings": {
+      "type": "block",
+      "description": "Settings to configure IAP's OAuth behavior.",
+      "required": false
+    },
+    "access_settings.oauth_settings.client_id": {
+      "description": "OAuth 2.0 client ID used in the OAuth flow to generate an access token. If this field is set, you can skip obtaining the OAuth credentials in this.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "access_settings.oauth_settings.client_secret": {
+      "description": "OAuth secret paired with client ID.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "access_settings.oauth_settings.login_hint": {
+      "description": "Domain hint to send as hd=? parameter in OAuth request flow.\nEnables redirect to primary IDP by skipping Google's login screen.\n(https://developers.google.com/identity/protocols/OpenIDConnect#hd-param)\nNote: IAP does not verify that the id token's hd claim matches this value\nsince access behavior is managed by IAM policies.\n* loginHint setting is not a replacement for access control. Always enforce an appropriate access policy if you want to restrict access to users outside your domain.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "access_settings.oauth_settings.programmatic_clients": {
+      "description": "List of client ids allowed to use IAP programmatically.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "access_settings.reauth_settings": {
+      "type": "block",
+      "description": "Settings to configure reauthentication policies in IAP.",
+      "required": false
+    },
+    "access_settings.reauth_settings.max_age": {
+      "description": "Reauth session lifetime, how long before a user has to reauthenticate again.\nA duration in seconds with up to nine fractional digits, ending with 's'.\nExample: \"3.5s\".",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "access_settings.reauth_settings.method": {
+      "description": "Reauth method requested. The possible values are:\n\n* 'LOGIN': Prompts the user to log in again.\n* 'SECURE_KEY': User must use their secure key 2nd factor device.\n* 'ENROLLED_SECOND_FACTORS': User can use any enabled 2nd factor. Possible values: [\"LOGIN\", \"SECURE_KEY\", \"ENROLLED_SECOND_FACTORS\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "access_settings.reauth_settings.policy_type": {
+      "description": "How IAP determines the effective policy in cases of hierarchical policies.\nPolicies are merged from higher in the hierarchy to lower in the hierarchy.\nThe possible values are:\n\n* 'MINIMUM': This policy acts as a minimum to other policies, lower in the hierarchy.\n\t\t   Effective policy may only be the same or stricter.\n* 'DEFAULT': This policy acts as a default if no other reauth policy is set. Possible values: [\"MINIMUM\", \"DEFAULT\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "access_settings.workforce_identity_settings": {
+      "type": "block",
+      "description": "Settings to configure the workforce identity federation, including workforce pools\nand OAuth 2.0 settings.",
+      "required": false
+    },
+    "access_settings.workforce_identity_settings.workforce_pools": {
+      "description": "The workforce pool resources. Only one workforce pool is accepted.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "access_settings.workforce_identity_settings.oauth2": {
+      "type": "block",
+      "description": "OAuth 2.0 settings for IAP to perform OIDC flow with workforce identity\nfederation services.",
+      "required": false
+    },
+    "access_settings.workforce_identity_settings.oauth2.client_id": {
+      "description": "The OAuth 2.0 client ID registered in the workforce identity\nfederation OAuth 2.0 Server.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "access_settings.workforce_identity_settings.oauth2.client_secret": {
+      "description": "Input only. The OAuth 2.0 client secret created while registering\nthe client ID.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "application_settings": {
+      "type": "block",
+      "description": "Top level wrapper for all application related settings in IAP.",
+      "required": false
+    },
+    "application_settings.cookie_domain": {
+      "description": "The Domain value to set for cookies generated by IAP. This value is not validated by the API,\nbut will be ignored at runtime if invalid.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Sets the Domain attribute for IAP-issued cookies. Pinning it to a specific (corporate) domain is the team's site-specific choice; a generic platform policy cannot know the right domain without hardcoding it, so enforcing a value here would be overreaching."
+    },
+    "application_settings.access_denied_page_settings": {
+      "type": "block",
+      "description": "Customization for Access Denied page. IAP allows customers to define a custom URI\nto use as the error page when access is denied to users. If IAP prevents access\nto this page, the default IAP error page will be displayed instead.",
+      "required": false
+    },
+    "application_settings.access_denied_page_settings.access_denied_page_uri": {
+      "description": "The URI to be redirected to when access is denied.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "application_settings.access_denied_page_settings.generate_troubleshooting_uri": {
+      "description": "Whether to generate a troubleshooting URL on access denied events to this application.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "application_settings.access_denied_page_settings.remediation_token_generation_enabled": {
+      "description": "Whether to generate remediation token on access denied events to this application.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "application_settings.attribute_propagation_settings": {
+      "type": "block",
+      "description": "Settings to configure attribute propagation.",
+      "required": false
+    },
+    "application_settings.attribute_propagation_settings.enable": {
+      "description": "Whether the provided attribute propagation settings should be evaluated on user requests.\nIf set to true, attributes returned from the expression will be propagated in the set output credentials.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "application_settings.attribute_propagation_settings.expression": {
+      "description": "Raw string CEL expression. Must return a list of attributes. A maximum of 45 attributes can\nbe selected. Expressions can select different attribute types from attributes:\nattributes.saml_attributes, attributes.iap_attributes.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "application_settings.attribute_propagation_settings.output_credentials": {
+      "description": "Which output credentials attributes selected by the CEL expression should be propagated in.\nAll attributes will be fully duplicated in each selected output credential.\nPossible values are:\n\n* 'HEADER': Propagate attributes in the headers with \"x-goog-iap-attr-\" prefix.\n* 'JWT': Propagate attributes in the JWT of the form:\n         \"additional_claims\": { \"my_attribute\": [\"value1\", \"value2\"] }\n* 'RCTOKEN': Propagate attributes in the RCToken of the form: \"\n             additional_claims\": { \"my_attribute\": [\"value1\", \"value2\"] } Possible values: [\"HEADER\", \"JWT\", \"RCTOKEN\"]",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "application_settings.csm_settings": {
+      "type": "block",
+      "description": "Settings to configure IAP's behavior for a service mesh.",
+      "required": false
+    },
+    "application_settings.csm_settings.rctoken_aud": {
+      "description": "Audience claim set in the generated RCToken. This value is not validated by IAP.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

@@ -1,0 +1,289 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "default_max_pods_per_node": {
+      "description": "The default maximum number of pods per node used if a maximum value is not\nspecified explicitly for a node pool in this cluster. If unspecified, the\nKubernetes default value will be used.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Sets the maximum pods schedulable per node, which also sizes per-node IP allocation. This is a capacity/scheduling tuning parameter, a team data-management choice rather than an access, exposure, or encryption control."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "external_load_balancer_ipv4_address_pools": {
+      "description": "Address pools for cluster data plane external load balancing.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "Specifies the IPv4 address pool the external load balancer draws VIPs from. Choosing these addresses is a team networking decision; the pool itself does not enforce access control and cannot be generically constrained without hardcoding ranges."
+    },
+    "labels": {
+      "description": "User-defined labels for the edgecloud cluster.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Labels are metadata for organisation and billing on the cluster; they do not affect access, exposure, or encryption."
+    },
+    "location": {
+      "description": "The location of the resource.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "name": {
+      "description": "The GDCE cluster name.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Cluster name is an identifier and doesn't directly impact security."
+    },
+    "project": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Specifies the GCP project the cluster belongs to. This is an identifier/reference that does not independently control access or security settings."
+    },
+    "release_channel": {
+      "description": "The release channel a cluster is subscribed to. Possible values: [\"RELEASE_CHANNEL_UNSPECIFIED\", \"NONE\", \"REGULAR\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Controls whether the cluster auto-receives versioned updates via a release channel. A policy can require a managed channel (not NONE) so security patches are applied automatically rather than left to manual upgrades."
+    },
+    "target_version": {
+      "description": "The target cluster version. For example: \"1.5.0\".",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Specifies the Kubernetes version the cluster runs. A policy can require a sufficiently recent/supported version so known-vulnerable releases are not deployed; it should express a minimum, not pin an exact version."
+    },
+    "authorization": {
+      "type": "block",
+      "description": "RBAC policy that will be applied and managed by GEC.",
+      "required": true
+    },
+    "authorization.admin_users": {
+      "type": "block",
+      "description": "User that will be granted the cluster-admin role on the cluster, providing\nfull access to the cluster. Currently, this is a singular field, but will\nbe expanded to allow multiple admins in the future.",
+      "required": true
+    },
+    "authorization.admin_users.username": {
+      "description": "An active Google username.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Lists the admin user principals granted cluster-admin authorization. Like IAM members, a policy should block public/wildcard or non-organisational principals from being granted admin; it must not pin specific named accounts."
+    },
+    "control_plane": {
+      "type": "block",
+      "description": "The configuration of the cluster control plane.",
+      "required": false
+    },
+    "control_plane.local": {
+      "type": "block",
+      "description": "Local control plane configuration.",
+      "required": false
+    },
+    "control_plane.local.machine_filter": {
+      "description": "Only machines matching this filter will be allowed to host control\nplane nodes. The filtering language accepts strings like \"name=<name>\",\nand is documented here: [AIP-160](https://google.aip.dev/160).",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "A free-form filter expression selecting which physical machines host control-plane nodes. The correct filter is site/team-specific; a generic policy cannot constrain an arbitrary expression without hardcoding values."
+    },
+    "control_plane.local.node_count": {
+      "description": "The number of nodes to serve as replicas of the Control Plane.\nOnly 1 and 3 are supported.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Sets the number of local control-plane nodes. This is a capacity/availability sizing choice, not an access, exposure, or encryption control."
+    },
+    "control_plane.local.node_location": {
+      "description": "Name of the Google Distributed Cloud Edge zones where this node pool\nwill be created. For example: 'us-central1-edge-customer-a'.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the geographic location of control-plane nodes. A data-residency policy should require it to fall within an approved location whitelist (the sanctioned case for a concrete allowed set)."
+    },
+    "control_plane.local.shared_deployment_policy": {
+      "description": "Policy configuration about how user applications are deployed. Possible values: [\"SHARED_DEPLOYMENT_POLICY_UNSPECIFIED\", \"ALLOWED\", \"DISALLOWED\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Controls whether user workloads may be scheduled onto control-plane nodes. A policy should disallow sharing so user workloads cannot run alongside the control plane, preserving isolation and reducing the control-plane attack surface."
+    },
+    "control_plane.remote": {
+      "type": "block",
+      "description": "Remote control plane configuration.",
+      "required": false
+    },
+    "control_plane.remote.node_location": {
+      "description": "Name of the Google Distributed Cloud Edge zones where this node pool\nwill be created. For example: 'us-central1-edge-customer-a'.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the geographic location of control-plane nodes. A data-residency policy should require it to fall within an approved location whitelist (the sanctioned case for a concrete allowed set)."
+    },
+    "control_plane_encryption": {
+      "type": "block",
+      "description": "Remote control plane disk encryption options. This field is only used when\nenabling CMEK support.",
+      "required": false
+    },
+    "control_plane_encryption.kms_key": {
+      "description": "The Cloud KMS CryptoKey e.g.\nprojects/{project}/locations/{location}/keyRings/{keyRing}/cryptoKeys/{cryptoKey}\nto use for protecting control plane disks. If not specified, a\nGoogle-managed key will be used instead.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Sets the CMEK used to encrypt control-plane data. A policy should require it to be non-empty so control-plane secrets are always customer-managed-key encrypted; it must not pin a specific key, since keys are team/project-specific."
+    },
+    "fleet": {
+      "type": "block",
+      "description": "Fleet related configuration.\nFleets are a Google Cloud concept for logically organizing clusters,\nletting you use and manage multi-cluster capabilities and apply\nconsistent policies across your systems.",
+      "required": true
+    },
+    "fleet.project": {
+      "description": "The name of the Fleet host project where this cluster will be registered.\nProject names are formatted as\n'projects/<project-number>'.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier referencing the fleet host project. This is a reference to another resource and not something a generic platform policy should constrain."
+    },
+    "maintenance_policy": {
+      "type": "block",
+      "description": "Cluster-wide maintenance policy configuration.",
+      "required": false
+    },
+    "maintenance_policy.maintenance_exclusions": {
+      "type": "block",
+      "description": "Exclusions to automatic maintenance. Non-emergency maintenance should not occur\nin these windows. Each exclusion has a unique name and may be active or expired.\nThe max number of maintenance exclusions allowed at a given time is 3.",
+      "required": false
+    },
+    "maintenance_policy.maintenance_exclusions.id": {
+      "description": "A unique (per cluster) id for the window.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "A user-assigned identifier for a maintenance-exclusion window. It is a naming/identifier field with no access, exposure, or encryption effect."
+    },
+    "maintenance_policy.maintenance_exclusions.window": {
+      "type": "block",
+      "description": "Represents an arbitrary window of time.",
+      "required": false
+    },
+    "maintenance_policy.maintenance_exclusions.window.end_time": {
+      "description": "The time that the window ends. The end time must take place after the\nstart time.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_policy.maintenance_exclusions.window.start_time": {
+      "description": "The time that the window first starts.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_policy.window": {
+      "type": "block",
+      "description": "Specifies the maintenance window in which maintenance may be performed.",
+      "required": true
+    },
+    "maintenance_policy.window.recurring_window": {
+      "type": "block",
+      "description": "Represents an arbitrary window of time that recurs.",
+      "required": true
+    },
+    "maintenance_policy.window.recurring_window.recurrence": {
+      "description": "An RRULE (https://tools.ietf.org/html/rfc5545#section-3.8.5.3) for how\nthis window recurs. They go on for the span of time between the start and\nend time.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "An RRULE defining when recurring maintenance windows occur. Scheduling maintenance is an operational team choice and does not affect access, exposure, or encryption."
+    },
+    "maintenance_policy.window.recurring_window.window": {
+      "type": "block",
+      "description": "Represents an arbitrary window of time.",
+      "required": false
+    },
+    "maintenance_policy.window.recurring_window.window.end_time": {
+      "description": "The time that the window ends. The end time must take place after the\nstart time.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "maintenance_policy.window.recurring_window.window.start_time": {
+      "description": "The time that the window first starts.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "networking": {
+      "type": "block",
+      "description": "Fleet related configuration.\nFleets are a Google Cloud concept for logically organizing clusters,\nletting you use and manage multi-cluster capabilities and apply\nconsistent policies across your systems.",
+      "required": true
+    },
+    "networking.cluster_ipv4_cidr_blocks": {
+      "description": "All pods in the cluster are assigned an RFC1918 IPv4 address from these\nblocks. Only a single block is supported. This field cannot be changed\nafter creation.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "Defines the IPv4 range allocated for pods. Address-range selection is a team networking choice and does not itself enforce access control; segmentation is governed by firewall/network-policy resources."
+    },
+    "networking.cluster_ipv6_cidr_blocks": {
+      "description": "If specified, dual stack mode is enabled and all pods in the cluster are\nassigned an IPv6 address from these blocks alongside from an IPv4\naddress. Only a single block is supported. This field cannot be changed\nafter creation.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "Defines the IPv6 address range allocated for pods. Picking a CIDR is a team networking/addressing choice and, for assigned pod ranges, does not map to an enforceable generic security control."
+    },
+    "networking.services_ipv4_cidr_blocks": {
+      "description": "All services in the cluster are assigned an RFC1918 IPv4 address from these\nblocks. Only a single block is supported. This field cannot be changed\nafter creation.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "Defines the IPv4 address range allocated for cluster services. Selecting this range is a team networking/addressing choice and does not by itself enforce access control."
+    },
+    "networking.services_ipv6_cidr_blocks": {
+      "description": "If specified, dual stack mode is enabled and all services in the cluster are\nassigned an IPv6 address from these blocks alongside from an IPv4\naddress. Only a single block is supported. This field cannot be changed\nafter creation.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "Defines the IPv6 address range allocated for cluster services. Selecting this range is a team networking/addressing choice and does not by itself enforce access control."
+    },
+    "system_addons_config": {
+      "type": "block",
+      "description": "Config that customers are allowed to define for GDCE system add-ons.",
+      "required": false
+    },
+    "system_addons_config.ingress": {
+      "type": "block",
+      "description": "Config for the Ingress add-on which allows customers to create an Ingress\nobject to manage external access to the servers in a cluster. The add-on\nconsists of istiod and istio-ingress.",
+      "required": false
+    },
+    "system_addons_config.ingress.disabled": {
+      "description": "Whether Ingress is disabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Toggles the cluster's bundled ingress add-on. Disabling it where not required removes an externally reachable entry point, reducing the attack surface; a policy can default it off unless ingress is explicitly needed."
+    },
+    "system_addons_config.ingress.ipv4_vip": {
+      "description": "Ingress VIP.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Sets the virtual IP for the ingress add-on. The VIP value is a team networking/addressing choice and does not itself enforce access control; constraining it would require hardcoding specific addresses."
+    }
+  }
+}

@@ -1,0 +1,21 @@
+package terraform.gcp.security.backup_for_gke.google_gke_backup_restore_channel.destination_project
+import data.terraform.helpers
+import data.terraform.gcp.security.backup_for_gke.google_gke_backup_restore_channel.vars
+
+conditions := [
+  [
+    {
+      "situation_description": "Restore Channel destination_project must be in australia-southeast1.",
+      "remedies": ["Set destination_project to a location in australia-southeast1."]
+    },
+    {
+      "condition": "Destination project must be 'projects/PDE'",
+      "attribute_path": ["destination_project"],
+      "values": ["projects/PDE"],
+      "policy_type": "whitelist"
+    }
+  ]
+]
+
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

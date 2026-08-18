@@ -1,0 +1,179 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "dataset": {
+      "description": "Healthcare Dataset under which the Pipeline Job is to run",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The dataset field is a required reference to the parent dataset and does not directly affect security posture."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "disable_lineage": {
+      "description": "If true, disables writing lineage for the pipeline.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Lineage tracking records data provenance across pipeline transformations, enabling organisations to trace how PHI was processed and transformed. Disabling lineage removes this audit capability, making it impossible to investigate data quality issues or demonstrate compliance with HIPAA data stewardship requirements."
+    },
+    "labels": {
+      "description": "User-supplied key-value pairs used to organize Pipeline Jobs.\nLabel keys must be between 1 and 63 characters long, have a UTF-8 encoding of\nmaximum 128 bytes, and must conform to the following PCRE regular expression:\n[\\p{Ll}\\p{Lo}][\\p{Ll}\\p{Lo}\\p{N}_-]{0,62}\nLabel values are optional, must be between 1 and 63 characters long, have a\nUTF-8 encoding of maximum 128 bytes, and must conform to the following PCRE\nregular expression: [\\p{Ll}\\p{Lo}\\p{N}_-]{0,63}\nNo more than 64 labels can be associated with a given pipeline.\nAn object containing a list of \"key\": value pairs.\nExample: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Free-form key/value metadata used for organisation, billing and grouping. Labels do not enforce authentication, authorization, or encryption, and a platform policy cannot meaningfully mandate arbitrary label content without hardcoding team-specific values, so this is not a security control."
+    },
+    "location": {
+      "description": "Location where the Pipeline Job is to run",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "name": {
+      "description": "Specifies the name of the pipeline job. This field is user-assigned.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The name is a resource identifier only and does not affect security posture."
+    },
+    "backfill_pipeline_job": {
+      "type": "block",
+      "description": "Specifies the backfill configuration.",
+      "required": false
+    },
+    "backfill_pipeline_job.mapping_pipeline_job": {
+      "description": "Specifies the mapping pipeline job to backfill, the name format\nshould follow: projects/{projectId}/locations/{locationId}/datasets/{datasetId}/pipelineJobs/{pipelineJobId}.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The mapping_pipeline_job reference is an identifier for the job to backfill and does not directly affect security posture."
+    },
+    "mapping_pipeline_job": {
+      "type": "block",
+      "description": "Specifies mapping configuration.",
+      "required": false
+    },
+    "mapping_pipeline_job.fhir_store_destination": {
+      "description": "If set, the mapping pipeline will write snapshots to this\nFHIR store without assigning stable IDs. You must\ngrant your pipeline project's Cloud Healthcare Service\nAgent serviceaccount healthcare.fhirResources.executeBundle\nand healthcare.fhirResources.create permissions on the\ndestination store. The destination store must set\n[disableReferentialIntegrity][FhirStore.disable_referential_integrity]\nto true. The destination store must use FHIR version R4.\nFormat: project/{projectID}/locations/{locationID}/datasets/{datasetName}/fhirStores/{fhirStoreID}.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The fhir_store_destination is a destination reference only. Security of the target FHIR store is managed through its own IAM policies."
+    },
+    "mapping_pipeline_job.reconciliation_destination": {
+      "description": "If set to true, a mapping pipeline will send output snapshots\nto the reconciliation pipeline in its dataset. A reconciliation\npipeline must exist in this dataset before a mapping pipeline\nwith a reconciliation destination can be created.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "This field controls pipeline routing behaviour and does not directly affect security posture."
+    },
+    "mapping_pipeline_job.fhir_streaming_source": {
+      "type": "block",
+      "description": "A streaming FHIR data source.",
+      "required": false
+    },
+    "mapping_pipeline_job.fhir_streaming_source.description": {
+      "description": "Describes the streaming FHIR data source.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mapping_pipeline_job.fhir_streaming_source.fhir_store": {
+      "description": "The path to the FHIR store in the format projects/{projectId}/locations/{locationId}/datasets/{datasetId}/fhirStores/{fhirStoreId}.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The fhir_store is a source reference only. Security of the source FHIR store is managed through its own IAM policies."
+    },
+    "mapping_pipeline_job.mapping_config": {
+      "type": "block",
+      "description": "The location of the mapping configuration.",
+      "required": true
+    },
+    "mapping_pipeline_job.mapping_config.description": {
+      "description": "Describes the mapping configuration.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mapping_pipeline_job.mapping_config.whistle_config_source": {
+      "type": "block",
+      "description": "Specifies the path to the mapping configuration for harmonization pipeline.",
+      "required": false
+    },
+    "mapping_pipeline_job.mapping_config.whistle_config_source.import_uri_prefix": {
+      "description": "Directory path where all the Whistle files are located.\nExample: gs://{bucket-id}/{path/to/import-root/dir}",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "mapping_pipeline_job.mapping_config.whistle_config_source.uri": {
+      "description": "Main configuration file which has the entrypoint or the root function.\nExample: gs://{bucket-id}/{path/to/import-root/dir}/entrypoint-file-name.wstl.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "reconciliation_pipeline_job": {
+      "type": "block",
+      "description": "Specifies reconciliation configuration.",
+      "required": false
+    },
+    "reconciliation_pipeline_job.fhir_store_destination": {
+      "description": "The harmonized FHIR store to write harmonized FHIR resources to,\nin the format of: project/{projectID}/locations/{locationID}/datasets/{datasetName}/fhirStores/{id}",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The fhir_store_destination is a destination reference only. Security of the target FHIR store is managed through its own IAM policies."
+    },
+    "reconciliation_pipeline_job.matching_uri_prefix": {
+      "description": "Specifies the top level directory of the matching configs used\nin all mapping pipelines, which extract properties for resources\nto be matched on.\nExample: gs://{bucket-id}/{path/to/matching/configs}",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The matching_uri_prefix is a configuration path reference and does not directly affect security posture."
+    },
+    "reconciliation_pipeline_job.merge_config": {
+      "type": "block",
+      "description": "Specifies the location of the reconciliation configuration.",
+      "required": true
+    },
+    "reconciliation_pipeline_job.merge_config.description": {
+      "description": "Describes the mapping configuration.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "reconciliation_pipeline_job.merge_config.whistle_config_source": {
+      "type": "block",
+      "description": "Specifies the path to the mapping configuration for harmonization pipeline.",
+      "required": true
+    },
+    "reconciliation_pipeline_job.merge_config.whistle_config_source.import_uri_prefix": {
+      "description": "Directory path where all the Whistle files are located.\nExample: gs://{bucket-id}/{path/to/import-root/dir}",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "reconciliation_pipeline_job.merge_config.whistle_config_source.uri": {
+      "description": "Main configuration file which has the entrypoint or the root function.\nExample: gs://{bucket-id}/{path/to/import-root/dir}/entrypoint-file-name.wstl.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

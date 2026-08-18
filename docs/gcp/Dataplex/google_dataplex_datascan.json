@@ -1,0 +1,666 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "data_scan_id": {
+      "description": "DataScan identifier. Must contain only lowercase letters, numbers and hyphens. Must start with a letter. Must end with a number or a letter.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "Description of the scan.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "User friendly display name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "User-defined labels for the scan. A list of key->value pairs.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The location where the data scan should reside.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data": {
+      "type": "block",
+      "description": "The data source for DataScan.",
+      "required": true
+    },
+    "data.entity": {
+      "description": "The Dataplex entity that represents the data source(e.g. BigQuery table) for Datascan.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data.resource": {
+      "description": "The service-qualified full resource name of the cloud resource for a DataScan job to scan against. The field could be:\nCloud Storage bucket (//storage.googleapis.com/projects/PROJECT_ID/buckets/BUCKET_ID) for DataDiscoveryScan OR BigQuery table of type \"TABLE\" (/bigquery.googleapis.com/projects/PROJECT_ID/datasets/DATASET_ID/tables/TABLE_ID) for DataProfileScan/DataQualityScan.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_discovery_spec": {
+      "type": "block",
+      "description": "DataDiscoveryScan related setting.",
+      "required": false
+    },
+    "data_discovery_spec.bigquery_publishing_config": {
+      "type": "block",
+      "description": "Configuration for metadata publishing.",
+      "required": false
+    },
+    "data_discovery_spec.bigquery_publishing_config.connection": {
+      "description": "The BigQuery connection used to create BigLake tables. Must be in the form 'projects/{projectId}/locations/{locationId}/connections/{connection_id}'.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_discovery_spec.bigquery_publishing_config.location": {
+      "description": "The location of the BigQuery dataset to publish BigLake external or non-BigLake external tables to.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_discovery_spec.bigquery_publishing_config.project": {
+      "description": "The project of the BigQuery dataset to publish BigLake external or non-BigLake external tables to. If not specified, the project of the Cloud Storage bucket will be used. The format is \"projects/{project_id_or_number}\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_discovery_spec.bigquery_publishing_config.table_type": {
+      "description": "Determines whether to publish discovered tables as BigLake external tables or non-BigLake external tables. Possible values: [\"TABLE_TYPE_UNSPECIFIED\", \"EXTERNAL\", \"BIGLAKE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_discovery_spec.storage_config": {
+      "type": "block",
+      "description": "Configurations related to Cloud Storage as the data source.",
+      "required": false
+    },
+    "data_discovery_spec.storage_config.exclude_patterns": {
+      "description": "Defines the data to exclude during discovery. Provide a list of patterns that identify the data to exclude. For Cloud Storage bucket assets, these patterns are interpreted as glob patterns used to match object names. For BigQuery dataset assets, these patterns are interpreted as patterns to match table names.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_discovery_spec.storage_config.include_patterns": {
+      "description": "Defines the data to include during discovery when only a subset of the data should be considered. Provide a list of patterns that identify the data to include. For Cloud Storage bucket assets, these patterns are interpreted as glob patterns used to match object names. For BigQuery dataset assets, these patterns are interpreted as patterns to match table names.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_discovery_spec.storage_config.csv_options": {
+      "type": "block",
+      "description": "Configuration for CSV data.",
+      "required": false
+    },
+    "data_discovery_spec.storage_config.csv_options.delimiter": {
+      "description": "The delimiter that is used to separate values. The default is ',' (comma).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_discovery_spec.storage_config.csv_options.encoding": {
+      "description": "The character encoding of the data. The default is UTF-8.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_discovery_spec.storage_config.csv_options.header_rows": {
+      "description": "The number of rows to interpret as header rows that should be skipped when reading data rows.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_discovery_spec.storage_config.csv_options.quote": {
+      "description": "The character used to quote column values. Accepts '\"' (double quotation mark) or ''' (single quotation mark). If unspecified, defaults to '\"' (double quotation mark).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_discovery_spec.storage_config.csv_options.type_inference_disabled": {
+      "description": "Whether to disable the inference of data types for CSV data. If true, all columns are registered as strings.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_discovery_spec.storage_config.json_options": {
+      "type": "block",
+      "description": "Configuration for JSON data.",
+      "required": false
+    },
+    "data_discovery_spec.storage_config.json_options.encoding": {
+      "description": "The character encoding of the data. The default is UTF-8.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_discovery_spec.storage_config.json_options.type_inference_disabled": {
+      "description": "Whether to disable the inference of data types for JSON data. If true, all columns are registered as their primitive types (strings, number, or boolean).",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_documentation_spec": {
+      "type": "block",
+      "description": "DataDocumentationScan related setting.",
+      "required": false
+    },
+    "data_profile_spec": {
+      "type": "block",
+      "description": "DataProfileScan related setting.",
+      "required": false
+    },
+    "data_profile_spec.catalog_publishing_enabled": {
+      "description": "If set, the latest DataScan job result will be published to Dataplex Catalog.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_profile_spec.row_filter": {
+      "description": "A filter applied to all rows in a single DataScan job. The filter needs to be a valid SQL expression for a WHERE clause in BigQuery standard SQL syntax. Example: col1 >= 0 AND col2 < 10",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_profile_spec.sampling_percent": {
+      "description": "The percentage of the records to be selected from the dataset for DataScan.\nValue can range between 0.0 and 100.0 with up to 3 significant decimal digits.\nSampling is not applied if 'sampling_percent' is not specified, 0 or 100.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_profile_spec.exclude_fields": {
+      "type": "block",
+      "description": "The fields to exclude from data profile.\nIf specified, the fields will be excluded from data profile, regardless of 'include_fields' value.",
+      "required": false
+    },
+    "data_profile_spec.exclude_fields.field_names": {
+      "description": "Expected input is a list of fully qualified names of fields as in the schema.\nOnly top-level field names for nested fields are supported.\nFor instance, if 'x' is of nested field type, listing 'x' is supported but 'x.y.z' is not supported. Here 'y' and 'y.z' are nested fields of 'x'.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_profile_spec.include_fields": {
+      "type": "block",
+      "description": "The fields to include in data profile.\nIf not specified, all fields at the time of profile scan job execution are included, except for ones listed in 'exclude_fields'.",
+      "required": false
+    },
+    "data_profile_spec.include_fields.field_names": {
+      "description": "Expected input is a list of fully qualified names of fields as in the schema.\nOnly top-level field names for nested fields are supported.\nFor instance, if 'x' is of nested field type, listing 'x' is supported but 'x.y.z' is not supported. Here 'y' and 'y.z' are nested fields of 'x'.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_profile_spec.post_scan_actions": {
+      "type": "block",
+      "description": "Actions to take upon job completion.",
+      "required": false
+    },
+    "data_profile_spec.post_scan_actions.bigquery_export": {
+      "type": "block",
+      "description": "If set, results will be exported to the provided BigQuery table.",
+      "required": false
+    },
+    "data_profile_spec.post_scan_actions.bigquery_export.results_table": {
+      "description": "The BigQuery table to export DataProfileScan results to.\nFormat://bigquery.googleapis.com/projects/PROJECT_ID/datasets/DATASET_ID/tables/TABLE_ID",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec": {
+      "type": "block",
+      "description": "DataQualityScan related setting.",
+      "required": false
+    },
+    "data_quality_spec.catalog_publishing_enabled": {
+      "description": "If set, the latest DataScan job result will be published to Dataplex Catalog.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.enable_catalog_based_rules": {
+      "description": "If set to true, the scan will retrieve rules defined in Data Catalog for the resource.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.filter": {
+      "description": "A filter to selectively run a subset of rules.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.row_filter": {
+      "description": "A filter applied to all rows in a single DataScan job. The filter needs to be a valid SQL expression for a WHERE clause in BigQuery standard SQL syntax. Example: col1 >= 0 AND col2 < 10",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.sampling_percent": {
+      "description": "The percentage of the records to be selected from the dataset for DataScan.\nValue can range between 0.0 and 100.0 with up to 3 significant decimal digits.\nSampling is not applied if 'sampling_percent' is not specified, 0 or 100.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.post_scan_actions": {
+      "type": "block",
+      "description": "Actions to take upon job completion.",
+      "required": false
+    },
+    "data_quality_spec.post_scan_actions.bigquery_export": {
+      "type": "block",
+      "description": "If set, results will be exported to the provided BigQuery table.",
+      "required": false
+    },
+    "data_quality_spec.post_scan_actions.bigquery_export.results_table": {
+      "description": "The BigQuery table to export DataQualityScan results to.\nFormat://bigquery.googleapis.com/projects/PROJECT_ID/datasets/DATASET_ID/tables/TABLE_ID",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.post_scan_actions.notification_report": {
+      "type": "block",
+      "description": "The configuration of notification report post scan action.",
+      "required": false
+    },
+    "data_quality_spec.post_scan_actions.notification_report.job_end_trigger": {
+      "type": "block",
+      "description": "This trigger is triggered whenever a scan job run ends, regardless of the result.",
+      "required": false
+    },
+    "data_quality_spec.post_scan_actions.notification_report.job_failure_trigger": {
+      "type": "block",
+      "description": "This trigger is triggered when the scan job itself fails, regardless of the result.",
+      "required": false
+    },
+    "data_quality_spec.post_scan_actions.notification_report.recipients": {
+      "type": "block",
+      "description": "The individuals or groups who are designated to receive notifications upon triggers.",
+      "required": true
+    },
+    "data_quality_spec.post_scan_actions.notification_report.recipients.emails": {
+      "description": "The email recipients who will receive the DataQualityScan results report.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.post_scan_actions.notification_report.score_threshold_trigger": {
+      "type": "block",
+      "description": "This trigger is triggered when the DQ score in the job result is less than a specified input score.",
+      "required": false
+    },
+    "data_quality_spec.post_scan_actions.notification_report.score_threshold_trigger.score_threshold": {
+      "description": "The score range is in [0,100].",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules": {
+      "type": "block",
+      "description": "The list of rules to evaluate against a data source. At least one rule is required.",
+      "required": false
+    },
+    "data_quality_spec.rules.attributes": {
+      "description": "Map of attribute name and value linked to the rule.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.column": {
+      "description": "The unnested column which this rule is evaluated against.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.description": {
+      "description": "Description of the rule.\nThe maximum length is 1,024 characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.dimension": {
+      "description": "The dimension name a rule belongs to. Custom dimension name is supported with all uppercase letters and maximum length of 30 characters.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.ignore_null": {
+      "description": "Rows with null values will automatically fail a rule, unless ignoreNull is true. In that case, such null rows are trivially considered passing. Only applicable to ColumnMap rules.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.name": {
+      "description": "A mutable name for the rule.\nThe name must contain only letters (a-z, A-Z), numbers (0-9), or hyphens (-).\nThe maximum length is 63 characters.\nMust start with a letter.\nMust end with a number or a letter.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.suspended": {
+      "description": "Whether the Rule is active or suspended. Default = false.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.threshold": {
+      "description": "The minimum ratio of passing_rows / total_rows required to pass this rule, with a range of [0.0, 1.0]. 0 indicates default value (i.e. 1.0).",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.non_null_expectation": {
+      "type": "block",
+      "description": "ColumnMap rule which evaluates whether each column value is null.",
+      "required": false
+    },
+    "data_quality_spec.rules.range_expectation": {
+      "type": "block",
+      "description": "ColumnMap rule which evaluates whether each column value lies between a specified range.",
+      "required": false
+    },
+    "data_quality_spec.rules.range_expectation.max_value": {
+      "description": "The maximum column value allowed for a row to pass this validation. At least one of minValue and maxValue need to be provided.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.range_expectation.min_value": {
+      "description": "The minimum column value allowed for a row to pass this validation. At least one of minValue and maxValue need to be provided.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.range_expectation.strict_max_enabled": {
+      "description": "Whether each value needs to be strictly lesser than ('<') the maximum, or if equality is allowed.\nOnly relevant if a maxValue has been defined. Default = false.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.range_expectation.strict_min_enabled": {
+      "description": "Whether each value needs to be strictly greater than ('>') the minimum, or if equality is allowed.\nOnly relevant if a minValue has been defined. Default = false.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.regex_expectation": {
+      "type": "block",
+      "description": "ColumnMap rule which evaluates whether each column value matches a specified regex.",
+      "required": false
+    },
+    "data_quality_spec.rules.regex_expectation.regex": {
+      "description": "A regular expression the column value is expected to match.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.row_condition_expectation": {
+      "type": "block",
+      "description": "Table rule which evaluates whether each row passes the specified condition.",
+      "required": false
+    },
+    "data_quality_spec.rules.row_condition_expectation.sql_expression": {
+      "description": "The SQL expression.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.set_expectation": {
+      "type": "block",
+      "description": "ColumnMap rule which evaluates whether each column value is contained by a specified set.",
+      "required": false
+    },
+    "data_quality_spec.rules.set_expectation.values": {
+      "description": "Expected values for the column value.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.sql_assertion": {
+      "type": "block",
+      "description": "Table rule which evaluates whether any row matches invalid state.",
+      "required": false
+    },
+    "data_quality_spec.rules.sql_assertion.sql_statement": {
+      "description": "The SQL statement.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.statistic_range_expectation": {
+      "type": "block",
+      "description": "ColumnAggregate rule which evaluates whether the column aggregate statistic lies between a specified range.",
+      "required": false
+    },
+    "data_quality_spec.rules.statistic_range_expectation.max_value": {
+      "description": "The maximum column statistic value allowed for a row to pass this validation.\nAt least one of minValue and maxValue need to be provided.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.statistic_range_expectation.min_value": {
+      "description": "The minimum column statistic value allowed for a row to pass this validation.\nAt least one of minValue and maxValue need to be provided.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.statistic_range_expectation.statistic": {
+      "description": "column statistics. Possible values: [\"STATISTIC_UNDEFINED\", \"MEAN\", \"MIN\", \"MAX\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.statistic_range_expectation.strict_max_enabled": {
+      "description": "Whether column statistic needs to be strictly lesser than ('<') the maximum, or if equality is allowed.\nOnly relevant if a maxValue has been defined. Default = false.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.statistic_range_expectation.strict_min_enabled": {
+      "description": "Whether column statistic needs to be strictly greater than ('>') the minimum, or if equality is allowed.\nOnly relevant if a minValue has been defined. Default = false.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.table_condition_expectation": {
+      "type": "block",
+      "description": "Table rule which evaluates whether the provided expression is true.",
+      "required": false
+    },
+    "data_quality_spec.rules.table_condition_expectation.sql_expression": {
+      "description": "The SQL expression.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.template_reference": {
+      "type": "block",
+      "description": "Aggregate rule which references a rule template and provides the parameters to be substituted in the template.",
+      "required": false
+    },
+    "data_quality_spec.rules.template_reference.name": {
+      "description": "The resource name of the template entry.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.template_reference.values": {
+      "type": "block",
+      "description": "The map of parameter name and value.",
+      "required": false
+    },
+    "data_quality_spec.rules.template_reference.values.name": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.template_reference.values.value": {
+      "description": "The string representation of the parameter value.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "data_quality_spec.rules.uniqueness_expectation": {
+      "type": "block",
+      "description": "Row-level rule which evaluates whether each column value is unique.",
+      "required": false
+    },
+    "execution_identity": {
+      "type": "block",
+      "description": "The identity to run the datascan. If not specified, defaults to the Dataplex Service Agent.",
+      "required": false
+    },
+    "execution_identity.dataplex_service_agent": {
+      "type": "block",
+      "description": "The Dataplex service agent associated with the user's project.",
+      "required": false
+    },
+    "execution_identity.service_account": {
+      "type": "block",
+      "description": "Service account to use to execute a datascan.",
+      "required": false
+    },
+    "execution_identity.service_account.email": {
+      "description": "Service account email.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "execution_identity.user_credential": {
+      "type": "block",
+      "description": "The credential of the calling user. Supports only ONE_TIME trigger type.",
+      "required": false
+    },
+    "execution_spec": {
+      "type": "block",
+      "description": "DataScan execution settings.",
+      "required": true
+    },
+    "execution_spec.field": {
+      "description": "The unnested field (of type Date or Timestamp) that contains values which monotonically increase over time. If not specified, a data scan will run for all data in the table.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "execution_spec.trigger": {
+      "type": "block",
+      "description": "Spec related to how often and when a scan should be triggered.",
+      "required": true
+    },
+    "execution_spec.trigger.on_demand": {
+      "type": "block",
+      "description": "The scan runs once via dataScans.run API.",
+      "required": false
+    },
+    "execution_spec.trigger.one_time": {
+      "type": "block",
+      "description": "The scan runs once upon DataScan creation.",
+      "required": false
+    },
+    "execution_spec.trigger.one_time.ttl_after_scan_completion": {
+      "description": "Time to live for the DataScan and its results after the one-time run completes. Accepts a string with a unit suffix 's' (e.g., '7200s'). Default is 24 hours. Ranges between 0 and 31536000 seconds (1 year).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "execution_spec.trigger.schedule": {
+      "type": "block",
+      "description": "The scan is scheduled to run periodically.",
+      "required": false
+    },
+    "execution_spec.trigger.schedule.cron": {
+      "description": "Cron schedule for running scans periodically. This field is required for Schedule scans.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

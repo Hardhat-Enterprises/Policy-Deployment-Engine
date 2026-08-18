@@ -1,0 +1,406 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "db_system_id": {
+      "description": "The ID of the DbSystem to create. This value is\nrestricted to (^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$) and must be a maximum of\n63 characters in length. The value must start with a letter and end with a\nletter or a number.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_protection": {
+      "description": "Whether or not to allow Terraform to destroy the instance. Unless this field is set to false in Terraform state, a terraform destroy or terraform apply that would delete the instance will fail.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "The display name for the System db. The name does not have to\nbe unique within your project.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "gcp_oracle_zone": {
+      "description": "The GCP Oracle zone where Oracle DbSystem is hosted.\nExample: us-east4-b-r2.\nIf not specified, the system will pick a zone based on availability.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "The labels or tags associated with the DbSystem.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "odb_network": {
+      "description": "The name of the OdbNetwork associated with the DbSystem.\nFormat: projects/{project}/locations/{location}/odbNetworks/{odb_network}\nIt is optional but if specified, this should match the parent ODBNetwork of\nthe OdbSubnet.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "odb_subnet": {
+      "description": "The name of the OdbSubnet associated with the DbSystem for IP\nallocation. Format:\nprojects/{project}/locations/{location}/odbNetworks/{odb_network}/odbSubnets/{odb_subnet}",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties": {
+      "type": "block",
+      "description": "The properties of a DbSystem.",
+      "required": false
+    },
+    "properties.compute_count": {
+      "description": "The number of CPU cores to enable for the DbSystem.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.compute_model": {
+      "description": "The compute model of the DbSystem.\nPossible values:\nECPU\nOCPU",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.data_storage_size_gb": {
+      "description": "The data storage size in GB that is currently available to DbSystems.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.database_edition": {
+      "description": "The database edition of the DbSystem.\nPossible values:\nSTANDARD_EDITION\nENTERPRISE_EDITION\nENTERPRISE_EDITION_HIGH_PERFORMANCE",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.domain": {
+      "description": "The host domain name of the DbSystem.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.hostname_prefix": {
+      "description": "Prefix for DB System host names.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.initial_data_storage_size_gb": {
+      "description": "The initial data storage size in GB.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.license_model": {
+      "description": "The license model of the DbSystem.\nPossible values:\nLICENSE_INCLUDED\nBRING_YOUR_OWN_LICENSE",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.memory_size_gb": {
+      "description": "The memory size in GB.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.node_count": {
+      "description": "The number of nodes in the DbSystem.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.private_ip": {
+      "description": "The private IP address of the DbSystem.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.reco_storage_size_gb": {
+      "description": "The reco/redo storage size in GB.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.shape": {
+      "description": "Shape of DB System.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.ssh_public_keys": {
+      "description": "SSH public keys to be stored with the DbSystem.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.data_collection_options": {
+      "type": "block",
+      "description": "Data collection options for DbSystem.",
+      "required": false
+    },
+    "properties.data_collection_options.is_diagnostics_events_enabled": {
+      "description": "Indicates whether to enable data collection for diagnostics.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.data_collection_options.is_incident_logs_enabled": {
+      "description": "Indicates whether to enable incident logs and trace collection.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_home": {
+      "type": "block",
+      "description": "Details of the Database Home resource.",
+      "required": false
+    },
+    "properties.db_home.db_version": {
+      "description": "A valid Oracle Database version. For a list of supported versions, use the\nListDbVersions operation.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_home.display_name": {
+      "description": "The display name for the Database Home. The name does not have to\nbe unique within your project.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_home.is_unified_auditing_enabled": {
+      "description": "Whether unified auditing is enabled for the Database Home.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_home.database": {
+      "type": "block",
+      "description": "Details of the Database resource.\nhttps://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/Database/",
+      "required": true
+    },
+    "properties.db_home.database.admin_password": {
+      "description": "The password for the default ADMIN user.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_home.database.character_set": {
+      "description": "The character set for the database. The default is AL32UTF8.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_home.database.database_id": {
+      "description": "The database ID of the Database.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_home.database.db_home_name": {
+      "description": "The name of the DbHome resource associated with the Database.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_home.database.db_name": {
+      "description": "The database name. The name must begin with an alphabetic character and can\ncontain a maximum of eight alphanumeric characters. Special characters are\nnot permitted.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_home.database.db_unique_name": {
+      "description": "The DB_UNIQUE_NAME of the Oracle Database being backed up.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_home.database.gcp_oracle_zone": {
+      "description": "The GCP Oracle zone where the Database is created.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_home.database.ncharacter_set": {
+      "description": "The national character set for the database. The default is AL16UTF16.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_home.database.pluggable_database_id": {
+      "description": "The ID of the pluggable database associated with Database. The ID must be unique within the project and location.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_home.database.pluggable_database_name": {
+      "description": "The pluggable dataabse associated with the Database. The name must begin with an alphabetic character and can contain a maximum of thirty alphanumeric characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_home.database.tde_wallet_password": {
+      "description": "The TDE wallet password for the database.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_home.database.properties": {
+      "type": "block",
+      "description": "The properties of a Database.",
+      "required": false
+    },
+    "properties.db_home.database.properties.db_version": {
+      "description": "The Oracle Database version.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_home.database.properties.database_management_config": {
+      "type": "block",
+      "description": "The configuration of the Database Management service.",
+      "required": false
+    },
+    "properties.db_home.database.properties.db_backup_config": {
+      "type": "block",
+      "description": "Backup Options for the Database.",
+      "required": false
+    },
+    "properties.db_home.database.properties.db_backup_config.auto_backup_enabled": {
+      "description": "If set to true, enables automatic backups on the database.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_home.database.properties.db_backup_config.auto_full_backup_day": {
+      "description": "Possible values:\nMONDAY\nTUESDAY\nWEDNESDAY\nTHURSDAY\nFRIDAY\nSATURDAY\nSUNDAY",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_home.database.properties.db_backup_config.auto_full_backup_window": {
+      "description": "The window in which the full backup should be performed on the database.\nIf no value is provided, the default is anytime.\nPossible values:\nSLOT_ONE\nSLOT_TWO\nSLOT_THREE\nSLOT_FOUR\nSLOT_FIVE\nSLOT_SIX\nSLOT_SEVEN\nSLOT_EIGHT\nSLOT_NINE\nSLOT_TEN\nSLOT_ELEVEN\nSLOT_TWELVE",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_home.database.properties.db_backup_config.auto_incremental_backup_window": {
+      "description": "The window in which the incremental backup should be performed on the\ndatabase. If no value is provided, the default is anytime except the auto\nfull backup day.\nPossible values:\nSLOT_ONE\nSLOT_TWO\nSLOT_THREE\nSLOT_FOUR\nSLOT_FIVE\nSLOT_SIX\nSLOT_SEVEN\nSLOT_EIGHT\nSLOT_NINE\nSLOT_TEN\nSLOT_ELEVEN\nSLOT_TWELVE",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_home.database.properties.db_backup_config.backup_deletion_policy": {
+      "description": "This defines when the backups will be deleted after Database termination.\nPossible values:\nDELETE_IMMEDIATELY\nDELETE_AFTER_RETENTION_PERIOD",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_home.database.properties.db_backup_config.retention_period_days": {
+      "description": "The number of days an automatic backup is retained before being\nautomatically deleted. This value determines the earliest point in time to\nwhich a database can be restored. Min: 1, Max: 60.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_home.database.properties.db_backup_config.backup_destination_details": {
+      "type": "block",
+      "description": "Details of the database backup destinations.",
+      "required": false
+    },
+    "properties.db_home.database.properties.db_backup_config.backup_destination_details.type": {
+      "description": "The type of the database backup destination.\nPossible values:\nNFS\nRECOVERY_APPLIANCE\nOBJECT_STORE\nLOCAL\nDBRS",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.db_system_options": {
+      "type": "block",
+      "description": "Details of the DbSystem Options.",
+      "required": false
+    },
+    "properties.db_system_options.storage_management": {
+      "description": "The storage option used in DB system.\nPossible values:\nASM\nLVM",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "properties.time_zone": {
+      "type": "block",
+      "description": "Represents a time zone from the\n[IANA Time Zone Database](https://www.iana.org/time-zones).",
+      "required": false
+    },
+    "properties.time_zone.id": {
+      "description": "IANA Time Zone Database time zone. For example \"America/New_York\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

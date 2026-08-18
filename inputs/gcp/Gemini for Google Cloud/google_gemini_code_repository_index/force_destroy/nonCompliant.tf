@@ -1,0 +1,7 @@
+resource "google_gemini_code_repository_index" "non_compliant_example_1" {
+  project = "PDE"
+  code_repository_index_id = "non_compliant_example_1"
+  location = "asia-south1"
+  kms_key = "random"
+  force_destroy = true
+}

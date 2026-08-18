@@ -1,0 +1,265 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "attempt_deadline": {
+      "description": "The deadline for job attempts. If the request handler does not respond by this deadline then the request is\ncancelled and the attempt is marked as a DEADLINE_EXCEEDED failure. The failed attempt can be viewed in\nexecution logs. Cloud Scheduler will retry the job according to the RetryConfig.\nThe allowed duration for this deadline is:\n* For HTTP targets, between 15 seconds and 30 minutes.\n* For App Engine HTTP targets, between 15 seconds and 24 hours.\n* **Note**: For PubSub targets, this field is ignored - setting it will introduce an unresolvable diff.\nA duration in seconds with up to nine fractional digits, terminated by 's'. Example: \"3.5s\"",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Sets how long a job attempt may run before it is cancelled as DEADLINE_EXCEEDED. This is an operational timeout/performance setting and does not affect access, encryption, or exposure, so it is not a security policy target."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "A human-readable description for the job.\nThis string must not contain more than 500 characters.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Only used to describe the purpose of the job thus does not have security related impact"
+    },
+    "name": {
+      "description": "The name of the job.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Is not related to security practices as is only used for naming purposes"
+    },
+    "paused": {
+      "description": "Sets the job to a paused state. Jobs default to being enabled when this property is not set.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "Sets whether the job is paused or running. Whether a scheduled job is active is a team operational choice, not a security control; a platform policy cannot generically dictate that jobs be paused or running."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Used for the project idenfication but does not have direct effects on the security of the service"
+    },
+    "region": {
+      "description": "Region where the scheduler job resides. If it is not provided, Terraform will use the provider default.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "schedule": {
+      "description": "Describes the schedule on which the job will be executed.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Only used to set the timer for the job which would not affect the data security"
+    },
+    "time_zone": {
+      "description": "Specifies the time zone to be used in interpreting schedule.\nThe value of this field must be a time zone name from the tz database.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Only used for schedule operational purposes thus does not have an effect on security principles"
+    },
+    "app_engine_http_target": {
+      "type": "block",
+      "description": "App Engine HTTP target.\nIf the job providers a App Engine HTTP target the cron will\nsend a request to the service instance",
+      "required": false
+    },
+    "app_engine_http_target.body": {
+      "description": "HTTP request body.\nA request body is allowed only if the HTTP method is POST or PUT.\nIt will result in invalid argument error to set a body on a job with an incompatible HttpMethod.\n\nA base64-encoded string.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Only used in methods POST or PUT and is just HTTP data thus would not affect security aspects"
+    },
+    "app_engine_http_target.headers": {
+      "description": "HTTP request headers.\nThis map contains the header field names and values.\nHeaders can be set when the job is created.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Only used to provide addtional context which has no effect on the security"
+    },
+    "app_engine_http_target.http_method": {
+      "description": "Which HTTP method to use for the request.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Selects the HTTP verb (GET/POST/PUT/...) the job uses when invoking its own configured target. The verb is dictated by the target API contract, not a platform security concern, and no verb is inherently \"malicious\" for a self-configured request, so it is not a useful policy target."
+    },
+    "app_engine_http_target.relative_uri": {
+      "description": "The relative URI.\nThe relative URL must begin with \"/\" and must be a valid HTTP relative URL.\nIt can contain a path, query string arguments, and \\# fragments.\nIf the relative URL is empty, then the root path \"/\" will be used.\nNo spaces are allowed, and the maximum length allowed is 2083 characters",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The relative path on the App Engine target the job calls. This is a team-defined path/reference to their own endpoint; there is no generic secure value to enforce, and \"avoid sensitive data in the path\" cannot be expressed as a structural platform policy."
+    },
+    "app_engine_http_target.app_engine_routing": {
+      "type": "block",
+      "description": "App Engine Routing setting for the job.",
+      "required": false
+    },
+    "app_engine_http_target.app_engine_routing.instance": {
+      "description": "App instance.\nBy default, the job is sent to an instance which is available when the job is attempted.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The available app instance which does not directly affect the security."
+    },
+    "app_engine_http_target.app_engine_routing.service": {
+      "description": "App service.\nBy default, the job is sent to the service which is the default service when the job is attempted.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Names the App Engine service the job's request is routed to. This is a reference to a team-owned target service; we do not constrain which resource a job points at, and there is no generic secure value to enforce."
+    },
+    "app_engine_http_target.app_engine_routing.version": {
+      "description": "App version.\nBy default, the job is sent to the version which is the default version when the job is attempted.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Only used to select version of service thus does not directly affect security"
+    },
+    "http_target": {
+      "type": "block",
+      "description": "HTTP target.\nIf the job providers a http_target the cron will\nsend a request to the targeted url",
+      "required": false
+    },
+    "http_target.body": {
+      "description": "HTTP request body.\nA request body is allowed only if the HTTP method is POST, PUT, or PATCH.\nIt is an error to set body on a job with an incompatible HttpMethod.\n\nA base64-encoded string.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The HTTP request payload sent by the job to its target. This is free-form, team-defined request content; there is no generic secure value to enforce, and it is treated the same as the App Engine target body (which is correctly false)."
+    },
+    "http_target.headers": {
+      "description": "This map contains the header field names and values.\nRepeated headers are not supported, but a header value can contain commas.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Only used to provide addtional context which has no effect on the security"
+    },
+    "http_target.http_method": {
+      "description": "Which HTTP method to use for the request.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Selects the HTTP verb (GET/POST/PUT/...) the job uses when invoking its own configured target. The verb is dictated by the target API contract, not a platform security concern, and no verb is inherently \"malicious\" for a self-configured request, so it is not a useful policy target."
+    },
+    "http_target.uri": {
+      "description": "The full URI path that the request will be sent to.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Must use HTTPS in order to improve upon encryption"
+    },
+    "http_target.oauth_token": {
+      "type": "block",
+      "description": "Contains information needed for generating an OAuth token.\nThis type of authorization should be used when sending requests to a GCP endpoint.",
+      "required": false
+    },
+    "http_target.oauth_token.scope": {
+      "description": "OAuth scope to be used for generating OAuth access token. If not specified,\n\"https://www.googleapis.com/auth/cloud-platform\" will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Defines the OAuth scopes granted to the access token the job uses to call Google APIs. A policy should require narrow, API-specific scopes to enforce least privilege; broad scopes (e.g. cloud-platform) over-grant what the job's token can do."
+    },
+    "http_target.oauth_token.service_account_email": {
+      "description": "Service account email to be used for generating OAuth token.\nThe service account must be within the same project as the job.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_target.oidc_token": {
+      "type": "block",
+      "description": "Contains information needed for generating an OpenID Connect token.\nThis type of authorization should be used when sending requests to third party endpoints or Cloud Run.",
+      "required": false
+    },
+    "http_target.oidc_token.audience": {
+      "description": "Audience to be used when generating OIDC token. If not specified,\nthe URI specified in target will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Will not provide addtional security as mismatched and misconfigured uri is automatically rejected thus making it more of a configuration"
+    },
+    "http_target.oidc_token.service_account_email": {
+      "description": "Service account email to be used for generating OAuth token.\nThe service account must be within the same project as the job.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "pubsub_target": {
+      "type": "block",
+      "description": "Pub/Sub target\nIf the job providers a Pub/Sub target the cron will publish\na message to the provided topic",
+      "required": false
+    },
+    "pubsub_target.attributes": {
+      "description": "Attributes for PubsubMessage.\nPubsub message must contain either non-empty data, or at least one attribute.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "The metadata of the pubsubmessage which does not have influence on securty aspects of the service"
+    },
+    "pubsub_target.data": {
+      "description": "The message payload for PubsubMessage.\nPubsub message must contain either non-empty data, or at least one attribute.\n\n A base64-encoded string.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Holds the data of the message but does not have direct impact on security attruibutes of the service"
+    },
+    "pubsub_target.topic_name": {
+      "description": "The full resource name for the Cloud Pub/Sub topic to which\nmessages will be published when a job is delivered. ~>**NOTE:**\nThe topic name must be in the same format as required by PubSub's\nPublishRequest.name, e.g. 'projects/my-project/topics/my-topic'.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Does not impact security as is only used as a naming convention"
+    },
+    "retry_config": {
+      "type": "block",
+      "description": "By default, if a job does not complete successfully,\nmeaning that an acknowledgement is not received from the handler,\nthen it will be retried with exponential backoff according to the settings",
+      "required": false
+    },
+    "retry_config.max_backoff_duration": {
+      "description": "The maximum amount of time to wait before retrying a job after it fails.\nA duration in seconds with up to nine fractional digits, terminated by 's'.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Only used to dictate the maximum backoff thus not a security related attribute"
+    },
+    "retry_config.max_doublings": {
+      "description": "The time between retries will double maxDoublings times.\nA job's retry interval starts at minBackoffDuration,\nthen doubles maxDoublings times, then increases linearly,\nand finally retries retries at intervals of maxBackoffDuration up to retryCount times.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Used to control the timer of max_doublings and has no impact on the securtiy of the service"
+    },
+    "retry_config.max_retry_duration": {
+      "description": "The time limit for retrying a failed job, measured from time when an execution was first attempted.\nIf specified with retryCount, the job will be retried until both limits are reached.\nA duration in seconds with up to nine fractional digits, terminated by 's'.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Used to dictate the maxiumum amount of retries thus not a security related attribute"
+    },
+    "retry_config.min_backoff_duration": {
+      "description": "The minimum amount of time to wait before retrying a job after it fails.\nA duration in seconds with up to nine fractional digits, terminated by 's'.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Only used to dictate the minimum backoff thus not a security related attribute"
+    },
+    "retry_config.retry_count": {
+      "description": "The number of attempts that the system will make to run a\njob using the exponential backoff procedure described by maxDoublings.\nValues greater than 5 and negative values are not allowed.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Number of times Cloud Scheduler retries a failed job attempt. This is a reliability/operational tuning value; capping retries does not improve confidentiality, integrity, or exposure, so it is not a platform security policy target."
+    }
+  }
+}

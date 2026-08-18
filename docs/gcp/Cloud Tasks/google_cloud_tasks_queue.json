@@ -1,0 +1,269 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "desired_state": {
+      "description": "The desired state of the queue. Use this to pause and resume the queue.\n\n* RUNNING: The queue is running. Tasks can be dispatched.\n* PAUSED: The queue is paused. Tasks are not dispatched but can be added to the queue. Default value: \"RUNNING\" Possible values: [\"RUNNING\", \"PAUSED\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The location of the queue",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "name": {
+      "description": "The queue name.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "app_engine_routing_override": {
+      "type": "block",
+      "description": "Overrides for task-level appEngineRouting. These settings apply only\nto App Engine tasks in this queue",
+      "required": false
+    },
+    "app_engine_routing_override.instance": {
+      "description": "App instance.\n\nBy default, the task is sent to an instance which is available when the task is attempted.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "app_engine_routing_override.service": {
+      "description": "App service.\n\nBy default, the task is sent to the service which is the default service when the task is attempted.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "app_engine_routing_override.version": {
+      "description": "App version.\n\nBy default, the task is sent to the version which is the default version when the task is attempted.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_target": {
+      "type": "block",
+      "description": "Modifies HTTP target for HTTP tasks.",
+      "required": false
+    },
+    "http_target.http_method": {
+      "description": "The HTTP method to use for the request.\n\nWhen specified, it overrides HttpRequest for the task.\nNote that if the value is set to GET the body of the task will be ignored at execution time. Possible values: [\"HTTP_METHOD_UNSPECIFIED\", \"POST\", \"GET\", \"HEAD\", \"PUT\", \"DELETE\", \"PATCH\", \"OPTIONS\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_target.header_overrides": {
+      "type": "block",
+      "description": "HTTP target headers.\n\nThis map contains the header field names and values.\nHeaders will be set when running the CreateTask and/or BufferTask.\n\nThese headers represent a subset of the headers that will be configured for the task's HTTP request.\nSome HTTP request headers will be ignored or replaced.\n\nHeaders which can have multiple values (according to RFC2616) can be specified using comma-separated values.\n\nThe size of the headers must be less than 80KB. Queue-level headers to override headers of all the tasks in the queue.",
+      "required": false
+    },
+    "http_target.header_overrides.header": {
+      "type": "block",
+      "description": "Header embodying a key and a value.",
+      "required": true
+    },
+    "http_target.header_overrides.header.key": {
+      "description": "The Key of the header.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_target.header_overrides.header.value": {
+      "description": "The Value of the header.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_target.oauth_token": {
+      "type": "block",
+      "description": "If specified, an OAuth token is generated and attached as the Authorization header in the HTTP request.\n\nThis type of authorization should generally be used only when calling Google APIs hosted on *.googleapis.com.\nNote that both the service account email and the scope MUST be specified when using the queue-level authorization override.",
+      "required": false
+    },
+    "http_target.oauth_token.scope": {
+      "description": "OAuth scope to be used for generating OAuth access token.\nIf not specified, \"https://www.googleapis.com/auth/cloud-platform\" will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_target.oauth_token.service_account_email": {
+      "description": "Service account email to be used for generating OAuth token.\nThe service account must be within the same project as the queue.\nThe caller must have iam.serviceAccounts.actAs permission for the service account.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_target.oidc_token": {
+      "type": "block",
+      "description": "If specified, an OIDC token is generated and attached as an Authorization header in the HTTP request.\n\nThis type of authorization can be used for many scenarios, including calling Cloud Run, or endpoints where you intend to validate the token yourself.\nNote that both the service account email and the audience MUST be specified when using the queue-level authorization override.",
+      "required": false
+    },
+    "http_target.oidc_token.audience": {
+      "description": "Audience to be used when generating OIDC token. If not specified, the URI specified in target will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_target.oidc_token.service_account_email": {
+      "description": "Service account email to be used for generating OIDC token.\nThe service account must be within the same project as the queue.\nThe caller must have iam.serviceAccounts.actAs permission for the service account.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_target.uri_override": {
+      "type": "block",
+      "description": "URI override.\n\nWhen specified, overrides the execution URI for all the tasks in the queue.",
+      "required": false
+    },
+    "http_target.uri_override.host": {
+      "description": "Host override.\n\nWhen specified, replaces the host part of the task URL.\nFor example, if the task URL is \"https://www.google.com\", and host value\nis set to \"example.net\", the overridden URI will be changed to \"https://example.net\".\nHost value cannot be an empty string (INVALID_ARGUMENT).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_target.uri_override.port": {
+      "description": "Port override.\n\nWhen specified, replaces the port part of the task URI.\nFor instance, for a URI http://www.google.com/foo and port=123, the overridden URI becomes http://www.google.com:123/foo.\nNote that the port value must be a positive integer.\nSetting the port to 0 (Zero) clears the URI port.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_target.uri_override.scheme": {
+      "description": "Scheme override.\n\nWhen specified, the task URI scheme is replaced by the provided value (HTTP or HTTPS). Possible values: [\"HTTP\", \"HTTPS\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_target.uri_override.uri_override_enforce_mode": {
+      "description": "URI Override Enforce Mode\n\nWhen specified, determines the Target UriOverride mode. If not specified, it defaults to ALWAYS. Possible values: [\"ALWAYS\", \"IF_NOT_EXISTS\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_target.uri_override.path_override": {
+      "type": "block",
+      "description": "URI path.\n\nWhen specified, replaces the existing path of the task URL.\nSetting the path value to an empty string clears the URI path segment.",
+      "required": false
+    },
+    "http_target.uri_override.path_override.path": {
+      "description": "The URI path (e.g., /users/1234). Default is an empty string.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "http_target.uri_override.query_override": {
+      "type": "block",
+      "description": "URI query.\n\nWhen specified, replaces the query part of the task URI. Setting the query value to an empty string clears the URI query segment.",
+      "required": false
+    },
+    "http_target.uri_override.query_override.query_params": {
+      "description": "The query parameters (e.g., qparam1=123&qparam2=456). Default is an empty string.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rate_limits": {
+      "type": "block",
+      "description": "Rate limits for task dispatches.\n\nThe queue's actual dispatch rate is the result of:\n\n* Number of tasks in the queue\n* User-specified throttling: rateLimits, retryConfig, and the queue's state.\n* System throttling due to 429 (Too Many Requests) or 503 (Service\n  Unavailable) responses from the worker, high error rates, or to\n  smooth sudden large traffic spikes.",
+      "required": false
+    },
+    "rate_limits.max_concurrent_dispatches": {
+      "description": "The maximum number of concurrent tasks that Cloud Tasks allows to\nbe dispatched for this queue. After this threshold has been\nreached, Cloud Tasks stops dispatching tasks until the number of\nconcurrent requests decreases.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rate_limits.max_dispatches_per_second": {
+      "description": "The maximum rate at which tasks are dispatched from this queue.\n\nIf unspecified when the queue is created, Cloud Tasks will pick the default.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "retry_config": {
+      "type": "block",
+      "description": "Settings that determine the retry behavior.",
+      "required": false
+    },
+    "retry_config.max_attempts": {
+      "description": "Number of attempts per task.\n\nCloud Tasks will attempt the task maxAttempts times (that is, if\nthe first attempt fails, then there will be maxAttempts - 1\nretries). Must be >= -1.\n\nIf unspecified when the queue is created, Cloud Tasks will pick\nthe default.\n\n-1 indicates unlimited attempts.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "retry_config.max_backoff": {
+      "description": "A task will be scheduled for retry between minBackoff and\nmaxBackoff duration after it fails, if the queue's RetryConfig\nspecifies that the task should be retried.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "retry_config.max_doublings": {
+      "description": "The time between retries will double maxDoublings times.\n\nA task's retry interval starts at minBackoff, then doubles maxDoublings times,\nthen increases linearly, and finally retries retries at intervals of maxBackoff\nup to maxAttempts times.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "retry_config.max_retry_duration": {
+      "description": "If positive, maxRetryDuration specifies the time limit for\nretrying a failed task, measured from when the task was first\nattempted. Once maxRetryDuration time has passed and the task has\nbeen attempted maxAttempts times, no further attempts will be\nmade and the task will be deleted.\n\nIf zero, then the task age is unlimited.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "retry_config.min_backoff": {
+      "description": "A task will be scheduled for retry between minBackoff and\nmaxBackoff duration after it fails, if the queue's RetryConfig\nspecifies that the task should be retried.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "stackdriver_logging_config": {
+      "type": "block",
+      "description": "Configuration options for writing logs to Stackdriver Logging.",
+      "required": false
+    },
+    "stackdriver_logging_config.sampling_ratio": {
+      "description": "Specifies the fraction of operations to write to Stackdriver Logging.\nThis field may contain any value between 0.0 and 1.0, inclusive. 0.0 is the\ndefault and means that no operations are logged.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

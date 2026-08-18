@@ -1,0 +1,98 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "The human-readable name of the playbook, unique within an agent.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "goal": {
+      "description": "High level description of the goal the playbook intend to accomplish. A goal should be concise since it's visible to other playbooks that may reference this playbook.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "parent": {
+      "description": "The agent to create a Playbook for.\nFormat: projects/<Project ID>/locations/<Location ID>/agents/<Agent ID>.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "playbook_type": {
+      "description": "Type of the playbook. Possible values: [\"PLAYBOOK_TYPE_UNSPECIFIED\", \"TASK\", \"ROUTINE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "referenced_tools": {
+      "description": "The resource name of tools referenced by the current playbook in the instructions. If not provided explicitly, they are will be implied using the tool being referenced in goal and steps.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "instruction": {
+      "type": "block",
+      "description": "Instruction to accomplish target goal.",
+      "required": false
+    },
+    "instruction.guidelines": {
+      "description": "General guidelines for the playbook. These are unstructured instructions that are not directly part of the goal, e.g. \"Always be polite\". It's valid for this text to be long and used instead of steps altogether.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "instruction.steps": {
+      "type": "block",
+      "description": "Ordered list of step by step execution instructions to accomplish target goal.",
+      "required": false
+    },
+    "instruction.steps.steps": {
+      "description": "Sub-processing needed to execute the current step.\n\nThis field uses JSON data as a string. The value provided must be a valid JSON representation documented in [Step](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/projects.locations.agents.playbooks#step).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "instruction.steps.text": {
+      "description": "Step instruction in text format.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "llm_model_settings": {
+      "type": "block",
+      "description": "Llm model settings for the playbook.",
+      "required": false
+    },
+    "llm_model_settings.model": {
+      "description": "The selected LLM model.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "llm_model_settings.prompt_text": {
+      "description": "The custom prompt to use.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

@@ -1,0 +1,351 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "avatar_uri": {
+      "description": "The URI of the agent's avatar. Avatars are used throughout the Dialogflow console and in the self-hosted Web Demo integration.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "default_language_code": {
+      "description": "The default language of the agent as a language tag. [See Language Support](https://cloud.google.com/dialogflow/cx/docs/reference/language)\nfor a list of the currently supported language codes. This field cannot be updated after creation.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "delete_chat_engine_on_destroy": {
+      "description": "If set to 'true', Terraform will delete the chat engine associated with the agent when the agent is destroyed.\nOtherwise, the chat engine will persist.\n\nThis virtual field addresses a critical dependency chain: 'agent' -> 'engine' -> 'data store'. The chat engine is automatically\nprovisioned when a data store is linked to the agent, meaning Terraform doesn't have direct control over its lifecycle as a managed\nresource. This creates a problem when both the agent and data store are managed by Terraform and need to be destroyed. Without\ndelete_chat_engine_on_destroy set to true, the data store's deletion would fail because the unmanaged chat engine would still be\nusing it. This setting ensures that the entire dependency chain can be properly torn down.\nSee 'mmv1/templates/terraform/examples/dialogflowcx_tool_data_store.tf.tmpl' as an example.\n\nData store can be linked to an agent through the 'knowledgeConnectorSettings' field of a [flow](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/projects.locations.agents.flows#resource:-flow)\nor a [page](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/projects.locations.agents.flows.pages#resource:-page)\nor the 'dataStoreSpec' field of a [tool](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/projects.locations.agents.tools#resource:-tool).\nThe ID of the implicitly created engine is stored in the 'genAppBuilderSettings' field of the [agent](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/projects.locations.agents#resource:-agent).",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "The description of this agent. The maximum length is 500 characters. If exceeded, the request is rejected.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "The human-readable name of the agent, unique within the location.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "enable_multi_language_training": {
+      "description": "Enable training multi-lingual models for this agent. These models will be trained on all the languages supported by the agent.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "enable_spell_correction": {
+      "description": "Indicates if automatic spell correction is enabled in detect intent requests.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "enable_stackdriver_logging": {
+      "description": "Determines whether this agent should log conversation queries.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The name of the location this agent is located in.\n\n~> **Note:** The first time you are deploying an Agent in your project you must configure location settings.\n This is a one time step but at the moment you can only [configure location settings](https://cloud.google.com/dialogflow/cx/docs/concept/region#location-settings) via the Dialogflow CX console.\n Another options is to use global location so you don't need to manually configure location settings.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "locked": {
+      "description": "Indicates whether the agent is locked for changes. If the agent is locked, modifications to the agent will be rejected except for [agents.restore][].",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "security_settings": {
+      "description": "Name of the SecuritySettings reference for the agent. Format: projects/<Project ID>/locations/<Location ID>/securitySettings/<Security Settings ID>.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "start_playbook": {
+      "description": "Name of the start playbook in this agent. A start playbook will be automatically created when the agent is created, and can only be deleted by deleting the agent. Format: **projects/<ProjectID>/locations/<LocationID>/agents/<AgentID>/playbooks/<PlaybookID>**. Currently only the default playbook with id \"00000000-0000-0000-0000-000000000000\" is allowed.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "supported_language_codes": {
+      "description": "The list of all languages supported by this agent (except for the default_language_code).",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "time_zone": {
+      "description": "The time zone of this agent from the [time zone database](https://www.iana.org/time-zones), e.g., America/New_York,\nEurope/Paris.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "advanced_settings": {
+      "type": "block",
+      "description": "Hierarchical advanced settings for this agent. The settings exposed at the lower level overrides the settings exposed at the higher level.\nHierarchy: Agent->Flow->Page->Fulfillment/Parameter.",
+      "required": false
+    },
+    "advanced_settings.audio_export_gcs_destination": {
+      "type": "block",
+      "description": "If present, incoming audio is exported by Dialogflow to the configured Google Cloud Storage destination. Exposed at the following levels:\n* Agent level\n* Flow level",
+      "required": false
+    },
+    "advanced_settings.audio_export_gcs_destination.uri": {
+      "description": "The Google Cloud Storage URI for the exported objects. Whether a full object name, or just a prefix, its usage depends on the Dialogflow operation.\nFormat: gs://bucket/object-name-or-prefix",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "advanced_settings.dtmf_settings": {
+      "type": "block",
+      "description": "Define behaviors for DTMF (dual tone multi frequency). DTMF settings does not override each other. DTMF settings set at different levels define DTMF detections running in parallel. Exposed at the following levels:\n* Agent level\n* Flow level\n* Page level\n* Parameter level",
+      "required": false
+    },
+    "advanced_settings.dtmf_settings.enabled": {
+      "description": "If true, incoming audio is processed for DTMF (dual tone multi frequency) events. For example, if the caller presses a button on their telephone keypad and DTMF processing is enabled, Dialogflow will detect the event (e.g. a \"3\" was pressed) in the incoming audio and pass the event to the bot to drive business logic (e.g. when 3 is pressed, return the account balance).",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "advanced_settings.dtmf_settings.finish_digit": {
+      "description": "The digit that terminates a DTMF digit sequence.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "advanced_settings.dtmf_settings.max_digits": {
+      "description": "Max length of DTMF digits.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "advanced_settings.logging_settings": {
+      "type": "block",
+      "description": "Settings for logging. Settings for Dialogflow History, Contact Center messages, StackDriver logs, and speech logging. Exposed at the following levels:\n* Agent level",
+      "required": false
+    },
+    "advanced_settings.logging_settings.enable_consent_based_redaction": {
+      "description": "Enables consent-based end-user input redaction, if true, a pre-defined session parameter **$session.params.conversation-redaction** will be used to determine if the utterance should be redacted.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "advanced_settings.logging_settings.enable_interaction_logging": {
+      "description": "Enables DF Interaction logging.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "advanced_settings.logging_settings.enable_stackdriver_logging": {
+      "description": "Enables Google Cloud Logging.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "advanced_settings.speech_settings": {
+      "type": "block",
+      "description": "Settings for speech to text detection. Exposed at the following levels:\n* Agent level\n* Flow level\n* Page level\n* Parameter level",
+      "required": false
+    },
+    "advanced_settings.speech_settings.endpointer_sensitivity": {
+      "description": "Sensitivity of the speech model that detects the end of speech. Scale from 0 to 100.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "advanced_settings.speech_settings.models": {
+      "description": "Mapping from language to Speech-to-Text model. The mapped Speech-to-Text model will be selected for requests from its corresponding language. For more information, see [Speech models](https://cloud.google.com/dialogflow/cx/docs/concept/speech-models).\nAn object containing a list of **\"key\": value** pairs. Example: **{ \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }**.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "advanced_settings.speech_settings.no_speech_timeout": {
+      "description": "Timeout before detecting no speech.\nA duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.5s\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "advanced_settings.speech_settings.use_timeout_based_endpointing": {
+      "description": "Use timeout based endpointing, interpreting endpointer sensitivity as seconds of timeout value.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "answer_feedback_settings": {
+      "type": "block",
+      "description": "Answer feedback collection settings.",
+      "required": false
+    },
+    "answer_feedback_settings.enable_answer_feedback": {
+      "description": "If enabled, end users will be able to provide [answer feedback](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/projects.locations.agents.sessions/submitAnswerFeedback#body.AnswerFeedback)\nto Dialogflow responses. Feature works only if interaction logging is enabled in the Dialogflow agent.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_certificate_settings": {
+      "type": "block",
+      "description": "Settings for custom client certificates.",
+      "required": false
+    },
+    "client_certificate_settings.passphrase": {
+      "description": "The name of the SecretManager secret version resource storing the passphrase. 'passphrase' should be left unset if the private key is not encrypted. Format: **projects/{project}/secrets/{secret}/versions/{version}**",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_certificate_settings.private_key": {
+      "description": "The name of the SecretManager secret version resource storing the private key encoded in PEM format. Format: **projects/{project}/secrets/{secret}/versions/{version}**",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "client_certificate_settings.ssl_certificate": {
+      "description": "The ssl certificate encoded in PEM format. This string must include the begin header and end footer lines.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "gen_app_builder_settings": {
+      "type": "block",
+      "description": "Gen App Builder-related agent-level settings.",
+      "required": false
+    },
+    "gen_app_builder_settings.engine": {
+      "description": "The full name of the Gen App Builder engine related to this agent if there is one.\nFormat: projects/{Project ID}/locations/{Location ID}/collections/{Collection ID}/engines/{Engine ID}",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "git_integration_settings": {
+      "type": "block",
+      "description": "Git integration settings for this agent.",
+      "required": false
+    },
+    "git_integration_settings.github_settings": {
+      "type": "block",
+      "description": "Settings of integration with GitHub.",
+      "required": false
+    },
+    "git_integration_settings.github_settings.access_token": {
+      "description": "The access token used to authenticate the access to the GitHub repository.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "git_integration_settings.github_settings.branches": {
+      "description": "A list of branches configured to be used from Dialogflow.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "git_integration_settings.github_settings.display_name": {
+      "description": "The unique repository display name for the GitHub repository.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "git_integration_settings.github_settings.repository_uri": {
+      "description": "The GitHub repository URI related to the agent.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "git_integration_settings.github_settings.tracking_branch": {
+      "description": "The branch of the GitHub repository tracked for this agent.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "personalization_settings": {
+      "type": "block",
+      "description": "Settings for end user personalization.",
+      "required": false
+    },
+    "personalization_settings.default_end_user_metadata": {
+      "description": "Default end user metadata, used when processing DetectIntent requests. Recommended to be filled as a template instead of hard-coded value, for example { \"age\": \"$session.params.age\" }.\nThe data will be merged with the [QueryParameters.end_user_metadata](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/QueryParameters#FIELDS.end_user_metadata)\nin [DetectIntentRequest.query_params](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/projects.locations.agents.sessions/detectIntent#body.request_body.FIELDS.query_params) during query processing.\n\nThis field uses JSON data as a string. The value provided must be a valid JSON representation documented in [Struct](https://protobuf.dev/reference/protobuf/google.protobuf/#struct).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "speech_to_text_settings": {
+      "type": "block",
+      "description": "Settings related to speech recognition.",
+      "required": false
+    },
+    "speech_to_text_settings.enable_speech_adaptation": {
+      "description": "Whether to use speech adaptation for speech recognition.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "text_to_speech_settings": {
+      "type": "block",
+      "description": "Settings related to speech synthesizing.",
+      "required": false
+    },
+    "text_to_speech_settings.synthesize_speech_configs": {
+      "description": "Configuration of how speech should be synthesized, mapping from [language](https://cloud.google.com/dialogflow/cx/docs/reference/language) to [SynthesizeSpeechConfig](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/projects.locations.agents#synthesizespeechconfig).\nThese settings affect:\n* The phone gateway synthesize configuration set via Agent.text_to_speech_settings.\n* How speech is synthesized when invoking session APIs. 'Agent.text_to_speech_settings' only applies if 'OutputAudioConfig.synthesize_speech_config' is not specified.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

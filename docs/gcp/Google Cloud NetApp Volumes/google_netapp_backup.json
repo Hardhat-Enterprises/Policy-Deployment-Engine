@@ -1,0 +1,95 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "A description of the backup with 2048 characters or less. Requests with longer descriptions will be rejected.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "Labels as key value pairs. Example: '{ \"owner\": \"Bob\", \"department\": \"finance\", \"purpose\": \"testing\" }'.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "Location of the backup.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "name": {
+      "description": "The resource name of the backup. Needs to be unique per location.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_snapshot": {
+      "description": "If specified, backup will be created from the given snapshot. If not specified,\nthere will be a new snapshot taken to initiate the backup creation.\nFormat: 'projects/{{projectId}}/locations/{{location}}/volumes/{{volumename}}/snapshots/{{snapshotname}}''",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "source_volume": {
+      "description": "ID of volumes this backup belongs to. Format: 'projects/{{projects_id}}/locations/{{location}}/volumes/{{name}}''",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Resource ID (projects/.../volumes/...) of the volume this backup belongs to. It is a reference to another resource; we do not constrain the names of resources a resource merely points at, and any 'approved volume/project' enforcement would require hardcoding specific identifiers."
+    },
+    "vault_name": {
+      "description": "Name of the backup vault to store the backup in.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Name reference to the backup vault that stores the backup. This is a pointer to another resource; the vault's own IAM/retention is governed on the vault resource, and requiring a specific 'approved' vault name would hardcode an identifier we cannot know generically."
+    },
+    "ontap_source": {
+      "type": "block",
+      "description": "Details of the ONTAP source volume and snapshot.",
+      "required": false
+    },
+    "ontap_source.snapshot_uuid": {
+      "description": "The UUID of the ONTAP source snapshot.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "ontap_source.storage_pool": {
+      "description": "Name of the storage pool. This must be specified for creating backups for ONTAP mode volumes.\nFormat: 'projects/{{project}}/locations/{{location}}/storagePools/{{storage_pool_id}}'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "ontap_source.volume_uuid": {
+      "description": "The UUID of the ONTAP source volume.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

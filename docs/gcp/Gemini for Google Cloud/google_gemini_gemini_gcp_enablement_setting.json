@@ -1,0 +1,62 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "disable_web_grounding": {
+      "description": "Whether web grounding should be disabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "Deprecated toggle for disabling web grounding; it has been superseded by web_grounding_type, so it is not a useful policy target (the equivalent control is enforced on web_grounding_type instead)."
+    },
+    "enable_customer_data_sharing": {
+      "description": "Whether customer data sharing should be enabled.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Controls a config that enables organisational data to be shared with Google, which involves data security and governance"
+    },
+    "gemini_gcp_enablement_setting_id": {
+      "description": "Id of the Gemini Gcp Enablement setting.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "ID, not security related."
+    },
+    "labels": {
+      "description": "Labels as key value pairs.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Not security-related."
+    },
+    "location": {
+      "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Affects resource grouping. Not security-related."
+    },
+    "web_grounding_type": {
+      "description": "Web grounding type.\nPossible values:\nGROUNDING_WITH_GOOGLE_SEARCH\nWEB_GROUNDING_FOR_ENTERPRISE",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "WEB_GROUNDING_FOR_ENTERPRISE is more secure as it is designed for high data security enterprises."
+    }
+  }
+}

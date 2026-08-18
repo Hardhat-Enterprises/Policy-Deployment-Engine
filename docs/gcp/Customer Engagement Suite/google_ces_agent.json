@@ -1,0 +1,329 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "agent_id": {
+      "description": "The ID to use for the agent, which will become the final component of\nthe agent's resource name. If not provided, a unique ID will be\nautomatically assigned for the agent.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "app": {
+      "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "child_agents": {
+      "description": "List of child agents in the agent tree.\nFormat: 'projects/{project}/locations/{location}/apps/{app}/agents/{agent}'",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "Human-readable description of the agent.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "Display name of the agent.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "guardrails": {
+      "description": "List of guardrails for the agent.\nFormat:\n'projects/{project}/locations/{location}/apps/{app}/guardrails/{guardrail}'",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "instruction": {
+      "description": "Instructions for the LLM model to guide the agent's behavior.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "tools": {
+      "description": "List of available tools for the agent.\nFormat: 'projects/{project}/locations/{location}/apps/{app}/tools/{tool}'",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "after_agent_callbacks": {
+      "type": "block",
+      "description": "The callbacks to execute after the agent is called.\nThe provided callbacks are executed sequentially in the exact order they\nare given in the list. If a callback returns an overridden response,\nexecution stops and any remaining callbacks are skipped.",
+      "required": false
+    },
+    "after_agent_callbacks.description": {
+      "description": "Human-readable description of the callback.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "after_agent_callbacks.disabled": {
+      "description": "Whether the callback is disabled. Disabled callbacks are ignored by the\nagent.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "after_agent_callbacks.python_code": {
+      "description": "The python code to execute for the callback.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "after_model_callbacks": {
+      "type": "block",
+      "description": "The callbacks to execute after the model is called. If there are multiple\ncalls to the model, the callback will be executed multiple times.\nThe provided callbacks are executed sequentially in the exact order they\nare given in the list. If a callback returns an overridden response,\nexecution stops and any remaining callbacks are skipped.",
+      "required": false
+    },
+    "after_model_callbacks.description": {
+      "description": "Human-readable description of the callback.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "after_model_callbacks.disabled": {
+      "description": "Whether the callback is disabled. Disabled callbacks are ignored by the\nagent.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "after_model_callbacks.python_code": {
+      "description": "The python code to execute for the callback.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "after_tool_callbacks": {
+      "type": "block",
+      "description": "The callbacks to execute after the tool is invoked. If there are multiple\ntool invocations, the callback will be executed multiple times.\nThe provided callbacks are executed sequentially in the exact order they\nare given in the list. If a callback returns an overridden response,\nexecution stops and any remaining callbacks are skipped.",
+      "required": false
+    },
+    "after_tool_callbacks.description": {
+      "description": "Human-readable description of the callback.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "after_tool_callbacks.disabled": {
+      "description": "Whether the callback is disabled. Disabled callbacks are ignored by the\nagent.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "after_tool_callbacks.python_code": {
+      "description": "The python code to execute for the callback.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "before_agent_callbacks": {
+      "type": "block",
+      "description": "The callbacks to execute before the agent is called.\nThe provided callbacks are executed sequentially in the exact order they\nare given in the list. If a callback returns an overridden response,\nexecution stops and any remaining callbacks are skipped.",
+      "required": false
+    },
+    "before_agent_callbacks.description": {
+      "description": "Human-readable description of the callback.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "before_agent_callbacks.disabled": {
+      "description": "Whether the callback is disabled. Disabled callbacks are ignored by the\nagent.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "before_agent_callbacks.python_code": {
+      "description": "The python code to execute for the callback.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "before_model_callbacks": {
+      "type": "block",
+      "description": "The callbacks to execute before the model is called. If there are multiple\ncalls to the model, the callback will be executed multiple times.\nThe provided callbacks are executed sequentially in the exact order they\nare given in the list. If a callback returns an overridden response,\nexecution stops and any remaining callbacks are skipped.",
+      "required": false
+    },
+    "before_model_callbacks.description": {
+      "description": "Human-readable description of the callback.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "before_model_callbacks.disabled": {
+      "description": "Whether the callback is disabled. Disabled callbacks are ignored by the\nagent.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "before_model_callbacks.python_code": {
+      "description": "The python code to execute for the callback.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "before_tool_callbacks": {
+      "type": "block",
+      "description": "The callbacks to execute before the tool is invoked. If there are multiple\ntool invocations, the callback will be executed multiple times.\nThe provided callbacks are executed sequentially in the exact order they\nare given in the list. If a callback returns an overridden response,\nexecution stops and any remaining callbacks are skipped.",
+      "required": false
+    },
+    "before_tool_callbacks.description": {
+      "description": "Human-readable description of the callback.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "before_tool_callbacks.disabled": {
+      "description": "Whether the callback is disabled. Disabled callbacks are ignored by the\nagent.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "before_tool_callbacks.python_code": {
+      "description": "The python code to execute for the callback.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "llm_agent": {
+      "type": "block",
+      "description": "Default agent type. The agent uses instructions and callbacks specified in\nthe agent to perform the task using a large language model.",
+      "required": false
+    },
+    "model_settings": {
+      "type": "block",
+      "description": "Model settings contains various configurations for the LLM model.",
+      "required": false
+    },
+    "model_settings.model": {
+      "description": "The LLM model that the agent should use.\nIf not set, the agent will inherit the model from its parent agent.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "model_settings.temperature": {
+      "description": "If set, this temperature will be used for the LLM model. Temperature\ncontrols the randomness of the model's responses. Lower temperatures\nproduce responses that are more predictable. Higher temperatures produce\nresponses that are more creative.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "remote_dialogflow_agent": {
+      "type": "block",
+      "description": "The agent which will transfer execution to an existing remote\n[Dialogflow](https://cloud.google.com/dialogflow/cx/docs/concept/console-conversational-agents)\nagent flow. The corresponding Dialogflow agent will process subsequent user\nqueries until the session ends or flow ends and the control is transferred\nback to the parent CES agent.",
+      "required": false
+    },
+    "remote_dialogflow_agent.agent": {
+      "description": "The\n[Dialogflow](https://cloud.google.com/dialogflow/cx/docs/concept/console-conversational-agents\nagent resource name.\nFormat: 'projects/{project}/locations/{location}/agents/{agent}'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "remote_dialogflow_agent.environment_id": {
+      "description": "The environment ID of the Dialogflow agent be used for the agent\nexecution. If not specified, the draft environment will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "remote_dialogflow_agent.flow_id": {
+      "description": "The flow ID of the flow in the Dialogflow agent.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "remote_dialogflow_agent.input_variable_mapping": {
+      "description": "The mapping of the app variables names to the Dialogflow session\nparameters names to be sent to the Dialogflow agent as input.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "remote_dialogflow_agent.output_variable_mapping": {
+      "description": "The mapping of the Dialogflow session parameters names to the app\nvariables names to be sent back to the CES agent after the Dialogflow\nagent execution ends.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "remote_dialogflow_agent.respect_response_interruption_settings": {
+      "description": "Indicates whether to respect the message-level interruption settings configured in the Dialogflow agent. * If false: all response messages from the Dialogflow agent follow the app-level barge-in settings. * If true: only response messages with ['allow_playback_interruption'](https://docs.cloud.google.com/dialogflow/cx/docs/reference/rpc/google.cloud.dialogflow.cx.v3#text) set to true will be interruptable, all other messages follow the app-level barge-in settings.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "toolsets": {
+      "type": "block",
+      "description": "List of toolsets for the agent.",
+      "required": false
+    },
+    "toolsets.tool_ids": {
+      "description": "The tools IDs to filter the toolset.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "toolsets.toolset": {
+      "description": "The resource name of the toolset.\nFormat:\n'projects/{project}/locations/{location}/apps/{app}/toolsets/{toolset}'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

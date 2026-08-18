@@ -1,0 +1,434 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "cleanup_policy_dry_run": {
+      "description": "If true, the cleanup pipeline is prevented from deleting versions in this\nrepository.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "The cleanup_policy_guardrails policy requires cleanup_policy_dry_run to be true."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "The user-provided description of the repository.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is descriptive metadata only and does not affect access control, encryption, scanning, retention, or upstream trust."
+    },
+    "format": {
+      "description": "The format of packages that are stored in the repository. Supported formats\ncan be found [here](https://cloud.google.com/artifact-registry/docs/supported-formats).\nYou can only create alpha formats if you are a member of the\n[alpha user group](https://cloud.google.com/artifact-registry/docs/supported-formats#alpha-access).",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This only defines the package type stored in the repository; security controls such as encryption, IAM, scanning, and upstream validation are handled by separate attributes."
+    },
+    "kms_key_name": {
+      "description": "The Cloud KMS resource name of the customer managed encryption key that’s\nused to encrypt the contents of the Repository. Has the form:\n'projects/my-project/locations/my-region/keyRings/my-kr/cryptoKeys/my-key'.\nThis value may not be changed after the Repository has been created.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Sets the CMEK used to encrypt the repository. A policy should require it to be non-empty so artifacts are always customer-managed-key encrypted; it must not pin a specific project/location/key, since keys are team/project-specific."
+    },
+    "labels": {
+      "description": "Labels with user-defined metadata.\nThis field may contain up to 64 entries. Label keys and values may be no\nlonger than 63 characters. Label keys must begin with a lowercase letter\nand may only contain lowercase letters, numeric characters, underscores,\nand dashes.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Labels are user-defined metadata for organization and filtering; they do not directly change repository permissions or security behaviour."
+    },
+    "location": {
+      "description": "The name of the repository's location. In addition to specific regions,\nspecial values for multi-region locations are 'asia', 'europe', and 'us'.\nSee [here](https://cloud.google.com/artifact-registry/docs/repositories/repo-locations),\nor use the\n[google_artifact_registry_locations](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/artifact_registry_locations)\ndata source for possible values.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "mode": {
+      "description": "The mode configures the repository to serve artifacts from different sources. Default value: \"STANDARD_REPOSITORY\" Possible values: [\"STANDARD_REPOSITORY\", \"VIRTUAL_REPOSITORY\", \"REMOTE_REPOSITORY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This controls the source of artifacts for the repository, but security controls such as encryption, IAM, scanning, and upstream validation are handled by separate attributes."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This identifies the parent project/provider context only; the security behaviour is controlled by the specific IAM, location, encryption, and policy attributes."
+    },
+    "repository_id": {
+      "description": "The last part of the repository name, for example:\n\"repo1\"",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is only the repository identifier/name segment and does not grant access, change encryption, or alter artifact handling by itself."
+    },
+    "cleanup_policies": {
+      "type": "block",
+      "description": "Cleanup policies for this repository. Cleanup policies indicate when\ncertain package versions can be automatically deleted.\nMap keys are policy IDs supplied by users during policy creation. They must\nunique within a repository and be under 128 characters in length.",
+      "required": false
+    },
+    "cleanup_policies.action": {
+      "description": "Policy action. Possible values: [\"DELETE\", \"KEEP\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The cleanup_policy_guardrails policy forbids DELETE rules targeting TAGGED artifacts and expects KEEP policies to retain at least 3 recent versions."
+    },
+    "cleanup_policies.id": {
+      "description": "N/A",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is only a user-defined identifier for the block and does not directly change access, encryption, scanning, or retention behaviour."
+    },
+    "cleanup_policies.condition": {
+      "type": "block",
+      "description": "Policy condition for matching versions.",
+      "required": false
+    },
+    "cleanup_policies.condition.newer_than": {
+      "description": "Match versions newer than a duration.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is only an age-based cleanup selector and does not directly remove artifacts unless combined with a cleanup action."
+    },
+    "cleanup_policies.condition.older_than": {
+      "description": "Match versions older than a duration.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is only an age-based cleanup selector and does not directly remove artifacts unless combined with a cleanup action."
+    },
+    "cleanup_policies.condition.package_name_prefixes": {
+      "description": "Match versions by package prefix. Applied on any prefix match.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "cleanup_policies.condition.tag_prefixes": {
+      "description": "Match versions by tag prefix. Applied on any prefix match.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "This is only a cleanup matching selector; by itself it does not delete, retain, or expose artifacts without the cleanup action and guardrail settings."
+    },
+    "cleanup_policies.condition.tag_state": {
+      "description": "Match versions by tag status. Default value: \"ANY\" Possible values: [\"TAGGED\", \"UNTAGGED\", \"ANY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The cleanup_policy_guardrails policy blocks DELETE cleanup rules from using tag_state = TAGGED."
+    },
+    "cleanup_policies.condition.version_name_prefixes": {
+      "description": "Match versions by version name prefix. Applied on any prefix match.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "This is only a cleanup matching selector and does not directly change access, encryption, scanning, or retention by itself."
+    },
+    "cleanup_policies.most_recent_versions": {
+      "type": "block",
+      "description": "Policy condition for retaining a minimum number of versions. May only be\nspecified with a Keep action.",
+      "required": false
+    },
+    "cleanup_policies.most_recent_versions.keep_count": {
+      "description": "Minimum number of versions to keep.",
+      "required": false,
+      "type": "number",
+      "security_impact": true,
+      "rationale": "The cleanup_policy_guardrails policy enforces a keep_count range of 3 to 100 for the checked KEEP policy."
+    },
+    "cleanup_policies.most_recent_versions.package_name_prefixes": {
+      "description": "Match versions by package prefix. Applied on any prefix match.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "docker_config": {
+      "type": "block",
+      "description": "Docker repository config contains repository level configuration for the repositories of docker type.",
+      "required": false
+    },
+    "docker_config.immutable_tags": {
+      "description": "The repository which enabled this flag prevents all tags from being modified, moved or deleted. This does not prevent tags from being created.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "The docker_immutable_tags policy requires immutable_tags = true when format is DOCKER."
+    },
+    "maven_config": {
+      "type": "block",
+      "description": "MavenRepositoryConfig is maven related repository details.\nProvides additional configuration details for repositories of the maven\nformat type.",
+      "required": false
+    },
+    "maven_config.allow_snapshot_overwrites": {
+      "description": "The repository with this flag will allow publishing the same\nsnapshot versions.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "The maven_snapshot_overwrite_disallowed policy blocks allow_snapshot_overwrites = true when format is MAVEN."
+    },
+    "maven_config.version_policy": {
+      "description": "Version policy defines the versions that the registry will accept. Default value: \"VERSION_POLICY_UNSPECIFIED\" Possible values: [\"VERSION_POLICY_UNSPECIFIED\", \"RELEASE\", \"SNAPSHOT\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This only controls accepted Maven version categories and does not directly affect access control, encryption, scanning, or cleanup guardrails."
+    },
+    "remote_repository_config": {
+      "type": "block",
+      "description": "Configuration specific for a Remote Repository.",
+      "required": false
+    },
+    "remote_repository_config.description": {
+      "description": "The description of the remote source.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is descriptive metadata only and does not affect access control, encryption, scanning, retention, or upstream trust."
+    },
+    "remote_repository_config.disable_upstream_validation": {
+      "description": "If true, the remote repository upstream and upstream credentials will\nnot be validated.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "The remote_upstream_validation_required policy blocks disable_upstream_validation = true for REMOTE_REPOSITORY mode."
+    },
+    "remote_repository_config.apt_repository": {
+      "type": "block",
+      "description": "Specific settings for an Apt remote repository.",
+      "required": false
+    },
+    "remote_repository_config.apt_repository.public_repository": {
+      "type": "block",
+      "description": "One of the publicly available Apt repositories supported by Artifact Registry.",
+      "required": false
+    },
+    "remote_repository_config.apt_repository.public_repository.repository_base": {
+      "description": "A common public repository base for Apt, e.g. '\"debian/dists/stable\"' Possible values: [\"DEBIAN\", \"UBUNTU\", \"DEBIAN_SNAPSHOT\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "remote_repository_config.apt_repository.public_repository.repository_path": {
+      "description": "Specific repository from the base.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "remote_repository_config.common_repository": {
+      "type": "block",
+      "description": "Specific settings for an Artifact Registory remote repository.",
+      "required": false
+    },
+    "remote_repository_config.common_repository.uri": {
+      "description": "One of:\na. Artifact Registry Repository resource, e.g. 'projects/UPSTREAM_PROJECT_ID/locations/REGION/repositories/UPSTREAM_REPOSITORY'\nb. URI to the registry, e.g. '\"https://registry-1.docker.io\"'\nc. URI to Artifact Registry Repository, e.g. '\"https://REGION-docker.pkg.dev/UPSTREAM_PROJECT_ID/UPSTREAM_REPOSITORY\"'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "remote_repository_config.docker_repository": {
+      "type": "block",
+      "description": "Specific settings for a Docker remote repository.",
+      "required": false
+    },
+    "remote_repository_config.docker_repository.public_repository": {
+      "description": "Address of the remote repository. Possible values: [\"DOCKER_HUB\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "remote_repository_config.docker_repository.custom_repository": {
+      "type": "block",
+      "description": "[Deprecated, please use commonRepository instead] Settings for a remote repository with a custom uri.",
+      "required": false
+    },
+    "remote_repository_config.docker_repository.custom_repository.uri": {
+      "description": "Specific uri to the registry, e.g. '\"https://registry-1.docker.io\"'",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "remote_repository_config.maven_repository": {
+      "type": "block",
+      "description": "Specific settings for a Maven remote repository.",
+      "required": false
+    },
+    "remote_repository_config.maven_repository.public_repository": {
+      "description": "Address of the remote repository. Possible values: [\"MAVEN_CENTRAL\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "remote_repository_config.maven_repository.custom_repository": {
+      "type": "block",
+      "description": "[Deprecated, please use commonRepository instead] Settings for a remote repository with a custom uri.",
+      "required": false
+    },
+    "remote_repository_config.maven_repository.custom_repository.uri": {
+      "description": "Specific uri to the registry, e.g. '\"https://repo.maven.apache.org/maven2\"'",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "remote_repository_config.npm_repository": {
+      "type": "block",
+      "description": "Specific settings for an Npm remote repository.",
+      "required": false
+    },
+    "remote_repository_config.npm_repository.public_repository": {
+      "description": "Address of the remote repository. Possible values: [\"NPMJS\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "remote_repository_config.npm_repository.custom_repository": {
+      "type": "block",
+      "description": "[Deprecated, please use commonRepository instead] Settings for a remote repository with a custom uri.",
+      "required": false
+    },
+    "remote_repository_config.npm_repository.custom_repository.uri": {
+      "description": "Specific uri to the registry, e.g. '\"https://registry.npmjs.org\"'",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "remote_repository_config.python_repository": {
+      "type": "block",
+      "description": "Specific settings for a Python remote repository.",
+      "required": false
+    },
+    "remote_repository_config.python_repository.public_repository": {
+      "description": "Address of the remote repository. Possible values: [\"PYPI\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "remote_repository_config.python_repository.custom_repository": {
+      "type": "block",
+      "description": "[Deprecated, please use commonRepository instead] Settings for a remote repository with a custom uri.",
+      "required": false
+    },
+    "remote_repository_config.python_repository.custom_repository.uri": {
+      "description": "Specific uri to the registry, e.g. '\"https://pypi.io\"'",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "remote_repository_config.upstream_credentials": {
+      "type": "block",
+      "description": "The credentials used to access the remote repository.",
+      "required": false
+    },
+    "remote_repository_config.upstream_credentials.username_password_credentials": {
+      "type": "block",
+      "description": "Use username and password to access the remote repository.",
+      "required": false
+    },
+    "remote_repository_config.upstream_credentials.username_password_credentials.password_secret_version": {
+      "description": "The Secret Manager key version that holds the password to access the\nremote repository. Must be in the format of\n'projects/{project}/secrets/{secret}/versions/{version}'.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This references a Secret Manager version rather than storing a plaintext password; no current policy validates this reference directly."
+    },
+    "remote_repository_config.upstream_credentials.username_password_credentials.username": {
+      "description": "The username to access the remote repository.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This is only the username component for remote authentication and does not provide secret material or change repository access policy by itself."
+    },
+    "remote_repository_config.yum_repository": {
+      "type": "block",
+      "description": "Specific settings for an Yum remote repository.",
+      "required": false
+    },
+    "remote_repository_config.yum_repository.public_repository": {
+      "type": "block",
+      "description": "One of the publicly available Yum repositories supported by Artifact Registry.",
+      "required": false
+    },
+    "remote_repository_config.yum_repository.public_repository.repository_base": {
+      "description": "A common public repository base for Yum. Possible values: [\"CENTOS\", \"CENTOS_DEBUG\", \"CENTOS_VAULT\", \"CENTOS_STREAM\", \"ROCKY\", \"EPEL\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "remote_repository_config.yum_repository.public_repository.repository_path": {
+      "description": "Specific repository from the base, e.g. '\"pub/rocky/9/BaseOS/x86_64/os\"'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "virtual_repository_config": {
+      "type": "block",
+      "description": "Configuration specific for a Virtual Repository.",
+      "required": false
+    },
+    "virtual_repository_config.upstream_policies": {
+      "type": "block",
+      "description": "Policies that configure the upstream artifacts distributed by the Virtual\nRepository. Upstream policies cannot be set on a standard repository.",
+      "required": false
+    },
+    "virtual_repository_config.upstream_policies.id": {
+      "description": "The user-provided ID of the upstream policy.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "virtual_repository_config.upstream_policies.priority": {
+      "description": "Entries with a greater priority value take precedence in the pull order.",
+      "required": false,
+      "type": "number",
+      "security_impact": true,
+      "rationale": "The virtual_upstream_priority_range policy requires priority to stay within 1 to 100."
+    },
+    "virtual_repository_config.upstream_policies.repository": {
+      "description": "A reference to the repository resource, for example:\n\"projects/p1/locations/us-central1/repository/repo1\".",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This identifies the target repository for the IAM binding and does not itself grant permissions without the member and role configuration."
+    },
+    "vulnerability_scanning_config": {
+      "type": "block",
+      "description": "Configuration for vulnerability scanning of artifacts stored in this repository.",
+      "required": false
+    },
+    "vulnerability_scanning_config.enablement_config": {
+      "description": "This configures whether vulnerability scanning is automatically performed for artifacts pushed to this repository. Possible values: [\"INHERITED\", \"DISABLED\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The vulnerability_scanning_enabled policy requires enablement_config to resolve to INHERITED rather than DISABLED."
+    }
+  }
+}

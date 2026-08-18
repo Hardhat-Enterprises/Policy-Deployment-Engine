@@ -1,0 +1,134 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "force_destroy": {
+      "description": "If set to true, any FeatureViews and Features for this FeatureOnlineStore will also be deleted.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "The labels with user-defined metadata to organize your feature online stores.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "name": {
+      "description": "The resource name of the Feature Online Store. This value may be up to 60 characters, and valid characters are [a-z0-9_]. The first character cannot be a number.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "region": {
+      "description": "The region of feature online store. eg us-central1",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "bigtable": {
+      "type": "block",
+      "description": "Settings for Cloud Bigtable instance that will be created to serve featureValues for all FeatureViews under this FeatureOnlineStore.",
+      "required": false
+    },
+    "bigtable.enable_direct_bigtable_access": {
+      "description": "Optional. If true, enable direct access to the Bigtable instance.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "bigtable.zone": {
+      "description": "The zone where the Bigtable instance will be created.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "bigtable.auto_scaling": {
+      "type": "block",
+      "description": "Autoscaling config applied to Bigtable Instance.",
+      "required": true
+    },
+    "bigtable.auto_scaling.cpu_utilization_target": {
+      "description": "A percentage of the cluster's CPU capacity. Can be from 10% to 80%. When a cluster's CPU utilization exceeds the target that you have set, Bigtable immediately adds nodes to the cluster. When CPU utilization is substantially lower than the target, Bigtable removes nodes. If not set will default to 50%.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "bigtable.auto_scaling.max_node_count": {
+      "description": "The maximum number of nodes to scale up to. Must be greater than or equal to minNodeCount, and less than or equal to 10 times of 'minNodeCount'.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "bigtable.auto_scaling.min_node_count": {
+      "description": "The minimum number of nodes to scale down to. Must be greater than or equal to 1.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dedicated_serving_endpoint": {
+      "type": "block",
+      "description": "The dedicated serving endpoint for this FeatureOnlineStore, which is different from common vertex service endpoint. Only need to be set when you choose Optimized storage type or enable EmbeddingManagement. Will use public endpoint by default.",
+      "required": false
+    },
+    "dedicated_serving_endpoint.private_service_connect_config": {
+      "type": "block",
+      "description": "Private service connect config.",
+      "required": false
+    },
+    "dedicated_serving_endpoint.private_service_connect_config.enable_private_service_connect": {
+      "description": "If set to true, customers will use private service connection to send request. Otherwise, the connection will set to public endpoint.",
+      "required": true,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dedicated_serving_endpoint.private_service_connect_config.project_allowlist": {
+      "description": "A list of Projects from which the forwarding rule will target the service attachment.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "encryption_spec": {
+      "type": "block",
+      "description": "If set, both of the online and offline data storage will be secured by this key.",
+      "required": false
+    },
+    "encryption_spec.kms_key_name": {
+      "description": "The Cloud KMS resource identifier of the customer managed encryption key used to protect a resource. Has the form: projects/my-project/locations/my-region/keyRings/my-kr/cryptoKeys/my-key. The key needs to be in the same region as where the compute resource is created.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "optimized": {
+      "type": "block",
+      "description": "Settings for the Optimized store that will be created to serve featureValues for all FeatureViews under this FeatureOnlineStore",
+      "required": false
+    }
+  }
+}

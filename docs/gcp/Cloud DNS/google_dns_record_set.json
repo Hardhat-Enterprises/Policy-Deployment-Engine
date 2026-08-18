@@ -1,0 +1,414 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "managed_zone": {
+      "description": "The name of the zone in which this record set will reside.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "name": {
+      "description": "The DNS name this record set will apply to.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "rrdatas": {
+      "description": "The string data for the records in this record set whose meaning depends on the DNS type. For TXT record, if the string data contains spaces, add surrounding \\\" if you don't want your string to get split on spaces. To specify a single record value longer than 255 characters such as a TXT record for DKIM, add \\\"\\\" inside the Terraform configuration string (e.g. \"first255characters\\\"\\\"morecharacters\").",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "ttl": {
+      "description": "The time-to-live of this record set (seconds).",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "type": {
+      "description": "The DNS record set type.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy": {
+      "type": "block",
+      "description": "The configuration for steering traffic based on query. You can specify either Weighted Round Robin(WRR) type or Geolocation(GEO) type.",
+      "required": false
+    },
+    "routing_policy.enable_geo_fencing": {
+      "description": "Specifies whether to enable fencing for geo queries.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.health_check": {
+      "description": "Specifies the health check.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.geo": {
+      "type": "block",
+      "description": "The configuration for Geo location based routing policy.",
+      "required": false
+    },
+    "routing_policy.geo.location": {
+      "description": "The location name defined in Google Cloud.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.geo.rrdatas": {
+      "description": "N/A",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.geo.health_checked_targets": {
+      "type": "block",
+      "description": "For A and AAAA types only. The list of targets to be health checked. These can be specified along with `rrdatas` within this item.",
+      "required": false
+    },
+    "routing_policy.geo.health_checked_targets.external_endpoints": {
+      "description": "The Internet IP addresses to be health checked.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.geo.health_checked_targets.internal_load_balancers": {
+      "type": "block",
+      "description": "The list of internal load balancers to health check.",
+      "required": false
+    },
+    "routing_policy.geo.health_checked_targets.internal_load_balancers.ip_address": {
+      "description": "The frontend IP address of the load balancer.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.geo.health_checked_targets.internal_load_balancers.ip_protocol": {
+      "description": "The configured IP protocol of the load balancer. This value is case-sensitive. Possible values: [\"tcp\", \"udp\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.geo.health_checked_targets.internal_load_balancers.load_balancer_type": {
+      "description": "The type of load balancer. This value is case-sensitive. Possible values: [\"regionalL4ilb\", \"regionalL7ilb\", \"globalL7ilb\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.geo.health_checked_targets.internal_load_balancers.network_url": {
+      "description": "The fully qualified url of the network in which the load balancer belongs. This should be formatted like `https://www.googleapis.com/compute/v1/projects/{project}/global/networks/{network}`.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.geo.health_checked_targets.internal_load_balancers.port": {
+      "description": "The configured port of the load balancer.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.geo.health_checked_targets.internal_load_balancers.project": {
+      "description": "The ID of the project in which the load balancer belongs.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.geo.health_checked_targets.internal_load_balancers.region": {
+      "description": "The region of the load balancer. Only needed for regional load balancers.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.primary_backup": {
+      "type": "block",
+      "description": "The configuration for a failover policy with global to regional failover. Queries are responded to with the global primary targets, but if none of the primary targets are healthy, then we fallback to a regional failover policy.",
+      "required": false
+    },
+    "routing_policy.primary_backup.enable_geo_fencing_for_backups": {
+      "description": "Specifies whether to enable fencing for backup geo queries.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.primary_backup.trickle_ratio": {
+      "description": "Specifies the percentage of traffic to send to the backup targets even when the primary targets are healthy.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.primary_backup.backup_geo": {
+      "type": "block",
+      "description": "The backup geo targets, which provide a regional failover policy for the otherwise global primary targets.",
+      "required": true
+    },
+    "routing_policy.primary_backup.backup_geo.location": {
+      "description": "The location name defined in Google Cloud.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.primary_backup.backup_geo.rrdatas": {
+      "description": "N/A",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.primary_backup.backup_geo.health_checked_targets": {
+      "type": "block",
+      "description": "For A and AAAA types only. The list of targets to be health checked. These can be specified along with `rrdatas` within this item.",
+      "required": false
+    },
+    "routing_policy.primary_backup.backup_geo.health_checked_targets.external_endpoints": {
+      "description": "The Internet IP addresses to be health checked.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.primary_backup.backup_geo.health_checked_targets.internal_load_balancers": {
+      "type": "block",
+      "description": "The list of internal load balancers to health check.",
+      "required": false
+    },
+    "routing_policy.primary_backup.backup_geo.health_checked_targets.internal_load_balancers.ip_address": {
+      "description": "The frontend IP address of the load balancer.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.primary_backup.backup_geo.health_checked_targets.internal_load_balancers.ip_protocol": {
+      "description": "The configured IP protocol of the load balancer. This value is case-sensitive. Possible values: [\"tcp\", \"udp\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.primary_backup.backup_geo.health_checked_targets.internal_load_balancers.load_balancer_type": {
+      "description": "The type of load balancer. This value is case-sensitive. Possible values: [\"regionalL4ilb\", \"regionalL7ilb\", \"globalL7ilb\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.primary_backup.backup_geo.health_checked_targets.internal_load_balancers.network_url": {
+      "description": "The fully qualified url of the network in which the load balancer belongs. This should be formatted like `https://www.googleapis.com/compute/v1/projects/{project}/global/networks/{network}`.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.primary_backup.backup_geo.health_checked_targets.internal_load_balancers.port": {
+      "description": "The configured port of the load balancer.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.primary_backup.backup_geo.health_checked_targets.internal_load_balancers.project": {
+      "description": "The ID of the project in which the load balancer belongs.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.primary_backup.backup_geo.health_checked_targets.internal_load_balancers.region": {
+      "description": "The region of the load balancer. Only needed for regional load balancers.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.primary_backup.primary": {
+      "type": "block",
+      "description": "The list of global primary targets to be health checked.",
+      "required": true
+    },
+    "routing_policy.primary_backup.primary.external_endpoints": {
+      "description": "The Internet IP addresses to be health checked.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.primary_backup.primary.internal_load_balancers": {
+      "type": "block",
+      "description": "The list of internal load balancers to health check.",
+      "required": false
+    },
+    "routing_policy.primary_backup.primary.internal_load_balancers.ip_address": {
+      "description": "The frontend IP address of the load balancer.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.primary_backup.primary.internal_load_balancers.ip_protocol": {
+      "description": "The configured IP protocol of the load balancer. This value is case-sensitive. Possible values: [\"tcp\", \"udp\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.primary_backup.primary.internal_load_balancers.load_balancer_type": {
+      "description": "The type of load balancer. This value is case-sensitive. Possible values: [\"regionalL4ilb\", \"regionalL7ilb\", \"globalL7ilb\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.primary_backup.primary.internal_load_balancers.network_url": {
+      "description": "The fully qualified url of the network in which the load balancer belongs. This should be formatted like `https://www.googleapis.com/compute/v1/projects/{project}/global/networks/{network}`.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.primary_backup.primary.internal_load_balancers.port": {
+      "description": "The configured port of the load balancer.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.primary_backup.primary.internal_load_balancers.project": {
+      "description": "The ID of the project in which the load balancer belongs.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.primary_backup.primary.internal_load_balancers.region": {
+      "description": "The region of the load balancer. Only needed for regional load balancers.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.wrr": {
+      "type": "block",
+      "description": "The configuration for Weighted Round Robin based routing policy.",
+      "required": false
+    },
+    "routing_policy.wrr.rrdatas": {
+      "description": "N/A",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.wrr.weight": {
+      "description": "The ratio of traffic routed to the target.",
+      "required": true,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.wrr.health_checked_targets": {
+      "type": "block",
+      "description": "The list of targets to be health checked. Note that if DNSSEC is enabled for this zone, only one of `rrdatas` or `health_checked_targets` can be set.",
+      "required": false
+    },
+    "routing_policy.wrr.health_checked_targets.external_endpoints": {
+      "description": "The Internet IP addresses to be health checked.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.wrr.health_checked_targets.internal_load_balancers": {
+      "type": "block",
+      "description": "The list of internal load balancers to health check.",
+      "required": false
+    },
+    "routing_policy.wrr.health_checked_targets.internal_load_balancers.ip_address": {
+      "description": "The frontend IP address of the load balancer.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.wrr.health_checked_targets.internal_load_balancers.ip_protocol": {
+      "description": "The configured IP protocol of the load balancer. This value is case-sensitive. Possible values: [\"tcp\", \"udp\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.wrr.health_checked_targets.internal_load_balancers.load_balancer_type": {
+      "description": "The type of load balancer. This value is case-sensitive. Possible values: [\"regionalL4ilb\", \"regionalL7ilb\", \"globalL7ilb\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.wrr.health_checked_targets.internal_load_balancers.network_url": {
+      "description": "The fully qualified url of the network in which the load balancer belongs. This should be formatted like `https://www.googleapis.com/compute/v1/projects/{project}/global/networks/{network}`.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.wrr.health_checked_targets.internal_load_balancers.port": {
+      "description": "The configured port of the load balancer.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.wrr.health_checked_targets.internal_load_balancers.project": {
+      "description": "The ID of the project in which the load balancer belongs.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routing_policy.wrr.health_checked_targets.internal_load_balancers.region": {
+      "description": "The region of the load balancer. Only needed for regional load balancers.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

@@ -1,0 +1,161 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "A description of the info type.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "User set display name of the info type.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "parent": {
+      "description": "The parent of the info type in any of the following formats:\n\n* 'projects/{{project}}'\n* 'projects/{{project}}/locations/{{location}}'\n* 'organizations/{{organization_id}}'\n* 'organizations/{{organization_id}}/locations/{{location}}'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "stored_info_type_id": {
+      "description": "The storedInfoType ID can contain uppercase and lowercase letters, numbers, and hyphens;\nthat is, it must match the regular expression: [a-zA-Z\\d-_]+. The maximum length is 100\ncharacters. Can be empty to allow the system to generate one.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dictionary": {
+      "type": "block",
+      "description": "Dictionary which defines the rule.",
+      "required": false
+    },
+    "dictionary.cloud_storage_path": {
+      "type": "block",
+      "description": "Newline-delimited file of words in Cloud Storage. Only a single file is accepted.",
+      "required": false
+    },
+    "dictionary.cloud_storage_path.path": {
+      "description": "A url representing a file or path (no wildcards) in Cloud Storage. Example: 'gs://[BUCKET_NAME]/dictionary.txt'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dictionary.word_list": {
+      "type": "block",
+      "description": "List of words or phrases to search for.",
+      "required": false
+    },
+    "dictionary.word_list.words": {
+      "description": "Words or phrases defining the dictionary. The dictionary must contain at least one\nphrase and every phrase must contain at least 2 characters that are letters or digits.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "large_custom_dictionary": {
+      "type": "block",
+      "description": "Dictionary which defines the rule.",
+      "required": false
+    },
+    "large_custom_dictionary.big_query_field": {
+      "type": "block",
+      "description": "Field in a BigQuery table where each cell represents a dictionary phrase.",
+      "required": false
+    },
+    "large_custom_dictionary.big_query_field.field": {
+      "type": "block",
+      "description": "Designated field in the BigQuery table.",
+      "required": true
+    },
+    "large_custom_dictionary.big_query_field.field.name": {
+      "description": "Name describing the field.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "large_custom_dictionary.big_query_field.table": {
+      "type": "block",
+      "description": "Field in a BigQuery table where each cell represents a dictionary phrase.",
+      "required": true
+    },
+    "large_custom_dictionary.big_query_field.table.dataset_id": {
+      "description": "The dataset ID of the table.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "large_custom_dictionary.big_query_field.table.project_id": {
+      "description": "The Google Cloud Platform project ID of the project containing the table.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "large_custom_dictionary.big_query_field.table.table_id": {
+      "description": "The name of the table.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "large_custom_dictionary.cloud_storage_file_set": {
+      "type": "block",
+      "description": "Set of files containing newline-delimited lists of dictionary phrases.",
+      "required": false
+    },
+    "large_custom_dictionary.cloud_storage_file_set.url": {
+      "description": "The url, in the format 'gs://<bucket>/<path>'. Trailing wildcard in the path is allowed.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "large_custom_dictionary.output_path": {
+      "type": "block",
+      "description": "Location to store dictionary artifacts in Google Cloud Storage. These files will only be accessible by project owners and the DLP API.\nIf any of these artifacts are modified, the dictionary is considered invalid and can no longer be used.",
+      "required": true
+    },
+    "large_custom_dictionary.output_path.path": {
+      "description": "A url representing a file or path (no wildcards) in Cloud Storage. Example: 'gs://[BUCKET_NAME]/dictionary.txt'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "regex": {
+      "type": "block",
+      "description": "Regular expression which defines the rule.",
+      "required": false
+    },
+    "regex.group_indexes": {
+      "description": "The index of the submatch to extract as findings. When not specified, the entire match is returned. No more than 3 may be included.",
+      "required": false,
+      "type": "list(number)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "regex.pattern": {
+      "description": "Pattern defining the regular expression.\nIts syntax (https://github.com/google/re2/wiki/Syntax) can be found under the google/re2 repository on GitHub.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

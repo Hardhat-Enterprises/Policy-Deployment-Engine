@@ -1,0 +1,93 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "column_family": {
+      "description": "The name of the column family.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Schema/column-family label only; it scopes which cells the GC policy affects but does not grant principals access or leak key material."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Controls how Terraform abandons vs deletes the GC policy resource object; it does not grant IAM on tables or expose cell data by itself."
+    },
+    "gc_rules": {
+      "description": "Serialized JSON string for garbage collection policy. Conflicts with \"mode\", \"max_age\" and \"max_version\".",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Alternate syntax for the same GC semantics; the attribute name does not carry secrets. Risk depends on the JSON content you place here, not on choosing this field instead of blocks."
+    },
+    "ignore_warnings": {
+      "description": "Allows ignoring warnings when updating the GC policy. This can be used\n\t\t\t\tto increase the gc policy on replicated clusters. Doing this may make clusters be\n\t\t\t\tinconsistent for a longer period of time, before using this make sure you understand\n\t\t\t\tthe risks listed at https://cloud.google.com/bigtable/docs/garbage-collection#increasing",
+      "required": false,
+      "type": "bool",
+      "security_impact": false,
+      "rationale": "Not a confidentiality or IAM control: it relaxes GC consistency warnings for replicated clusters and may affect operational consistency, but it does not publish data publicly or add principals by itself."
+    },
+    "instance_name": {
+      "description": "The name of the Bigtable instance.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Instance identifier for routing the policy to the right cluster; not a secret and does not by itself widen access or weaken encryption."
+    },
+    "mode": {
+      "description": "NOTE: 'gc_rules' is more flexible, and should be preferred over this field for new resources. This field may be deprecated in the future. If multiple policies are set, you should choose between UNION OR INTERSECTION.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Controls how rule predicates are combined mathematically; it does not name principals or secrets and is not an access-control mechanism by itself."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Project ID is non-secret scope metadata for API calls; it does not replace IAM checks or expose table contents."
+    },
+    "table": {
+      "description": "The name of the table.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Table name only identifies where GC rules apply; it does not expose credentials, grant IAM, or change who can read data by itself."
+    },
+    "max_age": {
+      "type": "block",
+      "description": "NOTE: 'gc_rules' is more flexible, and should be preferred over this field for new resources. This field may be deprecated in the future. GC policy that applies to all cells older than the given age.",
+      "required": false
+    },
+    "max_age.days": {
+      "description": "Number of days before applying GC policy.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Sets the age threshold (in days) at which the garbage-collection policy deletes old cell versions. This is a data-lifecycle/retention choice teams make per table, not a security control; constraining it does not improve access control, encryption, or exposure posture (and a generic threshold would be arbitrary)."
+    },
+    "max_age.duration": {
+      "description": "Duration before applying GC policy",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Another encoding for the same retention length as `days`; whichever field is used, the sensitive governance question is the retention value, not the fact that this alternate attribute exists."
+    },
+    "max_version": {
+      "type": "block",
+      "description": "NOTE: 'gc_rules' is more flexible, and should be preferred over this field for new resources. This field may be deprecated in the future. GC policy that applies to all versions of a cell except for the most recent.",
+      "required": false
+    },
+    "max_version.number": {
+      "description": "Number of version before applying the GC policy.",
+      "required": true,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Sets how many versions of a cell the garbage-collection policy keeps before deleting older ones. This is a data-lifecycle/retention choice per table, not a security control; an enforced version count would be arbitrary and would not improve access, encryption, or exposure posture."
+    }
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "Optional. Description of the watchlist.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "Required. Display name of the watchlist.\nNote that it must be at least one character and less than 63 characters\n(https://google.aip.dev/148).",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "instance": {
+      "description": "The unique identifier for the Chronicle instance, which is the same as the customer ID.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The location of the resource. This is the geographical region where the Chronicle instance resides, such as \"us\" or \"europe-west2\".",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "multiplying_factor": {
+      "description": "Optional. Weight applied to the risk score for entities\nin this watchlist.\nThe default is 1.0 if it is not specified.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "watchlist_id": {
+      "description": "Optional. The ID to use for the watchlist,\nwhich will become the final component of the watchlist's resource name.\nThis value should be 4-63 characters, and valid characters\nare /a-z-/.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "entity_population_mechanism": {
+      "type": "block",
+      "description": "Mechanism to populate entities in the watchlist.",
+      "required": true
+    },
+    "entity_population_mechanism.manual": {
+      "type": "block",
+      "description": "Entities are added manually.",
+      "required": false
+    },
+    "watchlist_user_preferences": {
+      "type": "block",
+      "description": "A collection of user preferences for watchlist UI configuration.",
+      "required": false
+    },
+    "watchlist_user_preferences.pinned": {
+      "description": "Optional. Whether the watchlist is pinned on the dashboard.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

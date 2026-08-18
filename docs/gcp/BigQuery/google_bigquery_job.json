@@ -1,0 +1,640 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "job_id": {
+      "description": "The ID of the job. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), or dashes (-). The maximum length is 1,024 characters.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "job_timeout_ms": {
+      "description": "Job timeout in milliseconds. If this time limit is exceeded, BigQuery may attempt to terminate the job.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "labels": {
+      "description": "The labels associated with this job. You can use these to organize and group your jobs.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The geographic location of the job. The default value is US.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "copy": {
+      "type": "block",
+      "description": "Copies a table.",
+      "required": false
+    },
+    "copy.create_disposition": {
+      "description": "Specifies whether the job is allowed to create new tables. The following values are supported:\nCREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table.\nCREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result.\nCreation, truncation and append actions occur as one atomic update upon job completion Default value: \"CREATE_IF_NEEDED\" Possible values: [\"CREATE_IF_NEEDED\", \"CREATE_NEVER\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "copy.write_disposition": {
+      "description": "Specifies the action that occurs if the destination table already exists. The following values are supported:\nWRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data and uses the schema from the query result.\nWRITE_APPEND: If the table already exists, BigQuery appends the data to the table.\nWRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result.\nEach action is atomic and only occurs if BigQuery is able to complete the job successfully.\nCreation, truncation and append actions occur as one atomic update upon job completion. Default value: \"WRITE_EMPTY\" Possible values: [\"WRITE_TRUNCATE\", \"WRITE_APPEND\", \"WRITE_EMPTY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "copy.destination_encryption_configuration": {
+      "type": "block",
+      "description": "Custom encryption configuration (e.g., Cloud KMS keys)",
+      "required": false
+    },
+    "copy.destination_encryption_configuration.kms_key_name": {
+      "description": "Describes the Cloud KMS encryption key that will be used to protect destination BigQuery table.\nThe BigQuery Service Account associated with your project requires access to this encryption key.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "copy.destination_table": {
+      "type": "block",
+      "description": "The destination table.",
+      "required": false
+    },
+    "copy.destination_table.dataset_id": {
+      "description": "The ID of the dataset containing this table.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "copy.destination_table.project_id": {
+      "description": "The ID of the project containing this table.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "copy.destination_table.table_id": {
+      "description": "The table. Can be specified '{{table_id}}' if 'project_id' and 'dataset_id' are also set,\nor of the form 'projects/{{project}}/datasets/{{dataset_id}}/tables/{{table_id}}' if not.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "copy.source_tables": {
+      "type": "block",
+      "description": "Source tables to copy.",
+      "required": true
+    },
+    "copy.source_tables.dataset_id": {
+      "description": "The ID of the dataset containing this table.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "copy.source_tables.project_id": {
+      "description": "The ID of the project containing this table.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "copy.source_tables.table_id": {
+      "description": "The table. Can be specified '{{table_id}}' if 'project_id' and 'dataset_id' are also set,\nor of the form 'projects/{{project}}/datasets/{{dataset_id}}/tables/{{table_id}}' if not.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "extract": {
+      "type": "block",
+      "description": "Configures an extract job.",
+      "required": false
+    },
+    "extract.compression": {
+      "description": "The compression type to use for exported files. Possible values include GZIP, DEFLATE, SNAPPY, and NONE.\nThe default value is NONE. DEFLATE and SNAPPY are only supported for Avro.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "extract.destination_format": {
+      "description": "The exported file format. Possible values include CSV, NEWLINE_DELIMITED_JSON and AVRO for tables and SAVED_MODEL for models.\nThe default value for tables is CSV. Tables with nested or repeated fields cannot be exported as CSV.\nThe default value for models is SAVED_MODEL.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "extract.destination_uris": {
+      "description": "A list of fully-qualified Google Cloud Storage URIs where the extracted table should be written.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "extract.field_delimiter": {
+      "description": "When extracting data in CSV format, this defines the delimiter to use between fields in the exported data.\nDefault is ','",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "extract.print_header": {
+      "description": "Whether to print out a header row in the results. Default is true.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "extract.use_avro_logical_types": {
+      "description": "Whether to use logical types when extracting to AVRO format.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "extract.source_model": {
+      "type": "block",
+      "description": "A reference to the model being exported.",
+      "required": false
+    },
+    "extract.source_model.dataset_id": {
+      "description": "The ID of the dataset containing this model.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "extract.source_model.model_id": {
+      "description": "The ID of the model.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "extract.source_model.project_id": {
+      "description": "The ID of the project containing this model.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "extract.source_table": {
+      "type": "block",
+      "description": "A reference to the table being exported.",
+      "required": false
+    },
+    "extract.source_table.dataset_id": {
+      "description": "The ID of the dataset containing this table.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "extract.source_table.project_id": {
+      "description": "The ID of the project containing this table.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "extract.source_table.table_id": {
+      "description": "The table. Can be specified '{{table_id}}' if 'project_id' and 'dataset_id' are also set,\nor of the form 'projects/{{project}}/datasets/{{dataset_id}}/tables/{{table_id}}' if not.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load": {
+      "type": "block",
+      "description": "Configures a load job.",
+      "required": false
+    },
+    "load.allow_jagged_rows": {
+      "description": "Accept rows that are missing trailing optional columns. The missing values are treated as nulls.\nIf false, records with missing trailing columns are treated as bad records, and if there are too many bad records,\nan invalid error is returned in the job result. The default value is false. Only applicable to CSV, ignored for other formats.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.allow_quoted_newlines": {
+      "description": "Indicates if BigQuery should allow quoted data sections that contain newline characters in a CSV file.\nThe default value is false.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.autodetect": {
+      "description": "Indicates if we should automatically infer the options and schema for CSV and JSON sources.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.create_disposition": {
+      "description": "Specifies whether the job is allowed to create new tables. The following values are supported:\nCREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table.\nCREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result.\nCreation, truncation and append actions occur as one atomic update upon job completion Default value: \"CREATE_IF_NEEDED\" Possible values: [\"CREATE_IF_NEEDED\", \"CREATE_NEVER\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.encoding": {
+      "description": "The character encoding of the data. The supported values are UTF-8 or ISO-8859-1.\nThe default value is UTF-8. BigQuery decodes the data after the raw, binary data\nhas been split using the values of the quote and fieldDelimiter properties.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.field_delimiter": {
+      "description": "The separator for fields in a CSV file. The separator can be any ISO-8859-1 single-byte character.\nTo use a character in the range 128-255, you must encode the character as UTF8. BigQuery converts\nthe string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the\ndata in its raw, binary state. BigQuery also supports the escape sequence \"\\t\" to specify a tab separator.\nThe default value is a comma (',').",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.ignore_unknown_values": {
+      "description": "Indicates if BigQuery should allow extra values that are not represented in the table schema.\nIf true, the extra values are ignored. If false, records with extra columns are treated as bad records,\nand if there are too many bad records, an invalid error is returned in the job result.\nThe default value is false. The sourceFormat property determines what BigQuery treats as an extra value:\nCSV: Trailing columns\nJSON: Named values that don't match any column names",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.json_extension": {
+      "description": "If sourceFormat is set to newline-delimited JSON, indicates whether it should be processed as a JSON variant such as GeoJSON.\nFor a sourceFormat other than JSON, omit this field. If the sourceFormat is newline-delimited JSON: - for newline-delimited\nGeoJSON: set to GEOJSON.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.max_bad_records": {
+      "description": "The maximum number of bad records that BigQuery can ignore when running the job. If the number of bad records exceeds this value,\nan invalid error is returned in the job result. The default value is 0, which requires that all records are valid.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Sets how many malformed rows a load job may skip before failing. This is a data-quality/operational tolerance, not a security control – it does not affect access, encryption, or exposure, so a platform policy adds no security value."
+    },
+    "load.null_marker": {
+      "description": "Specifies a string that represents a null value in a CSV file. For example, if you specify \"\\N\", BigQuery interprets \"\\N\" as a null value\nwhen loading a CSV file. The default value is the empty string. If you set this property to a custom value, BigQuery throws an error if an\nempty string is present for all data types except for STRING and BYTE. For STRING and BYTE columns, BigQuery interprets the empty string as\nan empty value.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.projection_fields": {
+      "description": "If sourceFormat is set to \"DATASTORE_BACKUP\", indicates which entity properties to load into BigQuery from a Cloud Datastore backup.\nProperty names are case sensitive and must be top-level properties. If no properties are specified, BigQuery loads all properties.\nIf any named property isn't found in the Cloud Datastore backup, an invalid error is returned in the job result.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.quote": {
+      "description": "The value that is used to quote data sections in a CSV file. BigQuery converts the string to ISO-8859-1 encoding,\nand then uses the first byte of the encoded string to split the data in its raw, binary state.\nThe default value is a double-quote ('\"'). If your data does not contain quoted sections, set the property value to an empty string.\nIf your data contains quoted newline characters, you must also set the allowQuotedNewlines property to true.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.schema_update_options": {
+      "description": "Allows the schema of the destination table to be updated as a side effect of the load job if a schema is autodetected or\nsupplied in the job configuration. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND;\nwhen writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators.\nFor normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified:\nALLOW_FIELD_ADDITION: allow adding a nullable field to the schema.\nALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.skip_leading_rows": {
+      "description": "The number of rows at the top of a CSV file that BigQuery will skip when loading the data.\nThe default value is 0. This property is useful if you have header rows in the file that should be skipped.\nWhen autodetect is on, the behavior is the following:\nskipLeadingRows unspecified - Autodetect tries to detect headers in the first row. If they are not detected,\nthe row is read as data. Otherwise data is read starting from the second row.\nskipLeadingRows is 0 - Instructs autodetect that there are no headers and data should be read starting from the first row.\nskipLeadingRows = N > 0 - Autodetect skips N-1 rows and tries to detect headers in row N. If headers are not detected,\nrow N is just skipped. Otherwise row N is used to extract column names for the detected schema.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.source_format": {
+      "description": "The format of the data files. For CSV files, specify \"CSV\". For datastore backups, specify \"DATASTORE_BACKUP\".\nFor newline-delimited JSON, specify \"NEWLINE_DELIMITED_JSON\". For Avro, specify \"AVRO\". For parquet, specify \"PARQUET\".\nFor orc, specify \"ORC\". [Beta] For Bigtable, specify \"BIGTABLE\".\nThe default value is CSV.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.source_uris": {
+      "description": "The fully-qualified URIs that point to your data in Google Cloud.\nFor Google Cloud Storage URIs: Each URI can contain one '\\*' wildcard character\nand it must come after the 'bucket' name. Size limits related to load jobs apply\nto external data sources. For Google Cloud Bigtable URIs: Exactly one URI can be\nspecified and it has be a fully specified and valid HTTPS URL for a Google Cloud Bigtable table.\nFor Google Cloud Datastore backups: Exactly one URI can be specified. Also, the '\\*' wildcard character is not allowed.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.write_disposition": {
+      "description": "Specifies the action that occurs if the destination table already exists. The following values are supported:\nWRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data and uses the schema from the query result.\nWRITE_APPEND: If the table already exists, BigQuery appends the data to the table.\nWRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result.\nEach action is atomic and only occurs if BigQuery is able to complete the job successfully.\nCreation, truncation and append actions occur as one atomic update upon job completion. Default value: \"WRITE_EMPTY\" Possible values: [\"WRITE_TRUNCATE\", \"WRITE_APPEND\", \"WRITE_EMPTY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.destination_encryption_configuration": {
+      "type": "block",
+      "description": "Custom encryption configuration (e.g., Cloud KMS keys)",
+      "required": false
+    },
+    "load.destination_encryption_configuration.kms_key_name": {
+      "description": "Describes the Cloud KMS encryption key that will be used to protect destination BigQuery table.\nThe BigQuery Service Account associated with your project requires access to this encryption key.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.destination_table": {
+      "type": "block",
+      "description": "The destination table to load the data into.",
+      "required": true
+    },
+    "load.destination_table.dataset_id": {
+      "description": "The ID of the dataset containing this table.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.destination_table.project_id": {
+      "description": "The ID of the project containing this table.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.destination_table.table_id": {
+      "description": "The table. Can be specified '{{table_id}}' if 'project_id' and 'dataset_id' are also set,\nor of the form 'projects/{{project}}/datasets/{{dataset_id}}/tables/{{table_id}}' if not.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.parquet_options": {
+      "type": "block",
+      "description": "Parquet Options for load and make external tables.",
+      "required": false
+    },
+    "load.parquet_options.enable_list_inference": {
+      "description": "If sourceFormat is set to PARQUET, indicates whether to use schema inference specifically for Parquet LIST logical type.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.parquet_options.enum_as_string": {
+      "description": "If sourceFormat is set to PARQUET, indicates whether to infer Parquet ENUM logical type as STRING instead of BYTES by default.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.time_partitioning": {
+      "type": "block",
+      "description": "Time-based partitioning specification for the destination table.",
+      "required": false
+    },
+    "load.time_partitioning.expiration_ms": {
+      "description": "Number of milliseconds for which to keep the storage for a partition. A wrapper is used here because 0 is an invalid value.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.time_partitioning.field": {
+      "description": "If not set, the table is partitioned by pseudo column '_PARTITIONTIME'; if set, the table is partitioned by this field.\nThe field must be a top-level TIMESTAMP or DATE field. Its mode must be NULLABLE or REQUIRED.\nA wrapper is used here because an empty string is an invalid value.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "load.time_partitioning.type": {
+      "description": "The only type supported is DAY, which will generate one partition per day. Providing an empty string used to cause an error,\nbut in OnePlatform the field will be treated as unset.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query": {
+      "type": "block",
+      "description": "Configures a query job.",
+      "required": false
+    },
+    "query.allow_large_results": {
+      "description": "If true and query uses legacy SQL dialect, allows the query to produce arbitrarily large result tables at a slight cost in performance.\nRequires destinationTable to be set. For standard SQL queries, this flag is ignored and large results are always allowed.\nHowever, you must still set destinationTable when result size exceeds the allowed maximum response size.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.create_disposition": {
+      "description": "Specifies whether the job is allowed to create new tables. The following values are supported:\nCREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table.\nCREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result.\nCreation, truncation and append actions occur as one atomic update upon job completion Default value: \"CREATE_IF_NEEDED\" Possible values: [\"CREATE_IF_NEEDED\", \"CREATE_NEVER\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.flatten_results": {
+      "description": "If true and query uses legacy SQL dialect, flattens all nested and repeated fields in the query results.\nallowLargeResults must be true if this is set to false. For standard SQL queries, this flag is ignored and results are never flattened.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.maximum_billing_tier": {
+      "description": "Limits the billing tier for this job. Queries that have resource usage beyond this tier will fail (without incurring a charge).\nIf unspecified, this will be set to your project default.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.maximum_bytes_billed": {
+      "description": "Limits the bytes billed for this job. Queries that will have bytes billed beyond this limit will fail (without incurring a charge).\nIf unspecified, this will be set to your project default.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.parameter_mode": {
+      "description": "Standard SQL only. Set to POSITIONAL to use positional (?) query parameters or to NAMED to use named (@myparam) query parameters in this query.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.priority": {
+      "description": "Specifies a priority for the query. Default value: \"INTERACTIVE\" Possible values: [\"INTERACTIVE\", \"BATCH\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.query": {
+      "description": "SQL query text to execute. The useLegacySql field can be used to indicate whether the query uses legacy SQL or standard SQL.\n*NOTE*: queries containing [DML language](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language)\n('DELETE', 'UPDATE', 'MERGE', 'INSERT') must specify 'create_disposition = \"\"' and 'write_disposition = \"\"'.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.schema_update_options": {
+      "description": "Allows the schema of the destination table to be updated as a side effect of the query job.\nSchema update options are supported in two cases: when writeDisposition is WRITE_APPEND;\nwhen writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table,\nspecified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema.\nOne or more of the following values are specified:\nALLOW_FIELD_ADDITION: allow adding a nullable field to the schema.\nALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.use_legacy_sql": {
+      "description": "Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true.\nIf set to false, the query will use BigQuery's standard SQL.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.use_query_cache": {
+      "description": "Whether to look for the result in the query cache. The query cache is a best-effort cache that will be flushed whenever\ntables in the query are modified. Moreover, the query cache is only available when a query does not have a destination table specified.\nThe default value is true.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.write_disposition": {
+      "description": "Specifies the action that occurs if the destination table already exists. The following values are supported:\nWRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data and uses the schema from the query result.\nWRITE_APPEND: If the table already exists, BigQuery appends the data to the table.\nWRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result.\nEach action is atomic and only occurs if BigQuery is able to complete the job successfully.\nCreation, truncation and append actions occur as one atomic update upon job completion. Default value: \"WRITE_EMPTY\" Possible values: [\"WRITE_TRUNCATE\", \"WRITE_APPEND\", \"WRITE_EMPTY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.connection_properties": {
+      "type": "block",
+      "description": "Connection properties to customize query behavior. Under JDBC, these correspond\ndirectly to connection properties passed to the DriverManager. Under ODBC, these\ncorrespond to properties in the connection string.",
+      "required": false
+    },
+    "query.connection_properties.key": {
+      "description": "The key of the property to set. Currently supported connection properties:\n* 'dataset_project_id': represents the default project for datasets that are used in the query\n* 'time_zone': represents the default timezone used to run the query\n* 'session_id': associates the query with a given session\n* 'query_label': associates the query with a given job label\n* 'service_account': indicates the service account to use to run a continuous query",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.connection_properties.value": {
+      "description": "The value of the property to set.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.default_dataset": {
+      "type": "block",
+      "description": "Specifies the default dataset to use for unqualified table names in the query. Note that this does not alter behavior of unqualified dataset names.",
+      "required": false
+    },
+    "query.default_dataset.dataset_id": {
+      "description": "The dataset. Can be specified '{{dataset_id}}' if 'project_id' is also set,\nor of the form 'projects/{{project}}/datasets/{{dataset_id}}' if not.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.default_dataset.project_id": {
+      "description": "The ID of the project containing this table.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.destination_encryption_configuration": {
+      "type": "block",
+      "description": "Custom encryption configuration (e.g., Cloud KMS keys)",
+      "required": false
+    },
+    "query.destination_encryption_configuration.kms_key_name": {
+      "description": "Describes the Cloud KMS encryption key that will be used to protect destination BigQuery table.\nThe BigQuery Service Account associated with your project requires access to this encryption key.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.destination_table": {
+      "type": "block",
+      "description": "Describes the table where the query results should be stored.\nThis property must be set for large results that exceed the maximum response size.\nFor queries that produce anonymous (cached) results, this field will be populated by BigQuery.",
+      "required": false
+    },
+    "query.destination_table.dataset_id": {
+      "description": "The ID of the dataset containing this table.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.destination_table.project_id": {
+      "description": "The ID of the project containing this table.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.destination_table.table_id": {
+      "description": "The table. Can be specified '{{table_id}}' if 'project_id' and 'dataset_id' are also set,\nor of the form 'projects/{{project}}/datasets/{{dataset_id}}/tables/{{table_id}}' if not.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.script_options": {
+      "type": "block",
+      "description": "Options controlling the execution of scripts.",
+      "required": false
+    },
+    "query.script_options.key_result_statement": {
+      "description": "Determines which statement in the script represents the \"key result\",\nused to populate the schema and query results of the script job. Possible values: [\"LAST\", \"FIRST_SELECT\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.script_options.statement_byte_budget": {
+      "description": "Limit on the number of bytes billed per statement. Exceeding this budget results in an error.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.script_options.statement_timeout_ms": {
+      "description": "Timeout period for each statement in a script.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.user_defined_function_resources": {
+      "type": "block",
+      "description": "Describes user-defined function resources used in the query.",
+      "required": false
+    },
+    "query.user_defined_function_resources.inline_code": {
+      "description": "An inline resource that contains code for a user-defined function (UDF).\nProviding a inline code resource is equivalent to providing a URI for a file containing the same code.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "query.user_defined_function_resources.resource_uri": {
+      "description": "A code resource to load from a Google Cloud Storage URI (gs://bucket/path).",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "database": {
+      "description": "The database to create the backup schedule on.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Reference to the parent Spanner database the backup schedule applies to. This is an identifier pointing at an existing resource; we do not constrain resource names or references to other resources."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "instance": {
+      "description": "The instance to create the database on.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Reference to the parent Spanner instance that owns the backup schedule. This is an identifier pointing at an existing resource and has no generic secure value to enforce."
+    },
+    "name": {
+      "description": "A unique identifier for the backup schedule, which cannot be changed after\nthe backup schedule is created. Values are of the form [a-z][-a-z0-9]*[a-z0-9].",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier of the backup schedule. Naming is a team choice with no security effect; we do not constrain resource names."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Project the backup schedule belongs to, defaulting to the provider project. This is a project selector/identifier; enforcing a specific project would require knowing a team's project, which is overreaching."
+    },
+    "retention_duration": {
+      "description": "At what relative time in the future, compared to its creation time, the backup should be deleted, e.g. keep backups for 7 days.\nA duration in seconds with up to nine fractional digits, ending with 's'. Example: '3.5s'.\nYou can set this to a value up to 366 days.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "How long backups created by the schedule are kept before expiry. This is a team data-management choice about backup lifecycle; it does not, on its own, prevent destructive loss or exposure, so it is not a platform security policy target."
+    },
+    "encryption_config": {
+      "type": "block",
+      "description": "Configuration for the encryption of the backup schedule.",
+      "required": false
+    },
+    "encryption_config.encryption_type": {
+      "description": "The encryption type of backups created by the backup schedule.\nPossible values are USE_DATABASE_ENCRYPTION, GOOGLE_DEFAULT_ENCRYPTION, or CUSTOMER_MANAGED_ENCRYPTION.\nIf you use CUSTOMER_MANAGED_ENCRYPTION, you must specify a kmsKeyName or kmsKeyNames. Possible values: [\"USE_DATABASE_ENCRYPTION\", \"GOOGLE_DEFAULT_ENCRYPTION\", \"CUSTOMER_MANAGED_ENCRYPTION\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Setting encryption_type to CUSTOMER_MANAGED_ENCRYPTION ensures backups are protected using customer-controlled keys, providing greater security and compliance control over backup data."
+    },
+    "encryption_config.kms_key_name": {
+      "description": "The resource name of the Cloud KMS key to use for encryption.\nFormat: 'projects/{project}/locations/{location}/keyRings/{keyRing}/cryptoKeys/{cryptoKey}'",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Single CMEK used to encrypt the backups produced by the schedule. A policy should require it be non-empty (and pair with CUSTOMER_MANAGED_ENCRYPTION) so backup data is always customer-managed-key encrypted; it must not pin a specific key, since keys are team/project-specific."
+    },
+    "encryption_config.kms_key_names": {
+      "description": "Fully qualified name of the KMS keys to use to encrypt this database. The keys must exist\nin the same locations as the Spanner Database.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": true,
+      "rationale": "Set of CMEK keys used to encrypt multi-region backups from the schedule. A policy should require it be non-empty so backups are always customer-managed-key encrypted; it must not pin specific keys, as keys are team/project-specific."
+    },
+    "full_backup_spec": {
+      "type": "block",
+      "description": "The schedule creates only full backups..",
+      "required": false
+    },
+    "incremental_backup_spec": {
+      "type": "block",
+      "description": "The schedule creates incremental backup chains.",
+      "required": false
+    },
+    "spec": {
+      "type": "block",
+      "description": "Defines specifications of the backup schedule.",
+      "required": false
+    },
+    "spec.cron_spec": {
+      "type": "block",
+      "description": "Cron style schedule specification..",
+      "required": false
+    },
+    "spec.cron_spec.text": {
+      "description": "Textual representation of the crontab. User can customize the\nbackup frequency and the backup version time using the cron\nexpression. The version time must be in UTC timzeone.\nThe backup will contain an externally consistent copy of the\ndatabase at the version time. Allowed frequencies are 12 hour, 1 day,\n1 week and 1 month. Examples of valid cron specifications:\n  0 2/12 * * * : every 12 hours at (2, 14) hours past midnight in UTC.\n  0 2,14 * * * : every 12 hours at (2,14) hours past midnight in UTC.\n  0 2 * * *    : once a day at 2 past midnight in UTC.\n  0 2 * * 0    : once a week every Sunday at 2 past midnight in UTC.\n  0 2 8 * *    : once a month on 8th day at 2 past midnight in UTC.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Cron expression defining when the backup schedule runs. It sets timing only and does not affect access, encryption, or exposure, so it is not a security policy target."
+    }
+  }
+}

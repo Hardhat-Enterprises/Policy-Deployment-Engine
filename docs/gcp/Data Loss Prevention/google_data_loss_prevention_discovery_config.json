@@ -1,0 +1,959 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "display_name": {
+      "description": "Display Name (max 1000 Chars)",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "inspect_templates": {
+      "description": "Detection logic for profile generation",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "Location to create the discovery config in.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "parent": {
+      "description": "The parent of the discovery config in any of the following formats:\n\n* 'projects/{{project}}/locations/{{location}}'\n* 'organizations/{{organization_id}}/locations/{{location}}'",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "status": {
+      "description": "Required. A status for this configuration Possible values: [\"RUNNING\", \"PAUSED\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "actions": {
+      "type": "block",
+      "description": "Actions to execute at the completion of scanning",
+      "required": false
+    },
+    "actions.export_data": {
+      "type": "block",
+      "description": "Export data profiles into a provided location",
+      "required": false
+    },
+    "actions.export_data.profile_table": {
+      "type": "block",
+      "description": "Store all table and column profiles in an existing table or a new table in an existing dataset. Each re-generation will result in a new row in BigQuery.\nThe system will create a new dataset and table for you if none are are provided. The dataset will be named 'sensitive_data_protection_discovery'\nand table will be named 'discovery_profiles'. This table will be placed in the same project as the container project running the scan.",
+      "required": false
+    },
+    "actions.export_data.profile_table.dataset_id": {
+      "description": "Dataset Id of the table",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "actions.export_data.profile_table.project_id": {
+      "description": "The Google Cloud Platform project ID of the project containing the table. If omitted, the project ID is inferred from the API call.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "actions.export_data.profile_table.table_id": {
+      "description": "Name of the table",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "actions.export_data.sample_findings_table": {
+      "type": "block",
+      "description": "Store sample findings in an existing table or a new table in an existing dataset. Each re-generation will result in a new row in BigQuery",
+      "required": false
+    },
+    "actions.export_data.sample_findings_table.dataset_id": {
+      "description": "Dataset Id of the table",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "actions.export_data.sample_findings_table.project_id": {
+      "description": "The Google Cloud Platform project ID of the project containing the table. If omitted, the project ID is inferred from the API call.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "actions.export_data.sample_findings_table.table_id": {
+      "description": "Name of the table",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "actions.pub_sub_notification": {
+      "type": "block",
+      "description": "Publish a message into the Pub/Sub topic.",
+      "required": false
+    },
+    "actions.pub_sub_notification.detail_of_message": {
+      "description": "How much data to include in the pub/sub message. Possible values: [\"TABLE_PROFILE\", \"RESOURCE_NAME\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "actions.pub_sub_notification.event": {
+      "description": "The type of event that triggers a Pub/Sub. At most one PubSubNotification per EventType is permitted. Possible values: [\"NEW_PROFILE\", \"CHANGED_PROFILE\", \"SCORE_INCREASED\", \"ERROR_CHANGED\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "actions.pub_sub_notification.topic": {
+      "description": "Cloud Pub/Sub topic to send notifications to. Format is projects/{project}/topics/{topic}.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "actions.pub_sub_notification.pubsub_condition": {
+      "type": "block",
+      "description": "Conditions for triggering pubsub",
+      "required": false
+    },
+    "actions.pub_sub_notification.pubsub_condition.expressions": {
+      "type": "block",
+      "description": "An expression",
+      "required": false
+    },
+    "actions.pub_sub_notification.pubsub_condition.expressions.logical_operator": {
+      "description": "The operator to apply to the collection of conditions Possible values: [\"OR\", \"AND\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "actions.pub_sub_notification.pubsub_condition.expressions.conditions": {
+      "type": "block",
+      "description": "Conditions to apply to the expression",
+      "required": false
+    },
+    "actions.pub_sub_notification.pubsub_condition.expressions.conditions.minimum_risk_score": {
+      "description": "The minimum data risk score that triggers the condition. Possible values: [\"HIGH\", \"MEDIUM_OR_HIGH\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "actions.pub_sub_notification.pubsub_condition.expressions.conditions.minimum_sensitivity_score": {
+      "description": "The minimum sensitivity level that triggers the condition. Possible values: [\"HIGH\", \"MEDIUM_OR_HIGH\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "actions.publish_to_chronicle": {
+      "type": "block",
+      "description": "Publishes generated data profiles to Google Security Operations. For more information, see [Use Sensitive Data Protection data in context-aware analytics](https://cloud.google.com/chronicle/docs/detection/usecase-dlp-high-risk-user-download).",
+      "required": false
+    },
+    "actions.publish_to_dataplex_catalog": {
+      "type": "block",
+      "description": "Publish a portion of each profile to Dataplex Universal Catalog with the aspect type Sensitive Data Protection Profile.",
+      "required": false
+    },
+    "actions.publish_to_scc": {
+      "type": "block",
+      "description": "Publishes findings to Security Command Center for each data profile.",
+      "required": false
+    },
+    "actions.tag_resources": {
+      "type": "block",
+      "description": "Tag the profiled resources with the specified tag values.",
+      "required": false
+    },
+    "actions.tag_resources.lower_data_risk_to_low": {
+      "description": "Whether applying a tag to a resource should lower the risk of the profile for that resource. For example, in conjunction with an [IAM deny policy](https://cloud.google.com/iam/docs/deny-overview), you can deny all principals a permission if a tag value is present, mitigating the risk of the resource. This also lowers the data risk of resources at the lower levels of the resource hierarchy. For example, reducing the data risk of a table data profile also reduces the data risk of the constituent column data profiles.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "actions.tag_resources.profile_generations_to_tag": {
+      "description": "The profile generations for which the tag should be attached to resources. If you attach a tag to only new profiles, then if the sensitivity score of a profile subsequently changes, its tag doesn't change. By default, this field includes only new profiles. To include both new and updated profiles for tagging, this field should explicitly include both 'PROFILE_GENERATION_NEW' and 'PROFILE_GENERATION_UPDATE'. Possible values: [\"PROFILE_GENERATION_NEW\", \"PROFILE_GENERATION_UPDATE\"]",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "actions.tag_resources.tag_conditions": {
+      "type": "block",
+      "description": "The tags to associate with different conditions.",
+      "required": false
+    },
+    "actions.tag_resources.tag_conditions.sensitivity_score": {
+      "type": "block",
+      "description": "Conditions attaching the tag to a resource on its profile having this sensitivity score.",
+      "required": false
+    },
+    "actions.tag_resources.tag_conditions.sensitivity_score.score": {
+      "description": "The sensitivity score applied to the resource. Possible values: [\"SENSITIVITY_LOW\", \"SENSITIVITY_MODERATE\", \"SENSITIVITY_HIGH\", \"SENSITIVITY_UNKNOWN\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "actions.tag_resources.tag_conditions.tag": {
+      "type": "block",
+      "description": "The tag value to attach to resources.",
+      "required": false
+    },
+    "actions.tag_resources.tag_conditions.tag.namespaced_value": {
+      "description": "The namespaced name for the tag value to attach to resources. Must be in the format '{parent_id}/{tag_key_short_name}/{short_name}', for example, \"123456/environment/prod\".",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "org_config": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "org_config.project_id": {
+      "description": "The project that will run the scan. The DLP service account that exists within this project must have access to all resources that are profiled, and the cloud DLP API must be enabled.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "org_config.location": {
+      "type": "block",
+      "description": "The data to scan folder org or project",
+      "required": false
+    },
+    "org_config.location.folder_id": {
+      "description": "The ID for the folder within an organization to scan",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "org_config.location.organization_id": {
+      "description": "The ID of an organization to scan",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "other_cloud_starting_location": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "other_cloud_starting_location.aws_location": {
+      "type": "block",
+      "description": "A nested object resource.",
+      "required": false
+    },
+    "other_cloud_starting_location.aws_location.account_id": {
+      "description": "The AWS account ID that this discovery config applies to. Within an organization, you can find the AWS account ID inside an AWS account ARN. Example: arn:<partition>:organizations::<management-account-id>:account/<organization-id>/<account-id>",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "other_cloud_starting_location.aws_location.all_asset_inventory_assets": {
+      "description": "All AWS assets stored in Asset Inventory that didn't match other AWS discovery configs.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets": {
+      "type": "block",
+      "description": "Target to match against for determining what to scan and how frequently",
+      "required": false
+    },
+    "targets.big_query_target": {
+      "type": "block",
+      "description": "BigQuery target for Discovery. The first target to match a table will be the one applied.",
+      "required": false
+    },
+    "targets.big_query_target.cadence": {
+      "type": "block",
+      "description": "How often and when to update profiles. New tables that match both the fiter and conditions are scanned as quickly as possible depending on system capacity.",
+      "required": false
+    },
+    "targets.big_query_target.cadence.inspect_template_modified_cadence": {
+      "type": "block",
+      "description": "Governs when to update data profiles when the inspection rules defined by the 'InspectTemplate' change. If not set, changing the template will not cause a data profile to update.",
+      "required": false
+    },
+    "targets.big_query_target.cadence.inspect_template_modified_cadence.frequency": {
+      "description": "How frequently data profiles can be updated when the template is modified. Defaults to never. Possible values: [\"UPDATE_FREQUENCY_NEVER\", \"UPDATE_FREQUENCY_DAILY\", \"UPDATE_FREQUENCY_MONTHLY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.big_query_target.cadence.schema_modified_cadence": {
+      "type": "block",
+      "description": "Governs when to update data profiles when a schema is modified",
+      "required": false
+    },
+    "targets.big_query_target.cadence.schema_modified_cadence.frequency": {
+      "description": "How frequently profiles may be updated when schemas are modified. Default to monthly Possible values: [\"UPDATE_FREQUENCY_NEVER\", \"UPDATE_FREQUENCY_DAILY\", \"UPDATE_FREQUENCY_MONTHLY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.big_query_target.cadence.schema_modified_cadence.types": {
+      "description": "The type of events to consider when deciding if the table's schema has been modified and should have the profile updated. Defaults to NEW_COLUMN. Possible values: [\"SCHEMA_NEW_COLUMNS\", \"SCHEMA_REMOVED_COLUMNS\"]",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.big_query_target.cadence.table_modified_cadence": {
+      "type": "block",
+      "description": "Governs when to update profile when a table is modified.",
+      "required": false
+    },
+    "targets.big_query_target.cadence.table_modified_cadence.frequency": {
+      "description": "How frequently data profiles can be updated when tables are modified. Defaults to never. Possible values: [\"UPDATE_FREQUENCY_NEVER\", \"UPDATE_FREQUENCY_DAILY\", \"UPDATE_FREQUENCY_MONTHLY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.big_query_target.cadence.table_modified_cadence.types": {
+      "description": "The type of events to consider when deciding if the table has been modified and should have the profile updated. Defaults to MODIFIED_TIMESTAMP Possible values: [\"TABLE_MODIFIED_TIMESTAMP\"]",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.big_query_target.conditions": {
+      "type": "block",
+      "description": "In addition to matching the filter, these conditions must be true before a profile is generated",
+      "required": false
+    },
+    "targets.big_query_target.conditions.created_after": {
+      "description": "A timestamp in RFC3339 UTC \"Zulu\" format with nanosecond resolution and upto nine fractional digits.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.big_query_target.conditions.type_collection": {
+      "description": "Restrict discovery to categories of table types. Currently view, materialized view, snapshot and non-biglake external tables are supported. Possible values: [\"BIG_QUERY_COLLECTION_ALL_TYPES\", \"BIG_QUERY_COLLECTION_ONLY_SUPPORTED_TYPES\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.big_query_target.conditions.or_conditions": {
+      "type": "block",
+      "description": "At least one of the conditions must be true for a table to be scanned.",
+      "required": false
+    },
+    "targets.big_query_target.conditions.or_conditions.min_age": {
+      "description": "Duration format. The minimum age a table must have before Cloud DLP can profile it. Value greater than 1.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.big_query_target.conditions.or_conditions.min_row_count": {
+      "description": "Minimum number of rows that should be present before Cloud DLP profiles as a table.",
+      "required": false,
+      "type": "number",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.big_query_target.conditions.types": {
+      "type": "block",
+      "description": "Restrict discovery to specific table type",
+      "required": false
+    },
+    "targets.big_query_target.conditions.types.types": {
+      "description": "A set of BiqQuery table types Possible values: [\"BIG_QUERY_TABLE_TYPE_TABLE\", \"BIG_QUERY_TABLE_TYPE_EXTERNAL_BIG_LAKE\"]",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.big_query_target.disabled": {
+      "type": "block",
+      "description": "Tables that match this filter will not have profiles created.",
+      "required": false
+    },
+    "targets.big_query_target.filter": {
+      "type": "block",
+      "description": "Required. The tables the discovery cadence applies to. The first target with a matching filter will be the one to apply to a table",
+      "required": false
+    },
+    "targets.big_query_target.filter.other_tables": {
+      "type": "block",
+      "description": "Catch-all. This should always be the last filter in the list because anything above it will apply first.",
+      "required": false
+    },
+    "targets.big_query_target.filter.table_reference": {
+      "type": "block",
+      "description": "The table to scan. Discovery configurations including this can only include one DiscoveryTarget (the DiscoveryTarget with this TableReference).",
+      "required": false
+    },
+    "targets.big_query_target.filter.table_reference.dataset_id": {
+      "description": "Dataset ID of the table.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.big_query_target.filter.table_reference.project_id": {
+      "description": "The Google Cloud project ID of the project containing the table.\nIf omitted, the project ID is inferred from the parent project.\nThis field is required if the parent resource is an organization.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.big_query_target.filter.table_reference.table_id": {
+      "description": "Name of the table.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.big_query_target.filter.tables": {
+      "type": "block",
+      "description": "A specific set of tables for this filter to apply to. A table collection must be specified in only one filter per config.",
+      "required": false
+    },
+    "targets.big_query_target.filter.tables.include_regexes": {
+      "type": "block",
+      "description": "A collection of regular expressions to match a BQ table against.",
+      "required": false
+    },
+    "targets.big_query_target.filter.tables.include_regexes.patterns": {
+      "type": "block",
+      "description": "A single BigQuery regular expression pattern to match against one or more tables, datasets, or projects that contain BigQuery tables.",
+      "required": false
+    },
+    "targets.big_query_target.filter.tables.include_regexes.patterns.dataset_id_regex": {
+      "description": "if unset, this property matches all datasets",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.big_query_target.filter.tables.include_regexes.patterns.project_id_regex": {
+      "description": "For organizations, if unset, will match all projects. Has no effect for data profile configurations created within a project.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.big_query_target.filter.tables.include_regexes.patterns.table_id_regex": {
+      "description": "if unset, this property matches all tables",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_sql_target": {
+      "type": "block",
+      "description": "Cloud SQL target for Discovery. The first target to match a table will be the one applied.",
+      "required": false
+    },
+    "targets.cloud_sql_target.conditions": {
+      "type": "block",
+      "description": "In addition to matching the filter, these conditions must be true before a profile is generated.",
+      "required": false
+    },
+    "targets.cloud_sql_target.conditions.database_engines": {
+      "description": "Database engines that should be profiled. Optional. Defaults to ALL_SUPPORTED_DATABASE_ENGINES if unspecified. Possible values: [\"ALL_SUPPORTED_DATABASE_ENGINES\", \"MYSQL\", \"POSTGRES\"]",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_sql_target.conditions.types": {
+      "description": "Data profiles will only be generated for the database resource types specified in this field. If not specified, defaults to [DATABASE_RESOURCE_TYPE_ALL_SUPPORTED_TYPES]. Possible values: [\"DATABASE_RESOURCE_TYPE_ALL_SUPPORTED_TYPES\", \"DATABASE_RESOURCE_TYPE_TABLE\"]",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_sql_target.disabled": {
+      "type": "block",
+      "description": "Disable profiling for database resources that match this filter.",
+      "required": false
+    },
+    "targets.cloud_sql_target.filter": {
+      "type": "block",
+      "description": "Required. The tables the discovery cadence applies to. The first target with a matching filter will be the one to apply to a table.",
+      "required": true
+    },
+    "targets.cloud_sql_target.filter.collection": {
+      "type": "block",
+      "description": "A specific set of database resources for this filter to apply to.",
+      "required": false
+    },
+    "targets.cloud_sql_target.filter.collection.include_regexes": {
+      "type": "block",
+      "description": "A collection of regular expressions to match a database resource against.",
+      "required": false
+    },
+    "targets.cloud_sql_target.filter.collection.include_regexes.patterns": {
+      "type": "block",
+      "description": "A group of regular expression patterns to match against one or more database resources. Maximum of 100 entries. The sum of all regular expressions' length can't exceed 10 KiB.",
+      "required": false
+    },
+    "targets.cloud_sql_target.filter.collection.include_regexes.patterns.database_regex": {
+      "description": "Regex to test the database name against. If empty, all databases match.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_sql_target.filter.collection.include_regexes.patterns.database_resource_name_regex": {
+      "description": "Regex to test the database resource's name against. An example of a database resource name is a table's name. Other database resource names like view names could be included in the future. If empty, all database resources match.'",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_sql_target.filter.collection.include_regexes.patterns.instance_regex": {
+      "description": "Regex to test the instance name against. If empty, all instances match.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_sql_target.filter.collection.include_regexes.patterns.project_id_regex": {
+      "description": "For organizations, if unset, will match all projects. Has no effect for data profile configurations created within a project.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_sql_target.filter.database_resource_reference": {
+      "type": "block",
+      "description": "The database resource to scan. Targets including this can only include one target (the target with this database resource reference).",
+      "required": false
+    },
+    "targets.cloud_sql_target.filter.database_resource_reference.database": {
+      "description": "Required. Name of a database within the instance.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_sql_target.filter.database_resource_reference.database_resource": {
+      "description": "Required. Name of a database resource, for example, a table within the database.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_sql_target.filter.database_resource_reference.instance": {
+      "description": "Required. The instance where this resource is located. For example: Cloud SQL instance ID.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_sql_target.filter.database_resource_reference.project_id": {
+      "description": "Required. If within a project-level config, then this must match the config's project ID.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_sql_target.filter.others": {
+      "type": "block",
+      "description": "Catch-all. This should always be the last target in the list because anything above it will apply first. Should only appear once in a configuration. If none is specified, a default one will be added automatically.",
+      "required": false
+    },
+    "targets.cloud_sql_target.generation_cadence": {
+      "type": "block",
+      "description": "How often and when to update profiles. New tables that match both the filter and conditions are scanned as quickly as possible depending on system capacity.",
+      "required": false
+    },
+    "targets.cloud_sql_target.generation_cadence.refresh_frequency": {
+      "description": "Data changes (non-schema changes) in Cloud SQL tables can't trigger reprofiling. If you set this field, profiles are refreshed at this frequency regardless of whether the underlying tables have changes. Defaults to never. Possible values: [\"UPDATE_FREQUENCY_NEVER\", \"UPDATE_FREQUENCY_DAILY\", \"UPDATE_FREQUENCY_MONTHLY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_sql_target.generation_cadence.inspect_template_modified_cadence": {
+      "type": "block",
+      "description": "Governs when to update data profiles when the inspection rules defined by the 'InspectTemplate' change. If not set, changing the template will not cause a data profile to update.",
+      "required": false
+    },
+    "targets.cloud_sql_target.generation_cadence.inspect_template_modified_cadence.frequency": {
+      "description": "How frequently data profiles can be updated when the template is modified. Defaults to never. Possible values: [\"UPDATE_FREQUENCY_NEVER\", \"UPDATE_FREQUENCY_DAILY\", \"UPDATE_FREQUENCY_MONTHLY\"]",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_sql_target.generation_cadence.schema_modified_cadence": {
+      "type": "block",
+      "description": "Governs when to update data profiles when a schema is modified",
+      "required": false
+    },
+    "targets.cloud_sql_target.generation_cadence.schema_modified_cadence.frequency": {
+      "description": "Frequency to regenerate data profiles when the schema is modified. Defaults to monthly. Possible values: [\"UPDATE_FREQUENCY_NEVER\", \"UPDATE_FREQUENCY_DAILY\", \"UPDATE_FREQUENCY_MONTHLY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_sql_target.generation_cadence.schema_modified_cadence.types": {
+      "description": "The types of schema modifications to consider. Defaults to NEW_COLUMNS. Possible values: [\"NEW_COLUMNS\", \"REMOVED_COLUMNS\"]",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_storage_target": {
+      "type": "block",
+      "description": "Cloud Storage target for Discovery. The first target to match a bucket will be the one applied.",
+      "required": false
+    },
+    "targets.cloud_storage_target.conditions": {
+      "type": "block",
+      "description": "In addition to matching the filter, these conditions must be true before a profile is generated.",
+      "required": false
+    },
+    "targets.cloud_storage_target.conditions.created_after": {
+      "description": "File store must have been created after this date. Used to avoid backfilling. A timestamp in RFC3339 UTC \"Zulu\" format with nanosecond resolution and upto nine fractional digits.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_storage_target.conditions.min_age": {
+      "description": "Duration format. Minimum age a file store must have. If set, the value must be 1 hour or greater.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_storage_target.conditions.cloud_storage_conditions": {
+      "type": "block",
+      "description": "Cloud Storage conditions.",
+      "required": false
+    },
+    "targets.cloud_storage_target.conditions.cloud_storage_conditions.included_bucket_attributes": {
+      "description": "Only objects with the specified attributes will be scanned. Defaults to [ALL_SUPPORTED_BUCKETS] if unset. Possible values: [\"ALL_SUPPORTED_BUCKETS\", \"AUTOCLASS_DISABLED\", \"AUTOCLASS_ENABLED\"]",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_storage_target.conditions.cloud_storage_conditions.included_object_attributes": {
+      "description": "Only objects with the specified attributes will be scanned. If an object has one of the specified attributes but is inside an excluded bucket, it will not be scanned. Defaults to [ALL_SUPPORTED_OBJECTS]. A profile will be created even if no objects match the included_object_attributes. Possible values: [\"ALL_SUPPORTED_OBJECTS\", \"STANDARD\", \"NEARLINE\", \"COLDLINE\", \"ARCHIVE\", \"REGIONAL\", \"MULTI_REGIONAL\", \"DURABLE_REDUCED_AVAILABILITY\"]",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_storage_target.disabled": {
+      "type": "block",
+      "description": "Disable profiling for buckets that match this filter.",
+      "required": false
+    },
+    "targets.cloud_storage_target.filter": {
+      "type": "block",
+      "description": "The buckets the generation_cadence applies to. The first target with a matching filter will be the one to apply to a bucket.",
+      "required": true
+    },
+    "targets.cloud_storage_target.filter.cloud_storage_resource_reference": {
+      "type": "block",
+      "description": "The bucket to scan. Targets including this can only include one target (the target with this bucket). This enables profiling the contents of a single bucket, while the other options allow for easy profiling of many buckets within a project or an organization.",
+      "required": false
+    },
+    "targets.cloud_storage_target.filter.cloud_storage_resource_reference.bucket_name": {
+      "description": "The bucket to scan.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_storage_target.filter.cloud_storage_resource_reference.project_id": {
+      "description": "If within a project-level config, then this must match the config's project id.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_storage_target.filter.collection": {
+      "type": "block",
+      "description": "A specific set of buckets for this filter to apply to.",
+      "required": false
+    },
+    "targets.cloud_storage_target.filter.collection.include_regexes": {
+      "type": "block",
+      "description": "A collection of regular expressions to match a file store against.",
+      "required": false
+    },
+    "targets.cloud_storage_target.filter.collection.include_regexes.patterns": {
+      "type": "block",
+      "description": "The group of regular expression patterns to match against one or more file stores. Maximum of 100 entries. The sum of all lengths of regular expressions can't exceed 10 KiB.",
+      "required": false
+    },
+    "targets.cloud_storage_target.filter.collection.include_regexes.patterns.cloud_storage_regex": {
+      "type": "block",
+      "description": "Regex for Cloud Storage.",
+      "required": false
+    },
+    "targets.cloud_storage_target.filter.collection.include_regexes.patterns.cloud_storage_regex.bucket_name_regex": {
+      "description": "Regex to test the bucket name against. If empty, all buckets match. Example: \"marketing2021\" or \"(marketing)\\d{4}\" will both match the bucket gs://marketing2021",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_storage_target.filter.collection.include_regexes.patterns.cloud_storage_regex.project_id_regex": {
+      "description": "For organizations, if unset, will match all projects.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_storage_target.filter.collection.include_tags": {
+      "type": "block",
+      "description": "For a resource to match the tag filters, the resource must have all of the\nprovided tags attached. Tags refer to Resource Manager tags bound to the\nresource or its ancestors.",
+      "required": false
+    },
+    "targets.cloud_storage_target.filter.collection.include_tags.tag_filters": {
+      "type": "block",
+      "description": "A resource must match ALL of the specified tag filters to be included in the collection.",
+      "required": false
+    },
+    "targets.cloud_storage_target.filter.collection.include_tags.tag_filters.namespaced_tag_key": {
+      "description": "The namespaced name for the tag key. Must be in the format\n'{parent_id}/{tag_key_short_name}', for example, \"123456/sensitive\" for\nan organization parent, or \"my-project/sensitive\" for a project parent.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_storage_target.filter.collection.include_tags.tag_filters.namespaced_tag_value": {
+      "description": "The namespaced name for the tag value. Must be in the format\n'{parent_id}/{tag_key_short_name}/{short_name}', for example,\n\"123456/environment/prod\" for an organization parent, or\n\"my-project/environment/prod\" for a project parent.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_storage_target.filter.others": {
+      "type": "block",
+      "description": "Match discovery resources not covered by any other filter.",
+      "required": false
+    },
+    "targets.cloud_storage_target.generation_cadence": {
+      "type": "block",
+      "description": "How often and when to update profiles. New buckets that match both the filter and conditions are scanned as quickly as possible depending on system capacity.",
+      "required": false
+    },
+    "targets.cloud_storage_target.generation_cadence.refresh_frequency": {
+      "description": "Data changes in Cloud Storage can't trigger reprofiling. If you set this field, profiles are refreshed at this frequency regardless of whether the underlying buckets have changes. Defaults to never. Possible values: [\"UPDATE_FREQUENCY_NEVER\", \"UPDATE_FREQUENCY_DAILY\", \"UPDATE_FREQUENCY_MONTHLY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.cloud_storage_target.generation_cadence.inspect_template_modified_cadence": {
+      "type": "block",
+      "description": "Governs when to update data profiles when the inspection rules defined by the 'InspectTemplate' change. If not set, changing the template will not cause a data profile to update.",
+      "required": false
+    },
+    "targets.cloud_storage_target.generation_cadence.inspect_template_modified_cadence.frequency": {
+      "description": "How frequently data profiles can be updated when the template is modified. Defaults to never. Possible values: [\"UPDATE_FREQUENCY_NEVER\", \"UPDATE_FREQUENCY_DAILY\", \"UPDATE_FREQUENCY_MONTHLY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.other_cloud_target": {
+      "type": "block",
+      "description": "Other clouds target for discovery. The first target to match a resource will be the one applied.",
+      "required": false
+    },
+    "targets.other_cloud_target.conditions": {
+      "type": "block",
+      "description": "In addition to matching the filter, these conditions must be true before a profile is generated.",
+      "required": false
+    },
+    "targets.other_cloud_target.conditions.min_age": {
+      "description": "Duration format.  Minimum age a resource must be before a profile can be generated. Value must be 1 hour or greater. Minimum age is not supported for Azure Blob Storage containers.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.other_cloud_target.conditions.amazon_s3_bucket_conditions": {
+      "type": "block",
+      "description": "Amazon S3 bucket conditions.",
+      "required": false
+    },
+    "targets.other_cloud_target.conditions.amazon_s3_bucket_conditions.bucket_types": {
+      "description": "Bucket types that should be profiled. Optional. Defaults to TYPE_ALL_SUPPORTED if unspecified. Possible values: [\"TYPE_ALL_SUPPORTED\", \"TYPE_GENERAL_PURPOSE\"]",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.other_cloud_target.conditions.amazon_s3_bucket_conditions.object_storage_classes": {
+      "description": "Object classes that should be profiled. Optional. Defaults to ALL_SUPPORTED_CLASSES if unspecified. Possible values: [\"ALL_SUPPORTED_CLASSES\", \"STANDARD\", \"STANDARD_INFREQUENT_ACCESS\", \"GLACIER_INSTANT_RETRIEVAL\", \"INTELLIGENT_TIERING\"]",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.other_cloud_target.data_source_type": {
+      "type": "block",
+      "description": "Required. The type of data profiles generated by this discovery target. Supported values are: aws/s3/bucket",
+      "required": false
+    },
+    "targets.other_cloud_target.data_source_type.data_source": {
+      "description": "N/A",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.other_cloud_target.disabled": {
+      "type": "block",
+      "description": "Disable profiling for resources that match this filter.",
+      "required": false
+    },
+    "targets.other_cloud_target.filter": {
+      "type": "block",
+      "description": "Required. The resources that the discovery cadence applies to. The first target with a matching filter will be the one to apply to a resource.",
+      "required": true
+    },
+    "targets.other_cloud_target.filter.collection": {
+      "type": "block",
+      "description": "A collection of resources for this filter to apply to.",
+      "required": false
+    },
+    "targets.other_cloud_target.filter.collection.include_regexes": {
+      "type": "block",
+      "description": "A collection of regular expressions to match a resource against.",
+      "required": false
+    },
+    "targets.other_cloud_target.filter.collection.include_regexes.patterns": {
+      "type": "block",
+      "description": "The group of regular expression patterns to match against one or more resources. Maximum of 100 entries. The sum of all lengths of regular expressions can't exceed 10 KiB.",
+      "required": false
+    },
+    "targets.other_cloud_target.filter.collection.include_regexes.patterns.amazon_s3_bucket_regex": {
+      "type": "block",
+      "description": "Regex for Cloud Storage.",
+      "required": false
+    },
+    "targets.other_cloud_target.filter.collection.include_regexes.patterns.amazon_s3_bucket_regex.bucket_name_regex": {
+      "description": "Regex to test the bucket name against. If empty, all buckets match.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.other_cloud_target.filter.collection.include_regexes.patterns.amazon_s3_bucket_regex.aws_account_regex": {
+      "type": "block",
+      "description": "The AWS account regex",
+      "required": false
+    },
+    "targets.other_cloud_target.filter.collection.include_regexes.patterns.amazon_s3_bucket_regex.aws_account_regex.account_id_regex": {
+      "description": "Regex to test the AWS account ID against. If empty, all accounts match. Example: arn:aws:organizations::123:account/o-b2c3d4/345",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.other_cloud_target.filter.others": {
+      "type": "block",
+      "description": "Match discovery resources not covered by any other filter.",
+      "required": false
+    },
+    "targets.other_cloud_target.filter.single_resource": {
+      "type": "block",
+      "description": "The resource to scan. Configs using this filter can only have one target (the target with this single resource reference).",
+      "required": false
+    },
+    "targets.other_cloud_target.filter.single_resource.amazon_s3_bucket": {
+      "type": "block",
+      "description": "Amazon S3 bucket.",
+      "required": false
+    },
+    "targets.other_cloud_target.filter.single_resource.amazon_s3_bucket.bucket_name": {
+      "description": "The bucket name.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.other_cloud_target.filter.single_resource.amazon_s3_bucket.aws_account": {
+      "type": "block",
+      "description": "The AWS account.",
+      "required": false
+    },
+    "targets.other_cloud_target.filter.single_resource.amazon_s3_bucket.aws_account.account_id": {
+      "description": "AWS account ID.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.other_cloud_target.generation_cadence": {
+      "type": "block",
+      "description": "How often and when to update profiles. New resources that match both the filter and conditions are scanned as quickly as possible depending on system capacity.",
+      "required": false
+    },
+    "targets.other_cloud_target.generation_cadence.refresh_frequency": {
+      "description": "Frequency to update profiles regardless of whether the underlying resource has changes. Defaults to never. Possible values: [\"UPDATE_FREQUENCY_NEVER\", \"UPDATE_FREQUENCY_DAILY\", \"UPDATE_FREQUENCY_MONTHLY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.other_cloud_target.generation_cadence.inspect_template_modified_cadence": {
+      "type": "block",
+      "description": "Governs when to update data profiles when the inspection rules defined by the 'InspectTemplate' change. If not set, changing the template will not cause a data profile to update.",
+      "required": false
+    },
+    "targets.other_cloud_target.generation_cadence.inspect_template_modified_cadence.frequency": {
+      "description": "How frequently data profiles can be updated when the template is modified. Defaults to never. Possible values: [\"UPDATE_FREQUENCY_NEVER\", \"UPDATE_FREQUENCY_DAILY\", \"UPDATE_FREQUENCY_MONTHLY\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "targets.secrets_target": {
+      "type": "block",
+      "description": "Discovery target that looks for credentials and secrets stored in cloud resource metadata and reports them as vulnerabilities to Security Command Center. Only one target of this type is allowed.",
+      "required": false
+    }
+  }
+}

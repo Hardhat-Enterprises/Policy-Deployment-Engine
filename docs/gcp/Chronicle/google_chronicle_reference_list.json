@@ -1,0 +1,77 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "description": {
+      "description": "Required. A user-provided description of the reference list.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "instance": {
+      "description": "The unique identifier for the Chronicle instance, which is the same as the customer ID.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "location": {
+      "description": "The location of the resource. This is the geographical region where the Chronicle instance resides, such as \"us\" or \"europe-west2\".",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "reference_list_id": {
+      "description": "Required. The ID to use for the reference list. This is also the display name for\nthe reference list. It must satisfy the following requirements:\n- Starts with letter.\n- Contains only letters, numbers and underscore.\n- Has length < 256.\n- Must be unique.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "syntax_type": {
+      "description": "Possible values:\nREFERENCE_LIST_SYNTAX_TYPE_PLAIN_TEXT_STRING\nREFERENCE_LIST_SYNTAX_TYPE_REGEX\nREFERENCE_LIST_SYNTAX_TYPE_CIDR",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "entries": {
+      "type": "block",
+      "description": "Required. The entries of the reference list.\nWhen listed, they are returned in the order that was specified at creation\nor update. The combined size of the values of the reference list may not\nexceed 6MB.\nThis is returned only when the view is REFERENCE_LIST_VIEW_FULL.",
+      "required": true
+    },
+    "entries.value": {
+      "description": "Required. The value of the entry. Maximum length is 512 characters.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "scope_info": {
+      "type": "block",
+      "description": "ScopeInfo specifies the scope info of the reference list.",
+      "required": false
+    },
+    "scope_info.reference_list_scope": {
+      "type": "block",
+      "description": "ReferenceListScope specifies the list of scope names of the reference list.",
+      "required": false
+    },
+    "scope_info.reference_list_scope.scope_names": {
+      "description": "Optional. The list of scope names of the reference list. The scope names should be\nfull resource names and should be of the format:\n\"projects/{project}/locations/{location}/instances/{instance}/dataAccessScopes/{scope_name}\".",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}

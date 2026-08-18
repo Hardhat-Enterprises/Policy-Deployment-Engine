@@ -1,0 +1,48 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "admission_policy": {
+      "description": "The cache admission policy dictates whether a block should be inserted upon a cache miss. Default value: \"admit-on-first-miss\" Possible values: [\"admit-on-first-miss\", \"admit-on-second-miss\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Controls the Anywhere Cache admission heuristic (whether to cache a block on first vs. second miss). This is a performance/cost tuning choice that does not affect access control, encryption, or exposure, so a platform security policy adds no value."
+    },
+    "bucket": {
+      "description": "A reference to Bucket resource",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Bucket name is required field and does not relate to security"
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "ingest_on_write": {
+      "description": "Whether or not the cache ingests data as the data is written to the bucket.",
+      "required": false,
+      "type": "bool",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "ttl": {
+      "description": "The TTL of all cache entries in whole seconds. e.g., \"7200s\". It defaults to '86400s'",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "TTL of cache entries is not security related"
+    },
+    "zone": {
+      "description": "The zone in which the cache instance needs to be created. For example, 'us-central1-a.'",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    }
+  }
+}

@@ -1,0 +1,342 @@
+{
+  "last_updated": "2026-06-23T08:26:44Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "annotations": {
+      "description": "Optional. Annotations on the cluster. This field has the same restrictions as Kubernetes annotations. The total size of all keys and values combined is limited to 256k. Key can have 2 segments: prefix (optional) and name (required), separated by a slash (/). Prefix must be a DNS subdomain. Name must be 63 characters or less, begin and end with alphanumerics, with dashes (-), underscores (_), dots (.), and alphanumerics between.\n\n**Note**: This field is non-authoritative, and will only manage the annotations present in your configuration.\nPlease refer to the field `effective_annotations` for all of the annotations present on the resource.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Annotations provide metadata for the cluster and do not directly control access, encryption, network exposure, or privileged permissions."
+    },
+    "aws_region": {
+      "description": "The AWS region where the cluster runs. Each Google Cloud region supports a subset of nearby AWS regions. You can call to list all supported AWS regions within a given Google Cloud region.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The AWS region determines where cluster workloads run and is a data residency control. It should be restricted to approved Australia AWS regions to meet data residency and sovereignty requirements."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "description": {
+      "description": "Optional. A human readable description of this cluster. Cannot be longer than 255 UTF-8 encoded bytes.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The description is metadata for humans and does not directly control access, encryption, network exposure, or privileged permissions."
+    },
+    "location": {
+      "description": "The location for the resource",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+    },
+    "name": {
+      "description": "The name of this resource.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The resource name identifies the cluster but does not directly control access, encryption, network exposure, or privileged permissions."
+    },
+    "project": {
+      "description": "The project for the resource",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The project identifies where the resource is created. It affects placement and ownership but does not directly define access, encryption, network exposure, or privileged permissions."
+    },
+    "authorization": {
+      "type": "block",
+      "description": "Configuration related to the cluster RBAC settings.",
+      "required": true
+    },
+    "authorization.admin_groups": {
+      "type": "block",
+      "description": "Groups of users that can perform operations as a cluster admin. A managed ClusterRoleBinding will be created to grant the `cluster-admin` ClusterRole to the groups. Up to ten admin groups can be provided. For more info on RBAC, see https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles",
+      "required": false
+    },
+    "authorization.admin_groups.group": {
+      "description": "The name of the group, e.g. `my-group@domain.com`.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The group email determines which group receives cluster-admin permissions and should belong to an approved organisation-managed domain."
+    },
+    "authorization.admin_users": {
+      "type": "block",
+      "description": "Users to perform operations as a cluster admin. A managed ClusterRoleBinding will be created to grant the `cluster-admin` ClusterRole to the users. Up to ten admin users can be provided. For more info on RBAC, see https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles",
+      "required": true
+    },
+    "authorization.admin_users.username": {
+      "description": "The name of the user, e.g. `my-gcp-id@gmail.com`.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The username identifies a user granted cluster-admin permissions and should belong to an approved organisation-managed identity."
+    },
+    "binary_authorization": {
+      "type": "block",
+      "description": "Configuration options for the Binary Authorization feature.",
+      "required": false
+    },
+    "binary_authorization.evaluation_mode": {
+      "description": "Mode of operation for Binary Authorization policy evaluation. Possible values: DISABLED, PROJECT_SINGLETON_POLICY_ENFORCE",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The evaluation mode determines whether Binary Authorization enforcement is enabled and should be set to enforce approved policy."
+    },
+    "control_plane": {
+      "type": "block",
+      "description": "Configuration related to the cluster control plane.",
+      "required": true
+    },
+    "control_plane.iam_instance_profile": {
+      "description": "The name of the AWS IAM instance pofile to assign to each control plane replica.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The IAM instance profile controls permissions granted to control plane replicas and should be limited to approved least-privilege profiles."
+    },
+    "control_plane.instance_type": {
+      "description": "Optional. The AWS instance type. When unspecified, it defaults to `m5.large`.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The instance type affects capacity and cost but does not directly control access, encryption, network exposure, or privileged permissions."
+    },
+    "control_plane.security_group_ids": {
+      "description": "Optional. The IDs of additional security groups to add to control plane replicas. The Anthos Multi-Cloud API will automatically create and manage security groups with the minimum rules needed for a functioning cluster.",
+      "required": false,
+      "type": "list(string)",
+      "security_impact": true,
+      "rationale": "Security groups control network access to control plane replicas and should be restricted to approved groups."
+    },
+    "control_plane.subnet_ids": {
+      "description": "The list of subnets where control plane replicas will run. A replica will be provisioned on each subnet and up to three values can be provided. Each subnet must be in a different AWS Availability Zone (AZ).",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": true,
+      "rationale": "Subnets determine network placement for control plane replicas and should be restricted to approved private subnets."
+    },
+    "control_plane.tags": {
+      "description": "Optional. A set of AWS resource tags to propagate to all underlying managed AWS resources. Specify at most 50 pairs containing alphanumerics, spaces, and symbols (.+-=_:@/). Keys can be up to 127 Unicode characters. Values can be up to 255 Unicode characters.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "Tags support resource identification, ownership, and cost allocation but do not directly grant access or permissions."
+    },
+    "control_plane.version": {
+      "description": "The Kubernetes version to run on control plane replicas (e.g. `1.19.10-gke.1000`). You can list all supported versions on a given Google Cloud region by calling .",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The Kubernetes version can affect exposure to known vulnerabilities and should be kept within approved supported versions."
+    },
+    "control_plane.aws_services_authentication": {
+      "type": "block",
+      "description": "Authentication configuration for management of AWS resources.",
+      "required": true
+    },
+    "control_plane.aws_services_authentication.role_arn": {
+      "description": "The Amazon Resource Name (ARN) of the role that the Anthos Multi-Cloud API will assume when managing AWS resources on your account.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The role ARN determines which AWS IAM role is assumed to manage AWS resources and should be restricted to approved roles."
+    },
+    "control_plane.aws_services_authentication.role_session_name": {
+      "description": "Optional. An identifier for the assumed role session. When unspecified, it defaults to `multicloud-service-agent`.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This value identifies the assumed role session for logging and traceability but does not directly grant permissions."
+    },
+    "control_plane.config_encryption": {
+      "type": "block",
+      "description": "The ARN of the AWS KMS key used to encrypt cluster configuration.",
+      "required": true
+    },
+    "control_plane.config_encryption.kms_key_arn": {
+      "description": "The ARN of the AWS KMS key used to encrypt cluster configuration.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Sets the KMS key used to encrypt control-plane configuration. A policy should require it to be non-empty so configuration is always CMEK-encrypted; it must not pin a specific key, since keys are team/project-specific."
+    },
+    "control_plane.database_encryption": {
+      "type": "block",
+      "description": "The ARN of the AWS KMS key used to encrypt cluster secrets.",
+      "required": true
+    },
+    "control_plane.database_encryption.kms_key_arn": {
+      "description": "The ARN of the AWS KMS key used to encrypt cluster secrets.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Sets the KMS key used to encrypt cluster secrets (database encryption). A policy should require it to be non-empty so secrets are always CMEK-encrypted; it must not pin a specific key, since keys are team/project-specific."
+    },
+    "control_plane.main_volume": {
+      "type": "block",
+      "description": "Optional. Configuration related to the main volume provisioned for each control plane replica. The main volume is in charge of storing all of the cluster's etcd state. Volumes will be provisioned in the availability zone associated with the corresponding subnet. When unspecified, it defaults to 8 GiB with the GP2 volume type.",
+      "required": false
+    },
+    "control_plane.main_volume.iops": {
+      "description": "Optional. The number of I/O operations per second (IOPS) to provision for GP3 volume.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "IOPS affects performance and cost but does not directly control access, encryption, network exposure, or privileged permissions."
+    },
+    "control_plane.main_volume.kms_key_arn": {
+      "description": "Optional. The Amazon Resource Name (ARN) of the Customer Managed Key (CMK) used to encrypt AWS EBS volumes. If not specified, the default Amazon managed key associated to the AWS region where this cluster runs will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The KMS key controls encryption for the main EBS volume and should use an approved customer-managed key where required."
+    },
+    "control_plane.main_volume.size_gib": {
+      "description": "Optional. The size of the volume, in GiBs. When unspecified, a default value is provided. See the specific reference in the parent resource.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Volume size affects capacity and cost but does not directly control access, encryption, network exposure, or privileged permissions."
+    },
+    "control_plane.main_volume.throughput": {
+      "description": "Optional. The throughput to provision for the volume, in MiB/s. Only valid if the volume type is GP3. If volume type is gp3 and throughput is not specified, the throughput will defaults to 125.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Throughput affects performance and cost but does not directly control access, encryption, network exposure, or privileged permissions."
+    },
+    "control_plane.main_volume.volume_type": {
+      "description": "Optional. Type of the EBS volume. When unspecified, it defaults to GP2 volume. Possible values: VOLUME_TYPE_UNSPECIFIED, GP2, GP3",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Volume type affects performance and cost but does not directly control access, encryption, network exposure, or privileged permissions."
+    },
+    "control_plane.proxy_config": {
+      "type": "block",
+      "description": "Proxy configuration for outbound HTTP(S) traffic.",
+      "required": false
+    },
+    "control_plane.proxy_config.secret_arn": {
+      "description": "The ARN of the AWS Secret Manager secret that contains the HTTP(S) proxy configuration.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier pointing at the AWS Secrets Manager secret that holds proxy configuration. It is a reference to an externally-managed resource; a generic platform policy cannot constrain which secret without naming a specific ARN, so it is not a useful policy target."
+    },
+    "control_plane.proxy_config.secret_version": {
+      "description": "The version string of the AWS Secret Manager secret that contains the HTTP(S) proxy configuration.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The secret version selects a version of an approved proxy secret but does not independently grant access or permissions."
+    },
+    "control_plane.root_volume": {
+      "type": "block",
+      "description": "Optional. Configuration related to the root volume provisioned for each control plane replica. Volumes will be provisioned in the availability zone associated with the corresponding subnet. When unspecified, it defaults to 32 GiB with the GP2 volume type.",
+      "required": false
+    },
+    "control_plane.root_volume.iops": {
+      "description": "Optional. The number of I/O operations per second (IOPS) to provision for GP3 volume.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "IOPS affects performance and cost but does not directly control access, encryption, network exposure, or privileged permissions."
+    },
+    "control_plane.root_volume.kms_key_arn": {
+      "description": "Optional. The Amazon Resource Name (ARN) of the Customer Managed Key (CMK) used to encrypt AWS EBS volumes. If not specified, the default Amazon managed key associated to the AWS region where this cluster runs will be used.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The KMS key controls encryption for the root EBS volume and should use an approved customer-managed key where required."
+    },
+    "control_plane.root_volume.size_gib": {
+      "description": "Optional. The size of the volume, in GiBs. When unspecified, a default value is provided. See the specific reference in the parent resource.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Volume size affects capacity and cost but does not directly control access, encryption, network exposure, or privileged permissions."
+    },
+    "control_plane.root_volume.throughput": {
+      "description": "Optional. The throughput to provision for the volume, in MiB/s. Only valid if the volume type is GP3. If volume type is gp3 and throughput is not specified, the throughput will defaults to 125.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Throughput affects performance and cost but does not directly control access, encryption, network exposure, or privileged permissions."
+    },
+    "control_plane.root_volume.volume_type": {
+      "description": "Optional. Type of the EBS volume. When unspecified, it defaults to GP2 volume. Possible values: VOLUME_TYPE_UNSPECIFIED, GP2, GP3",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Volume type affects performance and cost but does not directly control access, encryption, network exposure, or privileged permissions."
+    },
+    "control_plane.ssh_config": {
+      "type": "block",
+      "description": "Optional. SSH configuration for how to access the underlying control plane machines.",
+      "required": false
+    },
+    "control_plane.ssh_config.ec2_key_pair": {
+      "description": "The name of the EC2 key pair used to login into cluster machines.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The EC2 key pair controls SSH access to cluster machines and should be restricted to approved managed keys."
+    },
+    "fleet": {
+      "type": "block",
+      "description": "Fleet configuration.",
+      "required": true
+    },
+    "fleet.project": {
+      "description": "The number of the Fleet host project where this cluster will be registered.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The Fleet host project determines registration location but does not directly control cluster access, encryption, or network exposure."
+    },
+    "networking": {
+      "type": "block",
+      "description": "Cluster-wide networking configuration.",
+      "required": true
+    },
+    "networking.per_node_pool_sg_rules_disabled": {
+      "description": "Disable the per node pool subnet security group rules on the control plane security group. When set to true, you must also provide one or more security groups that ensure node pools are able to send requests to the control plane on TCP/443 and TCP/8132. Failure to do so may result in unavailable node pools.",
+      "required": false,
+      "type": "bool",
+      "security_impact": true,
+      "rationale": "Disabling managed per-node-pool security group rules can affect control plane connectivity and may require carefully approved replacement security groups."
+    },
+    "networking.pod_address_cidr_blocks": {
+      "description": "All pods in the cluster are assigned an RFC1918 IPv4 address from these ranges. Only a single range is supported. This field cannot be changed after creation.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "Pod CIDR ranges define internal pod addressing. They should be planned to avoid overlap, but they do not directly grant permissions."
+    },
+    "networking.service_address_cidr_blocks": {
+      "description": "All services in the cluster are assigned an RFC1918 IPv4 address from these ranges. Only a single range is supported. This field cannot be changed after creation.",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": false,
+      "rationale": "Service CIDR ranges define internal service addressing. They should be planned to avoid overlap, but they do not directly grant permissions."
+    },
+    "networking.vpc_id": {
+      "description": "The VPC associated with the cluster. All component clusters (i.e. control plane and node pools) run on a single VPC. This field cannot be changed after creation.",
+      "required": true,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "The VPC controls the network boundary for the cluster and should be restricted to approved VPCs."
+    }
+  }
+}

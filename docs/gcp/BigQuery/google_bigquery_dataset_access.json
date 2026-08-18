@@ -1,0 +1,185 @@
+{
+  "last_updated": "2026-06-23T08:26:43Z",
+  "provider_version": "7.37.0",
+  "arguments": {
+    "dataset_id": {
+      "description": "A unique ID for this dataset, without the project name. The ID\nmust contain only letters (a-z, A-Z), numbers (0-9), or\nunderscores (_). The maximum length is 1,024 characters.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifier of the dataset the access entry targets. It is a resource reference, not a control; access is governed by the principal/role fields, so there is nothing generic to enforce on the name."
+    },
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "domain": {
+      "description": "A domain to grant access to. Any users signed in with the\ndomain specified will be granted the specified access",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Grants dataset access to every user signed in with a named domain. It is not a public principal (allUsers/allAuthenticatedUsers), and restricting it would mean hardcoding the org's allowed domain(s), which a generic platform policy cannot know – overreaching."
+    },
+    "group_by_email": {
+      "description": "An email address of a Google Group to grant access to.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Grants dataset access to a specific Google Group by email. It is a specific (non-public) principal; we cannot generically constrain which group without hardcoding an email, and a group email is not a public/wildcard grant, so there is nothing useful to enforce."
+    },
+    "iam_member": {
+      "description": "Some other type of member that appears in the IAM Policy but isn't a user,\ngroup, domain, or special group. For example: 'allUsers'",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "A raw IAM member string for dataset access that can include public principals such as allUsers. A policy should reject public (allUsers/allAuthenticatedUsers) and wildcard principals here to prevent broad data exposure, while allowing specific users/groups."
+    },
+    "project": {
+      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "role": {
+      "description": "Describes the rights granted to the user specified by the other\nmember of the access object. Basic, predefined, and custom roles are\nsupported. Predefined roles that have equivalent basic roles are\nswapped by the API to their basic counterparts, and will show a diff\npost-create. See\n[official docs](https://cloud.google.com/bigquery/docs/access-control).",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Specifies the IAM role granted in the dataset access entry. A platform policy should not dictate which roles teams may assign; we instead constrain the principals (public/wildcard) rather than the role catalog."
+    },
+    "special_group": {
+      "description": "A special group to grant access to. Possible values include:\n* 'projectOwners': Owners of the enclosing project.\n* 'projectReaders': Readers of the enclosing project.\n* 'projectWriters': Writers of the enclosing project.\n* 'allAuthenticatedUsers': All authenticated BigQuery users.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Grants dataset access to a special group such as projectOwners/projectReaders or, critically, allAuthenticatedUsers. A policy should reject the public option (allAuthenticatedUsers) to prevent broad data exposure while allowing the project-scoped groups."
+    },
+    "user_by_email": {
+      "description": "An email address of a user to grant access to. For example:\nfred@example.com",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Grants dataset access to a specific user by email. It is a specific (non-public) principal; constraining which user is granted access would require hardcoding an email, and a single user is not a public/wildcard grant, so a generic policy adds no security value."
+    },
+    "condition": {
+      "type": "block",
+      "description": "Condition for the binding. If CEL expression in this field is true, this\naccess binding will be considered.",
+      "required": false
+    },
+    "condition.description": {
+      "description": "Description of the expression. This is a longer text which describes the expression,\ne.g. when hovered over it in a UI.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "condition.expression": {
+      "description": "Textual representation of an expression in Common Expression Language syntax.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "condition.location": {
+      "description": "String indicating the location of the expression for error reporting, e.g. a file\nname and a position in the file.",
+      "required": false,
+      "type": "string",
+      "security_impact": true,
+      "rationale": "Specifies the geographic location associated with the dataset access condition. Treated as a residency control, a policy can require it fall within an approved region whitelist to meet sovereignty requirements."
+    },
+    "condition.title": {
+      "description": "Title for the expression, i.e. a short string describing its purpose.\nThis can be used e.g. in UIs which allow to enter the expression.",
+      "required": false,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dataset": {
+      "type": "block",
+      "description": "Grants all resources of particular types in a particular dataset read access to the current dataset.",
+      "required": false
+    },
+    "dataset.target_types": {
+      "description": "Which resources in the dataset this entry applies to. Currently, only views are supported,\nbut additional target types may be added in the future. Possible values: VIEWS",
+      "required": true,
+      "type": "list(string)",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dataset.dataset": {
+      "type": "block",
+      "description": "The dataset this entry applies to",
+      "required": true
+    },
+    "dataset.dataset.dataset_id": {
+      "description": "The ID of the dataset containing this table.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "dataset.dataset.project_id": {
+      "description": "The ID of the project containing this table.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routine": {
+      "type": "block",
+      "description": "A routine from a different dataset to grant access to. Queries\nexecuted against that routine will have read access to tables in\nthis dataset. The role field is not required when this field is\nset. If that routine is updated by any user, access to the routine\nneeds to be granted again via an update operation.",
+      "required": false
+    },
+    "routine.dataset_id": {
+      "description": "The ID of the dataset containing this table.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routine.project_id": {
+      "description": "The ID of the project containing this table.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "routine.routine_id": {
+      "description": "The ID of the routine. The ID must contain only letters (a-z,\nA-Z), numbers (0-9), or underscores (_). The maximum length\nis 256 characters.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "view": {
+      "type": "block",
+      "description": "A view from a different dataset to grant access to. Queries\nexecuted against that view will have read access to tables in\nthis dataset. The role field is not required when this field is\nset. If that view is updated by any user, access to the view\nneeds to be granted again via an update operation.",
+      "required": false
+    },
+    "view.dataset_id": {
+      "description": "The ID of the dataset containing this table.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "view.project_id": {
+      "description": "The ID of the project containing this table.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    },
+    "view.table_id": {
+      "description": "The ID of the table. The ID must contain only letters (a-z,\nA-Z), numbers (0-9), or underscores (_). The maximum length\nis 1,024 characters.",
+      "required": true,
+      "type": "string",
+      "security_impact": "true/false",
+      "rationale": ""
+    }
+  }
+}
