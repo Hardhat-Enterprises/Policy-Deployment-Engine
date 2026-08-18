@@ -15,13 +15,11 @@ conditions := [
         {
             "condition": "Logging must NOT be disabled.",
             "attribute_path": ["rule", 0, "enable_logging"],
-            "values": [TRUE],
-            "policy_type": "blacklist"
+            "values": [true],
+            "policy_type": "whitelist"
         }
     ]
 ]
    
-result := helpers.get_multi_summary(conditions, vars.variables)
-  
-message := result.message
-details := result.details
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

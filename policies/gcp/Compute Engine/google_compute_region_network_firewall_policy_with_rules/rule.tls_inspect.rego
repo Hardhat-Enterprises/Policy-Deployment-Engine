@@ -1,6 +1,6 @@
 package terraform.gcp.security.compute_engine.google_compute_region_network_firewall_policy_with_rules.rule_tls_inspect
 import data.terraform.helpers
-import data.terraform.gcp.security.compute_engine.google_compute_region_network_firewall_policy_with_rules.vars
+import data.terraform.gcp.security.compute_engine.google_compute_region_network_firewall_policy_with_rules.vars as vars
 
 
 conditions := [
@@ -14,14 +14,12 @@ conditions := [
     {
       "condition": "TLS Inspection must be set to true.",
       "attribute_path": ["rule", 0, "tls_inspect"],
-      "values": [TRUE],
+      "values": [true],
       "policy_type": "whitelist"
     }
   ]
 ]
 
    
-result := helpers.get_multi_summary(conditions, vars.variables)
-  
-message := result.message
-details := result.details
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details

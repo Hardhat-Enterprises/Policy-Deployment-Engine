@@ -5,12 +5,11 @@ resource "google_compute_region_network_firewall_policy_with_rules" "compliant_e
     action         = "deny"
     direction      = "INGRESS"
 
-    match {
-      src_ip_ranges            = ["0.0.0.0/0"]
-
+      match {
+      src_ip_ranges = ["10.0.0.0/8"]
       layer4_config {
-        ip_protocol = "all"
-        ports       = [8080, 7070]
+        ip_protocol = "tcp"
+        ports       = ["443", "8443"]
       }
     }
   }

@@ -7,7 +7,8 @@ resource "google_compute_region_network_firewall_policy_with_rules" "non_complia
 
     match {
       src_ip_ranges            = ["0.0.0.0/0"]
-
+      dest_threat_intelligences = ["random_ip_lists", "google_search_engine_crawlers"]
+      
       layer4_config {
         ip_protocol = "all"
       }

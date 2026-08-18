@@ -4,7 +4,7 @@ resource "google_compute_region_network_firewall_policy_with_rules" "non_complia
     priority       = 1000
     action         = "deny"
     direction      = "INGRESS"
-    tls_inspect = FALSE
+    tls_inspect = false
 
     match {
       src_ip_ranges            = ["0.0.0.0/0"]

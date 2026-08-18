@@ -6,10 +6,10 @@ resource "google_compute_region_network_firewall_policy_with_rules" "non_complia
     direction      = "INGRESS"
 
     match {
-      src_ip_ranges            = ["0.0.0.0/0"]
-
+      src_ip_ranges = ["0.0.0.0/0"]
       layer4_config {
-        ip_protocol = "all"
+        ip_protocol = "tcp" 
+        ports = ["0-65535"]
       }
     }
   }

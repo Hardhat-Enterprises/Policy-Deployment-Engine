@@ -4,7 +4,7 @@ resource "google_compute_region_network_firewall_policy_with_rules" "compliant_e
     priority       = 1000
     action         = "deny"
     direction      = "INGRESS"
-    security_profile_group = "https://networksecurity.googleapis.com/v1/projects/{project}/locations/{location}/securityProfileGroups/my-security-profile-group"
+    security_profile_group = "https://networksecurity.googleapis.com/v1/projects/APPROVED_SECURITY_PROJECT/locations/global/securityProfileGroups/standard-threat-prevention"
     match {
       src_ip_ranges            = ["0.0.0.0/0"]
 

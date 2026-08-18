@@ -7,7 +7,7 @@ resource "google_compute_region_network_firewall_policy_with_rules" "compliant_e
 
     match {
       src_ip_ranges            = ["0.0.0.0/0"]
-      dest_threat_intelligences = ["iplist-search-engines-crawlers", "iplist-tor-exit-nodes"]
+      dest_threat_intelligences = ["iplist-known-malicious-ips", "iplist-tor-exit-nodes"]
       
       layer4_config {
         ip_protocol = "all"
