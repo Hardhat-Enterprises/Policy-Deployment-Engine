@@ -1,4 +1,4 @@
-# Security Assessment Guidance
+# Assessment Guidance: How to Think About `security_impact`
 
 How to decide an argument's `security_impact` (`true`/`false`) and write its `rationale`
 in the `docs/` resource files — and how to review student PRs that do the same.
@@ -11,15 +11,14 @@ in the `docs/` resource files — and how to review student PRs that do the same
 
 ---
 
-## 1. The core mental model: platform-level, multi-tenant
+## 1. The mission
 
-These policies run for an **imaginary enterprise org** with many teams and hundreds of
-projects. **We do not know — and must never assume — specific names, keys, projects,
-emails, or regions belonging to a particular team.** This is the single most common
-mistake.
+We are building a library of **generic, platform-level security policies** for an
+imaginary multi-tenant enterprise: many teams, hundreds of projects, and — crucially —
+**we know nothing about any particular team**. No project names, no key IDs, no email
+addresses, no bucket names.
 
-A policy is only valid if it is **generic and structural** — true for any team, any
-project, without naming anything specific:
+For each argument, the question you are answering is:
 
 - ✅ _"encryption key must not be blank/null"_ — structural, applies everywhere.
 - ❌ _"encryption key must equal `projects/acme/keys/foo`"_ — assumes a specific key we
@@ -30,8 +29,9 @@ project, without naming anything specific:
   acceptable — the policy shape is fully repurposable by swapping the list.
 - ❌ _"bucket name must be `prod-data`"_ — naming a specific resource. Invalid.
 
-Region is the one place a concrete value (even hardcoded) is fine; keys, projects,
-emails, and resource names are not.
+*Generic* means the policy could be written once and applied to every team without
+knowing anything team-specific. If the only way to enforce something is to hardcode a
+value that belongs to one team, that is not a platform policy — it's overreach.
 
 We are ensuring **this resource is cleanly/securely configured** — we are **not** policing
 the names of _other_ resources it references (other buckets, projects, datasets). Pointing
@@ -62,7 +62,8 @@ they were distilled from real Azure platform policies and apply equally to GCP:
 Rule of thumb: **enable security features; disable or constrain things that weaken
 security.** If an argument toggles or sizes one of those, it is almost always `true`.
 
----
+The single biggest differentiator between strong and weak assessments is whether the
+author actually found out what the argument does.
 
 ## 3. When is `security_impact = false`?
 
@@ -81,10 +82,9 @@ security.** If an argument toggles or sizes one of those, it is almost always `t
 
 ---
 
-## 4. IAM: freedom vs. overreaching
+## 3. Questions to ask of any argument
 
-IAM needs a careful, consistent line. Teams must stay free to assign access; we only block
-the clearly dangerous.
+Work through these honestly for every argument — they are the analysis:
 
 **Good IAM policy (`true`, worth enforcing):**
 
@@ -135,9 +135,9 @@ A rationale must **demonstrate understanding of what the argument controls** and
 
 ---
 
-## 6. PR-review checklist
+## 4. What a good rationale looks like
 
-When reviewing a student's assessment of an argument, **reject** if any of these fail:
+The rationale is where you prove the work happened. It must:
 
 1. **Generic, not specific** — does the implied policy avoid hardcoding any specific name,
    key, project, region, or email? (whitelists/structural shapes are fine)
@@ -218,6 +218,11 @@ Confirmed **`false`** (not policy targets):
   them. (Free-form **env-var maps** stay `true` on credential-hygiene grounds — a policy
   discourages plaintext secrets, pointing teams to Secret Manager.)
 
----
+To be plain about it: the analysis is what is being assessed, not the final booleans.
+Verdicts are checked, rationales are read, and reviewers are experienced at spotting
+prose that describes an argument without understanding it — including the fluent,
+confident, generically-worded kind. A rationale that doesn't demonstrate genuine
+engagement with what the argument does *in this resource* will not pass, whatever the
+verdict says.
 
 _Add a new `### <Service>` subsection here as each service is reviewed._
