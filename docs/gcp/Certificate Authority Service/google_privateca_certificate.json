@@ -20,8 +20,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument controls whether Terraform is permitted to destroy the certificate resource. A generic policy can prevent accidental destruction to preserve certificate records and reduce operational or trust disruption caused by unintended removal."
     },
     "labels": {
       "description": "Labels with user-defined metadata to apply to this resource.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
@@ -228,8 +228,8 @@
       "description": "Indicates whether or not this extension is critical (i.e., if the client does not know how to\nhandle this extension, the client should consider this to be an error).",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument determines whether clients must reject the certificate when they cannot process the custom X.509 extension. The appropriate setting depends on the meaning and intended enforcement of that specific extension, so a generic policy cannot require all custom extensions to be critical or non-critical."
     },
     "config.x509_config.additional_extensions.value": {
       "description": "The value of this X.509 extension. A base64-encoded string.",
@@ -247,8 +247,8 @@
       "description": "An ObjectId specifies an object identifier (OID). These provide context and describe types in ASN.1 messages.",
       "required": true,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument identifies the type and meaning of a custom X.509 extension using an object identifier path. The correct OID depends on the specific extension and its application-defined purpose, so a generic policy cannot prescribe one universally safe value."
     },
     "config.x509_config.ca_options": {
       "type": "block",
@@ -412,8 +412,8 @@
       "description": "An ObjectId specifies an object identifier (OID). These provide context and describe types in ASN.1 messages.",
       "required": true,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument specifies a custom extended key usage through an object identifier path. The correct OID depends on the application, protocol and intended certificate purpose, so a generic policy cannot prescribe a universally appropriate value."
     },
     "config.x509_config.name_constraints": {
       "type": "block",
@@ -424,8 +424,8 @@
       "description": "Indicates whether or not the name constraints are marked critical.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument determines whether clients must reject a CA certificate when they cannot process its name constraints. A generic policy can require the extension to be critical so namespace restrictions cannot be silently ignored during certificate-path validation, consistent with RFC 5280."
     },
     "config.x509_config.name_constraints.excluded_dns_names": {
       "description": "Contains excluded DNS names. Any DNS name that can be\nconstructed by simply adding zero or more labels to\nthe left-hand side of the name satisfies the name constraint.\nFor example, 'example.com', 'www.example.com', 'www.sub.example.com'\nwould satisfy 'example.com' while 'example1.com' does not.",
@@ -492,8 +492,8 @@
       "description": "An ObjectId specifies an object identifier (OID). These provide context and describe types in ASN.1 messages.",
       "required": true,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument identifies an applicable certificate policy using an object identifier path. The correct OID depends on the organisation's certificate policy and assurance framework, so a generic policy cannot prescribe one universally appropriate value."
     }
   }
 }
