@@ -148,8 +148,8 @@
       "description": "Optional. Indicates whether or not this extension is critical (i.e., if the client does not know how to handle this extension, the client should consider this to be an error).",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Whether a custom extension should be marked critical depends on the extension's purpose and client compatibility requirements, so no universal setting is appropriate."
+      "security_impact": true,
+      "rationale": "Controls whether clients must reject certificates containing an extension they cannot process. Enforcing appropriate critical-extension handling prevents security-relevant extension semantics from being silently ignored."
     },
     "predefined_values.additional_extensions.value": {
       "description": "Required. The value of this X.509 extension.",
@@ -167,8 +167,8 @@
       "description": "Required. The parts of an OID path. The most significant parts of the path come first.",
       "required": true,
       "type": "list(number)",
-      "security_impact": false,
-      "rationale": "Identifies an application-specific predefined extension by OID. The correct identifier depends on the certificate profile and cannot be universally mandated."
+     "security_impact": true,
+    "rationale": "Defines the OID of an additional certificate extension. Restricting permitted OIDs prevents unauthorized or security-sensitive extensions from being embedded in certificates issued from the template."
     },
     "predefined_values.ca_options": {
       "type": "block",
