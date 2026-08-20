@@ -13,29 +13,29 @@
       "description": "Specifies a unique device name of your choice that is reflected into the /dev/disk/by-id/google-* tree of a Linux operating system running within the instance. This name can be used to reference the device for mounting, resizing, and so on, from within the instance. If not specified, the server chooses a default device name to apply to this disk, in the form persistent-disks-x, where x is a number assigned by Google Compute Engine.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale":"This controls the device name used to expose the attached disk inside the guest operating system. Because device naming affects how storage is identified and accessed by guest-level software, a generic platform policy can enforce an approved device-naming configuration to reduce device spoofing, manipulation, or unsafe guest-level access patterns."
+      "security_impact": false,
+      "rationale":"This specifies the guest operating system device identifier used to reference the attached disk. It is an operational naming value inside the guest OS rather than a platform-level security control, so constraining it would not provide a useful generic security policy."
     },
     "disk": {
       "description": "name or self_link of the disk that will be attached.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This identifies the backing persistent disk that is attached to the compute instance. Attaching an unauthorized or unapproved disk can expose data or bypass storage security requirements. A generic platform policy can constrain disk references to approved storage resources or security tiers."
+      "security_impact": false,
+      "rationale": "This identifies the persistent disk resource that will be attached. It is a reference to another resource rather than a security configuration value on this resource, so a generic platform policy should not constrain the specific disk reference."
     },
     "instance": {
       "description": "name or self_link of the compute instance that the disk will be attached to. If the self_link is provided then zone and project are extracted from the self link. If only the name is used then zone and project must be defined as properties on the resource or provider.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale":  "This identifies the compute instance that receives the disk attachment. Attaching persistent storage to an unauthorized instance can expose data outside the intended access boundary. A generic platform policy can restrict disk attachments to approved compute instances or permitted instance scopes."
+      "security_impact": false,
+      "rationale": "This identifies the compute instance to which the disk is attached. It is a reference to another resource rather than a standalone security control, so constraining the specific instance reference would require environment-specific knowledge and is not a useful generic policy target."
     },
     "interface": {
       "description": "The disk interface used for attaching this disk. One of SCSI or NVME. (This field is only used for specific cases, please don't specify this field without advice from Google.)",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This selects the device interface used to attach the disk, such as SCSI or NVME. The interface affects how the guest and virtualization layer access the storage device, making it part of the resource's secure configuration. A generic platform policy can restrict disk interfaces to approved configurations."
+      "security_impact": false,
+      "rationale":"This selects the disk interface used for the attachment, such as SCSI or NVME. These are functional and architectural configuration options rather than secure versus insecure values, so restricting the interface would not provide a generic security improvement."
     },
     "mode": {
       "description": "The mode in which to attach this disk, either READ_WRITE or READ_ONLY. If not specified, the default is to attach the disk in READ_WRITE mode.",
@@ -48,8 +48,8 @@
       "description": "The project that the referenced compute instance is a part of. If instance is referenced by its self_link the project defined in the link will take precedence.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This identifies the project containing the compute instance associated with the disk attachment. Project boundaries are security boundaries, and inappropriate cross-project attachment can create unauthorized data-access or exfiltration paths. A generic platform policy can enforce approved project relationships or prevent disallowed cross-project attachments."
+      "security_impact": false,
+      "rationale": "This specifies the project associated with the referenced compute instance. It is an identifier and resource reference rather than a standalone security configuration value, so a generic platform policy should not constrain a specific project ID."
     },
     "zone": {
       "description": "The zone that the referenced compute instance is located within. If instance is referenced by its self_link the zone defined in the link will take precedence.",
