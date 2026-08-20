@@ -6,8 +6,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can destroy the certificate template. Enforcing PREVENT protects centrally defined certificate issuance constraints from accidental deletion."
     },
     "description": {
       "description": "Optional. A human-readable description of scenarios this template is intended for.",
@@ -79,8 +79,8 @@
       "description": "Optional. Description of the expression. This is a longer text which describes the expression, e.g. when hovered over it in a UI.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Human-readable explanatory text for the CEL expression; it does not change expression evaluation or certificate issuance behaviour."
     },
     "identity_constraints.cel_expression.expression": {
       "description": "Textual representation of an expression in Common Expression Language syntax.",
@@ -93,8 +93,8 @@
       "description": "Optional. String indicating the location of the expression for error reporting, e.g. a file name and a position in the file.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Diagnostic source-location metadata used for error reporting; it does not affect CEL expression evaluation or certificate issuance controls."
     },
     "identity_constraints.cel_expression.title": {
       "description": "Optional. Title for the expression, i.e. a short string describing its purpose. This can be used e.g. in UIs which allow to enter the expression.",
@@ -124,8 +124,8 @@
       "description": "Required. The parts of an OID path. The most significant parts of the path come first.",
       "required": true,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies an application-specific extension by OID. The correct OID depends on the certificate profile, so no universal platform policy value can be mandated."
     },
     "predefined_values": {
       "type": "block",
@@ -148,8 +148,8 @@
       "description": "Optional. Indicates whether or not this extension is critical (i.e., if the client does not know how to handle this extension, the client should consider this to be an error).",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Whether a custom extension should be marked critical depends on the extension's purpose and client compatibility requirements, so no universal setting is appropriate."
     },
     "predefined_values.additional_extensions.value": {
       "description": "Required. The value of this X.509 extension.",
@@ -167,8 +167,8 @@
       "description": "Required. The parts of an OID path. The most significant parts of the path come first.",
       "required": true,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies an application-specific predefined extension by OID. The correct identifier depends on the certificate profile and cannot be universally mandated."
     },
     "predefined_values.ca_options": {
       "type": "block",
@@ -332,8 +332,8 @@
       "description": "Required. The parts of an OID path. The most significant parts of the path come first.",
       "required": true,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies a custom extended key usage through an OID path. The appropriate OID is application-specific and cannot be universally constrained by platform policy."
     },
     "predefined_values.name_constraints": {
       "type": "block",
@@ -344,8 +344,8 @@
       "description": "Indicates whether or not the name constraints are marked critical.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+"rationale": "Controls whether clients must reject certificates when they cannot process the template's name constraints. Marking the constraints critical prevents issuance-scope restrictions from being silently ignored."
     },
     "predefined_values.name_constraints.excluded_dns_names": {
       "description": "Contains excluded DNS names. Any DNS name that can be\nconstructed by simply adding zero or more labels to\nthe left-hand side of the name satisfies the name constraint.\nFor example, 'example.com', 'www.example.com', 'www.sub.example.com'\nwould satisfy 'example.com' while 'example1.com' does not.",
@@ -412,8 +412,8 @@
       "description": "Required. The parts of an OID path. The most significant parts of the path come first.",
       "required": true,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies an applicable certificate policy through an OID path. The correct OID depends on the organisation's PKI policy and cannot be universally mandated."
     }
   }
 }
