@@ -6,36 +6,36 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This controls whether Terraform can destroy the network firewall policy. Because deleting the policy can remove firewall rules that provide security enforcement, it falls under the prevent-destructive-loss policy archetype. A generic platform policy can require deletion protection to reduce the risk of accidental removal of critical security controls."
     },
     "description": {
       "description": "An optional description of this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field stores descriptive text for the network firewall policy. It does not change rule evaluation, traffic matching, scope, or enforcement behaviour, so constraining it would not provide a generic security improvement."
     },
     "name": {
       "description": "User-provided name of the Network firewall policy.\nThe name should be unique in the project in which the firewall policy is created.\nThe name must be 1-63 characters long, and comply with RFC1035. Specifically,\nthe name must be 1-63 characters long and match the regular expression [a-z]([-a-z0-9]*[a-z0-9])?\nwhich means the first character must be a lowercase letter, and all following characters must be a dash,\nlowercase letter, or digit, except the last character, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale":  "This is the user-provided name of the network firewall policy. Enterprise governance can require security resources to follow approved naming conventions so they can be consistently identified, audited, and managed. A generic platform policy can enforce a naming pattern without requiring a team-specific name."
     },
     "policy_type": {
       "description": "Policy type is used to determine which resources (networks) the policy can be associated with.\nA policy can be associated with a network only if the network has the matching policyType in its network profile.\nDifferent policy types may support some of the Firewall Rules features. Possible values: [\"VPC_POLICY\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale":  "This determines the type of network firewall policy and which network profiles it can be associated with. The documented configurable value is VPC_POLICY, so there is no meaningful alternative insecure value for a generic policy to restrict."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This identifies the project that owns the network firewall policy, or falls back to the provider project when omitted. The correct project is an environment-specific resource identifier chosen according to each team's deployment structure, so a generic policy cannot require a particular project value."
     },
     "rule": {
       "type": "block",
@@ -46,71 +46,71 @@
       "description": "The Action to perform when the client connection triggers the rule. Can currently be either\n\"allow\", \"deny\", \"apply_security_profile_group\" or \"goto_next\".",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact":true,
+      "rationale": "This controls what happens when traffic matches the firewall rule, including whether it is allowed, denied, passed to another rule, or sent for inspection. Because the action directly determines enforcement behaviour, a generic platform policy can restrict unsafe permissive actions or require inspection-oriented behaviour where a security baseline applies."
     },
     "rule.description": {
       "description": "A description of the rule.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field provides human-readable descriptive text for an individual firewall rule. It does not change traffic matching or enforcement behaviour, so constraining it would not provide a generic security improvement."
     },
     "rule.direction": {
       "description": "The direction in which this rule applies. If unspecified an INGRESS rule is created. Possible values: [\"INGRESS\", \"EGRESS\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects whether the rule evaluates ingress or egress traffic. Both directions are valid for different security requirements, and neither is inherently safer, so a generic policy cannot require one direction across all workloads."
     },
     "rule.disabled": {
       "description": "Denotes whether the firewall policy rule is disabled. When set to true,\nthe firewall policy rule is not enforced and traffic behaves as if it did\nnot exist. If this is unspecified, the firewall policy rule will be\nenabled.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "When this is true, the firewall rule is not enforced and traffic behaves as though the rule does not exist. A generic platform policy can require security rules to remain enabled so required firewall protections cannot be bypassed by disabling the rule."
     },
     "rule.enable_logging": {
       "description": "Denotes whether to enable logging for a particular rule.\nIf logging is enabled, logs will be exported to the\nconfigured export destination in Stackdriver.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This controls whether supported firewall rules generate logs for matched traffic. Firewall logs support monitoring, auditing, and incident investigation, so a generic platform policy can require logging where the selected rule action supports it."
     },
     "rule.priority": {
       "description": "An integer indicating the priority of a rule in the list. The priority must be a value\nbetween 0 and 2147483647. Rules are evaluated from highest to lowest priority where 0 is the\nhighest priority and 2147483647 is the lowest priority.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This controls the precedence of firewall rules during evaluation. Network firewall designs can reserve priority ranges for baseline controls and separate them from team-managed rules. A generic platform policy can enforce approved priority bands so required security controls are not overridden or shadowed by lower-level rules."
     },
     "rule.rule_name": {
       "description": "An optional name for the rule. This field is not a unique identifier\nand can be updated.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This provides a human-readable name for the firewall rule. Enterprise governance can require firewall rules to follow standard naming conventions so security controls can be consistently identified, audited, and managed. A generic platform policy can enforce an approved naming pattern without requiring a team-specific name."
     },
     "rule.security_profile_group": {
       "description": "A fully-qualified URL of a SecurityProfile resource instance.\nExample:\nhttps://networksecurity.googleapis.com/v1/projects/{project}/locations/{location}/securityProfileGroups/my-security-profile-group\nMust be specified if action is 'apply_security_profile_group'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale":  "This identifies the SecurityProfileGroup used when the rule action applies security inspection. A missing inspection configuration can prevent the intended security controls from being applied. A generic platform policy can require a non-empty security profile group whenever the corresponding inspection action is used."
     },
     "rule.target_service_accounts": {
       "description": "A list of service accounts indicating the sets of\ninstances that are applied with this rule.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the service accounts whose instances are targeted by the firewall rule. Service-account identifiers are workload-specific targeting values, so a generic platform policy cannot require particular service accounts without depending on team-specific configuration."
     },
     "rule.tls_inspect": {
       "description": "Boolean flag indicating if the traffic should be TLS decrypted.\nIt can be set only if action = 'apply_security_profile_group' and cannot be set for other actions.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This controls whether eligible TLS traffic is decrypted for inspection when a security profile group is applied. Where inspection is part of the required security baseline, disabling TLS inspection can allow encrypted traffic to bypass deeper inspection. A generic platform policy can require TLS inspection when the corresponding security inspection configuration is mandated."
     },
     "rule.match": {
       "type": "block",
@@ -121,71 +121,71 @@
       "description": "Address groups which should be matched against the traffic destination.\nMaximum number of destination address groups is 10.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects address-group resources whose members are matched as traffic destinations. The referenced groups and their contents are environment-specific traffic selectors defined outside this resource, so a generic platform policy cannot determine which destination address groups every team should use."
     },
     "rule.match.dest_fqdns": {
       "description": "Fully Qualified Domain Name (FQDN) which should be matched against\ntraffic destination. Maximum number of destination fqdn allowed is 100.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects destination domain names to match. The domains that should be allowed, denied, or inspected depend on the workload and its traffic requirements, so there is no universally appropriate FQDN list that a generic platform policy can require."
     },
     "rule.match.dest_ip_ranges": {
       "description": "Destination IP address range in CIDR format. Required for\nEGRESS rules.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies the destination CIDR ranges matched by the firewall rule. Destination addressing is determined by each workload's network architecture, and generic platform policy should not restrict team-specific CIDR selections or range sizing. Security segmentation is enforced through the firewall rule design rather than by constraining these address values."
     },
     "rule.match.dest_region_codes": {
       "description": "Region codes whose IP addresses will be used to match for destination\nof traffic. Should be specified as 2 letter country code defined as per\nISO 3166 alpha-2 country codes. ex.\"US\"\nMaximum number of destination region codes allowed is 5000.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale":"This controls which geographic regions are matched as traffic destinations. Enterprise security and compliance requirements can restrict traffic to approved geographic locations or prohibit specified regions. A generic platform policy can enforce an approved destination-region whitelist without relying on team-specific resource identifiers."
     },
     "rule.match.dest_threat_intelligences": {
       "description": "Names of Network Threat Intelligence lists.\nThe IPs in these lists will be matched against traffic destination.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects threat intelligence lists used as destination traffic match criteria. The choice of threat intelligence feed depends on the workload and filtering design, making it an operational traffic-matching input rather than a structural security control that can be generically mandated."
     },
     "rule.match.src_address_groups": {
       "description": "Address groups which should be matched against the traffic source.\nMaximum number of source address groups is 10.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects address-group resources whose members are matched as traffic sources. The referenced groups and their contents are environment-specific selectors maintained outside this resource, so a generic platform policy cannot determine which source address groups every team should use."
     },
     "rule.match.src_fqdns": {
       "description": "Fully Qualified Domain Name (FQDN) which should be matched against\ntraffic source. Maximum number of source fqdn allowed is 100.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects source domain names to match. Trusted or untrusted source domains depend on the workload and organization, so there is no generic FQDN value or list that can be required across all teams."
     },
     "rule.match.src_ip_ranges": {
       "description": "Source IP address range in CIDR format. Required for\nINGRESS rules.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies the source CIDR ranges matched by an ingress firewall rule. Source addressing depends on the workload's network architecture, and generic platform policy should not restrict team-specific CIDR selections or range sizing. Security segmentation is instead enforced through the firewall rule design."
     },
     "rule.match.src_region_codes": {
       "description": "Region codes whose IP addresses will be used to match for source\nof traffic. Should be specified as 2 letter country code defined as per\nISO 3166 alpha-2 country codes. ex.\"US\"\nMaximum number of source region codes allowed is 5000.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This matches source traffic according to geographic region codes. Which source regions are appropriate depends on the workload's expected users and traffic patterns, so there is no universally correct source-region value that can be required across all teams."
     },
     "rule.match.src_threat_intelligences": {
       "description": "Names of Network Threat Intelligence lists.\nThe IPs in these lists will be matched against traffic source.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects threat intelligence lists used as source traffic match criteria. These lists are external selectors used according to each workload's filtering requirements, so they are functional configuration inputs rather than structural security controls that a generic platform policy can meaningfully constrain."
     },
     "rule.match.layer4_config": {
       "type": "block",
@@ -196,15 +196,15 @@
       "description": "The IP protocol to which this rule applies. The protocol\ntype is required when creating a firewall rule.\nThis value can either be one of the following well\nknown protocol strings (tcp, udp, icmp, esp, ah, ipip, sctp),\nor the IP protocol number.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the IP protocol that the firewall rule matches. The supported protocols serve different legitimate workloads, and no protocol value is universally insecure, so the correct choice is application-specific rather than a generic platform policy target."
     },
     "rule.match.layer4_config.ports": {
       "description": "An optional list of ports to which this rule applies. This field\nis only applicable for UDP or TCP protocol. Each entry must be\neither an integer or a range. If not specified, this rule\napplies to connections through any port.\nExample inputs include: [\"22\"], [\"80\",\"443\"], and\n[\"12345-12349\"].",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies the TCP or UDP ports that the firewall rule matches. Required ports vary according to the application and service being protected, so there is no universally secure set of port values that can be enforced across all workloads."
     },
     "rule.match.src_secure_tag": {
       "type": "block",
@@ -215,8 +215,8 @@
       "description": "Name of the secure tag, created with TagManager's TagValue API.\n@pattern tagValues/[0-9]+",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This identifies a specific secure tag value used to match traffic sources. Secure tag values are created and assigned according to each environment's resource model, so the correct identifier is team-specific and cannot be generically required."
     },
     "rule.target_secure_tag": {
       "type": "block",
@@ -227,8 +227,8 @@
       "description": "Name of the secure tag, created with TagManager's TagValue API.\n@pattern tagValues/[0-9]+",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This identifies a specific secure tag value used to select the instances to which the firewall rule applies. The correct tag depends on each environment's tagging and workload model, so a generic platform policy cannot require a particular tag value."
     }
   }
 }
