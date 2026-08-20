@@ -6,50 +6,50 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact":true,
+      "rationale": "This controls whether Terraform can destroy the attached disk resource. Removing the attachment can disrupt access to persistent data and remove a required storage relationship from the instance. It therefore falls under the prevent-destructive-loss policy archetype, and a generic platform policy can require deletion protection where destructive changes must be prevented."
     },
     "device_name": {
       "description": "Specifies a unique device name of your choice that is reflected into the /dev/disk/by-id/google-* tree of a Linux operating system running within the instance. This name can be used to reference the device for mounting, resizing, and so on, from within the instance. If not specified, the server chooses a default device name to apply to this disk, in the form persistent-disks-x, where x is a number assigned by Google Compute Engine.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies the device name exposed inside the guest operating system for identifying and mounting the attached disk. It is primarily an operational naming choice and does not change the disk's access permissions, attachment mode, or data protection, so constraining it would not provide a generic security improvement."
     },
     "disk": {
       "description": "name or self_link of the disk that will be attached.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This identifies the specific persistent disk that will be attached. The correct disk is a workload-specific resource reference chosen according to the application's storage requirements, so a generic platform policy cannot require a particular disk identifier without relying on team-specific configuration."
     },
     "instance": {
       "description": "name or self_link of the compute instance that the disk will be attached to. If the self_link is provided then zone and project are extracted from the self link. If only the name is used then zone and project must be defined as properties on the resource or provider.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale":  "This identifies the compute instance to which the disk will be attached. The correct instance is a workload-specific resource reference, so a generic platform policy cannot require a particular instance name or self-link without depending on environment-specific configuration."
     },
     "interface": {
       "description": "The disk interface used for attaching this disk. One of SCSI or NVME. (This field is only used for specific cases, please don't specify this field without advice from Google.)",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the disk interface used for the attachment, either SCSI or NVME. The documentation indicates that this field is intended only for specific cases and is otherwise selected by the server. The choice primarily affects compatibility and device behaviour rather than providing a generic security control."
     },
     "mode": {
       "description": "The mode in which to attach this disk, either READ_WRITE or READ_ONLY. If not specified, the default is to attach the disk in READ_WRITE mode.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This controls whether the attached disk is accessible in READ_WRITE or READ_ONLY mode. Write access allows the attached instance to modify data, while READ_ONLY limits modification. Because the access mode directly affects the level of access granted to the disk, a generic platform policy can restrict writable attachments where read-only access is required by a security baseline."
     },
     "project": {
       "description": "The project that the referenced compute instance is a part of. If instance is referenced by its self_link the project defined in the link will take precedence.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This identifies the project containing the referenced compute instance. The correct project depends on the environment and deployment structure and may also be derived from the instance self-link. It is therefore a workload-specific resource identifier rather than a generic security configuration value."
     },
     "zone": {
       "description": "The zone that the referenced compute instance is located within. If instance is referenced by its self_link the zone defined in the link will take precedence.",
