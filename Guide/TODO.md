@@ -2,8 +2,9 @@
 
 Tracking work needed on the contributor guide under `Guide/Policy_writing_tutorial/`.
 
-The **text** of the guide was reconciled with the post-consolidation repo (folder structure,
-scripts, flags, workflow, policy types) and every link/image reference resolves. The items below
+The **text** of the guide was reconciled with the post-restructure repo (one self-contained
+folder per attribute under `policies/`, no `inputs/` tree, no per-attribute `config.tf`) and
+every link/image reference resolves. The items below
 are things that could not be fixed from text alone — mostly **screenshots** whose *content* is
 outdated (they still render; they just depict the old layout), plus a few content gaps.
 
@@ -18,11 +19,11 @@ repo.
 
 | Image | Used in | What's stale → should show |
 |---|---|---|
-| `images/c.tf-nc.tf-file-structure.png` | policy-writing.md | `c.tf` / `nc.tf` → **`compliant.tf` / `nonCompliant.tf`**; service folder shown as slug `access_approval` → display name **`Access Approval`** |
-| `images/policy-vars-file-structure.PNG` | policy-writing.md, vars-rego.md | `vars.rego` → **`_vars.rego`**; attributes shown as **folders** → flat **`<attribute>.rego`** files; slug folder → display name |
-| `images/vars-rego.PNG` | vars-rego.md | tree shows `policy.rego` inside attribute folders → flat **`<attribute>.rego`**; slug `cloud_functions` → **`Cloud Functions`** (the package line in the shot is still correct) |
-| `images/runtime-policy-gcp.png` | policy-writing.md | `policies/` attributes shown as **folders** → flat **`<attribute>.rego`**; slug `cloud_functions` → **`Cloud Functions`** |
-| `images/runtime-example-inputs-policy.png` | policy-writing.md | slug `cloud_functions` → **`Cloud Functions`** (the inputs attribute-as-folder layout shown is still correct) |
+| `images/c.tf-nc.tf-file-structure.png` | policy-writing.md | `c.tf` / `nc.tf` → **`compliant.tf` / `nonCompliant.tf`**; service folder shown as slug `access_approval` → display name **`Access Approval`**; the fixtures now live under `policies/`, and **`config.tf` is gone** from the attribute folder |
+| `images/policy-vars-file-structure.PNG` | policy-writing.md, vars-rego.md | `vars.rego` → **`_vars.rego`**; slug folder → display name. (Attributes-as-folders, which this shot already shows, is correct again after the restructure.) |
+| `images/vars-rego.PNG` | vars-rego.md | slug `cloud_functions` → **`Cloud Functions`**. (The `policy.rego`-inside-attribute-folder tree this shot shows is correct again; only the `vars.rego` filename and the slug are wrong.) |
+| `images/runtime-policy-gcp.png` | policy-writing.md | slug `cloud_functions` → **`Cloud Functions`**. (Attributes-as-folders is correct again.) |
+| `images/runtime-example-inputs-policy.png` | policy-writing.md | **Re-capture entirely.** It contrasts an `inputs/` tree with a `policies/` tree; there is no `inputs/` tree any more — one `policies/gcp/<Service>/<resource>/<attribute>/` folder holds `policy.rego`, `compliant.tf` and `nonCompliant.tf` together |
 | `images/resource-folders.PNG` | policy-writing.md | slug `cloud_functions` → display name **`Cloud Functions`** |
 | `images/linters-output.PNG` | testing-policies.md | command `linter.py --gcp cloud_functions` → **`python3 scripts/linters/linter.py --platform gcp`** (the `--gcp` flag no longer exists) |
 | `images/artifact_registry.PNG` | researching-and-documentation.md | `docs/gcp/<Service>/resource_json/` subfolder → **flat `docs/gcp/<Service>/<resource>.json`**; underscore names (`App_Engine`, `Artifact_Registry`) → display names with spaces (**`App Engine`**, **`Artifact Registry`**) |
@@ -31,7 +32,7 @@ repo.
 
 | Image | Used in | Why review |
 |---|---|---|
-| `images/rego-package-name-top.PNG`, `images/rego-package-name-vars.PNG` | policy-rego.md | package naming is unchanged, but the surrounding file tree may still show `policy.rego`/`vars.rego` instead of `<attribute>.rego`/`_vars.rego` |
+| `images/rego-package-name-top.PNG`, `images/rego-package-name-vars.PNG` | policy-rego.md | package naming is unchanged, and `policy.rego` inside an attribute folder is correct again; check only that the surrounding tree shows **`_vars.rego`** (not `vars.rego`) and a display-name service folder |
 | `images/argument-reference.PNG` | researching-and-documentation.md | confirm the provider version in any visible URL is **7.37.0** |
 | `images/terraform-OPA-check.PNG` | raising-pull-request.md | confirm the PR check names match the current per-resource CI gate |
 

@@ -41,10 +41,19 @@ python main.py
 
 ### Generated Output Structure
 
-Policy files and inputs are created under:`
+Each policy is one self-contained directory:
 
-inputs/{cloud}/{service}/{resource}/{policy_name}/\
+```
 policies/{cloud}/{service}/{resource}/{policy_name}/
+    policy.rego        # from templates/{cloud}/policy.rego
+    compliant.tf       # from templates/{cloud}/compliant.tf
+    nonCompliant.tf    # from templates/{cloud}/nonCompliant.tf
+policies/{cloud}/{service}/{resource}/_vars.rego   # created once per resource
+```
+
+No `config.tf` is generated: there is one shared provider stub per platform at
+`policies/{cloud}/config.tf`, which the test runner copies into a temporary
+workspace when it needs to run `terraform plan`.
 
 
 ## Notes

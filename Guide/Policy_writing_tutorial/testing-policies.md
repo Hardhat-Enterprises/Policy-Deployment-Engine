@@ -3,7 +3,7 @@
 
 ### 1. Run the linter
 
-The linter validates that the `docs/`, `inputs/`, and `policies/` trees reconcile and that your
+The linter validates that the `docs/` and `policies/` trees reconcile and that your
 fixtures are well-formed. It runs automatically on commit via pre-commit, or you can run it directly:
 
     python3 scripts/linters/linter.py --platform gcp

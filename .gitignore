@@ -128,7 +128,8 @@ override.tf.json
 *_override.tf
 *_override.tf.json
 
-# Terraform plan files
+# Terraform plan files. auto_test now plans in a throwaway temp workspace, so these
+# never appear in the tree any more; kept as a backstop for manual terraform runs.
 *.tfplan
 plan
 plan_*.json
@@ -161,3 +162,7 @@ scripts/folder_generator/cache/
 # auto_test --report output: a CI build artifact for the AutoCapstone backend,
 # published via actions/upload-artifact — never committed to the repo.
 policy_results.json
+
+# Half-written plan-cache entries from an interrupted run. The real file is renamed
+# into place atomically; a leftover .tmp is never a valid cache entry.
+plan_cache/**/*.tmp

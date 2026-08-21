@@ -369,24 +369,30 @@ View full output for debugging:
 
 ### Individual Policy Tests
 
-Test specific policy modules:
+Test specific policy modules. Plans are committed under
+`plan_cache/gcp/<sha>.json`, named by a hash rather than by path; print the one for a
+given policy with:
+
+```bash
+python3 -c "import sys; sys.path.insert(0,'scripts/auto_test'); import auto_test, pathlib; \nprint(auto_test.plan_cache_path(pathlib.Path('policies/gcp/<Service>/<resource>/<attribute>')))"
+```
 
 ```bash
 # Blacklist test
 opa eval --data ./policies/_helpers --data ./policies/gcp \
-  --input ./inputs/gcp/access_context_manager_vpc_service_controls/access_context_manager_service_perimeter/status/plan.json \
+  --input ./plan_cache/gcp/<sha>.json \
   "data.terraform.gcp.security.access_context_manager_vpc_service_controls.access_context_manager_service_perimeter.status.message" \
   --format pretty
 
 # Whitelist test
 opa eval --data ./policies/_helpers --data ./policies/gcp \
-  --input ./inputs/gcp/api_hub/google_apihub_api_hub_instance/config_encryption_type/plan.json \
+  --input ./plan_cache/gcp/<sha>.json \
   "data.terraform.gcp.security.api_hub.google_apihub_api_hub_instance.config_encryption_type.message" \
   --format pretty
 
 # Range test
 opa eval --data ./policies/_helpers --data ./policies/gcp \
-  --input ./inputs/gcp/cloud_storage/google_storage_bucket/retention_period/plan.json \
+  --input ./plan_cache/gcp/<sha>.json \
   "data.terraform.gcp.security.cloud_storage.google_storage_bucket.message" \
   --format pretty
 ```
@@ -558,7 +564,7 @@ nc_resources := {
 **Debug command:**
 ```bash
 opa eval --explain full --data ./policies/_helpers --data ./policies/gcp \
-  --input ./inputs/gcp/.../plan.json \
+  --input ./plan_cache/gcp/<sha>.json \
   "data.terraform.gcp.security..." \
   --format pretty
 ```

@@ -1,9 +1,8 @@
 # 🛡️ Policy Deployment Engine — Linters
 
 A single linter, `scripts/linters/linter.py`, enforces structure and
-cross-consistency across three trees — `docs/`, `inputs/`, `policies/` —
-treating `docs/` as the source of truth that `inputs/` and `policies/` must
-reconcile to. It uses only the Python standard library (no extra installs).
+cross-consistency across two trees — `docs/` and `policies/` — treating
+`docs/` as the source of truth that `policies/` must reconcile to. It uses only the Python standard library (no extra installs).
 
 There are two supporting scripts:
 
@@ -19,8 +18,7 @@ There are two supporting scripts:
 # from the repo root
 python scripts/linters/linter.py                      # lint every tree
 python scripts/linters/linter.py --tree docs
-python scripts/linters/linter.py --tree inputs --platform gcp
-python scripts/linters/linter.py --tree policies
+python scripts/linters/linter.py --tree policies --platform gcp
 python scripts/linters/linter.py --no-content-checks  # structural only (skip §3 checks)
 ```
 
@@ -35,14 +33,13 @@ The structural pass never opens a `.tf`/`.rego` file (it does parse docs JSON).
 - **docs/** — only the platform folders (`gcp`, `aws`, `azure`); `gcp/<service>/`
   holds one `*.json` per resource, each matching the doc schema (`last_updated`,
   `provider_version`, `arguments`).
-- **inputs/** — reconciles **exactly** to docs:
-  `inputs/gcp/<service>/<resource>/<argument>/` where `<service>` and `<resource>`
+- **policies/** — reconciles **exactly** to docs:
+  `policies/gcp/<service>/<resource>/<argument>/` where `<service>` and `<resource>`
   match a `docs/gcp/<service>/<resource>.json`, and `<argument>` is a **non-block**
-  argument key in that doc. Each argument dir must contain `compliant.tf`,
-  `config.tf`, `nonCompliant.tf` (terraform artifacts tolerated; anything else flagged).
-- **policies/** — same taxonomy, but each argument is a single `<argument>.rego`
-  file plus an optional per-resource `_vars.rego` (underscore-prefixed so it is
-  never mistaken for a policy).
+  argument key in that doc. Each argument dir contains exactly `policy.rego`,
+  `compliant.tf` and `nonCompliant.tf` — nothing else. Each resource dir may add one
+  `_vars.rego` (underscore-prefixed so it is never mistaken for an argument dir), and
+  `policies/gcp/` carries the single shared `config.tf`.
 
 ---
 

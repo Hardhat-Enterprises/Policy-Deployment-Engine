@@ -48,7 +48,7 @@ jobs:
           sudo mv opa /usr/local/bin/opa
 
       # Best-effort provider mirror. The ALL run is designed to execute OFFLINE from
-      # the committed plan cache (inputs/plan_cache): when every plan is cached,
+      # the committed plan cache (plan_cache/): when every plan is cached,
       # auto_test skips terraform entirely and this mirror is never touched. So a
       # registry hiccup here must NOT fail the job — auto_test still lazily builds the
       # cache itself (ensure_cache_ready) if a fixture ever misses. Don't add `set -e`
@@ -58,12 +58,20 @@ jobs:
           bash scripts/auto_test/cache_setup.sh \
             || echo "⚠️  provider mirror unavailable — relying on the committed plan cache"
 
+      # Cheap read-only gate: every fixture must have a committed plan. Catches a
+      # fixture whose .tf changed without its regenerated plan_cache/ file being
+      # committed, which would otherwise silently force terraform in the run below.
+      # NOT a count comparison: fixtures with identical .tf legitimately share one
+      # cached plan, so there are fewer cache files than policies.
+      - name: Verify plan cache covers every fixture
+        run: python3 scripts/auto_test/auto_test.py gcp --verify-plan-cache
+
       # NOTE: plan-cache pruning is intentionally NOT done here. The runner is
       # ephemeral and this workflow has no commit/push step, so any prune would be
       # discarded. Pruning is a local-maintainer operation:
-      #   python3 scripts/auto_test/auto_test.py --inputs inputs/gcp \
-      #       --policies policies/gcp --prune-plan-cache   # then commit the result
-      # Only gcp carries fixtures/policies today (inputs/aws and inputs/azure are
+      #   python3 scripts/auto_test/auto_test.py --policies policies/gcp \
+      #       --prune-plan-cache                           # then commit the result
+      # Only gcp carries policies today (policies/aws and policies/azure are
       # empty), so a single gcp run already spans every provider the ALL run scans
       # and can write policy_results.json directly. When aws/azure gain fixtures,
       # run auto_test once per provider into provider-specific report files and
@@ -73,7 +81,6 @@ jobs:
       - name: Run policy checks (Terraform + OPA)
         run: |
           python3 scripts/auto_test/auto_test.py \
-            --inputs inputs/gcp \
             --policies policies/gcp \
             --report policy_results.json \
             --verbose

@@ -7,11 +7,11 @@ scoped to that one resource:
   1. Doc completeness — every leaf argument in docs/<platform>/<folder>/<resource>.json
      has a REAL boolean ``security_impact`` (the ``"true/false"`` placeholder the
      linter still tolerates globally is rejected here) and a non-empty ``rationale``.
-  2. True-arg coverage — every argument with ``security_impact: true`` has both a
-     policy file ``policies/.../<resource>/<arg>.rego`` and an input fixture dir
-     ``inputs/.../<resource>/<arg>/``.
+  2. True-arg coverage — every argument with ``security_impact: true`` has a complete
+     policy directory ``policies/.../<resource>/<arg>/`` holding policy.rego,
+     compliant.tf and nonCompliant.tf.
   3. OPA test — auto_test runs scoped to the resource (terraform plan + opa eval),
-     which also enforces input<->policy pairing.
+     which also enforces that each policy directory is complete.
 
 The linter (gate "1. linter") is a separate CI job; this is the resource-specific
 gate ("2." and "3."). Non-``Service/`` branches are a no-op (exit 0).
@@ -30,16 +30,18 @@ REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "scripts" / "linters"))
 from _service_slug import slug_to_folder  # noqa: E402
 
-DOCS, INPUTS, POLICIES = "docs", "inputs", "policies"
+DOCS, POLICIES = "docs", "policies"
+POLICY_FILE = "policy.rego"
+FIXTURE_FILES = ("compliant.tf", "nonCompliant.tf")
 AUTO_TEST = str(REPO / "scripts" / "auto_test" / "auto_test.py")
 
 # TODO(after this migration branch merges to dev): confine a Service/ PR's DIFF to
-# its selected service. Fail the PR if it changes any docs/, inputs/ or policies/
+# its selected service. Fail the PR if it changes any docs/ or policies/
 # file outside `<tree>/<platform>/<folder>/` (service-level, per the owner's intent;
 # could tighten to `<folder>/<resource>/` if desired). Add it as a step in the
 # policy_check job (gated on Service/ branches) — e.g. compare
 # `git diff --name-only origin/<base>...HEAD` against the selected service path.
-# DEFERRED because this chore/ branch intentionally modified inputs/policies/docs
+# DEFERRED because this chore/ branch intentionally modified policies/docs
 # across many services and must not be blocked by such a guardrail.
 
 
@@ -73,23 +75,25 @@ def check_doc_completeness(doc):
 
 
 def check_true_arg_coverage(doc, platform, folder, resource):
+    """Every security-relevant argument needs a complete policy directory."""
     errors = []
     for name, entry in leaf_args(doc):
-        if entry.get("security_impact") is True:
-            policy = Path(POLICIES) / platform / folder / resource / f"{name}.rego"
-            fixture = Path(INPUTS) / platform / folder / resource / name
-            if not policy.is_file():
-                errors.append(f"true arg '{name}': missing policy {policy}")
-            if not fixture.is_dir():
-                errors.append(f"true arg '{name}': missing input fixture {fixture}/")
+        if entry.get("security_impact") is not True:
+            continue
+        arg_dir = Path(POLICIES) / platform / folder / resource / name
+        if not arg_dir.is_dir():
+            errors.append(f"true arg '{name}': missing policy directory {arg_dir}/")
+            continue
+        for required in (POLICY_FILE, *FIXTURE_FILES):
+            if not (arg_dir / required).is_file():
+                errors.append(f"true arg '{name}': missing {arg_dir / required}")
     return errors
 
 
 def run_auto_test(platform, folder, resource):
-    inputs = Path(INPUTS) / platform / folder / resource
     policies = Path(POLICIES) / platform / folder / resource
     result = subprocess.run(
-        [sys.executable, AUTO_TEST, "--inputs", str(inputs), "--policies", str(policies), "--verbose"],
+        [sys.executable, AUTO_TEST, "--policies", str(policies), "--verbose"],
         capture_output=True, text=True)
     if result.returncode != 0:
         return ["auto_test (terraform plan + OPA) failed:\n" + (result.stdout or "") + (result.stderr or "")]

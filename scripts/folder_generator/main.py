@@ -10,7 +10,6 @@ from config import (
     CLOUD_CONFIGS,
     STATE_FILE,
     TEMPLATE_BASE_DIR,
-    INPUT_BASE_DIR,
     POLICY_BASE_DIR,
     TEMPLATE_FILES_TF,
     TEMPLATE_POLICY,
@@ -25,7 +24,6 @@ def get_cloud_paths(cloud):
     base_cloud = cloud.lower()
     return {
         "template_dir": os.path.join(TEMPLATE_BASE_DIR, base_cloud),
-        "input_dir": os.path.join(INPUT_BASE_DIR, base_cloud),
         "policy_dir": os.path.join(POLICY_BASE_DIR, base_cloud),
     }
 
@@ -89,20 +87,22 @@ def copy_files(files, src_dir, dest_dir):
 
 def create_policy_files(cloud, service, resource, policy_name):
     paths = get_cloud_paths(cloud)
-    base_folder = service.replace(" ", "_")
+    # The service folder is the docs subcategory VERBATIM (spaces and all) — every
+    # other tool reconciles against docs/gcp/<service>, so slugifying it here produced
+    # directories ("Cloud_Storage") that the linter then rejected.
+    base_folder = service
     subfolder = resource
-    input_dir = os.path.join(paths["input_dir"], base_folder, subfolder, policy_name)
     policy_dir = os.path.join(paths["policy_dir"], base_folder, subfolder, policy_name)
     vars_dir = os.path.join(paths["policy_dir"], base_folder, subfolder)
     # Refuse to clobber an existing policy of the same name.
-    if os.path.exists(input_dir) or os.path.exists(policy_dir):
+    if os.path.exists(policy_dir):
         if not messagebox.askyesno(
             "Policy exists",
             f"A policy named '{policy_name}' already exists for "
             f"{cloud}/{service}/{resource}. Overwrite its files?",
         ):
             return
-    missing = copy_files(TEMPLATE_FILES_TF, paths["template_dir"], input_dir)
+    missing = copy_files(TEMPLATE_FILES_TF, paths["template_dir"], policy_dir)
     missing += copy_files([TEMPLATE_POLICY], paths["template_dir"], policy_dir)
     if not os.path.exists(os.path.join(vars_dir, TEMPLATE_VARS)):
         os.makedirs(vars_dir, exist_ok=True)

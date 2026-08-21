@@ -1,0 +1,10 @@
+# Terraform fixtures and Rego policies are hashed byte-for-byte by the plan cache
+# (scripts/auto_test/auto_test.py: fixture_sha). Pin them to LF so a Windows checkout
+# and a Linux CI runner see identical bytes.
+#
+# The committed blobs are already LF, so adding this changes nothing in git history —
+# it stops a CRLF blob being committed in future. auto_test also normalises CRLF before
+# hashing, which is what makes existing Windows worktrees work; this is the belt to
+# that pair of braces.
+*.tf    text eol=lf
+*.rego  text eol=lf

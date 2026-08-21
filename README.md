@@ -6,17 +6,20 @@ Last updated: 2026-06-25
 
 ## 📁 Repository layout
 
-Three trees mirror each other, keyed off the **docs taxonomy** (the linter enforces that
-`inputs/` and `policies/` reconcile to `docs/`):
+Two trees, keyed off the **docs taxonomy** (the linter enforces that `policies/`
+reconciles to `docs/`). Each policy is one self-contained directory holding its Rego
+and both Terraform fixtures:
 
 ```
-docs/<platform>/<Service>/<resource>.json        # SOURCE OF TRUTH: every argument of a
+docs/<platform>/<Service>/<resource>.json         # SOURCE OF TRUTH: every argument of a
                                                   #   resource + its security assessment
-inputs/<platform>/<Service>/<resource>/<arg>/     # Terraform fixture per argument:
-                                                  #   compliant.tf, nonCompliant.tf, config.tf
-inputs/plan_cache/<platform>/<sha>.json           # committed terraform-plan JSON cache
-policies/<platform>/<Service>/<resource>/<arg>.rego   # one Rego policy per argument
-policies/_helpers/                                # shared Rego helpers (+ _vars.rego per resource)
+policies/<platform>/<Service>/<resource>/
+    _vars.rego                                    # shared variables, one per resource
+    <arg>/policy.rego                             # the policy for one argument
+    <arg>/compliant.tf, <arg>/nonCompliant.tf     # its Terraform fixtures
+policies/<platform>/config.tf                     # ONE provider stub, shared by every fixture
+policies/_helpers/                                # shared Rego helpers
+plan_cache/<platform>/<sha>.json                  # committed terraform-plan JSON cache
 
 templates/<platform>/   # starter files the folder_generator copies for a new resource
 tests/_helpers/         # Rego unit tests for the shared helpers
@@ -26,6 +29,10 @@ scripts/                # tooling — see "Tooling" below
 `<platform>` is `gcp` today (aws/azure are placeholders). A `<Service>` folder is the
 verbatim provider subcategory (e.g. `Cloud Storage`); `<resource>` is the full type
 (e.g. `google_storage_bucket`); `<arg>` is a documented, non-block argument key.
+
+Everything for one argument lives in one directory, so adding a policy means creating a
+single folder. You never write a `config.tf`: there is one per platform, and the test
+runner copies it into a throwaway workspace when it needs to run `terraform plan`.
 
 ## 📋 Contributor Requirements
 
@@ -69,7 +76,7 @@ pre-commit install
 ```
 
 This will enforce:
-- ✅ **Linter** - Validates the `docs/`, `inputs/`, and `policies/` trees against the docs taxonomy
+- ✅ **Linter** - Validates the `docs/` and `policies/` trees against the docs taxonomy
 - ✅ **Branch Naming Convention** - Ensures your branch name follows the required format
 
 ### ⚠️ What Happens During Commit
@@ -77,9 +84,9 @@ This will enforce:
 When you commit, the pre-commit hooks will run automatically:
 
 1. **Linter Check** (`scripts/linters/linter.py` via `run_precommit_linter.py`)
-   - Validates folder structure and reconciles `inputs/`/`policies/` to `docs/`
-   - Checks per-resource files: `inputs/` arg dirs need `compliant.tf`, `config.tf`,
-     `nonCompliant.tf`; `policies/` resources have `<argument>.rego` + optional `_vars.rego`
+   - Validates folder structure and reconciles `policies/` to `docs/`
+   - Checks per-argument files: each `<arg>/` dir needs `policy.rego`, `compliant.tf` and
+     `nonCompliant.tf`; each resource dir may add a shared `_vars.rego`
    - With content checks: fixtures contain only the tested resource type (no
      dependencies) and use the `compliant_example_N` / `non_compliant_example_N` labels
    - **Only fails on what you changed** (for input fixtures, the whole argument
@@ -117,8 +124,8 @@ Before opening a PR, run the OPA test suite. It confirms each fixture compiles a
 policy flags the `non_compliant_example_N` resources **and not** the `compliant_example_N`
 ones. The same check runs in CI.
 
-Pass a single **target** — `<platform>[/<service>[/<resource>]]` — and the runner derives
-both the `inputs/` and `policies/` roots for you (quote service names that contain spaces):
+Pass a single **target** — `<platform>[/<service>[/<resource>]]` — and the runner resolves
+it under `policies/` for you (quote service names that contain spaces):
 
 ```bash
 # One resource (recommended while you work):
@@ -135,8 +142,8 @@ python3 scripts/auto_test/auto_test.py
 ```
 
 Add `--verbose` for per-pair detail, or `--workers N` to change parallelism (default 4).
-(The explicit `--inputs <root> --policies <root>` flags still work for advanced/CI use, but
-can't be combined with a target.)
+(The explicit `--policies <root>` flag still works for advanced/CI use, but can't be
+combined with a target.)
 
 Output is quiet — a live progress line, **only failures are printed**, then a one-line
 summary:
@@ -150,14 +157,20 @@ summary:
 
 For each policy the runner produces a `terraform plan` of the fixture, converts it to JSON,
 and evaluates the policy with `opa`. Because the fixtures are static, the JSON plans are
-**committed** under `inputs/plan_cache/<platform>/<sha>.json` (the `<sha>` is a hash of the
-fixture's `*.tf` files + the provider version):
+**committed** under `plan_cache/<platform>/<sha>.json` (the `<sha>` is a hash of the
+fixture's `*.tf` files — including the shared `config.tf` — plus the provider version,
+with CRLF normalised to LF so Windows and Linux agree on the key):
 
 - **Plan already cached** → it is fed straight to OPA and **Terraform is not run at all**.
   A full run is ~40s and needs only `opa` installed.
 - **You changed a fixture's `.tf`** → its hash changes, so just that fixture re-runs
-  `terraform plan` and the new plan is written to the cache. **Commit the new/updated
-  `inputs/plan_cache/...json` alongside your fixture change.**
+  `terraform plan` (in a throwaway temp workspace, never in the repo) and the new plan is
+  written to the cache. **Commit the new/updated `plan_cache/...json` alongside your
+  fixture change.** `auto_test.py gcp --verify-plan-cache` checks this for you — it is a
+  read-only check, and CI runs it too.
+
+Two fixtures with byte-identical `.tf` share one cache file, so there are normally slightly
+fewer cached plans than policies. That is expected, not a gap.
 
 ### Prerequisites
 
@@ -189,7 +202,7 @@ fixture's `*.tf` files + the provider version):
 | Tool | What it does | Docs |
 |------|--------------|------|
 | `scripts/docgen/` | Generates the `docs/` JSON (one file per resource, every argument) from the Terraform provider **schema**. | [README](scripts/docgen/README.md) |
-| `scripts/linters/` | Validates that `docs/`, `inputs/`, and `policies/` reconcile (structure + content) and checks the branch-name convention. | [README](scripts/linters/readme-linters.md) |
+| `scripts/linters/` | Validates that `docs/` and `policies/` reconcile (structure + content) and checks the branch-name convention. | [README](scripts/linters/readme-linters.md) |
 | `scripts/auto_test/` | `terraform plan` + `opa eval` harness over the fixtures, with a committed plan cache and an offline project-local provider cache. | "Testing Your Policies Locally" above |
 | `scripts/folder_generator/` | Small GUI to scaffold a new resource's input + policy files from `templates/`. | [README](scripts/folder_generator/README.md) |
 
@@ -197,14 +210,14 @@ fixture's `*.tf` files + the provider version):
 
 Two GitHub Actions workflows in `.github/workflows/`:
 
-- **`policy_check_PR`** — runs on every PR that touches `docs/`, `inputs/`, or `policies/`:
+- **`policy_check_PR`** — runs on every PR that touches `docs/`, `policies/`, or `plan_cache/`:
   - *lint* job (all PRs): branch-name convention → whole-tree **structural** lint → a
     **content** lint scoped to the files this PR changed (the repo-wide backlog never blocks you).
   - *policy_check* job (only `Service/...` PRs): the per-resource gate — doc completeness
-    (real `security_impact` + rationale), policy/input coverage for every `true` arg, and the
+    (real `security_impact` + rationale), a complete policy directory for every `true` arg, and the
     `terraform plan` + OPA test. It then applies a `CI-Approved` / `CI-Review-Required` label.
-- **`policy_check_ALL`** — manual (`workflow_dispatch`) full-tree sweep: whole-tree lint + the
-  complete OPA suite.
+- **`policy_check_ALL`** — full-tree sweep on every push to `dev`, and on demand via
+  `workflow_dispatch`: whole-tree lint + plan-cache verification + the complete OPA suite.
 
 A PR is blocked when a lint error lands on a file it changed, or (for `Service/` PRs) when the
 per-resource gate fails. Terraform and OPA versions are pinned in the workflows for

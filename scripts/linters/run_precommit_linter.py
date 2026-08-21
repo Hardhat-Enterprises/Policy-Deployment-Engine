@@ -2,7 +2,7 @@
 """Lint gate: run the linter but only fail on the author's *own* changes.
 
 The linter (scripts/linters/linter.py) is whole-tree by design — it must build
-the full docs index to reconcile inputs/ and policies/ against it, so it cannot
+the full docs index to reconcile policies/ against it, so it cannot
 meaningfully lint a single file in isolation. To hold contributors to their own
 work *without* blocking them on the repo-wide backlog, we run the linter once
 over the whole tree (with --content-checks) and fail only on error lines whose
@@ -21,7 +21,10 @@ import sys
 
 LINTER = [sys.executable, os.path.join("scripts", "linters", "linter.py"),
           "--tree", "all", "--platform", "gcp", "--content-checks"]
-RELEVANT_PREFIXES = ("docs/", "inputs/", "policies/")
+RELEVANT_PREFIXES = ("docs/", "policies/")
+# The files that make up one argument policy; touching any of them means owning
+# the whole argument directory (see _owned).
+ARGUMENT_FILES = {"policy.rego", "compliant.tf", "nonCompliant.tf"}
 
 
 def _git(*args):
@@ -57,14 +60,14 @@ def _owns_error(error_path, owned_path):
 def _owned(changed):
     """The set of paths a contributor is accountable for.
 
-    A contributor owns every file they changed. For input fixtures they also own
-    the whole *argument directory*: compliant.tf and nonCompliant.tf test one
-    argument together, so touching one means owning the pair (and config.tf).
-    Policies/docs stay file-level — each policy/doc is an independent unit.
+    A contributor owns every file they changed. For an argument policy they also own
+    the whole *argument directory*: policy.rego, compliant.tf and nonCompliant.tf test
+    one argument together, so touching one means owning all three. Docs and the
+    per-resource _vars.rego stay file-level — each is an independent unit.
     """
     owned = set(changed)
     for f in changed:
-        if f.startswith("inputs/") and "/" in f:
+        if f.startswith("policies/") and f.rsplit("/", 1)[-1] in ARGUMENT_FILES:
             owned.add(f.rsplit("/", 1)[0])   # the argument directory
     return owned
 
@@ -92,9 +95,9 @@ def main(argv=None):
     if not lint_all:
         changed = {f for f in changed_files(base) if f.startswith(RELEVANT_PREFIXES)}
         if not changed:
-            print("No docs/ inputs/ policies/ changes — skipping linter.")
+            print("No docs/ policies/ changes — skipping linter.")
             return 0
-        print("Linting your changed files under docs/ inputs/ policies/:")
+        print("Linting your changed files under docs/ policies/:")
         for f in sorted(changed):
             print(f"  {f}")
 

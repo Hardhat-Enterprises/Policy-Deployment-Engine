@@ -40,30 +40,25 @@ When writing a policy for a resource that has multiple credential types (for exa
 
 ### Fix
 
-Split each credential into its own attribute. Each attribute gets its own **inputs** folder
-(`compliant.tf`, `nonCompliant.tf`, `config.tf`) and its own flat `<attribute>.rego` in the
-resource's **policies** folder:
+Split each credential into its own attribute. Each attribute gets its own folder holding
+`policy.rego`, `compliant.tf` and `nonCompliant.tf`, and the resource keeps one shared
+`_vars.rego` beside those folders:
 
 ```
-inputs/gcp/<Service>/google_monitoring_notification_channel/
-  auth_token/
-    compliant.tf
-    nonCompliant.tf
-    config.tf
-  password/
-    compliant.tf
-    nonCompliant.tf
-    config.tf
-  service_key/
-    compliant.tf
-    nonCompliant.tf
-    config.tf
-
 policies/gcp/<Service>/google_monitoring_notification_channel/
   _vars.rego
-  auth_token.rego
-  password.rego
-  service_key.rego
+  auth_token/
+    policy.rego
+    compliant.tf
+    nonCompliant.tf
+  password/
+    policy.rego
+    compliant.tf
+    nonCompliant.tf
+  service_key/
+    policy.rego
+    compliant.tf
+    nonCompliant.tf
 ```
 
 ---
