@@ -13,7 +13,7 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
+      "security_impact": true,
       "rationale": "Controls whether the application can be deleted, helping prevent accidental loss of resources."
     },
     "description": {
@@ -27,22 +27,22 @@
       "description": "Display name of the app.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Ensures consistent naming of apps for easier identification and management."
+      "security_impact": false,
+      "rationale": "Purely cosmetic and descriptive; it does not control a security-relevant resource behaviour."
     },
     "global_instruction": {
       "description": "Instructions for all the agents in the app.\nYou can use this instruction to set up a stable identity or personality\nacross all the agents.",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls the instructions and behaviour of AI agents, whihc can affect safety and data handling."
+      "rationale": "Controls the instructions and behaviour of AI agents, which can affect safety and data handling."
     },
     "guardrails": {
       "description": "List of guardrails for the app.\nFormat:\n'projects/{project}/locations/{location}/apps/{app}/guardrails/{guardrail}'",
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "Determines resource location and may affect data residency and compliance requirements."
+      "rationale": "Configures safety filters and security constraints for the AI model, making it a security-relevant control that can be enforced by policy."
     },
     "location": {
       "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
@@ -56,7 +56,7 @@
       "required": false,
       "type": "map(string)",
       "security_impact": false,
-      "rationale": "Metadata does not directly change secuirty controls."
+      "rationale": "Metadata does not directly change security controls."
     },
     "pinned": {
       "description": "Whether the app is pinned in the app list.",
@@ -69,22 +69,23 @@
       "description": "N/A",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines the Google cloud project boundary where the resource exists."
+      "security_impact": false,
+      "rationale": "Identifies or references the project where the resource exists rather than defining a security control."
     },
     "root_agent": {
       "description": "The root agent is the entry point of the app.\nFormat: 'projects/{project}/locations/{location}/apps/{app}/agents/{agent}'",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines the entry point agent that controls application behaviour."
+      "security_impact": false,
+      "rationale": "References the entry-point agent resource rather than defining a security policy control."
+
     },
     "tool_execution_mode": {
       "description": "The tool execution mode for the app.\nSee the [API reference](https://docs.cloud.google.com/customer-engagement-ai/conversational-agents/ps/reference/rpc/google.cloud.ces.v1#google.cloud.ces.v1.App.ToolExecutionMode) for more details.",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls how external tools/actions are executed by the AI agent."
+      "rationale": "Controls how the application executes tools, such as parallel or sequential execution, so policy can restrict execution modes to approved behaviour and reduce unsafe tool usage."
     },
     "audio_processing_config": {
       "type": "block",
@@ -171,22 +172,23 @@
       "description": "The passphrase to decrypt the private key.\nShould be left unset if the private key is not encrypted.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies the passphrase used to decrpyt the client's private key. A generic security policy can require encrypted private keys or appropriate secret management, making this security-relevant."
+      "security_impact": false,
+      "rationale":  "Contains sensitive credential material that cannot be meaningfully constrained by a generic platform policy; secret management should be handled through appropriate credential-management controls."
     },
     "client_certificate_settings.private_key": {
       "description": "The name of the SecretManager secret version resource\nstoring the private key encoded in PEM format.\nFormat: projects/{project}/secrets/{secret}/versions/{version}",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "References sensitive private key material used for authentication."
+      "security_impact": false,
+      "rationale": "References sensitive private-key material and is not a useful generic platform policy target for enforcing credential handling."
     },
     "client_certificate_settings.tls_certificate": {
       "description": "The TLS certificate encoded in PEM format.\nThis string must include the begin header and end footer lines.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines certificate configuration used for secure communication."
+      "security_impact": false,
+      "rationale": "Contains certificate configuration data rather than a useful platform-level security policy target."
+
     },
     "data_store_settings": {
       "type": "block",
@@ -372,14 +374,14 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Specifies the BigQuery dataset used for exported data. The dataset choice is workload-specific and access control is enforced by BigQuery IAM rather than this argument."
+      "rationale": "References an external BigQuery dataset rather than defining a security control."
     },
     "logging_settings.bigquery_export_settings.enabled": {
       "description": "Indicates whether the BigQuery export is enabled.",
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": "Controls whether conversation data is exproted to BigQuery. A generic policy can require exports to support centralized auditing, monitoring or compliance requirements."
+      "rationale": "Controls whether security-relevant application data is exported for logging and auditing, so policy can require logging to remain enabled for visibility and compliance."
     },
     "logging_settings.bigquery_export_settings.project": {
       "description": "The project ID of the BigQuery dataset to export the data to.\nNote: If the BigQuery dataset is in a different project from the app, you should grant\nroles/bigquery.admin role to the CES service agent service-<PROJECT-\nNUMBER>@gcp-sa-ces.iam.gserviceaccount.com.",
@@ -422,7 +424,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "References a Cloud DLP de-identification template. The specific template is organization-specific, so a generic security policy cannot enforce a particular template value."
+      "rationale": "References an external Cloud DLP de-identification template and is therefore an identifier/reference rather than the security policy target itself."
     },
     "logging_settings.redaction_config.enable_redaction": {
       "description": "If true, redaction will be applied in various logging scenarios, including\nconversation history, Cloud Logging and audio recording.",
@@ -436,7 +438,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "References a Clous DLP inspection template used to detect sensitive data. While using DLP is security-related, the specific template depends on organisational requirements,so a generic policy should not enforce a particular template identifier."
+      "rationale": "References an external Cloud DLP inspection template and is therefore an identifier/reference rather than a platform security policy target."
     },
     "model_settings": {
       "type": "block",
@@ -467,7 +469,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Specifies the application's time zone. This affects scheduling and localization but does not change the application's security posture."
+      "rationale": "The time zone is a functional localization and scheduling setting and does not directly control security."
     },
     "variable_declarations": {
       "type": "block",
@@ -505,7 +507,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Defines alternative valid schemas. It validates data structure but does not directly imporve security."
+      "rationale": "Schema strictness can affect application input validation, but this setting defines application data structures rather than providing a useful platform-level security policy target."
     },
     "variable_declarations.schema.default": {
       "description": "Optional. Default value of the data. Represents a dynamically typed value\nwhich can be either null, a number, a string, a boolean, a struct,\nor a list of values. The provided default value must be encoded as a JSON string.\nUse 'jsonencode' in Terraform HCL to encode the default value.",
@@ -519,7 +521,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Stores reusbale schema definitions. This affects schema organization rather than application security."
+      "rationale": "Provides a structural reference between schema nodes and does not itself represent a security control."
     },
     "variable_declarations.schema.description": {
       "description": "The description of the data.",
@@ -596,7 +598,7 @@
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": "Requires array items to be unique. This is a fata validation feature rather than a generic security control."
+      "rationale": "Requires array items to be unique. This is a data validation feature rather than a generic security control."
     }
   }
 }
