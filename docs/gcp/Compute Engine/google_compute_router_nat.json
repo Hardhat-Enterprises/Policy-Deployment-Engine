@@ -191,8 +191,8 @@
       "description": "Self-link of the subnetwork resource that will use NAT64",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Directly identifies the subnetwork that will use NAT64 translation. Controls which IPv6 resources within a subnet can access the internet which brings about exposure risks."
     },
     "rules": {
       "type": "block",
@@ -210,15 +210,15 @@
       "description": "CEL expression that specifies the match condition that egress traffic from a VM is evaluated against.\nIf it evaluates to true, the corresponding action is enforced.\n\nThe following examples are valid match expressions for public NAT:\n\n\"inIpRange(destination.ip, '1.1.0.0/16') || inIpRange(destination.ip, '2.2.0.0/16')\"\n\n\"destination.ip == '1.1.0.1' || destination.ip == '8.8.8.8'\"\n\nThe following example is a valid match expression for private NAT:\n\n\"nexthop.hub == 'https://networkconnectivity.googleapis.com/v1alpha1/projects/my-project/global/hub/hub-1'\"",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines which rules apply to outbound traffic. Filters and controls the behaviour of outgoing traffic passing through the NAT gateway. Prevents unintended behaviour that may cause vulnerabilities."
     },
     "rules.rule_number": {
       "description": "An integer uniquely identifying a rule in the list.\nThe rule number must be a positive value between 0 and 65000, and must be unique among rules within a NAT.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Unique identifier for a specific rule to seperate it from others and determines order of application. The ID is a reference point to help avoid unintended changes to rules, while the application order creates a rule priority system which prevents conflicts."
     },
     "rules.action": {
       "type": "block",
@@ -229,15 +229,15 @@
       "description": "A list of URLs of the IP resources used for this NAT rule.\nThese IP addresses must be valid static external IP addresses assigned to the project.\nThis field is used for public NAT.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Which static public IPs will be used by the NAT when creating connections. Is security related in that chosen IPs must be within trusted IP lists to prevent unintended filtering or blocking. Also provides tracability and transparency to traffic from these IPs."
     },
     "rules.action.source_nat_active_ranges": {
       "description": "A list of URLs of the subnetworks used as source ranges for this NAT Rule.\nThese subnetworks must have purpose set to PRIVATE_NAT.\nThis field is used for private NAT.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls which subnetwork source ranges are translated by the NAT and can be accessed through the private NAT. This is a security related argument as it directly configures access controls for the subnetworks and segments the internal network."
     },
     "rules.action.source_nat_drain_ips": {
       "description": "A list of URLs of the IP resources to be drained.\nThese IPs must be valid static external IPs that have been assigned to the NAT.\nThese IPs should be used for updating/patching a NAT rule only.\nThis field is used for public NAT.",
@@ -262,22 +262,22 @@
       "description": "Self-link of subnetwork to NAT",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Identifier for the specific subnetwork granted NAT translation. Controls what subnetworks can connect to the internet. Is security related as it exposes internal resources to the public internet."
     },
     "subnetwork.secondary_ip_range_names": {
       "description": "List of the secondary ranges of the subnetwork that are allowed\nto use NAT. This can be populated only if\n'LIST_OF_SECONDARY_IP_RANGES' is one of the values in\nsourceIpRangesToNat",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether secondary IP ranges are included in NAT translation. Security related as it determines whether pods and secondary services can connect to the internet and send outbound traffic."
     },
     "subnetwork.source_ip_ranges_to_nat": {
       "description": "List of options for which source IPs in the subnetwork\nshould have NAT enabled. Supported values include:\n'ALL_IP_RANGES', 'LIST_OF_SECONDARY_IP_RANGES',\n'PRIMARY_IP_RANGE'.",
       "required": true,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets IP range within a subnetwork to have NAT access. Is security related in that it determines at a subnet level what IPs can connect to the internet and send outbound traffic."
     }
   }
 }
