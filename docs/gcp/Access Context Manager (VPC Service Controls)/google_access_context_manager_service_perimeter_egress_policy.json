@@ -6,22 +6,22 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument controls Terraform deletion behaviour only. It does not define who can send egress traffic, where traffic can go, or which services, methods, permissions, roles, identities, or resources are allowed by the enforced egress policy."
     },
     "perimeter": {
       "description": "The name of the Service Perimeter to add this resource to.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument identifies the Service Perimeter that the egress policy belongs to. It is required for resource placement, but it does not independently define the allowed egress source, destination, identity, service, method, permission, or role."
     },
     "title": {
       "description": "Human readable title. Must be unique within the perimeter. Does not affect behavior.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument is a human-readable title used for identification. The provider description states that it does not affect behaviour, so it does not directly change the security posture of the enforced egress rule."
     },
     "egress_from": {
       "type": "block",
@@ -32,22 +32,22 @@
       "description": "Identities can be an individual user, service account, Google group,\nor third-party identity. For third-party identity, only single identities\nare supported and other identity types are not supported.The v1 identities\nthat have the prefix user, group and serviceAccount in\nhttps://cloud.google.com/iam/docs/principal-identifiers#v1 are supported.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument defines the specific identities that can match the egress rule. Allowing unapproved users, groups, service accounts, or external identities can broaden who is able to send traffic outside the perimeter, so it is security-impacting and is covered by the egress_from.identities policy."
     },
     "egress_from.identity_type": {
       "description": "Specifies the type of identities that are allowed access to outside the\nperimeter. If left unspecified, then members of 'identities' field will\nbe allowed access. Possible values: [\"ANY_IDENTITY\", \"ANY_USER_ACCOUNT\", \"ANY_SERVICE_ACCOUNT\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument controls the type of identities that can match the egress rule. Broad values such as ANY_IDENTITY can allow a wider set of principals to send traffic outside the perimeter, so it is security-impacting and is covered by the egress_from.identity_type policy."
     },
     "egress_from.source_restriction": {
       "description": "Whether to enforce traffic restrictions based on 'sources' field. If the 'sources' field is non-empty, then this field must be set to 'SOURCE_RESTRICTION_ENABLED'. Possible values: [\"SOURCE_RESTRICTION_UNSPECIFIED\", \"SOURCE_RESTRICTION_ENABLED\", \"SOURCE_RESTRICTION_DISABLED\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument controls whether source restrictions are enforced when sources are configured. The provider description states that when sources is non-empty this field must be set to SOURCE_RESTRICTION_ENABLED, so the security-relevant source values are better assessed through the source and identity arguments rather than this flag alone."
     },
     "egress_from.sources": {
       "type": "block",
@@ -58,15 +58,15 @@
       "description": "An AccessLevel resource name that allows resources outside the ServicePerimeter to be accessed from the inside.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument references an AccessLevel used as a source condition. The security posture depends on the separately managed AccessLevel definition rather than this reference string alone, so this resource-level policy set does not enforce it directly."
     },
     "egress_from.sources.resource": {
       "description": "A Google Cloud resource that is allowed to egress the perimeter.\nRequests from these resources are allowed to access data outside the perimeter.\nCurrently only projects are allowed. Project format: 'projects/{project_number}'.\nThe resource may be in any Google Cloud organization, not just the\norganization that the perimeter is defined in. '*' is not allowed, the\ncase of allowing all Google Cloud resources only is not supported.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument identifies a project resource allowed as a source for egress. The provider description does not allow '*' for this field, so the most dangerous all-source case is not supported here. Source access is primarily controlled through the implemented identity policies in this policy set."
     },
     "egress_to": {
       "type": "block",
@@ -77,22 +77,22 @@
       "description": "A list of external resources that are allowed to be accessed. A request\nmatches if it contains an external resource in this list (Example:\ns3://bucket/path). Currently '*' is not allowed.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument lists external resource URIs that may be accessed. The provider description does not allow '*' for this field, so there is no generic wildcard case to detect. Organisation-specific external resource allowlists may still be reviewed manually."
     },
     "egress_to.resources": {
       "description": "A list of resources, currently only projects in the form\n'projects/<projectnumber>', that match this to stanza. A request matches\nif it contains a resource in this list. If * is specified for resources,\nthen this 'EgressTo' rule will authorize access to all resources outside\nthe perimeter.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument defines destination resources outside the perimeter. A wildcard value can authorize access to all resources outside the perimeter, so it is security-impacting and is covered by the egress_to.resources policy."
     },
     "egress_to.roles": {
       "description": "A list of IAM roles that represent the set of operations that the sources\nspecified in the corresponding 'EgressFrom'\nare allowed to perform.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument defines IAM roles representing operations that the matching source can perform. Overly permissive roles can broaden allowed access outside the perimeter, so it is security-impacting and is covered by the egress_to.roles policy."
     },
     "egress_to.operations": {
       "type": "block",
@@ -103,8 +103,8 @@
       "description": "The name of the API whose methods or permissions the 'IngressPolicy' or\n'EgressPolicy' want to allow. A single 'ApiOperation' with serviceName\nfield set to '*' will allow all methods AND permissions for all services.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument defines the Google Cloud service whose methods or permissions are allowed. A wildcard service name can allow all methods and permissions for all services, so it is security-impacting and is covered by the egress_to.operations.service_name policy."
     },
     "egress_to.operations.method_selectors": {
       "type": "block",
@@ -115,15 +115,15 @@
       "description": "Value for 'method' should be a valid method name for the corresponding\n'serviceName' in 'ApiOperation'. If '*' used as value for method,\nthen ALL methods and permissions are allowed.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument defines the API method allowed for the selected service. A wildcard method can allow all methods and permissions for that service, so it is security-impacting and is covered by the egress_to.operations.method_selectors.method policy."
     },
     "egress_to.operations.method_selectors.permission": {
       "description": "Value for permission should be a valid Cloud IAM permission for the\ncorresponding 'serviceName' in 'ApiOperation'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument defines the IAM permission allowed for the selected service. Allowing unapproved or write-level permissions can broaden access outside the perimeter, so it is security-impacting and is covered by the egress_to.operations.method_selectors.permission policy."
     }
   }
 }
