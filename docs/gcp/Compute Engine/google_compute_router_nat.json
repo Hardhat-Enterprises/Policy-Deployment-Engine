@@ -6,8 +6,8 @@
       "description": "The network tier to use when automatically reserving NAT IP addresses.\nMust be one of: PREMIUM, STANDARD. If not specified, then the current\nproject-level default tier is used. Possible values: [\"PREMIUM\", \"STANDARD\"]",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Determines which Google network tier is used when routing traffic. Premium uses Google's private network which can provide higher speeds and reduced latency, while Standard defaults to using the public internet. Primarily impacts network performance and has no direct impact on security."
+      "security_impact": true,
+      "rationale": "Determines which Google network tier is used when routing traffic. Premium uses Google's secure private network which can provide higher speeds, reduced latency, and secure data transfers, while Standard defaults to using the insecure public internet."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
@@ -20,8 +20,8 @@
       "description": "A list of URLs of the IP resources to be drained. These IPs must be\nvalid static external IPs that have been assigned to the NAT.",
       "required": false,
       "type": "set(string)",
-      "security_impact": false,
-      "rationale": "A list of inactive IPs that cannot take on new connections. Is used during the transition to new IP addresses and has no direct security impact."
+      "security_impact": true,
+      "rationale": "A list of inactive IPs that cannot take on new connections. Is used during the transition to new IP addresses as old IPs are exposure risks."
     },
     "enable_dynamic_port_allocation": {
       "description": "Enable Dynamic Port Allocation.\nIf minPortsPerVm is set, minPortsPerVm must be set to a power of two greater than or equal to 32.\nIf minPortsPerVm is not set, a minimum of 32 ports will be allocated to a VM from this NAT config.\nIf maxPortsPerVm is set, maxPortsPerVm must be set to a power of two greater than minPortsPerVm.\nIf maxPortsPerVm is not set, a maximum of 65536 ports will be allocated to a VM from this NAT config.\n\nMutually exclusive with enableEndpointIndependentMapping.",
@@ -42,42 +42,42 @@
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "Determines what resource types can use the NAT gateway. Controls gateway routing which can introduce vulnerabilities and an attack surface."
+      "rationale": "Determines what resource types can use the NAT gateway. This argument is security related because it controls NAT routing to endpoints which, if left unconfigured, can unintentionally connect to unsupported endpoints and expose internal resources."
     },
     "icmp_idle_timeout_sec": {
       "description": "Timeout (in seconds) for ICMP connections. Defaults to 30s if not set.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Drops inactive ICMP connections after a set amount of time. Can prevent excessively long connections from draining network bandwidth. Primarily boosts network performance with very no direct impact on security."
+      "security_impact": true,
+      "rationale": "Drops inactive ICMP connections after a set amount of time. Can prevent excessively long connections from draining network bandwidth. Primarily boosts network performance and is security relating by preventing resource exhaustion attacks."
     },
     "initial_nat_ips": {
       "description": "Self-links of NAT IPs to be used as initial value for creation alongside a RouterNatAddress resource.\nConflicts with natIps and drainNatIps. Only valid if natIpAllocateOption is set to MANUAL_ONLY.",
       "required": false,
       "type": "set(string)",
-      "security_impact": true,
-      "rationale": "Sets the public-facing IPs to be used by the NAT. Influences internal resource outbound traffic permissions to third party networks as the NAT IP will be used in the allowlist."
+      "security_impact": false,
+      "rationale": "List of IPs and resources assigned to the NAT. This argument is a reference for network management."
     },
     "max_ports_per_vm": {
       "description": "Maximum number of ports allocated to a VM from this NAT.\nThis field can only be set when enableDynamicPortAllocation is enabled.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Set the maxiumum number of ports that can be allocated to a VM when dynamic allocation is enabled. Affects how many connections a VM can have simultaneously and primarily impacts performance rather than security."
+      "security_impact": true,
+      "rationale": "Set the maxiumum number of ports that can be allocated to a VM when dynamic allocation is enabled. Affects how many connections a VM can have simultaneously and is security related by preventing resources exhaustion through port management."
     },
     "min_ports_per_vm": {
       "description": "Minimum number of ports allocated to a VM from this NAT. Defaults to 64 for static port allocation and 32 dynamic port allocation if not set.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Set the minimum number of ports that can be allocated to a VM when dynamic allocation is enabled. Affects the minimum baseline connections a VM needs to have and primarily impacts performance rather than security."
+      "security_impact": true,
+      "rationale": "Set the minimum number of ports that can be allocated to a VM when dynamic allocation is enabled. Affects the minimum baseline connections a VM needs to have to function normally and is security related by ensuring resources that require outbound connections are allocated a minimum baseline."
     },
     "name": {
       "description": "Name of the NAT service. The name must be 1-63 characters long and\ncomply with RFC1035.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This is the name used to identify the NAT service. Has no security or performance impact and is primarily a reference."
+      "security_impact": true,
+      "rationale": "This is the name used to identify the NAT service. This is a argument concerned with regulatory compliance and is security related as the NAT name must comply with the RFC1035 official internet standard."
     },
     "nat_ip_allocate_option": {
       "description": "How external IPs should be allocated for this NAT. Valid values are\n'AUTO_ONLY' for only allowing NAT IPs allocated by Google Cloud\nPlatform, or 'MANUAL_ONLY' for only user-allocated NAT IP addresses. Possible values: [\"MANUAL_ONLY\", \"AUTO_ONLY\"]",
@@ -90,15 +90,15 @@
       "description": "Self-links of NAT IPs. Only valid if natIpAllocateOption\nis set to MANUAL_ONLY.\nIf this field is used alongside with a count created list of address resources 'google_compute_address.foobar.*.self_link',\nthe access level resource for the address resource must have a 'lifecycle' block with 'create_before_destroy = true' so\nthe number of resources can be increased/decreased without triggering the 'resourceInUseByAnotherResource' error.",
       "required": false,
       "type": "set(string)",
-      "security_impact": true,
-      "rationale": "A list of IPs used by the NAT for translation. Influences how outbound traffic is viewed and treated by third-party destinations."
+      "security_impact": false,
+      "rationale": "A list of IPs used by the NAT for translation. Recording IPs is a privacy violation."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Configures the NAT to a specific GCP project. Influences project-level security controls and monitoring."
+      "security_impact": false,
+      "rationale": "Configures the NAT to a specific GCP project. Project-level identifiers are privacy breaches."
     },
     "region": {
       "description": "Region where the router and NAT reside.",
@@ -111,22 +111,22 @@
       "description": "The name of the Cloud Router in which this NAT will be configured.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Configures the NAT and its network to a Cloud Router. This configuration influences the capabilities and limitations of a network by the router type chosen."
+      "security_impact": false,
+      "rationale": "Configures the name of the router the NAT is assigned to. Is an identifier for referencing the used router."
     },
     "source_subnetwork_ip_ranges_to_nat": {
       "description": "How NAT should be configured per Subnetwork.\nIf 'ALL_SUBNETWORKS_ALL_IP_RANGES', all of the\nIP ranges in every Subnetwork are allowed to Nat.\nIf 'ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES', all of the primary IP\nranges in every Subnetwork are allowed to Nat.\n'LIST_OF_SUBNETWORKS': A list of Subnetworks are allowed to Nat\n(specified in the field subnetwork below). Note that if this field\ncontains ALL_SUBNETWORKS_ALL_IP_RANGES or\nALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES, then there should not be any\nother RouterNat section in any Router for this network in this region. Possible values: [\"ALL_SUBNETWORKS_ALL_IP_RANGES\", \"ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES\", \"LIST_OF_SUBNETWORKS\"]",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines where the NAT is applied in the network. This configures the extent to which internal resources can access the internet."
+      "security_impact": false,
+      "rationale": "Determines where the NAT is applied in the network. This configures the extent to which internal resources can access the NAT and is primarily an network architecture concern."
     },
     "source_subnetwork_ip_ranges_to_nat64": {
       "description": "Specify the Nat option for NAT64, which can take one of the following values:\nALL_IPV6_SUBNETWORKS: All of the IP ranges in every Subnetwork are allowed to Nat.\nLIST_OF_IPV6_SUBNETWORKS: A list of Subnetworks are allowed to Nat (specified in the field nat64Subnetwork below).\nNote that if this field contains NAT64_ALL_V6_SUBNETWORKS no other Router.Nat section in this region can also enable NAT64 for any Subnetworks in this network.\nOther Router.Nat sections can still be present to enable NAT44 only. Possible values: [\"ALL_IPV6_SUBNETWORKS\", \"LIST_OF_IPV6_SUBNETWORKS\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls whether all or select IPv6 and NAT64 internal resources can access the internet. This has security impacts on the exposure of internal IPv6 traffic while transmitting through the public internet."
+      "security_impact": false,
+      "rationale": "Controls whether all or select IPv6 and NAT64 internal resources can access the NAT. Is primarily a network arcitectural matter and security concerns fall on NAT configuration itself."
     },
     "tcp_established_idle_timeout_sec": {
       "description": "Timeout (in seconds) for TCP established connections.\nDefaults to 1200s if not set.",
@@ -153,8 +153,8 @@
       "description": "Indicates whether this NAT is used for public or private IP translation.\nIf unspecified, it defaults to PUBLIC.\nIf 'PUBLIC' NAT used for public IP translation.\nIf 'PRIVATE' NAT used for private IP translation. Default value: \"PUBLIC\" Possible values: [\"PUBLIC\", \"PRIVATE\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Sets NAT type to public or private IP translation. Determines whether the NAT can share internal resources to the public internet."
+      "security_impact": false,
+      "rationale": "Sets NAT type to public or private IP translation. This has no security impact as it relates to network arcitecture in how the NAT translation is configured."
     },
     "udp_idle_timeout_sec": {
       "description": "Timeout (in seconds) for UDP connections. Defaults to 30s if not set.",
@@ -180,7 +180,7 @@
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "Decides the level of detail in NAT logs. This provides greater control over visibility to security teams."
+      "rationale": "Decides the level of detail in NAT logs. This argument is security related as it raise alarms for potential attacks and vulnerabilities while also recording in detail security related events."
     },
     "nat64_subnetwork": {
       "type": "block",
@@ -191,8 +191,8 @@
       "description": "Self-link of the subnetwork resource that will use NAT64",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Directly identifies the subnetwork that will use NAT64 translation. Controls which IPv6 resources within a subnet can access the internet which brings about exposure risks."
+      "security_impact": false,
+      "rationale": "Directly identifies the subnetwork that use NAT64 translation. Directly identifies IPv6 resources within a subnet that access the NAT which is primarily a reference for network arcitecture."
     },
     "rules": {
       "type": "block",
@@ -204,21 +204,21 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Plain text documenting the NAT rules. Has no impact on NAT configurations."
+      "rationale": "Plain text documenting the NAT rules. Has no impact on security and is purely to help describe the functions of specific rules."
     },
     "rules.match": {
       "description": "CEL expression that specifies the match condition that egress traffic from a VM is evaluated against.\nIf it evaluates to true, the corresponding action is enforced.\n\nThe following examples are valid match expressions for public NAT:\n\n\"inIpRange(destination.ip, '1.1.0.0/16') || inIpRange(destination.ip, '2.2.0.0/16')\"\n\n\"destination.ip == '1.1.0.1' || destination.ip == '8.8.8.8'\"\n\nThe following example is a valid match expression for private NAT:\n\n\"nexthop.hub == 'https://networkconnectivity.googleapis.com/v1alpha1/projects/my-project/global/hub/hub-1'\"",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines which rules apply to outbound traffic. Filters and controls the behaviour of outgoing traffic passing through the NAT gateway. Prevents unintended behaviour that may cause vulnerabilities."
+      "security_impact": false,
+      "rationale": "Defines which rules apply to network traffic. Filters and controls the behaviour of traffic passing through the NAT gateway. Is not security related in that it influences internal traffic routing and is configured on a team-based level."
     },
     "rules.rule_number": {
       "description": "An integer uniquely identifying a rule in the list.\nThe rule number must be a positive value between 0 and 65000, and must be unique among rules within a NAT.",
       "required": true,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Unique identifier for a specific rule to seperate it from others and determines order of application. The ID is a reference point to help avoid unintended changes to rules, while the application order creates a rule priority system which prevents conflicts."
+      "security_impact": false,
+      "rationale": "Unique identifier for a specific rule to seperate it from others and determines order of application. The ID is a reference point to help avoid unintended changes to rules, while the application order creates a rule priority system which prevents conflicts. Not security related in that it primarily influences rule ordering."
     },
     "rules.action": {
       "type": "block",
@@ -229,8 +229,8 @@
       "description": "A list of URLs of the IP resources used for this NAT rule.\nThese IP addresses must be valid static external IP addresses assigned to the project.\nThis field is used for public NAT.",
       "required": false,
       "type": "set(string)",
-      "security_impact": true,
-      "rationale": "Which static public IPs will be used by the NAT when creating connections. Is security related in that chosen IPs must be within trusted IP lists to prevent unintended filtering or blocking. Also provides tracability and transparency to traffic from these IPs."
+      "security_impact": false,
+      "rationale": "Which static public IPs will be used by the NAT when creating connections. Is not security related in that IP and CIDR assignments are a team-specific reference for addressing."
     },
     "rules.action.source_nat_active_ranges": {
       "description": "A list of URLs of the subnetworks used as source ranges for this NAT Rule.\nThese subnetworks must have purpose set to PRIVATE_NAT.\nThis field is used for private NAT.",
