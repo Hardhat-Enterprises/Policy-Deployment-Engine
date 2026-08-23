@@ -164,8 +164,8 @@
       "description": "Matching values of the field. Each element can be a 32-bit unsigned decimal or hexadecimal (starting with \"0x\") number (e.g. \"64\") or range (e.g. \"0x400-0x7ff\").",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "This field specifies the values or ranges used to match a user-defined packet field. Whether a particular value is security-relevant depends on the traffic signature, protocol and application being protected, so there is no generic structural security baseline that can be enforced for this attribute."
+      "security_impact": true,
+      "rationale": "This field defines the values and ranges used for packet filtering. Because empty, malformed, or overly broad match values can weaken the effectiveness of traffic filtering, a platform policy should ensure that configured values are present and structurally valid without enforcing application-specific signatures."
     },
     "preconfigured_waf_config": {
       "type": "block",
@@ -304,8 +304,8 @@
       "description": "Action to take for requests that are above the configured rate limit threshold, to deny with a specified HTTP response code.\nValid options are deny(STATUS), where valid values for STATUS are 403, 404, 429, and 502.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This field determines how requests that exceed the configured rate limit are handled, such as returning a particular denial response. The appropriate action depends on application behaviour and operational requirements, so it is an application-level design choice rather than a platform-wide security invariant."
+      "security_impact": true,
+      "rationale": "This field determines the action applied when requests exceed the configured rate limit. Because this behavior forms part of the rule's DDoS and abuse-mitigation enforcement, a platform policy should require an approved denial action when the threshold is exceeded."
     },
     "rate_limit_options.ban_threshold": {
       "type": "block",
