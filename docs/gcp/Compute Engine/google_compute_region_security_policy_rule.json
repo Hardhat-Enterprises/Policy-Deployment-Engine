@@ -164,8 +164,8 @@
       "description": "Matching values of the field. Each element can be a 32-bit unsigned decimal or hexadecimal (starting with \"0x\") number (e.g. \"64\") or range (e.g. \"0x400-0x7ff\").",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "This field defines custom traffic matching values used to inspect packets. Restricting these values can help prevent overly broad matching and support filtering of suspicious or unwanted traffic."
+      "security_impact": false,
+      "rationale": "This field specifies the values or ranges used to match a user-defined packet field. Whether a particular value is security-relevant depends on the traffic signature, protocol and application being protected, so there is no generic structural security baseline that can be enforced for this attribute."
     },
     "preconfigured_waf_config": {
       "type": "block",
@@ -189,7 +189,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field references a specific WAF rule set rather than an enforceable security standard."
+      "rationale": "This field identifies the specific preconfigured WAF rule set to which an exclusion applies. It is a reference to a particular WAF rule set rather than a generic enforceable security standard, so no universally secure value can be defined for this attribute."
     },
     "preconfigured_waf_config.exclusion.request_cookie": {
       "type": "block",
@@ -305,7 +305,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This field defines an operational response when rate limits are exceeded, so it is an application choice rather than a platform-wide policy target."
+      "rationale": "This field determines how requests that exceed the configured rate limit are handled, such as returning a particular denial response. The appropriate action depends on application behaviour and operational requirements, so it is an application-level design choice rather than a platform-wide security invariant."
     },
     "rate_limit_options.ban_threshold": {
       "type": "block",
