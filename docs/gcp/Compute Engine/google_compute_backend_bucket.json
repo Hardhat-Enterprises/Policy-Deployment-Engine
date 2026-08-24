@@ -20,8 +20,8 @@
      "description": "Headers that the HTTP/S load balancer should add to proxied responses.",
      "required": false,
      "type": "list(string)",
-     "security_impact": true,
-     "rationale": "This argument controls which HTTP response headers the load balancer adds to proxied responses. The specific headers are application-defined and can vary by workload, so a generic platform policy cannot safely prescribe or validate their contents without constraining application behaviour."
+     "security_impact": false,
+     "rationale": "This argument allows the load balancer to add arbitrary HTTP response headers. Some headers, such as Content-Security-Policy, Strict-Transport-Security, and X-Frame-Options, can provide important security protections. However, the specific headers required depend on the application's architecture and security requirements, and this field can also contain non-security headers. Therefore, applying a universal platform-level constraint to this arbitrary header list would be impractical and overly restrictive across heterogeneous workloads."
 },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
