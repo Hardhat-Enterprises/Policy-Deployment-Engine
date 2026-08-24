@@ -42,6 +42,7 @@ conditions := [
   ],
   [
 
+    # Note: a best-effort spot-check, not full coverage, It only catches a plaintext secret stored under the literal key "password" 
     {
       "situation_description": "A plaintext value is stored under the 'password' metadata key.",
       "remedies": ["Remove 'password' from metadata and store the credential in Secret Manager instead."]
