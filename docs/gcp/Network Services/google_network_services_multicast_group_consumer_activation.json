@@ -6,22 +6,22 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can destroy the resource. A generic policy can require PREVENT to reduce the risk of accidental or unauthorised deletion and protect resource availability."
     },
     "description": {
       "description": "An optional text description of the multicast group consumer activation.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides human-readable metadata only and does not directly affect access control, network exposure, encryption, authentication, logging, or another security control."
     },
     "labels": {
       "description": "Labels as key-value pairs\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels are primarily resource metadata used for organisation and management. Appropriate label keys and values depend on organisational conventions and do not directly secure this multicast activation."
     },
     "location": {
       "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
@@ -34,29 +34,29 @@
       "description": "The resource name of the multicast consumer association that is in the\nsame zone as this multicast group consumer activation.\nUse the following format:\n'projects/*/locations/*/multicastConsumerAssociations/*'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls which multicast consumer association is authorised to consume traffic from the activated multicast group. A generic policy can validate that the reference belongs to an approved project or location and follows the expected resource path, reducing unintended multicast access."
     },
     "multicast_group_consumer_activation_id": {
       "description": "A unique name for the multicast group consumer activation.\nThe name is restricted to letters, numbers, and hyphen, with the first\ncharacter a letter, and the last a letter or a number. The name must not\nexceed 48 characters.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument is only the resource identifier. The provider already enforces its naming format, and the specific identifier does not provide a generic security control."
     },
     "multicast_group_range_activation": {
       "description": "The resource name of the multicast group range activation created by the\nadmin in the same zone as this multicast group consumer activation. Use the\nfollowing format:\n// 'projects/*/locations/*/multicastGroupRangeActivations/*'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls which activated multicast group range this consumer can access. A generic policy can restrict references to approved projects, locations, or expected resource paths to reduce unintended access to multicast traffic."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines the GCP project that owns the resource. Project placement is a security and governance boundary, so a generic policy can restrict deployment to an approved project allowlist."
     },
     "log_config": {
       "type": "block",
@@ -67,8 +67,8 @@
       "description": "Whether to enable logging or not.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether activity for the multicast group consumer activation is logged. Logging supports security monitoring, incident investigation, and auditability, so a generic policy can require logging to be enabled."
     }
   }
 }
