@@ -1,8 +1,3 @@
-# google_compute_instance_group_manager: all_instances_config.metadata
-# Non-compliant: example 1 disables OS Login (and includes a plaintext-looking
-# secret); example 2 re-enables project-wide SSH keys; example 3 enables the
-# serial console. Each covers a different situation in the policy.
-
 resource "google_compute_instance_group_manager" "non_compliant_example_1" {
   name               = "non-compliant-example-1"
   base_instance_name = "non-compliant-example-1"

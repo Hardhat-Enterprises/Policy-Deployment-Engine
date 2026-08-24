@@ -1,6 +1,3 @@
-# google_compute_instance_group_manager: all_instances_config.metadata
-# Compliant when hardening keys stay enabled and no value looks like a plaintext secret.
-
 resource "google_compute_instance_group_manager" "compliant_example_1" {
   name               = "compliant-example-1"
   base_instance_name = "compliant-example-1"
