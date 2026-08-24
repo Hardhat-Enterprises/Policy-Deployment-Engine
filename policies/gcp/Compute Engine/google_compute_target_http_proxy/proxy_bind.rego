@@ -8,7 +8,7 @@ conditions := [
         {
             "situation_description": "Target HTTP Proxy has proxy_bind enabled",
             "remedies": [
-                "Set proxy_bind to false unless explicitly required"
+                "Set proxy_bind to false"
             ]
         },
         {
