@@ -14,7 +14,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls whether Terraform may delete, abandon, or protect the resource. A policy can require PREVENT for protected environments to reduce accidental destructive changes."
+      "rationale": "Controls whether Terraform can perform destructive deletion of the resource. A platform policy can enforce a generic destroy-blocking value to prevent unintended destructive changes without assuming a specific environment tier."
     },
     "description": {
       "description": "A brief description of this resource.",
@@ -28,7 +28,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Human-readable instance metadata only; it does not directly change a security boundary or protection mechanism."
+      "rationale": "Human-readable descriptive metadata for instantiated VMs only; it does not directly alter access, encryption, network exposure, or another security control."
     },
     "key_revocation_action_type": {
       "description": "Action to be taken when a customer's encryption key is revoked. Supports \"STOP\" and \"NONE\", with \"NONE\" being the default.",
@@ -42,7 +42,7 @@
       "required": false,
       "type": "map(string)",
       "security_impact": false,
-      "rationale": "Labels are organisational metadata. Required keys and values are organisation-specific and are not a generic security control."
+      "rationale": "Labels are cosmetic and organisational metadata. Required keys and values are organisation-specific, so they are not a generic security policy target."
     },
     "machine_type": {
       "description": "The machine type to create. To create a machine with a custom type (such as extended memory), format the value like custom-VCPUS-MEM_IN_MB like custom-6-20480 for 6 vCPU and 20GB of RAM.",
@@ -55,15 +55,15 @@
       "description": "Metadata key/value pairs to make available from within instances created from this template.",
       "required": false,
       "type": "map(string)",
-      "security_impact": false,
-      "rationale": "Contains arbitrary instance metadata whose keys and intended values are workload-specific. The map as a whole is too broad to enforce as one generic security control."
+      "security_impact": true,
+      "rationale": "Free-form instance metadata can contain plaintext secrets, credentials, tokens, or other sensitive values. A platform policy can restrict unsafe metadata usage to reduce credential exposure and improve credential hygiene."
     },
     "metadata_startup_script": {
       "description": "An alternative to using the startup-script metadata key, mostly to match the compute_instance resource. This replaces the startup-script metadata key on the created instance and thus the two mechanisms are not allowed to be used simultaneously.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Contains workload-specific startup code. Its security depends on the script content and requires code review rather than a simple value-based policy."
+      "security_impact": true,
+      "rationale": "Startup scripts execute commands when instances initialise and can embed secrets or run unverified commands. A platform policy can restrict inline startup scripts to reduce script-injection and credential-exposure risks."
     },
     "min_cpu_platform": {
       "description": "Specifies a minimum CPU platform. Applicable values are the friendly names of CPU platforms, such as Intel Haswell or Intel Skylake.",
@@ -104,8 +104,8 @@
       "description": "A map of resource manager tags.\n\t\t\t\tResource manager tag keys and values have the same definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id}, and values are in the format tagValues/456. The field is ignored (both PUT & PATCH) when empty.",
       "required": false,
       "type": "map(string)",
-      "security_impact": false,
-      "rationale": "Resource Manager tags are organisation-specific metadata and selectors. A central generic policy cannot know the required tag keys and values."
+      "security_impact": true,
+      "rationale": "Resource Manager tags can support attribute-based access control and security baselines. A platform policy can require mandatory security tags to be present without hardcoding organisation-specific tag values."
     },
     "resource_policies": {
       "description": "A list of self_links of resource policies to attach to the instance. Currently a max of 1 resource policy is supported.",
@@ -118,8 +118,8 @@
       "description": "Tags to attach to the instance.",
       "required": false,
       "type": "set(string)",
-      "security_impact": false,
-      "rationale": "Instance network tags are organisation-specific selectors whose meaning depends on separate firewall rules. A generic policy cannot safely prescribe specific tag names."
+      "security_impact": true,
+      "rationale": "Instance network tags can act as firewall targets. Unconstrained or overly broad tags can expose instances to unintended traffic or bypass security boundaries, so a platform policy can restrict their use."
     },
     "advanced_machine_features": {
       "type": "block",
@@ -130,8 +130,8 @@
       "description": "Whether to enable nested virtualization or not.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Enables a workload capability that may be legitimately required. It is a workload design choice rather than a universally applicable security control."
+      "security_impact": true,
+      "rationale": "Nested virtualization runs a hypervisor inside the VM and increases attack surface and potential privilege-escalation paths. A platform policy can require it to remain disabled by default unless explicitly necessary."
     },
     "advanced_machine_features.enable_uefi_networking": {
       "description": "Whether to enable UEFI networking or not.",
@@ -245,57 +245,57 @@
       "description": "A list of features to enable on the guest operating system. Applicable only for bootable images.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Declares guest OS capabilities needed by an image. Appropriate features depend on the selected workload and image rather than a single generic security rule."
+      "security_impact": true,
+      "rationale": "Guest OS features affect platform compatibility and security boundaries. Enabling unsupported or legacy features can weaken isolation or introduce unsafe guest-host interactions, so a platform policy can constrain them."
     },
     "disk.interface": {
       "description": "Specifies the disk interface to use for attaching this disk.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects the disk attachment interface. It is a compatibility/performance choice rather than a security control."
+      "security_impact": true,
+      "rationale": "The disk interface type affects the VM's storage driver path and virtualization isolation architecture. A platform policy can restrict interface choices to approved secure options rather than treating the setting only as performance tuning."
     },
     "disk.labels": {
       "description": "A set of key/value label pairs to assign to disks,",
       "required": false,
       "type": "map(string)",
-      "security_impact": false,
-      "rationale": "Disk labels are organisational metadata and do not directly enforce access or encryption."
+      "security_impact": true,
+      "rationale": "Disk labels are commonly used for data classification, compliance tracking, and security asset inventory. A platform policy can require appropriate label presence without hardcoding organisation-specific values."
     },
     "disk.mode": {
       "description": "The mode in which to attach this disk, either READ_WRITE or READ_ONLY. If you are attaching or creating a boot disk, this must read-write mode.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Controls whether a disk is attached read-only or read-write. The correct mode depends on workload function, and boot disks require read-write access, so it is not a universal security policy target."
+      "security_impact": true,
+      "rationale": "Disk attachment mode controls whether a volume is writable. Requiring read-only mode for applicable non-boot data disks can reduce unauthorized modification, tampering, and malware persistence."
     },
     "disk.provisioned_iops": {
       "description": "Indicates how many IOPS to provision for the disk. This sets the number of I/O operations per second that the disk can handle. For more details, see the [Extreme persistent disk documentation](https://cloud.google.com/compute/docs/disks/extreme-persistent-disk) or the [Hyperdisk documentation](https://cloud.google.com/compute/docs/disks/hyperdisks) depending on the selected disk_type.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Controls disk performance capacity. It is an operational/performance setting."
+      "security_impact": true,
+      "rationale": "Provisioned IOPS controls disk performance capacity. Bounding IOPS can help prevent resource-exhaustion abuse, uncontrolled high-tier consumption, and operational instability, making it suitable for a platform guardrail."
     },
     "disk.provisioned_throughput": {
       "description": "Indicates how much throughput to provision for the disk, in MB/s. This sets the amount of data that can be read or written from the disk per second. Values must greater than or equal to 1. For more details, see the [Hyperdisk documentation](https://cloud.google.com/compute/docs/disks/hyperdisks).",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Controls disk throughput. It is an operational/performance setting."
+      "security_impact": true,
+      "rationale": "Provisioned throughput controls how quickly data can be read or written. Bounding throughput can limit runaway workloads, resource abuse, and excessive data-exfiltration capacity while supporting operational stability."
     },
     "disk.resource_manager_tags": {
       "description": "A map of resource manager tags. Resource manager tag keys and values have the same definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id}, and values are in the format tagValues/456. The field is ignored (both PUT & PATCH) when empty.",
       "required": false,
       "type": "map(string)",
-      "security_impact": false,
-      "rationale": "Resource Manager tags on the disk are organisation-specific metadata/selectors and cannot be prescribed generically."
+      "security_impact": true,
+      "rationale": "Disk Resource Manager tags can support data classification and compliance controls. A platform policy can require mandatory security-tag presence while leaving organisation-specific tag keys and values configurable."
     },
     "disk.resource_policies": {
       "description": "A list (short name or id) of resource policies to attach to this disk. Currently a max of 1 resource policy is supported.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "References another resource-policy object. The appropriate referenced policy is workload- and organisation-specific."
+      "security_impact": true,
+      "rationale": "Attaching a resource policy can enforce data-protection controls such as backup or retention baselines. A platform policy can require that an appropriate resource policy is attached without pinning a specific policy identifier."
     },
     "disk.source": {
       "description": "The name (not self_link) of the disk (such as those managed by google_compute_disk) to attach. ~> Note: Either source or source_image is required when creating a new instance except for when creating a local SSD.",
@@ -342,14 +342,14 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Selects a customer-managed Cloud KMS key used to encrypt the disk. This directly controls encryption-at-rest key management and is therefore suitable for policy enforcement."
+      "rationale": "Specifies the Cloud KMS key used for disk encryption. A platform policy can require this value to be set and non-blank to enforce customer-managed encryption while avoiding pinning any specific key identifier."
     },
     "disk.disk_encryption_key.kms_key_service_account": {
       "description": "The service account being used for the encryption request for the given KMS key. If absent, the Compute Engine default service account is used.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Identifies the service account used with the KMS key. The correct identity is organisation-specific; encryption policy should focus on the key mechanism rather than pinning an account."
+      "security_impact": true,
+      "rationale": "Specifies the service account used for KMS encryption operations. A platform policy can require an explicit, non-default run-as service account to support least privilege without pinning a specific account."
     },
     "disk.source_image_encryption_key": {
       "type": "block",
@@ -367,8 +367,8 @@
       "description": "The service account being used for the encryption\nrequest for the given KMS key. If absent, the Compute\nEngine default service account is used.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Identifies the service account used to access the source-image KMS key. The correct service account is organisation-specific."
+      "security_impact": true,
+      "rationale": "Specifies the run-as service account used for source-image KMS operations. A platform policy can require an explicit, non-default service account for least privilege without hardcoding a specific email address."
     },
     "disk.source_image_encryption_key.raw_key": {
       "description": "Specifies a 256-bit customer-supplied encryption key, encoded in RFC 4648 base64 to either encrypt or decrypt this resource.  Only one of kms_key_self_link, rsa_encrypted_key and raw_key may be set.",
@@ -381,8 +381,8 @@
       "description": "Specifies an RFC 4648 base64 encoded, RSA-wrapped 2048-bit customer-supplied encryption key to either encrypt or decrypt this resource.  Only one of kms_key_self_link, rsa_encrypted_key and raw_key may be set.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Provides an RSA-wrapped customer-supplied key for an already-encrypted source image. It is a supported decryption mechanism and is not inherently insecure merely by being present."
+      "security_impact": true,
+      "rationale": "Uses a statically wrapped customer-supplied encryption key for the source image. A platform policy can discourage customer-supplied wrapping keys in favour of platform-managed CMEK to reduce secret-handling risk."
     },
     "disk.source_snapshot_encryption_key": {
       "type": "block",
@@ -393,15 +393,15 @@
       "description": "The self link of the encryption key that is stored in\nGoogle Cloud KMS. Only one of kms_key_self_link, rsa_encrypted_key and raw_key may be set.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "References the key required to decrypt an already-encrypted source snapshot. The specific key is an environment-specific resource reference."
+      "security_impact": true,
+      "rationale": "Specifies the Cloud KMS key used with the encrypted source snapshot. A platform policy can require a non-blank customer-managed key reference without pinning a specific key name."
     },
     "disk.source_snapshot_encryption_key.kms_key_service_account": {
       "description": "The service account being used for the encryption\nrequest for the given KMS key. If absent, the Compute\nEngine default service account is used.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Identifies the service account used to access the snapshot KMS key. The correct identity is organisation-specific."
+      "security_impact": true,
+      "rationale": "Specifies the run-as service account used for source-snapshot KMS operations. A platform policy can require an explicit, non-default service account for least privilege without pinning a specific identity."
     },
     "disk.source_snapshot_encryption_key.raw_key": {
       "description": "Specifies a 256-bit customer-supplied encryption key, encoded in RFC 4648 base64 to either encrypt or decrypt this resource. Only one of kms_key_self_link, rsa_encrypted_key and raw_key may be set.",
@@ -414,8 +414,8 @@
       "description": "Specifies an RFC 4648 base64 encoded, RSA-wrapped 2048-bit customer-supplied encryption key to either encrypt or decrypt this resource.  Only one of kms_key_self_link, rsa_encrypted_key and raw_key may be set.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Provides an RSA-wrapped customer-supplied key for an encrypted source snapshot. It is a supported decryption mechanism and is not inherently insecure merely by being present."
+      "security_impact": true,
+      "rationale": "Uses a statically wrapped customer-supplied encryption key for the source snapshot. A platform policy can discourage customer-supplied wrapping keys in favour of platform-managed CMEK to reduce secret-handling risk."
     },
     "guest_accelerator": {
       "type": "block",
@@ -426,8 +426,8 @@
       "description": "The number of the guest accelerator cards exposed to this instance.",
       "required": true,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Controls accelerator quantity and capacity. It is a workload sizing choice rather than a security control."
+      "security_impact": true,
+      "rationale": "Controls the quantity of accelerator hardware attached to instances. A platform policy can bound or whitelist high-privilege or costly accelerator tiers to prevent unintended GPU sprawl and unauthorized high-tier resource consumption."
     },
     "guest_accelerator.type": {
       "description": "The accelerator type resource to expose to this instance. E.g. nvidia-tesla-k80.",
@@ -494,22 +494,22 @@
       "description": "The name of the subnetwork to attach this interface to. The subnetwork must exist in the same region this instance will be created in. Either network or subnetwork must be provided.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "References a subnetwork resource. Which subnet is approved depends on the organisation's network design."
+      "security_impact": true,
+      "rationale": "Controls which subnetwork the instance joins. Restricting deployment to approved, segment-aligned subnets is a core network-exposure control and helps maintain intended security boundaries."
     },
     "network_interface.subnetwork_project": {
       "description": "The ID of the project in which the subnetwork belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "References the project containing the subnet. The approved project is organisation-specific."
+      "security_impact": true,
+      "rationale": "Controls the project from which the attached subnetwork is selected. A platform policy can restrict cross-project network attachment to approved boundaries and prevent unauthorized deployment into external projects."
     },
     "network_interface.vlan": {
       "description": "VLAN tag of a dynamic network interface, must be an integer in the range from 2 to 255 inclusively.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Selects a VLAN identifier for dynamic network interfaces. The correct value depends on network design and is not a universal security setting."
+      "security_impact": true,
+      "rationale": "Assigns a VLAN identifier to a dynamic network interface. A platform policy can restrict VLAN assignments to authorized segmentation boundaries to maintain workload isolation."
     },
     "network_interface.access_config": {
       "type": "block",
@@ -527,8 +527,8 @@
       "description": "The networking tier used for configuring this instance template. This field can take the following values: PREMIUM, STANDARD, FIXED_STANDARD. If this field is not specified, it is assumed to be PREMIUM.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects the service tier for an external IPv4 access configuration. The tier affects routing/performance rather than whether Internet access exists."
+      "security_impact": true,
+      "rationale": "Selects the network service tier for external access. Network tiers can affect routing paths and integration with security controls such as Cloud Armor, so a platform policy can enforce an approved secure tier."
     },
     "network_interface.alias_ip_range": {
       "type": "block",
@@ -539,15 +539,15 @@
       "description": "The IP CIDR range represented by this alias IP range. This IP CIDR range must belong to the specified subnetwork and cannot contain IP addresses reserved by system or used by other network interfaces. At the time of writing only a netmask (e.g. /24) may be supplied, with a CIDR format resulting in an API error.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects an alias IP range from the configured subnet. Addressing is environment-specific and not a generic security rule by itself."
+      "security_impact": true,
+      "rationale": "Defines an alias IP range for the interface. A platform policy can enforce valid approved internal address ranges to support IPAM governance and prevent address overlap or exhaustion."
     },
     "network_interface.alias_ip_range.subnetwork_range_name": {
       "description": "The subnetwork secondary range name specifying the secondary range from which to allocate the IP CIDR range for this alias IP range. If left unspecified, the primary range of the subnetwork will be used.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "References a named secondary subnet range. The correct range name is environment-specific."
+      "security_impact": true,
+      "rationale": "Selects the subnet secondary range used for alias IP allocation. A platform policy can require approved secondary ranges so alias addresses map to intended internal segmentation structures."
     },
     "network_interface.ipv6_access_config": {
       "type": "block",
@@ -641,22 +641,22 @@
       "description": "Allows instance to be preempted. This defaults to false.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Controls whether the instance may be preempted. It is a cost/availability choice rather than a security control."
+      "security_impact": true,
+      "rationale": "Preemptible instances can be terminated and reclaimed abruptly, which can affect availability, integrity, and workload stability. A platform policy can prohibit preemptible instances for sensitive or production workloads."
     },
     "scheduling.provisioning_model": {
       "description": "Whether the instance is spot. If this is set as SPOT.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects standard or Spot-style provisioning. It is a cost and availability decision."
+      "security_impact": true,
+      "rationale": "Spot or other non-standard provisioning models can be terminated unexpectedly and reduce workload stability. A platform policy can require standard provisioning for sensitive workloads to protect critical services from sudden termination."
     },
     "scheduling.termination_time": {
       "description": "Specifies the timestamp, when the instance will be terminated,\nin RFC3339 text format. If specified, the instance termination action\nwill be performed at the termination time.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Sets an automatic termination time. Lifecycle timing is an operational choice rather than a security control."
+      "security_impact": true,
+      "rationale": "An automatic termination time can prematurely stop security appliances, monitoring agents, or critical services. A platform policy can restrict time-bounded instances to prevent unintended loss of security controls and service integrity."
     },
     "scheduling.local_ssd_recovery_timeout": {
       "type": "block",
@@ -667,15 +667,15 @@
       "description": "Span of time that's a fraction of a second at nanosecond\nresolution. Durations less than one second are represented\nwith a 0 seconds field and a positive nanos field. Must\nbe from 0 to 999,999,999 inclusive.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Fine-tunes local SSD recovery timeout. It is an operational availability setting."
+      "security_impact": true,
+      "rationale": "Controls Local SSD recovery timing after host failure. A platform policy can constrain recovery timeouts because inappropriate values can affect data availability, recovery integrity, and handling of persistent or encrypted state."
     },
     "scheduling.local_ssd_recovery_timeout.seconds": {
       "description": "Span of time at a resolution of a second.\nMust be from 0 to 315,576,000,000 inclusive.",
       "required": true,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Controls local SSD recovery timeout. It is an operational availability setting."
+      "security_impact": true,
+      "rationale": "Controls Local SSD recovery timing after host failure. A platform policy can constrain recovery timeouts because they directly affect data availability, recovery integrity, and post-failure data handling."
     },
     "scheduling.max_run_duration": {
       "type": "block",
@@ -686,15 +686,15 @@
       "description": "Span of time that's a fraction of a second at nanosecond\nresolution. Durations less than one second are represented\nwith a 0 seconds field and a positive nanos field. Must\nbe from 0 to 999,999,999 inclusive.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Fine-tunes maximum run duration. It is an operational lifecycle setting."
+      "security_impact": true,
+      "rationale": "Controls the maximum lifetime of an instance. Enforcing bounded run duration can support ephemeral-compute practices so credentials and sessions do not persist indefinitely on long-running nodes."
     },
     "scheduling.max_run_duration.seconds": {
       "description": "Span of time at a resolution of a second.\nMust be from 0 to 315,576,000,000 inclusive.",
       "required": true,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Controls maximum run duration. It is an operational lifecycle setting."
+      "security_impact": true,
+      "rationale": "Controls the maximum lifetime of an instance. Limiting run duration reduces the exposure window of compromised long-running nodes and supports credential hygiene, session lifecycle management, and ephemeral-compute practices."
     },
     "scheduling.node_affinities": {
       "type": "block",
@@ -706,21 +706,21 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Identifies a node-affinity selector. Selector keys are environment-specific placement metadata."
+      "rationale": "Node-affinity selector keys are placement metadata and references specific to tenant isolation or hardware-allocation needs, making them unsuitable for a generic multi-tenant platform policy."
     },
     "scheduling.node_affinities.operator": {
       "description": "N/A",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Controls how a node-affinity selector is evaluated. It is a placement rule rather than a generic security control."
+      "security_impact": true,
+      "rationale": "Controls how node-affinity placement constraints are evaluated. Restricting operators to approved forms can support workload isolation and secure placement for multi-tenant or sensitive workloads."
     },
     "scheduling.node_affinities.values": {
       "description": "Corresponds to the label values of a reservation resource.",
       "required": true,
       "type": "set(string)",
-      "security_impact": false,
-      "rationale": "Defines node-affinity selector values. These are environment-specific placement metadata."
+      "security_impact": true,
+      "rationale": "Node-affinity values restrict where instances can run and therefore form part of tenancy and isolation enforcement. A platform policy can require approved node-group constraints without hardcoding specific names."
     },
     "service_account": {
       "type": "block",
@@ -731,15 +731,15 @@
       "description": "The service account e-mail address. If not given, the default Google Compute Engine service account is used.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Identifies the service account attached to instances. Which account is authorised is organisation-specific and should not be hardcoded by a generic policy."
+      "security_impact": true,
+      "rationale": "Controls the run-as service account attached to the instance. A platform policy can require an explicit, non-default service account to support least privilege while avoiding pinning a specific email address."
     },
     "service_account.scopes": {
       "description": "A list of service scopes. Both OAuth2 URLs and gcloud short names are supported. To allow full access to all Cloud APIs, use the cloud-platform scope.",
       "required": true,
       "type": "set(string)",
-      "security_impact": false,
-      "rationale": "OAuth scopes limit the service account token but effective access is also governed by IAM roles. The appropriate scopes are workload-specific, so platform policy should not generically prescribe a fixed set."
+      "security_impact": true,
+      "rationale": "OAuth scopes contribute to least-privilege access even though IAM roles provide primary authorization. A platform policy can reject overly broad or legacy all-access scopes, such as unrestricted cloud-platform access, and require a secure minimum scope shape."
     },
     "shielded_instance_config": {
       "type": "block",
