@@ -34,8 +34,8 @@
       "description": "The resource name of the multicast consumer association that is in the\nsame zone as this multicast group consumer activation.\nUse the following format:\n'projects/*/locations/*/multicastConsumerAssociations/*'.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls which multicast consumer association is authorised to consume traffic from the activated multicast group. A generic policy can validate that the reference belongs to an approved project or location and follows the expected resource path, reducing unintended multicast access."
+      "security_impact": false,
+      "rationale": "This argument is a reference to another multicast consumer association resource. It identifies a related resource rather than defining a generic platform-level security control."
     },
     "multicast_group_consumer_activation_id": {
       "description": "A unique name for the multicast group consumer activation.\nThe name is restricted to letters, numbers, and hyphen, with the first\ncharacter a letter, and the last a letter or a number. The name must not\nexceed 48 characters.",
@@ -48,15 +48,15 @@
       "description": "The resource name of the multicast group range activation created by the\nadmin in the same zone as this multicast group consumer activation. Use the\nfollowing format:\n// 'projects/*/locations/*/multicastGroupRangeActivations/*'.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls which activated multicast group range this consumer can access. A generic policy can restrict references to approved projects, locations, or expected resource paths to reduce unintended access to multicast traffic."
+      "security_impact": false,
+      "rationale": "This argument is a reference to another multicast group range activation resource. It identifies a related resource rather than defining a generic platform-level security control."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines the GCP project that owns the resource. Project placement is a security and governance boundary, so a generic policy can restrict deployment to an approved project allowlist."
+      "security_impact": false,
+      "rationale":"This argument identifies the GCP project that contains the resource. Project identifiers are resource ownership references and are not treated as generic platform-level security policy targets."
     },
     "log_config": {
       "type": "block",
