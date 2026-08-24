@@ -14,28 +14,28 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Basic text documenting the core function of the resource. It also being optional means it has no direct security impact and is purely for description."
+      "rationale": "Basic text documenting the core function of the resource. It also being optional means it has no direct security impact and is purely for description. Cosmetic and descriptive fields are not security targets."
     },
     "interconnect_group": {
       "description": "The URL of an InterconnectGroup that groups these Attachments'\nInterconnects. Customers do not need to set this unless directed by\nGoogle Support.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The specific group of physical network circuits being used. It has a direct security impact as if it is misconfigured then redundancy may not function correctly."
+      "security_impact": false,
+      "rationale": "The specific group of physical network circuits being used. It has no security impact as it is a reference or identifier pointing to another resource group."
     },
     "name": {
       "description": "Name of the resource. Provided by the client when the resource is created. The name must be\n1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters\nlong and match the regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the first\ncharacter must be a lowercase letter, and all following characters must be a dash,\nlowercase letter, or digit, except the last character, which cannot be a dash.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This is the label to be used when locating this resource. Renaming or altering it in any way changes nothing about how it functions. No direct security impacts."
+      "rationale": "This is the label to be used when locating this resource. Renaming or altering it in any way changes nothing about how it functions. Identifiers and resource names have no security impacts."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines which Google Cloud project owns the resource. Incorrect project assignment can cause the wrong access rules to be applied to it."
+      "security_impact": false,
+      "rationale": "Determines which Google Cloud project owns the resource. Has no security impact as project ID is a reference for identification."
     },
     "attachments": {
       "type": "block",
@@ -46,15 +46,15 @@
       "description": "URLs of Attachments in the given zone, to the given region, on Interconnects in the given facility and metro. Every Attachment in the AG has such an entry.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specific individual connections added to the list. Has security impact in that if two connections on the same physical line are added then there is no real backup despite listing otherwise."
+      "security_impact": false,
+      "rationale": "Specific individual connections added to the list. Has no security impact in that it only references to specific interconnect attachments which are external resources and outside our scope."
     },
     "attachments.name": {
       "description": "N/A",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This is a label for an entry in the list to keep track. Has no security impact in that it does not point to anything or change any behavior."
+      "rationale": "This is a label for an entry in the list to keep track. Has no security impact in that it does not point to anything or change any behavior. List entry labels and identifiers have no security impact."
     },
     "intent": {
       "type": "block",
@@ -65,8 +65,8 @@
       "description": "Which SLA the user intends this group to support. Possible values: [\"PRODUCTION_NON_CRITICAL\", \"PRODUCTION_CRITICAL\", \"NO_SLA\", \"AVAILABILITY_SLA_UNSPECIFIED\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The specific reliability level being claimed. Incorrect configurations can lead to false indications of backup protections or setup rejections due to mismatched claim."
+      "security_impact": false,
+      "rationale": "The specific reliability level being claimed. No security impact as this argument is ann architectural or performance tier setting with no insecure value or security control mechanism."
     }
   }
 }
