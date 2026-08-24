@@ -11,7 +11,7 @@ conditions := [
         },
         {
             "condition": "Require HTTPS for remote function endpoint",
-            "attribute_path": ["remote_function_options", "endpoint"],
+            "attribute_path": ["remote_function_options", 0, "endpoint"],
             "values": [
                 "*://",
                 [
