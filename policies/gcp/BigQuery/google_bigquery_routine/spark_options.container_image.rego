@@ -11,7 +11,7 @@ conditions := [
         },
         {
             "condition": "Reject container images from public registries",
-            "attribute_path": ["spark_options", "container_image"],
+            "attribute_path": ["spark_options", 0, "container_image"],
             "values": [
                 "*",
                 [
