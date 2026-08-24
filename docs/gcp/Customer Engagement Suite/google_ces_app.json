@@ -34,15 +34,8 @@
       "description": "Instructions for all the agents in the app.\nYou can use this instruction to set up a stable identity or personality\nacross all the agents.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls the instructions and behaviour of AI agents, which can affect safety and data handling."
-    },
-    "guardrails": {
-      "description": "List of guardrails for the app.\nFormat:\n'projects/{project}/locations/{location}/apps/{app}/guardrails/{guardrail}'",
-      "required": false,
-      "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Configures safety filters and security constraints for the AI model, making it a security-relevant control that can be enforced by policy."
+      "security_impact": false,
+      "rationale": "This is a free-form configuration document containing instructions for the application's agents. Its contents cannot be meaningfully constrained by a generic platform-level security policy."
     },
     "location": {
       "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
@@ -84,8 +77,8 @@
       "description": "The tool execution mode for the app.\nSee the [API reference](https://docs.cloud.google.com/customer-engagement-ai/conversational-agents/ps/reference/rpc/google.cloud.ces.v1#google.cloud.ces.v1.App.ToolExecutionMode) for more details.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls how the application executes tools, such as parallel or sequential execution, so policy can restrict execution modes to approved behaviour and reduce unsafe tool usage."
+      "security_impact": false,
+      "rationale":"This is an operational and architectural execution-mode toggle. There is no documented insecure value that a generic platform-level security policy should constrain."
     },
     "audio_processing_config": {
       "type": "block",
@@ -219,7 +212,7 @@
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": "Enables or disables DTMF input for telephony interactions. This is a functional configuration rather than a generic seecurity control."
+      "rationale": "Enables or disables DTMF input for telephony interactions. This is a functional configuration rather than a generic security control."
     },
     "default_channel_profile.profile_id": {
       "description": "The unique identifier of the channel profile.",
@@ -380,7 +373,7 @@
       "description": "Indicates whether the BigQuery export is enabled.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
+      "security_impact": true,
       "rationale": "Controls whether security-relevant application data is exported for logging and auditing, so policy can require logging to remain enabled for visibility and compliance."
     },
     "logging_settings.bigquery_export_settings.project": {
@@ -388,7 +381,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Controls whether session activity is written to Cloud Logging. Generic platform policies commonly require logging to support security monitoring, auditing and incident response."
+      "rationale": "Identifies the Google Cloud project containing the BigQuery dataset. It is a resource identifier/reference rather than a security control."
     },
     "logging_settings.cloud_logging_settings": {
       "type": "block",
@@ -399,8 +392,8 @@
       "description": "Whether to enable Cloud Logging for the sessions.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Enables security monitoring and audit logging."
+      "security_impact": true,
+      "rationale": "Enables security monitoring and audit logging, making it a useful policy target for ensuring security-relevant application activity is recorded."
     },
     "logging_settings.conversation_logging_settings": {
       "type": "block",
@@ -411,8 +404,8 @@
       "description": "Whether to disable conversation logging for the sessions.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Controls whether conversation activity is recorded for auditing."
+      "security_impact": true,
+      "rationale":  "Controls whether conversation logging is disabled. Security policies can require logging to remain enabled to support auditing, monitoring and incident investigation."
     },
     "logging_settings.redaction_config": {
       "type": "block",
@@ -430,8 +423,8 @@
       "description": "If true, redaction will be applied in various logging scenarios, including\nconversation history, Cloud Logging and audio recording.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Controls protection of sensitive information in logs and recordings."
+      "security_impact": true,
+      "rationale": "Controls whether sensitive information is redacted from logs and recordings, making it a useful policy target for enforcing protection of sensitive data in security telemetry."
     },
     "logging_settings.redaction_config.inspect_template": {
       "description": "[DLP](https://cloud.google.com/dlp/docs) inspect template name to configure\ndetection of sensitive data types.\nFormat:\n'projects/{project}/locations/{location}/inspectTemplates/{inspect_template}'",
@@ -450,7 +443,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Specifies which LLM the application uses. Model selection depends on application requirements such as cost, performance and capabilities rather than a generic platform security policy."
+      "rationale": "Identifies the LLM model resource or model name used by the application. It is a resource/model reference rather than a generic platform-level security policy target."
     },
     "model_settings.temperature": {
       "description": "If set, this temperature will be used for the LLM model. Temperature\ncontrols the randomness of the model's responses. Lower temperatures\nproduce responses that are more predictable. Higher temperatures produce\nresponses that are more creative.",
@@ -570,7 +563,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "References another schema definition. It organizes schema structure but dies not affect application security."
+      "rationale": "References another schema definition within the root defs structure.It organizes reusable schema components rather than defining a platform-level security control."
     },
     "variable_declarations.schema.required": {
       "description": "Required properties of Type.OBJECT.",
