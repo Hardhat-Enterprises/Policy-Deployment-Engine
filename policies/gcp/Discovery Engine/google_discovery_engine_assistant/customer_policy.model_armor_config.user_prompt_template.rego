@@ -13,7 +13,7 @@ conditions := [
     },
     {
       "condition": "Model Armor user-prompt template is not approved",
-      "attribute_path": ["customer_policy", "model_armor_config", "user_prompt_template"],
+      "attribute_path": ["customer_policy", 0, "model_armor_config", 0, "user_prompt_template"],
       "values": ["projects/735927692082/locations/eu/templates/approved-prompt-template"],
       "policy_type": "whitelist"
     }

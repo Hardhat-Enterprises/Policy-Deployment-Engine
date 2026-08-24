@@ -13,7 +13,7 @@ conditions := [
     },
     {
       "condition": "Model Armor failure mode is not secure",
-      "attribute_path": ["customer_policy", "model_armor_config", "failure_mode"],
+      "attribute_path": ["customer_policy", 0, "model_armor_config", 0, "failure_mode"],
       "values": ["FAIL_CLOSED"],
       "policy_type": "whitelist"
     }

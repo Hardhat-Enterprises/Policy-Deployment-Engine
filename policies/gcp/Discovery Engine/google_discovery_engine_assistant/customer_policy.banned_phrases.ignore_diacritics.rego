@@ -13,7 +13,7 @@ conditions := [
     },
     {
       "condition": "banned-phrase matching does not ignore diacritics",
-      "attribute_path": ["customer_policy", "banned_phrases", "ignore_diacritics"],
+      "attribute_path": ["customer_policy", 0, "banned_phrases", 0, "ignore_diacritics"],
       "values": [true],
       "policy_type": "whitelist"
     }

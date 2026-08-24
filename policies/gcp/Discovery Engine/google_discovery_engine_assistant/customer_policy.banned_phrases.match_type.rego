@@ -13,7 +13,7 @@ conditions := [
     },
     {
       "condition": "banned-phrase match type is not approved",
-      "attribute_path": ["customer_policy", "banned_phrases", "match_type"],
+      "attribute_path": ["customer_policy", 0, "banned_phrases", 0, "match_type"],
       "values": ["WORD_BOUNDARY_STRING_MATCH"],
       "policy_type": "whitelist"
     }
