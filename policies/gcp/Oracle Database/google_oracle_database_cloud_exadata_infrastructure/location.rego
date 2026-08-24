@@ -1,6 +1,6 @@
-package terraform.gcp.security.oracle_database.cloud_exadata_infrastructure.location
+package terraform.gcp.security.oracle_database.google_oracle_database_cloud_exadata_infrastructure.location
 import data.terraform.helpers
-import data.terraform.gcp.security.oracle_database.cloud_exadata_infrastructure.vars
+import data.terraform.gcp.security.oracle_database.google_oracle_database_cloud_exadata_infrastructure.vars
 
 conditions := [
     [
@@ -14,3 +14,12 @@ conditions := [
     }
     ]
 ]
+
+# Displays a general message about policy compliance
+# Use 'opa eval ... "data.terraform.gcp.security.oracle_database.google_oracle_database_cloud_exadata_infrastructure.location.message"
+message := helpers.get_multi_summary(conditions, vars.variables).message
+
+# Displays a detailed summary of each resources compliance to every condition and situation
+# Useful for debugging
+# Use 'opa eval ... "data.terraform.gcp.security.oracle_database.google_oracle_database_cloud_exadata_infrastructure.location.details"
+details := helpers.get_multi_summary(conditions, vars.variables).details
