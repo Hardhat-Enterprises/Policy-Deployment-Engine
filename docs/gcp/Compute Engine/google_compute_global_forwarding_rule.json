@@ -6,8 +6,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Only controls whether Terraform is allowed to delete the resource. It's a safety switch for the deployment tool, not a security setting on the resource itself."
+      "security_impact": true,
+      "rationale": "Controls whether Terraform is allowed to delete the resource. A policy should require 'PREVENT' so the forwarding rule can't be destroyed by an accidental 'terraform destroy'/'apply'."
     },
     "description": {
       "description": "An optional description of this resource. Provide this property when\nyou create the resource.",
