@@ -1,4 +1,4 @@
-package terraform.gcp.security.compute_engine.google_compute_region_autoscaler.min_replicas
+package terraform.gcp.security.compute_engine.google_compute_region_autoscaler.autoscaling_policy_min_replicas
 
 import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_region_autoscaler.vars
