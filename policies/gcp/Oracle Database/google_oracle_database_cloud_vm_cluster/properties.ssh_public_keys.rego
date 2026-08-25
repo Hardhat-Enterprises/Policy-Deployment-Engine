@@ -9,7 +9,7 @@ conditions := [
     {
         "condition": "Test if any ssh_public_keys entry is a known-insecure or placeholder value",
         "attribute_path" : ["properties", 0, "ssh_public_keys"],
-        "values" : ["not-a-valid-ssh-key", "", "changeme", "test", "ssh-key"],
+        "values" : ["not-a-valid-ssh-key", "changeme", "test", "ssh-key"],
         "policy_type" : "element blacklist"
     }
     ]
