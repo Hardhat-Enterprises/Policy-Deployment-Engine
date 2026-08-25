@@ -67,29 +67,29 @@
       "description": "Aggregated egress Packet-Per-Second for all multicast groups in the domain\nin this zone.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Sets aggregate egress capacity for infrastructure sizing; the appropriate threshold is a team-dependent operational metric, not a platform security control."
+      "security_impact": true,
+      "rationale": "Controls the aggregate egress packet rate for multicast traffic in the zone. A platform policy should enforce a safe upper bound to reduce the risk of excessive outbound traffic, amplification, denial-of-service behaviour, and resource abuse."
     },
     "traffic_spec.aggr_ingress_pps": {
       "description": "Aggregated ingress Packet-Per-Second for all multicast groups in the domain\nin this zone. Default to (aggregated_egress_pps /\nmax_per_group_subscribers) * 2.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Sets expected ingress throughput for provisioning; performance and capacity thresholds are operational choices outside platform security scope."
+      "security_impact": true,
+      "rationale": "Controls the aggregate ingress packet rate accepted for multicast traffic in the zone. A platform policy should bound this value to limit excessive traffic intake and reduce denial-of-service and resource-exhaustion risk."
     },
     "traffic_spec.avg_packet_size": {
       "description": "Average packet size (Default to 512 bytes).",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Provides an average packet-size estimate for capacity planning and infrastructure sizing, not security enforcement."
+      "security_impact": true,
+      "rationale": "Defines the expected average packet size used for multicast traffic provisioning. A platform policy should constrain it to an approved range so abnormal traffic profiles or malformed packet patterns cannot drive unsafe resource usage."
     },
     "traffic_spec.max_per_group_ingress_pps": {
       "description": "Maximum ingress Packet-Per-Second for a single multicast group in this\nzone. Default to aggregated_ingress_pps / 2.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Sets a per-group traffic rate used for scaling and capacity planning, making it an operational parameter rather than a security policy target."
+      "security_impact": true,
+      "rationale": "Sets the maximum ingress packet rate for an individual multicast group. A platform policy should enforce a safe upper bound to protect groups from flooding, traffic spikes, denial-of-service, and excessive resource consumption."
     },
     "traffic_spec.max_per_group_subscribers": {
       "description": "Maximum number of subscribers for a single multicast group in this zone.\nDefault to max(50, aggregated_egress_pps / aggregated_ingress_pps).",
