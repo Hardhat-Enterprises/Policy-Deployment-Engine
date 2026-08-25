@@ -14,14 +14,14 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "It is an ID created by the User for the deployed index - no security impact."
+      "rationale": "It is a user-defined identifier for the deployed index. Identifiers and references are out of scope for security policy."
     },
     "deployment_group": {
       "description": "The deployment group can be no longer than 64 characters (eg: 'test', 'prod'). If not set, we will use the 'default' deployment group.\nCreating deployment_groups with reserved_ip_ranges is a recommended practice when the peered network has multiple peering ranges. This creates your deployments from predictable IP spaces for easier traffic administration. Also, one deployment_group (except 'default') can only be used with the same reserved_ip_ranges which means if the deployment_group has been used with reserved_ip_ranges: [a, b, c], using it with [a, b] or [d, e] is disallowed. [See the official documentation here](https://cloud.google.com/vertex-ai/docs/reference/rest/v1/projects.locations.indexEndpoints#DeployedIndex.FIELDS.deployment_group).\nNote: we only support up to 5 deployment groups (not including 'default').",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "It names the deployment group for IP-range administration - it is a label with no security impact."
+      "security_impact": true,
+      "rationale": "It groups deployments into predictable IP ranges for the private endpoint. This affects network routing and isolation, so a policy should require an explicit non-default group."
     },
     "display_name": {
       "description": "The display name of the Index. The name can be up to 128 characters long and can consist of any UTF-8 characters.",
