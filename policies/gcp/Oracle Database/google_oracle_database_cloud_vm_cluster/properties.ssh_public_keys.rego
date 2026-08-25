@@ -1,6 +1,6 @@
-package terraform.gcp.security.oracle_database.google_oracle_database_cloud_vm_cluster.properties_ssh_public_keys
+package terraform.gcp.security.google_oracle_database_cloud_vm_cluster.properties_ssh_public_keys
 import data.terraform.helpers
-import data.terraform.gcp.security.oracle_database.google_oracle_database_cloud_vm_cluster.vars
+import data.terraform.gcp.security.google_oracle_database_cloud_vm_cluster.vars
 
 conditions := [
     [
@@ -16,10 +16,10 @@ conditions := [
 ]
 
 # Displays a general message about policy compliance
-# Use 'opa eval ... "data.terraform.gcp.security.oracle_database.google_oracle_database_cloud_vm_cluster.properties_ssh_public_keys.message"
+# Use 'opa eval ... "data.terraform.gcp.security.google_oracle_database_cloud_vm_cluster.properties_ssh_public_keys.message"
 message := helpers.get_multi_summary(conditions, vars.variables).message
 
 # Displays a detailed summary of each resources compliance to every condition and situation
 # Useful for debugging
-# Use 'opa eval ... "data.terraform.gcp.security.oracle_database.google_oracle_database_cloud_vm_cluster.properties_ssh_public_keys.details"
+# Use 'opa eval ... "data.terraform.gcp.security.google_oracle_database_cloud_vm_cluster.properties_ssh_public_keys.details"
 details := helpers.get_multi_summary(conditions, vars.variables).details
