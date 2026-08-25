@@ -1,5 +1,5 @@
 resource "google_apigee_flowhook" "non_compliant_example_1" {
-  org_id          = "example-org"
+  org_id          = "example-org2"
   environment     = "test"
   flow_hook_point = "PreProxyFlowHook"
   sharedflow      = "security-shared-flow"
