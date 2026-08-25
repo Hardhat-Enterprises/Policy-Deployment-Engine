@@ -6,43 +6,43 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform is permitted to destroy this security policy, defaulting to DELETE. Because Cloud Armor fails open, destroying the policy silently leaves the protected backends with no WAF, IP filtering or rate limiting while the service continues to appear healthy. A policy should require deletion_policy to be set to PREVENT so that removing this control cannot happen as a side effect of a routine apply."
     },
     "description": {
       "description": "An optional description of this security policy. Max size is 2048.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A free-text label of up to 2048 characters describing the policy for human readers. It is never evaluated when Cloud Armor matches a request against its rules, so its value has no effect on which traffic is allowed or blocked, and constraining it would enforce documentation conventions rather than improve security."
     },
     "labels": {
       "description": "Labels to apply to this address.  A list of key->value pairs.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Arbitrary key/value metadata attached to the policy for inventory, filtering and cost allocation. Labels are not consulted when Cloud Armor evaluates a request against its rules, so they cannot change which traffic is allowed or blocked, and any rule mandating particular label keys would depend on one organisation's tagging scheme rather than being generically enforceable."
     },
     "name": {
       "description": "The name of the security policy.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The identifier assigned to the security policy. It is used to reference the policy when attaching it to a backend service and plays no part in evaluating incoming requests, so its value cannot change which traffic is allowed or blocked; any rule about it would enforce a naming convention rather than a security outcome."
     },
     "project": {
       "description": "The project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines which GCP project the security policy is created in, defaulting to the provider's configured project. It selects where the resource lives rather than how it inspects traffic, and any rule constraining it would have to name specific project IDs belonging to individual teams, so it cannot be expressed as a generic platform policy."
     },
     "type": {
       "description": "The type indicates the intended use of the security policy. CLOUD_ARMOR - Cloud Armor backend security policies can be configured to filter incoming HTTP requests targeting backend services. They filter requests before they hit the origin servers. CLOUD_ARMOR_EDGE - Cloud Armor edge security policies can be configured to filter incoming HTTP requests targeting backend services (including Cloud CDN-enabled) as well as backend buckets (Cloud Storage). They filter requests before the request is served from Google's cache.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects the tier the policy operates at, and the tiers are not equivalent: CLOUD_ARMOR_EDGE filters at Google's cache and cannot use rate limiting, preconfigured WAF rule sets or Adaptive Protection, all of which CLOUD_ARMOR supports. A policy configured at the edge tier therefore cannot enforce protections its authors may believe are active, so a policy should require the backend tier wherever those defences are relied upon."
     },
     "adaptive_protection_config": {
       "type": "block",
@@ -58,15 +58,15 @@
       "description": "If set to true, enables CAAP for L7 DDoS detection.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Switches on Adaptive Protection, which builds a baseline of normal Layer 7 traffic and detects volumetric application-layer attacks that static rules would not catch. It is disabled by default, so a policy should require this to be set to true to ensure DDoS detection is actually active on the policy."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.rule_visibility": {
       "description": "Rule visibility. Supported values include: \"STANDARD\", \"PREMIUM\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines how much detail Adaptive Protection reports about attacks it detects, with PREMIUM exposing the signature analysis behind a finding and STANDARD reporting only a coarse summary. It does not change which requests are blocked, but a detection that responders cannot inspect or convert into a blocking rule delivers no defensive value, so a policy should require the visibility level that keeps findings actionable."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs": {
       "type": "block",
@@ -77,57 +77,57 @@
       "description": "Confidence threshold above which Adaptive Protection's auto-deploy takes actions.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets how confident Adaptive Protection must be in its attack classification before it automatically deploys a mitigating rule. It tunes the sensitivity of a detection mechanism rather than enabling or disabling it, and the appropriate value depends on a workload's traffic profile and tolerance for false positives, so no single threshold could be mandated across every team without either suppressing genuine mitigations or throttling legitimate traffic."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.auto_deploy_expiration_sec": {
       "description": "Duration over which Adaptive Protection's auto-deployed actions last.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets how long an automatically deployed mitigation stays in force before expiring. It tunes the duration of a response rather than whether that response happens, and the right value depends on how long a given workload's attacks typically persist, so no single duration could be mandated across all teams without either dropping mitigations early or holding them over legitimate traffic."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.auto_deploy_impacted_baseline_threshold": {
       "description": "Impacted baseline threshold below which Adaptive Protection's auto-deploy takes actions.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets how much of the established traffic baseline must be affected before Adaptive Protection auto-deploys a mitigation. It calibrates the sensitivity of an existing detection mechanism rather than enabling it, and the appropriate figure depends on each workload's normal traffic shape, so it cannot be fixed generically across every team."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.auto_deploy_load_threshold": {
       "description": "Load threshold above which Adaptive Protection automatically deploy threshold based on the backend load threshold and detect a new rule during an alerted attack.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the level of backend load above which Adaptive Protection will automatically deploy a mitigating rule during an alerted attack. It tunes when an already-enabled response triggers, and the meaningful load level differs entirely between a lightly used internal service and a high-volume public one, so no single value could be enforced for all teams."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.detection_absolute_qps": {
       "description": "Detection threshold based on absolute QPS.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the raw queries-per-second rate at which Adaptive Protection declares an attack. What counts as abnormal volume is entirely a property of the individual workload, so mandating one figure across the organisation would raise constant false positives on low-traffic services while failing to detect real attacks on high-traffic ones."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.detection_load_threshold": {
       "description": "Detection threshold based on the backend service's load.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the backend load level at which Adaptive Protection declares an attack. It calibrates the sensitivity of detection rather than turning it on, and a meaningful load figure depends on each service's capacity and normal utilisation, so it cannot be expressed as a generic platform rule."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.detection_relative_to_baseline_qps": {
       "description": "Detection threshold based on QPS relative to the average of baseline traffic.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets how far request volume must deviate from the learned baseline before Adaptive Protection declares an attack. It tunes detection sensitivity rather than enabling detection, and an appropriate multiplier depends on how variable a given workload's normal traffic is, so no single value would suit every team."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.name": {
       "description": "The name must be 1-63 characters long, and comply with RFC1035. The name must be unique within the security policy.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An RFC1035-compliant label that uniquely identifies this threshold configuration within the security policy. It exists so that individual threshold configs can be referenced and distinguished, and takes no part in detecting or mitigating traffic, so constraining it would enforce a naming convention rather than a security outcome."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.traffic_granularity_configs": {
       "type": "block",
@@ -138,22 +138,22 @@
       "description": "If enabled, traffic matching each unique value for the specified type constitutes a separate traffic unit. It can only be set to true if value is empty.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines whether every distinct value of the chosen granularity type is analysed as its own traffic unit rather than naming a single value. It refines how Adaptive Protection subdivides traffic for threshold evaluation rather than deciding whether detection occurs, and whether per-value analysis is appropriate depends on how many distinct hosts or paths a given workload serves, so it cannot be mandated generically."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.traffic_granularity_configs.type": {
       "description": "Type of this configuration.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects which request dimension, such as HTTP host or path, Adaptive Protection uses to group traffic into units before applying its thresholds. It tunes the granularity of an already-enabled detection mechanism, and the useful dimension depends on how an individual application is structured, so no single choice would be correct across every team."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.traffic_granularity_configs.value": {
       "description": "Requests that match this value constitute a granular traffic unit.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the specific host or path value whose matching requests are treated as a single traffic unit for threshold evaluation. Any rule constraining it would have to reference a team's actual hostnames or URL paths, which is team-specific configuration rather than something a platform-wide policy could express."
     },
     "advanced_options_config": {
       "type": "block",
@@ -164,29 +164,29 @@
       "description": "JSON body parsing. Supported values include: \"DISABLED\", \"STANDARD\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Cloud Armor parses JSON request bodies so that preconfigured WAF rules can inspect their contents. It defaults to DISABLED, meaning injection payloads carried inside JSON fields reach the backend without being examined by the WAF, so a policy should require STANDARD to ensure body inspection actually applies to JSON APIs."
     },
     "advanced_options_config.log_level": {
       "description": "Logging level. Supported values include: \"NORMAL\", \"VERBOSE\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines how much detail Cloud Armor records about rule evaluation, with VERBOSE capturing which rule matched a request and why. Without that detail an incident cannot be investigated and rules cannot be tuned against false positives, so a policy should require the verbose level to keep enforcement decisions auditable."
     },
     "advanced_options_config.request_body_inspection_size": {
       "description": "The maximum request size chosen by the customer with Waf enabled. Values supported are \"8KB\", \"16KB, \"32KB\", \"48KB\" and \"64KB\". Values are case insensitive.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets how much of a request body the WAF will inspect, defaulting to the smallest supported size. Content beyond the configured limit is never examined, so an attacker can pad a request and place an exploit past the cutoff to evade inspection entirely; a policy should require an inspection size large enough to cover the request bodies the protected services accept."
     },
     "advanced_options_config.user_ip_request_headers": {
       "description": "An optional list of case-insensitive request header names to use for resolving the callers client IP address.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Names the request headers Cloud Armor trusts when determining a caller's client IP address. If a header that clients can set is trusted here, an attacker can forge their apparent source address and bypass IP-based allow and deny rules as well as per-client rate limiting, so a policy should constrain which headers may be treated as authoritative for client IP resolution."
     },
     "advanced_options_config.json_custom_config": {
       "type": "block",
@@ -197,8 +197,8 @@
       "description": "A list of custom Content-Type header values to apply the JSON parsing.",
       "required": true,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Lists additional Content-Type header values that should be treated as JSON so that body parsing applies to them. Populating it correctly requires knowing the non-standard MIME types a particular application serves, which is application-specific configuration rather than something a platform-wide policy could specify."
     },
     "recaptcha_options_config": {
       "type": "block",
@@ -209,8 +209,8 @@
       "description": "A field to supply a reCAPTCHA site key to be used for all the rules using the redirect action with the type of GOOGLE_RECAPTCHA under the security policy. The specified site key needs to be created from the reCAPTCHA API. The user is responsible for the validity of the specified site key. If not specified, a Google-managed site key is used.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies the reCAPTCHA site key used by rules that redirect to a reCAPTCHA challenge, falling back to a Google-managed key when omitted. The key is an identifier issued to a particular project from the reCAPTCHA API, so any rule constraining its value would depend on team-specific credentials rather than expressing a generic security requirement."
     },
     "rule": {
       "type": "block",
@@ -221,29 +221,29 @@
       "description": "Action to take when match matches the request.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines what Cloud Armor does with a request once a rule's match condition succeeds, such as allowing it, denying it with an HTTP status, throttling it or redirecting it to a challenge. This is the enforcement decision itself, so a permissive action attached to a rule intended to block traffic renders the rule ineffective; a policy should constrain which actions may be paired with rules matching untrusted traffic."
     },
     "rule.description": {
       "description": "An optional description of this rule. Max size is 64.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A short free-text note describing the individual rule for human readers. It takes no part in matching or acting on requests, so its value cannot affect which traffic is allowed or blocked, and constraining it would enforce documentation practice rather than security."
     },
     "rule.preview": {
       "description": "When set to true, the action specified above is not enforced. Stackdriver logs for requests that trigger a preview action are annotated as such.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "When set to true the rule's action is logged but never enforced, so matching requests continue through to the backend. A rule left in preview appears fully configured while providing no protection at all, which makes this a silent bypass of the entire rule; a policy should require preview to be false on rules that are relied upon for enforcement."
     },
     "rule.priority": {
       "description": "An unique positive integer indicating the priority of evaluation for a rule. Rules are evaluated from highest priority (lowest numerically) to lowest priority (highest numerically) in order.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets the evaluation order of rules within the policy, where the lowest number is evaluated first and the first match wins. Because a permissive rule given a lower number takes effect before any stricter rule below it, priority determines which rules actually apply to traffic, so a policy should constrain the ordering that governs whether restrictive rules can be reached."
     },
     "rule.header_action": {
       "type": "block",
@@ -259,15 +259,15 @@
       "description": "The name of the header to set.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names a request header that Cloud Armor adds or overwrites before forwarding a matched request to the backend. It is used to pass application-specific signals downstream and does not affect whether the request is allowed or blocked, and any rule about which header names are permitted would depend on a team's own backend contract."
     },
     "rule.header_action.request_headers_to_adds.header_value": {
       "description": "The value to set the named header to.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies the value written into the named request header before the request is forwarded. The value is application-specific content consumed by a team's own backend rather than something that changes Cloud Armor's filtering decision, so it cannot be constrained by a generic platform policy."
     },
     "rule.match": {
       "type": "block",
@@ -278,8 +278,8 @@
       "description": "Predefined rule expression. If this field is specified, config must also be specified. Available options:   SRC_IPS_V1: Must specify the corresponding src_ip_ranges field in config.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the predefined match expression a rule uses, where SRC_IPS_V1 indicates matching is driven by the src_ip_ranges list in the config block. The provider accepts only this one value, so there is no alternative setting a policy could exclude and no insecure configuration to prevent; the security-relevant decision is which ranges are listed, not that this field selects the IP-matching mode."
     },
     "rule.match.config": {
       "type": "block",
@@ -290,8 +290,8 @@
       "description": "Set of IP addresses or ranges (IPV4 or IPV6) in CIDR notation to match against inbound traffic. There is a limit of 10 IP ranges per rule. A value of '*' matches all IPs (can be used to override the default behavior).",
       "required": true,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the source IP ranges a rule matches against, and accepts the wildcard '*' which matches every address. Although the specific ranges an organisation trusts are team-specific, the wildcard is not: combined with an allow action it exposes the protected backend to the entire internet, so a policy can generically forbid unrestricted source ranges on permissive rules."
     },
     "rule.match.expr": {
       "type": "block",
@@ -302,8 +302,8 @@
       "description": "Textual representation of an expression in Common Expression Language syntax. The application context of the containing message determines which well-known feature set of CEL is supported.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Holds the Common Expression Language expression that decides whether a rule matches a request, including calls that invoke the preconfigured WAF rule sets. The expression is the rule's entire matching logic, so one that is overly narrow or trivially satisfiable leaves the associated action either unreachable or applied to all traffic; a policy should constrain expressions that render enforcement ineffective."
     },
     "rule.match.expr_options": {
       "type": "block",
@@ -319,15 +319,15 @@
       "description": "A list of site keys to be used during the validation of reCAPTCHA action-tokens. The provided site keys need to be created from reCAPTCHA API under the same project where the security policy is created",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Lists the reCAPTCHA site keys used to validate action-tokens presented with a request. These keys are credentials issued to a specific project from the reCAPTCHA API, so any rule constraining their values would depend on team-specific identifiers rather than a generic security requirement."
     },
     "rule.match.expr_options.recaptcha_options.session_token_site_keys": {
       "description": "A list of site keys to be used during the validation of reCAPTCHA session-tokens. The provided site keys need to be created from reCAPTCHA API under the same project where the security policy is created.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Lists the reCAPTCHA site keys used to validate session-tokens presented with a request. As with action-token keys these are project-scoped credentials rather than security settings, so their values cannot be constrained by a policy written without knowledge of the owning team."
     },
     "rule.preconfigured_waf_config": {
       "type": "block",
@@ -343,15 +343,15 @@
       "description": "A list of target rule IDs under the WAF rule set to apply the preconfigured WAF exclusion. If omitted, it refers to all the rule IDs under the WAF rule set.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Lists which individual WAF signatures an exclusion applies to, and when omitted the exclusion silently applies to every rule in the targeted rule set. That default turns a narrow tuning exception into a blanket disabling of the whole rule set for the matched field, so a policy should require exclusions to name the specific rule IDs they are intended to suppress."
     },
     "rule.preconfigured_waf_config.exclusion.target_rule_set": {
       "description": "Target WAF rule set to apply the preconfigured WAF exclusion.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Names the preconfigured WAF rule set that an exclusion weakens, such as the SQL injection or cross-site scripting rule set. Because the value selects which class of attack detection is suppressed for the matched request field, a policy should constrain which rule sets may be excluded so that core injection protections cannot be turned off through tuning."
     },
     "rule.preconfigured_waf_config.exclusion.request_cookie": {
       "type": "block",
@@ -362,15 +362,15 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value. Available options: EQUALS: The operator matches if the field value equals the specified value. STARTS_WITH: The operator matches if the field value starts with the specified value. ENDS_WITH: The operator matches if the field value ends with the specified value. CONTAINS: The operator matches if the field value contains the specified value. EQUALS_ANY: The operator matches if the field value is any value.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects how broadly an exclusion matches the cookie it removes from WAF inspection, and accepts EQUALS_ANY which matches every cookie regardless of name. That value converts a targeted tuning exception into a blanket exemption of all cookies from injection and scripting checks, so a policy should forbid the wildcard operator on WAF exclusions."
     },
     "rule.preconfigured_waf_config.exclusion.request_cookie.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation. The field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the specific cookie whose value is excluded from WAF inspection. Identifying which cookie legitimately triggers a false positive requires knowledge of a particular application's session and state handling, so no generic rule could specify an appropriate value."
     },
     "rule.preconfigured_waf_config.exclusion.request_header": {
       "type": "block",
@@ -381,15 +381,15 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value. Available options: EQUALS: The operator matches if the field value equals the specified value. STARTS_WITH: The operator matches if the field value starts with the specified value. ENDS_WITH: The operator matches if the field value ends with the specified value. CONTAINS: The operator matches if the field value contains the specified value. EQUALS_ANY: The operator matches if the field value is any value.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects how broadly an exclusion matches the request header it removes from WAF inspection, and accepts EQUALS_ANY which matches any header. Because headers commonly carry attacker-controlled input, exempting all of them from preconfigured WAF evaluation removes a primary inspection surface, so a policy should require exclusions to target a named header rather than the wildcard."
     },
     "rule.preconfigured_waf_config.exclusion.request_header.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation. The field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the specific request header excluded from WAF inspection. Which header needs exempting depends on the custom headers an individual application uses, so the value cannot be constrained without knowledge of that application."
     },
     "rule.preconfigured_waf_config.exclusion.request_query_param": {
       "type": "block",
@@ -400,15 +400,15 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value. Available options: EQUALS: The operator matches if the field value equals the specified value. STARTS_WITH: The operator matches if the field value starts with the specified value. ENDS_WITH: The operator matches if the field value ends with the specified value. CONTAINS: The operator matches if the field value contains the specified value. EQUALS_ANY: The operator matches if the field value is any value.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects how broadly an exclusion matches the query parameter it removes from WAF inspection, and accepts EQUALS_ANY which matches every parameter. Since query parameters and POST body fields are the most common carriers of injection payloads, a wildcard exclusion here disables injection detection across all user input, so a policy should forbid it."
     },
     "rule.preconfigured_waf_config.exclusion.request_query_param.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation. The field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the specific query parameter excluded from WAF inspection. The parameter that legitimately produces a false positive is determined by an individual application's interface, so no platform-wide rule could prescribe its value."
     },
     "rule.preconfigured_waf_config.exclusion.request_uri": {
       "type": "block",
@@ -419,15 +419,15 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value. Available options: EQUALS: The operator matches if the field value equals the specified value. STARTS_WITH: The operator matches if the field value starts with the specified value. ENDS_WITH: The operator matches if the field value ends with the specified value. CONTAINS: The operator matches if the field value contains the specified value. EQUALS_ANY: The operator matches if the field value is any value.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects how broadly an exclusion matches the request URI it removes from WAF inspection, and accepts EQUALS_ANY which matches every path. Combined with a wildcard the exclusion exempts the entire application from the targeted WAF rule set, so a policy should require exclusions to name the specific paths they apply to."
     },
     "rule.preconfigured_waf_config.exclusion.request_uri.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation. The field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the specific request URI excluded from WAF inspection. Which path requires an exemption depends on an individual application's routing, so the value is team-specific rather than something a generic policy could set."
     },
     "rule.rate_limit_options": {
       "type": "block",
@@ -438,36 +438,36 @@
       "description": "Can only be specified if the action for the rule is \"rate_based_ban\". If specified, determines the time (in seconds) the traffic will continue to be banned by the rate limit after the rate falls below the threshold.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets how long a client remains banned after its request rate falls back below the threshold. It tunes the duration of an already-configured mitigation, and an appropriate ban length depends on a service's traffic patterns and tolerance for locking out shared-address clients, so no single value could be mandated across teams."
     },
     "rule.rate_limit_options.conform_action": {
       "description": "Action to take for requests that are under the configured rate limit threshold. Valid option is \"allow\" only.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies what happens to requests that remain under the rate limit threshold. The provider accepts only the value allow, so there is no alternative configuration that could weaken the policy and a rule constraining this argument would have no effect on security."
     },
     "rule.rate_limit_options.enforce_on_key": {
       "description": "Determines the key to enforce the rateLimitThreshold on",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines what the rate limit counts requests against, such as the source address, a header value, a cookie or all traffic collectively. Keying on ALL means no individual client is ever isolated, and keying on a client-supplied header or cookie lets an attacker rotate the value to reset their own counter, so a policy should constrain enforcement to a key an attacker cannot trivially control."
     },
     "rule.rate_limit_options.enforce_on_key_name": {
       "description": "Rate limit key name applicable only for the following key types: HTTP_HEADER -- Name of the HTTP header whose value is taken as the key value. HTTP_COOKIE -- Name of the HTTP cookie whose value is taken as the key value.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the particular header or cookie whose value is used as the rate limiting key. The name refers to a field defined by an individual application, so a generic policy could not specify it; the security-relevant decision is the key type rather than the field name."
     },
     "rule.rate_limit_options.exceed_action": {
       "description": "Action to take for requests that are above the configured rate limit threshold, to either deny with a specified HTTP response code, or redirect to a different endpoint. Valid options are \"deny()\" where valid values for status are 403, 404, 429, and 502, and \"redirect\" where the redirect parameters come from exceedRedirectOptions below.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies what happens to requests exceeding the rate limit, restricted by the provider to denying with a 403, 404, 429 or 502 status, or redirecting. Every accepted value stops the request reaching the backend and none permits it through, so constraining the choice would express a preference about response codes rather than improve security."
     },
     "rule.rate_limit_options.ban_threshold": {
       "type": "block",
@@ -478,15 +478,15 @@
       "description": "Number of HTTP(S) requests for calculating the threshold.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the number of over-limit requests required before a client is banned. It calibrates the sensitivity of an existing mitigation, and a meaningful count depends on each service's normal request volume, so no single figure would be correct across every team."
     },
     "rule.rate_limit_options.ban_threshold.interval_sec": {
       "description": "Interval over which the threshold is computed.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the window over which over-limit requests are counted toward a ban. It tunes the measurement period of an already-configured mitigation, and the appropriate window depends on a workload's traffic profile, so it cannot be fixed generically."
     },
     "rule.rate_limit_options.enforce_on_key_configs": {
       "type": "block",
@@ -497,15 +497,15 @@
       "description": "Rate limit key name applicable only for the following key types: HTTP_HEADER -- Name of the HTTP header whose value is taken as the key value. HTTP_COOKIE -- Name of the HTTP cookie whose value is taken as the key value.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the header or cookie used as the rate limiting key within a multi-key enforcement configuration. As with the single-key equivalent, the field name is defined by an individual application and cannot be prescribed by a generic policy."
     },
     "rule.rate_limit_options.enforce_on_key_configs.enforce_on_key_type": {
       "description": "Determines the key to enforce the rate_limit_threshold on",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines what a rate limit within a multi-key configuration counts requests against. The same weaknesses apply as for single-key enforcement: aggregating all traffic under one key isolates no individual client, and keying on a client-supplied header or cookie allows an attacker to reset their counter at will, so a policy should constrain which key types may be used."
     },
     "rule.rate_limit_options.exceed_redirect_options": {
       "type": "block",
@@ -516,15 +516,15 @@
       "description": "Target for the redirect action. This is required if the type is EXTERNAL_302 and cannot be specified for GOOGLE_RECAPTCHA.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies the destination URL that over-limit traffic is redirected to when the exceed action is an external redirect. The destination is an endpoint chosen and operated by the individual team, so a generic policy could not specify an appropriate value."
     },
     "rule.rate_limit_options.exceed_redirect_options.type": {
       "description": "Type of the redirect action.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects whether over-limit traffic is sent to a reCAPTCHA challenge or redirected to an external location. Both accepted values divert the request away from the backend rather than allowing it through, and which form of mitigation suits a workload is a team-level decision, so constraining the choice would not improve security."
     },
     "rule.rate_limit_options.rate_limit_threshold": {
       "type": "block",
@@ -535,15 +535,15 @@
       "description": "Number of HTTP(S) requests for calculating the threshold.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the number of requests permitted before rate limiting begins. What constitutes an abusive rate is entirely a property of the individual workload, so mandating one figure would throttle legitimate users on busy services while leaving quiet ones effectively unprotected."
     },
     "rule.rate_limit_options.rate_limit_threshold.interval_sec": {
       "description": "Interval over which the threshold is computed.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the time window over which requests are counted toward the rate limit. It defines the measurement period for a threshold that is itself workload-specific, so no single interval would be appropriate across every team."
     },
     "rule.redirect_options": {
       "type": "block",
@@ -554,15 +554,15 @@
       "description": "Target for the redirect action. This is required if the type is EXTERNAL_302 and cannot be specified for GOOGLE_RECAPTCHA.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies the destination URL for a rule whose action is an external redirect. The destination is an endpoint belonging to the individual team, so its value cannot be prescribed by a policy written without knowledge of that team's infrastructure."
     },
     "rule.redirect_options.type": {
       "description": "Type of the redirect action. Available options: EXTERNAL_302: Must specify the corresponding target field in config. GOOGLE_RECAPTCHA: Cannot specify target field in config.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects whether a redirect action issues a reCAPTCHA challenge or an external 302 to a supplied target. Both values divert the matched request away from the backend rather than permitting it, and the choice between challenging a client and relocating it depends on the team's intent for that rule, so constraining it would not change the security outcome."
     }
   }
 }
