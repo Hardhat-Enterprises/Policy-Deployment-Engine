@@ -1,4 +1,4 @@
-package terraform.gcp.security.compute_engine.google_compute_region_autoscaler.mode
+package terraform.gcp.security.compute_engine.google_compute_region_autoscaler.autoscaling_policy_mode
 
 import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_region_autoscaler.vars
