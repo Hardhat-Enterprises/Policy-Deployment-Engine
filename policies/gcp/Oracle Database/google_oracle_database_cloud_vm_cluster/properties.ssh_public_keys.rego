@@ -4,13 +4,13 @@ import data.terraform.gcp.security.google_oracle_database_cloud_vm_cluster.vars
 
 conditions := [
     [
-    {"situation_description" : "The Cloud VM Cluster has SSH public keys configured that are missing or not well-formed, risking unauthorised or unmanaged administrative access",
-    "remedies":[ "Provide valid SSH public keys in the standard 'ssh-<type> <key-data>' format (e.g. ssh-ed25519, ssh-rsa) for every administrator who needs access"]},
+    {"situation_description" : "The Cloud VM Cluster has SSH public keys configured that use a known-insecure or placeholder value, risking unauthorised or unmanaged administrative access",
+    "remedies":[ "Remove placeholder/example key values and provide a real, valid SSH public key in the standard 'ssh-<type> <key-data>' format (e.g. ssh-ed25519, ssh-rsa) for every administrator who needs access"]},
     {
-        "condition": "Test if any ssh_public_keys entry does not match a valid SSH public key format",
+        "condition": "Test if any ssh_public_keys entry is a known-insecure or placeholder value",
         "attribute_path" : ["properties", 0, "ssh_public_keys"],
-        "values" : ["^ssh-(rsa|ed25519|ecdsa-sha2-nistp256|ecdsa-sha2-nistp384|ecdsa-sha2-nistp521) "],
-        "policy_type" : "pattern whitelist"
+        "values" : ["not-a-valid-ssh-key", "", "changeme", "test", "ssh-key"],
+        "policy_type" : "element blacklist"
     }
     ]
 ]
