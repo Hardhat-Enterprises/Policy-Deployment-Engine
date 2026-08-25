@@ -22,7 +22,7 @@
       "type": "list(string)",
       "security_impact": false,
       "rationale": "The load balancer forwarding rules this extension attaches to, and in effect which traffic it covers. Coverage gaps are a real risk, but any rule about them has to name a specific team's forwarding rules, which fails the generic test, and the one structural constraint that exists (a single route extension per forwarding rule) is already enforced by the API."
-    }, 
+    },
     "labels": {
       "description": "Set of labels associated with the LbRouteExtension resource.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
@@ -114,29 +114,29 @@
       "description": "When set to 'TRUE', enables 'observability_mode' on the 'ext_proc' filter.\nThis makes 'ext_proc' calls asynchronous. Envoy doesn't check for the response from 'ext_proc' calls.\nFor more information about the filter, see: https://www.envoyproxy.io/docs/envoy/v1.32.3/api-v3/extensions/filters/http/ext_proc/v3/ext_proc.proto\nThis field is helpful when you want to try out the extension in async log-only mode.\nSupported by regional 'LbTrafficExtension' and 'LbRouteExtension' resources.\nOnly 'STREAMED' (default) body processing mode is supported.",
       "required": false,
       "type": "bool",
-       "security_impact": false,
+      "security_impact": false,
       "rationale": "The wire mode for streaming request bodies to the extension, and the platform has already narrowed the choice to almost nothing on this resource: it can only be set when supported_events includes REQUEST_BODY and the service points at a backend service, and only FULL_DUPLEX_STREAMED is supported for route extensions. No accepted value is safer than another, since this is a streaming protocol detail rather than an exposure control."
     },
     "extension_chains.extensions.service": {
       "description": "The reference to the service that runs the extension.\n\n* To configure a callout extension, service must be a fully-qualified reference to a backend service.\n* To configure a plugin extension, service must be a reference to a WasmPlugin resource.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The component the load balancer hands matched requests to, and whose response influences which backend service the request is routed to, all of it happening before the URL map is evaluated and therefore before the Cloud Armor and IAP policies attached to the selected backend apply. The reference can be a backend service, a WasmPlugin, or an endpoint managed by Google, so it can point outside the team's own project entirely. Policy should require it to resolve inside an approved trust boundary, either the same project or a parameterised allowlist of projects and Google services, so that request data and influence over routing are not handed to a service the organisation does not control."
+      "security_impact": false,
+      "rationale": "References the backend service or WasmPlugin that runs the extension. This field is a pointer to another resource, and platform policy should not constrain which team- or project-specific resource it references. The referenced service should be secured through its own configuration and IAM controls, so policing this pointer or cross-project reference would be overreaching."
     },
     "extension_chains.extensions.supported_events": {
       "description": "A set of events during request or response processing for which this extension is called.\nThis field is optional for the LbRouteExtension resource. If unspecified, 'REQUEST_HEADERS' event is assumed as supported.\nPossible values: 'REQUEST_HEADERS', 'REQUEST_BODY', 'REQUEST_TRAILERS'.",
       "required": false,
       "type": "set(string)",
-      "security_impact": false,
-      "rationale": "Selects which processing phases invoke the extension. Unlike forward_headers, the default here is the minimal one, headers only when unset, and only request side events exist on this resource, so leaving it alone exposes nothing extra. Adding body events does share more with the extension, but whether an extension needs the body is a workload decision the platform cannot make on a team's behalf."
+      "security_impact": true,
+      "rationale": "Controls which request-processing events are exposed to the extension. Enabling events such as REQUEST_BODY or REQUEST_TRAILERS can disclose substantially more request data than the default REQUEST_HEADERS event, including potentially sensitive payload content. Platform policy should enforce data minimisation by limiting supported events to the minimum secure set required, preventing unnecessary sensitive request data from being exposed to external processing extensions."
     },
     "extension_chains.extensions.timeout": {
       "description": "Specifies the timeout for each individual message on the stream. The timeout must be between 10-1000 milliseconds.\nA duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.5s\".",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "How long the proxy waits for each message on the ext_proc stream, already bounded by the API to between 10 and 1000 milliseconds. It is a knob for tuning latency against completeness; the question that matters for security, what happens when the timeout is hit, is answered by fail_open rather than here."
+      "security_impact": true,
+      "rationale": "Sets the per-message timeout for communication with the external extension. An excessively high timeout can allow a slow, hung, or misbehaving extension to keep ext_proc streams open and consume proxy resources, increasing the risk of resource exhaustion and denial of service. Platform policy should enforce a safe upper bound within the provider-supported range to protect availability while still allowing teams to choose an appropriate lower value."
     },
     "extension_chains.match_condition": {
       "type": "block",
@@ -147,8 +147,8 @@
       "description": "A Common Expression Language (CEL) expression that is used to match requests for which the extension chain is executed.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "The CEL expression that decides which requests the chain runs on; the first chain whose condition matches executes and no later chain does. Too narrow an expression means traffic skips the extension entirely, which is a genuine coverage risk, but judging it requires knowing a team's hosts, paths and headers, so it cannot be written as a generic rule and belongs in design review instead."
+      "security_impact": true,
+      "rationale": "Controls which requests invoke the extension chain. If a security extension such as authentication, authorization, or DLP is protected by an unsafe wildcard or an overly restrictive or incomplete CEL condition, some traffic can bypass that security control entirely. Platform policy should enforce a safe generic matching shape that prevents bypass-prone conditions and preserves required security coverage without hardcoding team-specific hosts, paths, or headers."
     }
   }
 }
