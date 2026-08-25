@@ -6,43 +6,43 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform may delete the playbook, abandon it from Terraform management, or prevent its destruction. A policy should require PREVENT to reduce the risk of accidental or unauthorised deletion disrupting the agent's generative conversation workflow."
     },
     "display_name": {
       "description": "The human-readable name of the playbook, unique within an agent.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the human-readable name used to identify the playbook. It does not directly control access, tool permissions, data handling or model security, so it is not a generic security policy target."
     },
     "goal": {
       "description": "High level description of the goal the playbook intend to accomplish. A goal should be concise since it's visible to other playbooks that may reference this playbook.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the application-specific objective supplied to the LLM as part of the playbook context. Although its content requires careful design review, a generic value policy cannot determine secure goal text without understanding the intended business task."
     },
     "parent": {
       "description": "The agent to create a Playbook for.\nFormat: projects/<Project ID>/locations/<Location ID>/agents/<Agent ID>.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the Dialogflow CX agent that owns the playbook. It is a team-specific resource reference, and constraining it would require pinning a particular project, location or agent rather than enforcing a generic security property."
     },
     "playbook_type": {
       "description": "Type of the playbook. Possible values: [\"PLAYBOOK_TYPE_UNSPECIFIED\", \"TASK\", \"ROUTINE\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects task or routine playbook behaviour. Both are supported architectural designs, and neither type is inherently an insecure configuration."
     },
     "referenced_tools": {
       "description": "The resource name of tools referenced by the current playbook in the instructions. If not provided explicitly, they are will be implied using the tool being referenced in goal and steps.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies tools referenced by the playbook and therefore depends on the capabilities required by that particular workflow. The values are team-specific resource references; tool permissions and least privilege should be enforced on the tool and through IAM rather than by constraining these names generically."
     },
     "instruction": {
       "type": "block",
@@ -53,8 +53,8 @@
       "description": "General guidelines for the playbook. These are unstructured instructions that are not directly part of the goal, e.g. \"Always be polite\". It's valid for this text to be long and used instead of steps altogether.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines free-form, application-specific guidance supplied to the LLM. A generic policy cannot understand the intended conversation behaviour or reliably determine whether arbitrary natural-language guidance is secure."
     },
     "instruction.steps": {
       "type": "block",
@@ -65,15 +65,15 @@
       "description": "Sub-processing needed to execute the current step.\n\nThis field uses JSON data as a string. The value provided must be a valid JSON representation documented in [Step](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/projects.locations.agents.playbooks#step).",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Encodes application-specific nested playbook steps as JSON. Their correct structure and actions depend on the workflow, referenced tools and conversation design, so they cannot be meaningfully constrained by a generic platform policy."
     },
     "instruction.steps.text": {
       "description": "Step instruction in text format.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the natural-language instruction for an individual playbook step. Its required content depends on the intended task and cannot be validated for security using a generic value constraint."
     },
     "llm_model_settings": {
       "type": "block",
@@ -84,15 +84,15 @@
       "description": "The selected LLM model.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects a supported LLM model. Model availability and suitability evolve and depend on workload requirements; the model identifier alone does not represent a universally insecure configuration."
     },
     "llm_model_settings.prompt_text": {
       "description": "The custom prompt to use.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines a custom, application-specific prompt for the selected model. Unsafe prompt content is possible, but semantic prompt safety cannot be reliably enforced through a generic string-value policy without understanding the intended workflow."
     }
   }
 }
