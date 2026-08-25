@@ -6,8 +6,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Controls Terraform's lifecycle behaviour during resource deletion. It protects against accidental deletion but does not configure the security of the multicast domain activation itself. Different workloads may legitimately require different deletion behaviours, so a generic security policy would not improve security."
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can destroy the multicast domain activation. Platform policy should enforce PREVENT so accidental or unintended Terraform changes cannot destructively remove the resource without an explicit, reviewed lifecycle change."
     },
     "description": {
       "description": "An optional text description of the multicast domain activation.",
@@ -68,35 +68,35 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Defines expected aggregate multicast traffic volume for infrastructure sizing. It affects capacity planning rather than security."
+      "rationale": "Sets aggregate egress capacity for infrastructure sizing; the appropriate threshold is a team-dependent operational metric, not a platform security control."
     },
     "traffic_spec.aggr_ingress_pps": {
       "description": "Aggregated ingress Packet-Per-Second for all multicast groups in the domain\nin this zone. Default to (aggregated_egress_pps /\nmax_per_group_subscribers) * 2.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Specifies expected ingress traffic for provisioning multicast infrastructure. It is a performance parameter and does not change the security posture."
+      "rationale": "Sets expected ingress throughput for provisioning; performance and capacity thresholds are operational choices outside platform security scope."
     },
     "traffic_spec.avg_packet_size": {
       "description": "Average packet size (Default to 512 bytes).",
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "Used for multicast infrastructure sizing calculations. It affects performance planning but not authentication, authorization, or data protection."
+      "rationale": "Provides an average packet-size estimate for capacity planning and infrastructure sizing, not security enforcement."
     },
     "traffic_spec.max_per_group_ingress_pps": {
       "description": "Maximum ingress Packet-Per-Second for a single multicast group in this\nzone. Default to aggregated_ingress_pps / 2.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Defines the maximum ingress packet rate for a multicast group. This is a scaling parameter and not a security control."
+      "rationale": "Sets a per-group traffic rate used for scaling and capacity planning, making it an operational parameter rather than a security policy target."
     },
     "traffic_spec.max_per_group_subscribers": {
       "description": "Maximum number of subscribers for a single multicast group in this zone.\nDefault to max(50, aggregated_egress_pps / aggregated_ingress_pps).",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Specifies the expected maximum number of multicast subscribers for infrastructure provisioning. It affects scalability and resource allocation, not the security of the resource."
+      "rationale": "Sets a subscriber-count assumption for capacity and scalability planning, which is an operational choice rather than a platform security control."
     }
   }
 }
