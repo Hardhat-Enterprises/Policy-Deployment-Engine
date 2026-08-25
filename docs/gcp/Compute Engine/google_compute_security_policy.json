@@ -41,8 +41,8 @@
       "description": "The type indicates the intended use of the security policy. CLOUD_ARMOR - Cloud Armor backend security policies can be configured to filter incoming HTTP requests targeting backend services. They filter requests before they hit the origin servers. CLOUD_ARMOR_EDGE - Cloud Armor edge security policies can be configured to filter incoming HTTP requests targeting backend services (including Cloud CDN-enabled) as well as backend buckets (Cloud Storage). They filter requests before the request is served from Google's cache.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Selects the tier the policy operates at, and the tiers are not equivalent: CLOUD_ARMOR_EDGE filters at Google's cache and cannot use rate limiting, preconfigured WAF rule sets or Adaptive Protection, all of which CLOUD_ARMOR supports. A policy configured at the edge tier therefore cannot enforce protections its authors may believe are active, so a policy should require the backend tier wherever those defences are relied upon."
+      "security_impact": false,
+      "rationale": "Selects the tier the policy operates at, determining whether it filters at the backend service or at Google's cache. The tiers are functional deployment choices suited to different resource types rather than a scale of secure to insecure values, and edge policies exist to protect CDN-backed content and storage buckets that backend policies cannot reach, so no single value could be mandated across teams without breaking legitimate architectures."
     },
     "adaptive_protection_config": {
       "type": "block",
@@ -65,8 +65,8 @@
       "description": "Rule visibility. Supported values include: \"STANDARD\", \"PREMIUM\".",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines how much detail Adaptive Protection reports about attacks it detects, with PREMIUM exposing the signature analysis behind a finding and STANDARD reporting only a coarse summary. It does not change which requests are blocked, but a detection that responders cannot inspect or convert into a blocking rule delivers no defensive value, so a policy should require the visibility level that keeps findings actionable."
+      "security_impact": false,
+      "rationale": "Determines how much detail Adaptive Protection reports about the attacks it detects, with PREMIUM exposing signature analysis and STANDARD giving a coarser summary. Both values leave detection and mitigation working identically; the setting adjusts the depth of operational telemetry surfaced to responders rather than changing which requests are blocked, so constraining it would express a reporting preference rather than a security boundary."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs": {
       "type": "block",
@@ -77,50 +77,50 @@
       "description": "Confidence threshold above which Adaptive Protection's auto-deploy takes actions.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Sets how confident Adaptive Protection must be in its attack classification before it automatically deploys a mitigating rule. It tunes the sensitivity of a detection mechanism rather than enabling or disabling it, and the appropriate value depends on a workload's traffic profile and tolerance for false positives, so no single threshold could be mandated across every team without either suppressing genuine mitigations or throttling legitimate traffic."
+      "security_impact": true,
+      "rationale": "Sets how confident Adaptive Protection must be before it automatically deploys a mitigating rule. Because it governs whether an automated defence actually engages during an attack, a policy should require the threshold to be configured within safe guardrails rather than left at a value that suppresses auto-deployment."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.auto_deploy_expiration_sec": {
       "description": "Duration over which Adaptive Protection's auto-deployed actions last.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Sets how long an automatically deployed mitigation stays in force before expiring. It tunes the duration of a response rather than whether that response happens, and the right value depends on how long a given workload's attacks typically persist, so no single duration could be mandated across all teams without either dropping mitigations early or holding them over legitimate traffic."
+      "security_impact": true,
+      "rationale": "Sets how long an automatically deployed mitigation remains in force before expiring. The duration determines whether protection persists for the length of an attack or lapses while it is still under way, so a policy should require an expiry consistent with the platform's security baseline."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.auto_deploy_impacted_baseline_threshold": {
       "description": "Impacted baseline threshold below which Adaptive Protection's auto-deploy takes actions.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Sets how much of the established traffic baseline must be affected before Adaptive Protection auto-deploys a mitigation. It calibrates the sensitivity of an existing detection mechanism rather than enabling it, and the appropriate figure depends on each workload's normal traffic shape, so it cannot be fixed generically across every team."
+      "security_impact": true,
+      "rationale": "Sets how much of the traffic baseline must be affected before Adaptive Protection auto-deploys a mitigation. It acts as a guardrail on whether protective action is triggered at all, so a policy should ensure the threshold is configured so that automated mitigation reliably activates."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.auto_deploy_load_threshold": {
       "description": "Load threshold above which Adaptive Protection automatically deploy threshold based on the backend load threshold and detect a new rule during an alerted attack.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Sets the level of backend load above which Adaptive Protection will automatically deploy a mitigating rule during an alerted attack. It tunes when an already-enabled response triggers, and the meaningful load level differs entirely between a lightly used internal service and a high-volume public one, so no single value could be enforced for all teams."
+      "security_impact": true,
+      "rationale": "Sets the backend load level above which Adaptive Protection automatically deploys a mitigating rule during an alerted attack. Because this load-based trigger governs whether an automated security control engages, it is a structural setting a platform policy should constrain rather than leave unbounded."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.detection_absolute_qps": {
       "description": "Detection threshold based on absolute QPS.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Sets the raw queries-per-second rate at which Adaptive Protection declares an attack. What counts as abnormal volume is entirely a property of the individual workload, so mandating one figure across the organisation would raise constant false positives on low-traffic services while failing to detect real attacks on high-traffic ones."
+      "security_impact": true,
+      "rationale": "Sets the absolute queries-per-second rate at which Adaptive Protection declares an attack. The threshold determines when protection engages, so a policy should require it to be configured within bounds that keep detection responsive rather than set so high that attacks pass unflagged."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.detection_load_threshold": {
       "description": "Detection threshold based on the backend service's load.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Sets the backend load level at which Adaptive Protection declares an attack. It calibrates the sensitivity of detection rather than turning it on, and a meaningful load figure depends on each service's capacity and normal utilisation, so it cannot be expressed as a generic platform rule."
+      "security_impact": true,
+      "rationale": "Sets the backend load level at which Adaptive Protection declares an attack. Detection sensitivity determines whether threats are identified in time for mitigation to matter, so a policy should constrain this threshold to keep identification reliable."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.detection_relative_to_baseline_qps": {
       "description": "Detection threshold based on QPS relative to the average of baseline traffic.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Sets how far request volume must deviate from the learned baseline before Adaptive Protection declares an attack. It tunes detection sensitivity rather than enabling detection, and an appropriate multiplier depends on how variable a given workload's normal traffic is, so no single value would suit every team."
+      "security_impact": true,
+      "rationale": "Sets how far request volume must deviate from the learned baseline before Adaptive Protection declares an attack. As a tuning control on automated threat detection it governs whether the security feature functions effectively, so a policy should require it to be configured within a defensible range."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.name": {
       "description": "The name must be 1-63 characters long, and comply with RFC1035. The name must be unique within the security policy.",
@@ -242,8 +242,8 @@
       "description": "An unique positive integer indicating the priority of evaluation for a rule. Rules are evaluated from highest priority (lowest numerically) to lowest priority (highest numerically) in order.",
       "required": true,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Sets the evaluation order of rules within the policy, where the lowest number is evaluated first and the first match wins. Because a permissive rule given a lower number takes effect before any stricter rule below it, priority determines which rules actually apply to traffic, so a policy should constrain the ordering that governs whether restrictive rules can be reached."
+      "security_impact": false,
+      "rationale": "Sets the position of a rule within the policy's evaluation order, where the lowest number is evaluated first. The correct ordering is entirely a function of the rule logic a team has written for its own application, so a platform policy could not prescribe priority values without knowing what each rule is intended to match."
     },
     "rule.header_action": {
       "type": "block",
@@ -290,8 +290,8 @@
       "description": "Set of IP addresses or ranges (IPV4 or IPV6) in CIDR notation to match against inbound traffic. There is a limit of 10 IP ranges per rule. A value of '*' matches all IPs (can be used to override the default behavior).",
       "required": true,
       "type": "set(string)",
-      "security_impact": true,
-      "rationale": "Defines the source IP ranges a rule matches against, and accepts the wildcard '*' which matches every address. Although the specific ranges an organisation trusts are team-specific, the wildcard is not: combined with an allow action it exposes the protected backend to the entire internet, so a policy can generically forbid unrestricted source ranges on permissive rules."
+      "security_impact": false,
+      "rationale": "Lists the source IP ranges in CIDR notation that a rule matches against. The addresses an organisation trusts or blocks are drawn from its own network estate and partner relationships, so the contents of this list are team addressing decisions that a generic platform policy has no basis to constrain."
     },
     "rule.match.expr": {
       "type": "block",
@@ -302,8 +302,8 @@
       "description": "Textual representation of an expression in Common Expression Language syntax. The application context of the containing message determines which well-known feature set of CEL is supported.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Holds the Common Expression Language expression that decides whether a rule matches a request, including calls that invoke the preconfigured WAF rule sets. The expression is the rule's entire matching logic, so one that is overly narrow or trivially satisfiable leaves the associated action either unreachable or applied to all traffic; a policy should constrain expressions that render enforcement ineffective."
+      "security_impact": false,
+      "rationale": "Holds the Common Expression Language expression that determines whether a rule matches a request. Expressions are free-form logic written against an individual application's traffic, structure and threat model, so their content cannot be meaningfully validated by a policy written without knowledge of that application."
     },
     "rule.match.expr_options": {
       "type": "block",
@@ -350,8 +350,8 @@
       "description": "Target WAF rule set to apply the preconfigured WAF exclusion.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Names the preconfigured WAF rule set that an exclusion weakens, such as the SQL injection or cross-site scripting rule set. Because the value selects which class of attack detection is suppressed for the matched request field, a policy should constrain which rule sets may be excluded so that core injection protections cannot be turned off through tuning."
+      "security_impact": false,
+      "rationale": "Names the preconfigured WAF rule set an exclusion applies to. Deciding which rule set produces false positives against a particular application is an application-specific tuning judgement, so a platform policy could not determine which rule sets a given team may legitimately need to exclude."
     },
     "rule.preconfigured_waf_config.exclusion.request_cookie": {
       "type": "block",
@@ -459,8 +459,8 @@
       "description": "Rate limit key name applicable only for the following key types: HTTP_HEADER -- Name of the HTTP header whose value is taken as the key value. HTTP_COOKIE -- Name of the HTTP cookie whose value is taken as the key value.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Names the particular header or cookie whose value is used as the rate limiting key. The name refers to a field defined by an individual application, so a generic policy could not specify it; the security-relevant decision is the key type rather than the field name."
+      "security_impact": true,
+      "rationale": "Names the header or cookie whose value is used as the rate limiting key. When a key type requiring a field name is selected, an empty or malformed name leaves the rate limit misconfigured and effectively inactive, so a policy should require a non-empty, well-formed name wherever the chosen key type depends on one."
     },
     "rule.rate_limit_options.exceed_action": {
       "description": "Action to take for requests that are above the configured rate limit threshold, to either deny with a specified HTTP response code, or redirect to a different endpoint. Valid options are \"deny()\" where valid values for status are 403, 404, 429, and 502, and \"redirect\" where the redirect parameters come from exceedRedirectOptions below.",
@@ -497,8 +497,8 @@
       "description": "Rate limit key name applicable only for the following key types: HTTP_HEADER -- Name of the HTTP header whose value is taken as the key value. HTTP_COOKIE -- Name of the HTTP cookie whose value is taken as the key value.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Names the header or cookie used as the rate limiting key within a multi-key enforcement configuration. As with the single-key equivalent, the field name is defined by an individual application and cannot be prescribed by a generic policy."
+      "security_impact": true,
+      "rationale": "Names the header or cookie used as the rate limiting key within a multi-key enforcement configuration. As with the single-key equivalent, a missing or malformed name silently prevents the mitigation from functioning, so a policy should require a valid name whenever this configuration tier is in use."
     },
     "rule.rate_limit_options.enforce_on_key_configs.enforce_on_key_type": {
       "description": "Determines the key to enforce the rate_limit_threshold on",
@@ -523,8 +523,8 @@
       "description": "Type of the redirect action.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects whether over-limit traffic is sent to a reCAPTCHA challenge or redirected to an external location. Both accepted values divert the request away from the backend rather than allowing it through, and which form of mitigation suits a workload is a team-level decision, so constraining the choice would not improve security."
+      "security_impact": true,
+      "rationale": "Selects how traffic exceeding the rate limit is handled, either by issuing a reCAPTCHA challenge or redirecting to an external location. Because it determines whether over-limit traffic is actively challenged rather than left unhandled, a policy should require a redirect type that keeps the mitigation meaningful."
     },
     "rule.rate_limit_options.rate_limit_threshold": {
       "type": "block",
@@ -554,15 +554,15 @@
       "description": "Target for the redirect action. This is required if the type is EXTERNAL_302 and cannot be specified for GOOGLE_RECAPTCHA.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Supplies the destination URL for a rule whose action is an external redirect. The destination is an endpoint belonging to the individual team, so its value cannot be prescribed by a policy written without knowledge of that team's infrastructure."
+      "security_impact": true,
+      "rationale": "Supplies the destination URL that a redirect action sends matched traffic to. Although the host itself is team-specific, the scheme is not: a target using plain HTTP exposes redirected requests to interception, so a policy should require HTTPS while leaving the host unconstrained."
     },
     "rule.redirect_options.type": {
       "description": "Type of the redirect action. Available options: EXTERNAL_302: Must specify the corresponding target field in config. GOOGLE_RECAPTCHA: Cannot specify target field in config.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects whether a redirect action issues a reCAPTCHA challenge or an external 302 to a supplied target. Both values divert the matched request away from the backend rather than permitting it, and the choice between challenging a client and relocating it depends on the team's intent for that rule, so constraining it would not change the security outcome."
+      "security_impact": true,
+      "rationale": "Selects whether a redirect action issues a reCAPTCHA challenge or an external 302. The choice determines whether a security challenge is actually applied to the matched traffic or the request is merely relocated, so a policy should constrain the type to ensure defensive challenges are enforced where they are relied upon."
     }
   }
 }
