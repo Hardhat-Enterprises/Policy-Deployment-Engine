@@ -6,43 +6,43 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Safeguard against accidental deletion. Unintended deletion immediately removes a group of instances from service without a backup, impacting routing availability."
     },
     "description": {
       "description": "An optional textual description of the instance group.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Informational text for reading the configurations. Is not a security impact as it is purely and identifier and changing it in any way has zero functional effect."
     },
     "instances": {
       "description": "The list of instances in the group, in self_link format. When adding instances they must all be in the same network and zone as the instance group.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A list of pointers to other resources and does not directly configured behavior the group itself. Has no security impact as it's a set of references linking specific instances to resources."
     },
     "name": {
       "description": "The name of the instance group. Must be 1-63 characters long and comply with RFC1035. Supported characters include lowercase letters, numbers, and hyphens.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is an identifier used to label and locate the resource. It has no behavioral effect and renaming the group doesn't change anything."
     },
     "network": {
       "description": "The URL of the network the instance group is in. If this is different from the network where the instances are in, the creation fails. Defaults to the network where the instances are in (if neither network nor instances is specified, this field will be blank).",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a pointer or reference field to another resource. This is what places the group into a specific network's addressing and routing context but because it's a reference rather than a configured behavior it has no direct security impact."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a pointer to the project, which determines IAM boundary. This resource has no direct security impact as it points security boundary governance to the project resource's own IAM policy instead of in within its own field."
     },
     "zone": {
       "description": "The zone that this instance group should be created in.",
@@ -60,15 +60,15 @@
       "description": "The name which the port will be mapped to.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a label used so a backend service configuration can reference it instead of a number. It has no security impact as it's an identifier used for cross-referencing between resources"
     },
     "named_port.port": {
       "description": "The port number to map the name to.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This is the value that determines which port on the group's instances is reachable through this named mapping. It is a security impact as it directly changes what's reachable through a path."
     }
   }
 }
