@@ -121,8 +121,8 @@
       "description": "The reference to the service that runs the extension.\n\n* To configure a callout extension, service must be a fully-qualified reference to a backend service.\n* To configure a plugin extension, service must be a reference to a WasmPlugin resource.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines the backend service or WasmPlugin that executes the extension for matched traffic. Because this is the workload execution target for the extension, using an implicit, default, or inappropriate target can weaken least-privilege separation. Platform policy should require an explicit, non-default execution target without pinning a specific service or plugin name, so teams retain control over which approved workload performs the extension logic."
+      "security_impact": false,
+      "rationale": "References the backend service or WasmPlugin that executes the extension. This field is a pointer to another resource rather than a security control on the LbRouteExtension itself. Platform policy should not constrain which specific backend service or plugin a team references; the referenced resource should be secured through its own configuration and policies."
     },
     "extension_chains.extensions.supported_events": {
       "description": "A set of events during request or response processing for which this extension is called.\nThis field is optional for the LbRouteExtension resource. If unspecified, 'REQUEST_HEADERS' event is assumed as supported.\nPossible values: 'REQUEST_HEADERS', 'REQUEST_BODY', 'REQUEST_TRAILERS'.",
