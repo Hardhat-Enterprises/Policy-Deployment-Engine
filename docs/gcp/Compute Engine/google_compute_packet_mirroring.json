@@ -6,43 +6,43 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Critical safeguard against accidental deletion. If this policy is deleted, traffic inspection and intrusion detection capabilities enabled by packet mirroring disappear, opening up monitoring blind spots."
     },
     "description": {
       "description": "A human-readable description of the rule.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier field documenting packet mirroring rules. No security impact as changing it has no effect on what gets mirrored, where it goes, or whether the policy is active."
     },
     "enable": {
       "description": "Indicates whether or not this packet mirroring takes effect. If set to FALSE, this packet mirroring\npolicy will not be enforced on the network. The default is TRUE. Possible values: [\"TRUE\", \"FALSE\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Master toggle for whether traffic is being copied. This argument has critical security impacts as it determines whether the mirroring, and whatever other monitoring systems depending upon it, is live or dormant."
     },
     "name": {
       "description": "The name of the packet mirroring rule",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier. No security impact as renaming it changes nothing about what's mirrored or where it goes."
     },
     "priority": {
       "description": "Since only one rule can be active at a time, priority is\nused to break ties in the case of two rules that apply to\nthe same instances.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument resolves conflicts, determining which rule's configuration takes effect when rules overlap. This has security impacts as incorrect configurations can lead to broader or narrower mirroring rule than intended applying to a given instance, changing what traffic is captured."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An identification pointer to the external project GCP entity. No security impact as it is a reference."
     },
     "region": {
       "description": "The Region in which the created address should reside.\nIf it is not provided, the provider region is used.",
@@ -60,8 +60,8 @@
       "description": "The URL of the forwarding rule.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument is the pointer for the collector_ilb block to the load-balancer forwarding rule. It is purely a reference and has no security impacts."
     },
     "filter": {
       "type": "block",
@@ -72,22 +72,22 @@
       "description": "IP CIDR ranges that apply as a filter on the source (ingress) or\ndestination (egress) IP in the IP header. Only IPv4 is supported.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "IPv4 CIDR ranges used to filter mirrored traffic by source or destination IP. The filter argument itself has critical security impacts in it filters and captures traffic while this argument configures the scope."
     },
     "filter.direction": {
       "description": "Direction of traffic to mirror. Default value: \"BOTH\" Possible values: [\"INGRESS\", \"EGRESS\", \"BOTH\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines whether inbound traffic, outbound traffic, or both get copied. This argument has security impacts in that it controls what traffic is captured."
     },
     "filter.ip_protocols": {
       "description": "Possible IP protocols including tcp, udp, icmp and esp",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Restricts mirroring to specific protocols. This argument has security impacts in that it determines what kind of protocol types are captured."
     },
     "mirrored_resources": {
       "type": "block",
@@ -98,8 +98,8 @@
       "description": "All instances with these tags will be mirrored.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Instances carrying specified network tags will be mirrored. This argument has direct security impacts as it directly determines which instances' traffic gets copied."
     },
     "mirrored_resources.instances": {
       "type": "block",
@@ -110,8 +110,8 @@
       "description": "The URL of the instances where this rule should be active.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The URL of a specific instance to mirror. Does not have security impact as it is a pointer or reference to an instance."
     },
     "mirrored_resources.subnetworks": {
       "type": "block",
@@ -122,8 +122,8 @@
       "description": "The URL of the subnetwork where this rule should be active.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The URL of a subnetwork to mirror. Does not have security impacts as it is a pointer or reference to a subnetwork."
     },
     "network": {
       "type": "block",
@@ -134,8 +134,8 @@
       "description": "The full self_link URL of the network where this rule is active.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The self-link URL of the mirrored network. Does not have security impacts as it is a pointer or reference to the network."
     }
   }
 }
