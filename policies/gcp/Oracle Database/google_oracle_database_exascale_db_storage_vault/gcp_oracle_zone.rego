@@ -5,12 +5,12 @@ import data.terraform.gcp.security.oracle_database.google_oracle_database_exasca
 conditions := [
     [
     {"situation_description" : "The Oracle Exascale hardware is hosted in a GCP zone outside the approved Australian regions",
-    "remedies":[ "Host the vault in a zone within an approved region (australia-southeast1 or australia-southeast2) to meet data residency requirements"]},
+    "remedies":[ "Host the vault in an approved zone within australia-southeast1 or australia-southeast2 to meet data residency requirements"]},
     {
-        "condition": "Test if gcp_oracle_zone is not within an approved Australian region",
+        "condition": "Test if gcp_oracle_zone is not an approved Australian zone",
         "attribute_path" : ["gcp_oracle_zone"],
-        "values" : ["^australia-southeast1", "^australia-southeast2"],
-        "policy_type" : "pattern whitelist"
+        "values" : ["australia-southeast1-a-r1", "australia-southeast1-b-r1", "australia-southeast2-a-r1", "australia-southeast2-b-r1"],
+        "policy_type" : "whitelist"
     }
     ]
 ]
