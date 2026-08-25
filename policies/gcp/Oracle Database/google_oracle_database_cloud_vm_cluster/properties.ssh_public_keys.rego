@@ -8,7 +8,7 @@ conditions := [
     "remedies":[ "Provide valid SSH public keys in the standard 'ssh-<type> <key-data>' format (e.g. ssh-ed25519, ssh-rsa) for every administrator who needs access"]},
     {
         "condition": "Test if any ssh_public_keys entry does not match a valid SSH public key format",
-        "attribute_path" : ["properties", "0", "ssh_public_keys"],
+        "attribute_path" : ["properties", 0, "ssh_public_keys"],
         "values" : ["^ssh-(rsa|ed25519|ecdsa-sha2-nistp256|ecdsa-sha2-nistp384|ecdsa-sha2-nistp521) "],
         "policy_type" : "pattern whitelist"
     }

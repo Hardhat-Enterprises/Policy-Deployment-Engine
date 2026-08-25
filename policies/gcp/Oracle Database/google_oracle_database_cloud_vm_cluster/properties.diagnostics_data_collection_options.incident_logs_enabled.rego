@@ -8,7 +8,7 @@ conditions := [
     "remedies":[ "Set properties.diagnostics_data_collection_options.incident_logs_enabled to false unless incident log collection is explicitly required and its output is securely stored with limited access"]},
     {
         "condition": "Test if incident_logs_enabled is not set to false",
-        "attribute_path" : ["properties", "0", "diagnostics_data_collection_options", "0", "incident_logs_enabled"],
+        "attribute_path" : ["properties", 0, "diagnostics_data_collection_options", 0, "incident_logs_enabled"],
         "values" : [false],
         "policy_type" : "whitelist"
     }
