@@ -1,4 +1,4 @@
-package terraform.gcp.security.compute_engine.google_compute_region_autoscaler.scaling_schedules_duration_sec
+package terraform.gcp.security.compute_engine.google_compute_region_autoscaler.autoscaling_policy_scaling_schedules_duration_sec
 
 import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_region_autoscaler.vars
