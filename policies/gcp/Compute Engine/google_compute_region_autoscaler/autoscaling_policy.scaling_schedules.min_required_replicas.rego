@@ -15,7 +15,7 @@ conditions := [
         },
         {
             "condition": "Check if min_required_replicas is within an acceptable range",
-            "attribute_path": ["autoscaling_policy", "scaling_schedules", "min_required_replicas"],
+            "attribute_path": ["autoscaling_policy", 0, "scaling_schedules", 0, "min_required_replicas"],
             "values": [1, 20],
             "policy_type": "Range"
         }
