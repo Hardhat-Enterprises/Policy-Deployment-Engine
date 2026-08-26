@@ -4,6 +4,8 @@ resource "google_access_context_manager_service_perimeter" "compliant_example_1"
   title  = "compliant_egress_permission"
 
   spec {
+    restricted_services = ["storage.googleapis.com"]
+
     egress_policies {
       egress_to {
         operations {
