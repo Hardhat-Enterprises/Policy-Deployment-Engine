@@ -157,8 +157,8 @@
       "description": "A list of IAM roles that represent the set of operations that the sources\nspecified in the corresponding 'EgressFrom'\nare allowed to perform.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "This argument does not have a security impact because it specifies IAM roles selected according to the team's workload requirements. Restricting specific roles at the generic platform level would overreach team-specific access requirements."
+      "security_impact": true,
+      "rationale": "This argument has a security impact because overly broad IAM roles can grant excessive permissions through the egress policy. A platform policy can restrict overly permissive roles or enforce least-privilege role patterns while allowing teams to select appropriate roles for their workloads."
     },
     "spec.egress_policies.egress_to.operations": {
       "type": "block",
@@ -250,15 +250,15 @@
       "description": "A list of resources, currently only projects in the form\n'projects/<projectnumber>', protected by this 'ServicePerimeter'\nthat are allowed to be accessed by sources defined in the\ncorresponding 'IngressFrom'. A request matches if it contains\na resource in this list. If '*' is specified for resources,\nthen this 'IngressTo' rule will authorize access to all\nresources inside the perimeter, provided that the request\nalso matches the 'operations' field.",
       "required": false,
       "type": "set(string)",
-      "security_impact": false,
-      "rationale": "This argument does not have a security impact because it references specific protected resources within the Service Perimeter. These resource references are team-specific configuration choices and are not appropriate generic platform-level policy targets."
+      "security_impact": true,
+      "rationale": "This argument has a security impact because overly broad resource targets can expand the ingress attack surface. A platform policy can prevent wildcard resource targets such as '*' while allowing teams to explicitly select the protected resources required by their workloads."
     },
     "spec.ingress_policies.ingress_to.roles": {
       "description": "A list of IAM roles that represent the set of operations that the sources\nspecified in the corresponding 'IngressFrom'\nare allowed to perform.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "This argument does not have a security impact because it specifies IAM roles selected according to the team's workload requirements. Restricting specific roles at the generic platform level would overreach team-specific access requirements."
+      "security_impact": ture,
+      "rationale": "This argument has a security impact because overly permissive IAM roles can grant excessive permissions through the ingress policy. A platform policy can restrict overly broad roles and enforce least-privilege role patterns while allowing teams to select appropriate roles for their workloads."
     },
     "spec.ingress_policies.ingress_to.operations": {
       "type": "block",
@@ -319,8 +319,8 @@
       "description": "A list of AccessLevel resource names that allow resources within\nthe ServicePerimeter to be accessed from the internet.\nAccessLevels listed must be in the same policy as this\nServicePerimeter. Referencing a nonexistent AccessLevel is a\nsyntax error. If no AccessLevel names are listed, resources within\nthe perimeter can only be accessed via GCP calls with request\norigins within the perimeter. For Service Perimeter Bridge, must\nbe empty.\n\nFormat: accessPolicies/{policy_id}/accessLevels/{access_level_name}",
       "required": false,
       "type": "set(string)",
-      "security_impact": false,
-      "rationale": "This argument does not have a security impact because it references specific Access Level resources and contextual access conditions. These references are team-specific configuration choices and are not appropriate generic platform-level policy targets."
+      "security_impact": ture,
+      "rationale": "This argument has a security impact because Access Levels define contextual security requirements for accessing resources within the Service Perimeter. A platform policy can enforce appropriate access-level constraints without hardcoding specific team-managed Access Level names."
     },
     "status.resources": {
       "description": "A list of GCP resources that are inside of the service perimeter.\nCurrently only projects are allowed.\nFormat: projects/{project_number}",
@@ -334,7 +334,7 @@
       "required": false,
       "type": "set(string)",
       "security_impact": true,
-      "rationale": "This argument has a security impact because it determines which Google Cloud services are protected by the Service Perimeter. A platform policy should ensure that critical services are not omitted from perimeter protection."
+      "rationale": "This argument has a security impact because it defines which Google Cloud services receive Service Perimeter protection. A platform policy can require appropriate perimeter coverage and prevent critical services from being omitted, while allowing each team to select the specific services required by its workload."
     },
     "status.egress_policies": {
       "type": "block",
