@@ -4,6 +4,8 @@ resource "google_access_context_manager_service_perimeter" "compliant_example_1"
   title  = "compliant_ingress_identities"
 
   spec {
+    restricted_services = ["storage.googleapis.com"]
+
     ingress_policies {
       ingress_from {
         identities = [
