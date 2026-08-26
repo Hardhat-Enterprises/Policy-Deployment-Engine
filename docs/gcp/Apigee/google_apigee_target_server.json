@@ -34,8 +34,8 @@
       "description": "Enabling/disabling a TargetServer is useful when TargetServers are used in load balancing configurations, and one or more TargetServers need to taken out of rotation periodically. Defaults to true.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls whether the TargetServer can receive traffic. Disabling it may affect service availability."
+      "security_impact": false,
+      "rationale": "Controls whether the target server participates in traffic routing and load balancing. Enabling or disabling a target server is an operational availability decision made by the team, not a platform-level security policy target."
     },
     "name": {
       "description": "The resource id of this reference. Values must match the regular expression [\\w\\s-.]+.",
@@ -49,14 +49,14 @@
       "required": true,
       "type": "number",
       "security_impact": false,
-      "rationale": "Specifies the target service port, and the appropriate value is service-specific."
+      "rationale": "Specifies the target service port, network ports are architectural choices rather than platform security controls."
     },
     "protocol": {
       "description": "Immutable. The protocol used by this TargetServer. Possible values: [\"HTTP\", \"HTTP2\", \"GRPC_TARGET\", \"GRPC\", \"EXTERNAL_CALLOUT\"]",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Specifies the application protocol, while transport security is configured separately through TLS settings."
+      "rationale": "Specifies the application protocol, while transport security is configured separately through TLS settings. protocol selection without insecure options is an architectural/functional enum."
     },
     "s_sl_info": {
       "type": "block",
@@ -102,15 +102,15 @@
       "description": "Required if clientAuthEnabled is true. The resource ID for the alias containing the private key and cert.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Selects the private key and certificate used to authenticate the client when mutual TLS is enabled."
+      "security_impact": false,
+      "rationale": "References a specific key alias containing the private key and certificate used for client authentication. The appropriate alias depends on the organisation's keystore configuration, so a generic platform policy does not constrain specific resource identifiers or naming choices."
     },
     "s_sl_info.key_store": {
       "description": "Required if clientAuthEnabled is true. The resource ID of the keystore.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the keystore containing the client credentials used for mutual TLS."
+      "security_impact": false,
+      "rationale": "References the specific keystore containing the client credentials used for mutual TLS. The appropriate keystore depends on the organisation's resource configuration, so a generic platform policy does not constrain specific resource names, identifiers, or references."
     },
     "s_sl_info.protocols": {
       "description": "The TLS versioins to be used.",
@@ -123,8 +123,8 @@
       "description": "The resource ID of the truststore.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the trusted certificates used to validate the target server."
+      "security_impact": false,
+      "rationale": "References the specific truststore containing certificates used to validate the target server. The appropriate truststore depends on the organisation's certificate and resource configuration, so a generic platform policy does not constrain specific resource names, identifiers, or references."
     },
     "s_sl_info.common_name": {
       "type": "block",
@@ -135,15 +135,15 @@
       "description": "The TLS Common Name string of the certificate.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies the certificate identity expected from the target server."
+      "security_impact": false,
+      "rationale": "Specifies the certificate common name expected from a particular backend target server. The correct hostname or certificate identity depends on the team's target-server configuration, so a generic platform policy cannot constrain a specific domain name or value."
     },
     "s_sl_info.common_name.wildcard_match": {
       "description": "Indicates whether the cert should be matched against as a wildcard cert.",
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Controls whether wildcard certificate matching is permitted, which can broaden accepted certificate identities."
+      "rationale": "Controls whether wildcard matching is allowed during target-server certificate validation. A platform policy can require false to enforce strict certificate identity matching and prevent broader wildcard certificate names from being accepted."
     }
   }
 }
