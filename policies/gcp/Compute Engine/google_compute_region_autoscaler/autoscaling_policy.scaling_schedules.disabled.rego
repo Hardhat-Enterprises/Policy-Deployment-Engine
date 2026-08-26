@@ -15,7 +15,7 @@ conditions := [
         },
         {
             "condition": "Check if scaling schedule is enabled",
-            "attribute_path": ["autoscaling_policy", "scaling_schedules", "disabled"],
+            "attribute_path": ["autoscaling_policy", 0, "scaling_schedules", 0, "disabled"],
             "values": [true],
             "policy_type": "Blacklist"
         }
