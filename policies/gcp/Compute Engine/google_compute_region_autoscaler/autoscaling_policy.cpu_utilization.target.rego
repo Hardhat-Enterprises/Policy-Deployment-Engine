@@ -15,7 +15,7 @@ conditions := [
         },
         {
             "condition": "Check if cpu_utilization target is within an acceptable range",
-            "attribute_path": ["autoscaling_policy", "cpu_utilization", "target"],
+            "attribute_path": ["autoscaling_policy", 0, "cpu_utilization", 0, "target"],
             "values": [0.1, 0.85],
             "policy_type": "Range"
         }
