@@ -15,7 +15,7 @@ conditions := [
         },
         {
             "condition": "Check if metric filter is explicitly set",
-            "attribute_path": ["autoscaling_policy", "metric", "filter"],
+            "attribute_path": ["autoscaling_policy", 0, "metric", 0, "filter"],
             "values": [""],
             "policy_type": "Blacklist"
         }
