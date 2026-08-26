@@ -1,0 +1,14 @@
+resource "google_access_context_manager_service_perimeter" "non_compliant_example_1" {
+  parent = "accessPolicies/123456789"
+  name   = "noncompliant_allowed_services"
+  title  = "noncompliant_allowed_services"
+
+  spec {
+    vpc_accessible_services {
+      enable_restriction = true
+      allowed_services   = ["*"]
+    }
+  }
+
+  use_explicit_dry_run_spec = true
+}
