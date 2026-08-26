@@ -16,7 +16,7 @@ resource "google_compute_region_autoscaler" "non_compliant_example_1" {
       disabled               = false
       duration_sec           = 3600
       min_required_replicas  = 3
-      schedule               = "not-a-valid-cron"
+      schedule               = ""
       time_zone              = "Australia/Melbourne"
     }
   }
