@@ -13,22 +13,22 @@
       "description": "An optional description of this resource.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "A free-text note describing the cross-site network for human readers. It plays no part in how the resource groups Interconnect attachments or carries traffic, so its value cannot affect the security of the connection, and constraining it would enforce documentation practice rather than a security outcome."
+      "security_impact": true,
+      "rationale": "A free-text note describing the cross-site network. Because the resource represents a trusted network path between an organisation's own sites and Google Cloud, recording its purpose supports review and incident response by making the intent of a connection clear to anyone auditing the environment, so a policy should require the field to be populated rather than left empty."
     },
     "name": {
       "description": "Name of the resource. Provided by the client when the resource is created. The name must be\n1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters\nlong and match the regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the first\ncharacter must be a lowercase letter, and all following characters must be a dash,\nlowercase letter, or digit, except the last character, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "The identifier assigned to the cross-site network, constrained by GCP to the RFC1035 format. It is used to reference the resource when attaching Interconnect resources to it and takes no part in how traffic is carried, so any rule about its value would enforce a naming convention rather than a security outcome."
+      "security_impact": true,
+      "rationale": "The identifier assigned to the cross-site network and the handle by which Interconnect attachments and Terraform state refer to it. Because the name is how a specific trusted network path is distinguished from every other one in the project, a policy should require it to follow a consistent, predictable form so that connectivity resources can be reliably identified during review and change control."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Determines which GCP project the cross-site network is created in, defaulting to the provider's configured project. It selects where the resource lives rather than how the connection behaves, and any rule constraining it would have to name project IDs belonging to individual teams, so it cannot be expressed as a generic platform policy."
+      "security_impact": true,
+      "rationale": "Determines which GCP project the cross-site network is created in, falling back to the provider's configured project when omitted. Because a project is the boundary within which IAM permissions, quotas and audit logging apply, the placement of a trusted network path decides who can administer it, so a policy should require the project to be stated explicitly rather than left to whatever the provider happens to be configured with."
     }
   }
 }
