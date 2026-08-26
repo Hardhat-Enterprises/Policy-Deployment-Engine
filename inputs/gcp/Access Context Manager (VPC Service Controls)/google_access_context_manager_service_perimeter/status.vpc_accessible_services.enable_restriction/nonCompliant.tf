@@ -4,6 +4,8 @@ resource "google_access_context_manager_service_perimeter" "non_compliant_exampl
   title  = "example"
 
   status {
+    restricted_services = ["storage.googleapis.com"]
+
     vpc_accessible_services {
       enable_restriction = false
     }
