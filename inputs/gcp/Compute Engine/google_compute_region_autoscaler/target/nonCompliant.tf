@@ -2,7 +2,7 @@ resource "google_compute_region_autoscaler" "non_compliant_example_1" {
   name             = "non-compliant-autoscaler"
   project          = "my-approved-project"
   region           = "us-central1"
-  target           = "https://www.googleapis.com/compute/v1/projects/some-other-project/regions/us-central1/instanceGroupManagers/unrelated-group"
+  target           = ""
   description      = "non_compliant_example_1"
 
   autoscaling_policy {
