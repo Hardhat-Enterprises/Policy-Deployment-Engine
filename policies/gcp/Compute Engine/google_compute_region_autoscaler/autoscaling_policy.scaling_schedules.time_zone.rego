@@ -15,7 +15,7 @@ conditions := [
         },
         {
             "condition": "Check if time_zone is explicitly set",
-            "attribute_path": ["autoscaling_policy", "scaling_schedules", "time_zone"],
+            "attribute_path": ["autoscaling_policy", 0, "scaling_schedules", 0, "time_zone"],
             "values": [""],
             "policy_type": "Blacklist"
         }
