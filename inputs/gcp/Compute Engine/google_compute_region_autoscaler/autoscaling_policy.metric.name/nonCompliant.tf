@@ -9,7 +9,7 @@ resource "google_compute_region_autoscaler" "non_compliant_example_1" {
     max_replicas = 5
     min_replicas = 1
     metric {
-      name   = "unverified.custom.metric/unknown"
+      name   = ""
       filter = "resource.type = \"gce_instance\" AND metric.labels.instance_name = \"web-server\""
       target = 100
     }
