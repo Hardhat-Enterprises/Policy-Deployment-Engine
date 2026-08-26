@@ -15,7 +15,7 @@ conditions := [
         },
         {
             "condition": "Check if cooldown_period is within an acceptable range",
-            "attribute_path": ["autoscaling_policy", "cooldown_period"],
+            "attribute_path": ["autoscaling_policy", 0, "cooldown_period"],
             "values": [60, 600],
             "policy_type": "Range"
         }
