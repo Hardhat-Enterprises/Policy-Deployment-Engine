@@ -1,0 +1,20 @@
+package terraform.gcp.security.access_context_manager_vpc_service_controls.google_access_context_manager_service_perimeter.spec_ingress_policies_ingress_to_operations_method_selectors_method
+
+import data.terraform.helpers as helpers
+import data.terraform.gcp.security.access_context_manager_vpc_service_controls.google_access_context_manager_service_perimeter.vars as vars
+
+conditions := [[
+  {
+    "situation_description": "Ingress policies should explicitly select required API methods instead of allowing all methods and permissions.",
+    "remedies": ["Configure spec.ingress_policies.ingress_to.operations.method_selectors.method with a specific method instead of '*'."],
+  },
+  {
+    "condition": "Ingress method selector must not allow all methods.",
+    "attribute_path": ["spec", "ingress_policies", "ingress_to", "operations", "method_selectors", "method"],
+    "values": ["*"],
+    "policy_type": "blacklist",
+  },
+]]
+
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details
