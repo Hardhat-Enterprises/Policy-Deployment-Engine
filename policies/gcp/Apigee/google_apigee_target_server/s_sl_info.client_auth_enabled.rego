@@ -1,4 +1,4 @@
-package terraform.gcp.security.apigee.google_apigee_target_server.s_sl_info.client_auth_enabled
+package terraform.gcp.security.apigee.google_apigee_target_server.s_sl_info_client_auth_enabled
 
 import data.terraform.helpers
 import data.terraform.gcp.security.apigee.google_apigee_target_server.vars

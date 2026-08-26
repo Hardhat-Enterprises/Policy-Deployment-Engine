@@ -1,4 +1,4 @@
-package terraform.gcp.security.apigee.google_apigee_target_server.s_sl_info.key_store
+package terraform.gcp.security.apigee.google_apigee_target_server.s_sl_info_key_store
 
 import data.terraform.helpers
 import data.terraform.gcp.security.apigee.google_apigee_target_server.vars

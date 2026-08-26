@@ -1,4 +1,4 @@
-package terraform.gcp.security.apigee.google_apigee_target_server.s_sl_info.trust_store
+package terraform.gcp.security.apigee.google_apigee_target_server.s_sl_info_trust_store
 
 import data.terraform.helpers
 import data.terraform.gcp.security.apigee.google_apigee_target_server.vars

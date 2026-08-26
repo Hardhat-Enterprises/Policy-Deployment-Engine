@@ -1,4 +1,4 @@
-package terraform.gcp.security.apigee.google_apigee_target_server.s_sl_info.common_name.value
+package terraform.gcp.security.apigee.google_apigee_target_server.s_sl_info_common_name_value
 
 import data.terraform.helpers
 import data.terraform.gcp.security.apigee.google_apigee_target_server.vars
