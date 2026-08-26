@@ -15,7 +15,7 @@ conditions := [
         },
         {
             "condition": "Check if mode is set to an active value",
-            "attribute_path": ["autoscaling_policy", "mode"],
+            "attribute_path": ["autoscaling_policy", 0, "mode"],
             "values": ["ON", "ONLY_UP"],
             "policy_type": "Whitelist"
         }
