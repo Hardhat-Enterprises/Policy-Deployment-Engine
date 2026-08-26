@@ -27,8 +27,8 @@
       "description": "The AccessPolicy this ServicePerimeter lives in.\nFormat: accessPolicies/{policy_id}",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it determines which Access Policy the Service Perimeter belongs to. Associating the Service Perimeter with the correct Access Policy is essential for applying the intended security boundaries and access controls."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it is a reference to the Access Policy that contains the Service Perimeter. The specific Access Policy is a team-managed resource choice and is not a generic platform-level security policy target."
     },
     "perimeter_type": {
       "description": "Specifies the type of the Perimeter. There are two types: regular and\nbridge. Regular Service Perimeter contains resources, access levels,\nand restricted services. Every resource can be in at most\nONE regular Service Perimeter.\n\nIn addition to being in a regular service perimeter, a resource can also\nbe in zero or more perimeter bridges. A perimeter bridge only contains\nresources. Cross project operations are permitted if all effected\nresources share some perimeter (whether bridge or regular). Perimeter\nBridge does not contain access levels or services: those are governed\nentirely by the regular perimeter that resource is in.\n\nPerimeter Bridges are typically useful when building more complex\ntopologies with many independent perimeters that need to share some data\nwith a common perimeter, but should not be able to share data among\nthemselves. Default value: \"PERIMETER_TYPE_REGULAR\" Possible values: [\"PERIMETER_TYPE_REGULAR\", \"PERIMETER_TYPE_BRIDGE\"]",
@@ -60,22 +60,22 @@
       "description": "A list of AccessLevel resource names that allow resources within\nthe ServicePerimeter to be accessed from the internet.\nAccessLevels listed must be in the same policy as this\nServicePerimeter. Referencing a nonexistent AccessLevel is a\nsyntax error. If no AccessLevel names are listed, resources within\nthe perimeter can only be accessed via GCP calls with request\norigins within the perimeter. For Service Perimeter Bridge, must\nbe empty.\n\nFormat: accessPolicies/{policy_id}/accessLevels/{access_level_name}",
       "required": false,
       "type": "set(string)",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it defines the Access Levels that determine which requests are allowed to access resources within the Service Perimeter. Incorrect configuration can allow unauthorized access or unnecessarily restrict legitimate access."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it references specific Access Level resources. These references are team-managed configuration choices and are not appropriate generic platform-level security policy targets."
     },
     "spec.resources": {
       "description": "A list of GCP resources that are inside of the service perimeter.\nCurrently only projects are allowed.\nFormat: projects/{project_number}",
       "required": false,
       "type": "set(string)",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it defines which GCP resources are included within the Service Perimeter. The selected resources determine which assets are protected by the perimeter's security controls."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it references specific GCP projects included within the Service Perimeter. These resource references are team-managed configuration choices and are not appropriate generic platform-level security policy targets."
     },
     "spec.restricted_services": {
       "description": "GCP services that are subject to the Service Perimeter\nrestrictions. Must contain a list of services. For example, if\n'storage.googleapis.com' is specified, access to the storage\nbuckets inside the perimeter must meet the perimeter's access\nrestrictions.",
       "required": false,
       "type": "set(string)",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies which Google Cloud services are protected by the Service Perimeter. The selected services determine where perimeter access restrictions are enforced."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it specifies particular Google Cloud services for the perimeter. Selecting specific services is an architectural choice for each team and is not an appropriate generic platform-level policy target."
     },
     "spec.egress_policies": {
       "type": "block",
@@ -124,15 +124,15 @@
       "description": "An AccessLevel resource name that allows resources outside the ServicePerimeter to be accessed from the inside.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the Access Level that authorizes access between resources inside and outside the Service Perimeter. The configured Access Level determines which requests are permitted."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it references a specific Access Level resource. Access Level references are team-specific configuration choices and are not appropriate generic platform-level policy targets."
     },
     "spec.egress_policies.egress_from.sources.resource": {
       "description": "A Google Cloud resource that is allowed to egress the perimeter.\nRequests from these resources are allowed to access data outside the perimeter.\nCurrently only projects are allowed. Project format: 'projects/{project_number}'.\nThe resource may be in any Google Cloud organization, not just the\norganization that the perimeter is defined in. '*' is not allowed, the\ncase of allowing all Google Cloud resources only is not supported.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies which Google Cloud resources are allowed to egress the Service Perimeter. The configured resources determine which projects are permitted to access data outside the perimeter."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it references specific Google Cloud resources or projects. These resource references are team-specific configuration choices and are not appropriate generic platform-level policy targets."
     },
     "spec.egress_policies.egress_to": {
       "type": "block",
@@ -143,22 +143,22 @@
       "description": "A list of external resources that are allowed to be accessed. A request\nmatches if it contains an external resource in this list (Example:\ns3://bucket/path). Currently '*' is not allowed.",
       "required": false,
       "type": "set(string)",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it defines which external resources can be accessed through the egress policy. Configuring these resources determines which external destinations are permitted."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it references specific external resources or destinations. These references are team-specific configuration choices and are not appropriate generic platform-level policy targets."
     },
     "spec.egress_policies.egress_to.resources": {
       "description": "A list of resources, currently only projects in the form\n'projects/<projectnumber>', that match this to stanza. A request matches\nif it contains a resource in this list. If * is specified for resources,\nthen this 'EgressTo' rule will authorize access to all resources outside\nthe perimeter.",
       "required": false,
       "type": "set(string)",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies which resources are allowed to be accessed through the egress policy. The configured resources determine the scope of access outside the Service Perimeter."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it references specific target resources or projects. These resource references are team-specific configuration choices and are not appropriate generic platform-level policy targets."
     },
     "spec.egress_policies.egress_to.roles": {
       "description": "A list of IAM roles that represent the set of operations that the sources\nspecified in the corresponding 'EgressFrom'\nare allowed to perform.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the IAM roles that determine which operations the allowed sources can perform. The configured roles directly control the permissions granted through the egress policy."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it specifies IAM roles selected according to the team's workload requirements. Restricting specific roles at the generic platform level would overreach team-specific access requirements."
     },
     "spec.egress_policies.egress_to.operations": {
       "type": "block",
@@ -170,7 +170,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the API service that the egress policy allows. The configured service determines which APIs can be accessed, and allowing all services significantly broadens access."
+      "rationale": "This argument has a security impact because overly broad service selection can significantly expand egress access. A platform policy can prevent wildcard service names such as '*' while allowing teams to explicitly select the services required by their workloads."
     },
     "spec.egress_policies.egress_to.operations.method_selectors": {
       "type": "block",
@@ -182,14 +182,14 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the API methods that are allowed for the configured service. The selected methods determine which operations are permitted, and allowing all methods grants broader access."
+      "rationale": "This argument has a security impact because wildcard method selectors can permit unrestricted API operations. A platform policy can prevent the use of '*' for methods while allowing teams to explicitly select the methods required by their workloads."
     },
     "spec.egress_policies.egress_to.operations.method_selectors.permission": {
       "description": "Value for permission should be a valid Cloud IAM permission for the\ncorresponding 'serviceName' in 'ApiOperation'.",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the Cloud IAM permission that is allowed for the configured service. The configured permission directly determines which actions are authorized through the egress policy."
+      "rationale": "This argument has a security impact because overly broad permissions can grant excessive access through the egress policy. A platform policy can prevent wildcard or overly permissive permissions while allowing teams to explicitly select the permissions required by their workloads."
     },
     "spec.ingress_policies": {
       "type": "block",
@@ -213,14 +213,14 @@
       "required": false,
       "type": "set(string)",
       "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the identities that are allowed access through the ingress policy. The configured users or service accounts determine who is authorized to access resources within the Service Perimeter."
+      "rationale": "This argument has a security impact because overly broad or public principals can allow unauthorized ingress access. A platform policy can prevent wildcard or public principal patterns while allowing teams to configure specific users and service accounts required by their workloads."
     },
     "spec.ingress_policies.ingress_from.identity_type": {
       "description": "Specifies the type of identities that are allowed access from outside the\nperimeter. If left unspecified, then members of 'identities' field will be\nallowed access. Possible values: [\"IDENTITY_TYPE_UNSPECIFIED\", \"ANY_IDENTITY\", \"ANY_USER_ACCOUNT\", \"ANY_SERVICE_ACCOUNT\"]",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the types of identities that are allowed access through the ingress policy. The configured identity type determines which users or service accounts are authorized to access resources within the Service Perimeter."
+      "rationale": "This argument has a security impact because broad identity types can allow overly permissive ingress access. A platform policy can prevent unrestricted identity types such as ANY_IDENTITY while allowing teams to configure appropriately scoped identity types for their workloads."
     },
     "spec.ingress_policies.ingress_from.sources": {
       "type": "block",
@@ -232,14 +232,14 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the Access Level that authorizes access to resources within the Service Perimeter. The configured Access Level determines which requests are permitted, and allowing all ingress sources broadens access."
+      "rationale": "This argument has a security impact because overly permissive or unconstrained access levels can broaden ingress access to resources within the Service Perimeter. A platform policy can require access levels to be explicitly constrained and prevent overly permissive configurations."
     },
     "spec.ingress_policies.ingress_from.sources.resource": {
       "description": "A Google Cloud resource that is allowed to ingress the perimeter.\nRequests from these resources will be allowed to access perimeter data.\nCurrently only projects are allowed. Format 'projects/{project_number}'\nThe project may be in any Google Cloud organization, not just the\norganization that the perimeter is defined in. '*' is not allowed, the case\nof allowing all Google Cloud resources only is not supported.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies which Google Cloud resources are allowed to ingress the Service Perimeter. The configured resources determine which projects are authorized to access data within the perimeter."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it references a specific Google Cloud resource or project. These resource references are team-specific configuration choices and are not appropriate generic platform-level policy targets."
     },
     "spec.ingress_policies.ingress_to": {
       "type": "block",
@@ -250,15 +250,15 @@
       "description": "A list of resources, currently only projects in the form\n'projects/<projectnumber>', protected by this 'ServicePerimeter'\nthat are allowed to be accessed by sources defined in the\ncorresponding 'IngressFrom'. A request matches if it contains\na resource in this list. If '*' is specified for resources,\nthen this 'IngressTo' rule will authorize access to all\nresources inside the perimeter, provided that the request\nalso matches the 'operations' field.",
       "required": false,
       "type": "set(string)",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies which protected resources within the Service Perimeter are allowed to be accessed by the configured ingress sources. The configured resources determine the scope of authorized access."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it references specific protected resources within the Service Perimeter. These resource references are team-specific configuration choices and are not appropriate generic platform-level policy targets."
     },
     "spec.ingress_policies.ingress_to.roles": {
       "description": "A list of IAM roles that represent the set of operations that the sources\nspecified in the corresponding 'IngressFrom'\nare allowed to perform.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the IAM roles that determine which operations the allowed ingress sources can perform. The configured roles directly control the permissions granted through the ingress policy."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it specifies IAM roles selected according to the team's workload requirements. Restricting specific roles at the generic platform level would overreach team-specific access requirements."
     },
     "spec.ingress_policies.ingress_to.operations": {
       "type": "block",
@@ -270,7 +270,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the API service that the ingress policy allows. The configured service determines which APIs can be accessed, and allowing all services significantly broadens access."
+      "rationale": "This argument has a security impact because overly broad service selection can significantly expand ingress access. A platform policy can prevent wildcard service names such as '*' while allowing teams to explicitly select the services required by their workloads."
     },
     "spec.ingress_policies.ingress_to.operations.method_selectors": {
       "type": "block",
@@ -282,14 +282,14 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the API methods that are allowed for the configured service. The configured methods determine which operations are permitted, and allowing all methods grants broader access."
+      "rationale": "This argument has a security impact because wildcard method selectors can permit unrestricted API operations. A platform policy can prevent the use of '*' for methods while allowing teams to explicitly select the methods required by their workloads."
     },
     "spec.ingress_policies.ingress_to.operations.method_selectors.permission": {
       "description": "Value for permission should be a valid Cloud IAM permission for the\ncorresponding 'serviceName' in 'ApiOperation'.",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the Cloud IAM permission that is allowed for the configured service. The configured permission directly determines which actions are authorized through the ingress policy."
+      "rationale": "This argument has a security impact because overly broad permissions can grant excessive access through the ingress policy. A platform policy can prevent wildcard or overly permissive permissions while allowing teams to explicitly select the permissions required by their workloads."
     },
     "spec.vpc_accessible_services": {
       "type": "block",
@@ -301,14 +301,14 @@
       "required": false,
       "type": "set(string)",
       "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies which APIs are allowed to be used within the Service Perimeter. The configured services determine which APIs are accessible and help enforce security restrictions."
+      "rationale": "This argument has a security impact because it acts as an API exposure allowlist that controls which services can be accessed within the Service Perimeter. A platform policy can constrain the allowlist to prevent overly broad API exposure without requiring specific services to be hardcoded."
     },
     "spec.vpc_accessible_services.enable_restriction": {
       "description": "Whether to restrict API calls within the Service Perimeter to the\nlist of APIs specified in 'allowedServices'.",
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "This argument has a security impact because it determines whether API calls within the Service Perimeter are restricted to the configured allowed services. Enabling or disabling this restriction directly affects which APIs can be accessed."
+      "rationale": "This argument has a security impact because enabling the restriction enforces API access constraints within the Service Perimeter. A platform policy should require this restriction to be enabled so that API access is limited according to the configured allowed services."
     },
     "status": {
       "type": "block",
@@ -319,22 +319,22 @@
       "description": "A list of AccessLevel resource names that allow resources within\nthe ServicePerimeter to be accessed from the internet.\nAccessLevels listed must be in the same policy as this\nServicePerimeter. Referencing a nonexistent AccessLevel is a\nsyntax error. If no AccessLevel names are listed, resources within\nthe perimeter can only be accessed via GCP calls with request\norigins within the perimeter. For Service Perimeter Bridge, must\nbe empty.\n\nFormat: accessPolicies/{policy_id}/accessLevels/{access_level_name}",
       "required": false,
       "type": "set(string)",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the Access Levels that authorize access to resources within the Service Perimeter. The configured Access Levels determine which requests are permitted to access protected resources."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it references specific Access Level resources and contextual access conditions. These references are team-specific configuration choices and are not appropriate generic platform-level policy targets."
     },
     "status.resources": {
       "description": "A list of GCP resources that are inside of the service perimeter.\nCurrently only projects are allowed.\nFormat: projects/{project_number}",
       "required": false,
       "type": "set(string)",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies which Google Cloud resources are included within the Service Perimeter. The configured resources determine which projects are protected by the perimeter and subject to its security controls."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it references specific Google Cloud projects protected by the Service Perimeter. These resource references are team-specific configuration choices and are not appropriate generic platform-level policy targets."
     },
     "status.restricted_services": {
       "description": "GCP services that are subject to the Service Perimeter\nrestrictions. Must contain a list of services. For example, if\n'storage.googleapis.com' is specified, access to the storage\nbuckets inside the perimeter must meet the perimeter's access\nrestrictions.",
       "required": false,
       "type": "set(string)",
       "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies which Google Cloud services are protected by the Service Perimeter restrictions. The configured services determine where the perimeter's access controls are enforced."
+      "rationale": "This argument has a security impact because it determines which Google Cloud services are protected by the Service Perimeter. A platform policy should ensure that critical services are not omitted from perimeter protection."
     },
     "status.egress_policies": {
       "type": "block",
@@ -346,7 +346,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This argument has no security impact because it is a human-readable title used to identify the egress policy. It does not affect the behavior or security configuration of the Service Perimeter."
+      "rationale": "This argument does not have a security impact because it is a human-readable identifier used to distinguish the egress policy. It is cosmetic and does not affect the policy's security behavior or enforcement."
     },
     "status.egress_policies.egress_from": {
       "type": "block",
@@ -358,21 +358,21 @@
       "required": false,
       "type": "set(string)",
       "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the identities that are allowed under the egress policy. The configured users, service accounts, groups, or third-party identities determine who is authorized to perform egress operations."
+      "rationale": "This argument has a security impact because it controls which identities can perform operations that allow data to leave the Service Perimeter. A platform policy should prevent wildcard or overly broad principal grants while allowing appropriately scoped identities."
     },
     "status.egress_policies.egress_from.identity_type": {
       "description": "Specifies the type of identities that are allowed access to outside the\nperimeter. If left unspecified, then members of 'identities' field will\nbe allowed access. Possible values: [\"IDENTITY_TYPE_UNSPECIFIED\", \"ANY_IDENTITY\", \"ANY_USER_ACCOUNT\", \"ANY_SERVICE_ACCOUNT\"]",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the types of identities that are allowed access outside the Service Perimeter. The configured identity type determines which users or service accounts are authorized to perform egress operations."
+      "rationale": "This argument has a security impact because it defines category-level identity grants for egress access. A platform policy should prevent overly permissive identity types such as ANY_IDENTITY from bypassing Service Perimeter boundaries."
     },
     "status.egress_policies.egress_from.source_restriction": {
       "description": "Whether to enforce traffic restrictions based on 'sources' field. If the 'sources' field is non-empty, then this field must be set to 'SOURCE_RESTRICTION_ENABLED'. Possible values: [\"SOURCE_RESTRICTION_UNSPECIFIED\", \"SOURCE_RESTRICTION_ENABLED\", \"SOURCE_RESTRICTION_DISABLED\"]",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "This argument has a security impact because it determines whether traffic restrictions based on the configured sources are enforced. Enabling or disabling source restrictions directly affects access control and the enforcement of the egress policy."
+      "rationale": "This argument has a security impact because it determines whether source-based traffic restrictions are enforced for egress. A platform policy should require source restrictions to be enabled when sources are configured and prevent unrestricted egress caused by disabled source restrictions."
     },
     "status.egress_policies.egress_from.sources": {
       "type": "block",
@@ -383,15 +383,15 @@
       "description": "An AccessLevel resource name that allows resources outside the ServicePerimeter to be accessed from the inside.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the Access Level that authorizes access between resources inside and outside the Service Perimeter. The configured Access Level determines which requests are permitted."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it references a specific Access Level resource. Access Level references are team-specific configuration choices and are not appropriate generic platform-level policy targets."
     },
     "status.egress_policies.egress_from.sources.resource": {
       "description": "A Google Cloud resource that is allowed to egress the perimeter.\nRequests from these resources are allowed to access data outside the perimeter.\nCurrently only projects are allowed. Project format: 'projects/{project_number}'.\nThe resource may be in any Google Cloud organization, not just the\norganization that the perimeter is defined in. '*' is not allowed, the\ncase of allowing all Google Cloud resources only is not supported.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies which Google Cloud resources are allowed to egress the Service Perimeter. The configured resources determine which projects are permitted to access data outside the perimeter."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it references specific Google Cloud resources or projects. These resource references are team-specific configuration choices and are not appropriate generic platform-level policy targets."
     },
     "status.egress_policies.egress_to": {
       "type": "block",
@@ -402,22 +402,22 @@
       "description": "A list of external resources that are allowed to be accessed. A request\nmatches if it contains an external resource in this list (Example:\ns3://bucket/path). Currently '*' is not allowed.",
       "required": false,
       "type": "set(string)",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies which external resources can be accessed through the egress policy. The configured resources determine which external destinations are permitted."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it references specific external resources or destinations. These destinations are team-specific configuration choices and are not appropriate generic platform-level policy targets."
     },
     "status.egress_policies.egress_to.resources": {
       "description": "A list of resources, currently only projects in the form\n'projects/<projectnumber>', that match this to stanza. A request matches\nif it contains a resource in this list. If * is specified for resources,\nthen this 'EgressTo' rule will authorize access to all resources outside\nthe perimeter.",
       "required": false,
       "type": "set(string)",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies which resources are allowed to be accessed through the egress policy. The configured resources determine the scope of access outside the Service Perimeter."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it references specific target resources or projects. These resource references are team-specific configuration choices and are not appropriate generic platform-level policy targets."
     },
     "status.egress_policies.egress_to.roles": {
       "description": "A list of IAM roles that represent the set of operations that the sources\nspecified in the corresponding 'EgressFrom'\nare allowed to perform.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the IAM roles that determine which operations the allowed egress sources can perform. The configured roles directly control the permissions granted through the egress policy."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it specifies IAM roles selected according to the team's workload requirements. Restricting specific roles at the generic platform level would overreach team-specific access requirements."
     },
     "status.egress_policies.egress_to.operations": {
       "type": "block",
@@ -428,8 +428,8 @@
       "description": "The name of the API whose methods or permissions the 'IngressPolicy' or\n'EgressPolicy' want to allow. A single 'ApiOperation' with serviceName\nfield set to '*' will allow all methods AND permissions for all services.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the API service that the egress policy allows. The configured service determines which APIs can be accessed, and allowing all services significantly broadens access."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because API service names are functional references selected according to the team's application architecture. A generic platform policy should not dictate which specific Google Cloud APIs a workload may use."
     },
     "status.egress_policies.egress_to.operations.method_selectors": {
       "type": "block",
@@ -440,15 +440,15 @@
       "description": "Value for 'method' should be a valid method name for the corresponding\n'serviceName' in 'ApiOperation'. If '*' used as value for method,\nthen ALL methods and permissions are allowed.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the API methods that are allowed for the configured service. The configured methods determine which operations are permitted, and allowing all methods grants broader access."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because specific API methods are functional implementation details selected according to workload requirements. They are not appropriate generic platform-level policy targets."
     },
     "status.egress_policies.egress_to.operations.method_selectors.permission": {
       "description": "Value for permission should be a valid Cloud IAM permission for the\ncorresponding 'serviceName' in 'ApiOperation'.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the Cloud IAM permission that is allowed for the configured service. The configured permission directly determines which actions are authorized through the egress policy."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it references specific IAM permissions required by individual workloads. These permissions depend on application requirements and are not appropriate generic platform-level policy targets."
     },
     "status.ingress_policies": {
       "type": "block",
@@ -472,14 +472,14 @@
       "required": false,
       "type": "set(string)",
       "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the identities that are allowed under the ingress policy. The configured users, service accounts, groups, or third-party identities determine who is authorized to access resources through the ingress policy."
+      "rationale": "This argument has a security impact because overly broad or public principals can permit unauthorized ingress access. A platform policy should prevent wildcard or public principal patterns such as allUsers while allowing teams to configure appropriately scoped identities."
     },
     "status.ingress_policies.ingress_from.identity_type": {
       "description": "Specifies the type of identities that are allowed access from outside the\nperimeter. If left unspecified, then members of 'identities' field will be\nallowed access. Possible values: [\"IDENTITY_TYPE_UNSPECIFIED\", \"ANY_IDENTITY\", \"ANY_USER_ACCOUNT\", \"ANY_SERVICE_ACCOUNT\"]",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the types of identities that are allowed access through the ingress policy. The configured identity type determines which users or service accounts are authorized to access resources within the Service Perimeter."
+      "rationale": "This argument has a security impact because overly broad identity types can permit unrestricted ingress access. A platform policy should prevent permissive identity types such as ANY_IDENTITY while allowing appropriately scoped identity configurations."
     },
     "status.ingress_policies.ingress_from.sources": {
       "type": "block",
@@ -490,15 +490,15 @@
       "description": "An 'AccessLevel' resource name that allow resources within the\n'ServicePerimeters' to be accessed from the internet. 'AccessLevels' listed\nmust be in the same policy as this 'ServicePerimeter'. Referencing a nonexistent\n'AccessLevel' will cause an error. If no 'AccessLevel' names are listed,\nresources within the perimeter can only be accessed via Google Cloud calls\nwith request origins within the perimeter.\nExample 'accessPolicies/MY_POLICY/accessLevels/MY_LEVEL.'\nIf * is specified, then all IngressSources will be allowed.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the Access Level that authorizes access to resources within the Service Perimeter. The configured Access Level determines which requests are permitted, and allowing all ingress sources broadens access."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it references a specific Access Level resource. Access Level references are team-specific architectural choices and are not appropriate generic platform-level policy targets."
     },
     "status.ingress_policies.ingress_from.sources.resource": {
       "description": "A Google Cloud resource that is allowed to ingress the perimeter.\nRequests from these resources will be allowed to access perimeter data.\nCurrently only projects and VPCs are allowed.\nProject format: 'projects/{projectNumber}'\nVPC network format:\n'//compute.googleapis.com/projects/{PROJECT_ID}/global/networks/{NAME}'.\nThe project may be in any Google Cloud organization, not just the\norganization that the perimeter is defined in. '*' is not allowed, the case\nof allowing all Google Cloud resources only is not supported.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies which Google Cloud resources are allowed to ingress the Service Perimeter. The configured resources determine which projects or VPC networks are authorized to access data within the perimeter."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it references specific external Google Cloud projects or network resources. These resource references are team-specific configuration choices and are not appropriate generic platform-level policy targets."
     },
     "status.ingress_policies.ingress_to": {
       "type": "block",
@@ -509,15 +509,15 @@
       "description": "A list of resources, currently only projects in the form\n'projects/<projectnumber>', protected by this 'ServicePerimeter'\nthat are allowed to be accessed by sources defined in the\ncorresponding 'IngressFrom'. A request matches if it contains\na resource in this list. If '*' is specified for resources,\nthen this 'IngressTo' rule will authorize access to all\nresources inside the perimeter, provided that the request\nalso matches the 'operations' field.",
       "required": false,
       "type": "set(string)",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies which protected resources within the Service Perimeter are allowed to be accessed by the configured ingress sources. The configured resources determine the scope of authorized access."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it references specific protected resources within the Service Perimeter. These resource references are team-specific configuration choices and are not appropriate generic platform-level policy targets."
     },
     "status.ingress_policies.ingress_to.roles": {
       "description": "A list of IAM roles that represent the set of operations that the sources\nspecified in the corresponding 'IngressFrom'\nare allowed to perform.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the IAM roles that determine which operations the allowed ingress sources can perform. The configured roles directly control the permissions granted through the ingress policy."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it specifies IAM roles selected according to the team's workload requirements. Restricting specific roles at the generic platform level would overreach team-specific access requirements."
     },
     "status.ingress_policies.ingress_to.operations": {
       "type": "block",
@@ -528,8 +528,8 @@
       "description": "The name of the API whose methods or permissions the 'IngressPolicy' or\n'EgressPolicy' want to allow. A single 'ApiOperation' with 'serviceName'\nfield set to '*' will allow all methods AND permissions for all services.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the API service that the ingress policy allows. The configured service determines which APIs can be accessed, and allowing all services significantly broadens access."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because API service names are functional references selected according to the team's application requirements. A generic platform policy should not dictate which specific Google Cloud APIs a workload may target."
     },
     "status.ingress_policies.ingress_to.operations.method_selectors": {
       "type": "block",
@@ -540,15 +540,15 @@
       "description": "Value for method should be a valid method name for the corresponding\nserviceName in 'ApiOperation'. If '*' used as value for 'method', then\nALL methods and permissions are allowed.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the API methods that are allowed for the configured service. The configured methods determine which operations are permitted, and allowing all methods grants broader access."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because individual API method names are functional references selected according to application requirements. These workload-specific methods are not appropriate generic platform-level policy targets."
     },
     "status.ingress_policies.ingress_to.operations.method_selectors.permission": {
       "description": "Value for permission should be a valid Cloud IAM permission for the\ncorresponding 'serviceName' in 'ApiOperation'.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies the Cloud IAM permission that is allowed for the configured service. The configured permission directly determines which actions are authorized through the ingress policy."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it references specific IAM permissions required by individual workloads. These permissions depend on application requirements and are not appropriate generic platform-level policy targets."
     },
     "status.vpc_accessible_services": {
       "type": "block",
@@ -559,8 +559,8 @@
       "description": "The list of APIs usable within the Service Perimeter.\nMust be empty unless 'enableRestriction' is True.",
       "required": false,
       "type": "set(string)",
-      "security_impact": true,
-      "rationale": "This argument has a security impact because it specifies which APIs are allowed to be used within the Service Perimeter. The configured services determine which APIs are accessible and help enforce security restrictions."
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because the required Google Cloud services depend on each team's application architecture and workload. A generic platform policy cannot prescribe a specific list of allowed services without overreaching team-specific requirements."
     },
     "status.vpc_accessible_services.enable_restriction": {
       "description": "Whether to restrict API calls within the Service Perimeter to the\nlist of APIs specified in 'allowedServices'.",
