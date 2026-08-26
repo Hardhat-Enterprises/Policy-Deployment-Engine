@@ -15,7 +15,7 @@ conditions := [
         },
         {
             "condition": "Check if load_balancing_utilization target is within an acceptable range",
-            "attribute_path": ["autoscaling_policy", "load_balancing_utilization", "target"],
+            "attribute_path": ["autoscaling_policy", 0, "load_balancing_utilization", 0, "target"],
             "values": [0.1, 0.85],
             "policy_type": "Range"
         }
