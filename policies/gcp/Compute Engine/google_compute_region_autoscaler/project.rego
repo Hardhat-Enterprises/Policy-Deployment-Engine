@@ -6,18 +6,18 @@ import data.terraform.gcp.security.compute_engine.google_compute_region_autoscal
 conditions := [
     [
         {
-            "situation_description": "The autoscaler's project is left unset, risking deployment into the wrong or a less-restricted default project.",
+            "situation_description": "The autoscaler's project is not set to an approved project, risking deployment into the wrong or a less-restricted default project.",
             "remedies": [
-                "Explicitly set project on the google_compute_region_autoscaler resource.",
+                "Explicitly set project to an approved project ID on the google_compute_region_autoscaler resource.",
                 "Avoid relying on the provider's default project context.",
                 "Confirm the correct project ID before deployment."
             ]
         },
         {
-            "condition": "Check if project is explicitly set",
+            "condition": "Check if project is an approved project ID",
             "attribute_path": ["project"],
-            "values": [""],
-            "policy_type": "Blacklist"
+            "values": ["my-approved-project"],
+            "policy_type": "Whitelist"
         }
     ]
 ]
