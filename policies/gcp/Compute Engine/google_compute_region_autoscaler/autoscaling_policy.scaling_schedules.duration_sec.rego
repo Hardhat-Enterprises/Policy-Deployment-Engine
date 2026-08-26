@@ -15,7 +15,7 @@ conditions := [
         },
         {
             "condition": "Check if duration_sec is within an acceptable range",
-            "attribute_path": ["autoscaling_policy", "scaling_schedules", "duration_sec"],
+            "attribute_path": ["autoscaling_policy", 0, "scaling_schedules", 0, "duration_sec"],
             "values": [1800, 86400],
             "policy_type": "Range"
         }
