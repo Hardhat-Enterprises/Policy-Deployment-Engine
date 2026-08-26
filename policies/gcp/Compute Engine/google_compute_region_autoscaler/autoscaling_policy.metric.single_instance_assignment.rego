@@ -15,7 +15,7 @@ conditions := [
         },
         {
             "condition": "Check if single_instance_assignment is within an acceptable range",
-            "attribute_path": ["autoscaling_policy", "metric", "single_instance_assignment"],
+            "attribute_path": ["autoscaling_policy", 0, "metric", 0, "single_instance_assignment"],
             "values": [1, 500],
             "policy_type": "Range"
         }
