@@ -15,7 +15,7 @@ conditions := [
         },
         {
             "condition": "Check if max_replicas is within an acceptable range",
-            "attribute_path": ["autoscaling_policy", "max_replicas"],
+            "attribute_path": ["autoscaling_policy", 0, "max_replicas"],
             "values": [1, 20],
             "policy_type": "Range"
         }
