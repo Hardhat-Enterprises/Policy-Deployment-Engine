@@ -1,4 +1,4 @@
-package terraform.gcp.security.apigee.google_apigee_security_action.region_codes
+package terraform.gcp.security.apigee.google_apigee_security_action.condition_config_region_codes
 
 import data.terraform.helpers
 import data.terraform.gcp.security.apigee.google_apigee_security_action.vars
