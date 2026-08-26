@@ -1,4 +1,4 @@
-package policies.gcp.google_access_context_manager_service_perimeter.spec_vpc_accessible_services_enable_restriction
+package terraform.gcp.security.google_access_context_manager_service_perimeter.spec_vpc_accessible_services_enable_restriction
 
 import rego.v1
 
