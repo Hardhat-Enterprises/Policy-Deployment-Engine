@@ -15,7 +15,7 @@ conditions := [
         },
         {
             "condition": "Check if stabilization_period is within an acceptable range",
-            "attribute_path": ["autoscaling_policy", "stabilization_period"],
+            "attribute_path": ["autoscaling_policy", 0, "stabilization_period"],
             "values": [60, 3600],
             "policy_type": "Range"
         }
