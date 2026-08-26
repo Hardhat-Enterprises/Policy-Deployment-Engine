@@ -15,7 +15,7 @@ conditions := [
         },
         {
             "condition": "Check if time_window_sec is within an acceptable range",
-            "attribute_path": ["autoscaling_policy", "scale_in_control", "time_window_sec"],
+            "attribute_path": ["autoscaling_policy", 0, "scale_in_control", 0, "time_window_sec"],
             "values": [60, 3600],
             "policy_type": "Range"
         }
