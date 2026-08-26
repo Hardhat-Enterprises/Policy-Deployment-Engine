@@ -15,7 +15,7 @@ conditions := [
         },
         {
             "condition": "Check if metric target is within an acceptable range",
-            "attribute_path": ["autoscaling_policy", "metric", "target"],
+            "attribute_path": ["autoscaling_policy", 0, "metric", 0, "target"],
             "values": [1, 1000],
             "policy_type": "Range"
         }
