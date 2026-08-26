@@ -15,7 +15,7 @@ conditions := [
         },
         {
             "condition": "Check if schedule is explicitly set",
-            "attribute_path": ["autoscaling_policy", "scaling_schedules", "schedule"],
+            "attribute_path": ["autoscaling_policy", 0, "scaling_schedules", 0, "schedule"],
             "values": [""],
             "policy_type": "Blacklist"
         }
