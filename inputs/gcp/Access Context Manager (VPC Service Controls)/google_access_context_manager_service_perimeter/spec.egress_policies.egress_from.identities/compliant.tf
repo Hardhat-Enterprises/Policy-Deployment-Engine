@@ -4,6 +4,8 @@ resource "google_access_context_manager_service_perimeter" "compliant_example_1"
   title  = "compliant_egress_identities"
 
   spec {
+    restricted_services = ["storage.googleapis.com"]
+
     egress_policies {
       egress_from {
         identities = ["serviceAccount:approved@example.iam.gserviceaccount.com"]
