@@ -10,7 +10,7 @@ conditions := [[
     },
     {
         "condition": "Egress identity type must be restricted.",
-        "attribute_path": ["spec", "egress_policies", "egress_from", "identity_type"],
+        "attribute_path": ["spec", 0, "egress_policies", 0, "egress_from", 0, "identity_type"],
         "values": ["ANY_SERVICE_ACCOUNT"],
         "policy_type": "whitelist",
     },
