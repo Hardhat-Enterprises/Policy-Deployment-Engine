@@ -10,7 +10,7 @@ conditions := [[
   },
   {
     "condition": "Ingress identity type must not allow any identity.",
-    "attribute_path": ["spec", "ingress_policies", "ingress_from", "identity_type"],
+    "attribute_path": ["spec", 0, "ingress_policies", 0, "ingress_from", 0, "identity_type"],
     "values": ["ANY_IDENTITY"],
     "policy_type": "blacklist",
   },
