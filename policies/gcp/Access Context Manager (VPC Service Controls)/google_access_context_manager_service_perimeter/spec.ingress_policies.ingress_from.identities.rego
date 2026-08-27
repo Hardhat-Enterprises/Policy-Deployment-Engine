@@ -10,7 +10,7 @@ conditions := [[
   },
   {
     "condition": "Ingress identities must not contain wildcard or public principals.",
-    "attribute_path": ["spec", "ingress_policies", "ingress_from", "identities"],
+    "attribute_path": ["spec", 0, "ingress_policies", 0, "ingress_from", 0, "identities"],
     "values": ["*", "allUsers", "allAuthenticatedUsers"],
     "policy_type": "blacklist",
   },
