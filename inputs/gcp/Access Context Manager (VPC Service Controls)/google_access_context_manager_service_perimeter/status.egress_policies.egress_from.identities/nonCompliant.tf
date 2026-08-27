@@ -8,9 +8,15 @@ resource "google_access_context_manager_service_perimeter" "non_compliant_exampl
 
     egress_policies {
       egress_from {
-        identities = [
-          "serviceAccount:unapproved@example-project.iam.gserviceaccount.com"
-        ]
+        identities = ["*"]
+      }
+
+      egress_to {
+        resources = ["projects/123456789"]
+
+        operations {
+          service_name = "storage.googleapis.com"
+        }
       }
     }
   }
