@@ -10,7 +10,7 @@ conditions := [[
   },
   {
     "condition": "Ingress permission selector must not allow unrestricted permissions.",
-    "attribute_path": ["spec", "ingress_policies", "ingress_to", "operations", "method_selectors", "permission"],
+    "attribute_path": ["spec", 0, "ingress_policies", 0, "ingress_to", 0, "operations", 0, "method_selectors", 0, "permission"],
     "values": ["*"],
     "policy_type": "blacklist",
   },
