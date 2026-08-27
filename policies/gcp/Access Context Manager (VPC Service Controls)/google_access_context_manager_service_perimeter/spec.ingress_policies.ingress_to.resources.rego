@@ -10,7 +10,7 @@ conditions := [[
   },
   {
     "condition": "Ingress resource targets must not allow all resources.",
-    "attribute_path": ["spec", "ingress_policies", "ingress_to", "resources"],
+    "attribute_path": ["spec", 0, "ingress_policies", 0, "ingress_to", 0, "resources"],
     "values": ["*"],
     "policy_type": "blacklist",
   },
