@@ -10,7 +10,7 @@ conditions := [[
   },
   {
     "condition": "Egress source restriction must be enabled.",
-    "attribute_path": ["spec", "egress_policies", "egress_from", "source_restriction"],
+    "attribute_path": ["spec", 0, "egress_policies", 0, "egress_from", 0, "source_restriction"],
     "values": ["SOURCE_RESTRICTION_ENABLED"],
     "policy_type": "whitelist",
   },
