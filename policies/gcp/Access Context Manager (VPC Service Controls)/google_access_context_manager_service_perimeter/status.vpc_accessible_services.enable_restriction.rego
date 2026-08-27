@@ -10,7 +10,7 @@ conditions := [[
   },
   {
     "condition": "VPC accessible services restriction must be enabled.",
-    "attribute_path": ["status", "vpc_accessible_services", "enable_restriction"],
+    "attribute_path": ["status", 0, "vpc_accessible_services", 0, "enable_restriction"],
     "values": [true],
     "policy_type": "whitelist",
   },
