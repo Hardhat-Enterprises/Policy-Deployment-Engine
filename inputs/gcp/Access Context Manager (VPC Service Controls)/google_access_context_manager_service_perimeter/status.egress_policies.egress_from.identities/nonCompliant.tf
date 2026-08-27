@@ -1,12 +1,16 @@
 resource "google_access_context_manager_service_perimeter" "non_compliant_example_1" {
   parent = "accessPolicies/123456789"
-  name   = "noncompliant_status_egress_identities"
+  name   = "accessPolicies/123456789/servicePerimeters/noncompliant_status_egress_identities"
   title  = "noncompliant_status_egress_identities"
 
   status {
+    restricted_services = ["storage.googleapis.com"]
+
     egress_policies {
       egress_from {
-        identities = ["allUsers"]
+        identities = [
+          "serviceAccount:unapproved@example-project.iam.gserviceaccount.com"
+        ]
       }
     }
   }
