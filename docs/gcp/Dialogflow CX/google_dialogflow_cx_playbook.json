@@ -14,35 +14,35 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Sets the human-readable name used to identify the playbook. It does not directly control access, tool permissions, data handling or model security, so it is not a generic security policy target."
+      "rationale": "Sets the human-readable name used to identify the playbook. Although the name may be visible to the LLM, a generic name-pattern policy cannot determine whether its content is safe; it is descriptive metadata rather than an authentication, authorisation, data-protection or execution control."
     },
     "goal": {
       "description": "High level description of the goal the playbook intend to accomplish. A goal should be concise since it's visible to other playbooks that may reference this playbook.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Defines the application-specific objective supplied to the LLM as part of the playbook context. Although its content requires careful design review, a generic value policy cannot determine secure goal text without understanding the intended business task."
+      "rationale": "Defines the application-specific objective supplied to the LLM. Unsafe text is possible, but string matching cannot reliably determine semantic prompt safety or the correct goal without understanding the intended workflow, so it is not a meaningful generic platform-policy target."
     },
     "parent": {
       "description": "The agent to create a Playbook for.\nFormat: projects/<Project ID>/locations/<Location ID>/agents/<Agent ID>.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Identifies the Dialogflow CX agent that owns the playbook. It is a team-specific resource reference, and constraining it would require pinning a particular project, location or agent rather than enforcing a generic security property."
+      "rationale": "Identifies the Dialogflow CX agent that owns the playbook. It is a team-specific resource reference, and constraining it would require pinning a particular project, location or agent; resource placement and access should instead be governed through organisation controls and IAM."
     },
     "playbook_type": {
       "description": "Type of the playbook. Possible values: [\"PLAYBOOK_TYPE_UNSPECIFIED\", \"TASK\", \"ROUTINE\"]",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Selects task or routine playbook behaviour. Both are supported architectural designs, and neither type is inherently an insecure configuration."
+      "rationale": "Selects TASK or ROUTINE behaviour, with the unspecified value defaulting to TASK. Neither supported type represents elevated privilege or administrative access, so this is a functional architecture choice rather than a generic security control."
     },
     "referenced_tools": {
       "description": "The resource name of tools referenced by the current playbook in the instructions. If not provided explicitly, they are will be implied using the tool being referenced in goal and steps.",
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "Identifies tools referenced by the playbook and therefore depends on the capabilities required by that particular workflow. The values are team-specific resource references; tool permissions and least privilege should be enforced on the tool and through IAM rather than by constraining these names generically."
+      "rationale": "Lists the resource names of tools referenced by the playbook. The permitted tools depend on the application, and constraining this list would pin team-specific identifiers; tool capabilities and access should be secured on the referenced tools and through IAM."
     },
     "instruction": {
       "type": "block",
@@ -54,7 +54,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Defines free-form, application-specific guidance supplied to the LLM. A generic policy cannot understand the intended conversation behaviour or reliably determine whether arbitrary natural-language guidance is secure."
+      "rationale": "Defines unstructured, application-specific guidance for the LLM. Unsafe content is possible, but a generic string rule cannot reliably identify prompt injection or determine correct guidance without workflow context, so this requires design review and runtime safeguards rather than a uniform value constraint."
     },
     "instruction.steps": {
       "type": "block",
@@ -66,7 +66,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Encodes application-specific nested playbook steps as JSON. Their correct structure and actions depend on the workflow, referenced tools and conversation design, so they cannot be meaningfully constrained by a generic platform policy."
+      "rationale": "Encodes application-specific nested playbook steps as JSON. The provider validates the document structure, while safe sequencing and tool use depend on the surrounding workflow; a generic value policy cannot reliably infer recursion or unauthorised execution paths from arbitrary step content."
     },
     "instruction.steps.text": {
       "description": "Step instruction in text format.",
