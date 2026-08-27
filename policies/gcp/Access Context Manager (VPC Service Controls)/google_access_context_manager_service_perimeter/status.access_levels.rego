@@ -1,14 +1,20 @@
-package terraform.gcp.security.google_access_context_manager_service_perimeter.status_access_levels
+package terraform.gcp.security.access_context_manager_vpc_service_controls.google_access_context_manager_service_perimeter.status_access_levels
 
-import rego.v1
+import data.terraform.helpers as helpers
+import data.terraform.gcp.security.access_context_manager_vpc_service_controls.google_access_context_manager_service_perimeter.vars as vars
 
-default allow := false
+conditions := [[
+  {
+    "situation_description": "Service Perimeter status should contain configured access levels.",
+    "remedies": ["Configure status.access_levels with at least one valid AccessLevel."],
+  },
+  {
+    "condition": "Status access levels must not be empty.",
+    "attribute_path": ["status", 0, "access_levels"],
+    "values": [[]],
+    "policy_type": "blacklist",
+  },
+]]
 
-allow if {
-    levels := input.status[0].access_levels
-    count(levels) > 0
-    every level in levels {
-        startswith(level, "accessPolicies/")
-        contains(level, "/accessLevels/")
-    }
-}
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details
