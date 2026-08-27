@@ -10,7 +10,7 @@ conditions := [[
   },
   {
     "condition": "Egress permission selector must not allow all permissions.",
-    "attribute_path": ["spec", "egress_policies", "egress_to", "operations", "method_selectors", "permission"],
+    "attribute_path": ["spec", 0, "egress_policies", 0, "egress_to", 0, "operations", 0, "method_selectors", 0, "permission"],
     "values": ["*"],
     "policy_type": "blacklist",
   },
