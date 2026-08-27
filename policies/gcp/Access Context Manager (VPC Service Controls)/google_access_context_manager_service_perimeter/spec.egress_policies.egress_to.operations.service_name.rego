@@ -10,7 +10,7 @@ conditions := [[
   },
   {
     "condition": "Egress service name must not allow all services.",
-    "attribute_path": ["spec", "egress_policies", "egress_to", "operations", "service_name"],
+    "attribute_path": ["spec", 0, "egress_policies", 0, "egress_to", 0, "operations", 0, "service_name"],
     "values": ["*"],
     "policy_type": "blacklist",
   },
