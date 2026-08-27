@@ -11,7 +11,7 @@ conditions := [[
   {
     "condition": "Egress identities must be explicitly approved.",
     "attribute_path": ["spec", "egress_policies", "egress_from", "identities"],
-    "values": [],
+    "values": ["serviceAccount:approved@example.iam.gserviceaccount.com"],
     "policy_type": "whitelist",
   },
 ]]
