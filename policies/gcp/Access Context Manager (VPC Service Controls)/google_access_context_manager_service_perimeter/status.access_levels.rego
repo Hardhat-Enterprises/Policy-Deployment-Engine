@@ -11,7 +11,7 @@ conditions := [[
   {
     "condition": "Status access levels must not be empty.",
     "attribute_path": ["status", 0, "access_levels"],
-    "values": [[]],
+    "values": null,
     "policy_type": "blacklist",
   },
 ]]
