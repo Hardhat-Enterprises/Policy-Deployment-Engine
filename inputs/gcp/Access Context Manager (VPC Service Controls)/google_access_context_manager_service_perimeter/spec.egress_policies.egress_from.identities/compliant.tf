@@ -8,7 +8,9 @@ resource "google_access_context_manager_service_perimeter" "compliant_example_1"
 
     egress_policies {
       egress_from {
-        identities = ["serviceAccount:approved@example.iam.gserviceaccount.com"]
+        identities = [
+          "serviceAccount:approved@example.iam.gserviceaccount.com"
+        ]
       }
     }
   }
