@@ -8,7 +8,8 @@ resource "google_access_context_manager_service_perimeter" "non_compliant_exampl
 
     egress_policies {
       egress_from {
-        identities = ["*"]
+        identity_type = "ANY_SERVICE_ACCOUNT"
+        identities    = ["*"]
       }
 
       egress_to {
