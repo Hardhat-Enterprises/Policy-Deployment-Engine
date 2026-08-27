@@ -10,7 +10,7 @@ conditions := [[
   },
   {
     "condition": "VPC accessible services must not allow unrestricted API access.",
-    "attribute_path": ["spec", "vpc_accessible_services", "allowed_services"],
+    "attribute_path": ["spec", 0, "vpc_accessible_services", 0, "allowed_services"],
     "values": ["*"],
     "policy_type": "blacklist",
   },
