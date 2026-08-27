@@ -10,7 +10,7 @@ conditions := [[
   },
   {
     "condition": "Ingress source access level must not allow all ingress sources.",
-    "attribute_path": ["spec", "ingress_policies", "ingress_from", "sources", "access_level"],
+    "attribute_path": ["spec", 0, "ingress_policies", 0, "ingress_from", 0, "sources", 0, "access_level"],
     "values": ["*"],
     "policy_type": "blacklist",
   },
