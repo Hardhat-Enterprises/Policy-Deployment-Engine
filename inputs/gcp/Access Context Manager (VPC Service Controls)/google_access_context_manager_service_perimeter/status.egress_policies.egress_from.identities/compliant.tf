@@ -8,6 +8,8 @@ resource "google_access_context_manager_service_perimeter" "compliant_example_1"
 
     egress_policies {
       egress_from {
+        identity_type = "ANY_SERVICE_ACCOUNT"
+
         identities = [
           "serviceAccount:approved@example-project.iam.gserviceaccount.com"
         ]
