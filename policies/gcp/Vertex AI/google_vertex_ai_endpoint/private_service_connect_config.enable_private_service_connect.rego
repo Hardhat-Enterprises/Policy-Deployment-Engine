@@ -6,13 +6,14 @@ import data.terraform.gcp.security.vertex_ai.google_vertex_ai_endpoint.vars
 conditions := [
     [
         {
-            "situation_description": "Ensure the endpoint uses Customer-Managed Encryption Keys (CMEK).",
-            "remedies": ["Provide a valid KMS key via the `encryption_spec` block."]
+            "situation_description": "Ensure the endpoint is exposed via Private Service Connect instead of the public internet.",
+            "remedies": ["Set `private_service_connect_config.enable_private_service_connect` to true."]
         },
         {
-            "condition": "encryption_spec block is missing",
-            "attribute_path": ["encryption_spec"],
-            "policy_type": "presence"
+            "condition": "enable_private_service_connect is not true",
+            "attribute_path": ["private_service_connect_config", 0, "enable_private_service_connect"],
+            "values": [true],
+            "policy_type": "whitelist"
         }
     ]
 ]

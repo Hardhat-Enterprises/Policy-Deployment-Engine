@@ -11,7 +11,7 @@ conditions := [
         },
         {
             "condition": "encryption_spec.kms_key_name is not configured",
-            "attribute_path": ["encryption_spec", 0, "kms_key_name"],
+            "attribute_path": ["encryption_spec"],
             "policy_type": "presence"
         }
     ]
