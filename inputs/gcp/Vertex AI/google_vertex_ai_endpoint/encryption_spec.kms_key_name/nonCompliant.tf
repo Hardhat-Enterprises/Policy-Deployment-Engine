@@ -2,5 +2,8 @@ resource "google_vertex_ai_endpoint" "non_compliant_example_1" {
   name         = "non_compliant_example_1"
   display_name = "sample-endpoint"
   location     = "us-central1"
-  # encryption_spec block is completely missing
+
+  encryption_spec {
+    kms_key_name = ""
+  }
 }
