@@ -10,9 +10,10 @@ conditions := [
             "remedies": ["Configure the `network` attribute."]
         },
         {
-            "condition": "network is not configured",
+            "condition": "network is improperly configured",
             "attribute_path": ["network"],
-            "policy_type": "presence"
+            "values": ["projects/my-project/global/networks/invalid-network"],
+            "policy_type": "blacklist"
         }
     ]
 ]
