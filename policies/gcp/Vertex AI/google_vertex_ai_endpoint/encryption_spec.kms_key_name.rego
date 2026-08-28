@@ -10,8 +10,8 @@ conditions := [
             "remedies": ["Configure the `encryption_spec.kms_key_name` attribute."]
         },
         {
-            "condition": "encryption_spec.kms_key_name is not configured",
-            "attribute_path": ["encryption_spec"],
+            "condition": "encryption_spec is missing or kms_key_name is not configured",
+            "attribute_path": ["encryption_spec", 0, "kms_key_name"],
             "policy_type": "presence"
         }
     ]
