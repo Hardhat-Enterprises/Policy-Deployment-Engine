@@ -1,4 +1,4 @@
-package terraform.gcp.security.vertex_ai.google_vertex_ai_endpoint.enable_private_service_connect
+package terraform.gcp.security.vertex_ai.google_vertex_ai_endpoint.encryption_spec_kms_key_name
 
 import data.terraform.helpers
 import data.terraform.gcp.security.vertex_ai.google_vertex_ai_endpoint.vars
