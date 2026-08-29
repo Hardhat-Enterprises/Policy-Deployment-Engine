@@ -6,43 +6,43 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Prevents the accidental or unauthorized destruction of the Vertex AI Index resource, which could lead to data loss or service disruption."
     },
     "description": {
       "description": "The description of the Index.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field only provides a human-readable description of the index and does not influence access control, data handling, or network security configurations."
     },
     "display_name": {
       "description": "The display name of the Index. The name can be up to 128 characters long and can consist of any UTF-8 characters.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This parameter is solely used for visual identification within the UI and has no bearing on the underlying security posture or data protection of the resource."
     },
     "index_update_method": {
       "description": "The update method to use with this Index. The value must be the followings. If not set, BATCH_UPDATE will be used by default.\n* BATCH_UPDATE: user can call indexes.patch with files on Cloud Storage of datapoints to update.\n* STREAM_UPDATE: user can call indexes.upsertDatapoints/DeleteDatapoints to update the Index and the updates will be applied in corresponding DeployedIndexes in nearly real-time.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "rationale: This determines whether updates are processed in batch or streaming modes. It dictates data processing logic, not the security or encryption mechanisms of the data in transit or at rest."
     },
     "labels": {
       "description": "The labels with user-defined metadata to organize your Indexes.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels are used for resource organization and billing categorization. They do not govern IAM policies, encryption, or network access boundaries."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "While it dictates the structural location of the resource, the project ID itself is an organizational boundary identifier rather than a direct security control parameter."
     },
     "region": {
       "description": "The region of the index. eg us-central1",
@@ -60,8 +60,8 @@
       "description": "Required. The Cloud KMS resource identifier of the customer managed encryption key used to protect a resource. Has the form: 'projects/my-project/locations/my-region/keyRings/my-kr/cryptoKeys/my-key'. The key needs to be in the same region as where the compute resource is created.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Required for enforcing Customer-Managed Encryption Keys (CMEK). This directly secures the Index and all its sub-resources, ensuring data confidentiality at rest."
     },
     "metadata": {
       "type": "block",
@@ -72,15 +72,15 @@
       "description": "Allows inserting, updating  or deleting the contents of the Matching Engine Index.\nThe string must be a valid Cloud Storage directory path. If this\nfield is set when calling IndexService.UpdateIndex, then no other\nIndex field can be also updated as part of the same call.\nThe expected structure and format of the files this URI points to is\ndescribed at https://cloud.google.com/vertex-ai/docs/matching-engine/using-matching-engine#input-data-format",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the Cloud Storage path for inserting, updating, or deleting index contents. Access to this path is controlled by GCS IAM policies, not by the index resource configuration itself."
     },
     "metadata.is_complete_overwrite": {
       "description": "If this field is set together with contentsDeltaUri when calling IndexService.UpdateIndex,\nthen existing content of the Index will be replaced by the data from the contentsDeltaUri.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A boolean flag indicating whether the update operation replaces existing content. This is a data manipulation directive, unrelated to security configurations."
     },
     "metadata.config": {
       "type": "block",
@@ -91,36 +91,36 @@
       "description": "The default number of neighbors to find via approximate search before exact reordering is\nperformed. Exact reordering is a procedure where results returned by an\napproximate search algorithm are reordered via a more expensive distance computation.\nRequired if tree-AH algorithm is used.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An algorithmic hyperparameter that sets the default number of neighbors to find during a search. It affects search accuracy and computational cost, not security."
     },
     "metadata.config.dimensions": {
       "description": "The number of dimensions of the input vectors.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the number of dimensions for the input vectors. This is a mathematical requirement for the machine learning model and carries no security implications."
     },
     "metadata.config.distance_measure_type": {
       "description": "The distance measure used in nearest neighbor search. The value must be one of the followings:\n* SQUARED_L2_DISTANCE: Euclidean (L_2) Distance\n* L1_DISTANCE: Manhattan (L_1) Distance\n* COSINE_DISTANCE: Cosine Distance. Defined as 1 - cosine similarity.\n* DOT_PRODUCT_DISTANCE: Dot Product Distance. Defined as a negative of the dot product",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the mathematical formula (e.g., COSINE_DISTANCE) used for nearest neighbor search. It impacts algorithm behavior, not resource security."
     },
     "metadata.config.feature_norm_type": {
       "description": "Type of normalization to be carried out on each vector. The value must be one of the followings:\n* UNIT_L2_NORM: Unit L2 normalization type\n* NONE: No normalization type is specified.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines the type of normalization applied to each vector. This is a data preprocessing step devoid of security impact."
     },
     "metadata.config.shard_size": {
       "description": "Index data is split into equal parts to be processed. These are called \"shards\".\nThe shard size must be specified when creating an index. The value must be one of the followings:\n* SHARD_SIZE_SMALL: Small (2GB)\n* SHARD_SIZE_MEDIUM: Medium (20GB)\n* SHARD_SIZE_LARGE: Large (50GB)",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the data splitting mechanism (e.g., Small, Medium, Large) for processing efficiency. It is a performance tuning parameter, unrelated to security."
     },
     "metadata.config.algorithm_config": {
       "type": "block",
@@ -141,15 +141,15 @@
       "description": "Number of embeddings on each leaf node. The default value is 1000 if not set.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Configuration for implementing a standard linear search. It dictates the search methodology without affecting access controls or data encryption."
     },
     "metadata.config.algorithm_config.tree_ah_config.leaf_nodes_to_search_percent": {
       "description": "The default percentage of leaf nodes that any query may be searched. Must be in\nrange 1-100, inclusive. The default value is 10 (means 10%) if not set.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An algorithmic tuning parameter defining the number of embeddings on each leaf node for the tree-AH algorithm. It impacts performance, not security."
     }
   }
 }
