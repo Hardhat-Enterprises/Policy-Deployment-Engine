@@ -84,43 +84,43 @@
       "description": "Duration over which Adaptive Protection's auto-deployed actions last.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Sets how long an automatically deployed mitigation stays in force before expiring. The duration determines whether protection holds for the length of an attack or lapses while it is still under way, so it governs the behaviour of a security mitigation rather than an operational preference, and a policy should require an expiry that keeps auto-deployed rules effective."
+      "security_impact": false,
+      "rationale": "Sets how long an auto-deployed mitigation stays in force before expiring. It tunes the duration of an already-enabled protection, and an appropriate expiry depends on the attack and traffic profile of the individual service, so no single value could be mandated across teams."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.auto_deploy_impacted_baseline_threshold": {
       "description": "Impacted baseline threshold below which Adaptive Protection's auto-deploy takes actions.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Sets how much of the established traffic baseline must be affected before Adaptive Protection automatically deploys a mitigation. It governs whether an automated defence is triggered during an attack rather than merely how it is reported, so a policy should require the threshold to be configured so that protective action reliably engages."
+      "security_impact": false,
+      "rationale": "Sets how much of the learned baseline must be affected before auto-deploy acts. It calibrates the sensitivity of an already-enabled detection mechanism against a workload's normal traffic distribution, so it cannot be fixed generically."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.auto_deploy_load_threshold": {
       "description": "Load threshold above which Adaptive Protection automatically deploy threshold based on the backend load threshold and detect a new rule during an alerted attack.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Sets the level of backend load above which Adaptive Protection automatically deploys a mitigating rule during an alerted attack. Because this trigger determines whether an automated countermeasure engages while a service is under strain, it configures a security feature rather than a performance preference, and a policy should constrain it so that protection activates before the backend is overwhelmed."
+      "security_impact": false,
+      "rationale": "Sets the backend load level above which a mitigation is automatically deployed. It tunes the trigger point of an already-enabled protection against a service's own capacity, so no platform-wide value would be correct."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.detection_absolute_qps": {
       "description": "Detection threshold based on absolute QPS.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Sets the absolute queries-per-second rate at which Adaptive Protection declares an attack. The value determines whether an attack is identified at all, so it configures the detection mechanism itself rather than how findings are reported, and a policy should require a threshold that keeps detection responsive rather than one set so high that attacks pass unflagged."
+      "security_impact": false,
+      "rationale": "Sets the absolute request rate at which an attack is declared. Normal request volume is a property of the individual workload, so mandating one figure would flag legitimate peaks on busy services and miss attacks on quiet ones."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.detection_load_threshold": {
       "description": "Detection threshold based on the backend service's load.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Sets the backend load level at which Adaptive Protection declares an attack. Because it determines whether a load-driven attack is identified in time for mitigation to matter, it configures the detection control itself, so a policy should constrain the threshold to keep attack identification reliable."
+      "security_impact": false,
+      "rationale": "Sets the backend load at which an attack is declared. It calibrates detection sensitivity against a service's own capacity, so a generic value could not hold across teams."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.detection_relative_to_baseline_qps": {
       "description": "Detection threshold based on QPS relative to the average of baseline traffic.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Sets how far request volume must deviate from the learned baseline before Adaptive Protection declares an attack. The value tunes the sensitivity of attack detection and therefore whether a protective response is triggered, so a policy should require it to sit within a range that keeps detection effective."
+      "security_impact": false,
+      "rationale": "Sets how far volume must deviate from the learned baseline before an attack is declared. The acceptable deviation depends on how variable a workload's traffic normally is, so no single multiplier applies across teams."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.name": {
       "description": "The name must be 1-63 characters long, and comply with RFC1035. The name must be unique within the security policy.",
