@@ -91,8 +91,8 @@
       "description": "Impacted baseline threshold below which Adaptive Protection's auto-deploy takes actions.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Sets how much of the learned baseline must be affected before auto-deploy acts. It calibrates the sensitivity of an already-enabled detection mechanism against a workload's normal traffic distribution, so it cannot be fixed generically."
+      "security_impact": true,
+      "rationale": "Sets how much of the learned traffic baseline must be affected before Adaptive Protection automatically deploys a mitigation. The value decides whether automated protection engages during an attack, so a policy should require it to be explicitly configured rather than left at a default that may never trigger."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.auto_deploy_load_threshold": {
       "description": "Load threshold above which Adaptive Protection automatically deploy threshold based on the backend load threshold and detect a new rule during an alerted attack.",
@@ -112,15 +112,15 @@
       "description": "Detection threshold based on the backend service's load.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Sets the backend load at which an attack is declared. It calibrates detection sensitivity against a service's own capacity, so a generic value could not hold across teams."
+      "security_impact": true,
+      "rationale": "Sets the backend load level at which Adaptive Protection declares an attack. Because it determines whether a load-driven attack is detected at all, a policy should require detection sensitivity to be explicitly calibrated rather than left at a weak default."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.detection_relative_to_baseline_qps": {
       "description": "Detection threshold based on QPS relative to the average of baseline traffic.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Sets how far volume must deviate from the learned baseline before an attack is declared. The acceptable deviation depends on how variable a workload's traffic normally is, so no single multiplier applies across teams."
+      "security_impact": true,
+      "rationale": "Sets how far request volume must deviate from the learned baseline before Adaptive Protection declares an attack. It governs whether threat detection fires, so a policy should require a non-default deviation threshold so that attacks are identified rather than absorbed into the baseline."
     },
     "adaptive_protection_config.layer_7_ddos_defense_config.threshold_configs.name": {
       "description": "The name must be 1-63 characters long, and comply with RFC1035. The name must be unique within the security policy.",
