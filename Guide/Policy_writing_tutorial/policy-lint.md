@@ -188,6 +188,10 @@ Good — only the tested argument differs:
       public_access_prevention = "inherited"
     }
 
+Every example is compared, including one that has no same-numbered counterpart on the other
+side: an example without a numbered twin is compared against the **lowest-numbered** example
+opposite it. Adding a third non-compliant example therefore does not exempt it from this rule.
+
 These keys are expected to differ and are never reported:
 
 - `name` — the example's own label.
@@ -198,19 +202,33 @@ These keys are expected to differ and are never reported:
   example label itself** (`bucket = "compliant_example_1"`). Two genuinely different values there
   (`bucket = "prod-data-bucket"` vs `"dev-scratch-bucket"`) are drift like any other.
 
-## fixture-unpaired
+## fixture-one-sided
 
-An example has no counterpart with the same number: a `non_compliant_example_2` with no
-`compliant_example_2`, or the other way round. The harness compares the two halves of each
-numbered pair, so a lone example is never compared to anything — it looks like extra coverage but
-tests nothing.
+Your fixture has examples on one side only: no `compliant_example_N` at all, or no
+`non_compliant_example_N` at all.
 
-Either add the missing half with the same number, or renumber so every example is one half of a
-pair:
+That is the one fixture shape the harness cannot say anything about. It checks two things across
+your examples — every `non_compliant_example_N` **must** be flagged, and no `compliant_example_N`
+may be. With no non-compliant example there is nothing that has to be flagged, so a policy that
+matches nothing passes. With no compliant example there is nothing that has to stay unflagged, so
+a policy that flags everything passes. Either way the harness goes green and your policy is
+untested.
+
+Add the missing side — one example is enough — and run the harness again.
+
+**You do not need the same number of each.** The harness matches examples by their *label*, not by
+their number: a `non_compliant_example_3` with no `compliant_example_3` is evaluated exactly like
+every other non-compliant example. One compliant baseline tested against several non-compliant
+examples, each breaking the rule a different way, is a good fixture — several resource types in
+this repo are written that way deliberately, and none of them is a finding.
+
+Numbering is still required — sequential from 1, checked by `linter.py` — but
+the two files are numbered independently of each other:
 
     # compliant.tf                        # nonCompliant.tf
-    ..."compliant_example_1" { ... }      ..."non_compliant_example_1" { ... }
-    ..."compliant_example_2" { ... }      ..."non_compliant_example_2" { ... }
+    ..."compliant_example_1" { ... }      ..."non_compliant_example_1" { ... }   # not set
+                                          ..."non_compliant_example_2" { ... }   # wrong value
+                                          ..."non_compliant_example_3" { ... }   # wrong shape
 
 ## fixture-missing-plan
 
@@ -299,7 +317,10 @@ but never blocks on.
 The same helper is called twice with the same arguments, so the same work is done twice. The
 usual shape is `message` and `details` each writing the `helpers.get_multi_summary(...)` call out
 again — OPA then evaluates the whole `conditions` list once per field. Call it once, give the
-result a name, and read the fields off that name. A warning only; it never fails a build.
+result a name, and read the fields off that name.
+
+**This one fails the build.** Only the files your branch changed are checked, so an older policy
+elsewhere in the tree is never held against you — but a file you touch has to be clean.
 
 Bad:
 
