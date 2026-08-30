@@ -1,0 +1,22 @@
+package terraform.gcp.security.backup_for_gke.google_gke_backup_restore_channel.brief
+
+import data.terraform.helpers
+import data.terraform.gcp.security.backup_for_gke.google_gke_backup_restore_channel.vars
+
+conditions := [
+    [
+        {
+            "situation_description": "Brief is set to an unapproved value.",
+            "remedies": []
+        },
+        {
+            "condition": "Brief must be approved.",
+            "attribute_path": ["brief"],
+            "values": ["approved"],
+            "policy_type": "whitelist"
+        }
+    ]
+]
+
+message := helpers.get_multi_summary(conditions, vars.variables).message
+details := helpers.get_multi_summary(conditions, vars.variables).details
