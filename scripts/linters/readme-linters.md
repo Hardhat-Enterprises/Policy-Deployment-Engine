@@ -5,13 +5,19 @@ cross-consistency across three trees — `docs/`, `inputs/`, `policies/` —
 treating `docs/` as the source of truth that `inputs/` and `policies/` must
 reconcile to. It uses only the Python standard library (no extra installs).
 
-There are three supporting scripts:
+There are four supporting scripts:
 
 - `run_precommit_linter.py` — runs the linter but fails only on **your** changed
   files (so you are never blocked by the repo-wide backlog). It also runs
   `policy_lint.py` (below) over every resource type your changed files belong
   to, on the same "own only what you changed" basis.
 - `check_branch_name.py` — enforces the branch naming convention.
+- `branch_scope.py` — enforces that a `Service/<platform>/<service_slug>/<resource_type>`
+  branch changes **only** that resource's files (`docs/` JSON, `inputs/`,
+  `policies/`), plus additions to `inputs/plan_cache/`. It catches the two
+  silent mistakes — editing the shared harness and wiping the plan cache —
+  neither of which fails any test on the branch that caused it. Rules are
+  documented in `Guide/Policy_writing_tutorial/branch-scope.md`.
 - `policy_lint.py` — deterministic *content*-quality rules over a policy kit's
   declared `conditions`/`variables` (hard-coded literals, trivial messages,
   fixture drift, ...). It answers whether the policy is any good, not just
@@ -90,7 +96,18 @@ to, and fails on an error-severity finding only when the specific `.rego` file
 python scripts/linters/run_precommit_linter.py            # staged + unstaged (pre-commit)
 python scripts/linters/run_precommit_linter.py --base origin/dev   # everything vs dev (CI)
 python scripts/linters/run_precommit_linter.py --all      # whole tree, fail on any error
+
+python scripts/linters/branch_scope.py --staged           # what you are about to commit
+python scripts/linters/branch_scope.py --base origin/dev  # the whole branch vs dev (CI)
 ```
+
+**CI (`.github/workflows/branch-scope.yml`):** a `branch_scope` job runs
+`branch_scope.py --branch <head ref> --base origin/<base>` on every pull request
+from a `Service/` branch. It is a **separate workflow with no `paths:` filter**
+on purpose: `policy_check_PR.yaml` only runs when `docs/`, `inputs/` or
+`policies/` changed, so a branch whose only change is to `scripts/` or to a
+stray committed binary would never trigger it — and those are exactly the
+changes the scope check exists to catch.
 
 **CI (`.github/workflows/policy_check_PR.yaml`):** a `lint` job runs
 (1) `linter.py --tree all --no-content-checks` as a hard whole-tree structural

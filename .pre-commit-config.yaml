@@ -5,6 +5,9 @@
 #   whole tree but only FAILS on errors in the files you changed (this commit),
 #   so you are never blocked by the repo-wide backlog.
 # - branch-name-check enforces the branch naming convention.
+# - branch-scope-check keeps a Service/ branch to its own resource's files. It
+#   runs with --staged so it sees what you are about to commit, which is where a
+#   stray `git add .` gets caught — before it is ever pushed.
 #
 # Both do their own git inspection, so pass_filenames is false and always_run
 # is true (the script decides whether there is anything to check).
@@ -20,6 +23,12 @@ repos:
       - id: branch-name-check
         name: Branch naming convention
         entry: python scripts/linters/check_branch_name.py
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: branch-scope-check
+        name: Branch scope (own resource only)
+        entry: python scripts/linters/branch_scope.py --staged
         language: system
         pass_filenames: false
         always_run: true
