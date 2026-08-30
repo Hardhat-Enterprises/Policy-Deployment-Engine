@@ -131,6 +131,122 @@ def test_findings_carry_the_service_and_resource(tmp_path):
 
 
 # --------------------------------------------------------------------------- #
+# repeated-helper-call.
+#
+# The fixture is the real GKEHub kit: policy_data.rego and _vars.rego are copied
+# byte-for-byte off dev, so the rule is exercised against a policy a student
+# actually wrote, not a hand-tuned imitation of one. The other four files sit
+# beside it to pin the boundaries.
+# --------------------------------------------------------------------------- #
+REPEATED_HELPER = ("gcp", "GKEHub", "google_gke_hub_scope_iam_policy")
+
+
+def test_repeated_helper_call_flags_only_the_repeated_forms(tmp_path):
+    root = build_tree(tmp_path, "repeated_helper")
+    findings = policy_lint.lint_resource(root, *REPEATED_HELPER)
+
+    # bound_once (the good form), different_args and rule_locals must be silent;
+    # nothing else in the fixture may fire either.
+    assert pairs(findings) == {
+        ("policy_data", "repeated-helper-call"),   # verbatim from dev
+        ("same_rule", "repeated-helper-call"),     # twice inside one rule body
+    }
+
+
+def test_repeated_helper_call_reports_the_real_dev_policy(tmp_path):
+    """policy_data.rego is the shape the owner described: one call per field."""
+    root = build_tree(tmp_path, "repeated_helper")
+    findings = policy_lint.lint_resource(root, *REPEATED_HELPER)
+    real = [f for f in findings
+            if f.policy == "policy_data" and f.rule == "repeated-helper-call"]
+    assert len(real) == 1
+    message = real[0].message
+    assert "helpers.get_multi_summary(conditions, vars.variables)" in message
+    assert "evaluated 2 times" in message
+    assert "lines 20, 21" in message
+
+
+def test_repeated_helper_call_message_says_what_to_do(tmp_path):
+    """A student-facing finding names the fix, not just the smell."""
+    root = build_tree(tmp_path, "repeated_helper")
+    findings = policy_lint.lint_resource(root, *REPEATED_HELPER)
+    message = [f.message for f in findings if f.policy == "policy_data"][0]
+    assert "`result := helpers.get_multi_summary(conditions, vars.variables)`" in message
+    assert "`message := result.message`" in message
+    assert "`details := result.details`" in message
+
+
+def test_repeated_helper_call_ignores_the_bound_form(tmp_path):
+    """`result := helper(...)` then `message := result.message` is the target state."""
+    root = build_tree(tmp_path, "repeated_helper")
+    findings = policy_lint.lint_resource(root, *REPEATED_HELPER)
+    assert [f for f in findings if f.policy == "bound_once"] == []
+
+
+def test_repeated_helper_call_ignores_different_arguments(tmp_path):
+    """Two calls that differ in their arguments compute different things."""
+    root = build_tree(tmp_path, "repeated_helper")
+    findings = policy_lint.lint_resource(root, *REPEATED_HELPER)
+    assert [f for f in findings if f.policy == "different_args"] == []
+
+
+def test_repeated_helper_call_ignores_identical_calls_over_rule_locals(tmp_path):
+    """Same call text, different rules, each over its own parameters.
+
+    This is the shape policies/_helpers really uses. The text matches but the
+    bindings do not, so there is nothing to hoist and flagging it would be wrong.
+    """
+    root = build_tree(tmp_path, "repeated_helper")
+    findings = policy_lint.lint_resource(root, *REPEATED_HELPER)
+    assert [f for f in findings if f.policy == "rule_locals"] == []
+
+
+def test_repeated_helper_call_generalises_beyond_get_multi_summary(tmp_path):
+    """Any helper repeated with identical arguments inside one rule is reported."""
+    root = build_tree(tmp_path, "repeated_helper")
+    findings = policy_lint.lint_resource(root, *REPEATED_HELPER)
+    same = [f for f in findings if f.policy == "same_rule"]
+    assert len(same) == 1
+    assert "shared.get_attribute_value(resource, attribute_path)" in same[0].message
+    # Not a field read, so the remedy is "use `result` at each of those sites"
+    # rather than "read the fields off it".
+    assert "use `result` at each of those sites" in same[0].message
+
+
+def test_repeated_helper_call_is_advisory(tmp_path):
+    """Style, not correctness: it must never fail a student's build on its own."""
+    root = build_tree(tmp_path, "repeated_helper")
+    findings = policy_lint.lint_resource(root, *REPEATED_HELPER)
+    reported = [f for f in findings if f.rule == "repeated-helper-call"]
+    assert reported and all(f.severity == "warn" for f in reported)
+    assert "repeated-helper-call" in policy_lint.WARN_RULES
+
+
+def test_repeated_helper_call_reads_past_strings_and_comments():
+    """A `#` or a brace inside a value must not confuse the scope split.
+
+    The real policy_data.rego carries an escaped-quote JSON literal full of `{`
+    and `[` — exactly what breaks a naive brace counter or a regex that cuts the
+    line at the first `#`.
+    """
+    text = "\n".join([
+        "package a.b",
+        "import data.terraform.helpers",
+        "import data.terraform.gcp.security.svc.google_thing.vars",
+        'conditions := [{"v": "{\\"a\\": [1]}  # not a comment"}]',
+        "message := helpers.get_multi_summary(conditions, vars.variables).message",
+        "details := helpers.get_multi_summary(conditions, vars.variables).details",
+    ])
+    repeats = list(policy_lint._repeated_helper_calls(
+        policy_lint._strip_rego_comments(text)))
+    assert len(repeats) == 1
+    callee, _args, lines, fields = repeats[0]
+    assert callee == "helpers.get_multi_summary"
+    assert lines == [5, 6]
+    assert fields == ["message", "details"]
+
+
+# --------------------------------------------------------------------------- #
 # _vars.rego rules.
 # --------------------------------------------------------------------------- #
 @pytest.mark.parametrize("resource_type,expected", [
