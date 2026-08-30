@@ -5,11 +5,18 @@ cross-consistency across three trees — `docs/`, `inputs/`, `policies/` —
 treating `docs/` as the source of truth that `inputs/` and `policies/` must
 reconcile to. It uses only the Python standard library (no extra installs).
 
-There are two supporting scripts:
+There are three supporting scripts:
 
 - `run_precommit_linter.py` — runs the linter but fails only on **your** changed
-  files (so you are never blocked by the repo-wide backlog).
+  files (so you are never blocked by the repo-wide backlog). It also runs
+  `policy_lint.py` (below) over every resource type your changed files belong
+  to, on the same "own only what you changed" basis.
 - `check_branch_name.py` — enforces the branch naming convention.
+- `policy_lint.py` — deterministic *content*-quality rules over a policy kit's
+  declared `conditions`/`variables` (hard-coded literals, trivial messages,
+  fixture drift, ...). It answers whether the policy is any good, not just
+  whether the trees reconcile. Every rule and how to run it standalone is
+  documented in `Guide/Policy_writing_tutorial/policy-lint.md`.
 
 ---
 
@@ -74,6 +81,11 @@ is the whole **argument directory** — `compliant.tf` and `nonCompliant.tf` tes
 one argument together, so touching one means you own the pair. Policies/docs are
 file-level. Pre-existing backlog errors elsewhere are counted, never blocking.
 
+It also runs `policy_lint.py` over every resource type a changed file belongs
+to, and fails on an error-severity finding only when the specific `.rego` file
+(or fixture pair) it names was itself changed — see
+`Guide/Policy_writing_tutorial/policy-lint.md`.
+
 ```bash
 python scripts/linters/run_precommit_linter.py            # staged + unstaged (pre-commit)
 python scripts/linters/run_precommit_linter.py --base origin/dev   # everything vs dev (CI)
@@ -84,7 +96,13 @@ python scripts/linters/run_precommit_linter.py --all      # whole tree, fail on 
 (1) `linter.py --tree all --no-content-checks` as a hard whole-tree structural
 gate (structural only, so it never blocks a PR on repo-wide content debt), and
 (2) `run_precommit_linter.py --base origin/<base>` to enforce structural + content
-checks on the PR's own changed files.
+checks (including `policy_lint.py`, which needs OPA installed in the job) on the
+PR's own changed files.
+
+`.github/workflows/policy_check_ALL.yaml` (on every push to `dev`) additionally
+runs `policy_lint.py --json gcp` over the whole tree as a `continue-on-error`
+report, publishing `policy-lint-report.json` as a build artifact for
+maintainers to track the content-quality backlog — it never blocks.
 
 ---
 

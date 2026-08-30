@@ -64,6 +64,7 @@ Example:
 
 <div align="center">
 
+[⬅️ Previous: policy_lint — content-quality rules](policy-lint.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
 [📘 Back to Contents](policy-writing-tutorial.md#top) &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;
 
 </div>
