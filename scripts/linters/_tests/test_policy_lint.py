@@ -110,14 +110,16 @@ def test_hard_coded_value_message_names_the_literal(tmp_path):
     assert "projects/PDE" in hard[0].message
 
 
-def test_only_style_rules_are_warnings(tmp_path):
+def test_only_advisory_rules_are_warnings(tmp_path):
+    # The two style conventions plus presence-only, which is a judgement about
+    # the argument's rationale that the reviewer makes, not the linter.
     root = build_tree(tmp_path, "policy_smells")
     findings = policy_lint.lint_resource(
         root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
     warns = {f.rule for f in findings if f.severity == "warn"}
     errors = {f.rule for f in findings if f.severity == "error"}
-    assert warns == {"legacy-assign", "package-case"}
-    assert "legacy-assign" not in errors and "package-case" not in errors
+    assert warns == {"legacy-assign", "package-case", "presence-only"}
+    assert not (warns & errors), "a rule must have one severity, not both"
 
 
 def test_findings_carry_the_service_and_resource(tmp_path):
@@ -257,7 +259,7 @@ def test_cli_exits_zero_on_a_clean_resource(tmp_path, capsys):
 def test_cli_exits_zero_when_only_warnings_are_found(tmp_path, capsys):
     # A tree whose only findings are warn-severity must not fail the build.
     root = build_tree(tmp_path, "policy_smells")
-    for name in ("destination_project", "members", "labels", "constraint", "brief", "short"):
+    for name in ("destination_project", "members", "constraint", "brief", "short"):
         (root / "policies" / "gcp" / "Backup for GKE"
          / "google_gke_backup_restore_channel" / f"{name}.rego").unlink()
     rc = policy_lint.main([
@@ -265,6 +267,7 @@ def test_cli_exits_zero_when_only_warnings_are_found(tmp_path, capsys):
         "gcp/Backup for GKE/google_gke_backup_restore_channel"])
     data = json.loads(capsys.readouterr().out)
     assert {e["severity"] for e in data} == {"warn"}
+    assert {e["rule"] for e in data} == {"legacy-assign", "package-case", "presence-only"}
     assert rc == 0
 
 
@@ -408,3 +411,148 @@ def test_identity_exemption_only_covers_the_fixture_labels(tmp_path):
     drift = [f for f in findings if f.rule == "fixture-drift"]
     assert len(drift) == 1
     assert "bucket" in drift[0].message
+
+
+# --------------------------------------------------------------------------- #
+# Fix wave 2: a broken file must not make the vars index fan out.
+# --------------------------------------------------------------------------- #
+def _break_one_policy(root):
+    """Drop an unparseable .rego into a tree, so the batched eval fails."""
+    broken = (root / "policies" / "gcp" / "Compute Service" / "google_a_thing"
+              / "oops.rego")
+    broken.write_text("package terraform.gcp.security.compute_service."
+                      "google_a_thing.oops\n\nconditions := [[[[\n")
+    return broken
+
+
+def test_friendly_index_does_not_fan_out_when_the_batch_fails(tmp_path, monkeypatch):
+    # The batched eval fails because of the broken file. Falling back to one opa
+    # call per _vars.rego cost 370 subprocesses (~9s); the text of the file is
+    # enough to read a friendly name, so no fan-out is needed.
+    root = build_tree(tmp_path, "vars_bad")
+    _break_one_policy(root)
+    policy_lint.clear_caches()
+
+    real_run = subprocess.run
+    calls = []
+
+    def counting_run(cmd, *args, **kwargs):
+        calls.append(cmd)
+        return real_run(cmd, *args, **kwargs)
+
+    monkeypatch.setattr(policy_lint.subprocess, "run", counting_run)
+    index = policy_lint._friendly_name_index(root / "policies", "gcp")
+
+    assert len(calls) <= 2, f"the index fanned out: {len(calls)} opa calls"
+    # ...and it is still complete: the duplicate pair is still detected.
+    assert sorted(rt for _, rt in index["shared fixture name"]) == [
+        "google_a_thing", "google_b_thing"]
+
+
+def test_duplicate_friendly_names_still_found_with_a_broken_file(tmp_path):
+    root = build_tree(tmp_path, "vars_bad")
+    _break_one_policy(root)
+    findings = policy_lint.lint_resource(root, "gcp", "Compute Service", "google_b_thing")
+    assert ("_vars", "vars-friendly-name") in pairs(findings)
+
+
+# --------------------------------------------------------------------------- #
+# Fix wave 2: presence-only is a warning — the reviewer rules on the rationale.
+# --------------------------------------------------------------------------- #
+def test_presence_only_is_a_warning(tmp_path):
+    root = build_tree(tmp_path, "policy_smells")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    presence = [f for f in findings if f.rule == "presence-only"]
+    assert len(presence) == 1
+    assert presence[0].severity == "warn"
+    assert "presence-only" in policy_lint.WARN_RULES
+
+
+# --------------------------------------------------------------------------- #
+# Fix wave 2: a malformed plan cache is a finding, not an AttributeError.
+# --------------------------------------------------------------------------- #
+@pytest.mark.parametrize("payload", ['[]', '"nope"', '{"planned_values": []}',
+                                     '{"planned_values": {"root_module": "x"}}'])
+def test_malformed_plan_cache_is_a_lint_error(tmp_path, payload):
+    root = build_tree(tmp_path, "clean")
+    input_dir = (root / "inputs" / "gcp" / "Cloud Storage" / "google_storage_bucket"
+                 / "public_access_prevention")
+    policy_lint.plan_cache_for(root, input_dir).write_text(payload)
+    findings = policy_lint.lint_resource(root, "gcp", "Cloud Storage", "google_storage_bucket")
+    assert pairs(findings) == {("public_access_prevention", "lint-error")}
+
+
+# --------------------------------------------------------------------------- #
+# Fix wave 2: no `opa` on PATH is one environment error, not N findings.
+# --------------------------------------------------------------------------- #
+def test_missing_opa_binary_propagates_once(tmp_path, monkeypatch):
+    root = build_tree(tmp_path, "policy_smells")
+    policy_lint.clear_caches()
+
+    def no_opa(cmd, *args, **kwargs):
+        raise FileNotFoundError(2, "No such file or directory", "opa")
+
+    monkeypatch.setattr(policy_lint.subprocess, "run", no_opa)
+    with pytest.raises(policy_lint.PolicyLintError) as excinfo:
+        policy_lint.lint_resource(
+            root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    assert "opa" in str(excinfo.value)
+    # run_precommit_linter.py catches PolicyLintError for exactly this case.
+    assert isinstance(excinfo.value, policy_lint.PolicyLintError)
+
+
+def test_missing_opa_binary_is_one_cli_error(tmp_path, monkeypatch, capsys):
+    root = build_tree(tmp_path, "policy_smells")
+    policy_lint.clear_caches()
+    monkeypatch.setattr(policy_lint.subprocess, "run",
+                        lambda *a, **k: (_ for _ in ()).throw(FileNotFoundError()))
+    rc = policy_lint.main([
+        "--root", str(root), "gcp/Backup for GKE/google_gke_backup_restore_channel"])
+    err = capsys.readouterr().err
+    assert rc == 2
+    assert err.count("[ERROR]") == 1, f"expected a single environment error, got:\n{err}"
+
+
+# --------------------------------------------------------------------------- #
+# Fix wave 2: unpaired fixture resources are reported, not skipped.
+# --------------------------------------------------------------------------- #
+def test_unpaired_fixture_resource_is_reported(tmp_path):
+    root = build_tree(tmp_path, "clean")
+    input_dir = (root / "inputs" / "gcp" / "Cloud Storage" / "google_storage_bucket"
+                 / "public_access_prevention")
+    cache = policy_lint.plan_cache_for(root, input_dir)
+    plan = json.loads(cache.read_text())
+    resources = plan["planned_values"]["root_module"]["resources"]
+    # A second non-compliant example with no compliant counterpart.
+    orphan = json.loads(json.dumps(
+        [r for r in resources if r["name"] == "non_compliant_example_1"][0]))
+    orphan["name"] = "non_compliant_example_2"
+    orphan["values"]["name"] = "non_compliant_example_2"
+    resources.append(orphan)
+    cache.write_text(json.dumps(plan))
+
+    findings = policy_lint.lint_resource(root, "gcp", "Cloud Storage", "google_storage_bucket")
+    assert pairs(findings) == {("public_access_prevention", "fixture-unpaired")}
+    assert "non_compliant_example_2" in findings[0].message
+    assert "fixture-unpaired" in policy_lint.RULES
+
+
+# --------------------------------------------------------------------------- #
+# Fix wave 2: a resource type with no policies directory is machine-readable.
+# --------------------------------------------------------------------------- #
+def test_missing_policies_dir_prints_a_marker(tmp_path, capsys):
+    root = build_tree(tmp_path, "clean")
+    target = "gcp/Cloud Storage/google_storage_bucket_iam_binding"
+    rc = policy_lint.main(["--root", str(root), target])
+    err = capsys.readouterr().err
+    assert rc == 2
+    assert f"[ERROR] no-policies-dir: {target}" in err
+
+
+def test_mistyped_service_is_not_a_no_policies_dir_marker(tmp_path, capsys):
+    root = build_tree(tmp_path, "clean")
+    rc = policy_lint.main(["--root", str(root), "gcp/Clod Storage/google_storage_bucket"])
+    err = capsys.readouterr().err
+    assert rc == 2
+    assert "no-policies-dir" not in err

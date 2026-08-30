@@ -100,9 +100,17 @@ looks at the **last** segment.
 ## presence-only
 
 `values` is only `null`/`""` under a `blacklist`/`whitelist` `policy_type`: the check tests
-nothing but whether the attribute is set at all. That's sometimes genuinely the intent (e.g. "an
-override must not be configured") — pair it with a real pattern where you can, or say why
-presence alone is the right check in the argument's `rationale` in `docs/`.
+nothing but whether the attribute is set at all.
+
+**This is a warning, and it does not fail your build.** Sometimes presence really is the control
+(e.g. "an override must not be configured at all"), and sometimes it is a check that gave up
+halfway. Which one it is depends on what the argument's `rationale` in `docs/` says the risk is —
+a judgement the reviewer makes when reading your policy, not something the linter can settle. So
+write the rationale honestly and expect to be asked about it: the finding is surfaced to whoever
+reviews the resource, and a clear rationale is what turns it from a question into a decision.
+
+Where the attribute has a *shape* — a prefix, a project path, an approved value — pair the
+presence check with a pattern instead. That is a stronger policy in every case.
 
 Bad:
 
@@ -148,11 +156,61 @@ Good:
 ## fixture-drift
 
 `compliant.tf` and `nonCompliant.tf` differ on an attribute **other than** the one under test.
-The whole point of the pair is to isolate a single variable; drift on anything else means the
-test isn't proving what you think it's proving (or the pipeline computed a plan diff that means
-something else entirely). Fix it by making every other attribute identical between the two
-files — only the tested argument (and expected provider-computed mirrors like `labels`) should
-differ.
+The whole point of the pair is to isolate a single variable: if two things differ and the policy
+flags the non-compliant resource, you cannot tell which of the two the policy actually caught.
+Fix it by making every other attribute identical between the two files.
+
+Bad — `public_access_prevention.rego`, but `storage_class` moved too:
+
+    # compliant.tf
+    resource "google_storage_bucket" "compliant_example_1" {
+      name                     = "compliant_example_1"
+      location                 = "AU"
+      storage_class            = "STANDARD"
+      public_access_prevention = "enforced"
+    }
+
+    # nonCompliant.tf
+    resource "google_storage_bucket" "non_compliant_example_1" {
+      name                     = "non_compliant_example_1"
+      location                 = "AU"
+      storage_class            = "NEARLINE"     # <- unrelated to the policy
+      public_access_prevention = "inherited"
+    }
+
+Good — only the tested argument differs:
+
+    # nonCompliant.tf
+    resource "google_storage_bucket" "non_compliant_example_1" {
+      name                     = "non_compliant_example_1"
+      location                 = "AU"
+      storage_class            = "STANDARD"
+      public_access_prevention = "inherited"
+    }
+
+These keys are expected to differ and are never reported:
+
+- `name` — the example's own label.
+- `labels`, and the provider-computed mirrors `effective_labels` and `terraform_labels`, which
+  always move with it.
+- the argument under test (for a nested argument, its top-level block).
+- the attribute named by `resource_value_name` in `_vars.rego` — **but only when it holds the
+  example label itself** (`bucket = "compliant_example_1"`). Two genuinely different values there
+  (`bucket = "prod-data-bucket"` vs `"dev-scratch-bucket"`) are drift like any other.
+
+## fixture-unpaired
+
+An example has no counterpart with the same number: a `non_compliant_example_2` with no
+`compliant_example_2`, or the other way round. The harness compares the two halves of each
+numbered pair, so a lone example is never compared to anything — it looks like extra coverage but
+tests nothing.
+
+Either add the missing half with the same number, or renumber so every example is one half of a
+pair:
+
+    # compliant.tf                        # nonCompliant.tf
+    ..."compliant_example_1" { ... }      ..."non_compliant_example_1" { ... }
+    ..."compliant_example_2" { ... }      ..."non_compliant_example_2" { ... }
 
 ## fixture-missing-plan
 

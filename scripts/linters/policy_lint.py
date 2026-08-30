@@ -41,8 +41,11 @@ Usage
     python3 scripts/linters/policy_lint.py --list-rules
 
 Exit codes: 0 clean, 1 at least one *error*-severity finding (warnings never fail
-a build on their own), 2 a usage error — a target naming a platform, service or
-resource type that is not in the tree.
+a build on their own), 2 a usage or environment error — a target naming a
+platform, service or resource type that is not in the tree, or a missing ``opa``
+binary. When the named resource type simply has no ``policies/`` directory yet,
+the stderr line is marked ``[ERROR] no-policies-dir: <target> (...)`` so a caller
+can treat it as "nothing to lint" rather than as a typo.
 """
 
 import argparse
@@ -75,8 +78,9 @@ RULES = {
         "`attribute_path` ends in a list index; check the whole list with "
         "`element blacklist`."),
     "presence-only": (
-        "`values` is only null/\"\": presence is the whole check. Pair with a pattern "
-        "or justify presence in the rationale."),
+        "`values` is only null/\"\": presence is the whole check. Acceptable when the "
+        "rationale says presence is the control — the reviewer decides; pair with a "
+        "pattern where a shape exists (warn)."),
     "wrong-argument": (
         "No condition in `<arg>.rego` reads the argument the file is named after."),
     "fixture-drift": (
@@ -85,6 +89,9 @@ RULES = {
     "fixture-missing-plan": (
         "No committed plan cache for this fixture pair — run the test locally and "
         "commit inputs/plan_cache."),
+    "fixture-unpaired": (
+        "A compliant_example_N or non_compliant_example_N has no counterpart with the "
+        "same N — every example must be one half of a pair."),
     "vars-resource-type": (
         "`_vars.resource_type` does not match the resource-type directory."),
     "vars-friendly-name": (
@@ -99,8 +106,11 @@ RULES = {
         "`opa check` on the file."),
 }
 
-# Only style rules are advisory; everything else is a correctness/quality error.
-WARN_RULES = {"legacy-assign", "package-case"}
+# Advisory rules: the two style conventions, plus presence-only — whether
+# "presence is the control" is a judgement about the argument's rationale, which
+# a human (or the AI reviewer) makes, not something a linter can decide. It is
+# surfaced to the reviewer rather than failing a build.
+WARN_RULES = {"legacy-assign", "package-case", "presence-only"}
 
 # --------------------------------------------------------------------------- #
 # Rule constants
@@ -158,8 +168,26 @@ class PolicyLintError(RuntimeError):
     """
 
 
+class OpaUnavailableError(PolicyLintError):
+    """The ``opa`` binary is missing — nothing in the tree can be evaluated.
+
+    A ``PolicyLintError`` so callers that already handle "policy_lint could not
+    run" (``run_precommit_linter.py``) catch it, but deliberately *not* caught by
+    the per-file guards: a missing toolchain is one environment error, not one
+    ``lint-error`` finding per policy file.
+    """
+
+
 class TargetError(ValueError):
     """A CLI target names a platform/service/resource that does not exist."""
+
+    #: Prefix printed before the target when the marker is set, so a caller can
+    #: distinguish "nothing to lint yet" from "you typed the name wrong".
+    marker = None
+
+    def __init__(self, message, marker=None):
+        super().__init__(message)
+        self.marker = marker
 
 
 @dataclass(frozen=True)
@@ -209,8 +237,9 @@ def _run_opa(query, *data_dirs):
     cmd.append(query)
     try:
         proc = subprocess.run(cmd, capture_output=True, text=True)
-    except FileNotFoundError as exc:                     # pragma: no cover - env
-        raise PolicyLintError("`opa` is not on PATH — install it to run policy_lint.") from exc
+    except FileNotFoundError as exc:
+        raise OpaUnavailableError(
+            "`opa` is not on PATH — install it to run policy_lint.") from exc
     if proc.returncode != 0:
         raise PolicyLintError(f"opa eval {query!r} failed: {_opa_reason(proc)}")
     result = json.loads(proc.stdout or "{}").get("result") or []
@@ -229,6 +258,8 @@ def _eval_dir(directory, helpers_dir):
     if key not in _eval_cache:
         try:
             _eval_cache[key] = _run_opa("data.terraform", helpers_dir, directory) or {}
+        except OpaUnavailableError:
+            raise                                         # environment, not content
         except PolicyLintError:
             _eval_cache[key] = None                       # force the per-file path
     return _eval_cache[key]
@@ -409,6 +440,8 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
 
     try:
         conditions = load_conditions(rego_path, policies_root)
+    except OpaUnavailableError:
+        raise
     except PolicyLintError as exc:
         # A kit that cannot be evaluated is itself a finding. The style rules
         # above already ran, and the fixture rules below still can, so one bad
@@ -485,6 +518,22 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
 # --------------------------------------------------------------------------- #
 # Rules over the fixture pair
 # --------------------------------------------------------------------------- #
+def _plan_resources(plan):
+    """``planned_values.root_module.resources`` — or None if this is not a plan."""
+    if not isinstance(plan, dict):
+        return None
+    planned = plan.get("planned_values")
+    if not isinstance(planned, dict):
+        return None
+    root_module = planned.get("root_module")
+    if not isinstance(root_module, dict):
+        return None
+    resources = root_module.get("resources")
+    if resources is None:
+        return []
+    return resources if isinstance(resources, list) else None
+
+
 def _is_fixture_label(value):
     """True when a planned value is just the fixture's own label."""
     return isinstance(value, str) and bool(FIXTURE_LABEL_RE.match(value))
@@ -509,16 +558,35 @@ def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=No
         return [Finding(service, resource_type, stem, "fixture-missing-plan",
                         f"plan cache {cache.name} is unreadable: {exc}")]
 
-    resources = (plan.get("planned_values", {}).get("root_module", {}).get("resources") or [])
+    # A cache written by an older/other tool (or a truncated file) must be a
+    # finding, not an AttributeError halfway down this function.
+    resources = _plan_resources(plan)
+    if resources is None:
+        return [Finding(service, resource_type, stem, "lint-error",
+                        f"plan cache {cache.name} is not a Terraform plan "
+                        "(no planned_values.root_module.resources list)")]
+
     compliant, non_compliant = {}, {}
     for resource in resources:
-        if resource.get("type") != resource_type:
+        if not isinstance(resource, dict) or resource.get("type") != resource_type:
             continue
-        match = FIXTURE_LABEL_RE.match(resource.get("name", ""))
+        match = FIXTURE_LABEL_RE.match(resource.get("name") or "")
         if not match:
             continue
         bucket = compliant if match.group(1) == "compliant" else non_compliant
-        bucket[match.group(2)] = resource.get("values") or {}
+        values = resource.get("values")
+        bucket[match.group(2)] = values if isinstance(values, dict) else {}
+
+    # Every example must be half of a pair; a lone one is never compared, so
+    # without this it would silently escape every fixture rule.
+    unpaired = ([f"compliant_example_{i}" for i in sorted(set(compliant) - set(non_compliant))]
+                + [f"non_compliant_example_{i}"
+                   for i in sorted(set(non_compliant) - set(compliant))])
+    findings = []
+    if unpaired:
+        findings.append(Finding(
+            service, resource_type, stem, "fixture-unpaired",
+            "no counterpart with the same number for: " + ", ".join(unpaired)))
 
     # Only the argument's *top-level* key is expected to differ; a nested
     # argument (a.b.c) is compared at its block key, since the plan nests it.
@@ -543,16 +611,28 @@ def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=No
             drifted.add(key)
 
     if drifted:
-        return [Finding(service, resource_type, stem, "fixture-drift",
-                        "compliant.tf and nonCompliant.tf also differ on: "
-                        + ", ".join(sorted(drifted)))]
-    return []
+        findings.append(Finding(
+            service, resource_type, stem, "fixture-drift",
+            "compliant.tf and nonCompliant.tf also differ on: " + ", ".join(sorted(drifted))))
+    return findings
 
 
 # --------------------------------------------------------------------------- #
 # Rules over _vars.rego
 # --------------------------------------------------------------------------- #
 _friendly_index_cache: dict[tuple, dict] = {}
+
+# Text fallback for the friendly-name index only. It is deliberately not used for
+# anything else: every rule that decides a finding reads *evaluated* Rego, never
+# scraped text.
+FRIENDLY_NAME_RE = re.compile(
+    r'"friendly_resource_name"\s*:\s*"((?:[^"\\]|\\.)*)"')
+
+
+def _friendly_name_from_text(vars_path):
+    """The declared friendly_resource_name scraped from a _vars.rego, or None."""
+    match = FRIENDLY_NAME_RE.search(Path(vars_path).read_text(encoding="utf-8"))
+    return match.group(1) if match else None
 
 
 def _friendly_name_index(policies_root, platform):
@@ -575,21 +655,28 @@ def _friendly_name_index(policies_root, platform):
     helpers_dir = _resolve_helpers(policies_root)
     try:
         tree = _run_opa("data.terraform", helpers_dir, platform_root) or {}
+    except OpaUnavailableError:
+        raise
     except PolicyLintError:
-        tree = None      # one bad file in the tree — fall back to per-file reads
+        # ONE unparseable file anywhere under the platform fails the batch. Asking
+        # per file instead meant ~370 subprocesses (0.8s -> 9.3s) just because of an
+        # unrelated typo, so read the names out of the text instead: a friendly name
+        # is a literal in the file, and this index only needs that one field.
+        tree = None
 
     index = {}
     for vars_path in vars_paths:
         try:
-            package = _package_of(vars_path)
             variables = None
             if tree is not None:
-                variables = _walk(tree, package.split(".")[1:] + ["variables"])
-            if not isinstance(variables, dict):
-                variables = load_variables(vars_path, policies_root)
-        except (PolicyLintError, OSError):
+                variables = _walk(tree, _package_of(vars_path).split(".")[1:]
+                                  + ["variables"])
+            friendly = (variables.get("friendly_resource_name")
+                        if isinstance(variables, dict) else None)
+            if friendly is None:
+                friendly = _friendly_name_from_text(vars_path)
+        except (PolicyLintError, OSError, UnicodeDecodeError):
             continue
-        friendly = variables.get("friendly_resource_name")
         friendly = friendly.strip().lower() if isinstance(friendly, str) else ""
         if friendly:
             index.setdefault(friendly, []).append(
@@ -660,6 +747,8 @@ def lint_resource(root, platform, service_folder, resource_type):
                                         vars_path, policies_root)
             identity_key = load_variables(
                 vars_path, policies_root).get("resource_value_name")
+        except OpaUnavailableError:
+            raise
         except (PolicyLintError, OSError, UnicodeDecodeError) as exc:
             findings.append(Finding(service_folder, resource_type, "_vars",
                                     "lint-error", str(exc)))
@@ -670,6 +759,8 @@ def lint_resource(root, platform, service_folder, resource_type):
         try:
             findings += _lint_policy_file(root, platform, service_folder, resource_type,
                                           rego_path, policies_root, identity_key)
+        except OpaUnavailableError:
+            raise
         except (PolicyLintError, OSError, UnicodeDecodeError) as exc:
             findings.append(Finding(service_folder, resource_type, rego_path.stem,
                                     "lint-error", str(exc)))
@@ -709,9 +800,13 @@ def _expand_target(root, target):
         resources = [d.name for d in sorted(service_dir.iterdir()) if d.is_dir()]
         if len(parts) == 3:
             if parts[2] not in resources:
+                # The service folder exists, so the name is plausible — this is
+                # usually a resource whose policies have not been written yet, not
+                # a typo. Marked so the portal can treat it as "nothing to lint".
                 raise TargetError(
-                    f"no resource type '{parts[2]}' in '{platform}/{service}' "
-                    f"({len(resources)} available)")
+                    f"no policies directory {platform}/{service}/{parts[2]}/ "
+                    f"({len(resources)} resource type(s) in that service)",
+                    marker="no-policies-dir")
             resources = [parts[2]]
         out += [(platform, service, resource) for resource in resources]
     return out
@@ -729,7 +824,11 @@ def main(argv=None):
         formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("targets", nargs="*", metavar="TARGET",
                         help="'<platform>', '<platform>/<Service folder>' or "
-                             "'<platform>/<Service folder>/<resource_type>'")
+                             "'<platform>/<Service folder>/<resource_type>'. "
+                             "Exit 2 means the target does not exist; when the "
+                             "resource type simply has no policies/ directory yet "
+                             "the stderr line reads "
+                             "'[ERROR] no-policies-dir: <target> (...)'.")
     parser.add_argument("--root", default=str(REPO_ROOT),
                         help="repo root holding docs/, policies/ and inputs/ "
                              "(default: this checkout)")
@@ -752,8 +851,13 @@ def main(argv=None):
             for platform, service, resource_type in _expand_target(root, target):
                 findings += lint_resource(root, platform, service, resource_type)
         except TargetError as exc:
-            print(f"[ERROR] {target}: {exc}", file=sys.stderr)
+            marker = f"{exc.marker}: " if exc.marker else ""
+            print(f"[ERROR] {marker}{target}: {exc}", file=sys.stderr)
             usage_error = True
+        except OpaUnavailableError as exc:
+            # One environment error for the whole run, not one per policy file.
+            print(f"[ERROR] policy_lint could not run: {exc}", file=sys.stderr)
+            return 2
 
     findings.sort(key=lambda f: (f.service, f.resource, f.policy, f.rule, f.message))
 
