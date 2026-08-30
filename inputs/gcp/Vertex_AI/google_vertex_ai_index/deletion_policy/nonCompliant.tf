@@ -1,11 +1,17 @@
-# Describe your resource type here.
-# Label the resource(s) under test non_compliant_example_1, non_compliant_example_2, ...
-# (sequential, in order; always suffixed with _1 even when there is only one).
-#
-# Only the tested resource type may appear in this file — no dependency resources.
-# We run `terraform plan` only, so point at fake addresses/values instead of
-# creating real dependencies.
+resource "google_vertex_ai_index" "non_compliant_example_1" {
+  display_name    = "non-compliant-index-1"
+  region          = "us-central1"
+  deletion_policy = "DELETE"
+}
 
-resource "RESOURCE_TYPE" "non_compliant_example_1" {
+resource "google_vertex_ai_index" "non_compliant_example_2" {
+  display_name    = "non-compliant-index-2"
+  region          = "us-central1"
+  deletion_policy = "ABANDON"
+}
 
+resource "google_vertex_ai_index" "non_compliant_example_3" {
+  display_name = "non-compliant-index-3"
+  region       = "us-central1"
+  # deletion_policy is omitted (defaults to DELETE)
 }
