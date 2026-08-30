@@ -101,16 +101,19 @@ RULES = {
         "`situation_description` under 20 characters or `remedies` empty."),
     "legacy-assign": "Use `:=` for message/details/summary (warn).",
     "package-case": "Package service segment is not lowercase snake_case (warn).",
+    "repeated-helper-call": (
+        "The same helper is called twice with the same arguments. Call it once, "
+        "bind the result to a variable, then read the fields off that (warn)."),
     "lint-error": (
         "The linter could not evaluate this policy (parse/opa failure) — run "
         "`opa check` on the file."),
 }
 
-# Advisory rules: the two style conventions, plus presence-only — whether
+# Advisory rules: the three style conventions, plus presence-only — whether
 # "presence is the control" is a judgement about the argument's rationale, which
 # a human (or the AI reviewer) makes, not something a linter can decide. It is
 # surfaced to the reviewer rather than failing a build.
-WARN_RULES = {"legacy-assign", "package-case", "presence-only"}
+WARN_RULES = {"legacy-assign", "package-case", "presence-only", "repeated-helper-call"}
 
 # --------------------------------------------------------------------------- #
 # Rule constants
@@ -142,6 +145,32 @@ MIN_SITUATION_DESCRIPTION = 20
 LEGACY_ASSIGN_RE = re.compile(r"^\s*(message|details|summary)\s*=\s")
 PACKAGE_RE = re.compile(r"^\s*package\s+([A-Za-z_][\w.]*)", re.MULTILINE)
 SNAKE_CASE_RE = re.compile(r"^[a-z][a-z0-9_]*$")
+
+# --- repeated-helper-call --------------------------------------------------- #
+# A qualified call, `<package>.<function>(`: the only call shape a policy uses
+# (`helpers.get_multi_summary`, the `shared.*` helpers, OPA built-ins like
+# `object.get`). Bare built-ins such as `count(x)` are never worth hoisting and
+# are deliberately not matched.
+QUALIFIED_CALL_RE = re.compile(r"\b([a-z_][A-Za-z0-9_]*)\.([a-z_][A-Za-z0-9_]*)\s*\(")
+# A top-level rule head. Column 0 is *not* the test: a good number of policies
+# indent their `message :=` line by a space or two, so the head is confirmed by
+# being at brace depth 0 instead (see _top_level_rules).
+RULE_HEAD_RE = re.compile(
+    r"^[ \t]*([a-z_][A-Za-z0-9_]*)\s*(?:\(|\[|:=|=|if\b|contains\b|\{)", re.MULTILINE)
+IMPORT_RE = re.compile(
+    r"^\s*import\s+([A-Za-z0-9_.]+)(?:\s+as\s+([A-Za-z_][A-Za-z0-9_]*))?\s*$",
+    re.MULTILINE)
+IDENTIFIER_RE = re.compile(r"\b[A-Za-z_][A-Za-z0-9_]*\b")
+REGO_STRING_RE = re.compile(r'"(?:[^"\\]|\\.)*"')
+# Roots that are global everywhere, so an argument built only from them means the
+# same thing in every rule of the file. Deliberately minimal: an unrecognised
+# root is treated as a local, which makes the rule *quieter*, never noisier.
+REGO_GLOBAL_ROOTS = frozenset({"input", "data", "true", "false", "null"})
+# `.message` / `.details` immediately after a call's closing parenthesis: the
+# field the call site actually wanted, which the remedy text echoes back.
+FIELD_ACCESS_RE = re.compile(r"\s*\.([a-z_][A-Za-z0-9_]*)")
+# How much of a call to echo back before eliding it.
+MAX_CALL_ECHO = 60
 
 # Fixture resource labels, per the auto_test convention.
 FIXTURE_LABEL_RE = re.compile(r"^(compliant|non_compliant)_example_(\d+)$")
@@ -413,6 +442,173 @@ def _is_location_argument(stem, attribute_path):
 
 
 # --------------------------------------------------------------------------- #
+# repeated-helper-call helpers
+# --------------------------------------------------------------------------- #
+def _strip_rego_comments(text):
+    """``text`` with ``#`` comments blanked out, line numbering preserved.
+
+    A ``#`` inside a string is not a comment — ``"projects/*#1"`` is a value, and
+    cutting at it would truncate the call the rule is trying to read.
+    """
+    out = []
+    for line in text.splitlines():
+        in_string = escaped = False
+        cut = None
+        for index, char in enumerate(line):
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == '"':
+                in_string = not in_string
+            elif char == "#" and not in_string:
+                cut = index
+                break
+        out.append(line if cut is None else line[:cut])
+    return "\n".join(out)
+
+
+def _qualified_calls(text):
+    """Yield ``(callee, argument_text, start, end, line_no)`` per ``pkg.func(...)``.
+
+    The closing parenthesis is found by balancing, not by regex, so a call whose
+    arguments themselves contain parentheses or brackets is read whole.
+    """
+    for match in QUALIFIED_CALL_RE.finditer(text):
+        depth = 0
+        index = match.end() - 1
+        in_string = escaped = False
+        while index < len(text):
+            char = text[index]
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == '"':
+                in_string = not in_string
+            elif not in_string:
+                if char == "(":
+                    depth += 1
+                elif char == ")":
+                    depth -= 1
+                    if depth == 0:
+                        break
+            index += 1
+        if depth != 0:            # unbalanced — a parse error, not this rule's job
+            continue
+        callee = f"{match.group(1)}.{match.group(2)}"
+        line_no = text.count("\n", 0, match.start()) + 1
+        yield callee, text[match.end():index], match.start(), index + 1, line_no
+
+
+def _top_level_rules(text):
+    """``[(start, end, name)]`` for each top-level rule, split at brace depth 0."""
+    heads = []
+    depth = 0
+    in_string = escaped = False
+    consumed = 0
+    for match in RULE_HEAD_RE.finditer(text):
+        for char in text[consumed:match.start()]:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == '"':
+                in_string = not in_string
+            elif not in_string:
+                if char in "{[(":
+                    depth += 1
+                elif char in "}])":
+                    depth -= 1
+        consumed = match.start()
+        if depth == 0 and not in_string:
+            heads.append((match.start(), match.group(1)))
+    return [(start, heads[i + 1][0] if i + 1 < len(heads) else len(text), name)
+            for i, (start, name) in enumerate(heads)]
+
+
+def _scope_of(position, spans):
+    """Index of the top-level rule containing ``position`` (-1 above them all)."""
+    for index, (start, end, _name) in enumerate(spans):
+        if start <= position < end:
+            return index
+    return -1
+
+
+def _argument_roots(argument_text):
+    """The root identifiers an argument expression depends on.
+
+    ``vars.variables`` has the single root ``vars``; ``resource`` has the root
+    ``resource``. String contents are blanked first so a word inside a value is
+    never mistaken for a variable.
+    """
+    cleaned = REGO_STRING_RE.sub('""', argument_text)
+    return {match.group()
+            for match in IDENTIFIER_RE.finditer(cleaned)
+            if match.start() == 0 or cleaned[match.start() - 1] != "."}
+
+
+def _echo_call(callee, argument_text):
+    """``callee(args)`` on one line, elided if long, for a finding message."""
+    collapsed = " ".join(argument_text.split())
+    if len(collapsed) > MAX_CALL_ECHO:
+        collapsed = collapsed[:MAX_CALL_ECHO].rstrip() + "..."
+    return f"{callee}({collapsed})"
+
+
+def _repeated_helper_calls(text):
+    """Identical helper calls that could be computed once and reused.
+
+    Yields ``(callee, argument_text, [line, ...], [field, ...])``. The fields are
+    the ``.message`` / ``.details`` read off each call site, and are empty when
+    any site is not a field read.
+
+    "Identical" means the same helper and the same argument text (whitespace
+    insensitive). Two calls with *different* arguments compute different things
+    and are never reported.
+
+    Scope is the second half of the test, and it is what keeps the rule honest.
+    Two calls are only interchangeable when their arguments mean the same thing
+    in both places, which holds when either:
+
+    * both sit in the same top-level rule, so they share its locals; or
+    * every argument is built from package-level names (another rule in the file,
+      an import such as ``vars``, ``input``/``data``), so it reads the same
+      anywhere in the file. This is the case the policy kits hit — ``message``
+      and ``details`` are *sibling* rules, and the fix binds a third one.
+
+    A call whose arguments name a rule-local variable (a function parameter, a
+    comprehension variable) is only reported against the same rule: two helper
+    rules that each do ``shared.get_attribute_value(resource, attribute_path)``
+    over their own ``resource`` are unrelated, and hoisting them is not possible.
+    """
+    spans = _top_level_rules(text)
+    file_globals = ({name for _s, _e, name in spans}
+                    | {(match.group(2) or match.group(1).rsplit(".", 1)[-1])
+                       for match in IMPORT_RE.finditer(text)}
+                    | REGO_GLOBAL_ROOTS)
+
+    groups = {}
+    for callee, argument_text, start, end, line_no in _qualified_calls(text):
+        key = (callee, "".join(argument_text.split()))
+        field = FIELD_ACCESS_RE.match(text, end)
+        groups.setdefault(key, []).append(
+            (start, line_no, argument_text, field.group(1) if field else None))
+
+    for (callee, _key), occurrences in groups.items():
+        if len(occurrences) < 2:
+            continue
+        scopes = {_scope_of(start, spans) for start, _l, _a, _f in occurrences}
+        argument_text = occurrences[0][2]
+        if len(scopes) > 1 and not _argument_roots(argument_text) <= file_globals:
+            continue
+        fields = [field for _s, _l, _a, field in occurrences]
+        yield (callee, argument_text,
+               [line for _s, line, _a, _f in occurrences],
+               fields if all(fields) else [])
+
+
+# --------------------------------------------------------------------------- #
 # Rules over one policy file
 # --------------------------------------------------------------------------- #
 def _lint_policy_file(root, platform, service, resource_type, rego_path, policies_root,
@@ -437,6 +633,25 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
                      for line in text.splitlines() if LEGACY_ASSIGN_RE.match(line)})
     if legacy:
         add("legacy-assign", f"{', '.join(legacy)} assigned with '=' instead of ':='")
+
+    # --- repeated-helper-call (warn) --------------------------------------- #
+    # The kit convention is one binding per file: `result := helpers.get_multi_
+    # summary(conditions, vars.variables)`, with `message` and `details` read off
+    # `result`. Writing the call out again per field re-evaluates it per field.
+    for callee, argument_text, lines, fields in _repeated_helper_calls(
+            _strip_rego_comments(text)):
+        call = _echo_call(callee, argument_text)
+        where = f"lines {', '.join(str(line) for line in lines)}"
+        if fields:
+            reads = ", ".join(f"`{field} := result.{field}`"
+                              for field in dict.fromkeys(fields))
+            fix = (f"assign it once — `result := {call}` — then read the fields "
+                   f"off `result`: {reads}")
+        else:
+            fix = (f"assign it once — `result := {call}` — and use `result` "
+                   "at each of those sites")
+        add("repeated-helper-call",
+            f"{call} is evaluated {len(lines)} times ({where}); {fix}")
 
     try:
         conditions = load_conditions(rego_path, policies_root)

@@ -294,6 +294,42 @@ but never blocks on.
     package terraform.gcp.security.BigQuery.google_bigquery_dataset.location   # flagged (warn)
     package terraform.gcp.security.big_query.google_bigquery_dataset.location  # preferred
 
+## repeated-helper-call
+
+The same helper is called twice with the same arguments, so the same work is done twice. The
+usual shape is `message` and `details` each writing the `helpers.get_multi_summary(...)` call out
+again — OPA then evaluates the whole `conditions` list once per field. Call it once, give the
+result a name, and read the fields off that name. A warning only; it never fails a build.
+
+Bad:
+
+    message := helpers.get_multi_summary(conditions, vars.variables).message
+    details := helpers.get_multi_summary(conditions, vars.variables).details
+
+Good:
+
+    result := helpers.get_multi_summary(conditions, vars.variables)
+
+    message := result.message
+    details := result.details
+
+`result` is the name most of the tree already uses, so prefer it unless the file has a reason not
+to. The rule is not specific to `get_multi_summary` — any helper called twice with identical
+arguments is reported, including inside a single rule body.
+
+Two calls with **different** arguments are never flagged: they compute different things, and
+there is nothing to share.
+
+    result := helpers.get_multi_summary(conditions, vars.variables)         # not flagged —
+    other  := helpers.get_multi_summary(other_conditions, vars.variables)   # different arguments
+
+Neither are two identical calls that sit in different rules over each rule's own local variables
+(a function parameter, a comprehension variable). The text matches, but the values do not, so
+there is nothing to hoist:
+
+    _first_value(resource, attribute_path) := shared.get_attribute_value(resource, attribute_path)
+    _second_value(resource, attribute_path) := shared.get_attribute_value(resource, attribute_path)
+
 ## lint-error
 
 The linter could not evaluate this policy at all — the file failed to parse, or it declares no
