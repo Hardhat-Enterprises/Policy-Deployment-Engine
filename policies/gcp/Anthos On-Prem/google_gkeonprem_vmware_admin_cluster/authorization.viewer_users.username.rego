@@ -16,6 +16,8 @@ import data.terraform.gcp.security.anthos_on_prem.google_gkeonprem_vmware_admin_
     ]
 ]
 
- message := helpers.get_multi_summary(conditions, vars.variables).message
+ result := helpers.get_multi_summary(conditions, vars.variables)
 
- details := helpers.get_multi_summary(conditions, vars.variables).details
+ message := result.message
+
+ details := result.details
