@@ -213,13 +213,17 @@ def test_repeated_helper_call_generalises_beyond_get_multi_summary(tmp_path):
     assert "use `result` at each of those sites" in same[0].message
 
 
-def test_repeated_helper_call_is_advisory(tmp_path):
-    """Style, not correctness: it must never fail a student's build on its own."""
+def test_repeated_helper_call_fails_the_build(tmp_path):
+    """It reads like a style rule, and the dev backlog (498 files) argues for advisory --
+    but that backlog is historical: only 46 of 1,855 branch-authored policy files repeat
+    the call. CI lints changed files only, and branch-scope stops anyone editing a file
+    outside their own resource type, so the backlog cannot reach someone who did not
+    write it. Failing is what retires the pattern."""
     root = build_tree(tmp_path, "repeated_helper")
     findings = policy_lint.lint_resource(root, *REPEATED_HELPER)
     reported = [f for f in findings if f.rule == "repeated-helper-call"]
-    assert reported and all(f.severity == "warn" for f in reported)
-    assert "repeated-helper-call" in policy_lint.WARN_RULES
+    assert reported and all(f.severity == "error" for f in reported)
+    assert "repeated-helper-call" not in policy_lint.WARN_RULES
 
 
 def test_repeated_helper_call_reads_past_strings_and_comments():

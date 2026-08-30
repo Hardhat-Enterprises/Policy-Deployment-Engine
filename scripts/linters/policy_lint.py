@@ -109,11 +109,20 @@ RULES = {
         "`opa check` on the file."),
 }
 
-# Advisory rules: the three style conventions, plus presence-only — whether
+# Advisory rules: the two style conventions, plus presence-only — whether
 # "presence is the control" is a judgement about the argument's rationale, which
 # a human (or the AI reviewer) makes, not something a linter can decide. It is
 # surfaced to the reviewer rather than failing a build.
-WARN_RULES = {"legacy-assign", "package-case", "presence-only", "repeated-helper-call"}
+#
+# repeated-helper-call is deliberately NOT here. It reads like a style rule and
+# 498 files on dev carry it, which argues for advisory — but the backlog is
+# almost entirely historical: measured across every live Service/ branch, only
+# 46 of 1,855 branch-authored policy files repeat the call, across 10 branches.
+# CI fails on changed files only, and the branch-scope check stops a contributor
+# touching any file outside their own resource type, so the dev backlog cannot
+# reach someone who did not write it. Failing is what actually retires the
+# pattern; warning is what lets it persist.
+WARN_RULES = {"legacy-assign", "package-case", "presence-only"}
 
 # --------------------------------------------------------------------------- #
 # Rule constants

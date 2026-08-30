@@ -299,7 +299,8 @@ but never blocks on.
 The same helper is called twice with the same arguments, so the same work is done twice. The
 usual shape is `message` and `details` each writing the `helpers.get_multi_summary(...)` call out
 again — OPA then evaluates the whole `conditions` list once per field. Call it once, give the
-result a name, and read the fields off that name. A warning only; it never fails a build.
+result a name, and read the fields off that name. This one **fails the build** on a file your
+pull request changes.
 
 Bad:
 
