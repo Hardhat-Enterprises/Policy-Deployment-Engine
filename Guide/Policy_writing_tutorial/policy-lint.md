@@ -344,6 +344,6 @@ changed, exactly like the structural linter on the previous page.
 
 [⬅️ Previous: Testing your policies](testing-policies.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
 [📘 Back to Contents](policy-writing-tutorial.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
-[Next: Raising a pull request ➡️](raising-pull-request.md#top)
+[Next: branch_scope — stay inside your own resource ➡️](branch-scope.md#top)
 
 </div>
