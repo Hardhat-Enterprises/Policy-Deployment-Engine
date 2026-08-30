@@ -9,6 +9,13 @@ over the whole tree (with --content-checks) and fail only on error lines whose
 path intersects the changed set. Pre-existing errors elsewhere are reported as a
 count but never block.
 
+The same "own it, don't block on the backlog" treatment applies to
+``policy_lint`` (scripts/linters/policy_lint.py): every resource type touched
+under policies/ or inputs/ is content-linted, but an individual finding only
+fails the run when the .rego file (or, for a fixture finding, the argument
+directory) it names was itself changed — a sibling argument's pre-existing
+finding never blocks you. See Guide/Policy_writing_tutorial/policy-lint.md.
+
 Modes (run from the repo root):
   (no args)         pre-commit: changed set = staged + unstaged worktree edits
   --base <ref>      CI/PR:      changed set = everything this branch changed vs
@@ -18,10 +25,21 @@ Modes (run from the repo root):
 import os
 import subprocess
 import sys
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO_ROOT))
+
+from scripts.linters import policy_lint  # noqa: E402
 
 LINTER = [sys.executable, os.path.join("scripts", "linters", "linter.py"),
           "--tree", "all", "--platform", "gcp", "--content-checks"]
 RELEVANT_PREFIXES = ("docs/", "inputs/", "policies/")
+
+# Findings about the fixture pair itself (compliant.tf/nonCompliant.tf), as
+# opposed to a policy .rego file — displayed and owned via the argument
+# directory under inputs/, not a single policy file.
+FIXTURE_RULES = {"fixture-drift", "fixture-missing-plan"}
 
 
 def _git(*args):
@@ -67,6 +85,61 @@ def _owned(changed):
         if f.startswith("inputs/") and "/" in f:
             owned.add(f.rsplit("/", 1)[0])   # the argument directory
     return owned
+
+
+def _owned_triples(changed):
+    """(platform, service, resource_type) triples policy_lint should check.
+
+    Any changed file at least 4 segments deep under ``policies/`` or
+    ``inputs/`` puts its resource type in scope for ``policy_lint`` — the
+    individual *findings* are then scoped back down to the argument or
+    fixture pair actually touched by ``_finding_owned``, so touching one
+    argument does not put a sibling argument's pre-existing findings on you.
+    """
+    triples = set()
+    for f in changed:
+        parts = f.split("/")
+        if len(parts) >= 4 and parts[0] in ("policies", "inputs"):
+            triples.add((parts[1], parts[2], parts[3]))
+    return triples
+
+
+def _finding_path(platform, service, resource_type, finding):
+    """The policy file (or, for a fixture finding, the argument directory)
+    a ``policy_lint`` finding is about."""
+    base = f"{platform}/{service}/{resource_type}"
+    if finding.rule in FIXTURE_RULES:
+        return f"inputs/{base}/{finding.policy}"
+    name = "_vars.rego" if finding.policy == "_vars" else f"{finding.policy}.rego"
+    return f"policies/{base}/{name}"
+
+
+def _finding_owned(path, changed):
+    """True if ``path`` (a file, or a fixture argument directory) is among
+    ``changed`` — either changed directly, or (for a directory) it has a
+    changed file beneath it."""
+    return path in changed or any(c == path or c.startswith(path + "/") for c in changed)
+
+
+def _policy_lint_findings(triples, changed, root=REPO_ROOT):
+    """Error-severity ``policy_lint`` findings for ``triples``, split into
+    ``(owned, backlog_count)``.
+
+    ``owned`` is a list of ``(path, Finding)`` pairs whose file was itself
+    changed; everything else (a sibling argument's pre-existing error, or a
+    warning) is counted in ``backlog_count`` but never attributed.
+    """
+    owned, backlog = [], 0
+    for platform, service, resource_type in sorted(triples):
+        for finding in policy_lint.lint_resource(root, platform, service, resource_type):
+            if finding.severity != "error":
+                continue
+            path = _finding_path(platform, service, resource_type, finding)
+            if _finding_owned(path, changed):
+                owned.append((path, finding))
+            else:
+                backlog += 1
+    return owned, backlog
 
 
 def _error_path(line):
@@ -123,7 +196,33 @@ def main(argv=None):
             print(f"\n({backlog} pre-existing error(s) elsewhere are not attributed to you.)")
         return 1
 
+    # policy_lint: content-quality rules (hard-coded values, trivial messages,
+    # fixture drift, ...) over the resource types this change touches. Only
+    # runs in changed-files modes — `--all` stays a linter.py-only, structural
+    # + reconciliation gate.
+    policy_lint_owned, policy_lint_backlog = [], 0
+    if changed is not None:
+        triples = _owned_triples(changed)
+        if triples:
+            try:
+                policy_lint_owned, policy_lint_backlog = _policy_lint_findings(triples, changed)
+            except policy_lint.PolicyLintError as exc:
+                print(f"\n[FAIL] policy_lint could not run: {exc}")
+                return 1
+
+    if policy_lint_owned:
+        print("\n[FAIL] policy_lint error(s) you must fix:\n")
+        for path, finding in policy_lint_owned:
+            print(f"  {finding.rule}: {path} — {finding.message}")
+        if policy_lint_backlog:
+            print(f"\n({policy_lint_backlog} pre-existing policy_lint error(s) elsewhere "
+                  "are not attributed to you.)")
+        return 1
+
     suffix = f" ({backlog} pre-existing backlog error(s) elsewhere ignored)" if backlog else ""
+    if policy_lint_backlog:
+        suffix += (f"; {policy_lint_backlog} pre-existing policy_lint backlog error(s) "
+                   "elsewhere ignored")
     print(f"\n[OK] no lint errors in scope{suffix}.")
     return 0
 

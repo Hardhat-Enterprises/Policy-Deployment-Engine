@@ -56,6 +56,17 @@ jobs:
       - name: Structural lint (whole tree)
         run: python3 scripts/linters/linter.py --tree all --platform gcp --no-content-checks
 
+      # run_precommit_linter.py also runs policy_lint.py (content-quality rules,
+      # e.g. hard-coded values, fixture drift) over the resource types this PR
+      # touches, which needs `opa eval` on PATH.
+      - name: Install OPA
+        env:
+          OPA_VERSION: ${{ env.OPA_VERSION }}
+        run: |
+          curl -L -o opa "https://openpolicyagent.org/downloads/${OPA_VERSION}/opa_linux_amd64_static"
+          chmod +x opa
+          sudo mv opa /usr/local/bin/opa
+
       # PR gate: structural + content checks (content is on by default), but only
       # fail on files this PR changed vs its base branch — never the repo-wide tree.
       - name: Lint changed files (structural + content)
