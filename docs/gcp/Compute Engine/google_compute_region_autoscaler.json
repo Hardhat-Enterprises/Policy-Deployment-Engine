@@ -27,8 +27,8 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "If project is left unset, the resource defaults to the provider's project context, which risks the autoscaler being deployed into the wrong project (for e.g. a shared or less-restricted enviroment) without explicit confirmation. Policy should require project to be explicitly set to avoid accidental cross-project deployment."
+      "security_impact": false,
+      "rationale": "project is an identifier/reference field specifying deployment context rather than a direct access, exposure, or data control, so no security impact is assigned per project classification guidance."
     },
     "region": {
       "description": "URL of the region where the instance group resides.",
@@ -41,8 +41,8 @@
       "description": "URL of the managed instance group that this autoscaler will scale.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "If target points to an unintended or incorrectly-scoped managed instance group, the autoscaler could apply scaling actions to the wrong workload, causing unintended capacity changes to an unrelated service, an integrity/availability risk under the CIA triad. Policy should verify target references a valid, intended instance group."
+      "security_impact": false,
+      "rationale": "target is a reference/pointer to another resource (the managed instance group), security is enforced on the referenced resource itself, not the pointer, so no security impact is assigned."
     },
     "autoscaling_policy": {
       "type": "block",
@@ -53,15 +53,15 @@
       "description": "The number of seconds that the autoscaler should wait before it\nstarts collecting information from a new instance. This prevents\nthe autoscaler from collecting information when the instance is\ninitializing, during which the collected usage would not be\nreliable. The default time autoscaler waits is 60 seconds.\n\nVirtual machine initialization times might vary because of\nnumerous factors. We recommend that you test how long an\ninstance may take to initialize. To do this, create an instance\nand time the startup process.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "If cooldown_period is set too short, the autoscaler collects metrics from instances still initializing, causing it to make scaling decisions based on unreliable data. Policy should require a sensible minimum cooldown_period matching realistic instance startup time."
+      "security_impact": false,
+      "rationale": "cooldown_period is an operational tuning parameter governing scaling responsiveness, not a security or access control, so no security impact is assigned."
     },
     "autoscaling_policy.max_replicas": {
       "description": "The maximum number of instances that the autoscaler can scale up\nto. This is required when creating or updating an autoscaler. The\nmaximum number of replicas should not be lower than minimal number\nof replicas.",
       "required": true,
       "type": "number",
-      "security_impact": true,
-      "rationale": "If max_replicas is not set to a sensible limit, the autoscaler can keep adding servers indefinitely during a traffic spike, leading to a massive, unexpected cloud bill - an attack known as Denial of Wallet. Policy should require max_replicas to be set to a reasonable, capped value."
+      "security_impact": false,
+      "rationale": "max_replicas is an operational/budgetary capacity cap that depends on workload requirements rather than a platform security policy, so no security impact is assigned."
     },
     "autoscaling_policy.min_replicas": {
       "description": "The minimum number of replicas that the autoscaler can scale down\nto. This cannot be less than 0. If not provided, autoscaler will\nchoose a default value depending on maximum number of instances\nallowed.",
@@ -81,8 +81,8 @@
       "description": "The number of seconds that the autoscaler waits for load stabilization\nbefore making scale-in decisions.\n\nThis might appear as a delay in scaling in but it is an important mechanism\nfor your application to not have fluctuating size due to short term load\nfluctuations.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "If stabilization_period is set too low, the autoscaler can scale in prematurely based on short-term dips in load, then be unable to respond fast enough to a subsequent spike, risking an availability failure under the CIA triad. Policy should require a sensible minimum stabilization_period."
+      "security_impact": false,
+      "rationale": "stabilization_period is operational performance management governing scale-in timing, not a security or availability control, so no security impact is assigned."
     },
     "autoscaling_policy.cpu_utilization": {
       "type": "block",
@@ -100,8 +100,8 @@
       "description": "The target CPU utilization that the autoscaler should maintain.\nMust be a float value in the range (0, 1]. If not specified, the\ndefault is 0.6.\n\nIf the CPU level is below the target utilization, the autoscaler\nscales down the number of instances until it reaches the minimum\nnumber of instances you specified or until the average CPU of\nyour instances reaches the target utilization.\n\nIf the average CPU is above the target utilization, the autoscaler\nscales up until it reaches the maximum number of instances you\nspecified or until the average utilization reaches the target\nutilization.",
       "required": true,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Setting cpu_utilization.target too close to 1.0 leaves little headroom for the autoscaler to react before instances become overloaded, risking service degradation or outage during a sudden traffic burst. Policy should require target to stay within a sensible range that preserves scaling headroom"
+      "security_impact": false,
+      "rationale": "cpu_utilization target is a performance and capacity sizing choice rather than a security or availability control, so no security impact is assigned."
     },
     "autoscaling_policy.load_balancing_utilization": {
       "type": "block",
@@ -112,8 +112,8 @@
       "description": "Fraction of backend capacity utilization (set in HTTP(s) load\nbalancing configuration) that autoscaler should maintain. Must\nbe a positive float value. If not defined, the default is 0.8.",
       "required": true,
       "type": "number",
-      "security_impact": true,
-      "rationale": "If load_balancing_utilization.target is set too close to 1.0, backend capacity leaves little headroom to absorb a sudden traffic surge, risking overloaded backends. Policy should require target to stay within a sensible range that preserves headroom."
+      "security_impact": false,
+      "rationale": "load_balancing_utilization target is a capacity/performance sizing choice rather than a platform security policy target, so no security impact is assigned."
     },
     "autoscaling_policy.metric": {
       "type": "block",
@@ -124,29 +124,29 @@
       "description": "A filter string to be used as the filter string for\na Stackdriver Monitoring TimeSeries.list API call.\nThis filter is used to select a specific TimeSeries for\nthe purpose of autoscaling and to determine whether the metric\nis exporting per-instance or per-group data.\n\nYou can only use the AND operator for joining selectors.\nYou can only use direct equality comparison operator (=) without\nany functions for each selector.\nYou can specify the metric in both the filter string and in the\nmetric field. However, if specified in both places, the metric must\nbe identical.\n\nThe monitored resource type determines what kind of values are\nexpected for the metric. If it is a gce_instance, the autoscaler\nexpects the metric to include a separate TimeSeries for each\ninstance in a group. In such a case, you cannot filter on resource\nlabels.\n\nIf the resource type is any other value, the autoscaler expects\nthis metric to contain values that apply to the entire autoscaled\ninstance group and resource label filtering can be performed to\npoint autoscaler at the correct TimeSeries to scale upon.\nThis is called a per-group metric for the purpose of autoscaling.\n\nIf not specified, the type defaults to gce_instance.\n\nYou should provide a filter that is selective enough to pick just\none TimeSeries for the autoscaled group or for each of the instances\n(if you are using gce_instance resource type). If multiple\nTimeSeries are returned upon the query execution, the autoscaler\nwill sum their respective values to obtain its scaling value.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "If metric.filter is too broad or misconfigured, the autoscaler may aggregate or select the wrong TimeSeries data, leading to inaccurate scaling decisions and potential availability issues. Policy should require metric.filter to be scoped precisely to the intended metric source."
+      "security_impact": false,
+      "rationale": "metric.filter is a query/reference string pointing to telemetry data sources, enforcing a generic policy on it would overreach, so no security impact is assigned."
     },
     "autoscaling_policy.metric.name": {
       "description": "The identifier (type) of the Stackdriver Monitoring metric.\nThe metric cannot have negative values.\n\nThe metric must have a value type of INT64 or DOUBLE.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "If metric_name reference an unreliable, unmonitored, or incorrect metric, the autoscaler will make scaling decisions based on faulty signals, potentially failing to scale out under real load, an availability risk under the CIA triad. Policy should require metric.name to reference a validated, actively-monitored metric."
+      "security_impact": false,
+      "rationale": "metric.name is an identifier pointing to a specific telemetry signal, making it a team-specific configuration reference rather than a platform policy target, so no security impact is assigned."
     },
     "autoscaling_policy.metric.single_instance_assignment": {
       "description": "If scaling is based on a per-group metric value that represents the\ntotal amount of work to be done or resource usage, set this value to\nan amount assigned for a single instance of the scaled group.\nThe autoscaler will keep the number of instances proportional to the\nvalue of this metric, the metric itself should not change value due\nto group resizing.\n\nFor example, a good metric to use with the target is\n'pubsub.googleapis.com/subscription/num_undelivered_messages'\nor a custom metric exporting the total number of requests coming to\nyour instances.\n\nA bad example would be a metric exporting an average or median\nlatency, since this value can't include a chunk assignable to a\nsingle instance, it could be better used with utilization_target\ninstead.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "If single_instance assignment is set too high, the autoscaler under-provisions instances relative to actual per-instance workload capacity, risking overloaded instances and an availability failure under the CIA triad. Policy should require a realistic single_instance_assignment value."
+      "security_impact": false,
+      "rationale": "single_instance_assignment is a capacity sizing and performance threshold, an operational choice rather than a security control, so no security impact is assigned."
     },
     "autoscaling_policy.metric.target": {
       "description": "The target value of the metric that autoscaler should\nmaintain. This must be a positive value. A utilization\nmetric scales number of virtual machines handling requests\nto increase or decrease proportionally to the metric.\n\nFor example, a good metric to use as a utilizationTarget is\nwww.googleapis.com/compute/instance/network/received_bytes_count.\nThe autoscaler will work to keep this value constant for each\nof the instances.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "If metric.target is set too high, the autoscaler waits too long to scale out, risking service degradation under load. Policy should require metric.target to be set to a value that leaves adequate scaling headroom."
+      "security_impact": false,
+      "rationale": "metric.target is a workload performance target and scaling threshold, an operational parameter rather than a security policy, so no security impact is assigned."
     },
     "autoscaling_policy.metric.type": {
       "description": "Defines how target utilization value is expressed for a\nStackdriver Monitoring metric. Possible values: [\"GAUGE\", \"DELTA_PER_SECOND\", \"DELTA_PER_MINUTE\"]",
@@ -164,8 +164,8 @@
       "description": "How long back autoscaling should look when computing recommendations\nto include directives regarding slower scale down, as described above.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "If time_window_sec is set too low, the autoscaler bases scale-in decisions on a very narrow, recent snapshot of load, making it prone to misreading a brief lull as sustained low demand and scaling in prematurely, an availability risk under the CIA triad. policy should require a sensible minimum time_window_sec to smooth out scale-in decisions."
+      "security_impact": false,
+      "rationale": "time_window_sec is an autoscaling timing/rate-limit parameter for operational reliability and availability tuning, not a security control, so no security impact is assigned."
     },
     "autoscaling_policy.scale_in_control.max_scaled_in_replicas": {
       "type": "block",
@@ -176,15 +176,15 @@
       "description": "Specifies a fixed number of VM instances. This must be a positive\ninteger.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "If max_scaled_in_replicas.fixed is left unset, the autoscaler can remove a large number of instances in a single scale-in event, riskinga sudden drop in serving capacity and an availability failure under the CIA triad if load returns quickly. Policy should require a sensible fixed cap on scale-in size."
+      "security_impact": false,
+      "rationale": "max_scaled_in_replicas.fixed is a scale-in rate limit and replica bound, an operational availability parameter rather than a platform security policy, so no security impact is assigned."
     },
     "autoscaling_policy.scale_in_control.max_scaled_in_replicas.percent": {
       "description": "Specifies a percentage of instances between 0 to 100%, inclusive.\nFor example, specify 80 for 80%.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "If max_scaled_in_replicas.percent is left unbounded (upto 100%), the autoscaler could remove the entire managed instance group in a single scale-in event, causing a self-inflicted availability outage under the CIA triad. Policy should require a sensible cap on the scale-in percentage."
+      "security_impact": false,
+      "rationale": "max_scaled_in_replicas.percent is a scaling limit and operational control rather than a security policy, so no security impact is assigned."
     },
     "autoscaling_policy.scaling_schedules": {
       "type": "block",
@@ -202,22 +202,22 @@
       "description": "A boolean value that specifies if a scaling schedule can influence autoscaler recommendations. If set to true, then a scaling schedule has no effect.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "If disabled is set to true unintentionally, the scaling schedule has no effect and the group will not scale as expected during the intended demand window. Policy should require disabled to be explicitly reviewed and set to false for active schedules."
+      "security_impact": false,
+      "rationale": "disabled toggles whether a scheduled scaling window is active, an operational workload management choice rather than a security control, so no security impact is assigned."
     },
     "autoscaling_policy.scaling_schedules.duration_sec": {
       "description": "The duration of time intervals (in seconds) for which this scaling schedule will be running. The minimum allowed value is 300.",
       "required": true,
       "type": "number",
-      "security_impact": true,
-      "rationale": "If duration_sec is set too short, the scaling schedule may end before the actual demand window passed, casuing the group to scale back down prematurely. Policy should require duration_sec to adequately cover the intended demand window."
+      "security_impact": false,
+      "rationale": "duration_sec is an operational availability/sizing choice governing schedule timing, a team decision that does not affect platform security or exposure, so no security impact is assigned."
     },
     "autoscaling_policy.scaling_schedules.min_required_replicas": {
       "description": "Minimum number of VM instances that autoscaler will recommend in time intervals starting according to schedule.",
       "required": true,
       "type": "number",
-      "security_impact": true,
-      "rationale": "If min_required_replicas is set to 0 or too low for a scheduled high-demand window, the group may be under-provisioned exactly when load is expected to be highest, an availability risk under the CIA triad. Policy should require min_required_replicas to be set to a sensible non-zero value."
+      "security_impact": false,
+      "rationale": "min_required_replicas is a capacity sizing decision, an operational availability choice rather than a security control, so no security impact is assigned."
     },
     "autoscaling_policy.scaling_schedules.name": {
       "description": "N/A",
@@ -230,15 +230,15 @@
       "description": "The start timestamps of time intervals when this scaling schedule should provide a scaling signal. This field uses the extended cron format (with an optional year field).",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "If schedule is misconfigured with an incorrect cron expression, the scaling schedule may fail to trigger at the intended time, leaving the group under-provisioned during an expected demand window. Policy should require schedule to be validated against expected demand patterns."
+      "security_impact": false,
+      "rationale": "schedule is a cron expression governing scaling timing, an operational scheduling choice rather than a security control, so no security impact is assigned."
     },
     "autoscaling_policy.scaling_schedules.time_zone": {
       "description": "The time zone to be used when interpreting the schedule. The value of this field must be a time zone name from the tz database: http://en.wikipedia.org/wiki/Tz_database.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "If time_zone is left unset or incorrect, the scaling schedule may trigger at the wrong actual time relative to real demand patterns, causing the group to scale out too late, an availability risk under the CIA triad. Policy should require time_zone to be explicitly and correctly set."
+      "security_impact": false,
+      "rationale": "time_zone is an operational scheduling choice for interpreting the schedule, not a security control, so no security impact is assigned."
     }
   }
 }
