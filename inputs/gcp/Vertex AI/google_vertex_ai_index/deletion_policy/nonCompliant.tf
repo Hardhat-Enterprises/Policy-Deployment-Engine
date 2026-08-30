@@ -14,4 +14,10 @@ resource "google_vertex_ai_index" "non_compliant_example_3" {
   display_name = "non-compliant-index-3"
   region       = "us-central1"
   # deletion_policy is omitted (defaults to DELETE)
+  
+  metadata {
+    config {
+      dimensions = 2
+    }
+  }
 }
