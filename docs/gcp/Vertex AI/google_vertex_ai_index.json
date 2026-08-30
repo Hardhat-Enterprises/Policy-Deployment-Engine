@@ -72,15 +72,15 @@
       "description": "Allows inserting, updating  or deleting the contents of the Matching Engine Index.\nThe string must be a valid Cloud Storage directory path. If this\nfield is set when calling IndexService.UpdateIndex, then no other\nIndex field can be also updated as part of the same call.\nThe expected structure and format of the files this URI points to is\ndescribed at https://cloud.google.com/vertex-ai/docs/matching-engine/using-matching-engine#input-data-format",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines the data source URI. Delivery and storage endpoint URIs that ingest data require schema enforcement and must meet secure-storage platform standards to prevent sensitive reference exposures."
+      "security_impact": false,
+      "rationale": "Specifies the Cloud Storage path for inserting, updating, or deleting index contents. Access to this path is controlled by GCS IAM policies, not by the index resource configuration itself."
     },
     "metadata.is_complete_overwrite": {
       "description": "If this field is set together with contentsDeltaUri when calling IndexService.UpdateIndex,\nthen existing content of the Index will be replaced by the data from the contentsDeltaUri.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "This boolean flag controls whether data updates overwrite existing content, directly touching on data integrity and destructive loss or mutation controls."
+      "security_impact": false,
+      "rationale": "A boolean flag indicating whether the update operation replaces existing content. This is a data manipulation directive, unrelated to security configurations."
     },
     "metadata.config": {
       "type": "block",
@@ -91,15 +91,15 @@
       "description": "The default number of neighbors to find via approximate search before exact reordering is\nperformed. Exact reordering is a procedure where results returned by an\napproximate search algorithm are reordered via a more expensive distance computation.\nRequired if tree-AH algorithm is used.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Algorithmic parameters and limits on resource queries are architectural constraints governed to prevent resource exhaustion or denial-of-service vectors."
+      "security_impact": false,
+      "rationale": "An algorithmic hyperparameter that sets the default number of neighbors to find during a search. It affects search accuracy and computational cost, not security."
     },
     "metadata.config.dimensions": {
       "description": "The number of dimensions of the input vectors.",
       "required": true,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Model dimension configurations define structural resource capacity and operational sizing limits to prevent over-provisioning or unbounded resource consumption."
+      "security_impact": false,
+      "rationale": "Defines the number of dimensions for the input vectors. This is a mathematical requirement for the machine learning model and carries no security implications."
     },
     "metadata.config.distance_measure_type": {
       "description": "The distance measure used in nearest neighbor search. The value must be one of the followings:\n* SQUARED_L2_DISTANCE: Euclidean (L_2) Distance\n* L1_DISTANCE: Manhattan (L_1) Distance\n* COSINE_DISTANCE: Cosine Distance. Defined as 1 - cosine similarity.\n* DOT_PRODUCT_DISTANCE: Dot Product Distance. Defined as a negative of the dot product",
@@ -119,8 +119,8 @@
       "description": "Index data is split into equal parts to be processed. These are called \"shards\".\nThe shard size must be specified when creating an index. The value must be one of the followings:\n* SHARD_SIZE_SMALL: Small (2GB)\n* SHARD_SIZE_MEDIUM: Medium (20GB)\n* SHARD_SIZE_LARGE: Large (50GB)",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Resource sizing and sharding tiers govern capacity allocation and infrastructure limits, making them valid targets for cost and resource-exhaustion policies."
+      "security_impact": false,
+      "rationale": "Controls the data splitting mechanism (e.g., Small, Medium, Large) for processing efficiency. It is a performance tuning parameter, unrelated to security."
     },
     "metadata.config.algorithm_config": {
       "type": "block",
@@ -141,8 +141,8 @@
       "description": "Number of embeddings on each leaf node. The default value is 1000 if not set.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Node and embedding count thresholds control resource scaling and density, falling under performance and resource exhaustion governance."
+      "security_impact": false,
+      "rationale": "An algorithmic tuning parameter defining the number of embeddings on each leaf node for the tree-AH algorithm. It impacts performance, not security."
     },
     "metadata.config.algorithm_config.tree_ah_config.leaf_nodes_to_search_percent": {
       "description": "The default percentage of leaf nodes that any query may be searched. Must be in\nrange 1-100, inclusive. The default value is 10 (means 10%) if not set.",
