@@ -11,6 +11,7 @@ version changes — the sha is recomputed from the same function the pipeline us
 
 import json
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -23,6 +24,14 @@ from scripts.auto_test import auto_test
 from scripts.linters import policy_lint
 
 FIXTURES = Path(__file__).parent / "fixtures"
+
+
+@pytest.fixture(autouse=True)
+def _clean_caches():
+    """The OPA-evaluation caches are process-global; no test may inherit one."""
+    policy_lint.clear_caches()
+    yield
+    policy_lint.clear_caches()
 
 
 def build_tree(tmp_path, case):
@@ -276,3 +285,126 @@ def test_cli_accepts_a_service_scoped_target(tmp_path, capsys):
     assert rc == 1
     assert {e["resource"] for e in data} == {
         "google_a_thing", "google_b_thing", "google_c_thing", "google_d_thing"}
+
+
+# --------------------------------------------------------------------------- #
+# Fix round 1: attribute_path given as a string.
+# --------------------------------------------------------------------------- #
+@pytest.mark.parametrize("policy", ["disabled", "keys.key_algorithm"])
+def test_string_attribute_path_is_split_not_iterated(tmp_path, policy):
+    # `"attribute_path": "disabled"` is a form shared.rego supports. Iterating it
+    # character by character made every such policy a false wrong-argument.
+    root = build_tree(tmp_path, "string_path")
+    findings = policy_lint.lint_resource(root, "gcp", "Cloud Platform", "google_service_account")
+    assert [f for f in findings if f.policy == policy] == []
+
+
+def test_string_attribute_path_still_reaches_the_value_rules(tmp_path):
+    # Normalising must not make the checks blind: a hard-coded literal behind a
+    # string path is still found.
+    root = build_tree(tmp_path, "string_path")
+    rego = (root / "policies" / "gcp" / "Cloud Platform" / "google_service_account"
+            / "disabled.rego")
+    rego.write_text(rego.read_text().replace(
+        '"attribute_path": "disabled",\n     "values": [true],',
+        '"attribute_path": "disabled",\n     "values": ["projects/PDE"],'))
+    findings = policy_lint.lint_resource(root, "gcp", "Cloud Platform", "google_service_account")
+    assert ("disabled", "hard-coded-value") in pairs(findings)
+
+
+# --------------------------------------------------------------------------- #
+# Fix round 1: a broken kit must degrade, never abort the run.
+# --------------------------------------------------------------------------- #
+def test_broken_policy_reports_lint_error_and_lets_siblings_through(tmp_path):
+    root = build_tree(tmp_path, "broken")
+    findings = policy_lint.lint_resource(root, "gcp", "Cloud Platform", "google_broken_thing")
+    assert pairs(findings) == {
+        ("broken", "lint-error"),           # unparseable
+        ("noconditions", "lint-error"),     # declares no `conditions` at all
+        # A file whose conditions cannot be read is still checked for everything
+        # that does not depend on them...
+        ("noconditions", "fixture-missing-plan"),
+        ("good", "fixture-missing-plan"),   # ...and the healthy sibling is still linted
+    }
+
+
+def test_lint_error_message_carries_the_opa_reason(tmp_path):
+    # `opa eval` writes parse errors to stdout, not stderr — the reason must
+    # still reach the finding.
+    root = build_tree(tmp_path, "broken")
+    findings = policy_lint.lint_resource(root, "gcp", "Cloud Platform", "google_broken_thing")
+    broken = [f for f in findings if f.policy == "broken"][0]
+    assert broken.severity == "error"
+    assert "rego_parse_error" in broken.message or "unexpected eof" in broken.message
+
+
+def test_missing_vars_file_is_not_a_crash(tmp_path):
+    # The broken kit has no _vars.rego at all.
+    root = build_tree(tmp_path, "broken")
+    findings = policy_lint.lint_resource(root, "gcp", "Cloud Platform", "google_broken_thing")
+    assert [f for f in findings if f.rule.startswith("vars-")] == []
+
+
+def test_lint_error_is_a_documented_rule():
+    assert "lint-error" in policy_lint.RULES
+
+
+# --------------------------------------------------------------------------- #
+# Fix round 1: the friendly-name index is one OPA call, not one per resource.
+# --------------------------------------------------------------------------- #
+def test_friendly_name_index_uses_a_single_opa_call(tmp_path, monkeypatch):
+    root = build_tree(tmp_path, "vars_bad")
+    policy_lint.clear_caches()
+
+    real_run = subprocess.run
+    calls = []
+
+    def counting_run(cmd, *args, **kwargs):
+        calls.append(cmd)
+        return real_run(cmd, *args, **kwargs)
+
+    monkeypatch.setattr(policy_lint.subprocess, "run", counting_run)
+    index = policy_lint._friendly_name_index(root / "policies", "gcp")
+
+    assert len(calls) == 1, f"expected one batched opa eval, got {len(calls)}"
+    assert sorted(rt for names in index.values() for _, rt in names) == [
+        "google_a_thing", "google_b_thing", "google_d_thing", "google_e_thing"]
+
+
+# --------------------------------------------------------------------------- #
+# Fix round 1: usage errors exit 2, distinct from findings (1).
+# --------------------------------------------------------------------------- #
+@pytest.mark.parametrize("target,needle", [
+    ("aws/Cloud Storage/google_storage_bucket", "aws"),          # no such platform tree
+    ("gcp/Nonexistent Service/google_storage_bucket", "Nonexistent Service"),
+    ("gcp/Cloud Storage/google_nonexistent_thing", "google_nonexistent_thing"),
+    ("gcp/a/b/c", "a/b/c"),                                       # malformed
+])
+def test_unknown_target_is_a_usage_error(tmp_path, capsys, target, needle):
+    root = build_tree(tmp_path, "clean")
+    rc = policy_lint.main(["--root", str(root), target])
+    err = capsys.readouterr().err
+    assert rc == 2, "a mistyped target must be a usage error, not 0 findings or 1"
+    assert needle in err
+
+
+def test_findings_still_exit_one(tmp_path, capsys):
+    root = build_tree(tmp_path, "policy_smells")
+    rc = policy_lint.main([
+        "--root", str(root), "gcp/Backup for GKE/google_gke_backup_restore_channel"])
+    capsys.readouterr()
+    assert rc == 1
+
+
+# --------------------------------------------------------------------------- #
+# Fix round 1: the identity-attribute exemption is only for label-shaped values.
+# --------------------------------------------------------------------------- #
+def test_identity_exemption_only_covers_the_fixture_labels(tmp_path):
+    # `bucket` is this resource's resource_value_name, but here the two fixtures
+    # name two genuinely different buckets — that is real drift, not identity.
+    root = build_tree(tmp_path, "fixture_identity_drift")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Cloud Storage", "google_storage_bucket_iam_binding")
+    drift = [f for f in findings if f.rule == "fixture-drift"]
+    assert len(drift) == 1
+    assert "bucket" in drift[0].message

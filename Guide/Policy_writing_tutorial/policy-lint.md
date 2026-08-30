@@ -30,8 +30,11 @@ this page.
     # Every rule id and its one-liner
     python3 scripts/linters/policy_lint.py --list-rules
 
-Exit code is `1` when any **error**-severity finding is reported, `0` otherwise — warnings never
-fail a run on their own.
+Exit code is `1` when any **error**-severity finding is reported and `0` otherwise — warnings
+never fail a run on their own. Exit code `2` means the *target* was wrong: a platform, service
+folder or resource type spelled in a way that doesn't exist in the tree. That is a typo in your
+command, not a finding about your policy — check the spelling (service folders have spaces and
+capitals, e.g. `"gcp/Cloud Storage/google_storage_bucket"`) and run it again.
 
 You do not need to run it separately as part of your normal workflow: `pre-commit` and the PR
 lint job (`run_precommit_linter.py`) both run it automatically, scoped to the resource type(s)
@@ -232,6 +235,21 @@ but never blocks on.
 
     package terraform.gcp.security.BigQuery.google_bigquery_dataset.location   # flagged (warn)
     package terraform.gcp.security.big_query.google_bigquery_dataset.location  # preferred
+
+## lint-error
+
+The linter could not evaluate this policy at all — the file failed to parse, or it declares no
+`conditions` list for the linter to read. Every other rule needs those conditions, so this
+finding means the policy was **not checked**, not that it passed.
+
+The message carries the reason OPA gave. Run `opa check` on the file to see it in full:
+
+    opa check policies/_helpers "policies/gcp/<Service>/<resource type>/<argument>.rego"
+
+Fix the parse error (or add the missing `conditions := [...]`) and re-run the linter. If the file
+looks fine to you and the error persists, ask in the unit channel before changing anything else —
+this one is usually a stray bracket or a missing `:=`, and it is much easier to spot with a
+second pair of eyes than to guess at.
 
 ---
 

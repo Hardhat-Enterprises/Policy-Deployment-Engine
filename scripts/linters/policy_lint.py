@@ -40,8 +40,9 @@ Usage
     python3 scripts/linters/policy_lint.py --json "gcp/BigQuery/google_bigquery_table"
     python3 scripts/linters/policy_lint.py --list-rules
 
-Exit code is 1 when any *error*-severity finding is reported, else 0; warnings
-never fail a build on their own.
+Exit codes: 0 clean, 1 at least one *error*-severity finding (warnings never fail
+a build on their own), 2 a usage error — a target naming a platform, service or
+resource type that is not in the tree.
 """
 
 import argparse
@@ -93,6 +94,9 @@ RULES = {
         "`situation_description` under 20 characters or `remedies` empty."),
     "legacy-assign": "Use `:=` for message/details/summary (warn).",
     "package-case": "Package service segment is not lowercase snake_case (warn).",
+    "lint-error": (
+        "The linter could not evaluate this policy (parse/opa failure) — run "
+        "`opa check` on the file."),
 }
 
 # Only style rules are advisory; everything else is a correctness/quality error.
@@ -132,13 +136,12 @@ SNAKE_CASE_RE = re.compile(r"^[a-z][a-z0-9_]*$")
 # Fixture resource labels, per the auto_test convention.
 FIXTURE_LABEL_RE = re.compile(r"^(compliant|non_compliant)_example_(\d+)$")
 # Keys that are *expected* to differ between the two fixture resources: the
-# resource's own identity, and the provider-computed mirrors of `labels` (which
-# always move with it). The resource's `resource_value_name` — the attribute the
-# violation message quotes, which is `bucket` on an IAM binding, not `name` — is
-# added per resource type.
+# resource's label ("name") and `labels`, plus the two provider-computed mirrors
+# of `labels`, which always move with it and would double-report every labels
+# policy. The resource's `resource_value_name` is handled separately — see
+# `_lint_fixtures` — because it is only exempt when it holds the fixture label.
 FIXTURE_IGNORED_KEYS = {
-    "name", "id", "labels", "label",
-    "effective_labels", "terraform_labels", "effective_annotations",
+    "name", "labels", "label", "effective_labels", "terraform_labels",
 }
 
 # Blacklist/whitelist only — a pattern or range policy with empty values means
@@ -148,7 +151,15 @@ EMPTY_VALUES = (None, "", [], {})
 
 
 class PolicyLintError(RuntimeError):
-    """A policy kit could not be read at all (OPA refused to evaluate it)."""
+    """One policy file could not be read (OPA refused to evaluate it).
+
+    Reported as a ``lint-error`` finding against that file — never fatal, so one
+    unparseable policy cannot hide every other finding in the run.
+    """
+
+
+class TargetError(ValueError):
+    """A CLI target names a platform/service/resource that does not exist."""
 
 
 @dataclass(frozen=True)
@@ -167,6 +178,29 @@ class Finding:
 _eval_cache: dict[tuple, dict] = {}
 
 
+def _opa_reason(proc):
+    """A one-line reason from a failed ``opa eval``.
+
+    Parse errors are written to *stdout* as a JSON ``errors`` array, not to
+    stderr, so reading stderr alone loses the reason entirely.
+    """
+    stderr = (proc.stderr or "").strip()
+    if stderr:
+        return stderr.splitlines()[0]
+    stdout = (proc.stdout or "").strip()
+    try:
+        errors = json.loads(stdout).get("errors") or []
+    except (json.JSONDecodeError, AttributeError):
+        errors = []
+    if errors:
+        first = errors[0]
+        location = first.get("location") or {}
+        where = (f" ({Path(location['file']).name}:{location.get('row')})"
+                 if location.get("file") else "")
+        return f"{first.get('code', 'error')}: {first.get('message', '')}{where}"
+    return stdout.splitlines()[0] if stdout else "no output"
+
+
 def _run_opa(query, *data_dirs):
     """``opa eval --format json`` over ``data_dirs``; returns the query value."""
     cmd = ["opa", "eval", "--format", "json"]
@@ -178,7 +212,7 @@ def _run_opa(query, *data_dirs):
     except FileNotFoundError as exc:                     # pragma: no cover - env
         raise PolicyLintError("`opa` is not on PATH — install it to run policy_lint.") from exc
     if proc.returncode != 0:
-        raise PolicyLintError(f"opa eval {query!r} failed: {proc.stderr.strip()}")
+        raise PolicyLintError(f"opa eval {query!r} failed: {_opa_reason(proc)}")
     result = json.loads(proc.stdout or "{}").get("result") or []
     if not result:
         return None                                       # undefined, not an error
@@ -224,9 +258,10 @@ def _rule_value(rego_path, helpers_dir, rule_name):
         node = _walk(tree, package.split(".")[1:] + [rule_name])
         if node is not None:
             return node
-    # Batch evaluation failed or the rule is undefined in it — ask directly, so a
-    # genuine OPA error surfaces as an error rather than as a silent empty list.
-    return _run_opa(f"data.{package}.{rule_name}", helpers_dir, Path(rego_path).parent)
+    # Batch evaluation failed or the rule is undefined in it — ask again with just
+    # this one file, so a genuine OPA error surfaces (rather than becoming a silent
+    # empty list) and an unparseable *sibling* cannot poison a healthy policy.
+    return _run_opa(f"data.{package}.{rule_name}", helpers_dir, Path(rego_path))
 
 
 def load_conditions(rego_path, policies_root, helpers_dir=None):
@@ -238,14 +273,20 @@ def load_conditions(rego_path, policies_root, helpers_dir=None):
     """
     helpers_dir = _resolve_helpers(policies_root, helpers_dir)
     value = _rule_value(rego_path, helpers_dir, "conditions")
-    return value if isinstance(value, list) else []
+    if not isinstance(value, list):
+        raise PolicyLintError(
+            "declares no `conditions` list (the rule is undefined or not an array)")
+    return value
 
 
 def load_variables(vars_path, policies_root, helpers_dir=None):
     """The evaluated ``variables`` object of a ``_vars.rego`` file."""
     helpers_dir = _resolve_helpers(policies_root, helpers_dir)
     value = _rule_value(vars_path, helpers_dir, "variables")
-    return value if isinstance(value, dict) else {}
+    if not isinstance(value, dict):
+        raise PolicyLintError(
+            "declares no `variables` object (the rule is undefined or not an object)")
+    return value
 
 
 def _resolve_helpers(policies_root, helpers_dir=None):
@@ -302,9 +343,26 @@ def _strings_in(value):
             yield from _strings_in(item)
 
 
+def _normalise_path(attribute_path):
+    """An ``attribute_path`` as a list, whatever form the policy declared it in.
+
+    ``policies/_helpers/shared.rego`` accepts both an array (``["labels", 0]``)
+    and a bare string (``"disabled"`` — see
+    ``format_attribute_path``/``get_attribute_value``'s ``is_string`` branches).
+    Left as a string, every rule here would iterate it *character by character*,
+    which made `google_service_account/disabled` a false `wrong-argument`. Dots
+    are the same nesting separator the policy file names use.
+    """
+    if isinstance(attribute_path, str):
+        return [segment for segment in attribute_path.split(".") if segment]
+    if isinstance(attribute_path, list):
+        return attribute_path
+    return []
+
+
 def _path_segments(attribute_path):
     """String segments of an attribute_path, list indices dropped."""
-    return [p for p in (attribute_path or []) if isinstance(p, str)]
+    return [p for p in _normalise_path(attribute_path) if isinstance(p, str)]
 
 
 def _is_index(segment):
@@ -349,7 +407,15 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
     if legacy:
         add("legacy-assign", f"{', '.join(legacy)} assigned with '=' instead of ':='")
 
-    conditions = load_conditions(rego_path, policies_root)
+    try:
+        conditions = load_conditions(rego_path, policies_root)
+    except PolicyLintError as exc:
+        # A kit that cannot be evaluated is itself a finding. The style rules
+        # above already ran, and the fixture rules below still can, so one bad
+        # file never silences the rest of the run.
+        add("lint-error", str(exc))
+        return out + _lint_fixtures(root, platform, service, resource_type, stem,
+                                    identity_key)
 
     seen = set()
 
@@ -376,7 +442,7 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
                          f"remedies is empty for {str(description)!r}")
 
         for check in checks:
-            attribute_path = check.get("attribute_path") or []
+            attribute_path = _normalise_path(check.get("attribute_path"))
             values = check.get("values")
             policy_type = (check.get("policy_type") or "").strip().lower()
             path_text = ".".join(str(p) for p in attribute_path)
@@ -419,6 +485,11 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
 # --------------------------------------------------------------------------- #
 # Rules over the fixture pair
 # --------------------------------------------------------------------------- #
+def _is_fixture_label(value):
+    """True when a planned value is just the fixture's own label."""
+    return isinstance(value, str) and bool(FIXTURE_LABEL_RE.match(value))
+
+
 def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=None):
     input_dir = Path(root) / "inputs" / platform / service / resource_type / stem
     # A missing input directory is linter.py's finding (an orphan policy), not
@@ -453,15 +524,23 @@ def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=No
     # argument (a.b.c) is compared at its block key, since the plan nests it.
     argument_key = stem.split(".")[0]
     ignored = FIXTURE_IGNORED_KEYS | {argument_key}
-    if identity_key:
-        ignored.add(identity_key)
 
     drifted = set()
     for index in sorted(set(compliant) & set(non_compliant)):
         good, bad = compliant[index], non_compliant[index]
         for key in set(good) | set(bad):
-            if key not in ignored and good.get(key) != bad.get(key):
-                drifted.add(key)
+            if key in ignored:
+                continue
+            good_value, bad_value = good.get(key), bad.get(key)
+            if good_value == bad_value:
+                continue
+            # The identity attribute (`bucket` on an IAM binding, `name`
+            # elsewhere) is exempt ONLY when it *is* the fixture label — two
+            # genuinely different bucket names are drift like any other.
+            if (key == identity_key
+                    and _is_fixture_label(good_value) and _is_fixture_label(bad_value)):
+                continue
+            drifted.add(key)
 
     if drifted:
         return [Finding(service, resource_type, stem, "fixture-drift",
@@ -479,20 +558,36 @@ _friendly_index_cache: dict[tuple, dict] = {}
 def _friendly_name_index(policies_root, platform):
     """{normalised friendly name: [(service, resource_type), ...]} for a platform.
 
-    Scanned once per platform root and cached: duplicate detection is only
-    meaningful across the whole tree.
+    Duplicate detection is only meaningful across the whole tree, so this reads
+    *every* ``_vars.rego`` under ``policies/<platform>/``. It does that in ONE
+    ``opa eval`` over the platform (~0.6s); asking per file cost 370 subprocesses
+    and ~9s for a single-resource lint. Package names are read from the files
+    themselves (a plain regex, no subprocess) so each result maps back to its
+    real service folder and resource-type directory.
     """
     policies_root = Path(policies_root)
     key = (str(policies_root.resolve()), platform)
     if key in _friendly_index_cache:
         return _friendly_index_cache[key]
 
-    index = {}
     platform_root = policies_root / platform
-    for vars_path in sorted(platform_root.glob(f"*/*/{VARS_FILE}")):
+    vars_paths = sorted(platform_root.glob(f"*/*/{VARS_FILE}"))
+    helpers_dir = _resolve_helpers(policies_root)
+    try:
+        tree = _run_opa("data.terraform", helpers_dir, platform_root) or {}
+    except PolicyLintError:
+        tree = None      # one bad file in the tree — fall back to per-file reads
+
+    index = {}
+    for vars_path in vars_paths:
         try:
-            variables = load_variables(vars_path, policies_root)
-        except PolicyLintError:
+            package = _package_of(vars_path)
+            variables = None
+            if tree is not None:
+                variables = _walk(tree, package.split(".")[1:] + ["variables"])
+            if not isinstance(variables, dict):
+                variables = load_variables(vars_path, policies_root)
+        except (PolicyLintError, OSError):
             continue
         friendly = variables.get("friendly_resource_name")
         friendly = friendly.strip().lower() if isinstance(friendly, str) else ""
@@ -501,6 +596,12 @@ def _friendly_name_index(policies_root, platform):
                 (vars_path.parent.parent.name, vars_path.parent.name))
     _friendly_index_cache[key] = index
     return index
+
+
+def clear_caches():
+    """Drop every cached OPA evaluation (the caches are process-global)."""
+    _eval_cache.clear()
+    _friendly_index_cache.clear()
 
 
 def _lint_vars_file(platform, service, resource_type, vars_path, policies_root):
@@ -552,37 +653,67 @@ def lint_resource(root, platform, service_folder, resource_type):
     identity_key = None
     vars_path = resource_dir / VARS_FILE
     if vars_path.is_file():
-        findings += _lint_vars_file(platform, service_folder, resource_type,
-                                    vars_path, policies_root)
-        identity_key = load_variables(vars_path, policies_root).get("resource_value_name")
+        # _vars.rego is optional; when it exists but cannot be read, say so and
+        # keep going — the argument policies are still worth linting.
+        try:
+            findings += _lint_vars_file(platform, service_folder, resource_type,
+                                        vars_path, policies_root)
+            identity_key = load_variables(
+                vars_path, policies_root).get("resource_value_name")
+        except (PolicyLintError, OSError, UnicodeDecodeError) as exc:
+            findings.append(Finding(service_folder, resource_type, "_vars",
+                                    "lint-error", str(exc)))
+
     for rego_path in sorted(resource_dir.glob(f"*{REGO_EXT}")):
         if rego_path.name == VARS_FILE:
             continue
-        findings += _lint_policy_file(root, platform, service_folder, resource_type,
-                                      rego_path, policies_root, identity_key)
+        try:
+            findings += _lint_policy_file(root, platform, service_folder, resource_type,
+                                          rego_path, policies_root, identity_key)
+        except (PolicyLintError, OSError, UnicodeDecodeError) as exc:
+            findings.append(Finding(service_folder, resource_type, rego_path.stem,
+                                    "lint-error", str(exc)))
     return findings
 
 
 def _expand_target(root, target):
-    """A ``platform[/service[/resource]]`` target into (platform, service, resource)."""
+    """A ``platform[/service[/resource]]`` target into (platform, service, resource).
+
+    Every segment is checked against the tree. A mistyped target must be a *usage*
+    error — silently linting nothing and exiting 0 is the worst possible answer to
+    a typo.
+    """
     parts = [p for p in target.split("/") if p]
     if not parts or len(parts) > 3:
-        raise ValueError(
+        raise TargetError(
             f"target {target!r} must be '<platform>', '<platform>/<Service folder>' or "
             "'<platform>/<Service folder>/<resource_type>'")
+
     platform = parts[0]
     platform_root = Path(root) / "policies" / platform
-    if len(parts) == 3:
-        return [(platform, parts[1], parts[2])]
-    services = [parts[1]] if len(parts) == 2 else [
+    if not platform_root.is_dir():
+        available = sorted(d.name for d in (Path(root) / "policies").glob("*")
+                           if d.is_dir() and not d.name.startswith("_"))
+        raise TargetError(
+            f"no policies for platform '{platform}' "
+            f"(available: {', '.join(available) or 'none'})")
+
+    services = [parts[1]] if len(parts) >= 2 else [
         d.name for d in sorted(platform_root.iterdir()) if d.is_dir()]
+
     out = []
     for service in services:
         service_dir = platform_root / service
         if not service_dir.is_dir():
-            raise ValueError(f"no policies directory for '{platform}/{service}'")
-        out += [(platform, service, d.name)
-                for d in sorted(service_dir.iterdir()) if d.is_dir()]
+            raise TargetError(f"no policies directory for '{platform}/{service}'")
+        resources = [d.name for d in sorted(service_dir.iterdir()) if d.is_dir()]
+        if len(parts) == 3:
+            if parts[2] not in resources:
+                raise TargetError(
+                    f"no resource type '{parts[2]}' in '{platform}/{service}' "
+                    f"({len(resources)} available)")
+            resources = [parts[2]]
+        out += [(platform, service, resource) for resource in resources]
     return out
 
 
@@ -615,14 +746,14 @@ def main(argv=None):
         parser.error("at least one TARGET is required (or use --list-rules)")
 
     root = Path(args.root)
-    findings, failed = [], False
+    findings, usage_error = [], False
     for target in args.targets:
         try:
             for platform, service, resource_type in _expand_target(root, target):
                 findings += lint_resource(root, platform, service, resource_type)
-        except (ValueError, PolicyLintError) as exc:
+        except TargetError as exc:
             print(f"[ERROR] {target}: {exc}", file=sys.stderr)
-            failed = True
+            usage_error = True
 
     findings.sort(key=lambda f: (f.service, f.resource, f.policy, f.rule, f.message))
 
@@ -634,10 +765,17 @@ def main(argv=None):
                   f"{finding.policy}: {finding.rule} — {finding.message}")
         errors = sum(1 for f in findings if f.severity == "error")
         warns = len(findings) - errors
-        print(f"\n{errors} error(s), {warns} warning(s)."
-              if findings else "\nNo findings.")
+        if findings:
+            print(f"\n{errors} error(s), {warns} warning(s).")
+        elif not usage_error:
+            # "No findings." after a bad target would read as an all-clear.
+            print("\nNo findings.")
 
-    return 1 if failed or any(f.severity == "error" for f in findings) else 0
+    # 2 = the caller asked for something that does not exist (a typo); 1 = the
+    # tree was linted and has error-severity findings; 0 = clean.
+    if usage_error:
+        return 2
+    return 1 if any(f.severity == "error" for f in findings) else 0
 
 
 if __name__ == "__main__":
