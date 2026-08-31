@@ -1,7 +1,7 @@
 resource "google_cloudfunctions2_function" "non_compliant_example_1" {
 
   name = "non_compliant_example_1"
-  location = "australia-southeast1"
+  location = "us-central1"
   description = "a new function"
 
   build_config {
