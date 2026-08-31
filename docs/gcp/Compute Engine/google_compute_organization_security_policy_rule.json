@@ -6,43 +6,43 @@
       "description": "The Action to perform when the client connection triggers the rule. Valid actions are:\n\"allow\": allow access to target.\n\"deny\": deny access to target.\n\"goto_next\": forward the request to the next hierarchical policy for evaluation.\n\"redirect\": redirect to a different target. Parameters for this action can be configured via redirectOptions. Only EXTERNAL_302 redirect type is supported for organization security policies.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Directly determines whether traffic is allowed, denied, or redirected, this is the core access-control decision the rule enforces. A misconfigured action (e.g. allow instead of deny) directly changes what traffic reaches the target."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "If deletion_policy is left at the default value of DELETE, this security rule can be destroyed accidentally via terraform destroy or apply, removing an active access-control enforcement without warning."
     },
     "description": {
       "description": "A description of the rule.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "description is a free-text label field with no functional effect on rule behaviour, so it carries no security impact."
     },
     "policy_id": {
       "description": "The ID of the OrganizationSecurityPolicy this rule applies to.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "policy_id is an identifier/reference to the parent OrganizationSecurityPolicy, not a control itself, security is enforced by the rule's own settings, not this pointer."
     },
     "preview": {
       "description": "If set to true, the specified action is not enforced.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "If preview is set to true, the rule's action is not enforced even though the rule appears configured and active. This can silently leave traffic unprotected while looking secure on inspection, a direct exposure risk."
     },
     "priority": {
       "description": "An integer indicating the priority of a rule in the list. The priority must be a value\nbetween 0 and 2147483647. Rules are evaluated from highest to lowest priority where 0 is the\nhighest priority and 2147483647 is the lowest prority.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "priority determines evaluation order among rules. A misconfigured priority can allow a less-restrictive or unintended rule to be evaluated first, directly changing which access-control decision actually applies to a given request."
     },
     "header_action": {
       "type": "block",
@@ -58,15 +58,15 @@
       "description": "The name of the header to set.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "header_name specifies which header to set as part of a functional header-injection action, it does not itself control access, exposure, or data protection."
     },
     "header_action.request_headers_to_adds.header_value": {
       "description": "The value to set the named header to.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "header_value specifies the value to set for an added header, a functional configuration choice rather than a direct security control."
     },
     "match": {
       "type": "block",
@@ -77,15 +77,15 @@
       "description": "A description of the rule.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "match.description is a free-text label field with no functional effect on rule behaviour, so it carries no security impact."
     },
     "match.versioned_expr": {
       "description": "Preconfigured versioned expression. For organization security policy rules,\nthe only supported type is \"SRC_IPS_V1\".\n**NOTE** : 'FIREWALL' type is deprecated. Please use 'google_compute_firewall_policy_rule' resource instead.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "match.versioned_expr is a functional selector enum currently limited to one supported value (SRC_IPS_V1) with no insecure alternative, so no security impact is assigned."
     },
     "match.config": {
       "type": "block",
@@ -96,8 +96,8 @@
       "description": "Source IP address range in CIDR format. Required for\nINGRESS rules.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "src_ip_ranges directly defines which source IP addresses the rule matches against. An overly broad range (e.g. 0.0.0.0/0 where not intended) directly widens which traffic the rule's action applies to, a direct access-control concern."
     },
     "match.expr": {
       "type": "block",
@@ -108,8 +108,8 @@
       "description": "Textual representation of an expression in Common Expression Language syntax. The application context of the containing message determines which well-known feature set of CEL is supported.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The CEL expression defines the actual match logic determining which traffic triggers the rule's action. A misconfigured or overly permissive expression directly changes which requests are allowed, denied, or redirected."
     },
     "preconfigured_waf_config": {
       "type": "block",
@@ -125,15 +125,15 @@
       "description": "A list of target rule IDs under the WAF rule set to apply the preconfigured WAF exclusion.\nIf omitted, it refers to all the rule IDs under the WAF rule set.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "target_rule_ids determines which specific WAF rule IDs are excluded from evaluation. If omitted, it defaults to excluding all rule IDs under the rule set, directly and significantly reducing WAF protection coverage."
     },
     "preconfigured_waf_config.exclusion.target_rule_set": {
       "description": "Target WAF rule set to apply the preconfigured WAF exclusion.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "target_rule_set determines which WAF rule set the exclusion applies to. Selecting the wrong or an overly broad rule set directly reduces the scope of WAF protection in effect."
     },
     "preconfigured_waf_config.exclusion.request_cookie": {
       "type": "block",
@@ -144,15 +144,15 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the match breadth of a WAF exclusion applied to cookies, for example, EQUALS_ANY exempts the field entirely from inspection regardless of value. A misconfigured operator can silently widen the scope of traffic exempted from WAF protection, directly affecting exposure."
     },
     "preconfigured_waf_config.exclusion.request_cookie.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the exact cookie value exempted from WAF inspection. If set too broadly or incorrectly, it can allow malicious payloads in that cookie to bypass WAF protection entirely, directly affecting exposure."
     },
     "preconfigured_waf_config.exclusion.request_header": {
       "type": "block",
@@ -163,15 +163,15 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the match breadth of a WAF exclusion applied to request headers — for example, EQUALS_ANY exempts the header entirely from inspection. A misconfigured operator can silently widen the scope of header-based traffic exempted from WAF protection, directly affecting exposure."
     },
     "preconfigured_waf_config.exclusion.request_header.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the exact header value exempted from WAF inspection. If set too broadly or incorrectly, it can allow malicious payloads in that header to bypass WAF protection entirely, directly affecting exposure."
     },
     "preconfigured_waf_config.exclusion.request_query_param": {
       "type": "block",
@@ -182,15 +182,15 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the match breadth of a WAF exclusion applied to query parameters — for example, EQUALS_ANY exempts the parameter entirely from inspection. A misconfigured operator can silently widen the scope of query-string traffic exempted from WAF protection, directly affecting exposure."
     },
     "preconfigured_waf_config.exclusion.request_query_param.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the exact query parameter value exempted from WAF inspection. If set too broadly or incorrectly, it can allow malicious payloads in that parameter to bypass WAF protection entirely, directly affecting exposure."
     },
     "preconfigured_waf_config.exclusion.request_uri": {
       "type": "block",
@@ -201,15 +201,15 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the match breadth of a WAF exclusion applied to the request URI — for example, EQUALS_ANY exempts URI matching entirely from inspection. A misconfigured operator can silently widen the scope of URI-based traffic exempted from WAF protection, directly affecting exposure."
     },
     "preconfigured_waf_config.exclusion.request_uri.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the exact URI value exempted from WAF inspection. If set too broadly or incorrectly, it can allow malicious payloads via that URI to bypass WAF protection entirely, directly affecting exposure."
     },
     "redirect_options": {
       "type": "block",
@@ -220,15 +220,15 @@
       "description": "Target for the redirect action. This is required if the type is EXTERNAL_302.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Specifies the destination for a redirect action. If misconfigured or left pointing to an unintended/attacker-controlled destination, it directly creates an open-redirect-style exposure risk."
     },
     "redirect_options.type": {
       "description": "Type of the redirect action. For organization security policies, only EXTERNAL_302 is supported.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Redirect_options.type is currently limited to one supported value (EXTERNAL_302) with no insecure alternative for organization security policies, so no security impact is assigned."
     }
   }
 }
