@@ -6,13 +6,13 @@ import data.terraform.gcp.security.access_context_manager_vpc_service_controls.g
 conditions := [[
   {
     "situation_description": "Egress access should be restricted to explicitly scoped identities.",
-    "remedies": ["Configure spec.egress_policies.egress_from.identities with explicitly scoped service account identities."],
+    "remedies": ["Configure spec.egress_policies.egress_from.identities with explicitly approved service account identities."],
   },
   {
-    "condition": "Egress identities must not contain wildcard or public principals.",
+    "condition": "Egress identities must use explicitly approved service account identities.",
     "attribute_path": ["spec", 0, "egress_policies", 0, "egress_from", 0, "identities"],
-    "values": ["*", "allUsers", "allAuthenticatedUsers"],
-    "policy_type": "blacklist",
+    "values": ["serviceAccount:approved@example.iam.gserviceaccount.com"],
+    "policy_type": "whitelist",
   },
 ]]
 
