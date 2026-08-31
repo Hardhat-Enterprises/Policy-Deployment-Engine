@@ -1,7 +1,7 @@
 resource "google_dns_response_policy_rule" "non_compliant_example_1" {
-  response_policy = "nc-response-policy"
+  response_policy = "c-response-policy"
   rule_name       = "non_compliant_example_1"
-  dns_name        = "nc.example.com."
+  dns_name        = "dns.example.com."
   project         = "demo-project"
 
   local_data {
