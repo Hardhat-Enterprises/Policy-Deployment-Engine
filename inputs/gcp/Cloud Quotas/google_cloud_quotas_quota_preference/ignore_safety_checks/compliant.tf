@@ -1,6 +1,6 @@
 resource "google_cloud_quotas_quota_preference" "compliant_example_1" {
   parent        = "projects/my-project-name"
-  name = "c"
+  name = "compliant_example_1"
   service       = "compute.googleapis.com"
   quota_id = "compliant_example_1"
   contact_email = "testuser@gmail.com"

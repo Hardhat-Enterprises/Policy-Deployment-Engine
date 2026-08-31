@@ -9,14 +9,16 @@ conditions := [
       "remedies": ["Remove public/broad principals like allUsers/allAuthenticatedUsers/project*"]
     },
     {
-      "condition": "members[0] must NOT be public/broad",
-      "attribute_path": ["members", 0],
+      "condition": "no member may be public/broad",
+      "attribute_path": ["members"],
       "values": ["allUsers", "allAuthenticatedUsers"],
       "policy_type": "blacklist"
     }
   ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details
 
