@@ -1,5 +1,5 @@
 resource "google_data_catalog_tag_template" "non_compliant_example_1" {
-  tag_template_id = "my_template_nc"
+  tag_template_id = "my_template_c"
   region          = "australia-southeast1"
   display_name    = "Demo Tag Template"
   project         = "gcp-project-12345"

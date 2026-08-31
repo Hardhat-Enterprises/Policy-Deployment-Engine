@@ -1,12 +1,12 @@
 resource "google_apihub_plugin" "non_compliant_example_1"{
   location = "us-central1"
-  display_name = "Test Plugin nc1"
+  display_name = "Test Plugin c"
   project  = "PDE"
   plugin_id = "non_compliant_example_1"
   plugin_category = "API_GATEWAY"
     actions_config {
-    id = "sync-metadata-nc1"
-    display_name = "Sync Metadata nc1"
+    id = "sync-metadata-c"
+    display_name = "Sync Metadata c"
     description = "Syncs API metadata."
     trigger_mode = "API_HUB_SCHEDULE_TRIGGER"
   }
