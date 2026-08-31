@@ -47,6 +47,18 @@ import data.terraform.helpers.policies.element_blacklist
 # Logic:
 #   Resources must fail ALL conditions within a situation to be non-compliant (AND logic)
 get_multi_summary(conditions, tf_variables) = summary if {
+    # An unrecognised policy_type is a BROKEN policy, not a permissive one. This
+    # branch runs before any evaluation so it cannot be swallowed: select_policy_logic
+    # is only reached from a comprehension, and a comprehension silently DROPS an
+    # iteration whose body is undefined, which is how an unknown type used to make a
+    # policy pass everything in silence. Refuse the whole summary instead.
+    problems := policy_type_problems(conditions)
+    count(problems) > 0
+    summary := {
+        "message": [policy_type_error_message(problems)],
+        "details": []
+    }
+} else = summary if {
     # Count resources without storing them
     resource_count := count([r |
         r := input.planned_values.root_module.resources[_]
@@ -154,6 +166,82 @@ find_failing_resources(condition_results) = failing_resources if {
 # Routes evaluation to appropriate policy module based on policy_type string
 # Each policy type implements its own violation detection logic
 
+# The complete set of policy_type values select_policy_logic can dispatch. Every
+# entry here must have a matching select_policy_logic rule below, and vice versa:
+# this list is what get_multi_summary validates against and what the error message
+# offers the author. Keep it in step with policies/_helpers/policies/.
+valid_policy_types := [
+    "blacklist",
+    "whitelist",
+    "range",
+    "pattern blacklist",
+    "pattern whitelist",
+    "element blacklist",
+]
+
+# Every reason `conditions` cannot be dispatched, as human-readable phrases. Two
+# kinds, because evaluate_conditions drops both in the same silent way:
+#   - a policy_type dispatch does not know;
+#   - a condition with no policy_type at all (line "condition_obj.policy_type"
+#     there skips it, which is right for the situation_description/remedies
+#     entries and wrong for a real check that simply forgot the key).
+policy_type_problems(conditions) := problems if {
+    problems := _unknown_type_problems(conditions) | _missing_type_problems(conditions)
+}
+
+# Normalised the same way evaluate_conditions normalises it (lowercased), so
+# "Whitelist" and "whitelist" are one type. A non-string policy_type is reported
+# verbatim rather than dropped — lower() is undefined for it, which would
+# otherwise make it invisible here and silently unevaluated there.
+_unknown_type_problems(conditions) := problems if {
+    problems := {sprintf("unknown policy_type '%s'", [t]) |
+        some condition_group in conditions
+        some condition_entry in condition_group
+        raw := condition_entry.policy_type
+        t := _normalise_policy_type(raw)
+        not t in valid_policy_types
+    }
+}
+
+# A condition is anything carrying an attribute_path; the metadata entries carry
+# situation_description/remedies instead and are meant to have no policy_type.
+_missing_type_problems(conditions) := problems if {
+    problems := {sprintf("no policy_type on the condition reading '%s'",
+                         [shared.format_attribute_path(condition_entry.attribute_path)]) |
+        some condition_group in conditions
+        some condition_entry in condition_group
+        condition_entry.attribute_path
+        not "policy_type" in object.keys(condition_entry)
+    }
+}
+
+_normalise_policy_type(raw) := lower(raw) if {
+    is_string(raw)
+}
+
+_normalise_policy_type(raw) := sprintf("%v", [raw]) if {
+    not is_string(raw)
+}
+
+# The message the author sees. It names what they wrote, what the valid values
+# are, and what to do about it — a bare "unsupported" tells a student nothing.
+# auto_test.py keys off the "POLICY ERROR:" prefix to fail the check with this
+# text as the reason (see find_policy_error there).
+policy_type_error_message(problems) := msg if {
+    named := concat("; ", sort(problems))
+    msg := sprintf(
+        concat("", [
+            "POLICY ERROR: %s. ",
+            "Nothing in this policy was checked. ",
+            "Valid values are: %s. ",
+            "Edit the \"policy_type\" in this policy's conditions to one of those ",
+            "- they are lowercase and use a SPACE, not an underscore ",
+            "(\"pattern whitelist\", not \"pattern_whitelist\") - then run the test again.",
+        ]),
+        [named, concat(", ", valid_policy_types)]
+    )
+}
+
 select_policy_logic(tf_variables, attribute_path, values_formatted, "blacklist") = results if {
     results := blacklist.get_violations(tf_variables, attribute_path, values_formatted)
 }
@@ -178,13 +266,11 @@ select_policy_logic(tf_variables, attribute_path, values_formatted, "element bla
     results := element_blacklist.get_violations(tf_variables, attribute_path, values_formatted)
 }
 
-# Fallback for unknown policy types
-select_policy_logic(_, _, _, policy_type) = results if {
-    not policy_type in ["blacklist", "whitelist", "range", "pattern blacklist", "pattern whitelist", "element blacklist"]
-    results := {
-        {"error": sprintf("Unknown policy type: '%s'. Valid types: blacklist, whitelist, range, pattern blacklist, pattern whitelist, element blacklist", [policy_type])}
-    }
-}
+# There is deliberately NO fallback rule for an unknown policy_type. One used to
+# exist and returned {"error": ...} — an object with no "name" key, which
+# find_failing_resources then intersected into the empty set, so the policy passed
+# everything and the diagnosis was thrown away. The type is validated up front in
+# get_multi_summary instead, where the error can actually reach the surface.
 
 ################################################################################
 # Output Formatting

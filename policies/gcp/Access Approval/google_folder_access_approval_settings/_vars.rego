@@ -1,7 +1,7 @@
 package terraform.gcp.security.access_approval.google_folder_access_approval_settings.vars
 
 variables := {
-	"friendly_resource_name": "Access Approval",
+	"friendly_resource_name": "Folder Access Approval Settings",
 	"resource_type": "google_folder_access_approval_settings",
 	"resource_value_name": "name",
 }
