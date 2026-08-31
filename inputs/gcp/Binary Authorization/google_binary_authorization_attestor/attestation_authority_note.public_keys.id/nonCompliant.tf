@@ -1,6 +1,6 @@
 resource "google_binary_authorization_attestor" "non_compliant_example_1" {
   name        = "non_compliant_example_1"
-  description = "Non-compliant attestor with no public keys"
+  description = "Compliant attestor with valid public keys"
   project     = "my-secure-project"
 
   attestation_authority_note {

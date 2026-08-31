@@ -1,10 +1,10 @@
 resource "google_bigtable_app_profile" "non_compliant_example_1" {
   project        = "PDE"
-  instance       = "nc"
+  instance       = "c"
   app_profile_id = "non_compliant_example_1"
 
   single_cluster_routing {
-    cluster_id                 = "nc-cluster"
+    cluster_id                 = "c-cluster"
     allow_transactional_writes = false
   }
 
