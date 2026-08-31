@@ -3,6 +3,10 @@ package terraform.gcp.security.dialogflow_cx.google_dialogflow_cx_tool.open_api_
 import data.terraform.gcp.security.dialogflow_cx.google_dialogflow_cx_tool.vars
 import data.terraform.helpers.shared
 
+# This rule uses structural validation because Secret Manager references contain
+# tenant-specific project, secret, and version segments.
+conditions := []
+
 secret_version_path := ["open_api_spec", 0, "authentication", 0, "api_key_config", 0, "secret_version_for_api_key"]
 
 resources := [

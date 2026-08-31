@@ -3,6 +3,9 @@ package terraform.gcp.security.dialogflow_cx.google_dialogflow_cx_tool.open_api_
 import data.terraform.gcp.security.dialogflow_cx.google_dialogflow_cx_tool.vars
 import data.terraform.helpers.shared
 
+# This rule uses structural validation because the hostname is application-specific.
+conditions := []
+
 endpoint_path := ["open_api_spec", 0, "authentication", 0, "oauth_config", 0, "token_endpoint"]
 
 resources := [
