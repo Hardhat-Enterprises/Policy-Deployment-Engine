@@ -5,4 +5,10 @@ resource "google_compute_interconnect" "non_compliant_example_1" {
   requested_link_count = 1
   location             = "syd-zone1-6"
   macsec_enabled       = false
+
+  macsec {
+    pre_shared_keys {
+      name = "key1"
+    }
+  }
 }
