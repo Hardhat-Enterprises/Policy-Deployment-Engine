@@ -12,8 +12,8 @@ conditions := [
     {
       "condition": "'enable-oslogin' must not be disabled",
       "attribute_path": ["all_instances_config", 0, "metadata", "enable-oslogin"],
-      "values": ["TRUE", "true", "True"],
-      "policy_type": "whitelist"
+      "values": ["FALSE", "false", "False"],
+      "policy_type": "blacklist"
     }
   ],
   [
@@ -24,8 +24,8 @@ conditions := [
     {
       "condition": "'block-project-ssh-keys' must not be disabled",
       "attribute_path": ["all_instances_config", 0, "metadata", "block-project-ssh-keys"],
-      "values": ["TRUE", "true", "True"],
-      "policy_type": "whitelist"
+      "values": ["FALSE", "false", "False"],
+      "policy_type": "blacklist"
     }
   ],
   [
