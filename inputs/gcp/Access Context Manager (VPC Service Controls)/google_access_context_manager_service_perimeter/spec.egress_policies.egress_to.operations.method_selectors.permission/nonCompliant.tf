@@ -1,7 +1,7 @@
 resource "google_access_context_manager_service_perimeter" "non_compliant_example_1" {
   parent = "accessPolicies/123456789"
-  name   = "noncompliant_egress_permission"
-  title  = "noncompliant_egress_permission"
+  name   = "compliant_egress_permission"
+  title  = "service_perimeter"
 
   spec {
     restricted_services = ["storage.googleapis.com"]
