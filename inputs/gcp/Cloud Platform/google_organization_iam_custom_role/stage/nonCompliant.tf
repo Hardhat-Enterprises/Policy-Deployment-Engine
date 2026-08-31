@@ -1,8 +1,8 @@
 resource "google_organization_iam_custom_role" "non_compliant_example_1" {
-  role_id     = "badCustomRole"
+  role_id     = "myCustomRole"
   org_id      = "123456789"
-  title       = "Over-Privileged Role"
-  description = "Grants too much power"
-  permissions = ["iam.roles.delete", "resourcemanager.*"]  # ❌ risky
+  title       = "Read Only Role"
+  description = "Minimal safe permissions"
+  permissions = ["iam.roles.list"]   # ✅ allowed
   stage       = "ALPHA"                                   # ❌ unstable
 }
