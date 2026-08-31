@@ -13,20 +13,20 @@ import data.terraform.gcp.security.BigQuery.google_bigquery_dataset_iam_policy.v
 # matched, so a wildcard cannot replace it without the match failing.
 conditions := [
 [
-        {"situation_description" : "allUsers detected",
+        {"situation_description" : "The dataset's IAM policy grants a role to allUsers, making the dataset readable by anyone on the internet, signed in or not.",
          "remedies": ["Remove access from allUsers"]},
         {
-            "condition": "Check for iam_member containing allUsers",
+            "condition": "Check policy_data for a binding that grants a role to allUsers",
             "attribute_path" : ["policy_data"],
             "values" : "{\"bindings\":[{\"members\":[\"allUsers\"],\"role\":\"roles/bigquery.dataViewer\"}]}", 
             "policy_type" : "Blacklist"
         }
     ],
 [
-        {"situation_description" : "allUsers detected",
-         "remedies": ["Remove access from allUsers"]},
+        {"situation_description" : "The dataset's IAM policy document does not match the approved binding set, so bindings have been added, removed or altered outside review.",
+         "remedies": ["Restore policy_data to the reviewed binding set, or take the change through review before applying it", "If you only need to add one role, use google_bigquery_dataset_iam_binding or _iam_member instead — google_bigquery_dataset_iam_policy replaces the whole document"]},
         {
-            "condition": "Check for iam_member containing allUsers",
+            "condition": "Check policy_data matches the approved binding set",
             "attribute_path" : ["policy_data"],
             "values" : "{\"bindings\":[{\"members\":[\"user:fakeuser@example.com\"],\"role\":\"roles/bigquery.dataViewer\"}]}", 
             "policy_type" : "whitelist"

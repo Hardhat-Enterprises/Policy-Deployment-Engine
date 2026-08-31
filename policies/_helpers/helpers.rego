@@ -9,7 +9,7 @@ package terraform.helpers
 #
 # Architecture:
 #   - Delegates policy logic to specialized modules (blacklist, whitelist, range, etc.)
-#   - Uses set intersection for AND logic across conditions
+#   - Unions the violations of every condition in a situation (OR, not AND)
 #   - Returns structured summaries with violation details
 
 import data.terraform.helpers.shared
@@ -45,7 +45,9 @@ import data.terraform.helpers.policies.element_blacklist
 #     - details: Array of situation results with non_compliant_resources
 #
 # Logic:
-#   Resources must fail ALL conditions within a situation to be non-compliant (AND logic)
+#   Within a situation, a resource is non-compliant if it fails ANY condition (OR
+#   logic). Each condition's violations are unioned, not intersected. See the long
+#   note on find_failing_resources for why that is the semantics we want.
 get_multi_summary(conditions, tf_variables) = summary if {
     # An unrecognised policy_type is a BROKEN policy, not a permissive one. This
     # branch runs before any evaluation so it cannot be swallowed: select_policy_logic
@@ -98,7 +100,7 @@ build_single_situation(tf_variables, condition_group) = situation_result if {
     # Evaluate all conditions for this situation
     condition_results := evaluate_conditions(tf_variables, condition_group)
     
-    # Find resources that fail ALL conditions (AND logic)
+    # Every resource flagged by ANY of this situation's conditions (OR logic)
     nc_resources := find_failing_resources(condition_results)
     
     situation_result := {
@@ -145,9 +147,36 @@ evaluate_conditions(tf_variables, condition_group) = results if {
     ]
 }
 
-# Find resources failing ALL conditions using set intersection
+# Collect every resource flagged by ANY condition in this situation (OR logic).
+#
+# This is a UNION, and that is deliberate. Read the shape before "fixing" it: the
+# outer `[...]` is an array LITERAL wrapping ONE set comprehension, not a
+# comprehension over conditions. That single comprehension walks every condition
+# result (`condition_results[_]`) and every violation inside it, so the one set it
+# builds already holds the union of all conditions' violations. `resource_sets`
+# therefore always has exactly one element, `set_intersection_all` takes its
+# `count(sets) == 1` branch, and the set comes back unchanged.
+#
+# WHY union is the behaviour we want. A situation groups the several ways one
+# argument can be wrong, and each condition is one of those ways. Flagging on ANY
+# of them OVER-flags: a resource that trips one check gets reported even though
+# another check passed. Real AND would UNDER-flag: a resource that trips one check
+# and passes another would be reported compliant, and the policy would quietly
+# stop catching the thing it was written to catch. An over-flag is visible in a
+# test run and gets fixed; an under-flag is silent and can sit there for a
+# trimester. The tutorial already assumes OR — "check the shape with a whitelist
+# (or a pattern blacklist on the bad shape) as a second condition" only adds
+# coverage if a second condition can flag on its own.
+#
+# Verified 2026-08-31 by probe: two whitelist conditions in one situation, on
+# `labels.owner` and `labels.cost-center`, against a resource whose `owner` is
+# correct and whose `cost-center` is wrong. It IS flagged. Under AND it would not
+# be.
+#
+# These comments used to read "fail ALL conditions (AND logic)". The comments were
+# wrong, not the code. Do not change the code to match an old comment.
 find_failing_resources(condition_results) = failing_resources if {
-    # Extract resource names from each condition into sets
+    # ONE set, holding the names from every condition's violations.
     resource_sets := [
         {resource.name |
             some _, violations in condition_results[_]
@@ -155,7 +184,10 @@ find_failing_resources(condition_results) = failing_resources if {
         }
     ]
     
-    # Apply intersection across all sets
+    # With exactly one set this is always true and set_intersection_all's
+    # count(sets) == 1 branch hands that set straight back — so the `else = set()`
+    # fallback below is unreachable today. Kept: it is the correct answer if a
+    # future change ever makes resource_sets undefined.
     count(resource_sets) > 0
     failing_resources := set_intersection_all(resource_sets)
 } else = set()
@@ -314,7 +346,11 @@ _get_display_list(nc_list) = nc_list if {
 # Set Utilities
 ################################################################################
 
-# Improved set intersection using native Rego idioms
+# Intersection over a list of sets. The function is correct as written, but note
+# that its only caller, find_failing_resources, always hands it exactly ONE set —
+# so in practice the count(sets) == 1 branch is the branch that runs, and the
+# engine's cross-condition semantics is union. The multi-set branch below is
+# currently unexercised by any policy.
 set_intersection_all(sets) = result if {
     count(sets) == 0
     result := set()
