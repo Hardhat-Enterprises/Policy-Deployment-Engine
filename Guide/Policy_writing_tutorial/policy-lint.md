@@ -394,8 +394,21 @@ CI also runs `policy_lint.py` over **every** documented `gcp` resource on every 
 (`Policy lint (whole tree, report only)` in the `ALL` workflow) and publishes the JSON as a build
 artifact. That run is `continue-on-error` and exists so maintainers can track the repo-wide
 backlog over time — it is not a gate. Pre-existing findings elsewhere on `dev` are never held
-against you: your PR only fails on findings inside the `.rego` file (or fixture pair) **you**
-changed, exactly like the structural linter on the previous page.
+against you, exactly like the structural linter on the previous page.
+
+Nor are the pre-existing findings **inside** a file you touched. The PR lint job lints the
+resource types your change reaches twice — once on your branch, once on the base branch you
+started from — and fails only on findings that are not in the base result. So editing one
+argument in a resource type somebody else left messy does not hand you their backlog, and a
+change that *removes* findings can never fail. What you touched but did not break is printed
+under a `[NOTE]` line, so you can still see the file has known problems:
+
+    [NOTE] 3 pre-existing policy_lint error(s) in the file(s) you touched — not attributed
+    to you: hard-coded-value x2, index-path x1
+
+A finding counts as yours when its `(rule, service, resource type, argument)` appears more times
+on your branch than on the base — so introducing a *second* hard-coded value into a file that
+already had one does fail, and re-wording the message of an existing one does not.
 
 <div align="center">
 

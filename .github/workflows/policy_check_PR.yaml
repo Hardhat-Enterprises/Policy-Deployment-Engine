@@ -34,7 +34,14 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          fetch-depth: 0          # need history for merge-base with the base branch
+          # Full history, for two things run_precommit_linter.py needs: the
+          # merge-base with the base branch (what did this PR change), and the
+          # base branch's *tree*, which it checks out into a temporary git
+          # worktree to work out which findings the PR introduced rather than
+          # inherited. On a shallow clone the gate fails loudly rather than
+          # blaming the contributor for the whole backlog — so this is
+          # load-bearing, not an optimisation.
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v6
@@ -69,11 +76,15 @@ jobs:
 
       # PR gate: structural + content checks (content is on by default), but only
       # fail on files this PR changed vs its base branch — never the repo-wide tree.
+      # For policy_lint it narrows further: only findings this PR *introduced*,
+      # measured against a throwaway worktree of the base tree.
       - name: Lint changed files (structural + content)
         if: github.event_name == 'pull_request'
         env:
           BASE_REF: ${{ github.base_ref }}
         run: |
+          # Belt and braces with fetch-depth: 0 above — the base branch must be a
+          # real local commit, because its tree is checked out and linted.
           git fetch --quiet origin "$BASE_REF"
           python3 scripts/linters/run_precommit_linter.py --base "origin/$BASE_REF"
 
