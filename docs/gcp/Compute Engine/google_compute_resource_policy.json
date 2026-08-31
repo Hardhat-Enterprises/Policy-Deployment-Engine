@@ -154,7 +154,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "This controls what happens to scheduled snapshots when the source disk is deleted with the default being KEEP_AUTO_SNAPSHOTS. APPLY_RETENTION_POLICY will mean that destroying the primary disk will also delete its backups. This extra field makes this dangerous as it allows an accidental disk deletion to be unrecoverable. A policy should be written to require KEEP_AUTO_SNAPSHOTS so that the recovery outlives the thing it protects."
+      "rationale": "APPLY_RETENTION_POLICY means the snapshots continue to age out according to max_retention_days after the source disk is deleted, so they remain within the organisation's data lifecycle governance rather than persisting indefinitely. This reduces recoverability after an accidental disk deletion, but that risk is better addressed by deletion_protection on the disk and by a separate backup of record, not by exempting auto-snapshots from retention. A policy should require APPLY_RETENTION_POLICY so that retained snapshots stay governed by the organisational retention policy."
     },
     "snapshot_schedule_policy.schedule": {
       "type": "block",
