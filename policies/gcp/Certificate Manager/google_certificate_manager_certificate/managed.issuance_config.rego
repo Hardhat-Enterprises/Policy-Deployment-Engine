@@ -11,8 +11,11 @@ conditions := [[
 	{
 		"condition": "Certificate managed issuance config should use an approved value.",
 		"attribute_path": ["managed", 0, "issuance_config"],
-		"values": ["projects/sit764-policy-project/locations/global/certificateIssuanceConfigs/approved-issuance-config"],
-		"policy_type": "whitelist",
+		"values": [
+			"projects/*/locations/*/certificateIssuanceConfigs/*",
+			[["sit764-policy-project"], ["global"], ["approved-issuance-config"]],
+		],
+		"policy_type": "pattern whitelist",
 	},
 ]]
 
