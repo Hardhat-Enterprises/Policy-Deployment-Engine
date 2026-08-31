@@ -1,14 +1,21 @@
 """Unit tests for the policy_lint wiring in run_precommit_linter.py.
 
-These exercise the owned-triple derivation and the "fail only on findings the
-contributor's own changes reached" filter in isolation, with a fake
-``policy_lint.lint_resource`` (monkeypatched) — no git repo, no OPA, and no
-real policy tree required.
+These exercise the owned-triple derivation, the "fail only on findings the
+contributor's own changes reached" filter, and the base-tree comparison that
+narrows that further to the findings the change actually *introduced* — with a
+fake ``policy_lint.lint_resource`` (monkeypatched), so no OPA and no real policy
+tree is required.
+
+The base-tree tests that shell out to git build a throwaway one-commit repo in
+``tmp_path`` (the ``git_repo`` fixture) rather than touching this checkout.
 """
 
 import re
+import subprocess
 import sys
 from pathlib import Path
+
+import pytest
 
 project_root = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
@@ -197,3 +204,253 @@ def test_every_rule_has_an_anchored_heading_in_the_rules_page():
     headings = set(re.findall(r"^##\s+([a-z0-9-]+)\s*$", page, re.MULTILINE))
     missing = set(policy_lint.RULES) - headings
     assert not missing, f"policy-lint.md is missing headings for: {sorted(missing)}"
+
+
+# --------------------------------------------------------------------------- #
+# _finding_key / _finding_counts — a finding's identity excludes its message
+# --------------------------------------------------------------------------- #
+def test_finding_key_excludes_the_message():
+    # Same finding, message re-worded by an unrelated edit (a line number moved).
+    a = Finding("BigQuery", "google_bigquery_dataset", "dataset_id",
+                "hard-coded-value", "project id 'projects/PDE' at line 12")
+    b = Finding("BigQuery", "google_bigquery_dataset", "dataset_id",
+                "hard-coded-value", "project id 'projects/PDE' at line 40")
+    assert rpl._finding_key(a) == rpl._finding_key(b)
+
+
+def test_finding_counts_ignores_warnings():
+    findings = [
+        Finding("BigQuery", "google_bigquery_dataset", "dataset_id",
+                "hard-coded-value", "err"),
+        Finding("BigQuery", "google_bigquery_dataset", "dataset_id",
+                "legacy-assign", "warn", severity="warn"),
+    ]
+    counts = rpl._finding_counts(findings)
+    assert sum(counts.values()) == 1
+    assert list(counts)[0][0][0] == "hard-coded-value"
+
+
+# --------------------------------------------------------------------------- #
+# _split_new_and_inherited — new vs inherited
+# --------------------------------------------------------------------------- #
+DATASET_REGO = "policies/gcp/BigQuery/google_bigquery_dataset/dataset_id.rego"
+
+
+def _owned(*findings):
+    """HEAD's owned (path, Finding) pairs for the dataset_id policy file."""
+    return [(DATASET_REGO, finding) for finding in findings]
+
+
+def _hard_coded(message="literal project id 'projects/PDE'"):
+    return Finding("BigQuery", "google_bigquery_dataset", "dataset_id",
+                   "hard-coded-value", message)
+
+
+def test_a_finding_present_in_both_base_and_head_is_inherited_not_new():
+    baseline = rpl._finding_counts([_hard_coded()])
+    new, inherited = rpl._split_new_and_inherited(_owned(_hard_coded()), baseline)
+    assert new == []
+    assert [f.rule for _, f in inherited] == ["hard-coded-value"]
+
+
+def test_a_finding_whose_message_shifted_is_still_inherited():
+    # The point of keying on (rule, service, resource, policy): a legitimate edit
+    # moves line numbers and counts inside the message, and that must not read as
+    # a new problem.
+    baseline = rpl._finding_counts([_hard_coded("2 conditions name 'projects/PDE'")])
+    new, inherited = rpl._split_new_and_inherited(
+        _owned(_hard_coded("3 conditions name 'projects/PDE'")), baseline)
+    assert new == []
+    assert len(inherited) == 1
+
+
+def test_a_genuinely_new_finding_fails():
+    baseline = rpl._finding_counts([_hard_coded()])
+    introduced = Finding("BigQuery", "google_bigquery_dataset", "dataset_id",
+                         "index-path", "attribute_path ends in [0]")
+    new, inherited = rpl._split_new_and_inherited(
+        _owned(_hard_coded(), introduced), baseline)
+    assert [f.rule for _, f in new] == ["index-path"]
+    assert [f.rule for _, f in inherited] == ["hard-coded-value"]
+
+
+def test_a_new_finding_in_a_resource_type_absent_from_the_base_is_new():
+    # A brand-new resource type lints to nothing on the base tree, so every
+    # finding in it belongs to the contributor who added it.
+    new, inherited = rpl._split_new_and_inherited(_owned(_hard_coded()),
+                                                  rpl._finding_counts([]))
+    assert len(new) == 1
+    assert inherited == []
+
+
+def test_removing_a_finding_passes():
+    baseline = rpl._finding_counts([_hard_coded("a"), _hard_coded("b")])
+    new, inherited = rpl._split_new_and_inherited(_owned(_hard_coded("a")), baseline)
+    assert new == []
+    assert len(inherited) == 1
+
+
+def test_removing_every_finding_passes():
+    baseline = rpl._finding_counts([_hard_coded()])
+    new, inherited = rpl._split_new_and_inherited([], baseline)
+    assert (new, inherited) == ([], [])
+
+
+def test_going_from_one_to_two_of_the_same_rule_in_the_same_file_fails():
+    # Counts, not set membership: the file already had one hard-coded value and
+    # the change added a second, so exactly one finding is the contributor's.
+    baseline = rpl._finding_counts([_hard_coded("literal 'projects/PDE'")])
+    new, inherited = rpl._split_new_and_inherited(
+        _owned(_hard_coded("literal 'projects/PDE'"),
+               _hard_coded("literal 'projects/OTHER'")), baseline)
+    assert [f.message for _, f in new] == ["literal 'projects/OTHER'"]
+    assert [f.message for _, f in inherited] == ["literal 'projects/PDE'"]
+
+
+def test_two_findings_of_one_rule_unchanged_are_both_inherited():
+    baseline = rpl._finding_counts([_hard_coded("a"), _hard_coded("b")])
+    new, inherited = rpl._split_new_and_inherited(
+        _owned(_hard_coded("a"), _hard_coded("b")), baseline)
+    assert new == []
+    assert len(inherited) == 2
+
+
+# --------------------------------------------------------------------------- #
+# _base_commit / _base_tree / _subtract_baseline — real git, fake lint_resource
+# --------------------------------------------------------------------------- #
+@pytest.fixture
+def git_repo(tmp_path, monkeypatch):
+    """A throwaway one-commit repo, cwd'd into: the helpers shell out to git."""
+    repo = tmp_path / "repo"
+    repo.mkdir()
+
+    def git(*args):
+        subprocess.run(["git", "-C", str(repo), *args], check=True, capture_output=True)
+
+    git("init", "--quiet", "-b", "main")
+    git("config", "user.email", "linter@example.invalid")
+    git("config", "user.name", "Linter Test")
+    git("config", "commit.gpgsign", "false")
+    (repo / "README.md").write_text("base\n", encoding="utf-8")
+    git("add", "README.md")
+    git("commit", "--quiet", "-m", "base commit")
+    monkeypatch.chdir(repo)
+    return repo
+
+
+def test_missing_base_ref_fails_loudly_instead_of_blaming_everything(git_repo):
+    # A shallow CI clone: the base branch is simply not here. Treating that as
+    # "an empty base tree" would blame the contributor for the whole backlog of
+    # every file they touched, so it must be a hard, explained failure.
+    with pytest.raises(rpl.BaseTreeUnavailable) as excinfo:
+        rpl._base_commit("origin/dev")
+    message = str(excinfo.value)
+    assert "origin/dev" in message
+    assert "fetch-depth: 0" in message
+
+
+def test_main_refuses_to_run_at_all_without_a_reachable_base_ref(git_repo, capsys):
+    # Not just "everything is new": with no base ref, changed_files() diffs
+    # against a ref git cannot resolve, comes back empty, and the gate would
+    # otherwise pass every PR silently. It must fail instead.
+    assert rpl.main(["--base", "origin/dev"]) == 1
+    out = capsys.readouterr().out
+    assert "[FAIL]" in out
+    assert "fetch-depth: 0" in out
+    assert "skipping linter" not in out
+
+
+def test_subtract_baseline_propagates_a_missing_base_ref(git_repo):
+    with pytest.raises(rpl.BaseTreeUnavailable):
+        rpl._subtract_baseline(_owned(_hard_coded()), base="origin/dev")
+
+
+def test_base_commit_without_a_base_is_head(git_repo):
+    head = subprocess.run(["git", "rev-parse", "HEAD"],
+                          capture_output=True, text=True).stdout.strip()
+    assert rpl._base_commit() == head
+
+
+def test_subtract_baseline_lints_a_real_base_worktree_and_removes_it(git_repo, monkeypatch):
+    seen_roots = []
+
+    def fake_lint_resource(root, platform, service, resource_type):
+        seen_roots.append(Path(root))
+        return [_hard_coded("literal 'projects/PDE' (base wording)")]
+
+    monkeypatch.setattr(policy_lint, "lint_resource", fake_lint_resource)
+
+    new, inherited = rpl._subtract_baseline(
+        _owned(_hard_coded("literal 'projects/PDE' (head wording)")))
+
+    assert new == []
+    assert len(inherited) == 1
+    # The base tree is a separate checkout, not the tree we are standing in ...
+    assert seen_roots and seen_roots[0].resolve() != git_repo.resolve()
+    # ... and it is gone again, both on disk and as a registered worktree.
+    assert not seen_roots[0].exists()
+    listed = subprocess.run(["git", "worktree", "list", "--porcelain"],
+                            capture_output=True, text=True).stdout
+    assert "policy-lint-base-" not in listed
+
+
+def test_base_tree_is_removed_even_when_linting_it_raises(git_repo, monkeypatch):
+    seen_roots = []
+
+    def exploding_lint_resource(root, platform, service, resource_type):
+        seen_roots.append(Path(root))
+        raise policy_lint.PolicyLintError("opa fell over")
+
+    monkeypatch.setattr(policy_lint, "lint_resource", exploding_lint_resource)
+
+    with pytest.raises(policy_lint.PolicyLintError):
+        rpl._subtract_baseline(_owned(_hard_coded()))
+
+    assert seen_roots and not seen_roots[0].exists()
+
+
+def test_no_owned_findings_means_the_base_tree_is_never_built(monkeypatch):
+    # Cost control: a target that is clean at HEAD has nothing to subtract, so
+    # checking out and linting the base tree for it is pure waste.
+    def refuse(*args, **kwargs):
+        raise AssertionError("the base tree must not be built when nothing is owned")
+
+    monkeypatch.setattr(rpl, "_base_tree", refuse)
+    monkeypatch.setattr(rpl, "_base_commit", refuse)
+
+    assert rpl._subtract_baseline([]) == ([], [])
+
+
+def test_only_targets_with_a_finding_at_head_are_linted_on_the_base(git_repo, monkeypatch):
+    linted = []
+
+    def fake_lint_resource(root, platform, service, resource_type):
+        linted.append((platform, service, resource_type))
+        return []
+
+    monkeypatch.setattr(policy_lint, "lint_resource", fake_lint_resource)
+
+    # The base targets come from the owned findings, not from the changed set:
+    # a resource type the change touched but left clean never reaches the base
+    # tree at all, because there would be nothing to subtract from.
+    rpl._subtract_baseline(_owned(_hard_coded()))
+
+    assert linted == [("gcp", "BigQuery", "google_bigquery_dataset")]
+
+
+# --------------------------------------------------------------------------- #
+# _print_inherited — context, never a failure
+# --------------------------------------------------------------------------- #
+def test_print_inherited_says_nothing_when_there_is_nothing_inherited(capsys):
+    rpl._print_inherited([])
+    assert capsys.readouterr().out == ""
+
+
+def test_print_inherited_summarises_by_rule_and_elides_a_long_list(capsys):
+    inherited = [(f"policies/gcp/BigQuery/google_bigquery_dataset/arg_{i}.rego",
+                  _hard_coded(f"m{i}")) for i in range(rpl.INHERITED_PREVIEW + 5)]
+    rpl._print_inherited(inherited)
+    out = capsys.readouterr().out
+    assert f"hard-coded-value x{len(inherited)}" in out
+    assert "not attributed to you" in out
+    assert "... and 5 more" in out

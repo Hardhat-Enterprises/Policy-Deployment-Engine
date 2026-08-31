@@ -10,7 +10,9 @@ There are four supporting scripts:
 - `run_precommit_linter.py` — runs the linter but fails only on **your** changed
   files (so you are never blocked by the repo-wide backlog). It also runs
   `policy_lint.py` (below) over every resource type your changed files belong
-  to, on the same "own only what you changed" basis.
+  to, and there it fails only on the findings your change **introduced** —
+  measured against the base tree — so a pre-existing finding inside a file you
+  merely touched is reported as context, not as your fault.
 - `check_branch_name.py` — enforces the branch naming convention.
 - `branch_scope.py` — enforces that a `Service/<platform>/<service_slug>/<resource_type>`
   branch changes **only** that resource's files (`docs/` JSON, `inputs/`,
@@ -91,6 +93,28 @@ It also runs `policy_lint.py` over every resource type a changed file belongs
 to, and fails on an error-severity finding only when the specific `.rego` file
 (or fixture pair) it names was itself changed — see
 `Guide/Policy_writing_tutorial/policy-lint.md`.
+
+**Blame is limited to what you introduced.** Within a file you did change, a
+`policy_lint` finding fails the run only if it is not already there on the base
+tree. The same resource types are linted a second time against a detached
+`git worktree` of the base commit (the merge-base with `--base <ref>`, else
+`HEAD`), thrown away afterwards, and anything present in both is printed under a
+`[NOTE]` line as context instead of failing. Consequences worth knowing:
+
+- Removing findings can never fail. A mechanical cleanup PR passes.
+- A finding is identified by `(rule, service, resource, policy)` — **not** the
+  message, because messages carry line numbers and counts that shift when a file
+  is legitimately edited, and a shifted message must not read as a new problem.
+- Identities are compared by **count**, so one `hard-coded-value` in a file
+  becoming two still fails.
+- The base tree is built only when something is owned at HEAD, and only the
+  resource types that produced one of those findings are linted on it — a clean
+  change never pays for it at all. Measured: +0s on a clean one-resource PR,
+  ~1.7s on a one-resource PR that inherits a finding, ~3.1s on a 234-resource-type
+  cleanup PR.
+- If the base ref is not in the clone (a shallow CI checkout), the gate **fails
+  loudly** rather than treating the whole backlog as newly introduced. CI must
+  check out with `fetch-depth: 0`.
 
 ```bash
 python scripts/linters/run_precommit_linter.py            # staged + unstaged (pre-commit)
