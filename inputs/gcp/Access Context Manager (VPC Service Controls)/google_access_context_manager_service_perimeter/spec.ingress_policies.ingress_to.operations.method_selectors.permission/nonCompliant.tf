@@ -1,6 +1,6 @@
 resource "google_access_context_manager_service_perimeter" "non_compliant_example_1" {
   parent = "accessPolicies/123456789"
-  name   = "compliant_ingress_permission"
+  name   = "non_compliant_ingress_permission"
   title  = "service_perimeter"
 
   spec {
