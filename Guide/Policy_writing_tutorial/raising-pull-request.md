@@ -3,9 +3,15 @@
 
 ### 1. Push your changes
 
-Run the following commands to commit and push your work:
+Add **only the files for your own resource** — not `git add .`, which sweeps up editor
+scratch files, downloaded binaries and any file you were only looking at, and will fail the
+`Branch scope` check on your pull request:
 
-    git add .
+    git add "docs/gcp/<Service>/<resource type>.json" \
+            "inputs/gcp/<Service>/<resource type>" \
+            "policies/gcp/<Service>/<resource type>"
+
+    git status          # check nothing else crept in
 
     git commit -m "message"  # e.g. initial commit
 
@@ -50,6 +56,9 @@ Your pull request must pass:
 
 - OPA checks  
 - Terraform checks  
+- Lint checks — see [policy_lint](policy-lint.md#top)  
+- **Branch scope** — your branch may only change files for its own resource type; see
+  [branch_scope](branch-scope.md#top) if it fails  
 
 Example:
 
@@ -64,6 +73,7 @@ Example:
 
 <div align="center">
 
+[⬅️ Previous: branch_scope — stay inside your own resource](branch-scope.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
 [📘 Back to Contents](policy-writing-tutorial.md#top) &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;
 
 </div>
