@@ -6,13 +6,13 @@ import data.terraform.gcp.security.access_context_manager_vpc_service_controls.g
 conditions := [[
   {
     "situation_description": "Egress operations should use explicitly selected IAM permissions instead of overly broad permissions.",
-    "remedies": ["Configure spec.egress_policies.egress_to.operations.method_selectors.permission with explicit IAM permissions instead of '*'."],
+    "remedies": ["Configure spec.egress_policies.egress_to.operations.method_selectors.permission with an explicit IAM permission instead of '*'."],
   },
   {
-    "condition": "Each egress permission selector must not allow all permissions.",
+    "condition": "Egress permission selector must not allow all permissions.",
     "attribute_path": ["spec", 0, "egress_policies", 0, "egress_to", 0, "operations", 0, "method_selectors", 0, "permission"],
     "values": ["*"],
-    "policy_type": "element blacklist",
+    "policy_type": "blacklist",
   },
 ]]
 
