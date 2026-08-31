@@ -12,7 +12,7 @@ conditions := [[
     "condition": "Each egress identity must not be a wildcard or public principal.",
     "attribute_path": ["spec", 0, "egress_policies", 0, "egress_from", 0, "identities"],
     "values": ["*", "allUsers", "allAuthenticatedUsers"],
-    "policy_type": "element_blacklist",
+    "policy_type": "element blacklist",
   },
 ]]
 
