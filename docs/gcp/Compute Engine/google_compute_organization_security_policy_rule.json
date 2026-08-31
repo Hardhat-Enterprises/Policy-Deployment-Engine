@@ -6,8 +6,8 @@
       "description": "The Action to perform when the client connection triggers the rule. Valid actions are:\n\"allow\": allow access to target.\n\"deny\": deny access to target.\n\"goto_next\": forward the request to the next hierarchical policy for evaluation.\n\"redirect\": redirect to a different target. Parameters for this action can be configured via redirectOptions. Only EXTERNAL_302 redirect type is supported for organization security policies.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Directly determines whether traffic is allowed, denied, or redirected, this is the core access-control decision the rule enforces. A misconfigured action (e.g. allow instead of deny) directly changes what traffic reaches the target."
+      "security_impact": false,
+      "rationale": "The action a rule takes (allow/deny/redirect) is the core functional definition of what the rule does, a team's business-logic choice, not a platform-level constraint. A generic policy cannot dictate whether a specific rule should allow or deny traffic without second-guessing legitimate business decisions."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
@@ -34,15 +34,15 @@
       "description": "If set to true, the specified action is not enforced.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "If preview is set to true, the rule's action is not enforced even though the rule appears configured and active. This can silently leave traffic unprotected while looking secure on inspection, a direct exposure risk."
+      "security_impact": false,
+      "rationale": "Whether a rule runs in preview or enforcement mode is an operational and deployment lifecycle choice (e.g., testing rules before rollout), not a structural security control."
     },
     "priority": {
       "description": "An integer indicating the priority of a rule in the list. The priority must be a value\nbetween 0 and 2147483647. Rules are evaluated from highest to lowest priority where 0 is the\nhighest priority and 2147483647 is the lowest prority.",
       "required": true,
       "type": "number",
-      "security_impact": true,
-      "rationale": "priority determines evaluation order among rules. A misconfigured priority can allow a less-restrictive or unintended rule to be evaluated first, directly changing which access-control decision actually applies to a given request."
+      "security_impact": false,
+      "rationale": "Rule priority ordering is an architectural and functional design choice for the team's rule evaluation sequence, not a platform-level security policy target."
     },
     "header_action": {
       "type": "block",
@@ -151,8 +151,8 @@
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines the exact cookie value exempted from WAF inspection. If set too broadly or incorrectly, it can allow malicious payloads in that cookie to bypass WAF protection entirely, directly affecting exposure."
+      "security_impact": false,
+      "rationale": "Specifies a concrete cookie value for a WAF exclusion, a generic platform policy cannot meaningfully constrain team-specific exclusion values."
     },
     "preconfigured_waf_config.exclusion.request_header": {
       "type": "block",
@@ -163,15 +163,15 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines the match breadth of a WAF exclusion applied to request headers — for example, EQUALS_ANY exempts the header entirely from inspection. A misconfigured operator can silently widen the scope of header-based traffic exempted from WAF protection, directly affecting exposure."
+      "security_impact": false,
+      "rationale": "Configures a specific match operator for a WAF exclusion rule, team-specific data-tuning rather than a platform-level policy target."
     },
     "preconfigured_waf_config.exclusion.request_header.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines the exact header value exempted from WAF inspection. If set too broadly or incorrectly, it can allow malicious payloads in that header to bypass WAF protection entirely, directly affecting exposure."
+      "security_impact": false,
+      "rationale": "Specifies a concrete header value for a WAF exclusion, this requires application-specific context that cannot be generalized into an organization-wide platform policy"
     },
     "preconfigured_waf_config.exclusion.request_query_param": {
       "type": "block",
@@ -182,8 +182,8 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines the match breadth of a WAF exclusion applied to query parameters — for example, EQUALS_ANY exempts the parameter entirely from inspection. A misconfigured operator can silently widen the scope of query-string traffic exempted from WAF protection, directly affecting exposure."
+      "security_impact": false,
+      "rationale": "References a specific query parameter value to exclude from inspection, an application-specific configuration a platform policy cannot generically constrain."
     },
     "preconfigured_waf_config.exclusion.request_query_param.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
@@ -201,15 +201,15 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines the match breadth of a WAF exclusion applied to the request URI — for example, EQUALS_ANY exempts URI matching entirely from inspection. A misconfigured operator can silently widen the scope of URI-based traffic exempted from WAF protection, directly affecting exposure."
+      "security_impact": false,
+      "rationale": "URI exclusion match operators are application-specific tuning choices rather than structural security features suitable for a generic enterprise-wide policy."
     },
     "preconfigured_waf_config.exclusion.request_uri.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines the exact URI value exempted from WAF inspection. If set too broadly or incorrectly, it can allow malicious payloads via that URI to bypass WAF protection entirely, directly affecting exposure."
+      "security_impact": false,
+      "rationale": "Specifies a concrete URI path exempted from WAF inspection, a team-specific configuration that cannot be validated by a generic platform policy without knowing exact application routes."
     },
     "redirect_options": {
       "type": "block",
@@ -220,8 +220,8 @@
       "description": "Target for the redirect action. This is required if the type is EXTERNAL_302.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies the destination for a redirect action. If misconfigured or left pointing to an unintended/attacker-controlled destination, it directly creates an open-redirect-style exposure risk."
+      "security_impact": false,
+      "rationale": "Specifies a concrete redirect destination, a team-specific application routing choice that a generic platform policy cannot constrain without overreaching into application-level decisions."
     },
     "redirect_options.type": {
       "description": "Type of the redirect action. For organization security policies, only EXTERNAL_302 is supported.",
