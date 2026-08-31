@@ -1,6 +1,6 @@
 resource "google_dialogflow_cx_tool" "compliant_example_1" {
   parent       = "projects/example-project/locations/global/agents/example-agent"
-  display_name = "dialogflow-cx-tool-fixture"
+  display_name = "compliant_example_1"
   description  = "Dialogflow CX Tool fixture."
 
   open_api_spec {
