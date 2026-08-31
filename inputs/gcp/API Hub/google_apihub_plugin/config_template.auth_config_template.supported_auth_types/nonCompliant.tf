@@ -1,6 +1,6 @@
 resource "google_apihub_plugin" "non_compliant_example_1"{
   location = "us-central1"
-  display_name = "Test Plugin nc1"
+  display_name = "Test Plugin c"
   project  = "PDE"
   plugin_id = "non_compliant_example_1"
   plugin_category = "API_GATEWAY"
