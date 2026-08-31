@@ -13,8 +13,16 @@ conditions := [
       {
         "condition": "KMS Key is mis-configured",
         "attribute_path": ["kms_key_name"],
-        "values": ["/project/keys/my-safe-key"],
-        "policy_type": "whitelist"
+        "values": [
+          "projects/*/locations/*/keyRings/*/cryptoKeys/*",
+          [
+            ["example-project"],
+            ["australia-southeast1"],
+            ["example-key-ring"],
+            ["example-key"]
+          ]
+        ],
+        "policy_type": "pattern whitelist"
       }
     ]
 ]
