@@ -1,6 +1,6 @@
 # Compliant — a single repository that satisfies every merged scenario
 resource "google_cloudbuildv2_repository" "compliant_example_1" {
-  project           = "c"
+  project           = "compliant_example_1"
   location          = "australia-southeast2"
   name              = "my-repository"
   parent_connection = "my-connection"
