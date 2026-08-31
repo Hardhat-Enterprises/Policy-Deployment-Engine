@@ -1,7 +1,7 @@
 resource "google_gkeonprem_bare_metal_cluster" "non_compliant_example_1" {
   name = "non_compliant_example_1"
   project = "PDE"
-  location = "us-west1"
+  location = "australia_southeast1"
   admin_cluster_membership = "projects/870316890899/locations/global/memberships/gkeonprem-terraform-test"
   bare_metal_version = "1.12.3"
   network_config {
@@ -49,7 +49,7 @@ resource "google_gkeonprem_bare_metal_cluster" "non_compliant_example_1" {
   security_config {
     authorization {
       admin_users {
-        username = "user@hashicorptest.com"
+        username = "admin@hashicorptest.com"
       }
     }
   }

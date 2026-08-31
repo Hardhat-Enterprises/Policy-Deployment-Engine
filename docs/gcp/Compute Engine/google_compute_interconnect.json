@@ -6,106 +6,106 @@
       "description": "Administrative status of the interconnect. When this is set to true, the Interconnect is\nfunctional and can carry traffic. When set to false, no packets can be carried over the\ninterconnect and no BGP routes are exchanged over it. By default, the status is set to true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Administrative kill-switch for the physical connection - true carries traffic and exchanges BGP routes, false carries nothing. Both states are legitimate operational needs (e.g. provisioning ahead of cutover, or temporarily pulling a link for maintenance), and the resource's whole purpose is to be an active connection, so there is no generically 'safer' fixed value to enforce; this is an operational toggle, not an access-control setting."
     },
     "customer_name": {
       "description": "Customer name, to put in the Letter of Authorization as the party authorized to request a\ncrossconnect. This field is required for Dedicated and Partner Interconnect, should not be specified\nfor cross-cloud interconnect.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Free-text customer name recorded on the Letter of Authorization for the physical cross-connect. An identifier used for provisioning paperwork with the colocation facility, with no access-control or exposure effect."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform is prevented from destroying the interconnect. Setting this to 'PREVENT' guards against accidental or unauthorised deletion via 'terraform destroy'/'apply' - the same destructive-loss-prevention pattern already enforced on google_compute_forwarding_rule's deletion_policy. The default 'DELETE' leaves the physical connection (and everything routed over it) exposed to being torn down with no safeguard."
     },
     "description": {
       "description": "An optional description of this resource. Provide this property when you create the resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Free-text, human-readable annotation with no runtime effect on access or exposure."
     },
     "interconnect_type": {
       "description": "Type of interconnect. Note that a value IT_PRIVATE has been deprecated in favor of DEDICATED.\nCan take one of the following values:\n  - PARTNER: A partner-managed interconnection shared between customers though a partner.\n  - DEDICATED: A dedicated physical interconnection with the customer. Possible values: [\"DEDICATED\", \"PARTNER\", \"IT_PRIVATE\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Chooses between a dedicated physical circuit direct to Google ('DEDICATED') and a circuit aggregated through a third-party service provider ('PARTNER'; 'IT_PRIVATE' is a deprecated alias for 'DEDICATED'). PARTNER does add an extra party into the physical path, but forcing DEDICATED as a platform policy isn't workable: Dedicated Interconnect requires physical colocation in one of a small number of Google facilities that most teams don't have access to, unlike a region whitelist where multiple approved choices are normally available to everyone. The actual access-control lever - link encryption - is available on both types and is already enforced directly via macsec_enabled/macsec.fail_open, so this tier choice alone (like network_tier on google_compute_forwarding_rule) doesn't change the connection's enforced security posture."
     },
     "labels": {
       "description": "Labels for this resource. These can only be added or modified by the setLabels\nmethod. Each label key/value pair must comply with RFC1035. Label values may be empty.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Free-form key/value metadata for organisation and billing; has no effect on network exposure or access control."
     },
     "link_type": {
       "description": "Type of link requested. Note that this field indicates the speed of each of the links in the\nbundle, not the speed of the entire bundle. Can take one of the following values:\n  - LINK_TYPE_ETHERNET_10G_LR: A 10G Ethernet with LR optics.\n  - LINK_TYPE_ETHERNET_100G_LR: A 100G Ethernet with LR optics.\n  - LINK_TYPE_ETHERNET_400G_LR4: A 400G Ethernet with LR4 optics Possible values: [\"LINK_TYPE_ETHERNET_10G_LR\", \"LINK_TYPE_ETHERNET_100G_LR\", \"LINK_TYPE_ETHERNET_400G_LR4\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the physical link speed (10G/100G/400G Ethernet optics) for the bundle. A capacity/performance choice with no more- or less-secure value - every listed speed is subject to the same MACsec and administrative controls assessed elsewhere in this doc."
     },
     "location": {
       "description": "URL of the InterconnectLocation object that represents where this connection is to be provisioned.\nSpecifies the location inside Google's Networks.",
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+      "rationale": "URL of the InterconnectLocation - the physical Google colocation facility this circuit is provisioned into. This is the interconnect equivalent of a region: it fixes the physical/jurisdictional point where the customer's traffic meets Google's network, so policy should restrict it to an approved-facility whitelist for data-residency reasons, the same archetype already applied to region on google_compute_forwarding_rule; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
     },
     "macsec_enabled": {
       "description": "Enable or disable MACsec on this Interconnect connection.\nMACsec enablement fails if the MACsec object is not specified.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Toggles MACsec (802.1AE) link-layer encryption for the physical connection between Google and the customer's on-prem router. Without it the L2 medium the interconnect traffic runs over is unencrypted; enabling it is the direct 'require encryption' control for this resource, so it should be required true (the strength of that encryption enforcement is then governed by macsec.fail_open)."
     },
     "name": {
       "description": "Name of the resource. Provided by the client when the resource is created. The name must be\n1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters\nlong and match the regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the first\ncharacter must be a lowercase letter, and all following characters must be a dash,\nlowercase letter, or digit, except the last character, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Resource identifier only; naming has no access-control effect."
     },
     "noc_contact_email": {
       "description": "Email address to contact the customer NOC for operations and maintenance notifications\nregarding this Interconnect. If specified, this will be used for notifications in addition to\nall other forms described, such as Cloud Monitoring logs alerting and Cloud Notifications.\nThis field is required for users who sign up for Cloud Interconnect using workforce identity\nfederation.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An operational contact address used only for Google's maintenance/operations notifications to the customer's NOC (in addition to Cloud Monitoring alerting) - a notification-routing convenience, not a control on the resource's own security posture, and enforcing a specific address would mean hardcoding a team-specific email, which is overreaching."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies which GCP project the resource is created in; a deployment routing detail with no intrinsic security value to enforce generically."
     },
     "remote_location": {
       "description": "Indicates that this is a Cross-Cloud Interconnect. This field specifies the location outside\nof Google's network that the interconnect is connected to.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Used only for Cross-Cloud Interconnect: the facility outside Google's network (a Google-published point-of-presence where another cloud/network provider is also present) that this circuit terminates at. Unlike a plain resource reference, the value chosen determines the physical/jurisdictional point where traffic leaves Google's network boundary entirely into third-party infrastructure - the same data-residency/boundary-control reasoning as location, applied to the far end of a cross-cloud link. Policy should restrict it to an approved-facility whitelist (parameterised; a hardcoded example is acceptable) so teams can't bridge Google's network out to an unvetted external facility."
     },
     "requested_features": {
       "description": "List of features to request for this Interconnect connection. This field is only applicable during Interconnect creation and cannot be modified later.\nPossible values include:\n- 'IF_MACSEC': Provisions the connection on hardware ports that support MACsec (Media Access Control Security). If not specified, the system may allocate non-MACsec capable ports if available.\n- 'IF_L2_FORWARDING': Provisions the connection for Layer 2 (L2) traffic forwarding. If not specified, the connection defaults to Layer 3 (L3) traffic forwarding.\n- 'IF_CROSS_SITE_NETWORK': Provisions the connection exclusively for Cross-Site Networking.\nNote: 'MACSEC' is a legacy value for compatibility reasons and has the same effect as 'IF_MACSEC'. 'IF_MACSEC' is preferred. Possible values: [\"MACSEC\", \"CROSS_SITE_NETWORK\", \"IF_MACSEC\", \"IF_L2_FORWARDING\"]",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A creation-time hardware provisioning hint (e.g. requesting MACsec-capable ports via 'IF_MACSEC', or L2 forwarding) rather than a live security toggle - the interconnect's actual encryption enforcement is governed by macsec_enabled/macsec.fail_open regardless of what was requested here. The available policy types can blacklist or whitelist values but can't require a specific element be present in a list, so 'must request IF_MACSEC' isn't generically enforceable here even if desired, and doing so would force MACsec-capable hardware allocation on every interconnect whether or not the team needs it."
     },
     "requested_link_count": {
       "description": "Target number of physical links in the link bundle, as requested by the customer.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Target physical link count for the bundle - a capacity/redundancy sizing choice, not an access-control setting."
     },
     "macsec": {
       "type": "block",
@@ -116,8 +116,8 @@
       "description": "If set to true, the Interconnect connection is configured with a should-secure\nMACsec security policy, that allows the Google router to fallback to cleartext\ntraffic if the MKA session cannot be established. By default, the Interconnect\nconnection is configured with a must-secure security policy that drops all traffic\nif the MKA session cannot be established with your router.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Chooses between 'must-secure' (drop traffic if the MACsec session can't be established - the default) and 'should-secure' (silently fall back to cleartext). Setting this true is a fail-open control that defeats the confidentiality guarantee macsec_enabled is meant to provide, so it must stay false (fail-closed) to guarantee the link never silently downgrades to unencrypted traffic."
     },
     "macsec.pre_shared_keys": {
       "type": "block",
@@ -128,22 +128,22 @@
       "description": "If set to true, the Interconnect connection is configured with a should-secure\nMACsec security policy, that allows the Google router to fallback to cleartext\ntraffic if the MKA session cannot be established. By default, the Interconnect\nconnection is configured with a must-secure security policy that drops all traffic\nif the MKA session cannot be established with your router.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "A deprecated duplicate of macsec.fail_open exposed at the pre_shared_keys level (same should-secure/must-secure choice); the provider still accepts it, so the same fail-closed requirement applies for as long as it remains a live field - it must stay false so the connection doesn't silently fall back to cleartext if the MACsec session can't be established."
     },
     "macsec.pre_shared_keys.name": {
       "description": "A name for this pre-shared key. The name must be 1-63 characters long, and\n comply with RFC1035. Specifically, the name must be 1-63 characters long and match\n the regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the first character\n must be a lowercase letter, and all following characters must be a dash, lowercase\n letter, or digit, except the last character, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier for a pre-shared key entry in the MACsec keychain; naming has no access-control effect."
     },
     "macsec.pre_shared_keys.start_time": {
       "description": "A RFC3339 timestamp on or after which the key is valid. startTime can be in the\nfuture. If the keychain has a single key, startTime can be omitted. If the keychain\nhas multiple keys, startTime is mandatory for each key. The start times of keys must\nbe in increasing order. The start times of two consecutive keys must be at least 6\nhours apart.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An RFC3339 timestamp controlling when a given pre-shared key becomes valid, used to stage key rotation across multiple keychain entries. There's no generic 'safe' timestamp to enforce (it's mandatory only once multiple keys exist, and rotation cadence is an operational schedule a team sets over successive Terraform applies, not a single-plan property) - closer to backup retention length: operational key-rotation hygiene, not a blockable destructive-loss or access-control setting."
     },
     "params": {
       "type": "block",
@@ -154,8 +154,8 @@
       "description": "Resource manager tags to be bound to the interconnect. Tag keys and values have the\nsame definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id},\nand values are in the format tagValues/456.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Resource Manager tag bindings applied to the interconnect. Like labels, this is organisational metadata about the resource itself; although GCP tags can be referenced by conditional IAM/org policies elsewhere, that enforcement lives on those other policies, not on this field - we secure this resource's own configuration, not what other systems might key off its tags."
     }
   }
 }

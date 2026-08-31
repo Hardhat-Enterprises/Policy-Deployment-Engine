@@ -9,16 +9,17 @@ resource "google_artifact_registry_repository" "non_compliant_example_1" {
     id     = "delete-untagged"
     action = "DELETE"
     condition {
-      tag_state = "TAGGED"
+      tag_state = "UNTAGGED"
     }
   }
-
   cleanup_policies {
     id     = "keep-minimum-versions"
     action = "KEEP"
     most_recent_versions {
       package_name_prefixes = ["webapp", "mobile", "sandbox"]
-      keep_count            = 2
+      keep_count            = 5
     }
   }
+
+
 }
