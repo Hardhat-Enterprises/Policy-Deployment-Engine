@@ -2,6 +2,11 @@ package terraform.gcp.security.backup_for_gke.google_gke_backup_restore_channel.
 import data.terraform.helpers
 import data.terraform.gcp.security.backup_for_gke.google_gke_backup_restore_channel.vars
 
+# 'owner' and 'cost-center' are checked for PRESENCE only, by blacklisting the empty
+# values. The docs rationale for `labels` makes presence the control ("Labels are
+# required for cost allocation and ownership tracking") and states no shape for the
+# values, so there is no pattern to pair the check with. This is the same idiom
+# google_gke_backup_backup_plan/labels.rego uses for the same labels.
 conditions := [
   [
     {
@@ -23,14 +28,14 @@ conditions := [
     {
       "condition": "Must have owner label",
       "attribute_path": ["labels", "owner"],
-      "values": ["^.+$"],
-      "policy_type": "pattern_whitelist"
+      "values": [null, ""],
+      "policy_type": "blacklist"
     },
     {
       "condition": "Must have cost-center label",
       "attribute_path": ["labels", "cost-center"],
-      "values": ["^.+$"],
-      "policy_type": "pattern_whitelist"
+      "values": [null, ""],
+      "policy_type": "blacklist"
     }
   ]
 ]
