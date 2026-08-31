@@ -9,10 +9,10 @@ conditions := [[
     "remedies": ["Configure spec.egress_policies.egress_from.identities with explicitly scoped service account identities."],
   },
   {
-    "condition": "Egress identities must use explicitly scoped service account identities.",
+    "condition": "Egress identities must not contain wildcard or public principals.",
     "attribute_path": ["spec", 0, "egress_policies", 0, "egress_from", 0, "identities"],
-    "values": ["serviceAccount:*"],
-    "policy_type": "pattern whitelist",
+    "values": ["*", "allUsers", "allAuthenticatedUsers"],
+    "policy_type": "blacklist",
   },
 ]]
 
