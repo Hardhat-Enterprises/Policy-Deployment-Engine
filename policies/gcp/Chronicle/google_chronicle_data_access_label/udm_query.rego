@@ -23,7 +23,9 @@ conditions := [
   ],
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
 
 # Detailed report of each condition and situation
-details := helpers.get_multi_summary(conditions, vars.variables).details
+details := result.details

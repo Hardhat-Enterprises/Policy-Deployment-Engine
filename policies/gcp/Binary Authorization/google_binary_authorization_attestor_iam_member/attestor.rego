@@ -25,7 +25,9 @@ conditions := [
 ]
 
 # Summary message for compliance
-message := helpers.get_multi_summary(conditions, vars.variables).message
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
 
 # Detailed compliance info for debugging
-details := helpers.get_multi_summary(conditions, vars.variables).details
+details := result.details

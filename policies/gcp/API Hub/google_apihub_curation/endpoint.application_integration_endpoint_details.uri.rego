@@ -20,4 +20,4 @@ summary := helpers.get_multi_summary(conditions, vars.variables)
 message := summary.message
 
 
-details := helpers.get_multi_summary(conditions, vars.variables).details
+details := summary.details
