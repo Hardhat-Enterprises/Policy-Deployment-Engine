@@ -55,23 +55,36 @@ export function discoverPolicies(policiesRoot: string): PolicyTarget[] {
     return out;
 }
 
-type PlanResource = { type?: string; name?: string };
+import type { PlanResource } from "./plan-normalise.js";
 
-function planResources(planPath: string): PlanResource[] {
-    const plan = JSON.parse(fs.readFileSync(planPath, 'utf8'));
-    return plan?.planned_values?.root_module?.resources ?? [];
+export function resourcesFromPlan(plan: unknown): PlanResource[] {
+    const root = plan as { planned_values?: { root_module?: { resources?: PlanResource[] } } };
+    return root?.planned_values?.root_module?.resources ?? [];
 }
 
-export function resourceTypesInPlan(planPath: string): Set<string> {
+function planResources(planPath: string): PlanResource[] {
+    const plan = JSON.parse(fs.readFileSync(planPath, "utf8"));
+    return resourcesFromPlan(plan);
+}
+
+export function resourceTypesFromPlan(plan: unknown): Set<string> {
     return new Set(
-        planResources(planPath)
+        resourcesFromPlan(plan)
             .map((r) => r.type)
             .filter(Boolean) as string[]
     );
 }
 
-export function resourceNamesInPlan(planPath: string, resourceType: string): string[] {
-    return planResources(planPath)
+export function resourceNamesFromPlan(plan: unknown, resourceType: string): string[] {
+    return resourcesFromPlan(plan)
         .filter((r) => r.type === resourceType && r.name)
         .map((r) => r.name as string);
+}
+
+export function resourceTypesInPlan(planPath: string): Set<string> {
+    return resourceTypesFromPlan(JSON.parse(fs.readFileSync(planPath, "utf8")));
+}
+
+export function resourceNamesInPlan(planPath: string, resourceType: string): string[] {
+    return resourceNamesFromPlan(JSON.parse(fs.readFileSync(planPath, "utf8")), resourceType);
 }

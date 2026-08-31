@@ -13,6 +13,7 @@ package terraform.helpers
 #   - Returns structured summaries with violation details
 
 import data.terraform.helpers.shared
+import data.terraform.helpers.org_config
 import data.terraform.helpers.policies.blacklist
 import data.terraform.helpers.policies.whitelist
 import data.terraform.helpers.policies.range
@@ -124,10 +125,15 @@ evaluate_conditions(tf_variables, condition_group) = results if {
         # Get violations for this condition
         values := shared.ensure_array(condition_obj.values)
         policy_type := lower(condition_obj.policy_type)
+        resolved_values := org_config.resolve_condition_values(
+            condition_obj.attribute_path,
+            values,
+            policy_type
+        )
         violations := select_policy_logic(
             tf_variables,
             condition_obj.attribute_path,
-            values,
+            resolved_values,
             policy_type
         )
     ]
