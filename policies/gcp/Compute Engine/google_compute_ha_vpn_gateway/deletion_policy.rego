@@ -6,11 +6,11 @@ import data.terraform.gcp.security.compute_engine.google_compute_ha_vpn_gateway.
 conditions := [
     [
         {
-            "situation_description": "The HA VPN gateway is not protected against accidental Terraform deletion.",
+            "situation_description": "The HA VPN gateway is not protected against Terraform-driven deletion, which could disrupt security-critical VPN connectivity and network availability.",
             "remedies": [
                 "Set deletion_policy to PREVENT.",
-                "Enable deletion protection for business-critical VPN gateways.",
-                "Review lifecycle settings before allowing gateway deletion."
+                "Protect HA VPN gateways that provide security-critical connectivity between trusted networks from unintended Terraform-driven removal.",
+                "Require an explicit lifecycle and security review before permitting deletion of a protected VPN gateway."
             ]
         },
         {
@@ -26,3 +26,4 @@ result := helpers.get_multi_summary(conditions, vars.variables)
 
 message := result.message
 details := result.details
+
