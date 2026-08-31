@@ -4,22 +4,22 @@ import data.terraform.helpers
 import data.terraform.gcp.security.access_context_manager_vpc_service_controls.google_access_context_manager_service_perimeter.vars
 
 conditions := [
-    [
+  [
     {
-      "situation_description": "Ensure restricted services is not empty (no protection) or to general.",
-      "remedies": ["Update status/restricted_services to explicitly include only required service calls."]
+      "situation_description": "Restricted services should explicitly identify protected Google Cloud services and must not use overly broad wildcard service patterns.",
+      "remedies": ["Configure status.restricted_services with explicit required Google Cloud service names instead of wildcard service patterns."]
     },
     {
-      "condition": "restricted_services is not an empty list",
+      "condition": "restricted_services must not be an empty list",
       "attribute_path": ["status", 0, "restricted_services"],
       "values": null,
       "policy_type": "blacklist"
     },
     {
-      "condition": "restricted_services is too permissive",
+      "condition": "restricted_services must not contain wildcard service patterns",
       "attribute_path": ["status", 0, "restricted_services"],
-      "values": ["*"],
-      "policy_type": "element blacklist"
+      "values": [".*\\*.*"],
+      "policy_type": "pattern blacklist"
     }
   ]
 ]
