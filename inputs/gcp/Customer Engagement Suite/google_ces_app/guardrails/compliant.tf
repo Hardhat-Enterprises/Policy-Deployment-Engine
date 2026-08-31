@@ -4,6 +4,6 @@ resource "google_ces_app" "compliant_example_1" {
   display_name = "my-app"
 
   guardrails = [
-    "projects/*/locations/*/apps/*/guardrails/*"
+    "projects/example-project/locations/us/apps/compliant-example-1/guardrails/example-guardrail"
   ]
 }
