@@ -213,13 +213,23 @@ def test_repeated_helper_call_generalises_beyond_get_multi_summary(tmp_path):
     assert "use `result` at each of those sites" in same[0].message
 
 
-def test_repeated_helper_call_is_advisory(tmp_path):
-    """Style, not correctness: it must never fail a student's build on its own."""
+def test_repeated_helper_call_is_an_error(tmp_path):
+    """It fails the build: the owner's call, and CI only lints files you changed."""
     root = build_tree(tmp_path, "repeated_helper")
     findings = policy_lint.lint_resource(root, *REPEATED_HELPER)
     reported = [f for f in findings if f.rule == "repeated-helper-call"]
-    assert reported and all(f.severity == "warn" for f in reported)
-    assert "repeated-helper-call" in policy_lint.WARN_RULES
+    assert reported and all(f.severity == "error" for f in reported)
+    assert "repeated-helper-call" not in policy_lint.WARN_RULES
+
+
+def test_repeated_helper_call_fails_the_cli(tmp_path, capsys):
+    # Severity is only real if it moves the exit code.
+    root = build_tree(tmp_path, "repeated_helper")
+    rc = policy_lint.main(
+        ["--root", str(root), "--json", "gcp/GKEHub/google_gke_hub_scope_iam_policy"])
+    data = json.loads(capsys.readouterr().out)
+    assert rc == 1
+    assert {e["severity"] for e in data if e["rule"] == "repeated-helper-call"} == {"error"}
 
 
 def test_repeated_helper_call_reads_past_strings_and_comments():
@@ -631,27 +641,109 @@ def test_missing_opa_binary_is_one_cli_error(tmp_path, monkeypatch, capsys):
 
 
 # --------------------------------------------------------------------------- #
-# Fix wave 2: unpaired fixture resources are reported, not skipped.
+# Correction: an example without a numbered twin is still fully evaluated by the
+# harness, so only a fixture with nothing on one side is untested.
 # --------------------------------------------------------------------------- #
-def test_unpaired_fixture_resource_is_reported(tmp_path):
-    root = build_tree(tmp_path, "clean")
+CLEAN_BUCKET = ("gcp", "Cloud Storage", "google_storage_bucket")
+CLEAN_BUCKET_ARG = "public_access_prevention"
+
+
+def _bucket_plan(root):
+    """(cache_path, plan, resources) for the clean tree's bucket fixture."""
     input_dir = (root / "inputs" / "gcp" / "Cloud Storage" / "google_storage_bucket"
-                 / "public_access_prevention")
+                 / CLEAN_BUCKET_ARG)
     cache = policy_lint.plan_cache_for(root, input_dir)
     plan = json.loads(cache.read_text())
-    resources = plan["planned_values"]["root_module"]["resources"]
-    # A second non-compliant example with no compliant counterpart.
-    orphan = json.loads(json.dumps(
-        [r for r in resources if r["name"] == "non_compliant_example_1"][0]))
-    orphan["name"] = "non_compliant_example_2"
-    orphan["values"]["name"] = "non_compliant_example_2"
-    resources.append(orphan)
+    return cache, plan, plan["planned_values"]["root_module"]["resources"]
+
+
+def _clone_example(resources, source, new_name, **values):
+    """A copy of resource ``source`` relabelled ``new_name``, appended in place."""
+    clone = json.loads(json.dumps([r for r in resources if r["name"] == source][0]))
+    clone["name"] = new_name
+    clone["values"]["name"] = new_name
+    clone["values"].update(values)
+    resources.append(clone)
+    return clone
+
+
+def test_an_orphan_example_is_not_a_finding(tmp_path):
+    """The regression this rule change fixes.
+
+    ``auto_test.validate_policy_output`` matches examples by label pattern only —
+    every ``non_compliant_example_N`` must be flagged whether or not a
+    ``compliant_example_N`` exists — so 1-vs-2 is fully tested, not a smell.
+    """
+    root = build_tree(tmp_path, "clean")
+    cache, plan, resources = _bucket_plan(root)
+    _clone_example(resources, "non_compliant_example_1", "non_compliant_example_2")
     cache.write_text(json.dumps(plan))
 
-    findings = policy_lint.lint_resource(root, "gcp", "Cloud Storage", "google_storage_bucket")
-    assert pairs(findings) == {("public_access_prevention", "fixture-unpaired")}
-    assert "non_compliant_example_2" in findings[0].message
-    assert "fixture-unpaired" in policy_lint.RULES
+    findings = policy_lint.lint_resource(root, *CLEAN_BUCKET)
+    assert findings == []
+
+
+def test_an_orphan_compliant_example_is_not_a_finding(tmp_path):
+    root = build_tree(tmp_path, "clean")
+    cache, plan, resources = _bucket_plan(root)
+    _clone_example(resources, "compliant_example_1", "compliant_example_2")
+    cache.write_text(json.dumps(plan))
+
+    assert policy_lint.lint_resource(root, *CLEAN_BUCKET) == []
+
+
+@pytest.mark.parametrize("drop,missing", [
+    ("non_compliant", "no non_compliant_example_N"),
+    ("compliant", "no compliant_example_N"),
+])
+def test_a_one_sided_fixture_is_reported(tmp_path, drop, missing):
+    # Nothing on one side is the only genuinely untested shape: with no
+    # non-compliant example a policy that matches nothing passes; with no
+    # compliant example a policy that flags everything passes.
+    root = build_tree(tmp_path, "clean")
+    cache, plan, resources = _bucket_plan(root)
+    plan["planned_values"]["root_module"]["resources"] = [
+        r for r in resources if not r["name"].startswith(drop + "_example_")]
+    cache.write_text(json.dumps(plan))
+
+    findings = policy_lint.lint_resource(root, *CLEAN_BUCKET)
+    assert pairs(findings) == {(CLEAN_BUCKET_ARG, "fixture-one-sided")}
+    assert missing in findings[0].message
+    assert findings[0].severity == "error"
+    assert "fixture-one-sided" in policy_lint.RULES
+    assert "fixture-unpaired" not in policy_lint.RULES
+
+
+@pytest.mark.parametrize("source,orphan", [
+    ("non_compliant_example_1", "non_compliant_example_2"),
+    ("compliant_example_1", "compliant_example_2"),
+])
+def test_fixture_drift_is_caught_in_an_orphan_example(tmp_path, source, orphan):
+    # An orphan has no numbered twin, so without the widened pairing its drift
+    # would never be compared to anything.
+    root = build_tree(tmp_path, "clean")
+    cache, plan, resources = _bucket_plan(root)
+    _clone_example(resources, source, orphan, storage_class="NEARLINE")
+    cache.write_text(json.dumps(plan))
+
+    findings = policy_lint.lint_resource(root, *CLEAN_BUCKET)
+    assert pairs(findings) == {(CLEAN_BUCKET_ARG, "fixture-drift")}
+    assert "storage_class" in findings[0].message
+
+
+def test_drift_comparisons_cover_every_example(tmp_path):
+    # The pairing itself: twins together, each orphan against the lowest-numbered
+    # example on the other side, and nothing at all when one side is empty.
+    compliant = {"1": {"c": 1}, "4": {"c": 4}}
+    non_compliant = {"1": {"n": 1}, "2": {"n": 2}, "10": {"n": 10}}
+    assert policy_lint._drift_comparisons(compliant, non_compliant) == [
+        ({"c": 1}, {"n": 1}),                       # the numbered twin
+        ({"c": 1}, {"n": 2}),                       # orphan nc vs lowest compliant
+        ({"c": 1}, {"n": 10}),                      # "10" sorts numerically, not "1"
+        ({"c": 4}, {"n": 1}),                       # orphan c vs lowest non-compliant
+    ]
+    assert policy_lint._drift_comparisons({}, non_compliant) == []
+    assert policy_lint._drift_comparisons(compliant, {}) == []
 
 
 # --------------------------------------------------------------------------- #

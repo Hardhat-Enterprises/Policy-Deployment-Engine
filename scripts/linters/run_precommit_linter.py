@@ -60,7 +60,13 @@ RELEVANT_PREFIXES = ("docs/", "inputs/", "policies/")
 # Findings about the fixture pair itself (compliant.tf/nonCompliant.tf), as
 # opposed to a policy .rego file — displayed and owned via the argument
 # directory under inputs/, not a single policy file.
-FIXTURE_RULES = {"fixture-drift", "fixture-missing-plan"}
+#
+# fixture-one-sided belongs here for the same reason as the other two, and its
+# absence was a real bug under the old name (fixture-unpaired): the finding is
+# about inputs/, so leaving it out blamed it on a .rego file the contributor may
+# never have touched. It fires 0 times on the tree today, so this closes a trap
+# set for whoever first writes a fixture with nothing on one side.
+FIXTURE_RULES = {"fixture-drift", "fixture-missing-plan", "fixture-one-sided"}
 
 # How many inherited findings to list before eliding the rest. They are context,
 # not work items: enough to prove the problem is real and show where it lives,

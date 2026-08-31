@@ -89,9 +89,9 @@ RULES = {
     "fixture-missing-plan": (
         "No committed plan cache for this fixture pair — run the test locally and "
         "commit inputs/plan_cache."),
-    "fixture-unpaired": (
-        "A compliant_example_N or non_compliant_example_N has no counterpart with the "
-        "same N — every example must be one half of a pair."),
+    "fixture-one-sided": (
+        "The fixture has no compliant examples at all, or no non-compliant examples "
+        "at all, so one half of what the harness checks is never exercised."),
     "vars-resource-type": (
         "`_vars.resource_type` does not match the resource-type directory."),
     "vars-friendly-name": (
@@ -103,17 +103,29 @@ RULES = {
     "package-case": "Package service segment is not lowercase snake_case (warn).",
     "repeated-helper-call": (
         "The same helper is called twice with the same arguments. Call it once, "
-        "bind the result to a variable, then read the fields off that (warn)."),
+        "bind the result to a variable, then read the fields off that."),
     "lint-error": (
         "The linter could not evaluate this policy (parse/opa failure) — run "
         "`opa check` on the file."),
 }
 
-# Advisory rules: the three style conventions, plus presence-only — whether
-# "presence is the control" is a judgement about the argument's rationale, which
-# a human (or the AI reviewer) makes, not something a linter can decide. It is
-# surfaced to the reviewer rather than failing a build.
-WARN_RULES = {"legacy-assign", "package-case", "presence-only", "repeated-helper-call"}
+# Advisory rules: two style conventions, plus presence-only — whether "presence
+# is the control" is a judgement about the argument's rationale, which a human
+# (or the AI reviewer) makes, not something a linter can decide. It is surfaced
+# to the reviewer rather than failing a build.
+#
+# `repeated-helper-call` is deliberately NOT here: it is an error, by the owner's
+# call. The size of the backlog is what made that look risky — measured on dev
+# 2026-08-31, 498 of 1,395 policy files carried the pattern — but the mechanical
+# cleanup (PR #565) takes that to 5, and those 5 are skipped only because open
+# Service/* branches are editing them.
+#
+# What keeps a backlog from reaching someone who did not write it is structural,
+# not the severity: run_precommit_linter.py fails only on findings the
+# contributor OWNS (a file their own branch changed — see `_finding_owned`), and
+# branch_scope.py stops a Service/* branch touching a file outside its own
+# resource type. A pre-existing finding elsewhere is reported, never failed on.
+WARN_RULES = {"legacy-assign", "package-case", "presence-only"}
 
 # --------------------------------------------------------------------------- #
 # Rule constants
@@ -634,7 +646,7 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
     if legacy:
         add("legacy-assign", f"{', '.join(legacy)} assigned with '=' instead of ':='")
 
-    # --- repeated-helper-call (warn) --------------------------------------- #
+    # --- repeated-helper-call ---------------------------------------------- #
     # The kit convention is one binding per file: `result := helpers.get_multi_
     # summary(conditions, vars.variables)`, with `message` and `details` read off
     # `result`. Writing the call out again per field re-evaluates it per field.
@@ -754,6 +766,31 @@ def _is_fixture_label(value):
     return isinstance(value, str) and bool(FIXTURE_LABEL_RE.match(value))
 
 
+def _drift_comparisons(compliant, non_compliant):
+    """(compliant_values, non_compliant_values) pairs for the drift rule.
+
+    Numbered twins are compared to each other. An example with no twin is still
+    compared — to the lowest-numbered example on the other side — so that an
+    N-vs-M fixture cannot hide drift in the examples that happen to be orphans.
+    Every example on both sides therefore appears in at least one comparison.
+
+    Measured over the whole tree on 2026-08-31: this widens 1,050 comparisons to
+    1,110 and produces 0 additional findings and 0 additional drifted keys, so
+    it closes the gap without moving anyone's backlog.
+    """
+    if not compliant or not non_compliant:
+        return []
+    lowest_compliant = compliant[min(compliant, key=int)]
+    lowest_non_compliant = non_compliant[min(non_compliant, key=int)]
+    pairs = [(compliant[i], non_compliant[i])
+             for i in sorted(set(compliant) & set(non_compliant), key=int)]
+    pairs += [(lowest_compliant, non_compliant[i])
+              for i in sorted(set(non_compliant) - set(compliant), key=int)]
+    pairs += [(compliant[i], lowest_non_compliant)
+              for i in sorted(set(compliant) - set(non_compliant), key=int)]
+    return pairs
+
+
 def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=None):
     input_dir = Path(root) / "inputs" / platform / service / resource_type / stem
     # A missing input directory is linter.py's finding (an orphan policy), not
@@ -792,16 +829,30 @@ def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=No
         values = resource.get("values")
         bucket[match.group(2)] = values if isinstance(values, dict) else {}
 
-    # Every example must be half of a pair; a lone one is never compared, so
-    # without this it would silently escape every fixture rule.
-    unpaired = ([f"compliant_example_{i}" for i in sorted(set(compliant) - set(non_compliant))]
-                + [f"non_compliant_example_{i}"
-                   for i in sorted(set(non_compliant) - set(compliant))])
+    # --- fixture-one-sided ------------------------------------------------- #
+    # The harness does NOT pair examples by number. `validate_policy_output`
+    # matches labels against `^compliant_example_\d+$` / `^non_compliant_
+    # example_\d+$` and asserts two things over the whole set: no compliant
+    # example may be flagged, and every non-compliant example must be. An
+    # orphan `non_compliant_example_3` is therefore fully evaluated — N
+    # compliant against M non-compliant is a legitimate, and often better,
+    # shape (one baseline against several distinct failure modes).
+    #
+    # What is genuinely untested is a fixture with nothing on one side: with no
+    # non-compliant example nothing has to be flagged, so a policy that matches
+    # nothing passes; with no compliant example nothing has to stay unflagged,
+    # so a policy that flags everything passes.
     findings = []
-    if unpaired:
+    if not compliant or not non_compliant:
+        missing = []
+        if not compliant:
+            missing.append("no compliant_example_N resources")
+        if not non_compliant:
+            missing.append("no non_compliant_example_N resources")
         findings.append(Finding(
-            service, resource_type, stem, "fixture-unpaired",
-            "no counterpart with the same number for: " + ", ".join(unpaired)))
+            service, resource_type, stem, "fixture-one-sided",
+            f"the committed plan has {' and '.join(missing)} of type "
+            f"'{resource_type}' — a fixture needs at least one of each"))
 
     # Only the argument's *top-level* key is expected to differ; a nested
     # argument (a.b.c) is compared at its block key, since the plan nests it.
@@ -809,8 +860,7 @@ def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=No
     ignored = FIXTURE_IGNORED_KEYS | {argument_key}
 
     drifted = set()
-    for index in sorted(set(compliant) & set(non_compliant)):
-        good, bad = compliant[index], non_compliant[index]
+    for good, bad in _drift_comparisons(compliant, non_compliant):
         for key in set(good) | set(bad):
             if key in ignored:
                 continue
