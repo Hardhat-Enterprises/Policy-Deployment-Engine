@@ -7,7 +7,7 @@
 # creating real dependencies.
 
 resource "google_compute_target_http_proxy" "non_compliant_example_1" {
-  name            = "non-compliant-http-proxy"
+  name            = "non_compliant_example_1"
   url_map         = "https://www.googleapis.com/compute/v1/projects/example-project/global/urlMaps/example-url-map"
   deletion_policy = "ABANDON"
 }
