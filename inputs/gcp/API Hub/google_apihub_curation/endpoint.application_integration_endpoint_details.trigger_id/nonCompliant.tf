@@ -2,7 +2,7 @@ resource "google_apihub_curation" "non_compliant_example_1" {
   location = "us-central1"
   curation_id = "non_compliant_example_1"
   project = "PDE"
-  display_name = "API Hub Curation Endpoint Compliant Test NC1"
+  display_name = "API Hub Curation Endpoint Compliant Test C1"
   endpoint {
     application_integration_endpoint_details {
       trigger_id = "api_trigger/curation_API_1/aaaa"
