@@ -6,8 +6,8 @@
       "description": "'Specifies whether an instance needs to spin up. Once the instance is\nactive, the activation policy can be updated to the 'NEVER' to stop the\ninstance. Likewise, the activation policy can be updated to 'ALWAYS' to\nstart the instance.\nThere are restrictions around when an instance can/cannot be activated (for\nexample, a read pool instance should be stopped before stopping primary\netc.). Please refer to the API documentation for more details.\nPossible values are: 'ACTIVATION_POLICY_UNSPECIFIED', 'ALWAYS', 'NEVER'.' Possible values: [\"ACTIVATION_POLICY_UNSPECIFIED\", \"ALWAYS\", \"NEVER\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls whether the instance accepts connection requests. A policy can restrict unexpected or unnecessary active database exposure and ensure instances are not left running when they should be inactive."
+      "security_impact": false,
+      "rationale": "Controls the operational state of the AlloyDB instance rather than a security control. AlloyDB instances are operationally started or stopped, so constraining this argument would not provide a generic platform-level security benefit."
     },
     "annotations": {
       "description": "Annotations to allow client tools to store small amount of arbitrary data. This is distinct from labels.\n\n**Note**: This field is non-authoritative, and will only manage the annotations present in your configuration.\nPlease refer to the field 'effective_annotations' for all of the annotations present on the resource.",
@@ -20,8 +20,8 @@
       "description": "'Availability type of an Instance. Defaults to REGIONAL for both primary and read instances.\nNote that primary and read instances can have different availability types.\nPrimary instances can be either ZONAL or REGIONAL. Read Pool instances can also be either ZONAL or REGIONAL.\nRead pools of size 1 can only have zonal availability. Read pools with a node count of 2 or more\ncan have regional availability (nodes are present in 2 or more zones in a region).\nPossible values are: 'AVAILABILITY_TYPE_UNSPECIFIED', 'ZONAL', 'REGIONAL'.' Possible values: [\"AVAILABILITY_TYPE_UNSPECIFIED\", \"ZONAL\", \"REGIONAL\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls whether the instance is zonal or regional. Regional deployment can improve availability and resilience against zone failure, making it relevant to the availability component of security."
+      "security_impact": false,
+      "rationale": "Controls the instance's availability and resilience configuration, such as zonal or regional deployment. This is an operational reliability choice rather than a direct security control, so a generic security policy should not constrain it."
     },
     "cluster": {
       "description": "Identifies the alloydb cluster. Must be in the format\n'projects/{project}/locations/{location}/clusters/{cluster_id}'",
@@ -55,8 +55,8 @@
       "description": "The Compute Engine zone that the instance should serve from, per https://cloud.google.com/compute/docs/regions-zones This can ONLY be specified for ZONAL instances. If present for a REGIONAL instance, an error will be thrown. If this is absent for a ZONAL instance, instance is created in a random zone with available capacity.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects the Compute Engine zone for a zonal instance. Although zone selection affects resilience, the security-relevant availability decision is more appropriately represented by availability_type; the actual zone is workload-specific."
+      "security_impact": true,
+      "rationale": "Specifies the geographic zone in which a zonal AlloyDB instance operates. Location can affect data residency and where organisational data is physically processed or stored, making this a valid generic platform-level security and compliance policy target."
     },
     "instance_id": {
       "description": "The ID of the alloydb instance.",
@@ -176,8 +176,8 @@
       "description": "CIDR range for one authorized network of the instance.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines which external IP ranges may connect to a public-IP instance. This is directly an access-control boundary, so a generic policy can restrict overly broad ranges such as unrestricted internet access."
+      "security_impact": false,
+      "rationale": "Specifies an IP/CIDR range chosen for external connectivity. Although network access is security-relevant, the particular address range is a team-specific network architecture choice and should not be constrained by a generic platform policy."
     },
     "psc_instance_config": {
       "type": "block",
@@ -200,15 +200,15 @@
       "description": "The consumer network for the PSC service automation, example:\n\"projects/vpc-host-project/global/networks/default\".\nThe consumer network might be hosted a different project than the\nconsumer project. The API expects the consumer project specified to be\nthe project ID (and not the project number)",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines the consumer network to which PSC service automation connects. Because it establishes an automated connectivity relationship with another network, a policy can restrict unintended cross-network connectivity."
+      "security_impact": false,
+      "rationale": "Identifies the consumer network used for PSC service automation. This is a reference to another network and represents a team-specific architecture decision rather than a generic security-policy control on the AlloyDB instance."
     },
     "psc_instance_config.psc_auto_connections.consumer_project": {
       "description": "The consumer project to which the PSC service automation endpoint will\nbe created. The API expects the consumer project to be the project ID(\nand not the project number).",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the project receiving the PSC service-automation endpoint. This creates a cross-project connectivity relationship, so restricting which projects can receive such connections is security-relevant."
+      "security_impact": false,
+      "rationale": "Identifies the consumer project for the PSC service-automation endpoint. The project identifier is a reference to another resource and is team-specific, so a generic security policy should not constrain its particular value."
     },
     "psc_instance_config.psc_interface_configs": {
       "type": "block",
@@ -219,8 +219,8 @@
       "description": "The network attachment resource created in the consumer project to which the PSC interface will be linked.\nThis is of the format: \"projects/${CONSUMER_PROJECT}/regions/${REGION}/networkAttachments/${NETWORK_ATTACHMENT_NAME}\".\nThe network attachment must be in the same region as the instance.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the consumer network attachment used for the PSC interface and therefore controls an outbound connectivity path from the instance. A generic policy can restrict use of unapproved or unintended network attachments."
+      "security_impact": false,
+      "rationale": "Identifies a specific network attachment resource used by the PSC interface. This is a resource reference determined by the team's network architecture and therefore is outside the scope of a generic security policy."
     },
     "query_insights_config": {
       "type": "block",
@@ -238,22 +238,22 @@
       "description": "Query string length. The default value is 1024. Any integer between 256 and 4500 is considered valid.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Controls how much of query strings Query Insights stores. Longer captured queries can contain sensitive SQL text or application data, so a generic policy can limit unnecessary collection of potentially sensitive information. Google confirms that this setting controls the query length stored/analysed and that larger values require more memory."
+      "security_impact": false,
+      "rationale": "Controls the amount of query text captured by Query Insights. This changes monitoring and data-management detail rather than the security configuration of the AlloyDB instance, so it is not a generic security-policy target."
     },
     "query_insights_config.record_application_tags": {
       "description": "Record application tags for an instance. This flag is turned \"on\" by default.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Records application tags associated with queries. These tags can contain application-level information and are stored as monitoring data, so a generic policy can limit unnecessary collection of potentially sensitive metadata. Google documents that application tags identify APIs and application routes making requests."
+      "security_impact": false,
+      "rationale": "Controls whether application tags are recorded by Query Insights. This is a telemetry and monitoring preference rather than a direct security control, so constraining it does not provide a generic platform-level security benefit."
     },
     "query_insights_config.record_client_address": {
       "description": "Record client address for an instance. Client address is PII information. This flag is turned \"on\" by default.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Records client IP addresses, which are potentially sensitive identifying/network information. A generic policy can restrict collection of client addresses where they are not required. Google explicitly describes client addresses as information stored by Query Insights for grouping and analysis."
+      "security_impact": false,
+      "rationale": "Controls whether client address information is recorded by Query Insights. This affects telemetry and monitoring data collection rather than the instance's security controls, so it should not be treated as a generic security-policy target."
     },
     "read_pool_config": {
       "type": "block",
