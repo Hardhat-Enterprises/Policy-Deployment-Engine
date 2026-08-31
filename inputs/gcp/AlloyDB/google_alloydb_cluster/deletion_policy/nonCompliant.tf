@@ -11,6 +11,6 @@ resource "google_alloydb_cluster" "non_compliant_example_1" {
 
   initial_user {
     user     = "admin"
-    password = "weak-password"
+    password = "secure-password"
   }
 }
