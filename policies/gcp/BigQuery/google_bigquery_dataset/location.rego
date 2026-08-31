@@ -4,7 +4,7 @@ import data.terraform.gcp.security.BigQuery.google_bigquery_dataset.vars
 
 conditions := [
     [
-        {"situation_description" : "Incorrect location",
+        {"situation_description" : "The dataset is created outside the approved region, so its data is stored where the organisation's data-residency and sovereignty commitments do not hold.",
          "remedies": ["Change to australia-southeast1"]},
         {
             "condition": "Check if any is set to australia-southeast1",
