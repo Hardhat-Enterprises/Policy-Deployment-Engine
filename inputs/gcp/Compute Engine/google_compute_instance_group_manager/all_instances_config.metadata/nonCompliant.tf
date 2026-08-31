@@ -13,7 +13,6 @@ resource "google_compute_instance_group_manager" "non_compliant_example_1" {
       enable-oslogin          = "FALSE"
       block-project-ssh-keys  = "FALSE"
       serial-port-enable      = "TRUE"
-      password                = "Secretpassword123"
     }
   }
 }

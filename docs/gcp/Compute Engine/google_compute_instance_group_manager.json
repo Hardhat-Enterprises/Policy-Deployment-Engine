@@ -13,8 +13,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls whether Terraform is allowed to delete the resource. A policy should require 'PREVENT' so the group can't be destroyed by an accidental 'terraform destroy'/'apply'."
+      "security_impact": false,
+      "rationale": "Only controls whether Terraform's own destroy/apply workflow is allowed to remove the resource - it has no effect on the deployed GCE resource's actual security posture, and it can still be deleted via gcloud/console/another Terraform state regardless of this setting. Forcing 'PREVENT' platform-wide would also block legitimate CI/CD pipelines that need automated teardown of ephemeral environments. IaC-workflow safety guard, not a security control."
     },
     "description": {
       "description": "An optional textual description of the instance group manager.",
@@ -110,7 +110,7 @@
       "required": false,
       "type": "map(string)",
       "security_impact": true,
-      "rationale": "Sets metadata on the instances, which includes security-related settings (like SSH key access and OS Login) and is a common spot where people accidentally leave plaintext secrets. A policy should discourage turning those protections off and flag anything that looks like a secret, pointing teams to Secret Manager instead."
+      "rationale": "Sets metadata on the instances, which includes reserved GCE keys with real hardening semantics (enable-oslogin, block-project-ssh-keys, serial-port-enable). A policy should discourage turning those protections off."
     },
     "auto_healing_policies": {
       "type": "block",
