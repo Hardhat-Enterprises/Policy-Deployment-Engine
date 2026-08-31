@@ -1,5 +1,5 @@
 resource "google_folder_organization_policy" "non_compliant_example_1" {
-  folder     = "folders/098765432"
+  folder     = "folders/123456789"
   constraint = "serviceuser.services"
 
   list_policy {
@@ -18,7 +18,7 @@ resource "google_folder_organization_policy" "non_compliant_example_2" {
   }
 }
 resource "google_folder_organization_policy" "non_compliant_example_3" {
-  folder     = "folders/8383838"
+  folder     = "folders/123456789"
   constraint = "serviceuser.services"
 
   list_policy {
