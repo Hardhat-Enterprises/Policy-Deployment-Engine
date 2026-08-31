@@ -6,78 +6,78 @@
       "description": "'Specifies whether an instance needs to spin up. Once the instance is\nactive, the activation policy can be updated to the 'NEVER' to stop the\ninstance. Likewise, the activation policy can be updated to 'ALWAYS' to\nstart the instance.\nThere are restrictions around when an instance can/cannot be activated (for\nexample, a read pool instance should be stopped before stopping primary\netc.). Please refer to the API documentation for more details.\nPossible values are: 'ACTIVATION_POLICY_UNSPECIFIED', 'ALWAYS', 'NEVER'.' Possible values: [\"ACTIVATION_POLICY_UNSPECIFIED\", \"ALWAYS\", \"NEVER\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether the instance accepts connection requests. A policy can restrict unexpected or unnecessary active database exposure and ensure instances are not left running when they should be inactive."
     },
     "annotations": {
       "description": "Annotations to allow client tools to store small amount of arbitrary data. This is distinct from labels.\n\n**Note**: This field is non-authoritative, and will only manage the annotations present in your configuration.\nPlease refer to the field 'effective_annotations' for all of the annotations present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Stores arbitrary metadata for client tools and does not control database access, network exposure, encryption, or security behaviour. Restricting annotation values would mainly affect resource management."
     },
     "availability_type": {
       "description": "'Availability type of an Instance. Defaults to REGIONAL for both primary and read instances.\nNote that primary and read instances can have different availability types.\nPrimary instances can be either ZONAL or REGIONAL. Read Pool instances can also be either ZONAL or REGIONAL.\nRead pools of size 1 can only have zonal availability. Read pools with a node count of 2 or more\ncan have regional availability (nodes are present in 2 or more zones in a region).\nPossible values are: 'AVAILABILITY_TYPE_UNSPECIFIED', 'ZONAL', 'REGIONAL'.' Possible values: [\"AVAILABILITY_TYPE_UNSPECIFIED\", \"ZONAL\", \"REGIONAL\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether the instance is zonal or regional. Regional deployment can improve availability and resilience against zone failure, making it relevant to the availability component of security."
     },
     "cluster": {
       "description": "Identifies the alloydb cluster. Must be in the format\n'projects/{project}/locations/{location}/clusters/{cluster_id}'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the parent AlloyDB cluster. It establishes which cluster the instance belongs to but does not itself define an access-control, encryption, or network-security setting."
     },
     "database_flags": {
       "description": "Database flags. Set at instance level. * They are copied from primary instance on read instance creation. * Read instances can set new or override existing flags that are relevant for reads, e.g. for enabling columnar cache on a read instance. Flags set on read instance may or may not be present on primary.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Database flags can change database-engine behaviour, and supported flags can include settings affecting database security and operation. A generic policy can restrict unsafe database-engine configurations rather than allowing arbitrary flags."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can destroy or abandon the database instance. Preventing unintended deletion can protect database availability and reduce the impact of destructive configuration changes."
     },
     "display_name": {
       "description": "User-settable and human-readable display name for the Instance.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a human-readable name only. Changing or restricting it does not materially alter authentication, authorization, confidentiality, integrity, or availability."
     },
     "gce_zone": {
       "description": "The Compute Engine zone that the instance should serve from, per https://cloud.google.com/compute/docs/regions-zones This can ONLY be specified for ZONAL instances. If present for a REGIONAL instance, an error will be thrown. If this is absent for a ZONAL instance, instance is created in a random zone with available capacity.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the Compute Engine zone for a zonal instance. Although zone selection affects resilience, the security-relevant availability decision is more appropriately represented by availability_type; the actual zone is workload-specific."
     },
     "instance_id": {
       "description": "The ID of the alloydb instance.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the AlloyDB instance. It is a resource naming/identification value and does not itself change the instance's security controls."
     },
     "instance_type": {
       "description": "The type of the instance.\nIf the instance type is READ_POOL, provide the associated PRIMARY/SECONDARY instance in the 'depends_on' meta-data attribute.\nIf the instance type is SECONDARY, point to the cluster_type of the associated secondary cluster instead of mentioning SECONDARY.\nExample: {instance_type = google_alloydb_cluster.<secondary_cluster_name>.cluster_type} instead of {instance_type = SECONDARY}\nIf the instance type is SECONDARY, the terraform delete instance operation does not delete the secondary instance but abandons it instead.\nUse deletion_policy = \"FORCE\" in the associated secondary cluster and delete the cluster forcefully to delete the secondary cluster as well its associated secondary instance.\nUsers can undo the delete secondary instance action by importing the deleted secondary instance by calling terraform import. Possible values: [\"PRIMARY\", \"READ_POOL\", \"SECONDARY\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines whether the instance is PRIMARY, READ_POOL, or SECONDARY. This is primarily an architectural/topology decision; constraining the role generically would not necessarily improve the security posture of every tenant."
     },
     "labels": {
       "description": "User-defined labels for the alloydb instance.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels are organisational metadata used to classify and manage resources. They do not directly control access, encryption, network exposure, or database behaviour."
     },
     "client_connection_config": {
       "type": "block",
@@ -88,8 +88,8 @@
       "description": "Configuration to enforce connectors only (ex: AuthProxy) connections to the database.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enforces connections through AlloyDB connectors such as Auth Proxy/Language Connectors. Restricting direct connection paths can reduce exposure and strengthen the database connection boundary. Google documents connector enforcement as a network-security option."
     },
     "client_connection_config.ssl_config": {
       "type": "block",
@@ -100,8 +100,8 @@
       "description": "SSL mode. Specifies client-server SSL/TLS connection behavior. Possible values: [\"ENCRYPTED_ONLY\", \"ALLOW_UNENCRYPTED_AND_ENCRYPTED\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Directly controls whether client-server connections must use SSL/TLS. A generic policy can require ENCRYPTED_ONLY, preventing plaintext database traffic that could expose sensitive information. Google identifies allowing unencrypted connections as a potential exposure of sensitive data."
     },
     "connection_pool_config": {
       "type": "block",
@@ -112,15 +112,15 @@
       "description": "Whether to enabled Managed Connection Pool.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Enables or disables managed connection pooling. This primarily affects connection management and performance rather than directly controlling authentication, authorization, encryption, or network access."
     },
     "connection_pool_config.flags": {
       "description": "Flags for configuring managed connection pooling when it is enabled.\nThese flags will only be set if 'connection_pool_config.enabled' is\ntrue.\nPlease see\nhttps://cloud.google.com/alloydb/docs/configure-managed-connection-pooling#configuration-options\nfor a comprehensive list of flags that can be set. To specify the flags\nin Terraform, please remove the \"connection-pooling-\" prefix and use\nunderscores instead of dashes in the name. For example,\n\"connection-pooling-pool-mode\" would be \"pool_mode\".",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Configures the behaviour of managed connection pooling. These settings primarily affect connection-pooling operation and performance; the argument does not inherently establish a security boundary."
     },
     "machine_config": {
       "type": "block",
@@ -131,15 +131,15 @@
       "description": "The number of CPU's in the VM instance.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines the number of CPUs allocated to the VM. This affects capacity and performance rather than the database's security configuration."
     },
     "machine_config.machine_type": {
       "description": "Machine type of the VM instance.\nE.g. \"n2-highmem-4\", \"n2-highmem-8\", \"c4a-highmem-4-lssd\".\n'cpu_count' must match the number of vCPUs in the machine type.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the underlying VM machine type. It controls compute resources and performance rather than access, encryption, or network exposure."
     },
     "network_config": {
       "type": "block",
@@ -150,22 +150,22 @@
       "description": "Name of the allocated IP range for the private IP AlloyDB instance, for example: \"google-managed-services-default\".\nIf set, the instance IPs will be created from this allocated range and will override the IP range used by the parent cluster.\nThe range name must comply with RFC 1035. Specifically, the name must be 1-63 characters long and match the regular expression [a-z]([-a-z0-9]*[a-z0-9])?.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the private IP allocation range used by the instance. The value identifies an existing network allocation and is workload/network-specific; restricting the particular range generically would require knowledge of each team's network design."
     },
     "network_config.enable_outbound_public_ip": {
       "description": "Enabling outbound public ip for the instance.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables an outbound public IP, allowing the database instance to send requests to the internet. A generic security policy can prohibit unnecessary public outbound connectivity and thereby reduce external attack/exfiltration exposure. Google identifies this setting as enabling a public IP for database-server outbound requests to the internet."
     },
     "network_config.enable_public_ip": {
       "description": "Enabling public ip for the instance. If a user wishes to disable this,\nplease also clear the list of the authorized external networks set on\nthe same instance.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Directly controls whether the AlloyDB instance is reachable through a public IP. A generic policy can require private connectivity unless public exposure is explicitly justified, reducing internet-facing attack surface."
     },
     "network_config.authorized_external_networks": {
       "type": "block",
@@ -176,8 +176,8 @@
       "description": "CIDR range for one authorized network of the instance.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines which external IP ranges may connect to a public-IP instance. This is directly an access-control boundary, so a generic policy can restrict overly broad ranges such as unrestricted internet access."
     },
     "psc_instance_config": {
       "type": "block",
@@ -188,8 +188,8 @@
       "description": "List of consumer projects that are allowed to create PSC endpoints to service-attachments to this instance.\nThese should be specified as project numbers only.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls which consumer projects may create Private Service Connect endpoints to the instance. This directly affects which projects can establish connectivity, making it a cross-project access-control boundary."
     },
     "psc_instance_config.psc_auto_connections": {
       "type": "block",
@@ -200,15 +200,15 @@
       "description": "The consumer network for the PSC service automation, example:\n\"projects/vpc-host-project/global/networks/default\".\nThe consumer network might be hosted a different project than the\nconsumer project. The API expects the consumer project specified to be\nthe project ID (and not the project number)",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines the consumer network to which PSC service automation connects. Because it establishes an automated connectivity relationship with another network, a policy can restrict unintended cross-network connectivity."
     },
     "psc_instance_config.psc_auto_connections.consumer_project": {
       "description": "The consumer project to which the PSC service automation endpoint will\nbe created. The API expects the consumer project to be the project ID(\nand not the project number).",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Identifies the project receiving the PSC service-automation endpoint. This creates a cross-project connectivity relationship, so restricting which projects can receive such connections is security-relevant."
     },
     "psc_instance_config.psc_interface_configs": {
       "type": "block",
@@ -219,8 +219,8 @@
       "description": "The network attachment resource created in the consumer project to which the PSC interface will be linked.\nThis is of the format: \"projects/${CONSUMER_PROJECT}/regions/${REGION}/networkAttachments/${NETWORK_ATTACHMENT_NAME}\".\nThe network attachment must be in the same region as the instance.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Identifies the consumer network attachment used for the PSC interface and therefore controls an outbound connectivity path from the instance. A generic policy can restrict use of unapproved or unintended network attachments."
     },
     "query_insights_config": {
       "type": "block",
@@ -231,29 +231,29 @@
       "description": "Number of query execution plans captured by Insights per minute for all queries combined. The default value is 5. Any integer between 0 and 20 is considered valid.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls how many query execution plans are sampled per minute. Google documents this primarily as a monitoring/performance setting, with higher sampling potentially adding performance overhead. It does not directly control access or protection of the database."
     },
     "query_insights_config.query_string_length": {
       "description": "Query string length. The default value is 1024. Any integer between 256 and 4500 is considered valid.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls how much of query strings Query Insights stores. Longer captured queries can contain sensitive SQL text or application data, so a generic policy can limit unnecessary collection of potentially sensitive information. Google confirms that this setting controls the query length stored/analysed and that larger values require more memory."
     },
     "query_insights_config.record_application_tags": {
       "description": "Record application tags for an instance. This flag is turned \"on\" by default.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Records application tags associated with queries. These tags can contain application-level information and are stored as monitoring data, so a generic policy can limit unnecessary collection of potentially sensitive metadata. Google documents that application tags identify APIs and application routes making requests."
     },
     "query_insights_config.record_client_address": {
       "description": "Record client address for an instance. Client address is PII information. This flag is turned \"on\" by default.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Records client IP addresses, which are potentially sensitive identifying/network information. A generic policy can restrict collection of client addresses where they are not required. Google explicitly describes client addresses as information stored by Query Insights for grouping and analysis."
     },
     "read_pool_config": {
       "type": "block",
@@ -264,8 +264,8 @@
       "description": "Read capacity, i.e. number of nodes in a read pool instance.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the number of read-pool nodes and therefore read capacity. It primarily affects scalability, availability and cost; the number of nodes does not directly establish an access-control or confidentiality boundary."
     }
   }
 }
