@@ -6,36 +6,36 @@
       "description": "The ID for the data collector. Must begin with 'dc_'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is the resource's identifier, constrained by the platform to begin with the prefix 'dc_'. The naming convention is already enforced by the Apigee API itself. Beyond that prefix, the specific name chosen is a team-level decision with no effect on security posture. A generic policy could not further constrain it without hardcoding team-specific naming schemes."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a Terraform-level lifecycle meta-argument that controls whether 'terraform destroy' can remove the resource. It affects operational workflow safety (preventing accidental deletion), not the security configuration of the data collector itself. A data collector is a lightweight metadata definition; its deletion does not expose data or create a vulnerability. The choice between DELETE, PREVENT, and ABANDON is an infrastructure management concern, not a security posture decision."
     },
     "description": {
       "description": "A description of the data collector.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is free-text informational metadata describing the data collector. It has no effect on how the resource behaves, what data it captures, or how it is secured. Constraining it would not improve security posture."
     },
     "org_id": {
       "description": "The Apigee Organization associated with the Apigee data collector,\nin the format 'organizations/{{org_name}}'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a reference to the parent Apigee Organization resource. The value is inherently team- or project-specific (the organization name). A generic platform policy cannot constrain it without hardcoding specific organization identifiers. The security of the organization itself is governed by the google_apigee_organization resource, not by resources that reference it."
     },
     "type": {
       "description": "The type of data this data collector will collect. Possible values: [\"BOOLEAN\", \"DATETIME\", \"FLOAT\", \"INTEGER\", \"STRING\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This determines the data format (STRING, INTEGER, FLOAT, BOOLEAN, DATETIME) of the values the data collector will store. Every accepted value is equally safe; the choice depends entirely on the kind of metric the team is capturing. There is no security difference between any of the options, and constraining this would only interfere with legitimate functional requirements without improving security."
     }
   }
 }
