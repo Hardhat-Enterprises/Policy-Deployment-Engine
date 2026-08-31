@@ -11,8 +11,8 @@ import data.terraform.gcp.security.BigQuery.google_bigquery_dataset.vars
 # against an allowed pattern; adding one is what would unblock this.
 conditions := [
     [
-        {"situation_description" : "Incorrect Email",
-         "remedies": ["Change to valid email address"]},
+        {"situation_description" : "A dataset access entry grants an individual account outside the organisation's directory, putting dataset contents in the hands of an identity the org cannot suspend.",
+         "remedies": ["Grant an account in the organisation's own directory, one the organisation can suspend or offboard", "Or drop the entry if the account is external and does not need the data"]},
         {
             "condition": "Check if any access entry has invalid user email",
             "attribute_path" : ["access", "user_by_email"],
