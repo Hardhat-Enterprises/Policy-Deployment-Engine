@@ -4,8 +4,8 @@ import data.terraform.gcp.security.BigQuery.google_bigquery_dataset_access.vars
 
 conditions := [
     [
-        {"situation_description" : "Incorrect domain",
-         "remedies": ["Change to valid domain"]},
+        {"situation_description" : "This access grant opens the dataset to an entire email domain rather than a named principal, admitting every account in that domain, including ones created later.",
+         "remedies": ["Restrict the grant to a domain the organisation owns and has approved for dataset sharing", "Or replace the domain grant with the specific users or groups that need the data"]},
         {
             "condition": "Check for correct domain",
             "attribute_path" : ["domain"],

@@ -191,12 +191,20 @@ MAX_CALL_ECHO = 60
 # Fixture resource labels, per the auto_test convention.
 FIXTURE_LABEL_RE = re.compile(r"^(compliant|non_compliant)_example_(\d+)$")
 # Keys that are *expected* to differ between the two fixture resources: the
-# resource's label ("name") and `labels`, plus the two provider-computed mirrors
-# of `labels`, which always move with it and would double-report every labels
-# policy. The resource's `resource_value_name` is handled separately — see
-# `_lint_fixtures` — because it is only exempt when it holds the fixture label.
+# resource's label ("name"), `labels`, and the provider-computed mirrors.
+# `effective_labels` and `terraform_labels` mirror `labels`; `effective_annotations`
+# mirrors `annotations` in exactly the same way. A mirror always moves with the key
+# it mirrors, so reporting one duplicates a difference the argument under test
+# already explains — and it is a difference no author can remove: the mirror cannot
+# be equal while the fixture legitimately differs on what it mirrors.
+# `annotations` itself needs no entry here: when it is the argument under test
+# `_lint_fixtures` already adds the argument key to the ignore set, and when it is
+# not, a difference in it is real drift. The resource's `resource_value_name` is
+# handled separately — see `_lint_fixtures` — because it is only exempt when it
+# holds the fixture label.
 FIXTURE_IGNORED_KEYS = {
     "name", "labels", "label", "effective_labels", "terraform_labels",
+    "effective_annotations",
 }
 
 # The policy types `policies/_helpers/helpers.rego` can dispatch, in the order its

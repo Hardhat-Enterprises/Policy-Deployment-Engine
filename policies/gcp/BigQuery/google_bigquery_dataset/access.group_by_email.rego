@@ -11,8 +11,8 @@ import data.terraform.gcp.security.BigQuery.google_bigquery_dataset.vars
 # against an allowed pattern; adding one is what would unblock this.
 conditions := [
     [
-        {"situation_description" : "Incorrect Email",
-         "remedies": ["Change to valid email address"]},
+        {"situation_description" : "A dataset access entry grants a Google Group outside the organisation's approved groups, so dataset contents can reach members the dataset owner does not control.",
+         "remedies": ["Grant a Google Group in a domain the organisation owns, whose membership the organisation controls", "Or drop the entry if the group is external and does not need the data"]},
         {
             "condition": "Check if any access entry has invalid group email",
             "attribute_path" : ["access", "group_by_email"],
