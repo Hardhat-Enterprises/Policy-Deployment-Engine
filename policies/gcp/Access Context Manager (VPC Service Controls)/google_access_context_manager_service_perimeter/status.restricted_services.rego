@@ -6,8 +6,8 @@ import data.terraform.gcp.security.access_context_manager_vpc_service_controls.g
 conditions := [
   [
     {
-      "situation_description": "Restricted services should explicitly identify protected Google Cloud services and must not use overly broad wildcard service patterns.",
-      "remedies": ["Configure status.restricted_services with explicit required Google Cloud service names instead of wildcard service patterns."]
+      "situation_description": "Restricted services should explicitly identify protected Google Cloud services and must not use overly broad wildcard service entries.",
+      "remedies": ["Configure status.restricted_services with explicit required Google Cloud service names instead of wildcard service entries."]
     },
     {
       "condition": "restricted_services must not be an empty list",
@@ -16,10 +16,10 @@ conditions := [
       "policy_type": "blacklist"
     },
     {
-      "condition": "restricted_services must not contain wildcard service patterns",
+      "condition": "restricted_services must not contain overly broad wildcard service entries",
       "attribute_path": ["status", 0, "restricted_services"],
-      "values": [".*\\*.*"],
-      "policy_type": "pattern blacklist"
+      "values": ["*", "*.googleapis.com"],
+      "policy_type": "element blacklist"
     }
   ]
 ]
