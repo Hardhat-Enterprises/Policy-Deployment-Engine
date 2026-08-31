@@ -3,7 +3,6 @@ package terraform.gcp.security.compute_engine.google_compute_instance_group_mana
 import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_instance_group_manager.vars
 
-# All three situations use "blacklist" (forbid the explicit disabling value)
 conditions := [
   [
     {
@@ -37,7 +36,7 @@ conditions := [
     {
       "condition": "'serial-port-enable' must not be enabled",
       "attribute_path": ["all_instances_config", 0, "metadata", "serial-port-enable"],
-      "values": ["TRUE", "true"],
+      "values": ["TRUE", "true", "True"],
       "policy_type": "blacklist"
     }
   ]
