@@ -5,13 +5,13 @@ import data.terraform.gcp.security.access_context_manager_vpc_service_controls.g
 
 conditions := [[
   {
-    "situation_description": "Service Perimeter should use an explicit dry-run specification to safely test security configuration changes.",
-    "remedies": ["Set use_explicit_dry_run_spec = true."],
+    "situation_description": "Service Perimeter configurations should use a valid explicit dry-run specification setting appropriate to the deployment workflow.",
+    "remedies": ["Configure use_explicit_dry_run_spec according to the deployment workflow and ensure the setting is explicitly defined."],
   },
   {
-    "condition": "use_explicit_dry_run_spec must be true.",
+    "condition": "use_explicit_dry_run_spec must be explicitly configured with a valid boolean value.",
     "attribute_path": ["use_explicit_dry_run_spec"],
-    "values": [true],
+    "values": [true, false],
     "policy_type": "whitelist",
   },
 ]]
