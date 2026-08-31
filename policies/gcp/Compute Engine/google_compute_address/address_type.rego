@@ -19,9 +19,8 @@ conditions := [
     ]
 ]
    
-# Displays a general message about policy compliance
-message := helpers.get_multi_summary(conditions, vars.variables).message
+result := helpers.get_multi_summary(conditions, vars.variables)
 
-# Displays a detailed summary of each resources compliance to every condition and situation
-# Useful for debugging
-details := helpers.get_multi_summary(conditions, vars.variables).details
+message := result.message
+
+details := result.details
