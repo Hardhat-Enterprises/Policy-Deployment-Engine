@@ -48,6 +48,44 @@ of the local test loop.
 Each rule below is its own anchored section (`policy-lint.md#<rule-id>`) — the portal links a
 finding straight to it.
 
+## unknown-policy-type
+
+`policy_type` is not one of the six values the engine can dispatch, so the whole condition is
+never evaluated. This is the worst thing a policy can do quietly: the condition is not weak, it
+is *absent*, and the policy passes every resource you point it at.
+
+The six, exactly as the engine spells them:
+
+    blacklist, whitelist, range, pattern blacklist, pattern whitelist, element blacklist
+
+They are **lowercase**, and the two-word ones use a **space, not an underscore**. Writing
+`pattern_whitelist` is the mistake this rule exists to catch. `element whitelist` is not a type
+either — for allowing a list, a plain `whitelist` already requires every element to be allowed
+(see [policy.rego](policy-rego.md#top) for what each type does).
+
+Bad:
+
+    {
+      "attribute_path": ["location"],
+      "values": ["australia-southeast1"],
+      "policy_type": "pattern_whitelist"
+    }
+
+Good:
+
+    {
+      "attribute_path": ["location"],
+      "values": ["australia-southeast1"],
+      "policy_type": "whitelist"
+    }
+
+If none of the six expresses what you need, that is worth saying out loud rather than working
+around — raise it, so the type can be added to the helpers instead of a broken one shipping.
+
+Miss this and the test catches it too: the helper refuses to evaluate the policy at all and
+`auto_test` fails it with `POLICY ERROR: unknown policy_type '<what you wrote>'`. The linter just
+tells you at the point you write it rather than at the point you test it.
+
 ## hard-coded-value
 
 A value in `values` is a team-specific literal (project id, email address, bucket/key/folder
@@ -75,8 +113,16 @@ Good:
 ## index-path
 
 `attribute_path` ends in a bare list index (e.g. `["allowed_ips", 0]`). That checks only the
-first element of an array and silently ignores the rest — use `element blacklist` (or
-`element whitelist`) to check the whole list instead.
+first element of an array and silently ignores the rest. Drop the index and check the whole
+list instead — with which `policy_type` depends on which way round the check goes:
+
+- **Allowing a list** — plain **`whitelist`** already handles it. Given an array value it
+  requires *every* element to be in your `values` set, so `["allowed_ips"]` under a `whitelist`
+  is a complete check. There is **no `element whitelist`**; do not reach for one.
+- **Forbidding a list** — use **`element blacklist`**. A plain `blacklist` compares the whole
+  array against your `values`, which is almost never what you want, and forbidden things
+  usually appear *inside* an element (`"*.googleapis.com"` contains `"*"`) rather than as the
+  whole element. `element blacklist` does that substring match per element.
 
 Bad:
 

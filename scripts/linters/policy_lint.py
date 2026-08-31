@@ -77,6 +77,10 @@ RULES = {
     "index-path": (
         "`attribute_path` ends in a list index; check the whole list with "
         "`element blacklist`."),
+    "unknown-policy-type": (
+        "`policy_type` is not one of the six the engine dispatches, so the condition "
+        "is never evaluated. Set it to a valid type (lowercase, spaces not "
+        "underscores)."),
     "presence-only": (
         "`values` is only null/\"\": presence is the whole check. Acceptable when the "
         "rationale says presence is the control — the reviewer decides; pair with a "
@@ -194,6 +198,15 @@ FIXTURE_LABEL_RE = re.compile(r"^(compliant|non_compliant)_example_(\d+)$")
 FIXTURE_IGNORED_KEYS = {
     "name", "labels", "label", "effective_labels", "terraform_labels",
 }
+
+# The policy types `policies/_helpers/helpers.rego` can dispatch, in the order its
+# error message lists them (so the two read identically to a student who hits both).
+# Anything else is refused at evaluation time; this rule catches it at authoring
+# time instead. Keep in step with `valid_policy_types` there.
+VALID_POLICY_TYPES = (
+    "blacklist", "whitelist", "range",
+    "pattern blacklist", "pattern whitelist", "element blacklist",
+)
 
 # Blacklist/whitelist only — a pattern or range policy with empty values means
 # something else entirely.
@@ -707,6 +720,25 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
             policy_type = (check.get("policy_type") or "").strip().lower()
             path_text = ".".join(str(p) for p in attribute_path)
             joined_paths.append(".".join(_path_segments(attribute_path)))
+
+            # --- unknown-policy-type ---------------------------------------- #
+            # First in the block on purpose: if the engine cannot dispatch the
+            # type, the condition is never evaluated, so every other reading of
+            # it (what it checks, against which values) is beside the point.
+            if policy_type not in VALID_POLICY_TYPES:
+                declared = check.get("policy_type")
+                wrote = (f"declares policy_type {declared!r}"
+                         if declared not in (None, "")
+                         else "declares no policy_type")
+                # Keyed on the path as well as the type, so every offending
+                # condition is reported at once rather than the next one
+                # surfacing each time the author fixes the previous.
+                add_once("unknown-policy-type", (str(declared), path_text),
+                         f"'{path_text}' {wrote}, which the engine cannot dispatch "
+                         f"— the condition is never evaluated and the policy passes "
+                         f"everything. Set policy_type to one of: "
+                         f"{', '.join(VALID_POLICY_TYPES)} (lowercase, and a space "
+                         f"rather than an underscore).")
 
             # --- index-path ------------------------------------------------ #
             if attribute_path and _is_index(attribute_path[-1]):
