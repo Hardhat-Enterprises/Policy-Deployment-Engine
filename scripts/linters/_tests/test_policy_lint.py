@@ -10,6 +10,7 @@ version changes — the sha is recomputed from the same function the pipeline us
 """
 
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -80,7 +81,65 @@ def test_policy_body_rules_fire_exactly_once_each(tmp_path):
         ("short", "trivial-message"),
         ("legacy", "legacy-assign"),
         ("badcase", "package-case"),
+        ("bogus_type", "unknown-policy-type"),
+        ("no_type", "unknown-policy-type"),
     }
+
+
+def test_unknown_policy_type_names_what_was_written_and_the_valid_values(tmp_path):
+    # The finding has to be actionable on its own: a student reading it in CI
+    # needs the offending spelling and the list to pick a replacement from.
+    root = build_tree(tmp_path, "policy_smells")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    by_policy = {f.policy: f.message
+                 for f in findings if f.rule == "unknown-policy-type"}
+
+    assert "'pattern_whitelist'" in by_policy["bogus_type"]
+    assert "declares no policy_type" in by_policy["no_type"]
+    for message in by_policy.values():
+        for valid in policy_lint.VALID_POLICY_TYPES:
+            assert valid in message, f"{valid!r} missing from: {message}"
+
+
+def test_unknown_policy_type_is_an_error_not_a_warning(tmp_path):
+    # By the owner's call: a condition that is never evaluated is not a style
+    # question, so it must fail a build rather than be surfaced for review.
+    root = build_tree(tmp_path, "policy_smells")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    unknown = [f for f in findings if f.rule == "unknown-policy-type"]
+    assert unknown
+    assert {f.severity for f in unknown} == {"error"}
+    assert "unknown-policy-type" not in policy_lint.WARN_RULES
+
+
+def test_unknown_policy_type_is_silent_on_every_valid_type(tmp_path):
+    # The rule must accept all six, including the two-word ones — flagging a
+    # valid type would block every pattern/element policy in the tree.
+    root = build_tree(tmp_path, "policy_smells")
+    template = (root / "policies" / "gcp" / "Backup for GKE"
+                / "google_gke_backup_restore_channel" / "bogus_type.rego")
+    body = template.read_text(encoding="utf-8")
+    for valid in policy_lint.VALID_POLICY_TYPES:
+        template.write_text(body.replace('"pattern_whitelist"', f'"{valid}"'),
+                            encoding="utf-8")
+        policy_lint.clear_caches()
+        findings = policy_lint.lint_resource(
+            root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+        assert not [f for f in findings
+                    if f.policy == "bogus_type" and f.rule == "unknown-policy-type"], \
+            f"{valid!r} is a valid policy_type and must not be flagged"
+
+
+def test_unknown_policy_type_matches_what_the_helpers_dispatch(tmp_path):
+    # The linter's list and helpers.rego's `valid_policy_types` are two copies of
+    # one fact. If they drift, the linter either passes a policy the engine will
+    # refuse, or blocks one it would have run.
+    helpers = (project_root / "policies" / "_helpers" / "helpers.rego").read_text(
+        encoding="utf-8")
+    declared = helpers.split("valid_policy_types := [", 1)[1].split("]", 1)[0]
+    assert set(re.findall(r'"([^"]+)"', declared)) == set(policy_lint.VALID_POLICY_TYPES)
 
 
 def test_trivial_message_flags_short_text_and_empty_remedies_separately(tmp_path):
@@ -371,6 +430,8 @@ def test_cli_json_output_and_exit_code(tmp_path, capsys):
         ("short", "trivial-message"),
         ("legacy", "legacy-assign"),
         ("badcase", "package-case"),
+        ("bogus_type", "unknown-policy-type"),
+        ("no_type", "unknown-policy-type"),
     }
 
 
@@ -385,7 +446,8 @@ def test_cli_exits_zero_on_a_clean_resource(tmp_path, capsys):
 def test_cli_exits_zero_when_only_warnings_are_found(tmp_path, capsys):
     # A tree whose only findings are warn-severity must not fail the build.
     root = build_tree(tmp_path, "policy_smells")
-    for name in ("destination_project", "members", "constraint", "brief", "short"):
+    for name in ("destination_project", "members", "constraint", "brief", "short",
+                 "bogus_type", "no_type"):
         (root / "policies" / "gcp" / "Backup for GKE"
          / "google_gke_backup_restore_channel" / f"{name}.rego").unlink()
     rc = policy_lint.main([
