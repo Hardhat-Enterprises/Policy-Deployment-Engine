@@ -9,10 +9,10 @@ conditions := [[
     "remedies": ["Configure spec.egress_policies.egress_from.identities with specific service account identities instead of wildcard or public principals."],
   },
   {
-    "condition": "Egress identities must not contain wildcard or public principals.",
+    "condition": "Each egress identity must not be a wildcard or public principal.",
     "attribute_path": ["spec", 0, "egress_policies", 0, "egress_from", 0, "identities"],
     "values": ["*", "allUsers", "allAuthenticatedUsers"],
-    "policy_type": "blacklist",
+    "policy_type": "element_blacklist",
   },
 ]]
 
