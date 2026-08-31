@@ -15,9 +15,10 @@ conditions := [
       "condition": "`member` must be set to an approved identity",
       "attribute_path": ["member"],
       "values": [
-        "serviceAccount:valid-sa@my-secure-project.iam.gserviceaccount.com"
+        "*:*@*",
+        [["serviceAccount"], ["valid-sa"], ["my-secure-project.iam.gserviceaccount.com"]]
       ],
-      "policy_type": "whitelist"
+      "policy_type": "pattern whitelist"
     }
   ]
 ]

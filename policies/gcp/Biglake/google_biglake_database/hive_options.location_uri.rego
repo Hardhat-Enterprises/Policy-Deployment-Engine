@@ -14,8 +14,8 @@ conditions := [
     {
       "condition": "Restrict hive_options.location_uri to approved GCS prefixes",
       "attribute_path": ["hive_options", 0, "location_uri"],
-      "values": ["gs://org-au-biglake-metadata/metadata/"],
-      "policy_type": "whitelist"
+      "values": ["*://*/metadata/", [["gs"], ["org-au-biglake-metadata"]]],
+      "policy_type": "pattern whitelist"
     }
   ]
 ]

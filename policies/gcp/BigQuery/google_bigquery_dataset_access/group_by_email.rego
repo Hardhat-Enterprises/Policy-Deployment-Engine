@@ -9,8 +9,8 @@ conditions := [
         {
             "condition": "Check for correct group_by_email",
             "attribute_path" : ["group_by_email"],
-            "values" : ["user@example.com"],
-            "policy_type" : "whitelist"  
+            "values" : ["*@*", [["user"], ["example.com"]]],
+            "policy_type" : "pattern whitelist"  
         }
     ]
 ]

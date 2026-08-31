@@ -15,10 +15,15 @@ conditions := [
       "condition": "crypto_key_name equals an approved key",
       "attribute_path": ["crypto_key_name"],
       "values": [
-        "projects/deakin-lab-123/locations/australia-southeast1/keyRings/netapp-kr/cryptoKeys/netapp-cmek",
-        "projects/deakin-lab-123/locations/australia-southeast2/keyRings/netapp-kr/cryptoKeys/netapp-cmek"
+        "projects/*/locations/*/keyRings/*/cryptoKeys/*",
+        [
+          ["deakin-lab-123"],
+          ["australia-southeast1", "australia-southeast2"],
+          ["netapp-kr"],
+          ["netapp-cmek"]
+        ]
       ],
-      "policy_type": "whitelist"
+      "policy_type": "pattern whitelist"
     }
   ]
 ]

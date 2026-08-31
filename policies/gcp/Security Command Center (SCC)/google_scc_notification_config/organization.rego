@@ -12,8 +12,8 @@ conditions := [
     {
       "condition": "Organization allowlist.",
       "attribute_path": ["organization"],
-      "values": ["organizations/123456789012"],
-      "policy_type": "whitelist"
+      "values": ["organizations/*", [["123456789012"]]],
+      "policy_type": "pattern whitelist"
     }
   ]
 ]

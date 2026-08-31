@@ -9,8 +9,8 @@ import data.terraform.gcp.security.anthos_on_prem.google_gkeonprem_vmware_admin_
     {
         "condition": "Test if the username is a secured gmail.com account",
         "attribute_path" : ["authorization", 0, "viewer_users", 0, "username"],
-        "values" : ["user1@gmail.com"],
-        "policy_type" : "whitelist" 
+        "values" : ["*@*", [["user1"], ["gmail.com"]]],
+        "policy_type" : "pattern whitelist" 
     }
     
     ]

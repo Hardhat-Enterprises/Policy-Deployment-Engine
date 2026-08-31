@@ -33,7 +33,10 @@ conditions := [
     {
       "condition": "Invalid or disallowed 'location' value",
       "attribute_path": ["scope"],
-      "values": ["projects/fake-project/locations/*/instances/audit-log-activity/dataAccessScopes/legitimatescope", 
+      # Anchored on the location segment only: a pattern target constrains the
+      # segments it captures, so naming the project and instance here would pin
+      # them without checking them.
+      "values": ["locations/*/instances/",
       [["australia-southeast1"]]],
       "policy_type": "pattern whitelist"
     }
