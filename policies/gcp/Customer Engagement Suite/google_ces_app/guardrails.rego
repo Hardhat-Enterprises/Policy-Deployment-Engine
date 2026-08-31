@@ -6,14 +6,14 @@ import data.terraform.gcp.security.customer_engagement_suite.google_ces_app.vars
 conditions := [
     [
         {
-            "situation_description": "CES app does not define an approved guardrail.",
-            "remedies": ["Configure an approved guardrail for the CES app."]
+            "situation_description": "CES app must define a guardrail to constrain agent behaviour.",
+            "remedies": ["Define at least one guardrail for the CES app."]
         },
         {
-            "condition": "Guardrails must use an approved value.",
+            "condition": "guardrails must not be empty",
             "attribute_path": ["guardrails"],
-            "values": ["approved-guardrail"],
-            "policy_type": "whitelist"
+            "values": [null, []],
+            "policy_type": "blacklist"
         }
     ]
 ]
