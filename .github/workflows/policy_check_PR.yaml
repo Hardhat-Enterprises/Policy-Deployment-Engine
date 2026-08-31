@@ -131,6 +131,14 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 scripts/auto_test/check_resource_pr.py
 
+      - name: Create or update APC PR comment
+        if: always()
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHECK_OUTCOME: ${{ steps.policy-checks.outcome }}
+        run: python3 scripts/auto_test/manage_pr_comment.py
+
       - name: Add PR label based on policy check results
         if: always()
         env:
