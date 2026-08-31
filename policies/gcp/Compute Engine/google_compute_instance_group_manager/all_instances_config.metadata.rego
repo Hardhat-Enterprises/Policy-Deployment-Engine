@@ -1,4 +1,4 @@
-package terraform.gcp.security.compute_engine.google_compute_instance_group_manager.metadata
+package terraform.gcp.security.compute_engine.google_compute_instance_group_manager.all_instances_config_metadata
 
 import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_instance_group_manager.vars
