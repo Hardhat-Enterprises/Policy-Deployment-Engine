@@ -494,15 +494,15 @@
       "description": "The name of the subnetwork to attach this interface to. The subnetwork must exist in the same region this instance will be created in. Either network or subnetwork must be provided.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "References the subnetwork to which the interface is attached. Approved subnetwork identifiers are environment-specific resource references, and constraining them generically would require hardcoding team-specific values."
-    },
+      "security_impact": true,
+      "rationale": "Controls which subnetwork the instance joins. Restricting deployment to approved, compliant subnets is a core network-exposure and isolation control. A platform policy can enforce approved subnet paths or patterns without pinning a specific subnet."
+    
     "network_interface.subnetwork_project": {
       "description": "The ID of the project in which the subnetwork belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Identifies the project containing the referenced subnetwork. Project identifiers are environment-specific pointers and are not suitable generic platform security-policy targets."
+      "security_impact": true,
+      "rationale": "Controls the project from which the attached subnetwork is selected. Cross-project network attachment can cross security boundaries, so a platform policy can restrict subnet projects to approved environments without pinning a specific project identifier."
     },
     "network_interface.vlan": {
       "description": "VLAN tag of a dynamic network interface, must be an integer in the range from 2 to 255 inclusively.",
@@ -738,8 +738,8 @@
       "description": "A list of service scopes. Both OAuth2 URLs and gcloud short names are supported. To allow full access to all Cloud APIs, use the cloud-platform scope.",
       "required": true,
       "type": "set(string)",
-      "security_impact": false,
-      "rationale": "OAuth access scopes are legacy IAM boundaries and modern authorization is primarily controlled through fine-grained IAM roles. Scope selection is therefore not a useful generic platform-level security policy target."
+      "security_impact": true,
+      "rationale": "OAuth scopes define authorization boundaries alongside IAM. Overly broad scopes such as unrestricted cloud-platform access can grant excessive access, so a platform policy can restrict broad scopes and enforce least-privilege scope configurations."
     },
     "shielded_instance_config": {
       "type": "block",
