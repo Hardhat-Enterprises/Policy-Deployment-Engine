@@ -15,11 +15,13 @@ conditions := [
       "condition": "Only approved attestor references are allowed",
       "attribute_path": ["attestor"],
       "values": [
-        "projects/my-secure-project/attestors/australia-southeast1",
-        "projects/my-secure-project/attestors/us-central1-attestor1",
-        "projects/my-secure-project/attestors/us-central1-attestor2"
+        "projects/*/attestors/*",
+        [
+          ["my-secure-project"],
+          ["australia-southeast1", "us-central1-attestor1", "us-central1-attestor2"]
+        ]
       ],
-      "policy_type": "whitelist"
+      "policy_type": "pattern whitelist"
     }
   ]
 ]

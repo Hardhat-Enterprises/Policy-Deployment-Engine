@@ -13,8 +13,8 @@ conditions := [
     },
     {
         "condition": "Check that api_targets.methods does not contain a wildcard.",
-        # restrictions[0].api_targets[0].methods[0]
-        "attribute_path" : ["restrictions", 0, "api_targets", 0, "methods", 0],
+        # restrictions[0].api_targets[0].methods
+        "attribute_path" : ["restrictions", 0, "api_targets", 0, "methods"],
         "values" : ["*"],
         "policy_type" : "blacklist"
     }

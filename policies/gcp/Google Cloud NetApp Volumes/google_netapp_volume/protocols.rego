@@ -9,7 +9,7 @@ conditions := [
          "remedies":[ "Remove NFSv3 or SMB from the list"]},
         {
         "condition": "protocols must not include NFSv3 or SMB",
-        "attribute_path" : ["protocols", 0], 
+        "attribute_path" : ["protocols"], 
         "values" : ["NFSV3", "SMB"], 
         "policy_type" : "blacklist" 
         }

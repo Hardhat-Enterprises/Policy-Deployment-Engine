@@ -16,10 +16,10 @@ conditions := [
       "condition": "Pub/Sub topic must be from the allowlist.",
       "attribute_path": ["pubsub_topic"],
       "values": [
-        "projects/security-core/topics/scc-findings",
-        "projects/sec-ops/topics/scc-high"
+        "projects/*/topics/*",
+        [["security-core", "sec-ops"], ["scc-findings", "scc-high"]]
       ],
-      "policy_type": "whitelist"
+      "policy_type": "pattern whitelist"
     }
   ]
 ]

@@ -13,8 +13,10 @@ conditions := [
     },
     {
         "condition": "Check that allowed_referrers does not contain overly broad patterns.",
-        # restrictions[0].browser_key_restrictions[0].allowed_referrers[0]
-        "attribute_path" : ["restrictions", 0, "browser_key_restrictions", 0, "allowed_referrers", 0],
+        # restrictions[0].browser_key_restrictions[0].allowed_referrers -- the whole list.
+        # Exact-match blacklist, not "element blacklist": the latter matches by substring,
+        # and a legitimate referrer such as "https://example.com/*" contains "*".
+        "attribute_path" : ["restrictions", 0, "browser_key_restrictions", 0, "allowed_referrers"],
         "values" : ["*", "http://*", "https://*"],
         "policy_type" : "blacklist"
     }

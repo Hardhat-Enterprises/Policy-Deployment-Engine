@@ -14,7 +14,7 @@ conditions := [
     },
     {
       "condition": "Disallow OWNER or WRITER roles for wildcard entities",
-      "attribute_path": ["role_entity",0],
+      "attribute_path": ["role_entity"],
       "policy_type": "blacklist",
       "values": [
         "OWNER:allUsers",

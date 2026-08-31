@@ -19,8 +19,8 @@ conditions := [
     {
         "condition": "Validating email",
         "attribute_path" : ["member"],
-        "values" : ["user:user@external.com"], 
-        "policy_type" : "blacklist"
+        "values" : ["*:*@*", [[], [], ["external.com"]]],
+        "policy_type" : "pattern blacklist"
     }
     ],
     [

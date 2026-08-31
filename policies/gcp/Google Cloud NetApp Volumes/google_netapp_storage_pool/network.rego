@@ -15,10 +15,10 @@ conditions := [
       "condition": "network equals an approved VPC",
       "attribute_path": ["network"],
       "values": [
-        "projects/deakin-lab-123/global/networks/nondefault-vpc",
-        "projects/deakin-lab-123/global/networks/prod-vpc"
+        "projects/*/global/networks/*",
+        [["deakin-lab-123"], ["nondefault-vpc", "prod-vpc"]]
       ],
-      "policy_type": "whitelist"
+      "policy_type": "pattern whitelist"
     }
   ]
 ]

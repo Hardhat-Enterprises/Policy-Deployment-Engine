@@ -8,8 +8,8 @@ conditions := [
         {"situation_description" : "Check supported_auth_types match whitelist",
         "remedies":[ "Use valid supported auth types"]},
         {
-            "condition": "Auth types not set to allowed types",
-            "attribute_path" : ["config_template",0,"auth_config_template",0,"supported_auth_types",0],
+            "condition": "Every supported auth type must be an allowed type",
+            "attribute_path" : ["config_template",0,"auth_config_template",0,"supported_auth_types"],
             "values" : ["USER_PASSWORD"],
             "policy_type" : "whitelist" 
         }

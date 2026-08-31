@@ -14,7 +14,7 @@ conditions := [
 
     {
       "condition": "Public access should be prohibited.",
-      "attribute_path": ["members",0],
+      "attribute_path": ["members"],
       "values": ["allUsers","allAuthenticatedUsers"],
       "policy_type": "blacklist"
     }

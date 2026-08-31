@@ -13,8 +13,10 @@ conditions := [
     },
     {
         "condition": "Check that allowed_ips does not contain public 0.0.0.0/0.",
-        # restrictions[0].server_key_restrictions[0].allowed_ips[0]
-        "attribute_path" : ["restrictions", 0, "server_key_restrictions", 0, "allowed_ips", 0],
+        # restrictions[0].server_key_restrictions[0].allowed_ips -- the whole list.
+        # Exact-match blacklist, not "element blacklist": CIDR strings contain each other
+        # as substrings ("10.0.0.0/0" contains "0.0.0.0/0").
+        "attribute_path" : ["restrictions", 0, "server_key_restrictions", 0, "allowed_ips"],
         "values" : ["0.0.0.0/0"],
         "policy_type" : "blacklist"
     }

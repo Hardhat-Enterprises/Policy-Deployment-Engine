@@ -9,8 +9,8 @@ conditions := [
         {
             "condition": "Automation uses dedicated service account",
             "attribute_path": ["service_account"],
-            "values": ["dedicated-automation-sa@my-project.iam.gserviceaccount.com"],
-            "policy_type": "whitelist"
+            "values": ["*@*", [["dedicated-automation-sa"], ["my-project.iam.gserviceaccount.com"]]],
+            "policy_type": "pattern whitelist"
         }
     ]
 ]
