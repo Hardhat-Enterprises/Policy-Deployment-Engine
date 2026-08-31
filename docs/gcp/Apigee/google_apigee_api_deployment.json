@@ -6,36 +6,36 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a Terraform-level lifecycle meta-argument that controls whether 'terraform destroy' can undeploy the API proxy. It affects operational workflow safety (preventing accidental undeployment), not the security configuration of the deployment itself. The choice between DELETE, PREVENT, and ABANDON is an infrastructure management concern, not a security posture decision."
     },
     "environment": {
       "description": "The Apigee Environment associated with the Apigee API deployment.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies which Apigee environment the API proxy is deployed to (e.g. test, staging, prod). Environment names are arbitrary, team-specific strings with no platform-enforced security distinction between them. A generic policy cannot constrain this without hardcoding team-specific environment names. The security configuration of the environment itself is governed by the google_apigee_environment resource, not by what is deployed into it."
     },
     "org_id": {
       "description": "The Apigee Organization associated with the Apigee API deployment.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a reference to the parent Apigee Organization. The value is inherently team- or project-specific (the organization name). A generic platform policy cannot constrain it without hardcoding specific organization identifiers. The security of the organization itself is governed by the google_apigee_organization resource, not by resources that reference it."
     },
     "proxy_id": {
       "description": "The Apigee API associated with the Apigee API deployment.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a reference to which API proxy to deploy. It points to another resource whose security (policies, TLS configuration, threat protection) is managed on the google_apigee_api resource itself. A generic policy cannot determine which proxies are safe to deploy without team-specific knowledge of proxy names and their contents."
     },
     "revision": {
       "description": "The revision of the API proxy to be deployed.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies the revision number of the API proxy to deploy. Revision numbers are sequential, team-specific identifiers. There is no inherently secure or insecure revision number; the security of a revision depends on the proxy content within it, which is managed on the proxy resource. A generic platform policy cannot determine which revision number is appropriate for any given team or workload."
     }
   }
 }
