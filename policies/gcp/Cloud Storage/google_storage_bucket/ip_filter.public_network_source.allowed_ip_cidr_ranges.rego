@@ -11,7 +11,7 @@ conditions := [
         },
         {
             "condition": "Check if all ips are allowed.",
-            "attribute_path": ["ip_filter",0,"public_network_source",0,"allowed_ip_cidr_ranges",0],
+            "attribute_path": ["ip_filter",0,"public_network_source",0,"allowed_ip_cidr_ranges"],
             "values": ["0.0.0.0/0"],
             "policy_type": "blacklist"
         }

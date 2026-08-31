@@ -9,7 +9,7 @@ conditions := [
    "remedies": ["Remove admin-level permissions such as iam.roles.delete or resourcemanager.*"]},
   {
     "condition": "Blacklist risky permissions",
-    "attribute_path": ["permissions",0],
+    "attribute_path": ["permissions"],
     "values": ["iam.roles.delete", "resourcemanager.*"],
     "policy_type": "blacklist"
   }

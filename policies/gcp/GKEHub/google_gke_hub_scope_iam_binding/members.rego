@@ -9,8 +9,8 @@ conditions := [
       "remedies": ["Remove public/broad principals like allUsers/allAuthenticatedUsers/project*"]
     },
     {
-      "condition": "members[0] must NOT be public/broad",
-      "attribute_path": ["members", 0],
+      "condition": "no member may be public/broad",
+      "attribute_path": ["members"],
       "values": ["allUsers", "allAuthenticatedUsers"],
       "policy_type": "blacklist"
     }
