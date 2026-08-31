@@ -75,8 +75,16 @@ Good:
 ## index-path
 
 `attribute_path` ends in a bare list index (e.g. `["allowed_ips", 0]`). That checks only the
-first element of an array and silently ignores the rest — use `element blacklist` (or
-`element whitelist`) to check the whole list instead.
+first element of an array and silently ignores the rest. Drop the index and check the whole
+list instead — with which `policy_type` depends on which way round the check goes:
+
+- **Allowing a list** — plain **`whitelist`** already handles it. Given an array value it
+  requires *every* element to be in your `values` set, so `["allowed_ips"]` under a `whitelist`
+  is a complete check. There is **no `element whitelist`**; do not reach for one.
+- **Forbidding a list** — use **`element blacklist`**. A plain `blacklist` compares the whole
+  array against your `values`, which is almost never what you want, and forbidden things
+  usually appear *inside* an element (`"*.googleapis.com"` contains `"*"`) rather than as the
+  whole element. `element blacklist` does that substring match per element.
 
 Bad:
 
