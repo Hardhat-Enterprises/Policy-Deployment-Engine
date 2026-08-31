@@ -1,9 +1,8 @@
 resource "google_compute_network_endpoints" "non_compliant_example_1" {
-  network_endpoint_group = "projects/fake-project/zones/europe-west1-a/networkEndpointGroups/noncompliant-neg"
+  network_endpoint_group = "non_compliant_example_1"
   zone                    = "europe-west1-a"
-
   network_endpoints {
-    ip_address = "10.0.0.6"
+    ip_address = "10.0.0.5"
     port       = 90
   }
 }
