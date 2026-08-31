@@ -8,19 +8,15 @@ conditions := [[
     "remedies": ["Remove any public principals,use org service accounts"]
   },
   {
-    "condition": "members[0] must NOT be public",
-    "attribute_path": ["members", 0],
-    "values": ["allUsers","allAuthenticatedUsers"],
-    "policy_type": "blacklist"
-  },
-  {
-    "condition": "members[1] must NOT be public",
-    "attribute_path": ["members", 1],
+    "condition": "no member may be public",
+    "attribute_path": ["members"],
     "values": ["allUsers","allAuthenticatedUsers"],
     "policy_type": "blacklist"
   }
 ]]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details
 

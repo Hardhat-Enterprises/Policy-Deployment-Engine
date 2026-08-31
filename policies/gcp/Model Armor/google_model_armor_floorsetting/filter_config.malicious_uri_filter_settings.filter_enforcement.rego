@@ -12,7 +12,7 @@ conditions := [
     },
     {
       "condition": "filter_config must not be completely empty",
-      "attribute_path": ["filter_config",0],
+      "attribute_path": ["filter_config"],
       "values": [
         {"malicious_uri_filter_settings":[],"pi_and_jailbreak_filter_settings":[],"rai_settings":[],"sdp_settings":[]}
       ],
@@ -33,5 +33,7 @@ conditions := [
   ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details
