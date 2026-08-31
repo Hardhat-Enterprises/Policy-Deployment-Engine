@@ -9,7 +9,7 @@ resource "google_access_context_manager_service_perimeter" "non_compliant_exampl
     egress_policies {
       egress_from {
         identities = [
-          "serviceAccount:unapproved@example.iam.gserviceaccount.com"
+          "*"
         ]
       }
     }
