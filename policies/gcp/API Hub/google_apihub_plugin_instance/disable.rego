@@ -5,7 +5,7 @@ import data.terraform.gcp.security.api_hub.google_apihub_plugin_instance.vars
 
 conditions := [
     [
-        {"situation_description" : "Plugin is disabled",
+        {"situation_description" : "The API Hub plugin instance is disabled, so the monitoring and governance checks it provides stop running while the plugin stays deployed and unnoticed.",
         "remedies":[ "Enable plugin with disable=false"]},
         {
             "condition": "Not allowed to disable plugin",
