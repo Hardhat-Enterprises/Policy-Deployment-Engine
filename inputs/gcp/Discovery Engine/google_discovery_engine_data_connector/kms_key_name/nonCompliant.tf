@@ -12,5 +12,5 @@ resource "google_discovery_engine_data_connector" "non_compliant_example_1" {
   }
   refresh_interval             = "86400s"
   incremental_refresh_interval = "21600s"
-  kms_key_name = "not-a-valid-kms-key-path"
+  kms_key_name = "projects/INVALID!/locations/australia-southeast1/keyRings/example-key-ring/cryptoKeys/unapproved-key"
 }

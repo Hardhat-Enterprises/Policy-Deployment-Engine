@@ -14,5 +14,5 @@ resource "google_discovery_engine_data_connector" "compliant_example_1" {
   }
   refresh_interval             = "86400s"
   incremental_refresh_interval = "21600s"
-  kms_key_name = "google_kms_crypto_key.crypto_key.id"
+  kms_key_name = "projects/example-project/locations/australia-southeast1/keyRings/example-key-ring/cryptoKeys/example-key"
 }
