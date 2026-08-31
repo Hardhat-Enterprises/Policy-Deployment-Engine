@@ -4,12 +4,12 @@ resource "google_alloydb_cluster" "non_compliant_example_1" {
   project = "123"
 
   network_config {
-    network = "projects/pde-demo/global/networks/default"
+    network = "projects/pde-demo/global/networks/prod-vpc"
   }
 
   initial_user {
     user     = "admin"
-    password = "weak-pass"
+    password = "StrongPassw0rd!"
   }
 
   
