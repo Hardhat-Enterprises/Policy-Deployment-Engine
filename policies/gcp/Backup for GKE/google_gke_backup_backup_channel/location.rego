@@ -14,18 +14,6 @@ conditions := [
       "values": ["australia-southeast1", "australia-southeast2"],
       "policy_type": "whitelist"
     }
-  ],
-  [
-    {
-      "situation_description": "Location must follow valid GCP region format.",
-      "remedies": ["Ensure location matches regex '^[a-z]+-[a-z]+\\d$'."]
-    },
-    {
-      "condition": "Location must match valid region format",
-      "attribute_path": ["location"],
-      "values": ["^[a-z]+-[a-z]+\\d$"],
-      "policy_type": "pattern_whitelist"
-    }
   ]
 ]
 
