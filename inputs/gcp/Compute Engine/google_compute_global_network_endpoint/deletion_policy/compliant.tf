@@ -1,5 +1,5 @@
 resource "google_compute_global_network_endpoint" "compliant_example_1" {
-  global_network_endpoint_group = "projects/fake-project/global/networkEndpointGroups/compliant-neg"
+  global_network_endpoint_group = "compliant_example_1"
   fqdn                           = "www.example.com"
   port                            = 90
   deletion_policy                 = "PREVENT"
