@@ -3,5 +3,5 @@ resource "google_access_context_manager_service_perimeter" "compliant_example_1"
   name   = "compliant_explicit_dry_run"
   title  = "service_perimeter"
 
-  use_explicit_dry_run_spec = true
+  use_explicit_dry_run_spec = false
 }
