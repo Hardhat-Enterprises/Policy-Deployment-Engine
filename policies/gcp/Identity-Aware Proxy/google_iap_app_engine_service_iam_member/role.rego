@@ -40,14 +40,31 @@ conditions := [
         "roles/editor",
         "roles/viewer",
         "roles/iap.admin",
-        "roles/run.invoker",
-        "projects/my-gcp-project/roles/CustomBroadRole"
+        "roles/run.invoker"
       ],
       "policy_type": "blacklist"
+    }
+  ],
+
+  # 3) The same broad custom role, in whichever project it was defined
+  [
+    {
+      "situation_description": "Broad custom project roles are not allowed on IAP",
+      "remedies": [
+        "Replace with roles/iap.httpsResourceAccessor"
+      ]
+    },
+    {
+      "condition": "role must not be a broad custom project role",
+      "attribute_path": ["role"],
+      "values": ["projects/*/roles/*", [[], ["CustomBroadRole"]]],
+      "policy_type": "pattern blacklist"
     }
   ]
 ]
 
 # Summaries (same helper usage as member policy)
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details
