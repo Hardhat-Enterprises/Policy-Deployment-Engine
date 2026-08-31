@@ -3,6 +3,7 @@ package terraform.gcp.security.compute_engine.google_compute_instance_group_mana
 import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_instance_group_manager.vars
 
+# All three situations use "blacklist" (forbid the explicit disabling value)
 conditions := [
   [
     {
