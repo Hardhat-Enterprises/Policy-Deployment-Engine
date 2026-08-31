@@ -15,26 +15,6 @@ conditions := [
             "values": [null, []],
             "policy_type": "blacklist"
         }
-    ],
-    [
-        {
-            "situation_description": "CES app guardrails must use the approved platform-level resource path format.",
-            "remedies": ["Use guardrail references following the projects/*/locations/*/apps/*/guardrails/* structure."]
-        },
-        {
-            "condition": "guardrails must use an approved resource path",
-            "attribute_path": ["guardrails"],
-            "values": [
-                "projects/*/locations/*/apps/*/guardrails/*",
-                [
-                    ["*"],
-                    ["*"],
-                    ["*"],
-                    ["*"]
-                ]
-            ],
-            "policy_type": "pattern whitelist"
-        }
     ]
 ]
 
