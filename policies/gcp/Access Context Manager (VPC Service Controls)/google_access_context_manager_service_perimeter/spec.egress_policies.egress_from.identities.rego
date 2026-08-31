@@ -1,22 +1,19 @@
-package terraform.gcp.security.access_context_manager_vpc_service_controls.google_access_context_manager_service_perimeter.spec_egress_policies_egress_from_identities
+resource "google_access_context_manager_service_perimeter" "non_compliant_example_1" {
+  parent = "accessPolicies/123456789"
+  name   = "non_compliant_egress_identities"
+  title  = "service_perimeter"
 
-import data.terraform.helpers as helpers
-import data.terraform.gcp.security.access_context_manager_vpc_service_controls.google_access_context_manager_service_perimeter.vars as vars
+  spec {
+    restricted_services = ["storage.googleapis.com"]
 
-conditions := [[
-  {
-    "situation_description": "Egress access should be restricted to explicitly scoped identities.",
-    "remedies": ["Configure spec.egress_policies.egress_from.identities with specific service account identities instead of wildcard or public principals."],
-  },
-  {
-    "condition": "Egress identities must not contain wildcard or public principals.",
-    "attribute_path": ["spec", 0, "egress_policies", 0, "egress_from", 0, "identities"],
-    "values": ["*", "allUsers", "allAuthenticatedUsers"],
-    "policy_type": "blacklist",
-  },
-]]
+    egress_policies {
+      egress_from {
+        identities = [
+          "allUsers"
+        ]
+      }
+    }
+  }
 
-summary := helpers.get_multi_summary(conditions, vars.variables)
-
-message := summary.message
-details := summary.details
+  use_explicit_dry_run_spec = true
+}
