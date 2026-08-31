@@ -7,7 +7,7 @@ resource "google_discovery_engine_data_connector" "non_compliant_example_1" {
   location                     = "eu"
   collection_id                = "non_compliant_example_1"
   collection_display_name      = "tf-c-dataconnector"
-  data_source                  = "nc-datasource"
+  data_source                  = "c-datasource"
   params = {
   }
   refresh_interval             = "86400s"
