@@ -120,7 +120,7 @@
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "BGP MD5 authentication secret defending peering sessions against spoofing and route hijack; the value is stored in Terraform configuration and state. Policy should blacklist weak or placeholder literals (e.g. password, secret, test, changeme, or trivially short values) so obviously insecure keys are rejected."
+      "rationale": "BGP MD5 authentication secret protecting peering sessions against spoofing and route hijack. A blank or trivially guessable shared secret leaves the session effectively unauthenticated, allowing an on-path attacker to inject or modify route advertisements. Keys must be of sufficient length and complexity and should be sourced from a secret manager rather than committed to configuration or state."
     },
     "md5_authentication_keys.name": {
       "description": "Name used to identify the key. Must be unique within a router.\nMust be referenced by exactly one bgpPeer. Must comply with RFC1035.",
