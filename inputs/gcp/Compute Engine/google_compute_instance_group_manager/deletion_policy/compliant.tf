@@ -1,6 +1,6 @@
 resource "google_compute_instance_group_manager" "compliant_example_1" {
   name               = "compliant-example-1"
-  base_instance_name = "compliant-example-1"
+  base_instance_name = "mig-example"
   project            = "test-project"
   zone               = "australia-southeast1-a"
   deletion_policy    = "PREVENT"
