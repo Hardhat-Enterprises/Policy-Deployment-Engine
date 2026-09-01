@@ -5,14 +5,14 @@ import data.terraform.gcp.security.access_context_manager_vpc_service_controls.g
 
 conditions := [[
     {
-        "situation_description": "Ensure only whitelisted project resources are associated with the ingress policy.",
-        "remedies": ["Update resource to 'projects/123456789'."]
+        "situation_description": "Ensure only valid project resources are associated with the ingress policy.",
+        "remedies": ["Update resource to a valid project resource such as 'projects/<project-number>'."]
     },
     {
         "condition": "resource is whitelisted",
         "attribute_path": ["resource"],
-        "values": ["projects/123456789"],
-        "policy_type": "whitelist"
+        "values": ["projects/*"],
+        "policy_type": "pattern whitelist"
     }
 ]]
 
