@@ -1,5 +1,5 @@
 resource "google_dataproc_metastore_federation" "non_compliant_example_1" {
-  version             = "3.0.0"  
+  version             = "3.1.2"   
   federation_id       = "non_compliant_example_1"
   project = 1 
 

@@ -12,8 +12,11 @@ conditions := [
 		{
 			"condition": "Certificate issuance config should use an approved CA pool.",
 			"attribute_path": ["certificate_authority_config", 0, "certificate_authority_service_config", 0, "ca_pool"],
-			"values": ["projects/sit764-policy-project/locations/us-central1/caPools/approved-ca-pool"],
-			"policy_type": "whitelist"
+			"values": [
+				"projects/*/locations/*/caPools/*",
+				[["sit764-policy-project"], ["us-central1"], ["approved-ca-pool"]]
+			],
+			"policy_type": "pattern whitelist"
 		}
 	]
 ]
