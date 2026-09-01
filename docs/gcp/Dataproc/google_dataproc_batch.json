@@ -7,7 +7,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "rationale": "A resource identifier used as part of the Dataproc Batch resource name. We do not constrain resource names or references through platform security policy."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
@@ -21,7 +21,7 @@
       "required": false,
       "type": "map(string)",
       "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "rationale": "Labels are descriptive key-value metadata used to organize resources. They are cosmetic metadata rather than security controls."
     },
     "location": {
       "description": "The location in which the batch will be created in.",
@@ -35,7 +35,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "rationale": "The project value identifies the Google Cloud project containing the resource. It is a resource reference, and we do not constrain resource references through this policy."
     },
     "environment_config": {
       "type": "block",
@@ -52,49 +52,49 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls the Cloud KMS key used for encryption, directly affecting protection of data associated with the Dataproc Batch workload."
+      "rationale": "Controls the Cloud KMS key used for workload encryption. Requiring this attribute to be explicitly configured ensures the workload does not rely on an unspecified encryption configuration."
     },
     "environment_config.execution_config.network_tags": {
       "description": "Tags used for network traffic control.",
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "rationale": "Network tags are used to associate the workload with network traffic-control rules. Their selection is a team architectural choice rather than a platform security policy target."
     },
     "environment_config.execution_config.network_uri": {
       "description": "Network configuration for workload execution.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "rationale": "network_uri is a reference to a Google Cloud network resource used by the workload. Network resource pointers are architectural choices and are not constrained by this platform policy."
     },
     "environment_config.execution_config.service_account": {
       "description": "Service account that used to execute workload.",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "A dedicated service account limits workload permissions and helps prevent use of an overly privileged default identity."
+      "rationale": "Controls the identity used by the workload. Requiring a dedicated service account to be explicitly configured prevents the workload from relying on an unspecified or default identity."
     },
     "environment_config.execution_config.staging_bucket": {
       "description": "A Cloud Storage bucket used to stage workload dependencies, config files, and store\nworkload output and other ephemeral data, such as Spark history files. If you do not specify a staging bucket,\nCloud Dataproc will determine a Cloud Storage location according to the region where your workload is running,\nand then create and manage project-level, per-location staging and temporary buckets.\nThis field requires a Cloud Storage bucket name, not a gs://... URI to a Cloud Storage bucket.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "rationale": "staging_bucket references a Cloud Storage bucket used for workload staging and temporary data. It is a pointer to another resource rather than a direct platform security control."
     },
     "environment_config.execution_config.subnetwork_uri": {
       "description": "Subnetwork configuration for workload execution.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls the subnetwork used for workload execution, which affects the network boundary and connectivity available to the Dataproc Batch workload."
+      "security_impact": false,
+      "rationale": "Controls the network boundary used for workload execution. Requiring a subnetwork URI to be explicitly configured prevents the workload from relying on an unspecified network configuration."
     },
     "environment_config.execution_config.ttl": {
       "description": "The duration after which the workload will be terminated.\nWhen the workload exceeds this duration, it will be unconditionally terminated without waiting for ongoing\nwork to finish. If ttl is not specified for a batch workload, the workload will be allowed to run until it\nexits naturally (or run forever without exiting). If ttl is not specified for an interactive session,\nit defaults to 24 hours. If ttl is not specified for a batch that uses 2.1+ runtime version, it defaults to 4 hours.\nMinimum value is 10 minutes; maximum value is 14 days. If both ttl and idleTtl are specified (for an interactive session),\nthe conditions are treated as OR conditions: the workload will be terminated when it has been idle for idleTtl or\nwhen ttl has been exceeded, whichever occurs first.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "rationale": "TTL controls how long the workload is allowed to run before termination. This is a data-management and operational lifecycle choice rather than a direct security control."
     },
     "environment_config.execution_config.authentication_config": {
       "type": "block",
@@ -106,7 +106,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls the authentication method used by the user workload, determining whether the workload runs with a service account or end user credentials."
+      "rationale": "This controls how the user workload authenticates during execution. A security policy can restrict weak or end-user credential authentication and require managed service-account based authentication."
     },
     "environment_config.peripherals_config": {
       "type": "block",
@@ -118,7 +118,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "rationale": "metastore_service is a reference to an existing external Dataproc Metastore service. It is a resource pointer rather than a direct platform security policy target."
     },
     "environment_config.peripherals_config.spark_history_server_config": {
       "type": "block",
@@ -130,7 +130,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "rationale": "dataproc_cluster is a reference to an existing Dataproc cluster used for Spark History Server functionality. It is a resource pointer rather than a platform security policy target."
     },
     "pyspark_batch": {
       "type": "block",
@@ -142,42 +142,42 @@
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "rationale": "These URIs reference external archives used by the PySpark workload. They are team data-management and implementation choices rather than direct platform security policy targets."
     },
     "pyspark_batch.args": {
       "description": "The arguments to pass to the driver. Do not include arguments that can be set as batch\nproperties, such as --conf, since a collision can occur that causes an incorrect batch submission.",
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "rationale": "Job arguments are free-form application parameters defined by the workload team. They are application-level configuration rather than platform security controls."
     },
     "pyspark_batch.file_uris": {
       "description": "HCFS URIs of files to be placed in the working directory of each executor.",
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "rationale": "These file URIs point to job source files and dependencies used by the PySpark workload. They are team implementation choices rather than direct platform security controls."
     },
     "pyspark_batch.jar_file_uris": {
       "description": "HCFS URIs of jar files to add to the classpath of the Spark driver and tasks.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "security_impact": true,
+      "rationale": "These URIs reference JAR artifacts loaded into the PySpark execution environment. A platform policy can require secure HTTPS transport to reduce the risk of insecure artifact retrieval."
     },
     "pyspark_batch.main_python_file_uri": {
       "description": "The HCFS URI of the main Python file to use as the Spark driver. Must be a .py file.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "security_impact": true,
+      "rationale": "This URI identifies the primary Python execution script for the PySpark workload. Because it references executable workload code, a platform policy can require secure HTTPS transport."
     },
     "pyspark_batch.python_file_uris": {
       "description": "HCFS file URIs of Python files to pass to the PySpark framework.\nSupported file types: .py, .egg, and .zip.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "security_impact": true,
+      "rationale": "These URIs reference supporting Python dependencies used by the PySpark workload. A platform policy can require secure HTTPS transport to reduce the risk of insecure artifact retrieval."
     },
     "runtime_config": {
       "type": "block",
@@ -188,29 +188,29 @@
       "description": "Optional. Cohort identifier. Identifies families of the workloads having the same shape, e.g. daily ETL jobs.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "security_impact": true,
+      "rationale": "The cohort identifies a family or class of workloads with the same runtime shape. A platform security policy can use this classification to restrict workloads to stable and security-supported enterprise runtime tiers."
     },
     "runtime_config.container_image": {
       "description": "Optional custom container image for the job runtime environment. If not specified, a default container image will be used.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "security_impact": true,
+      "rationale": "The container image defines the workload runtime environment and can introduce vulnerabilities or untrusted code. A platform policy can require images to originate from approved trusted enterprise registries."
     },
     "runtime_config.properties": {
       "description": "A mapping of property names to values, which are used to configure workload execution.",
       "required": false,
       "type": "map(string)",
-      "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "security_impact": true,
+      "rationale": "The property map controls workload execution configuration and can contain sensitive settings or values that weaken security controls. A platform policy can restrict sensitive properties or require secure defaults."
     },
     "runtime_config.version": {
       "description": "Version of the batch runtime.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "security_impact": true,
+      "rationale": "The runtime version determines the execution engine used by the workload. A security policy can enforce a minimum supported version to prevent use of deprecated or vulnerable runtime versions."
     },
     "runtime_config.autotuning_config": {
       "type": "block",
@@ -221,8 +221,8 @@
       "description": "Optional. Scenarios for which tunings are applied. Possible values: [\"AUTO\", \"SCALING\", \"BROADCAST_HASH_JOIN\", \"MEMORY\"]",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "security_impact": true,
+      "rationale": "Autotuning scenarios control runtime performance-tuning behavior. A platform policy can constrain these settings where required to ensure workload configuration remains within approved operational and security boundaries."
     },
     "spark_batch": {
       "type": "block",
@@ -233,43 +233,43 @@
       "description": "HCFS URIs of archives to be extracted into the working directory of each executor.\nSupported file types: .jar, .tar, .tar.gz, .tgz, and .zip.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "security_impact": true,
+      "rationale": "These URIs reference external dependency archives loaded into the Spark workload. They can introduce untrusted code, so a platform policy can require trusted internal storage locations."
     },
     "spark_batch.args": {
       "description": "The arguments to pass to the driver. Do not include arguments that can be set as batch\nproperties, such as --conf, since a collision can occur that causes an incorrect batch submission.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "security_impact": true,
+      "rationale": "Spark job arguments can contain sensitive parameters such as credentials, API keys, or connection strings. A platform policy can scan or restrict argument values to reduce credential leakage."
     },
     "spark_batch.file_uris": {
       "description": "HCFS URIs of files to be placed in the working directory of each executor.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "security_impact": true,
+      "rationale": "These URIs reference external files or dependencies used by the Spark workload. A platform policy can require them to originate from trusted and secure sources."
     },
     "spark_batch.jar_file_uris": {
       "description": "HCFS URIs of jar files to add to the classpath of the Spark driver and tasks.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "security_impact": true,
+      "rationale": "These URIs reference JAR files whose code is loaded and executed by the Spark workload. A platform policy can restrict them to verified organization-controlled storage to prevent execution of untrusted code."
     },
     "spark_batch.main_class": {
       "description": "The name of the driver main class. The jar file that contains the class must be in the\nclasspath or specified in jarFileUris.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "rationale": "main_class defines the entry point for the Spark application. Selecting the application entry point is an architectural choice left to the development team rather than a platform security control."
     },
     "spark_batch.main_jar_file_uri": {
       "description": "The HCFS URI of the jar file that contains the main class.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "security_impact": true,
+      "rationale": "This URI points to the primary JAR containing the Spark application's main class. Because it identifies executable code, a platform policy can require a trusted and secure storage location."
     },
     "spark_r_batch": {
       "type": "block",
@@ -280,29 +280,29 @@
       "description": "HCFS URIs of archives to be extracted into the working directory of each executor.\nSupported file types: .jar, .tar, .tar.gz, .tgz, and .zip.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "security_impact": true,
+      "rationale": "These URIs reference external archives loaded into the SparkR workload. They can introduce untrusted code, so a platform policy can constrain them to trusted internal storage locations."
     },
     "spark_r_batch.args": {
       "description": "The arguments to pass to the driver. Do not include arguments that can be set as batch\nproperties, such as --conf, since a collision can occur that causes an incorrect batch submission.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "security_impact": true,
+      "rationale": "R workload arguments can contain sensitive values or credentials in cleartext. A platform security policy can restrict argument values to reduce the risk of credential exposure."
     },
     "spark_r_batch.file_uris": {
       "description": "HCFS URIs of files to be placed in the working directory of each executor.",
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "rationale": "These file URIs reference external files or artifacts used by the SparkR workload. They are resource or artifact references rather than direct platform security policy targets."
     },
     "spark_r_batch.main_r_file_uri": {
       "description": "The HCFS URI of the main R file to use as the driver. Must be a .R or .r file.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "rationale": "This URI points to the external R file used by the SparkR workload. It is an external file reference and is not directly targeted by the platform security policy."
     },
     "spark_sql_batch": {
       "type": "block",
@@ -314,21 +314,21 @@
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "rationale": "These URIs reference external JAR files used by the Spark SQL workload. They are pointers to external artifacts rather than direct platform security policy targets."
     },
     "spark_sql_batch.query_file_uri": {
       "description": "The HCFS URI of the script that contains Spark SQL queries to execute.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "rationale": "This URI points to the external SQL query file used by the Spark SQL workload. It is an application artifact reference rather than a direct platform security policy target."
     },
     "spark_sql_batch.query_variables": {
       "description": "Mapping of query variable names to values (equivalent to the Spark SQL command: SET name=\"value\";).",
       "required": false,
       "type": "map(string)",
       "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "rationale": "These values are application and job configuration variables used by the Spark SQL query. They are workload-level configuration rather than direct platform security controls."
     }
   }
 }
