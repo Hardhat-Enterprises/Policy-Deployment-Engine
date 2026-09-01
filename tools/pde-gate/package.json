@@ -4,21 +4,24 @@
   "description": "Run PDE OPA policies against a Terraform plan JSON",
   "type": "module",
   "bin": {
-    "pde-gate": "./dist/cli.js"
+    "pde-gate": "./bin/pde-gate.js"
   },
   "scripts": {
     "build": "tsc",
     "test": "tsx --test src/*.test.ts",
     "check": "tsx src/cli.ts check --plan ../../samples/org-input/plan.json --policies ../../policies --org-config ../../samples/org-input/org-config.json",
     "register": "tsx src/cli.ts register --output ../../samples/org-input/org-config.json",
+    "register:portal": "PDE_API_URL=http://localhost:3847 PDE_PORTAL_URL=http://localhost:3847 tsx src/cli.ts register --mode portal",
+    "status": "tsx src/cli.ts status",
+    "status:portal": "PDE_API_URL=http://localhost:3847 PDE_PORTAL_URL=http://localhost:3847 tsx src/cli.ts status",
+    "check:portal": "PDE_API_URL=http://localhost:3847 PDE_PORTAL_URL=http://localhost:3847 tsx src/cli.ts check --plan ../../samples/org-input/plan.json --policies ../../policies",
     "start": "tsx src/cli.ts"
   },
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
-    "commander": "^12.1.0",
-    "execa": "^9.5.2"
+    "commander": "^12.1.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

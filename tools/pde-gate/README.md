@@ -4,7 +4,7 @@ CLI that runs PDE Rego policies against a **custom Terraform plan JSON** (organi
 
 ## Requirements
 
-- Node.js 20+
+- **Node.js 20+** (run `nvm use` in `tools/pde-gate` — `.nvmrc` is included)
 - `opa` on PATH (OPA ~1.2, same as PDE)
 
 ## Organisation quickstart
@@ -13,24 +13,50 @@ See **[ORG-QUICKSTART.md](./ORG-QUICKSTART.md)** for the mentor/adopter walkthro
 
 ## Organisation registration
 
-Registration starts **from the terminal**. The wizard is the temporary stand-in for the future portal popup.
+Two modes — same prod architecture, different config delivery:
+
+| Mode | Command | Use when |
+| ---- | ------- | -------- |
+| **file** (MVP) | `pde-gate register --mode file` | Capstone demo, air-gapped CI |
+| **portal** (prod) | `pde-gate register --mode portal` | Browser signup → auto-saves token; config from API |
 
 ```bash
-cd tools/pde-gate
-npm install
+# MVP — writes org-config.json
+npx tsx src/cli.ts register --mode file --output ../../samples/org-input/org-config.json
 
-# Interactive onboarding popup in the terminal
-npx tsx src/cli.ts register --output ../../samples/org-input/org-config.json
+# Production — opens portal, saves ~/.pde-gate/credentials.json (callback — no paste)
+npx tsx src/cli.ts register --mode portal
+
+# Verify portal connection
+npx tsx src/cli.ts status
 ```
 
-You will be asked for:
+## Architecture (scalable layers)
 
-1. Organisation name  
-2. Contact email  
-3. Approved regions (comma-separated)  
-4. Approved zones (comma-separated)
+```text
+resolve-org-config   →  file | portal API | credentials  (Layer 1)
+plan-normalise       →  flatten + version detect         (Layer 2; registry in Phase 2)
+policy-select        →  enabled_policies per resource    (Layer 3)
+OPA + PDE Rego       →  enforcement                      (Layer 4)
+```
 
-This writes `org-config.json`. Later CI uses that file for dynamic region/zone whitelisting.
+Terraform version registry plugs into `src/normalizer/` later — no rebuild of auth or policy selection.
+
+See **[MENTOR-BRIEF.md](./MENTOR-BRIEF.md)** for production flow and mentor summary.
+
+### Local portal API (Step 2 demo)
+
+```bash
+# Terminal 1
+cd tools/pde-gate-portal && npm install && npm start
+
+# Terminal 2 — browser: http://localhost:3847/register
+
+# Terminal 3
+export PDE_API_URL=http://localhost:3847 PDE_PORTAL_URL=http://localhost:3847
+export PDE_ORG_ID=... PDE_ORG_TOKEN=...
+npx tsx src/cli.ts check --plan ../../samples/org-input/plan.json --policies ../../policies --org-id $PDE_ORG_ID
+```
 
 ## Usage (from this repo)
 
@@ -48,7 +74,9 @@ npx tsx src/cli.ts check \
 
 - `--plan` — org-shaped `terraform show -json` output
 - `--policies` — PDE `policies/` tree (`_helpers` + resource folders)
-- `--org-config` — registered org allowlists (from `pde-gate register`)
+- `--org-config` — org settings file (MVP / air-gapped)
+- `--org-id` — fetch config from portal API using `PDE_ORG_TOKEN` (production)
+- `--require-org-config` — fail if no org config source is available
 - `--strict-versions` — fail when Terraform / plan format / Google provider is outside the PDE support matrix (default: warn only)
 - `--format text|json` — default `text` (stable `PDE_GATE_*` lines for CI)
 - `--output <file>` — write the JSON report even when printing text

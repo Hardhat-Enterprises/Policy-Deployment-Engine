@@ -1,11 +1,6 @@
 /**
- * Organisation config + registration (Phase 2 planning skeleton).
- *
- * Flow we are designing:
- * 1. Admin runs `pde-gate register` in the terminal (opens onboarding wizard).
- * 2. Wizard collects org details + approved regions/zones (the "popup").
- * 3. Writes org-config.json for CI to pass into `pde-gate check --org-config ...`.
- * 4. Later: portal UI + remote fetch by org-id/token; same schema.
+ * Organisation configuration — same JSON schema for file (MVP), portal API (prod), and air-gapped export.
+ * Loaded via resolve-org-config.ts (do not call loaders directly from cli.ts).
  */
 
 import fs from "node:fs";

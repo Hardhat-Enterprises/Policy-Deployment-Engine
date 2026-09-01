@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PDE Gate — Register Organisation</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 520px; margin: 2rem auto; padding: 0 1rem; }
+    label { display: block; margin-top: 1rem; font-weight: 600; }
+    input, select, textarea { width: 100%; padding: 0.5rem; margin-top: 0.25rem; box-sizing: border-box; }
+    button { margin-top: 1.5rem; padding: 0.6rem 1.2rem; background: #1a56db; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    .result { margin-top: 2rem; padding: 1rem; background: #f0fdf4; border: 1px solid #86efac; border-radius: 4px; display: none; }
+    .error { background: #fef2f2; border-color: #fca5a5; }
+    code { word-break: break-all; }
+    .muted { color: #4b5563; font-size: 0.95rem; }
+    nav a { margin-right: 1rem; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/register">Register</a>
+    <a href="/settings">Settings</a>
+  </nav>
+
+  <h1>PDE Gate — Register</h1>
+  <p>Configure your organisation here. Regions and policy choices are stored on the portal — CI only needs the API token.</p>
+
+  <form id="form">
+    <label for="org_name">Organisation name</label>
+    <input id="org_name" name="org_name" required />
+
+    <label for="contact_email">Contact email</label>
+    <input id="contact_email" name="contact_email" type="email" required />
+
+    <label for="approved_regions">Approved regions (comma-separated)</label>
+    <input id="approved_regions" name="approved_regions" value="australia-southeast1, australia-southeast2" required />
+
+    <label for="approved_zones">Approved zones (comma-separated, optional)</label>
+    <input id="approved_zones" name="approved_zones" value="australia-southeast1-a" />
+
+    <label for="policy_profile">Policy profile</label>
+    <select id="policy_profile" name="policy_profile">
+      <option value="full">full — all policies per resource</option>
+      <option value="baseline" selected>baseline — subset (see policy-profiles.json)</option>
+    </select>
+
+    <button type="submit">Register organisation</button>
+  </form>
+
+  <div id="result" class="result">
+    <h2>Registration successful</h2>
+    <p id="callback_msg" class="muted" style="display:none">Credentials sent to pde-gate CLI. You can close this tab.</p>
+    <p><strong>org_id:</strong><br /><code id="out_org_id"></code></p>
+    <p><strong>API token</strong> (save as <code>PDE_ORG_TOKEN</code> in CI — shown once):<br /><code id="out_token"></code></p>
+    <p>Next in CI:</p>
+    <pre id="out_ci"></pre>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const callbackUrl = params.get("callback");
+
+    function isLocalCallback(url) {
+      try {
+        const u = new URL(url);
+        return u.protocol === "http:" && (u.hostname === "127.0.0.1" || u.hostname === "localhost" || u.hostname === "::1");
+      } catch {
+        return false;
+      }
+    }
+
+    const form = document.getElementById("form");
+    const result = document.getElementById("result");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      result.style.display = "none";
+      result.classList.remove("error");
+
+      const fd = new FormData(form);
+      const body = {
+        org_name: fd.get("org_name"),
+        contact_email: fd.get("contact_email"),
+        approved_regions: String(fd.get("approved_regions")).split(",").map(s => s.trim()).filter(Boolean),
+        approved_zones: String(fd.get("approved_zones")).split(",").map(s => s.trim()).filter(Boolean),
+        policy_profile: fd.get("policy_profile"),
+      };
+
+      try {
+        const res = await fetch("/v1/orgs/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || res.statusText);
+        }
+
+        if (callbackUrl && isLocalCallback(callbackUrl)) {
+          try {
+            const cb = await fetch(callbackUrl, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ org_id: data.org_id, token: data.token }),
+            });
+            if (cb.ok) {
+              document.getElementById("callback_msg").style.display = "block";
+            }
+          } catch {
+            /* CLI callback failed — show manual copy UI */
+          }
+        }
+
+        document.getElementById("out_org_id").textContent = data.org_id;
+        document.getElementById("out_token").textContent = data.token;
+        document.getElementById("out_ci").textContent =
+          `export PDE_ORG_ID=${data.org_id}\nexport PDE_ORG_TOKEN=${data.token}\nexport PDE_API_URL=${location.origin}\nexport PDE_PORTAL_URL=${location.origin}\npde-gate check --plan plan.json --policies policies/ --org-id ${data.org_id}`;
+        result.style.display = "block";
+        form.style.display = "none";
+      } catch (err) {
+        result.classList.add("error");
+        result.innerHTML = "<h2>Registration failed</h2><p>" + err.message + "</p>";
+        result.style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>
