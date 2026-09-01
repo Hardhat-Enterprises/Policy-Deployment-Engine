@@ -7,126 +7,126 @@
       "required": false,
       "type": "map(string)",
       "security_impact": false,
-      "rationale": "Parameters are intended for temporary experimental features that are not yet part of the stable API."
+      "rationale": "Free-form metadata map for enabling beta runtime features; team-specific content that can't be structurally validated by a generic policy."
     },
     "default_expiration": {
       "description": "Duration that static files should be cached by web proxies and browsers.\nOnly applicable if the corresponding StaticFilesHandler does not specify its own expiration time.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Cache-control requirements are dictated by the specific nature of the application's static assets."
+      "rationale": "Cache duration for static files. Affects performance/cost, not security."
     },
     "delete_service_on_destroy": {
       "description": "If set to 'true', the service will be deleted if it is the last version.",
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "When true, destroying a version also deletes the entire parent service and all its versions. A policy should keep this disabled to prevent destructive, accidental loss of the whole service — matching the prevent-destructive-loss archetype (like force_destroy)."
+      "rationale": "Matches the prevent-destructive-loss archetype: if true, the entire underlying service (not just this version) can be deleted when the last version is destroyed. A generic policy can require this be false to prevent accidental service-wide deletion."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Matches the prevent-destructive-loss archetype directly: a generic policy can require this be set to 'PREVENT' so the resource cannot be accidentally destroyed via terraform apply/destroy."
     },
     "env_variables": {
       "description": "Environment variables available to the application.  As these are not returned in the API request, Terraform will not detect any changes made outside of the Terraform config.",
       "required": false,
       "type": "map(string)",
       "security_impact": false,
-      "rationale": "Free-form key/value environment variables passed to the running version. A generic platform policy cannot meaningfully constrain arbitrary application-defined values, so it is not a policy target."
+      "rationale": "Team-specific environment variable content; a generic policy cannot meaningfully validate arbitrary key/value pairs without hardcoding team-specific data."
     },
     "inbound_services": {
       "description": "A list of the types of messages that this application is able to receive. Possible values: [\"INBOUND_SERVICE_MAIL\", \"INBOUND_SERVICE_MAIL_BOUNCE\", \"INBOUND_SERVICE_XMPP_ERROR\", \"INBOUND_SERVICE_XMPP_MESSAGE\", \"INBOUND_SERVICE_XMPP_SUBSCRIBE\", \"INBOUND_SERVICE_XMPP_PRESENCE\", \"INBOUND_SERVICE_CHANNEL_PRESENCE\", \"INBOUND_SERVICE_WARMUP\"]",
       "required": false,
       "type": "set(string)",
       "security_impact": false,
-      "rationale": "Enables legacy App Engine bundled inbound services (e.g. mail, warmup). These are optional legacy integrations rather than a primary access control; ingress/firewall settings govern exposure, so a generic policy on this list adds no meaningful hardening."
+      "rationale": "Selects which inbound message types the app handles (mail, XMPP, etc). A functional feature choice with no inherently insecure value."
     },
     "instance_class": {
       "description": "Instance class that is used to run this version. Valid values are\nAutomaticScaling: F1, F2, F4, F4_1G\nManualScaling: B1, B2, B4, B8, B4_1G\nDefaults to F1 for AutomaticScaling and B1 for ManualScaling.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "It is a legacy parameter exclusive to the App Engine Standard environment."
+      "rationale": "Performance/cost sizing choice, not a security lever."
     },
     "nobuild_files_regex": {
       "description": "Files that match this pattern will not be built into this version. Only applicable for Go runtimes.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "File exclusion is more effectively managed via standardized version control ignore files and container-specific exclusion files."
+      "rationale": "Team-specific build exclusion pattern for Go runtimes."
     },
     "noop_on_destroy": {
       "description": "If set to 'true', the application version will not be deleted.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Ensure that the Terraform state remains a truthful representation of the cloud environment."
+      "security_impact": true,
+      "rationale": "Matches the prevent-destructive-loss archetype: a generic policy can require this be true so the application version cannot be silently deleted."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "To automatically inherit the provider-level project ID"
+      "rationale": "Identifies which project owns the resource. A generic platform policy cannot constrain this without hardcoding a specific project ID."
     },
     "runtime": {
       "description": "Desired runtime. Example python27.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "To ensure the application environment is patched against known vulnerabilities and remains compatible with organizational security tooling."
+      "security_impact": false,
+      "rationale": "Functional runtime language choice."
     },
     "runtime_api_version": {
       "description": "The version of the API in the given runtime environment.\nPlease see the app.yaml reference for valid values at 'https://cloud.google.com/appengine/docs/standard/<language>/config/appref'\\\nSubstitute '<language>' with 'python', 'java', 'php', 'ruby', 'go' or 'nodejs'.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "As managed internally by the selected runtime, enforcing a specific API version at the policy level would create unnecessary coupling between infrastructure code and language-specific internals."
+      "rationale": "Functional/team-specific API version choice."
     },
     "runtime_channel": {
       "description": "The channel of the runtime to use. Only available for some runtimes.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "The platform defaults to the stable channel which ensures that applications run on production-ready environment binaries without requiring manual intervention or the risk of using experimental preview features."
+      "rationale": "Functional runtime channel choice."
     },
     "runtime_main_executable_path": {
       "description": "The path or name of the app's main executable.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Within a containerized Flexible environment the execution logic is better governed by the entrypoint or the container's internal configuration and enforcing a path would break standard deployment conventions for multi-language microservices."
+      "rationale": "Team-specific file path."
     },
     "service": {
       "description": "AppEngine service resource. Can contain numbers, letters, and hyphens.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "The App Engine service name this version belongs to. This is an identifier; we do not constrain resource names."
+      "rationale": "Identifier only."
     },
     "service_account": {
       "description": "The identity that the deployed version will run as. Admin API will use the App Engine Appspot service account as\ndefault if this field is neither provided in app.yaml file nor through CLI flag.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Specifies the runtime identity (service account email) the version runs as. This is a reference to a team-chosen identity; a platform policy cannot pin a specific service account, so it is not a generic policy target."
+      "security_impact": true,
+      "rationale": "Leaving this unset causes the deployed version to fall back to the broad default App Engine Appspot service account. A generic policy can require this be explicitly set (non-empty), favouring an intentionally-scoped identity over the broad default, without needing to hardcode which specific service account to use."
     },
     "serving_status": {
       "description": "Current serving status of this version. Only the versions with a SERVING status create instances and can be billed. Default value: \"SERVING\" Possible values: [\"SERVING\", \"STOPPED\"]",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "As it governs the operational state of a version which must remain dynamic to allow automated deployments, traffic splitting and manual emergency interventions without triggering policy violations."
+      "rationale": "Functional serving state (SERVING/STOPPED); no inherently insecure value."
     },
     "version_id": {
       "description": "Relative name of the version within the service. For example, 'v1'. Version names can contain only lowercase letters, numbers, or hyphens.\nReserved names,\"default\", \"latest\", and any name with the prefix \"ah-\".",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "to allow CI/CD pipelines to dynamically generate unique identifiers, which is essential for maintaining an immutable audit trail and enabling safe rollbacks."
+      "rationale": "Identifier only."
     },
     "api_config": {
       "type": "block",
@@ -137,36 +137,36 @@
       "description": "Action to take when users access resources that require authentication. Default value: \"AUTH_FAIL_ACTION_REDIRECT\" Possible values: [\"AUTH_FAIL_ACTION_REDIRECT\", \"AUTH_FAIL_ACTION_UNAUTHORIZED\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Both REDIRECT and UNAUTHORIZED are legitimate, equally valid ways to handle failed authentication depending on the application's needs; not a structural security lever."
     },
     "api_config.login": {
       "description": "Level of login required to access this resource. Default value: \"LOGIN_OPTIONAL\" Possible values: [\"LOGIN_OPTIONAL\", \"LOGIN_ADMIN\", \"LOGIN_REQUIRED\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Matches the access-control archetype: a generic policy can require LOGIN_REQUIRED or LOGIN_ADMIN, excluding the permissive LOGIN_OPTIONAL default, to ensure this endpoint isn't left unintentionally open."
     },
     "api_config.script": {
       "description": "Path to the script from the application root directory.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Team-specific file path."
     },
     "api_config.security_level": {
       "description": "Security (HTTPS) enforcement for this URL. Possible values: [\"SECURE_DEFAULT\", \"SECURE_NEVER\", \"SECURE_OPTIONAL\", \"SECURE_ALWAYS\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Matches the enforce-secure-protocol archetype: a generic policy can require SECURE_ALWAYS to enforce HTTPS for this endpoint."
     },
     "api_config.url": {
       "description": "URL to serve the endpoint at.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Team-specific endpoint URL."
     },
     "automatic_scaling": {
       "type": "block",
@@ -423,29 +423,29 @@
       "description": "Endpoints service configuration ID as specified by the Service Management API. For example \"2016-09-19r1\".\n\nBy default, the rollout strategy for Endpoints is \"FIXED\". This means that Endpoints starts up with a particular configuration ID.\nWhen a new configuration is rolled out, Endpoints must be given the new configuration ID. The configId field is used to give the configuration ID\nand is required in this case.\n\nEndpoints also has a rollout strategy called \"MANAGED\". When using this, Endpoints fetches the latest configuration and does not need\nthe configuration ID. In this case, configId must be omitted.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Team-specific version pin for the Endpoints service configuration."
     },
     "endpoints_api_service.disable_trace_sampling": {
       "description": "Enable or disable trace sampling. By default, this is set to false for enabled.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls observability/tracing sampling, not a security control."
     },
     "endpoints_api_service.name": {
       "description": "Endpoints service name which is the name of the \"service\" resource in the Service Management API.\nFor example \"myapi.endpoints.myproject.cloud.goog\"",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier for the Endpoints service."
     },
     "endpoints_api_service.rollout_strategy": {
       "description": "Endpoints rollout strategy. If FIXED, configId must be specified. If MANAGED, configId must be omitted. Default value: \"FIXED\" Possible values: [\"FIXED\", \"MANAGED\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "FIXED and MANAGED are both legitimate operational rollout choices depending on the team's process; not a clear-cut structural security control either way."
     },
     "entrypoint": {
       "type": "block",
@@ -805,8 +805,8 @@
       "description": "Full Serverless VPC Access Connector name e.g. /projects/my-project/locations/us-central1/connectors/c1.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to another resource (the VPC Access Connector). We secure the referenced connector itself, not this pointer to it."
     }
   }
 }
