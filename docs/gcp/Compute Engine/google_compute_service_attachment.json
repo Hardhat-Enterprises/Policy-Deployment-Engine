@@ -13,8 +13,8 @@
       "description": "An array of projects that are not allowed to connect to this service\nattachment.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Defines a list using specific project identifiers to allow or block connection to the service which is not constrained"
+      "security_impact": true,
+      "rationale": "Defines a list using specific project identifiers that are denied access to the service which must be intentionally configured correctly in order to prevent network exposure"
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
@@ -56,7 +56,7 @@
       "required": true,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "This is a configuration control as it's whose IP address is used for consumer traffic for the service attachment"
+      "rationale": "This is a configuration control not a security control as it's whose IP address is used for consumer traffic for the service attachment, meaning the address range is networking choice that does not impact the security of the service"
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
@@ -69,15 +69,15 @@
       "description": "The number of consumer spokes that connected Private Service Connect endpoints can be propagated to through Network Connectivity Center.\nThis limit lets the service producer limit how many propagated Private Service Connect connections can be established to this service attachment from a single consumer.\n\nIf the connection preference of the service attachment is ACCEPT_MANUAL, the limit applies to each project or network that is listed in the consumer accept list.\nIf the connection preference of the service attachment is ACCEPT_AUTOMATIC, the limit applies to each project that contains a connected endpoint.\n\nIf unspecified, the default propagated connection limit is 250. To explicitly send a zero value, set 'send_propagated_connection_limit_if_zero = true'.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Defines the limit for the number of connected Private Service Connect endpoints thus is operational availability control not security related control."
+      "security_impact": true,
+      "rationale": "Defines the limit for the number of connected Private Service Connect endpoints thus an upper limit must be configured in order to address resource exhaustion issues and DoS exposure"
     },
     "reconcile_connections": {
       "description": "This flag determines whether a consumer accept/reject list change can reconcile the statuses of existing ACCEPTED or REJECTED PSC endpoints.\n\nIf false, connection policy update will only affect existing PENDING PSC endpoints. Existing ACCEPTED/REJECTED endpoints will remain untouched regardless how the connection policy is modified .\nIf true, update will affect both PENDING and ACCEPTED/REJECTED PSC endpoints. For example, an ACCEPTED PSC endpoint will be moved to REJECTED if its project is added to the reject list.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Purpose is to determine if consumers access changes are made from the existing connections thus this would make it operational flow control not security control as it is resolving behaviour"
+      "security_impact": true,
+      "rationale": "Purpose is to determine if consumers access changes are made from the existing connections thus to protect from unauthorized consumer connection modifications it should explicitly be configured"
     },
     "region": {
       "description": "URL of the region where the resource resides.",
@@ -90,15 +90,15 @@
       "description": "Controls the behavior of propagated_connection_limit.\nWhen false, setting propagated_connection_limit to zero causes the provider to use to the API's default value.\nWhen true, the provider will set propagated_connection_limit to zero.\nDefaults to false.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
+      "security_impact": true,
       "rationale": "Purpose is to designate if the propagated_connection_limit is either 0 or the default value thus is configuration control for connection limits and not a security control"
     },
     "show_nat_ips": {
       "description": "NOTE: This field is temporarily non-functional due to an underlying API issue.\nAny value provided here will be ignored until the API issue is resolved, expected around 2026-03.\n[If true, show NAT IPs of all connected endpoints.]",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Only purpose is to show metadata display of NAT IPs thus not effecting the security of the resource"
+      "security_impact": true,
+      "rationale": "Dictates the display of the NAT IPs which exposes NAT mapping details thus must be restricted to avoid leaking internal information"
     },
     "target_service": {
       "description": "The URL of a service serving the endpoint identified by this service attachment.",
@@ -123,22 +123,22 @@
       "description": "The endpoint that is allowed to connect to this service attachment.\nOnly one of project_id_or_num, network_url and endpoint_url may be set.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Dictates the endpoint for consumers to access the service attatchment thus should not be left empty to ensure intentional whitelisting"
+      "security_impact": false,
+      "rationale": "Contains a reference to a consumer endpoint that specifies what external resource is allowed to connect to the service attachment, and is therefore an external resource identifiers that should not be constrained"
     },
     "consumer_accept_lists.network_url": {
       "description": "The network that is allowed to connect to this service attachment.\nOnly one of project_id_or_num and network_url may be set.",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Defines a list for what consumer networks are allowed to access and platform policies should not pin specific network URLS"
+      "rationale": "Defines a list for what consumer networks are allowed to access thus the field should be non-empty to support intentional allowlisting for connection to the service attachment"
     },
     "consumer_accept_lists.project_id_or_num": {
       "description": "A project that is allowed to connect to this service attachment.\nOnly one of project_id_or_num and network_url may be set.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Configuration control as it dictates access control boundries by projects, and the platform policy must not pin specific project IDs"
+      "security_impact": true,
+      "rationale": "Controls the projects that are given permission to connect to the service attachment, thus it should be not left empty to ensure intentional projects are allowlisted to be connection"
     }
   }
 }
