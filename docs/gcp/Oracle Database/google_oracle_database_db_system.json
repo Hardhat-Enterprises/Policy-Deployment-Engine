@@ -55,14 +55,15 @@
       "description": "The name of the OdbNetwork associated with the DbSystem.\nFormat: projects/{project}/locations/{location}/odbNetworks/{odb_network}\nIt is optional but if specified, this should match the parent ODBNetwork of\nthe OdbSubnet.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This argument determines the OdbNetwork to which the DbSystem is attached. Network assignment establishes the network boundary for the database system and can affect how the resource is isolated and accessed. Restricting the DbSystem to an approved OdbNetwork helps ensure it is deployed within an authorized network structure and reduces the risk of placing the database in an unintended or insecure network environment."},
+      "security_impact": false,
+      "rationale": "This argument references an existing OdbNetwork resource associated with the DbSystem. It is a resource pointer used to identify the network to associate with the database system and does not itself configure or enforce network security controls. Security controls for the referenced network should be evaluated through the configuration of that network and its applicable security policy resources."
+    },
     "odb_subnet": {
       "description": "The name of the OdbSubnet associated with the DbSystem for IP\nallocation. Format:\nprojects/{project}/locations/{location}/odbNetworks/{odb_network}/odbSubnets/{odb_subnet}",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This argument determines the OdbSubnet in which the DbSystem is deployed and therefore establishes the network isolation boundary for the database. Restricting the DbSystem to an approved enterprise subnet helps ensure that the database resides within an authorized and appropriately segmented network environment, rather than a default or unsegmented subnet that may expose the resource to unintended network access."
+      "security_impact": false,
+      "rationale": "This argument references an existing OdbSubnet resource associated with the DbSystem and identifies the subnet used for IP allocation. Subnet selection and addressing are team network configuration choices and this argument does not itself configure or enforce network security controls. Security controls associated with the subnet should be evaluated through the configuration of the referenced network and applicable security policy resources."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
@@ -152,8 +153,8 @@
       "description": "The private IP address of the DbSystem.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This argument specifies the private IP address assigned to the DbSystem and can influence the addressing of the database connectivity endpoint. IP assignment can affect how the database is reached within the network and may enforce structural constraints on the endpoint. Restricting IP assignment to approved configurations helps ensure the DbSystem uses an authorized and appropriately controlled network endpoint."
+      "security_impact": false,
+      "rationale": "This argument specifies the private IP address assigned to the DbSystem. IP assignment is a team-managed network addressing choice and does not itself configure or enforce a platform security control. Network security controls should instead be evaluated through the relevant network, subnet, firewall, and access-control configurations."
     },
     "properties.reco_storage_size_gb": {
       "description": "The reco/redo storage size in GB.",
@@ -305,8 +306,8 @@
       "description": "The TDE wallet password for the database.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This argument provides the password used to protect the Oracle Transparent Data Encryption (TDE) wallet, but a raw plaintext secret cannot be meaningfully constrained by a generic platform policy without inspecting or hardcoding the secret value. Such validation would not provide a reliable security control and could itself expose sensitive credentials. Secret and password management should instead be handled through appropriate secret-management mechanisms rather than treating the plaintext credential as a structural policy target."
+      "security_impact": true,
+      "rationale": "This argument contains the password used to protect the Oracle Transparent Data Encryption (TDE) wallet. As a credential and secret, it is a credential-hygiene security target. Platform policy should ensure that sensitive credentials are managed through approved secret-management mechanisms rather than being hardcoded as plaintext values in Terraform configurations, reducing the risk of credential exposure."
     },
     "properties.db_home.database.properties": {
       "type": "block",
