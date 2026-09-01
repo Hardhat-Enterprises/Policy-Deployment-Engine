@@ -6,22 +6,22 @@
       "description": "List of domains authorized for OAuth redirects.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines application-specific OAuth redirect domains; without knowing each team's legitimate domains, a generic platform policy cannot distinguish trusted from untrusted values."
     },
     "autodelete_anonymous_users": {
       "description": "Whether anonymous users will be auto-deleted after a period of 30 days",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls the lifecycle of unlinked anonymous accounts, reducing the persistence of unused identities and their associated data."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the Google Cloud project for this configuration but does not itself configure an authentication or authorization control."
     },
     "blocking_functions": {
       "type": "block",
@@ -37,22 +37,22 @@
       "description": "Whether to pass the user's OAuth identity provider's access token.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Forwards OAuth access tokens to a blocking function, expanding the set of systems that can access bearer credentials."
     },
     "blocking_functions.forward_inbound_credentials.id_token": {
       "description": "Whether to pass the user's OIDC identity provider's ID token.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Forwards OIDC identity tokens to a blocking function, exposing signed identity claims to that endpoint."
     },
     "blocking_functions.forward_inbound_credentials.refresh_token": {
       "description": "Whether to pass the user's OAuth identity provider's refresh token.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Forwards refresh tokens to a blocking function; refresh tokens can obtain new access tokens and require strict handling."
     },
     "blocking_functions.triggers": {
       "type": "block",
@@ -63,15 +63,15 @@
       "description": "The identifier for this object. Format specified above.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects beforeCreate or beforeSignIn for team-authored blocking logic; both are platform-supported and the appropriate lifecycle event depends on that logic, so a universal constraint would not improve security."
     },
     "blocking_functions.triggers.function_uri": {
       "description": "HTTP URI trigger for the Cloud Function.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Identifies the endpoint that receives authentication-event requests and potentially forwarded credentials; it must be a trusted HTTPS function endpoint."
     },
     "client": {
       "type": "block",
@@ -87,15 +87,15 @@
       "description": "When true, end users cannot delete their account on the associated project through any of our API methods",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether users may delete their own accounts; preventing deletion is a product, retention, and recovery choice with no universally safer setting."
     },
     "client.permissions.disabled_user_signup": {
       "description": "When true, end users cannot sign up for a new account on the associated project through any of our API methods",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls self-service account creation, which directly affects exposure to unauthorized registrations and abuse."
     },
     "mfa": {
       "type": "block",
@@ -106,15 +106,15 @@
       "description": "A list of usable second factors for this project. Possible values: [\"PHONE_SMS\"]",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects PHONE_SMS as an MFA factor; whether to use SMS rather than configured TOTP is workload-specific, so an additional generic whitelist adds no protection."
     },
     "mfa.state": {
       "description": "Whether MultiFactor Authentication has been enabled for this project. Possible values: [\"DISABLED\", \"ENABLED\", \"MANDATORY\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables or mandates multi-factor authentication for the project, directly changing sign-in assurance."
     },
     "mfa.provider_configs": {
       "type": "block",
@@ -125,8 +125,8 @@
       "description": "Whether MultiFactor Authentication has been enabled for this project. Possible values: [\"DISABLED\", \"ENABLED\", \"MANDATORY\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables or disables configured multi-factor providers, changing which MFA protections users can use."
     },
     "mfa.provider_configs.totp_provider_config": {
       "type": "block",
@@ -137,8 +137,8 @@
       "description": "The allowed number of adjacent intervals that will be used for verification to avoid clock skew.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets the permitted TOTP clock-skew window; larger values increase the number of valid one-time-password intervals."
     },
     "monitoring": {
       "type": "block",
@@ -154,8 +154,8 @@
       "description": "Whether logging is enabled for this project or not.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables audit-relevant request logging for Identity Platform activity, supporting detection and investigation."
     },
     "multi_tenant": {
       "type": "block",
@@ -166,15 +166,15 @@
       "description": "Whether this project can have tenants or not.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables multi-tenant identity isolation and changes the project’s authentication tenancy model."
     },
     "multi_tenant.default_tenant_location": {
       "description": "The default cloud parent org or folder that the tenant project should be created under.\nThe parent resource name should be in the format of \"/\", such as \"folders/123\" or \"organizations/456\".\nIf the value is not set, the tenant will be created under the same organization or folder as the agent project.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the organization or folder that owns tenant projects; the approved parent is environment-specific, and a generic policy cannot identify it without pinning a resource ID."
     },
     "quota": {
       "type": "block",
@@ -190,22 +190,22 @@
       "description": "A sign up APIs quota that customers can override temporarily. Value can be in between 1 and 1000.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Limits sign-up requests per project and IP, helping mitigate automated account-creation abuse."
     },
     "quota.sign_up_quota_config.quota_duration": {
       "description": "How long this quota will be active for. It is measurred in seconds, e.g., Example: \"9.615s\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines how long a raised sign-up quota remains active; a policy can cap the duration of the enlarged account-creation abuse window."
     },
     "quota.sign_up_quota_config.start_time": {
       "description": "When this quota will take affect.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Schedules a temporary quota override; valid start times are deployment-specific and neither earlier nor later is universally more secure."
     },
     "sign_in": {
       "type": "block",
@@ -216,8 +216,8 @@
       "description": "Whether to allow more than one account to have the same email.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Allows multiple accounts to share an email address, weakening account uniqueness and increasing identity-confusion risk."
     },
     "sign_in.anonymous": {
       "type": "block",
@@ -228,8 +228,8 @@
       "description": "Whether anonymous user auth is enabled for the project or not.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables unauthenticated anonymous identities, directly changing the application’s authentication attack surface."
     },
     "sign_in.email": {
       "type": "block",
@@ -240,15 +240,15 @@
       "description": "Whether email auth is enabled for the project or not.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Enables an application sign-in method; whether email authentication is required depends on the application, and enabling or disabling it is not universally safer."
     },
     "sign_in.email.password_required": {
       "description": "Whether a password is required for email auth or not. If true, both an email and\npassword must be provided to sign in. If false, a user may sign in via either\nemail/password or email link.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Chooses between password-required and email-link-capable sign-in; both are supported authentication designs, so a generic policy should not mandate one without an organization-specific assurance requirement."
     },
     "sign_in.phone_number": {
       "type": "block",
@@ -259,15 +259,15 @@
       "description": "Whether phone number auth is enabled for the project or not.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables phone-number authentication; a policy may disable SMS sign-in to reduce SMS-pumping and SIM-swap exposure."
     },
     "sign_in.phone_number.test_phone_numbers": {
       "description": "A map of <test phone number, fake code> that can be used for phone auth testing.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines test phone numbers and verification codes; exposing or retaining them outside testing can bypass normal SMS verification."
     },
     "sms_region_config": {
       "type": "block",
@@ -283,8 +283,8 @@
       "description": "Two letter unicode region codes to disallow as defined by https://cldr.unicode.org/ The full list of these region codes is here: https://github.com/unicode-cldr/cldr-localenames-full/blob/master/main/en/territories.json",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Restricts the regions that may receive verification SMS when SMS delivery is otherwise allowed by default."
     },
     "sms_region_config.allowlist_only": {
       "type": "block",
@@ -295,8 +295,8 @@
       "description": "Two letter unicode region codes to allow as defined by https://cldr.unicode.org/ The full list of these region codes is here: https://github.com/unicode-cldr/cldr-localenames-full/blob/master/main/en/territories.json",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the exclusive allowlist of regions that may receive verification SMS, limiting SMS fraud and unwanted geographic exposure."
     }
   }
 }
