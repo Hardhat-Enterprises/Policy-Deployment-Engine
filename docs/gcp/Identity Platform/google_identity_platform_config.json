@@ -106,8 +106,8 @@
       "description": "A list of usable second factors for this project. Possible values: [\"PHONE_SMS\"]",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Selects an MFA provider as part of the application's authentication architecture rather than enforcing a platform-wide security boundary. This field accepts only PHONE_SMS, so a generic policy cannot further constrain it."
+      "security_impact": true,
+      "rationale": "Selects usable MFA providers. A policy can require an approved provider set when MFA is enabled, preventing a configuration from weakening second-factor authentication."
     },
     "mfa.state": {
       "description": "Whether MultiFactor Authentication has been enabled for this project. Possible values: [\"DISABLED\", \"ENABLED\", \"MANDATORY\"]",
@@ -137,8 +137,8 @@
       "description": "The allowed number of adjacent intervals that will be used for verification to avoid clock skew.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Sets the TOTP clock-skew tolerance used to accommodate client clock drift. The appropriate window is an operational usability setting, not a generic platform security enforcement target."
+      "security_impact": true,
+      "rationale": "Sets the TOTP clock-skew tolerance. A policy can cap the number of accepted adjacent intervals to limit the authentication acceptance window."
     },
     "monitoring": {
       "type": "block",
@@ -166,8 +166,8 @@
       "description": "Whether this project can have tenants or not.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Enables the multi-tenant architecture feature. Whether the project should host tenants is a workload design choice with no universally safer enabled or disabled setting."
+      "security_impact": true,
+      "rationale": "Enables tenant creation in the project. A policy can require an explicit disabled-by-default tenant posture to limit unintended tenant isolation and administration exposure."
     },
     "multi_tenant.default_tenant_location": {
       "description": "The default cloud parent org or folder that the tenant project should be created under.\nThe parent resource name should be in the format of \"/\", such as \"folders/123\" or \"organizations/456\".\nIf the value is not set, the tenant will be created under the same organization or folder as the agent project.",
@@ -190,15 +190,15 @@
       "description": "A sign up APIs quota that customers can override temporarily. Value can be in between 1 and 1000.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Sets a temporary sign-up quota between 1 and 1000 requests per project, hour, and IP. The appropriate numeric limit depends on application demand, so a generic threshold would be arbitrary."
+      "security_impact": true,
+      "rationale": "Sets the temporary maximum sign-up rate per project, hour, and IP. A policy can cap it to reduce automated account-creation abuse."
     },
     "quota.sign_up_quota_config.quota_duration": {
       "description": "How long this quota will be active for. It is measurred in seconds, e.g., Example: \"9.615s\".",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Sets the duration of a temporary sign-up quota override. The safe duration depends on the workload and operational incident, so a generic maximum would be arbitrary."
+      "security_impact": true,
+      "rationale": "Sets how long a temporary sign-up quota override remains active. A policy can cap the duration of an elevated account-creation abuse window."
     },
     "quota.sign_up_quota_config.start_time": {
       "description": "When this quota will take affect.",
@@ -266,8 +266,8 @@
       "description": "A map of <test phone number, fake code> that can be used for phone auth testing.",
       "required": false,
       "type": "map(string)",
-      "security_impact": false,
-      "rationale": "Defines test phone numbers and fake verification codes for phone-auth testing. Their use is environment-specific test configuration rather than a generic platform security control."
+      "security_impact": true,
+      "rationale": "Defines phone numbers and fixed verification codes that bypass normal SMS delivery. A policy can prohibit these test credentials to prevent authentication bypass outside controlled testing."
     },
     "sms_region_config": {
       "type": "block",
