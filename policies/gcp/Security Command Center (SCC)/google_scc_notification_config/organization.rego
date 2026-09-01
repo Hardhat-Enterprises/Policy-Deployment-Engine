@@ -12,11 +12,13 @@ conditions := [
     {
       "condition": "Organization allowlist.",
       "attribute_path": ["organization"],
-      "values": ["organizations/123456789012"],
-      "policy_type": "whitelist"
+      "values": ["organizations/*", [["123456789012"]]],
+      "policy_type": "pattern whitelist"
     }
   ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details
