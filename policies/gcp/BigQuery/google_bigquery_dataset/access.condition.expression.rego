@@ -2,8 +2,25 @@ package terraform.gcp.security.BigQuery.google_bigquery_dataset.access_condition
 
 import data.terraform.gcp.security.BigQuery.google_bigquery_dataset.vars
 
+conditions := [
+    [
+        {
+            "situation_description": "A dataset access condition uses an empty or unconditional expression, causing the access binding to apply without a meaningful restriction.",
+            "remedies": [
+                "Replace the unconditional expression with a meaningful CEL condition that restricts when the access binding applies"
+            ]
+        },
+        {
+            "condition": "Reject clearly unconditional access conditions",
+            "attribute_path": ["access", "condition", "expression"],
+            "values": ["", "true", "1 == 1"],
+            "policy_type": "blacklist"
+        }
+    ]
+]
+
 unsafe_expression(expression) if {
-    bad_value := ["", "true", "1 == 1"][_]
+    bad_value := conditions[0][1].values[_]
     expression == bad_value
 }
 
@@ -49,22 +66,26 @@ message := [
         [vars.variables.friendly_resource_name, resource_count]
     ),
     [
-        "Situation 1: A dataset access condition uses an empty or unconditional expression, causing the access binding to apply without a meaningful restriction.",
+        sprintf(
+            "Situation 1: %s",
+            [conditions[0][0].situation_description]
+        ),
         sprintf(
             "Non-Compliant Resources: %s",
             [concat(", ", display_names)]
         ),
-        "Potential Remedies: Replace the unconditional expression with a meaningful CEL condition that restricts when the access binding applies"
+        sprintf(
+            "Potential Remedies: %s",
+            [concat(", ", conditions[0][0].remedies)]
+        )
     ]
 ]
 
 details := [
     {
-        "situation": "A dataset access condition uses an empty or unconditional expression, causing the access binding to apply without a meaningful restriction.",
-        "remedies": [
-            "Replace the unconditional expression with a meaningful CEL condition that restricts when the access binding applies"
-        ],
+        "situation": conditions[0][0].situation_description,
+        "remedies": conditions[0][0].remedies,
         "non_compliant_resources": non_compliant_names,
-        "conditions": []
+        "conditions": [conditions[0][1]]
     }
 ]
