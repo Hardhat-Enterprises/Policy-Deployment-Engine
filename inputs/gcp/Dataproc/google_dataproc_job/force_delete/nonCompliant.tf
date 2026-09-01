@@ -1,6 +1,6 @@
 resource "google_dataproc_job" "non_compliant_example_1" {
   project      = "ecstatic-device-491708-g4"
-  region       = "us-central1"
+  region       = "australia-southeast1"
   force_delete = true
 
   placement {
