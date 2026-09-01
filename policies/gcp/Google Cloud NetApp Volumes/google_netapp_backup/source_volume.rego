@@ -3,6 +3,12 @@ package terraform.gcp.security.google_cloud_netapp_volumes.google_netapp_backup.
 import data.terraform.helpers
 import data.terraform.gcp.security.google_cloud_netapp_volumes.google_netapp_backup.vars
 
+# policy_lint reports hard-coded-value on the value below, and the finding stands.
+# A pattern whitelist only judges values that MATCH its target: one that does not
+# match the shape is never flagged at all. This argument's non-compliant example
+# is the empty string, so converting would make the fixture pass for the wrong
+# reason. Either _helpers needs a pattern whitelist that fails a non-matching
+# value, or the fixture needs a wrongly-scoped (not malformed) example.
 conditions := [
   [
     {
@@ -23,5 +29,7 @@ conditions := [
   ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details
