@@ -16,7 +16,7 @@ conditions := [
             "condition": "Reject public IAM members",
             "attribute_path": ["access", "iam_member"],
             "values": ["allUsers", "allAuthenticatedUsers"],
-            "policy_type": "blacklist"
+            "policy_type": "element blacklist"
         }
     ]
 ]
