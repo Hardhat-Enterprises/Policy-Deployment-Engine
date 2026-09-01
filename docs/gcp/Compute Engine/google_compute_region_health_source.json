@@ -6,8 +6,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Deletion-blocking flags fall under the prevent-destructive-loss archetype, meaning deletion_protection and deletion_policy flags must always be true to require the destroy-blocking value, even on networking and infrastructure sub-resources."
+      "security_impact": false,
+      "rationale": "Per the Terraform provider's own design documentation (deletion_policy feature proposal), this field is intended to mitigate accidental deletions and improve operational flexibility — it does not affect confidentiality, access, or exposure, so it is not treated as a security control."
     },
     "description": {
       "description": "An optional description of this resource. Provide this property when you\ncreate the resource.",
