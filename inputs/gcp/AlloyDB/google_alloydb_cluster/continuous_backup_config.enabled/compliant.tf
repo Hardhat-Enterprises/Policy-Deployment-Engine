@@ -1,5 +1,5 @@
 resource "google_alloydb_cluster" "compliant_example_1" {
-  cluster_id = "c1"
+  cluster_id = "compliant_example_1"
   location   = "us-central1"
   project = "123"
 
