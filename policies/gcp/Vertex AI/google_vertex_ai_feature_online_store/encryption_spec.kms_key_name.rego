@@ -6,6 +6,20 @@ import data.terraform.gcp.security.vertex_ai.google_vertex_ai_feature_online_sto
 conditions := [
     [
         {
+            "situation_description": "The Feature Online Store does not use a customer-managed encryption key, so data is not always encrypted with a CMEK.",
+            "remedies": [
+                "Set 'encryption_spec.kms_key_name' to a Cloud KMS key in the form projects/PROJECT/locations/LOCATION/keyRings/RING/cryptoKeys/KEY."
+            ]
+        },
+        {
+            "condition": "A customer-managed encryption key must be set",
+            "attribute_path": ["encryption_spec", 0, "kms_key_name"],
+            "values": [null],
+            "policy_type": "blacklist"
+        }
+    ],
+    [
+        {
             "situation_description": "The Feature Online Store CMEK key is in a region outside the approved Australian regions.",
             "remedies": [
                 "Set 'encryption_spec.kms_key_name' to a Cloud KMS key whose location is australia-southeast1 or australia-southeast2."
