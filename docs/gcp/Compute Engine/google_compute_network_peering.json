@@ -6,8 +6,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Governs Terraform's lifecycle behaviour on destroy (DELETE/PREVENT/ABANDON). This is an operational/state-management control rather than a cloud security control; it does not change how traffic or routes are exchanged across the peering."
+      "security_impact": true,
+      "rationale": "Controls whether the network peering can be destroyed via Terraform. The default (DELETE) allows unrestricted deletion, risking permanent loss of peering connectivity and route exchange. Setting it to PREVENT blocks destructive operations, acting as a safety guard against accidental or unauthorised deletion under the prevent-destructive-loss archetype."
     },
     "export_custom_routes": {
       "description": "Whether to export the custom routes to the peer network. Defaults to false.",
@@ -55,15 +55,15 @@
       "description": "The peer network in the peering. The peer network may belong to a different project.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the remote VPC being peered with, which may live in a different project or organisation. The choice of peer directly determines the trust boundary being crossed and which external network gains routed reachability into this one. Policy should restrict peering to an approved allowlist of peer networks/projects to prevent connections to untrusted or unmanaged VPCs."
+      "security_impact": false,
+      "rationale": "Identifies the remote VPC being peered with. This is a reference/pointer to another resource — platform policy cannot hardcode or maintain an approved allowlist of peer networks across an enterprise. The security of the peering is governed by the route import/export flags and each network's own firewall rules and IAM."
     },
     "stack_type": {
       "description": "Which IP version(s) of traffic and routes are allowed to be imported or exported between peer networks. The default value is IPV4_ONLY. Possible values: [\"IPV4_ONLY\", \"IPV4_IPV6\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Selects whether the peering exchanges IPv4 only or both IPv4 and IPv6 traffic and routes. Enabling IPV4_IPV6 widens the exchanged address families and, if IPv6 controls are less mature in the environment, can open reachability that firewall rules do not yet fully cover. Policy can require IPV4_ONLY unless dual-stack is explicitly needed and the corresponding IPv6 firewall controls are in place."
+      "security_impact": false,
+      "rationale": "Selects whether the peering exchanges IPv4 only or both IPv4 and IPv6 traffic and routes. IPv6 support is a standard networking capability, not an inherently insecure state. Protocol version selection is a functional networking choice, not a security control."
     },
     "update_strategy": {
       "description": "The update strategy determines the semantics for updates and deletes to the peering connection configuration. The default value is INDEPENDENT. Possible values: [\"INDEPENDENT\", \"CONSENSUS\"]",
