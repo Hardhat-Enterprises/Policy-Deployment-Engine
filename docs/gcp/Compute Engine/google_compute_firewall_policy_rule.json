@@ -6,15 +6,15 @@
       "description": "The Action to perform when the client connection triggers the rule. Valid actions are \"allow\", \"deny\", \"goto_next\" and \"apply_security_profile_group\".",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Controls what happens to matched traffic, but there is no universally secure action. Legitimate firewall rules may need allow, deny, goto_next, or apply_security_profile_group depending on the workload, so a platform-wide constraint on this field would block valid configurations."
+      "security_impact": true,
+      "rationale": "Determines whether traffic matching this rule is allowed, denied, passed to the next rule, or routed through a security profile group. This is the primary access-control decision the rule makes."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Controls how Terraform handles removal of the firewall rule. PREVENT can reduce accidental deletion, but requiring it for every rule would interfere with normal decommissioning and refactoring, so this is a lifecycle-management choice rather than a universal security control."
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can destroy this rule via IaC (DELETE/ABANDON/PREVENT). This maps directly to the prevent-destructive-loss archetype (the same mechanism as force_destroy): PREVENT blocks hard-destroy of the resource, and a policy should enforce that value."
     },
     "description": {
       "description": "An optional description for this resource.",
