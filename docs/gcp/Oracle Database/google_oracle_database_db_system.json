@@ -306,8 +306,9 @@
       "description": "The TDE wallet password for the database.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This argument contains the password used to protect the Oracle Transparent Data Encryption (TDE) wallet. Although the value is security-sensitive, a plaintext password embedded in a resource configuration block cannot be meaningfully validated or prevented by a structural platform policy without inspecting or hardcoding the secret value. Secret management should instead be handled through approved Secret Manager or external KMS mechanisms, making this an un-constrainable secret value for structural policy purposes."},
+      "security_impact": true,
+      "rationale": "This argument contains the password used to protect the Oracle Transparent Data Encryption (TDE) wallet. Supplying a plaintext password directly in a Terraform resource configuration creates a credential-hygiene risk because the secret may be exposed through configuration files, version control, or other infrastructure-management artifacts. Platform policy should prohibit inline cleartext passwords and require sensitive credentials to be managed through an approved external secret-management mechanism such as Secret Manager or an external KMS reference."
+    },
     "properties.db_home.database.properties": {
       "type": "block",
       "description": "The properties of a Database.",
