@@ -5,7 +5,7 @@ resource "google_compute_image" "compliant_example_1" {
 
   params {
     resource_manager_tags = {
-      "tagKeys/env" = "tagValues/dev"
+      "tagKeys/123456789012" = "tagValues/987654321098"
     }
   }
 }

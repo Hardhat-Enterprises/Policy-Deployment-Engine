@@ -3,5 +3,5 @@ resource "google_compute_image" "non_compliant_example_1" {
 
   source_disk = "projects/pde-demo/zones/us-central1-a/disks/example-disk"
 
-  project = "unapproved-project-999"
+  project = "team-project-12345"
 }

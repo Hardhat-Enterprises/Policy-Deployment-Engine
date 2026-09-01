@@ -4,6 +4,6 @@ resource "google_compute_image" "non_compliant_example_1" {
   source_disk = "projects/pde-demo/zones/us-central1-a/disks/example-disk"
 
   guest_os_features {
-    type = "UEFI_COMPATIBLE"
+    type = "MULTI_IP_SUBNET"
   }
 }

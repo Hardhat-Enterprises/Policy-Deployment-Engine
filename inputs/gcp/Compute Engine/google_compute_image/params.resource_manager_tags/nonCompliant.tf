@@ -5,7 +5,7 @@ resource "google_compute_image" "non_compliant_example_1" {
 
   params {
     resource_manager_tags = {
-      "tagKeys/env" = "tagValues/staging"
+      "tagKeys/environment" = "tagValues/development"
     }
   }
 }

@@ -6,15 +6,15 @@ import data.terraform.gcp.security.compute_engine.google_compute_image.vars
 conditions := [
     [
         {
-            "situation_description": "The Compute Image is assigned to an image family, which can cause deployments to resolve to a newer active image instead of remaining pinned to a specific image.",
+            "situation_description": "The Compute Image uses an image family that is not included in the platform-wide approved image-family allowlist.",
             "remedies": [
-                "Remove the family setting and reference a specific image when a fixed, predictable image version is required."
+                "Remove the family setting when a fixed image is required, or use an approved platform-managed image family."
             ]
         },
         {
-            "condition": "Image family must not be configured.",
+            "condition": "Image family must be unset or use an approved platform-managed family.",
             "attribute_path": ["family"],
-            "values": [null, ""],
+            "values": [null, "", "approved-linux", "approved-windows"],
             "policy_type": "whitelist"
         }
     ]

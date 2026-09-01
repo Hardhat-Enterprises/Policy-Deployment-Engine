@@ -6,16 +6,16 @@ import data.terraform.gcp.security.compute_engine.google_compute_image.vars
 conditions := [
     [
         {
-            "situation_description": "The Compute Image does not include Secure Boot support in its guest OS features.",
+            "situation_description": "The Compute Image enables the MULTI_IP_SUBNET guest OS feature, which can increase network complexity and exposure for VMs created from the image.",
             "remedies": [
-                "Add SECURE_BOOT to guest_os_features so VMs created from the image can support Secure Boot."
+                "Remove MULTI_IP_SUBNET unless it has been explicitly approved for the workload."
             ]
         },
         {
-            "condition": "SECURE_BOOT must be included in guest_os_features.",
+            "condition": "MULTI_IP_SUBNET must not be enabled.",
             "attribute_path": ["guest_os_features", "type"],
-            "values": ["SECURE_BOOT"],
-            "policy_type": "whitelist"
+            "values": ["MULTI_IP_SUBNET"],
+            "policy_type": "blacklist"
         }
     ]
 ]
