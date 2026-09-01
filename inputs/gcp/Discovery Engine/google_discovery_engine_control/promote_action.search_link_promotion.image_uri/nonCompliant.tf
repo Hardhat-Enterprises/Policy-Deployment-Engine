@@ -4,8 +4,8 @@ resource "google_discovery_engine_control" "non_compliant_example_1" {
   project         = "735927692082"
   location        = "us"
   engine_id       = "engine-id"
-  control_id      = "non-compliant-example-1"
-  display_name    = "Unapproved-image promotion"
+  control_id      = "non_compliant_example_1"
+  display_name    = "Approved-image promotion"
   solution_type   = "SOLUTION_TYPE_SEARCH"
   use_cases       = ["SEARCH_USE_CASE_SEARCH"]
   deletion_policy = "PREVENT"
