@@ -3,6 +3,23 @@ package terraform.gcp.security.compute_engine.google_compute_image.project
 import data.terraform.gcp.security.compute_engine.google_compute_image.vars
 import data.terraform.helpers
 
+conditions := [
+	[
+		{
+			"situation_description": "The Compute Image uses a project outside the approved platform namespace.",
+			"remedies": [
+				"Set project to an approved project ID following the platform-* naming convention.",
+			],
+		},
+		{
+			"condition": "A project must be explicitly configured.",
+			"attribute_path": ["project"],
+			"values": [null, ""],
+			"policy_type": "blacklist",
+		},
+	],
+]
+
 approved_project_pattern := `^platform-[a-z][a-z0-9-]{3,18}[a-z0-9]$`
 
 valid_project(value) if {
@@ -25,6 +42,11 @@ violations := [
 	resource_name := object.get(resource.values, vars.variables.resource_value_name, resource.name)
 ]
 
+non_compliant_resource_names := {
+violation.name |
+	some violation in violations
+}
+
 resource_count := count([
 resource |
 	resource := input.planned_values.root_module.resources[_]
@@ -37,7 +59,7 @@ situation_results := [
 		"remedies": [
 			"Set project to an approved project ID beginning with platform- and following the organisation-wide naming convention.",
 		],
-		"non_compliant_resources": violations,
+		"non_compliant_resources": non_compliant_resource_names,
 		"conditions": [
 			{
 				"Project ID must follow the approved platform naming convention": violations,

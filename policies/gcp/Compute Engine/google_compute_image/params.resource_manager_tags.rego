@@ -3,6 +3,23 @@ package terraform.gcp.security.compute_engine.google_compute_image.params_resour
 import data.terraform.gcp.security.compute_engine.google_compute_image.vars
 import data.terraform.helpers
 
+conditions := [
+	[
+		{
+			"situation_description": "The Compute Image contains missing or structurally invalid Resource Manager tags.",
+			"remedies": [
+				"Use numeric Resource Manager references in the form tagKeys/{id} = tagValues/{id}.",
+			],
+		},
+		{
+			"condition": "Resource Manager tags must be configured.",
+			"attribute_path": ["params", 0, "resource_manager_tags"],
+			"values": [null, {}],
+			"policy_type": "blacklist",
+		},
+	],
+]
+
 tag_key_pattern := `^tagKeys/[0-9]+$`
 tag_value_pattern := `^tagValues/[0-9]+$`
 
@@ -37,6 +54,11 @@ violations := [
 	resource_name := object.get(resource.values, vars.variables.resource_value_name, resource.name)
 ]
 
+non_compliant_resource_names := {
+violation.name |
+	some violation in violations
+}
+
 resource_count := count([
 resource |
 	resource := input.planned_values.root_module.resources[_]
@@ -49,7 +71,7 @@ situation_results := [
 		"remedies": [
 			"Use numeric Resource Manager references in the form tagKeys/{tag-key-id} = tagValues/{tag-value-id}.",
 		],
-		"non_compliant_resources": violations,
+		"non_compliant_resources": non_compliant_resource_names,
 		"conditions": [
 			{
 				"Resource Manager tags must use numeric tagKeys and tagValues references": violations,

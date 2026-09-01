@@ -3,6 +3,23 @@ package terraform.gcp.security.compute_engine.google_compute_image.storage_locat
 import data.terraform.gcp.security.compute_engine.google_compute_image.vars
 import data.terraform.helpers
 
+conditions := [
+	[
+		{
+			"situation_description": "The Compute Image uses a missing or unapproved storage location.",
+			"remedies": [
+				"Set storage_locations to an approved Australian region.",
+			],
+		},
+		{
+			"condition": "At least one storage location must be configured.",
+			"attribute_path": ["storage_locations"],
+			"values": [null, []],
+			"policy_type": "blacklist",
+		},
+	],
+]
+
 approved_storage_locations := {
 	"australia-southeast1",
 	"australia-southeast2",
@@ -34,6 +51,11 @@ violations := [
 	resource_name := object.get(resource.values, vars.variables.resource_value_name, resource.name)
 ]
 
+non_compliant_resource_names := {
+violation.name |
+	some violation in violations
+}
+
 resource_count := count([
 resource |
 	resource := input.planned_values.root_module.resources[_]
@@ -46,7 +68,7 @@ situation_results := [
 		"remedies": [
 			"Set storage_locations to australia-southeast1 or australia-southeast2.",
 		],
-		"non_compliant_resources": violations,
+		"non_compliant_resources": non_compliant_resource_names,
 		"conditions": [
 			{
 				"Storage locations must contain only approved Australian regions": violations,

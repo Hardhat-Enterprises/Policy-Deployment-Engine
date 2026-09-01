@@ -3,6 +3,23 @@ package terraform.gcp.security.compute_engine.google_compute_image.source_image_
 import data.terraform.gcp.security.compute_engine.google_compute_image.vars
 import data.terraform.helpers
 
+conditions := [
+	[
+		{
+			"situation_description": "The source image encryption configuration does not use a structurally valid service account.",
+			"remedies": [
+				"Set source_image_encryption_key.kms_key_service_account to a valid IAM service-account email.",
+			],
+		},
+		{
+			"condition": "A source image KMS service account must be configured.",
+			"attribute_path": ["source_image_encryption_key", 0, "kms_key_service_account"],
+			"values": [null, ""],
+			"policy_type": "blacklist",
+		},
+	],
+]
+
 service_account_pattern := `^[a-z][a-z0-9-]{4,28}[a-z0-9]@[a-z][a-z0-9-]{4,28}[a-z0-9]\.iam\.gserviceaccount\.com$`
 
 valid_service_account(value) if {
@@ -25,6 +42,11 @@ violations := [
 	resource_name := object.get(resource.values, vars.variables.resource_value_name, resource.name)
 ]
 
+non_compliant_resource_names := {
+violation.name |
+	some violation in violations
+}
+
 resource_count := count([
 resource |
 	resource := input.planned_values.root_module.resources[_]
@@ -37,7 +59,7 @@ situation_results := [
 		"remedies": [
 			"Set source_image_encryption_key.kms_key_service_account using service-account@project-id.iam.gserviceaccount.com.",
 		],
-		"non_compliant_resources": violations,
+		"non_compliant_resources": non_compliant_resource_names,
 		"conditions": [
 			{
 				"Source image KMS service account must use the required IAM email structure": violations,
