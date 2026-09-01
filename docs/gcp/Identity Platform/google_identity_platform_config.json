@@ -87,8 +87,8 @@
       "description": "When true, end users cannot delete their account on the associated project through any of our API methods",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Controls whether users may delete their own accounts; preventing deletion is a product, retention, and recovery choice with no universally safer setting."
+      "security_impact": true,
+      "rationale": "Prevents end users from deleting their own accounts through Identity Platform APIs. A generic policy can require this to protect user records from unauthorized or accidental destructive loss."
     },
     "client.permissions.disabled_user_signup": {
       "description": "When true, end users cannot sign up for a new account on the associated project through any of our API methods",
@@ -107,7 +107,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "Selects PHONE_SMS as an MFA factor; whether to use SMS rather than configured TOTP is workload-specific, so an additional generic whitelist adds no protection."
+      "rationale": "Selects an MFA provider as part of the application's authentication architecture rather than enforcing a platform-wide security boundary. This field accepts only PHONE_SMS, so a generic policy cannot further constrain it."
     },
     "mfa.state": {
       "description": "Whether MultiFactor Authentication has been enabled for this project. Possible values: [\"DISABLED\", \"ENABLED\", \"MANDATORY\"]",
@@ -137,8 +137,8 @@
       "description": "The allowed number of adjacent intervals that will be used for verification to avoid clock skew.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Sets the permitted TOTP clock-skew window; larger values increase the number of valid one-time-password intervals."
+      "security_impact": false,
+      "rationale": "Sets the TOTP clock-skew tolerance used to accommodate client clock drift. The appropriate window is an operational usability setting, not a generic platform security enforcement target."
     },
     "monitoring": {
       "type": "block",
@@ -166,8 +166,8 @@
       "description": "Whether this project can have tenants or not.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Enables multi-tenant identity isolation and changes the project’s authentication tenancy model."
+      "security_impact": false,
+      "rationale": "Enables the multi-tenant architecture feature. Whether the project should host tenants is a workload design choice with no universally safer enabled or disabled setting."
     },
     "multi_tenant.default_tenant_location": {
       "description": "The default cloud parent org or folder that the tenant project should be created under.\nThe parent resource name should be in the format of \"/\", such as \"folders/123\" or \"organizations/456\".\nIf the value is not set, the tenant will be created under the same organization or folder as the agent project.",
@@ -190,15 +190,15 @@
       "description": "A sign up APIs quota that customers can override temporarily. Value can be in between 1 and 1000.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Limits sign-up requests per project and IP, helping mitigate automated account-creation abuse."
+      "security_impact": false,
+      "rationale": "Sets a temporary sign-up quota between 1 and 1000 requests per project, hour, and IP. The appropriate numeric limit depends on application demand, so a generic threshold would be arbitrary."
     },
     "quota.sign_up_quota_config.quota_duration": {
       "description": "How long this quota will be active for. It is measurred in seconds, e.g., Example: \"9.615s\".",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines how long a raised sign-up quota remains active; a policy can cap the duration of the enlarged account-creation abuse window."
+      "security_impact": false,
+      "rationale": "Sets the duration of a temporary sign-up quota override. The safe duration depends on the workload and operational incident, so a generic maximum would be arbitrary."
     },
     "quota.sign_up_quota_config.start_time": {
       "description": "When this quota will take affect.",
@@ -247,8 +247,8 @@
       "description": "Whether a password is required for email auth or not. If true, both an email and\npassword must be provided to sign in. If false, a user may sign in via either\nemail/password or email link.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Chooses between password-required and email-link-capable sign-in; both are supported authentication designs, so a generic policy should not mandate one without an organization-specific assurance requirement."
+      "security_impact": true,
+      "rationale": "Controls whether email sign-in requires a password. Requiring passwords enforces a stronger credential requirement than email-link-only authentication and reduces account-takeover exposure from compromised email links."
     },
     "sign_in.phone_number": {
       "type": "block",
@@ -266,8 +266,8 @@
       "description": "A map of <test phone number, fake code> that can be used for phone auth testing.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Defines test phone numbers and verification codes; exposing or retaining them outside testing can bypass normal SMS verification."
+      "security_impact": false,
+      "rationale": "Defines test phone numbers and fake verification codes for phone-auth testing. Their use is environment-specific test configuration rather than a generic platform security control."
     },
     "sms_region_config": {
       "type": "block",
