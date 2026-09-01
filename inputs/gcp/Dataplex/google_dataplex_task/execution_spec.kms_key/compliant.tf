@@ -1,6 +1,6 @@
 resource "google_dataplex_task" "compliant_example_1" {
     task_id = "compliant_example_1"
-    location = "australia-southeat1"
+    location = "australia-southeast1"
     lake = "example-lake"
     project = "example-project"
 
