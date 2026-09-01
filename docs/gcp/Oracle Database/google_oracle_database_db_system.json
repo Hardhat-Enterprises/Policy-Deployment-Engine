@@ -34,9 +34,9 @@
       "description": "The GCP Oracle zone where Oracle DbSystem is hosted.\nExample: us-east4-b-r2.\nIf not specified, the system will pick a zone based on availability.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This argument specifies the deployment zone of the Oracle DbSystem. It determines where the resource is hosted but does not configure security controls such as authentication, authorization, encryption, network protection, or access restrictions."
-    },
+      "security_impact": true,
+      "rationale": "This argument determines the GCP Oracle zone in which the Oracle DbSystem is hosted, which controls where the resource's data is stored and used. The selected zone can therefore affect data residency, regulatory, compliance, and organizational security requirements. The allowed zones should be restricted through policy to an approved location whitelist."
+      },
     "labels": {
       "description": "The labels or tags associated with the DbSystem.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
@@ -48,22 +48,22 @@
       "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "The location parameter defines the deployment location of the Oracle DbSystem resource and is primarily used for resource identification and placement. Although the selected location may influence data residency and compliance considerations, it does not directly configure security controls such as access management, encryption, authentication, or network protection."
+      "security_impact": true,
+      "rationale": "This argument specifies the location in which the Oracle DbSystem resource is deployed and can therefore affect where the resource and its data are stored and used. Location selection has data residency, regulatory, compliance, and organizational security implications. The allowed locations should be restricted through policy to an approved whitelist of geographic locations."
     },
     "odb_network": {
       "description": "The name of the OdbNetwork associated with the DbSystem.\nFormat: projects/{project}/locations/{location}/odbNetworks/{odb_network}\nIt is optional but if specified, this should match the parent ODBNetwork of\nthe OdbSubnet.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The OdbNetwork defines the network environment where the Oracle DbSystem is deployed. Network configuration can influence the isolation, connectivity, and exposure of the database resource. Incorrect network association may result in unintended access paths or reduced network security controls."
+      "security_impact": false,
+      "rationale": "This argument is a reference to an existing OdbNetwork resource and identifies which network is associated with the DbSystem. It does not itself configure network security controls or modify the security properties of the referenced network. Security controls should be evaluated and enforced on the referenced OdbNetwork resource and its underlying network configuration."
     },
     "odb_subnet": {
       "description": "The name of the OdbSubnet associated with the DbSystem for IP\nallocation. Format:\nprojects/{project}/locations/{location}/odbNetworks/{odb_network}/odbSubnets/{odb_subnet}",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The OdbSubnet determines the network segment and IP allocation used by the Oracle DbSystem. Subnet selection affects network isolation, resource accessibility, and segmentation of the database environment, which can directly impact the security posture of the deployed resource."
+      "security_impact": false,
+      "rationale": "This argument is a reference to an existing OdbSubnet resource and identifies the subnet used by the DbSystem for IP allocation. It does not itself configure network access controls, firewall rules, or network security policies. Security and network segmentation controls should be evaluated and enforced on the referenced subnet and associated network-policy or firewall resources."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
@@ -132,8 +132,8 @@
       "description": "The license model of the DbSystem.\nPossible values:\nLICENSE_INCLUDED\nBRING_YOUR_OWN_LICENSE",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "The license_model parameter specifies how the Oracle Database license is provided for the DbSystem. It affects licensing and cost management but does not directly configure security controls such as authentication, authorization, encryption, auditing, or network access restrictions."
+      "security_impact": true,
+      "rationale": "This argument specifies the license model for the DbSystem. The underlying API includes an unspecified license-model value, so an unexplicit configuration may result in an unspecified or default selection. Requiring an explicit, approved license model prevents unintended configuration and ensures that the licensing choice is deliberately defined."
     },
     "properties.memory_size_gb": {
       "description": "The memory size in GB.",
@@ -153,8 +153,8 @@
       "description": "The private IP address of the DbSystem.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The private_ip parameter defines the private network address assigned to the Oracle DbSystem. The IP address determines the network location and connectivity of the database within the private network, which can affect network isolation, access control, and exposure of the database resource."
+      "security_impact": false,
+      "rationale": "This argument specifies the private IP address assigned to the DbSystem. It is an addressing and resource configuration value and does not itself configure network access controls, firewall rules, routing, or network security policies. Network security and segmentation should be evaluated and enforced through the relevant network and firewall policy resources."
     },
     "properties.reco_storage_size_gb": {
       "description": "The reco/redo storage size in GB.",
@@ -189,14 +189,14 @@
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "This parameter controls whether diagnostic data collection is enabled for the Oracle DbSystem. Diagnostic information may contain operational details about the system environment, which can introduce information disclosure and privacy risks if not properly managed."
+      "rationale": "This parameter controls whether diagnostic events are collected for the DbSystem. Enabling diagnostic event collection supports security monitoring, operational visibility, and auditability by providing information needed to identify and investigate relevant system events. Disabling diagnostic collection can reduce monitoring visibility and limit the ability to detect, investigate, and respond to security-relevant events."
     },
     "properties.data_collection_options.is_incident_logs_enabled": {
       "description": "Indicates whether to enable incident logs and trace collection.",
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "This parameter controls whether incident logs and trace information are collected for the Oracle DbSystem. Incident logs may contain sensitive operational details, error information, or system configuration data, which can affect information disclosure, monitoring capabilities, and security incident investigation."
+      "rationale": "This parameter controls whether incident logs and trace information are collected for the DbSystem. Enabling incident log collection supports security monitoring, incident investigation, and auditability by ensuring relevant telemetry is available to identify and investigate security-relevant events. Disabling incident log collection can reduce visibility during security investigations and limit the ability to detect, analyze, and respond to security incidents."
     },
     "properties.db_home": {
       "type": "block",
@@ -209,8 +209,8 @@
       "description": "A valid Oracle Database version. For a list of supported versions, use the\nListDbVersions operation.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The db_version parameter specifies the Oracle Database version deployed on the DbSystem. The selected version affects the availability of security patches, vulnerability fixes, and supported security features. Using outdated or unsupported database versions may increase exposure to known vulnerabilities."
+      "security_impact": false,
+      "rationale": "This argument specifies the Oracle Database software version used by the DbSystem. Version selection is a team configuration choice, and the platform provides supported Oracle Database versions through its service. The argument does not itself configure a security control or provide a structural security policy guarantee, so software version selection is not treated as a security policy target."
     },
     "properties.db_home.display_name": {
       "description": "The display name for the Database Home. The name does not have to\nbe unique within your project.",
