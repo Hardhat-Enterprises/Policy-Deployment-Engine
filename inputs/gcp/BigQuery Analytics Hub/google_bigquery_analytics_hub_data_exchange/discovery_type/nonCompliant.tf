@@ -4,8 +4,8 @@
 resource "google_bigquery_analytics_hub_data_exchange" "non_compliant_example_1" {
   location         = "australia-southeast1"
   data_exchange_id = "non_compliant_example_1"
-  display_name     = "nc"
-  description      = "Non-compliant exchange - discovery_type is not approved"
+  display_name     = "c"
+  description      = "Compliant exchange - discovery_type is approved"
 
   discovery_type = "DISCOVERY_TYPE_PUBLIC"
 }
