@@ -13,8 +13,8 @@
       "description": "An array of projects that are not allowed to connect to this service\nattachment.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Defines a list using specific project identifiers that are denied access to the service which must be intentionally configured correctly in order to prevent network exposure"
+      "security_impact": false,
+      "rationale": "Defines a list using specific project identifiers that are denied access to the service, which is out of scope per service guidance due to the nature of it being a reference or identifier to another resource"
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
@@ -56,7 +56,7 @@
       "required": true,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "This is a configuration control not a security control as it's whose IP address is used for consumer traffic for the service attachment, meaning the address range is networking choice that does not impact the security of the service"
+      "rationale": "This is a configuration control not a security control as it's whose IP address is used for consumer traffic for the service attachment, this is operational routing choice that does not impact the security of the service as network address ranges have firewalls enforce segmentation not range sizing"
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
@@ -76,8 +76,8 @@
       "description": "This flag determines whether a consumer accept/reject list change can reconcile the statuses of existing ACCEPTED or REJECTED PSC endpoints.\n\nIf false, connection policy update will only affect existing PENDING PSC endpoints. Existing ACCEPTED/REJECTED endpoints will remain untouched regardless how the connection policy is modified .\nIf true, update will affect both PENDING and ACCEPTED/REJECTED PSC endpoints. For example, an ACCEPTED PSC endpoint will be moved to REJECTED if its project is added to the reject list.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Purpose is to determine if consumers access changes are made from the existing connections thus making it an operational toggle not security control as it determines how the connection states are handled"
+      "security_impact": true,
+      "rationale": "Controls whether changes made to the accept/reject list are enforced thus it must be set as true so that access list changes are actually enforced in real time"
     },
     "region": {
       "description": "URL of the region where the resource resides.",
@@ -90,15 +90,15 @@
       "description": "Controls the behavior of propagated_connection_limit.\nWhen false, setting propagated_connection_limit to zero causes the provider to use to the API's default value.\nWhen true, the provider will set propagated_connection_limit to zero.\nDefaults to false.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Purpose is to designate if the propagated_connection_limit is either 0 or the default value thus is configuration control for connection limits and not a security control"
+      "security_impact": true,
+      "rationale": "Purpose is to designate if the propagated_connection_limit is either 0 or the default value thus there must be a limit set to prevent resource exhuastion and DoS risks meaning it should be set as true"
     },
     "show_nat_ips": {
       "description": "NOTE: This field is temporarily non-functional due to an underlying API issue.\nAny value provided here will be ignored until the API issue is resolved, expected around 2026-03.\n[If true, show NAT IPs of all connected endpoints.]",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Dictates the display of the NAT IPs which is a descriptive and display preference and not a security related control"
+      "security_impact": true,
+      "rationale": "Dictates whether the display of the NAT IP addresses of the service attachment are exposed to consumers thus it must be set to false to reduce network exposure and service visibility"
     },
     "target_service": {
       "description": "The URL of a service serving the endpoint identified by this service attachment.",
@@ -123,8 +123,8 @@
       "description": "The endpoint that is allowed to connect to this service attachment.\nOnly one of project_id_or_num, network_url and endpoint_url may be set.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Contains a reference to a consumer endpoint that specifies what external resource is allowed to connect to the service attachment, and it must be non empty to ensure intentional allowlisting due to exposure allowlists having the ability to gate who can reach the privat resource"
+      "security_impact": false,
+      "rationale": "Contains a reference to a consumer endpoint that specifies what external resource is allowed to connect to the service attachment, making it not suitable as we are securing the resource not the pointer and this is a reference type field that points to the consumers resources"
     },
     "consumer_accept_lists.network_url": {
       "description": "The network that is allowed to connect to this service attachment.\nOnly one of project_id_or_num and network_url may be set.",
@@ -137,8 +137,8 @@
       "description": "A project that is allowed to connect to this service attachment.\nOnly one of project_id_or_num and network_url may be set.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This field is a single entry that allows the identified project to connect to the service attachment, thus unintentional values could expand the amount of connections allowed making it so that untended parties are able to gain permission"
+      "security_impact": false,
+      "rationale": "This field is a single entry that allows the identified project to connect to the service attachment, thus it is a configuration control and it is too restricting to not allow teams to choose what projects to not allow and is an identifer that references another resource or project making it not a security related control"
     }
   }
 }
