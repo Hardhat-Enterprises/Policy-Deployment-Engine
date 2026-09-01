@@ -9,8 +9,8 @@ conditions := [
     {
         "condition": "Only approved and verified IAM members are allowed",
         "attribute_path" : ["member"],
-        "values" : ["user:jane@organization.org"],
-        "policy_type" : "whitelist" 
+        "values" : ["*:*@*", [["user"], ["jane"], ["organization.org"]]],
+        "policy_type" : "pattern whitelist" 
     }
     
     ]
