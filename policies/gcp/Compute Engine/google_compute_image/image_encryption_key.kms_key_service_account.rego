@@ -8,7 +8,7 @@ conditions := [
 		{
 			"situation_description": "The Compute Image does not specify a structurally valid KMS service account.",
 			"remedies": [
-				"Set image_encryption_key.kms_key_service_account to a valid IAM service-account email.",
+				"Set image_encryption_key.kms_key_service_account to a valid Google IAM service-account email.",
 			],
 		},
 		{
@@ -20,7 +20,7 @@ conditions := [
 	],
 ]
 
-service_account_pattern := `^[a-z][a-z0-9-]{4,28}[a-z0-9]@[a-z][a-z0-9-]{4,28}[a-z0-9]\.iam\.gserviceaccount\.com$`
+service_account_pattern := `^[a-z0-9-]+@[a-z0-9-]+\.iam\.gserviceaccount\.com$`
 
 valid_service_account(value) if {
 	is_string(value)
@@ -31,7 +31,7 @@ violations := [
 {
 	"name": resource_name,
 	"message": sprintf(
-		"Compute Image '%s' must set image_encryption_key.kms_key_service_account to a valid service-account email.",
+		"Compute Image '%s' must set image_encryption_key.kms_key_service_account to a valid Google IAM service-account email.",
 		[resource_name],
 	),
 } |
@@ -62,7 +62,7 @@ situation_results := [
 		"non_compliant_resources": non_compliant_resource_names,
 		"conditions": [
 			{
-				"KMS service account must use the required IAM service-account email structure": violations,
+				"KMS service account must use the generalized Google IAM email structure": violations,
 			},
 		],
 	},

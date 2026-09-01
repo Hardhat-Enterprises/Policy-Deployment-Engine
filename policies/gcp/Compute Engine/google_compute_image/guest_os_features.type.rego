@@ -6,16 +6,30 @@ import data.terraform.helpers
 conditions := [
 	[
 		{
-			"situation_description": "The Compute Image enables the MULTI_IP_SUBNET guest OS feature, which can increase network complexity and exposure for VMs created from the image.",
+			"situation_description": "The Compute Image enables a guest OS feature outside the platform-approved security and compatibility feature set.",
 			"remedies": [
-				"Remove MULTI_IP_SUBNET unless it has been explicitly approved for the workload.",
+				"Use a supported security or compatibility feature and remove MULTI_IP_SUBNET unless separately approved.",
 			],
 		},
 		{
-			"condition": "MULTI_IP_SUBNET must not be enabled.",
+			"condition": "Guest OS feature must use a platform-approved API enumeration.",
 			"attribute_path": ["guest_os_features", "type"],
-			"values": ["MULTI_IP_SUBNET"],
-			"policy_type": "blacklist",
+			"values": [
+				"SECURE_BOOT",
+				"SEV_CAPABLE",
+				"UEFI_COMPATIBLE",
+				"VIRTIO_SCSI_MULTIQUEUE",
+				"WINDOWS",
+				"GVNIC",
+				"IDPF",
+				"SEV_LIVE_MIGRATABLE",
+				"SEV_SNP_CAPABLE",
+				"SUSPEND_RESUME_COMPATIBLE",
+				"TDX_CAPABLE",
+				"SEV_LIVE_MIGRATABLE_V2",
+				"SNP_SVSM_CAPABLE",
+			],
+			"policy_type": "whitelist",
 		},
 	],
 ]
