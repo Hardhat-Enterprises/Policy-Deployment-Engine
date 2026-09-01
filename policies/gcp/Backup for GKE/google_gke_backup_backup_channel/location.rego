@@ -14,20 +14,10 @@ conditions := [
       "values": ["australia-southeast1", "australia-southeast2"],
       "policy_type": "whitelist"
     }
-  ],
-  [
-    {
-      "situation_description": "Location must follow valid GCP region format.",
-      "remedies": ["Ensure location matches regex '^[a-z]+-[a-z]+\\d$'."]
-    },
-    {
-      "condition": "Location must match valid region format",
-      "attribute_path": ["location"],
-      "values": ["^[a-z]+-[a-z]+\\d$"],
-      "policy_type": "pattern_whitelist"
-    }
   ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details
