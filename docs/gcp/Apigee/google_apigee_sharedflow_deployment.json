@@ -6,43 +6,43 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a Terraform-level lifecycle meta-argument that controls whether 'terraform destroy' can undeploy the sharedflow. It affects operational workflow safety (preventing accidental undeployment), not the security configuration of the deployment itself. The choice between DELETE, PREVENT, and ABANDON is an infrastructure management concern, not a security posture decision."
     },
     "environment": {
       "description": "The resource ID of the environment.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies which Apigee environment the sharedflow is deployed to. Environment names are arbitrary, team-specific strings with no platform-enforced security distinction between them. A generic policy cannot constrain this without hardcoding team-specific environment names. The security configuration of the environment itself is governed by the google_apigee_environment resource, not by what is deployed into it."
     },
     "org_id": {
       "description": "The Apigee Organization associated with the Apigee instance",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a reference to the parent Apigee Organization. The value is inherently team- or project-specific (the organization name). A generic platform policy cannot constrain it without hardcoding specific organization identifiers. The security of the organization itself is governed by the google_apigee_organization resource, not by resources that reference it."
     },
     "revision": {
       "description": "Revision of the Sharedflow to be deployed.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies the revision number of the sharedflow to deploy. Revision numbers are sequential, team-specific identifiers. There is no inherently secure or insecure revision number; the security of a revision depends on the sharedflow content within it, which is managed on the google_apigee_sharedflow resource. A generic platform policy cannot determine which revision number is appropriate for any given team or workload."
     },
     "service_account": {
       "description": "The service account represents the identity of the deployed proxy, and determines what permissions it has. The format must be {ACCOUNT_ID}@{PROJECT}.iam.gserviceaccount.com.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument sets the runtime identity of the deployed sharedflow and determines what GCP resources and APIs it can access. According to GCP documentation, the service account represents the identity of the deployed proxy and determines what permissions it has. When left unset, the deployment may operate without a scoped identity, violating the principle of least privilege. A generic platform policy can require that this field is explicitly set (non-empty) for every deployment, ensuring teams assign a dedicated service account with appropriately scoped permissions rather than relying on defaults or no identity."
     },
     "sharedflow_id": {
       "description": "Id of the Sharedflow to be deployed.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a reference to which sharedflow to deploy. It points to another resource whose security (its policies, configuration, and logic) is managed on the google_apigee_sharedflow resource itself. A generic policy cannot determine which sharedflows are safe to deploy without team-specific knowledge of sharedflow names and their contents."
     }
   }
 }
