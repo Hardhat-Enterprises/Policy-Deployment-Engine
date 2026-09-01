@@ -1,93 +1,93 @@
 {
-  "last_updated": "2026-06-23T08:26:44Z",
-  "provider_version": "7.37.0",
-  "arguments": {
-    "deletion_policy": {
-      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
-      "required": false,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "description": {
-      "description": "A textual description for the organization security policy.",
-      "required": false,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "display_name": {
-      "description": "User-provided name of the organization security policy. The name should be unique in the organization in which the security policy is created. This should only be used when SecurityPolicyType is FIREWALL.",
-      "required": false,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "parent": {
-      "description": "The parent of this OrganizationSecurityPolicy in the Cloud Resource Hierarchy.\nFormat: organizations/{organization_id} or folders/{folder_id}",
-      "required": true,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "short_name": {
-      "description": "User-provided name of the organization security policy. The name should be unique in the organization in which the security policy is created. This should only be used when SecurityPolicyType is CLOUD_ARMOR.",
-      "required": false,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "type": {
-      "description": "The type indicates the intended use of the security policy. This field can be set only at resource creation time.\n\n**NOTE** : 'FIREWALL' type is deprecated and will be removed in a future major release. Please use 'google_compute_firewall_policy' instead.\" Possible values: [\"FIREWALL\", \"CLOUD_ARMOR\", \"CLOUD_ARMOR_EDGE\", \"CLOUD_ARMOR_INTERNAL_SERVICE\", \"CLOUD_ARMOR_NETWORK\"]",
-      "required": false,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "advanced_options_config": {
-      "type": "block",
-      "description": "Additional options for this security policy.",
-      "required": false
-    },
-    "advanced_options_config.json_parsing": {
-      "description": "JSON body parsing. Supported values include: \"DISABLED\", \"STANDARD\", \"STANDARD_WITH_GRAPHQL\". Possible values: [\"DISABLED\", \"STANDARD\", \"STANDARD_WITH_GRAPHQL\"]",
-      "required": false,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "advanced_options_config.log_level": {
-      "description": "Logging level. Supported values include: \"NORMAL\", \"VERBOSE\". Possible values: [\"NORMAL\", \"VERBOSE\"]",
-      "required": false,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "advanced_options_config.request_body_inspection_size": {
-      "description": "The maximum request size chosen by the customer with Waf enabled. Values supported are \"8KB\", \"16KB\", \"32KB\", \"48KB\" and \"64KB\".\nValues are case insensitive. Possible values: [\"8KB\", \"16KB\", \"32KB\", \"48KB\", \"64KB\"]",
-      "required": false,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "advanced_options_config.user_ip_request_headers": {
-      "description": "An optional list of case-insensitive request header names to use for resolving the client source IP address.",
-      "required": false,
-      "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "advanced_options_config.json_custom_config": {
-      "type": "block",
-      "description": "Custom JSON parsing configurations.",
-      "required": false
-    },
-    "advanced_options_config.json_custom_config.content_types": {
-      "description": "A list of content types to be parsed as JSON.",
-      "required": true,
-      "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+    "last_updated": "2026-06-23T08:26:44Z",
+    "provider_version": "7.37.0",
+    "arguments": {
+        "deletion_policy": {
+            "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+            "required": false,
+            "type": "string",
+            "security_impact": true,
+            "rationale": "Controls whether Terraform is allowed to destroy this organization wide security policy. Since this policy can govern security rules across an entire organization or folder, an accidental deletion here is even higher impact than losing a single resource's protection."
+        },
+        "description": {
+            "description": "A textual description for the organization security policy.",
+            "required": false,
+            "type": "string",
+            "security_impact": false,
+            "rationale": "Free text documentation field with no functional  effect."
+        },
+        "display_name": {
+            "description": "User-provided name of the organization security policy. The name should be unique in the organization in which the security policy is created. This should only be used when SecurityPolicyType is FIREWALL.",
+            "required": false,
+            "type": "string",
+            "security_impact": false,
+            "rationale": "label for the policy."
+        },
+        "parent": {
+            "description": "The parent of this OrganizationSecurityPolicy in the Cloud Resource Hierarchy.\nFormat: organizations/{organization_id} or folders/{folder_id}",
+            "required": true,
+            "type": "string",
+            "security_impact": false,
+            "rationale": "team created tag reference.Not a security control."
+        },
+        "short_name": {
+            "description": "User-provided name of the organization security policy. The name should be unique in the organization in which the security policy is created. This should only be used when SecurityPolicyType is CLOUD_ARMOR.",
+            "required": false,
+            "type": "string",
+            "security_impact": false,
+            "rationale": "Identifier for the policy. same purpose as display_name but scoped for a different policy type."
+        },
+        "type": {
+            "description": "The type indicates the intended use of the security policy. This field can be set only at resource creation time.\n\n**NOTE** : 'FIREWALL' type is deprecated and will be removed in a future major release. Please use 'google_compute_firewall_policy' instead.\" Possible values: [\"FIREWALL\", \"CLOUD_ARMOR\", \"CLOUD_ARMOR_EDGE\", \"CLOUD_ARMOR_INTERNAL_SERVICE\", \"CLOUD_ARMOR_NETWORK\"]",
+            "required": false,
+            "type": "string",
+            "security_impact": false,
+            "rationale": "Chooses what kind of policy this is (FIREWALL, CLOUD_ARMOR, etc.) a functional choice about the policy's intended use, not a setting with an inherently insecure value."
+        },
+        "advanced_options_config": {
+            "type": "block",
+            "description": "Additional options for this security policy.",
+            "required": false
+        },
+        "advanced_options_config.json_parsing": {
+            "description": "JSON body parsing. Supported values include: \"DISABLED\", \"STANDARD\", \"STANDARD_WITH_GRAPHQL\". Possible values: [\"DISABLED\", \"STANDARD\", \"STANDARD_WITH_GRAPHQL\"]",
+            "required": false,
+            "type": "string",
+            "security_impact": true,
+            "rationale": "Controls whether Cloud Armor's WAF parses JSON request bodies to inspect them for attacks. If set to DISABLED, malicious payloads hidden inside JSON bodies pass straight through undetected  the same kind of risk as disabling a firewall rule."
+        },
+        "advanced_options_config.log_level": {
+            "description": "Logging level. Supported values include: \"NORMAL\", \"VERBOSE\". Possible values: [\"NORMAL\", \"VERBOSE\"]",
+            "required": false,
+            "type": "string",
+            "security_impact": false,
+            "rationale": "Chooses logging detail (NORMAL vs VERBOSE), not whether logging happens at all"
+        },
+        "advanced_options_config.request_body_inspection_size": {
+            "description": "The maximum request size chosen by the customer with Waf enabled. Values supported are \"8KB\", \"16KB\", \"32KB\", \"48KB\" and \"64KB\".\nValues are case insensitive. Possible values: [\"8KB\", \"16KB\", \"32KB\", \"48KB\", \"64KB\"]",
+            "required": false,
+            "type": "string",
+            "security_impact": false,
+            "rationale": "Sets the max body size the WAF will inspect. Larger generally means more coverage, but this is a resource/cost trade-off with no single universally correct value. "
+        },
+        "advanced_options_config.user_ip_request_headers": {
+            "description": "An optional list of case-insensitive request header names to use for resolving the client source IP address.",
+            "required": false,
+            "type": "set(string)",
+            "security_impact": false,
+            "rationale": "A list of specific header names used to resolve the client's real IP .Which headers are legitimate depends entirely on each team."
+        },
+        "advanced_options_config.json_custom_config": {
+            "type": "block",
+            "description": "Custom JSON parsing configurations.",
+            "required": false
+        },
+        "advanced_options_config.json_custom_config.content_types": {
+            "description": "A list of content types to be parsed as JSON.",
+            "required": true,
+            "type": "set(string)",
+            "security_impact": false,
+            "rationale": "Defining custom content types for JSON parsing is an application-logic choice rather than a security configuration."
+        }
     }
-  }
 }
