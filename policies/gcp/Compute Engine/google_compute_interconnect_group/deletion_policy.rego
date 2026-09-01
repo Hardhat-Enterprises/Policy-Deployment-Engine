@@ -12,10 +12,10 @@ conditions := [
 			],
 		},
 		{
-			"condition": "deletion_policy must not be set to ABANDON.",
+			"condition": "deletion_policy must be set to DELETE or PREVENT.",
 			"attribute_path": ["deletion_policy"],
-			"values": ["ABANDON"],
-			"policy_type": "blacklist",
+			"values": ["DELETE", "PREVENT"],
+			"policy_type": "whitelist",
 		},
 	],
 ]
