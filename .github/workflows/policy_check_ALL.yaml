@@ -3,7 +3,7 @@ name: Terraform OPA Policy Check ALL
 on:
   workflow_dispatch:
   # Publish a fresh policy-results artifact on every push to dev so the
-  # AutoCapstone backend can consume the latest verdicts.
+  # PDE Portal backend can consume the latest verdicts.
   push:
     branches:
       - dev
@@ -47,6 +47,36 @@ jobs:
           chmod +x opa
           sudo mv opa /usr/local/bin/opa
 
+      # Content-quality rules (scripts/linters/policy_lint.py) over every documented
+      # gcp resource — a repo-wide companion to the structural lint above, not a gate:
+      # continue-on-error so a repo-wide content regression never reddens this job.
+      # `--json gcp` is the whole-platform sweep (~11s; needs only OPA, no terraform
+      # plan), so it must run after "Install OPA" above and needs nothing else set up.
+      - name: Policy lint (whole tree, report only)
+        continue-on-error: true
+        run: |
+          python3 scripts/linters/policy_lint.py --json gcp > policy-lint-report.json || true
+          python3 - <<'EOF'
+          import json
+          from collections import Counter
+
+          findings = json.load(open("policy-lint-report.json"))
+          errors = sum(1 for f in findings if f["severity"] == "error")
+          warns = len(findings) - errors
+          print(f"policy_lint (whole tree): {errors} error(s), {warns} warning(s)")
+          for rule, count in sorted(Counter(f["rule"] for f in findings).items()):
+              print(f"  {rule}: {count}")
+          EOF
+
+      - name: Upload policy-lint report artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: policy-lint-report
+          path: policy-lint-report.json
+          retention-days: 90
+          if-no-files-found: warn
+
       # Best-effort provider mirror. The ALL run is designed to execute OFFLINE from
       # the committed plan cache (plan_cache/): when every plan is cached,
       # auto_test skips terraform entirely and this mirror is never touched. So a
@@ -85,7 +115,7 @@ jobs:
             --report policy_results.json \
             --verbose
 
-      # Publish the machine-readable verdicts for the AutoCapstone backend. Runs
+      # Publish the machine-readable verdicts for the PDE Portal backend. Runs
       # even when the policy checks failed (the report is written first), under a
       # stable name so consumers can always fetch the latest.
       - name: Upload policy results artifact

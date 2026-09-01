@@ -428,6 +428,28 @@ def match_names_in_messages(messages: list[str], candidate_names: set[str]) -> s
     return matched
 
 
+# policies/_helpers/helpers.rego refuses to evaluate a policy whose conditions name
+# a policy_type it cannot dispatch, and says so with a message carrying this prefix.
+# Treating that as a plain summary would leave it to chance whether the check went
+# red (it would depend on whether the fixture happened to have compliant examples),
+# and the reported reason would be the wrong one, so it is matched explicitly.
+POLICY_ERROR_PREFIX = "POLICY ERROR:"
+
+
+def find_policy_error(messages: list[str]) -> str | None:
+    """The helper's own hard-error text, if the policy declared something unevaluatable.
+
+    Searched for anywhere in a message rather than only at the start: OPA returns the
+    message rule as a nested array and normalize_messages stringifies it, so the marker
+    can sit inside a Python repr rather than at position 0.
+    """
+    for message in messages:
+        index = message.find(POLICY_ERROR_PREFIX)
+        if index != -1:
+            return message[index:].strip().rstrip("]'\"")
+    return None
+
+
 def normalize_messages(messages_value) -> list[str]:
     if isinstance(messages_value, list):
         return [str(m) for m in messages_value]
@@ -548,6 +570,16 @@ def thread_safe_print(*args, **kwargs):
 def validate_policy_output(attribute: str, resource_type: str | None, plan_path: Path, messages: list[str],
                            verbose: bool, service: str, resource: str,
                            resource_value_name: str | None = None) -> dict:
+    # A policy the engine refused to evaluate fails outright, with the helper's own
+    # text as the reason. This must come first: without it the run would fall through
+    # to name-matching against an error string, and report "non-compliant resources
+    # were not flagged" — true, but it hides why, and it would report nothing at all
+    # for a fixture that has no non-compliant examples.
+    policy_error = find_policy_error(messages)
+    if policy_error:
+        thread_safe_print(f"Check failed: {policy_error}\n")
+        return make_failure(attribute, policy_error, service, resource)
+
     # Map each label to the identifier the OPA message uses (the resource_value_name
     # value). A label counts as flagged if EITHER the label OR its identifier appears
     # in the messages — so fixtures whose id field rejects the underscore example-name

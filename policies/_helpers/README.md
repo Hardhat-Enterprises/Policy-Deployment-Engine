@@ -7,7 +7,7 @@ The `_helpers` directory contains the core policy evaluation framework for the P
 **Key Features:**
 - Modular architecture with specialized policy modules
 - Support for 6 policy types: Blacklist, Whitelist, Range, Pattern Blacklist, Pattern Whitelist, Element Blacklist
-- AND logic for multi-condition situations
+- OR logic across the conditions of a situation (a resource is flagged if it fails **any** of them)
 - Standardized interfaces across all policy modules
 - Shared utility functions for common operations
 
@@ -31,7 +31,7 @@ The `_helpers` directory contains the core policy evaluation framework for the P
   - [6. Element Blacklist](#6-element-blacklist)
 - [Usage Guide](#usage-guide)
   - [Input Format](#input-format)
-  - [Multi-Condition Example (AND Logic)](#multi-condition-example-and-logic)
+  - [Multi-Condition Example (OR Logic)](#multi-condition-example-or-logic)
   - [Output Format](#output-format)
 - [Testing](#testing)
   - [Quick Smoke Tests](#quick-smoke-tests)
@@ -98,13 +98,13 @@ policies/_helpers/
 - **Responsibilities:**
   - Aggregate policy results across multiple conditions
   - Route evaluation to appropriate policy modules
-  - Apply AND logic for multi-condition situations (resources must fail ALL conditions to be non-compliant)
+  - Union the violations of a situation's conditions (a resource failing **any** condition is non-compliant)
   - Format summary output for end users
 
 **Key Functions:**
 - `get_multi_summary(conditions, tf_variables)` - Main entry point
 - `select_policy_logic(...)` - Routes to correct policy module
-- `set_intersection_all(sets)` - Implements AND logic via set intersection
+- `set_intersection_all(sets)` - Set intersection. `find_failing_resources` only ever passes it **one** set (the union of every condition's violations), so the cross-condition semantics is OR
 
 #### **shared.rego** - Utility Library
 - **Package:** `terraform.helpers.shared`
@@ -282,9 +282,10 @@ get_violations(tf_variables, attribute_path, values) = results
 ]
 ```
 
-### Multi-Condition Example (AND Logic)
+### Multi-Condition Example (OR Logic)
 
-Resources must violate ALL conditions in a situation to be non-compliant:
+A resource is non-compliant if it violates **any** condition in the situation. The
+conditions' violations are unioned, not intersected:
 
 ```rego
 conditions := [
@@ -308,11 +309,19 @@ conditions := [
 ]
 ```
 
-Only buckets that BOTH:
-1. Don't match "prod-*" pattern, AND
+Buckets that EITHER:
+1. Don't match the "prod-*" pattern, OR
 2. Don't use CMEK encryption
 
-...will be flagged as non-compliant.
+...will be flagged as non-compliant. A bucket that is named correctly but skips CMEK
+is still flagged, and so is one that uses CMEK under the wrong name.
+
+> **Why OR and not AND.** Each condition in a situation is one of the ways the argument
+> can be wrong, so flagging on any of them over-flags — visible in a test run, and
+> fixed. AND would under-flag: a resource that trips one check and passes another would
+> come back compliant, and the policy would silently stop catching what it was written
+> to catch. The behaviour is deliberate; see the note on `find_failing_resources` in
+> `helpers.rego` before changing it.
 
 ### Output Format
 
@@ -597,9 +606,11 @@ opa eval --explain full --data ./policies/_helpers --data ./policies/gcp \
 ## Performance Considerations
 
 ### Set Operations
-The framework uses Rego's native set operations for efficient intersections:
+The framework builds each situation's violations as a single set comprehension, so no
+per-condition intersection pass is needed:
 ```rego
-# Efficient AND logic via set intersection
+# One set holding every condition's violations (OR logic); set_intersection_all
+# receives exactly one set and returns it unchanged.
 failing_resources := set_intersection_all(resource_sets)
 ```
 
