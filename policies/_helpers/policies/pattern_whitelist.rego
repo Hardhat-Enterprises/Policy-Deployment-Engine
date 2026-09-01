@@ -33,6 +33,7 @@ get_violations(tf_variables, attribute_path, values_formatted) = results if {
 }
 
 _build_violation(tf_variables, attribute_path, values_formatted, resource) = violation if {
+    count(values_formatted) > 1
     attribute_path_string := shared.format_attribute_path(attribute_path)
     nc := _get_whitelist(resource, attribute_path, values_formatted[0], values_formatted[1])
     
@@ -44,6 +45,50 @@ _build_violation(tf_variables, attribute_path, values_formatted, resource) = vio
             attribute_path_string,
             shared.get_attribute_value(resource, attribute_path),
             nc
+        )
+    }
+}
+
+# Match an entire value against a structural wildcard pattern.
+# A one-item values array, such as ["projects/*/locations/*/templates/*"],
+# performs structural validation without hardcoding team-specific identifiers.
+_matches_structure(target, value) if {
+    is_string(value)
+    pattern := sprintf("^%s$", [regex.replace(target, "\\*", "[^/]+")])
+    regex.match(pattern, value)
+}
+
+_build_violation(tf_variables, attribute_path, values_formatted, resource) = violation if {
+    count(values_formatted) == 1
+    target := values_formatted[0]
+    attribute_path_string := shared.format_attribute_path(attribute_path)
+    actual := shared.get_attribute_value(resource, attribute_path)
+
+    violation := {
+        "name": shared.get_resource_attribute(resource, tf_variables.resource_value_name),
+        "message": sprintf(
+            "%s '%s' has '%s' set to '%v'. It must match structural pattern '%s'",
+            [
+                tf_variables.friendly_resource_name,
+                shared.get_resource_attribute(resource, tf_variables.resource_value_name),
+                attribute_path_string,
+                actual,
+                target
+            ]
+        )
+    }
+}
+
+_get_resources(resource_type, attribute_path, values) = resources if {
+    count(values) == 1
+    target := values[0]
+    resources := {
+        resource |
+        resource := input.planned_values.root_module.resources[_]
+        resource.type == resource_type
+        not _matches_structure(
+            target,
+            shared.get_attribute_value(resource, attribute_path)
         )
     }
 }
@@ -63,6 +108,7 @@ _get_whitelist(resource, attribute_path, target, patterns) = ncc if {
 }
 
 _get_resources(resource_type, attribute_path, values) = resources if {
+    count(values) > 1
     resources := {
         resource |
         target := values[0] # target val string
