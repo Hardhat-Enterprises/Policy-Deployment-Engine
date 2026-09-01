@@ -6,8 +6,8 @@
       "description": "The Action to perform when the client connection triggers the rule. Valid actions are:\n\"allow\": allow access to target.\n\"deny\": deny access to target.\n\"goto_next\": forward the request to the next hierarchical policy for evaluation.\n\"redirect\": redirect to a different target. Parameters for this action can be configured via redirectOptions. Only EXTERNAL_302 redirect type is supported for organization security policies.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "The action a rule takes (allow/deny/redirect) is the core functional definition of what the rule does, a team's business-logic choice, not a platform-level constraint. A generic policy cannot dictate whether a specific rule should allow or deny traffic without second-guessing legitimate business decisions."
+      "security_impact": true,
+      "rationale": "Allow/deny is a direct access-control decision — it determines whether matching traffic is permitted or blocked, the core enforcement outcome of the rule. This is functionally equivalent to other access-gating arguments already marked true (e.g. deletion_policy)."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
@@ -34,8 +34,8 @@
       "description": "If set to true, the specified action is not enforced.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Whether a rule runs in preview or enforcement mode is an operational and deployment lifecycle choice (e.g., testing rules before rollout), not a structural security control."
+      "security_impact": true,
+      "rationale": "When true, the rule's action is not enforced — this is a kill switch that can silently disable an active security control while appearing configured correctly, the same class of risk as deletion_policy."
     },
     "priority": {
       "description": "An integer indicating the priority of a rule in the list. The priority must be a value\nbetween 0 and 2147483647. Rules are evaluated from highest to lowest priority where 0 is the\nhighest priority and 2147483647 is the lowest prority.",
@@ -163,8 +163,8 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Configures a specific match operator for a WAF exclusion rule, team-specific data-tuning rather than a platform-level policy target."
+      "security_impact": true,
+      "rationale": "Same mechanism as request_cookie.operator: EQUALS_ANY exempts the header field entirely from WAF inspection regardless of value, directly widening exclusion scope."
     },
     "preconfigured_waf_config.exclusion.request_header.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
@@ -182,8 +182,8 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "References a specific query parameter value to exclude from inspection, an application-specific configuration a platform policy cannot generically constrain."
+      "security_impact": true,
+      "rationale": "Same mechanism as request_cookie.operator: the operator defines match breadth for excluding query parameters from WAF inspection. EQUALS_ANY exempts the field entirely from inspection regardless of value, directly widening the scope of traffic exempted from WAF protection — a misconfigured or overly broad operator here silently reduces WAF coverage over query-parameter-based attacks."
     },
     "preconfigured_waf_config.exclusion.request_query_param.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
@@ -201,8 +201,8 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "URI exclusion match operators are application-specific tuning choices rather than structural security features suitable for a generic enterprise-wide policy."
+      "security_impact": true,
+      "rationale": "Same mechanism as request_cookie.operator: the operator defines match breadth for excluding request URIs from WAF inspection. EQUALS_ANY exempts the field entirely from inspection regardless of value, directly widening the scope of traffic exempted from WAF protection — since URI paths are a common target for injection and traversal attacks, an overly broad operator here has a direct exposure impact."
     },
     "preconfigured_waf_config.exclusion.request_uri.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
