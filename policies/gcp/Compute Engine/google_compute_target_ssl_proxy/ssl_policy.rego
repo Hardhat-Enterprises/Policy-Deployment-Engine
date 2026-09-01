@@ -6,16 +6,36 @@ import data.terraform.helpers
 conditions := [
 	[
 		{
-			"situation_description": "Target SSL proxy has no SSL policy attached and therefore uses the default compatible TLS settings.",
+			"situation_description": "Target SSL proxy has no SSL policy attached and falls back to the default TLS settings.",
 			"remedies": [
-				"Attach an organisation-approved SSL policy without requiring a specific project or policy name.",
+				"Attach an organisation-approved SSL policy using the expected Google Compute resource path.",
 			],
 		},
 		{
-			"condition": "ssl_policy must contain a resource reference rather than being unset.",
+			"condition": "ssl_policy must be configured.",
 			"attribute_path": ["ssl_policy"],
 			"values": [null],
 			"policy_type": "blacklist",
+		},
+	],
+	[
+		{
+			"situation_description": "Target SSL proxy does not use the approved structural SSL policy reference.",
+			"remedies": [
+				"Set ssl_policy using the parameterised format projects/*/global/sslPolicies/*.",
+			],
+		},
+		{
+			"condition": "ssl_policy must follow the approved Google Compute SSL policy resource path.",
+			"attribute_path": ["ssl_policy"],
+			"values": [
+				"projects/*/global/sslPolicies/*",
+				[
+					["*"],
+					["*"],
+				],
+			],
+			"policy_type": "pattern whitelist",
 		},
 	],
 ]
