@@ -2,7 +2,7 @@ package terraform.gcp.security.google_cloud_netapp_volumes.google_netapp_kmsconf
 
 
 variables := {
-    "friendly_resource_name": "netapps_volumes", 
+    "friendly_resource_name": "NetApp KMS Config", 
     "resource_type":  "google_netapp_kmsconfig",
     "resource_value_name" : "name" 
 }
