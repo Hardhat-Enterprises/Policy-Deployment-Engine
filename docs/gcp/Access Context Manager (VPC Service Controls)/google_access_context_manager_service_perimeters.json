@@ -79,8 +79,8 @@
       "description": "GCP services that are subject to the Service Perimeter\nrestrictions. Must contain a list of services. For example, if\n'storage.googleapis.com' is specified, access to the storage\nbuckets inside the perimeter must meet the perimeter's access\nrestrictions.",
       "required": false,
       "type": "set(string)",
-      "security_impact": false,
-      "rationale": "This argument lists the specific services protected by the perimeter. Selecting those services is a team-specific architectural and operational decision, so a generic platform policy should not prescribe them."
+      "security_impact": true,
+      "rationale": "This argument defines the services protected by the service perimeter. Requiring explicit protected services helps ensure the perimeter has a meaningful boundary instead of leaving service protection empty or overly broad."
     },
     "service_perimeters.spec.egress_policies": {
       "type": "block",
@@ -174,8 +174,8 @@
       "description": "The name of the API whose methods or permissions the 'IngressPolicy' or\n'EgressPolicy' want to allow. A single 'ApiOperation' with serviceName\nfield set to '*' will allow all methods AND permissions for all services.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This argument names the target service for an egress rule. The service identifier is a team-specific architectural reference, so a generic platform policy should not constrain it."
+      "security_impact": true,
+      "rationale": "This argument defines which API service an egress rule may access. Constraining broad or wildcard service names helps prevent overly broad outbound access and reduces potential data-exfiltration channels."
     },
     "service_perimeters.spec.egress_policies.egress_to.operations.method_selectors": {
       "type": "block",
@@ -274,8 +274,8 @@
       "description": "The name of the API whose methods or permissions the 'IngressPolicy' or\n'EgressPolicy' want to allow. A single 'ApiOperation' with 'serviceName'\nfield set to '*' will allow all methods AND permissions for all services.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This argument identifies the target service for an ingress rule. Service names are workload-specific references, so a generic platform policy should not prescribe them."
+      "security_impact": true,
+      "rationale": "This argument defines which API service may be reached through an ingress rule. Constraining broad or wildcard service names ensures inbound access is explicitly scoped to approved services."
     },
     "service_perimeters.spec.ingress_policies.ingress_to.operations.method_selectors": {
       "type": "block",
