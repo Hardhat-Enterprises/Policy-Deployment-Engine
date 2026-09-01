@@ -14,7 +14,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "Dictates which projects can not connect to the service which is a configuration control not security"
+      "rationale": "Defines a list using specific project identifiers to allow or block connection to the service which is not constrained"
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
@@ -28,21 +28,21 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Only purpose is to provide context of this resource to readers thus does not affect the security of this resource"
+      "rationale": "Only purpose is to provide descriptive context of this resource to readers thus it would not have significant effect on the security of this resource"
     },
     "domain_names": {
       "description": "If specified, the domain name will be used during the integration between\nthe PSC connected endpoints and the Cloud DNS. For example, this is a\nvalid domain name: \"p.mycompany.com.\". Current max number of domain names\nsupported is 1.",
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "domain_names is a configuration control not a security control as it's purpose is for DNS identification"
+      "rationale": "domain_names is a configuration control not a security control as it's purpose is for DNS identification "
     },
     "enable_proxy_protocol": {
       "description": "If true, enable the proxy protocol which is for supplying client TCP/IP\naddress data in TCP connections that traverse proxies on their way to\ndestination servers.",
       "required": true,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Should be set to FALSE to ensure that connections are being made directly to clients instead of proxy IPs"
+      "rationale": "Preserves original IP client visibility, thus is needed to be enabled in order to allow backend services to client IPs and support auditing and security posture"
     },
     "name": {
       "description": "Name of the resource. The name must be 1-63 characters long, and\ncomply with RFC1035. Specifically, the name must be 1-63 characters\nlong and match the regular expression '[a-z]([-a-z0-9]*[a-z0-9])?'\nwhich means the first character must be a lowercase letter, and all\nfollowing characters must be a dash, lowercase letter, or digit,\nexcept the last character, which cannot be a dash.",
@@ -69,15 +69,15 @@
       "description": "The number of consumer spokes that connected Private Service Connect endpoints can be propagated to through Network Connectivity Center.\nThis limit lets the service producer limit how many propagated Private Service Connect connections can be established to this service attachment from a single consumer.\n\nIf the connection preference of the service attachment is ACCEPT_MANUAL, the limit applies to each project or network that is listed in the consumer accept list.\nIf the connection preference of the service attachment is ACCEPT_AUTOMATIC, the limit applies to each project that contains a connected endpoint.\n\nIf unspecified, the default propagated connection limit is 250. To explicitly send a zero value, set 'send_propagated_connection_limit_if_zero = true'.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Should be set to a minimal value to protect the service stability protecting the security of the resource"
+      "security_impact": false,
+      "rationale": "Defines the limit for the number of connected Private Service Connect endpoints thus is operational availability control not security related control."
     },
     "reconcile_connections": {
       "description": "This flag determines whether a consumer accept/reject list change can reconcile the statuses of existing ACCEPTED or REJECTED PSC endpoints.\n\nIf false, connection policy update will only affect existing PENDING PSC endpoints. Existing ACCEPTED/REJECTED endpoints will remain untouched regardless how the connection policy is modified .\nIf true, update will affect both PENDING and ACCEPTED/REJECTED PSC endpoints. For example, an ACCEPTED PSC endpoint will be moved to REJECTED if its project is added to the reject list.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Purpose is to determine if consumers access changes are made from the exisiting connections thus if it is set to FALSE it may not enforce accept or reject policies and not remove their connection"
+      "security_impact": false,
+      "rationale": "Purpose is to determine if consumers access changes are made from the existing connections thus this would make it operational flow control not security control as it is resolving behaviour"
     },
     "region": {
       "description": "URL of the region where the resource resides.",
@@ -90,22 +90,22 @@
       "description": "Controls the behavior of propagated_connection_limit.\nWhen false, setting propagated_connection_limit to zero causes the provider to use to the API's default value.\nWhen true, the provider will set propagated_connection_limit to zero.\nDefaults to false.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Purpose is to designate if the propagated_connection_limit is either 0 or the default value thus should be set to true when using propagated connections to limit access control"
+      "security_impact": false,
+      "rationale": "Purpose is to designate if the propagated_connection_limit is either 0 or the default value thus is configuration control for connection limits and not a security control"
     },
     "show_nat_ips": {
       "description": "NOTE: This field is temporarily non-functional due to an underlying API issue.\nAny value provided here will be ignored until the API issue is resolved, expected around 2026-03.\n[If true, show NAT IPs of all connected endpoints.]",
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": "Function is not available thus not effecting the security of the resource"
+      "rationale": "Only purpose is to show metadata display of NAT IPs thus not effecting the security of the resource"
     },
     "target_service": {
       "description": "The URL of a service serving the endpoint identified by this service attachment.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Used to designate the service's endpoint which is a configuration control not security"
+      "rationale": "Used to designate the service's endpoint which is a identifier to another resource not security"
     },
     "consumer_accept_lists": {
       "type": "block",
@@ -116,29 +116,29 @@
       "description": "The number of consumer forwarding rules the consumer project can\ncreate.",
       "required": true,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Main purpose is to dictate a limit to the amount of forwarding a consumer can create thus a limit should be intentionally set to ensure least amount of access needed is given to consumer"
+      "security_impact": false,
+      "rationale": "Main purpose is to dictate a limit to the amount of forwarding a consumer can create thus is a operation limit control not a security control"
     },
     "consumer_accept_lists.endpoint_url": {
       "description": "The endpoint that is allowed to connect to this service attachment.\nOnly one of project_id_or_num, network_url and endpoint_url may be set.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Configuration control as it dictates the endpoint for consumers to access"
+      "security_impact": true,
+      "rationale": "Dictates the endpoint for consumers to access the service attatchment thus should not be left empty to ensure intentional whitelisting"
     },
     "consumer_accept_lists.network_url": {
       "description": "The network that is allowed to connect to this service attachment.\nOnly one of project_id_or_num and network_url may be set.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Configuration control as it dictates which consumers networks are able to access the provided service"
+      "security_impact": true,
+      "rationale": "Defines a list for what consumer networks are allowed to access and platform policies should not pin specific network URLS"
     },
     "consumer_accept_lists.project_id_or_num": {
       "description": "A project that is allowed to connect to this service attachment.\nOnly one of project_id_or_num and network_url may be set.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Configuration control as it dictates which consumers projects are able to access the service"
+      "rationale": "Configuration control as it dictates access control boundries by projects, and the platform policy must not pin specific project IDs"
     }
   }
 }
