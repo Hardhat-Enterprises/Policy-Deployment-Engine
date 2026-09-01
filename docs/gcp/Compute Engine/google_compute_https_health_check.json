@@ -1,83 +1,84 @@
 {
-  "last_updated": "2026-06-23T08:26:44Z",
-  "provider_version": "7.37.0",
-  "arguments": {
-    "check_interval_sec": {
-      "description": "How often (in seconds) to send a health check. The default value is 5\nseconds.",
-      "required": false,
-      "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "deletion_policy": {
-      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
-      "required": false,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "description": {
-      "description": "An optional description of this resource. Provide this property when\nyou create the resource.",
-      "required": false,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "healthy_threshold": {
-      "description": "A so-far unhealthy instance will be marked healthy after this many\nconsecutive successes. The default value is 2.",
-      "required": false,
-      "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "host": {
-      "description": "The value of the host header in the HTTPS health check request. If\nleft empty (default value), the public IP on behalf of which this\nhealth check is performed will be used.",
-      "required": false,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "name": {
-      "description": "Name of the resource. Provided by the client when the resource is\ncreated. The name must be 1-63 characters long, and comply with\nRFC1035.  Specifically, the name must be 1-63 characters long and\nmatch the regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means\nthe first character must be a lowercase letter, and all following\ncharacters must be a dash, lowercase letter, or digit, except the\nlast character, which cannot be a dash.",
-      "required": true,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "port": {
-      "description": "The TCP port number for the HTTPS health check request.\nThe default value is 443.",
-      "required": false,
-      "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "project": {
-      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
-      "required": false,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "request_path": {
-      "description": "The request path of the HTTPS health check request.\nThe default value is /.",
-      "required": false,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "timeout_sec": {
-      "description": "How long (in seconds) to wait before claiming failure.\nThe default value is 5 seconds.  It is invalid for timeoutSec to have\ngreater value than checkIntervalSec.",
-      "required": false,
-      "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "unhealthy_threshold": {
-      "description": "A so-far healthy instance will be marked unhealthy after this many\nconsecutive failures. The default value is 2.",
-      "required": false,
-      "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+    "last_updated": "2026-06-23T08:26:44Z",
+    "provider_version": "7.37.0",
+
+    "arguments": {
+        "check_interval_sec": {
+            "description": "How often (in seconds) to send a health check. The default value is 5\nseconds.",
+            "required": false,
+            "type": "number",
+            "security_impact": false,
+            "rationale": "This controls how frequently health checks are sent to determine whether a resource is available. While it affects how quickly failures are detected, it is an operational reliability setting and does not directly enforce a security control such as access restriction, encryption, or logging."
+        },
+        "deletion_policy": {
+            "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
+            "required": false,
+            "type": "string",
+            "security_impact": true,
+            "rationale": "This setting controls whether Terraform is allowed to destroy the resource. Requiring the deletion policy to be set to \"PREVENT\" helps protect security-critical infrastructure from accidental removal during infrastructure changes, reducing the risk of unintentionally weakening the security posture."
+        },
+        "description": {
+            "description": "An optional description of this resource. Provide this property when\nyou create the resource.",
+            "required": false,
+            "type": "string",
+            "security_impact": false,
+            "rationale": "This field provides descriptive text.It has no impact on the security behavior of the resource."
+        },
+        "healthy_threshold": {
+            "description": "A so-far unhealthy instance will be marked healthy after this many\nconsecutive successes. The default value is 2.",
+            "required": false,
+            "type": "number",
+            "security_impact": false,
+            "rationale": "This determines how many consecutive successful health checks are required before a resource is considered healthy. It influences service availability and recovery behavior rather than enforcing a security control, making it unsuitable for a generic security policy."
+        },
+        "host": {
+            "description": "The value of the host header in the HTTPS health check request. If\nleft empty (default value), the public IP on behalf of which this\nhealth check is performed will be used.",
+            "required": false,
+            "type": "string",
+            "security_impact": false,
+            "rationale": "This specifies the HTTP Host header used during health check requests. The appropriate value depends on the deployed application and virtual host configuration, so enforcing a specific value would require environment specific knowledge rather than a reusable enterprise security policy."
+        },
+        "name": {
+            "description": "Name of the resource. Provided by the client when the resource is\ncreated. The name must be 1-63 characters long, and comply with\nRFC1035.  Specifically, the name must be 1-63 characters long and\nmatch the regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means\nthe first character must be a lowercase letter, and all following\ncharacters must be a dash, lowercase letter, or digit, except the\nlast character, which cannot be a dash.",
+            "required": true,
+            "type": "string",
+            "security_impact": false,
+            "rationale": "This is unique identifier for the resourse.No Security Impact"
+        },
+        "port": {
+            "description": "The TCP port number for the HTTPS health check request.\nThe default value is 443.",
+            "required": false,
+            "type": "number",
+            "security_impact": false,
+            "rationale": "This specifies the network port used for health check requests. The correct port depends on how the application is deployed, so enforcing a particular value would be application specific rather than a generic platform security requirement."
+        },
+        "project": {
+            "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+            "required": false,
+            "type": "string",
+            "security_impact": false,
+            "rationale": "This specifies the network port used for health check requests. The correct port depends on how the application is deployed, so enforcing a particular value would be application specific rather than a generic platform security requirement."
+        },
+        "request_path": {
+            "description": "The request path of the HTTPS health check request.\nThe default value is /.",
+            "required": false,
+            "type": "string",
+            "security_impact": false,
+            "rationale": "This specifies the application endpoint that receives health check requests. Because the correct path depends on the application's implementation, constraining it would require application specific knowledge rather than improving platform security."
+        },
+        "timeout_sec": {
+            "description": "How long (in seconds) to wait before claiming failure.\nThe default value is 5 seconds.  It is invalid for timeoutSec to have\ngreater value than checkIntervalSec.",
+            "required": false,
+            "type": "number",
+            "security_impact": false,
+            "rationale": "This controls how long the system waits for a health check response before considering it failed. It affects service reliability and responsiveness but does not directly strengthen or weaken the security of the deployed resource."
+        },
+        "unhealthy_threshold": {
+            "description": "A so-far healthy instance will be marked unhealthy after this many\nconsecutive failures. The default value is 2.",
+            "required": false,
+            "type": "number",
+            "security_impact": false,
+            "rationale": "This determines how many consecutive failed health checks are required before a resource is marked unhealthy. It is a reliability and failover setting rather than a security control, so enforcing a specific value would not provide a generic security benefit."
+        }
     }
-  }
 }
