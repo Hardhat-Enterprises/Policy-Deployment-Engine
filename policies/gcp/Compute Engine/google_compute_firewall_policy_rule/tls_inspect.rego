@@ -1,30 +1,42 @@
 package terraform.gcp.security.compute_engine.google_compute_firewall_policy_rule.tls_inspect
+
+import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_firewall_policy_rule.vars
 
-resources := [r |
+conditions := [
+  [
+    {
+      "situation_description": "TLS inspection is not enabled when a security profile group is applied",
+      "remedies": [
+        "Set tls_inspect to true when action is apply_security_profile_group"
+      ]
+    },
+    {
+      "condition": "tls_inspect must be true",
+      "attribute_path": ["tls_inspect"],
+      "values": [true],
+      "policy_type": "whitelist"
+    }
+  ]
+]
+
+applicable_resources := [r |
     r := input.planned_values.root_module.resources[_]
     r.type == "google_compute_firewall_policy_rule"
-]
-
-is_violating(r) if {
     r.values.action == "apply_security_profile_group"
-    r.values.tls_inspect != true
-}
-
-violating_names := [r.name |
-    r := resources[_]
-    is_violating(r)
 ]
 
-message := sprintf(
-    "%s: action is apply_security_profile_group but tls_inspect is not true, meaning encrypted traffic bypasses inspection. Non-Compliant Resources: %v. Remedy: set tls_inspect to true when action is apply_security_profile_group.",
-    [vars.variables.friendly_resource_name, violating_names]
-) if {
-    count(violating_names) > 0
+filtered_input := {
+    "planned_values": {
+        "root_module": {
+            "resources": applicable_resources
+        }
+    }
 }
 
-message := sprintf("%s: all resources compliant.", [vars.variables.friendly_resource_name]) if {
-    count(violating_names) == 0
+result := r if {
+    r := helpers.get_multi_summary(conditions, vars.variables) with input as filtered_input
 }
 
-details := violating_names
+message := result.message
+details := result.details
