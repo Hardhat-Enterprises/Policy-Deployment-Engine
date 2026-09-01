@@ -1,53 +1,24 @@
 package terraform.gcp.security.identity_platform.google_identity_platform_config.sms_region_config_allow_by_default_disallowed_regions
 
-import data.terraform.gcp.security.identity_platform.google_identity_platform_config.vars
-import data.terraform.helpers.shared
+import data.terraform.gcp.security.identity_platform.google_identity_platform_config.vars as vars
+import data.terraform.helpers as helpers
 
-conditions := []
-
-resources := [
-    resource |
-    resource := input.planned_values.root_module.resources[_]
-    resource.type == vars.variables.resource_type
+conditions := [
+	[
+		{
+			"situation_description": "SMS regions blocked by an allow-by-default configuration must be approved regional codes.",
+			"remedies": ["Set disallowed_regions to approved regional codes: AU or NZ."],
+		},
+		{
+			"condition": "Each disallowed SMS region must be on the approved regional-code allowlist.",
+			"attribute_path": ["sms_region_config", 0, "allow_by_default", 0, "disallowed_regions"],
+			"values": ["AU", "NZ"],
+			"policy_type": "whitelist",
+		},
+	],
 ]
 
-non_compliant_resource(resource) if {
-    sms_configs := object.get(resource.values, "sms_region_config", [])
-    some sms_config in sms_configs
-    allow_by_default_configs := object.get(sms_config, "allow_by_default", [])
-    some allow_by_default_config in allow_by_default_configs
-    is_array(object.get(allow_by_default_config, "disallowed_regions", null))
-}
+result := helpers.get_multi_summary(conditions, vars.variables)
 
-non_compliant_resources := [
-    resource |
-    resource := resources[_]
-    non_compliant_resource(resource)
-]
-
-non_compliant_names := [
-    shared.get_resource_attribute(resource, vars.variables.resource_value_name) |
-    resource := non_compliant_resources[_]
-]
-
-non_compliant_display := concat(", ", non_compliant_names) if {
-    count(non_compliant_names) > 0
-}
-
-non_compliant_display := "None - All passed" if {
-    count(non_compliant_names) == 0
-}
-
-message := [
-    sprintf("Total %s detected: %d ", [vars.variables.friendly_resource_name, count(resources)]),
-    "Situation 1: SMS routing uses allow-by-default regional access.",
-    sprintf("Non-Compliant Resources: %s", [non_compliant_display]),
-    "Potential Remedies: Replace allow_by_default with allowlist_only so only explicitly approved regions can receive verification SMS."
-]
-
-details := [{
-    "situation": "SMS routing uses allow-by-default regional access.",
-    "remedies": ["Replace allow_by_default with allowlist_only so only explicitly approved regions can receive verification SMS."],
-    "non_compliant_resources": non_compliant_names
-}]
-
+message := result.message
+details := result.details
