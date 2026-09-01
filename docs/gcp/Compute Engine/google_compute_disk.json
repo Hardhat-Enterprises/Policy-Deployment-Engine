@@ -20,8 +20,8 @@
       "description": "If set to true, a snapshot of the disk will be created before it is destroyed.\nIf your disk is encrypted with customer managed encryption keys these will be reused for the snapshot creation.\nThe name of the snapshot by default will be '{{disk-name}}-YYYYMMDD-HHmm'",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "A data-preservation convenience that captures a snapshot before deletion. It supports availability/recovery but does not itself weaken or strengthen the disk's security posture, and encryption keys are inherited from the disk, so it is treated as non-security-relevant."
+      "security_impact": true,
+      "rationale": "When set to true, automatically creates a snapshot before the disk is destroyed, preventing irreversible data loss on deletion. Leaving this at the default (false) means a terraform destroy permanently removes all data with no recovery option. Policy should require this to be enabled for disks holding important data to ensure a safety net exists before destructive operations."
     },
     "create_snapshot_before_destroy_prefix": {
       "description": "This will set a custom name prefix for the snapshot that's created when the disk is deleted.",
@@ -34,8 +34,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Governs Terraform's lifecycle behaviour on destroy (DELETE/PREVENT/ABANDON). This is an operational/state-management control rather than a cloud security control; it does not change how the disk protects data or restricts access."
+      "security_impact": true,
+      "rationale": "Controls whether the disk can be destroyed via Terraform. The default (DELETE) allows unrestricted deletion, which risks permanent data loss. Setting it to PREVENT blocks destructive operations, acting as a safety guard against accidental or unauthorised deletion. Policy should require PREVENT for disks holding critical data to enforce the prevent-destructive-loss archetype."
     },
     "description": {
       "description": "An optional description of this resource. Provide this property when\nyou create the resource.",
@@ -185,7 +185,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Selects a Cloud KMS (CMEK) key to encrypt the disk at rest, giving the organisation control over key lifecycle, rotation and revocation instead of relying solely on Google-managed keys. Policy should require CMEK for disks holding sensitive data and, where the key ring is parameterised, verify the key belongs to an approved project/region for data-residency and key-sovereignty requirements."
+      "rationale": "Specifies a Cloud KMS (CMEK) key to encrypt the disk at rest, giving the organisation control over key lifecycle, rotation, and revocation instead of relying solely on Google-managed keys. Policy should require that this field is populated (non-blank) for disks holding sensitive data to ensure customer-managed encryption is in use."
     },
     "disk_encryption_key.kms_key_service_account": {
       "description": "The service account used for the encryption request for the given KMS key.\nIf absent, the Compute Engine Service Agent service account is used.",
@@ -199,14 +199,14 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Supplies a customer-supplied encryption key (CSEK) as raw base64. While it gives full customer key ownership, the value is persisted in Terraform state as plaintext, creating a secret-sprawl and key-exposure risk. Policy should discourage raw_key in favour of kms_key_self_link (CMEK); if raw CSEK is used, it must be paired with protected/encrypted remote state."
+      "rationale": "Supplies a customer-supplied encryption key (CSEK) as raw base64. While it provides customer key ownership, embedding static secrets directly in configuration creates key-exposure and secret-sprawl risks. Policy should discourage raw_key in favour of kms_key_self_link (CMEK), which delegates key management to a dedicated managed service."
     },
     "disk_encryption_key.rsa_encrypted_key": {
       "description": "Specifies an RFC 4648 base64 encoded, RSA-wrapped 2048-bit\ncustomer-supplied encryption key to either encrypt or decrypt\nthis resource. You can provide either the rawKey or the rsaEncryptedKey.",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "An RSA-wrapped CSEK — safer than raw_key because the key material is wrapped in transit, but it is still a customer-managed secret that appears in Terraform state. Policy should treat it like raw_key: prefer CMEK (kms_key_self_link), and where CSEK is required, ensure the wrapped key is handled through protected state rather than committed in plaintext configuration."
+      "rationale": "An RSA-wrapped CSEK — safer than raw_key because the key material is wrapped in transit, but it still embeds customer-managed key material directly in the configuration. Policy should prefer CMEK (kms_key_self_link) over embedded wrapped keys, as managed keys provide centralised lifecycle control, rotation, and revocation without static secrets in configuration."
     },
     "guest_os_features": {
       "type": "block",
@@ -217,8 +217,8 @@
       "description": "The type of supported feature. Read [Enabling guest operating system features](https://cloud.google.com/compute/docs/images/create-delete-deprecate-private-images#guest-os-features) to see a list of available options.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Enables guest OS features, some of which are security controls — notably SECURE_BOOT, which validates boot components against trusted signatures to block rootkits and unsigned/tampered boot code. Policy can require security-relevant features (e.g. SECURE_BOOT, and where applicable UEFI_COMPATIBLE for Shielded VM support) on bootable disks that run sensitive workloads."
+      "security_impact": false,
+      "rationale": "Enables guest OS compatibility features on the disk (e.g. VIRTIO_SCSI_MULTIQUEUE, GVNIC, UEFI_COMPATIBLE). These are functional and architectural settings that define guest OS compatibility rather than standalone security policy targets. Security-relevant boot features like Secure Boot are enforced at the instance level, not on the disk resource."
     },
     "params": {
       "type": "block",
@@ -229,8 +229,8 @@
       "description": "Resource manager tags to be bound to the disk. Tag keys and values have the\nsame definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id},\nand values are in the format tagValues/456.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Binds Resource Manager tags to the disk. Tags can drive IAM conditions and organisation-policy enforcement, so they participate directly in access-control decisions. Policy can require governance-mandated tags (e.g. data-classification) to be present where the organisation uses tag-based conditional access."
+      "security_impact": false,
+      "rationale": "Binds Resource Manager tags to the disk. Tags are team-specific resource metadata and references that cannot be generically mandated by platform policy without overreaching into team-specific taxonomy. Tag-based access controls are governed at the organisation policy level, not on individual resource arguments."
     },
     "source_image_encryption_key": {
       "type": "block",
@@ -242,7 +242,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Specifies the Cloud KMS (CMEK) key protecting the source image from which this disk is created. When the source image is CMEK-protected, this key is required to read it, and its use keeps the encryption chain under customer key control. Policy can verify that CMEK-protected source images are referenced with an approved KMS key rather than falling back to unmanaged keys."
+      "rationale": "Specifies the Cloud KMS (CMEK) key protecting the source image from which this disk is created. When the source image is CMEK-protected, this key is required to read it, keeping the encryption chain under customer key control. Policy should require that this field is populated (non-blank) when CMEK is used for source images, ensuring customer-managed encryption continuity."
     },
     "source_image_encryption_key.kms_key_service_account": {
       "description": "The service account used for the encryption request for the given KMS key.\nIf absent, the Compute Engine Service Agent service account is used.",
@@ -267,8 +267,8 @@
       "description": "The self link of the encryption key used to encrypt the disk. Also called KmsKeyName\nin the cloud console. Your project's Compute Engine System service account\n('service-{{PROJECT_NUMBER}}@compute-system.iam.gserviceaccount.com') must have\n'roles/cloudkms.cryptoKeyEncrypterDecrypter' to use this feature.\nSee https://cloud.google.com/compute/docs/disks/customer-managed-encryption#encrypt_a_new_persistent_disk_with_your_own_keys",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies the Cloud KMS (CMEK) key protecting the source snapshot from which this disk is created. When the source snapshot is CMEK-protected, this key is required to read it, keeping the encryption chain under customer key control. Policy can verify that CMEK-protected source snapshots are referenced with an approved KMS key rather than an unmanaged key."
+      "security_impact": false,
+      "rationale": "A pointer/reference to a specific KMS key for the source snapshot. As guidance states, platform policy does not pin or constrain specific resource names, paths, or keys. This is an external key reference whose validity is governed by KMS IAM, not by disk-level policy."
     },
     "source_snapshot_encryption_key.kms_key_service_account": {
       "description": "The service account used for the encryption request for the given KMS key.\nIf absent, the Compute Engine Service Agent service account is used.",
