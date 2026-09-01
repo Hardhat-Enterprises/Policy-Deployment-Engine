@@ -6,29 +6,29 @@
       "description": "The asymmetric crypto key version to use for signing approval requests.\nEmpty active_key_version indicates that a Google-managed key should be used for signing.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This argument provides the customer-managed crypto key that is used to approve requests, empty would mean that google controls the key. By mandating a customer-managed key provides the organization with control over the signing material. Therefore, a policy must require it to be set."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This argument determines if Terraform can destroy the setting resource. Because Access approval settings are recreatable, their deletion does not pose any security risks. Therefore, false. "
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "notification_emails": {
       "description": "A list of email addresses to which notifications relating to approval requests should be sent.\nNotifications relating to a resource will be sent to all emails in the settings of ancestor\nresources of that resource. A maximum of 50 email addresses are allowed.",
       "required": false,
       "type": "set(string)",
-      "security_impact": false,
-      "rationale": "This argument controls the emails that are notified when an approval request is received. The emails that an organization choses to use is determined by themselves, and there is no way a policy can determine if one email is safer than another. Therefore, false."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "organization_id": {
       "description": "ID of the organization of the access approval settings.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This argument identifies which organization the settings are applied to. Acting as a reference to the organization resource, and does not act as a security control. Therefore, false."
+      "security_impact": "true/false",
+      "rationale": ""
     },
     "enrolled_services": {
       "type": "block",
@@ -39,14 +39,14 @@
       "description": "The product for which Access Approval will be enrolled. Allowed values are listed (case-sensitive):\n  all\n  appengine.googleapis.com\n  bigquery.googleapis.com\n  bigtable.googleapis.com\n  cloudkms.googleapis.com\n  compute.googleapis.com\n  dataflow.googleapis.com\n  iam.googleapis.com\n  pubsub.googleapis.com\n  storage.googleapis.com",
       "required": true,
       "type": "string",
-      "security_impact": true,
+      "security_impact": "true/false",
       "rationale": "Allow access to Google services depending on the organization."
     },
     "enrolled_services.enrollment_level": {
       "description": "The enrollment level of the service. Default value: \"BLOCK_ALL\" Possible values: [\"BLOCK_ALL\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
+      "security_impact": "true/false",
       "rationale": "Ensure default value is already assigned to the enrollment level."
     }
   }
