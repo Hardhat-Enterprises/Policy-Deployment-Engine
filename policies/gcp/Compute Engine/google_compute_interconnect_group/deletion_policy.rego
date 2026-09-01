@@ -8,7 +8,7 @@ conditions := [
 		{
 			"situation_description": "Interconnect group is using ABANDON and can leave critical network connectivity outside Terraform security management.",
 			"remedies": [
-				"Set deletion_policy to DELETE or PREVENT so the connection is removed safely or protected from accidental deletion.",
+				"Set deletion_policy to DELETE to remove the group through Terraform, or PREVENT to block accidental or malicious deletion.",
 			],
 		},
 		{
