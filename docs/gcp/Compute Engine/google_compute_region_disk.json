@@ -6,15 +6,15 @@
       "description": "The access mode of the disk.\nFor example:\n  * READ_WRITE_SINGLE: The default AccessMode, means the disk can be attached to single instance in RW mode.\n  * READ_WRITE_MANY: The AccessMode means the disk can be attached to multiple instances in RW mode.\n  * READ_ONLY_SINGLE: The AccessMode means the disk can be attached to multiple instances in RO mode.\nThe AccessMode is only valid for Hyperdisk disk types.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This changes whether a supported Hyperdisk can be attached to one or several VMs. Disk attachment permissions are still controlled by IAM, and blocking multi-writer mode for every team would break valid clustered workloads."
+      "security_impact": true,
+      "rationale": "Multi-writer access allows the same disk to be written by several VMs, which increases the risk of unintended sharing and data corruption. A policy can keep disks in single-writer mode unless multi-writer access is specifically allowed."
     },
     "create_snapshot_before_destroy": {
       "description": "If set to true, a snapshot of the disk will be created before it is destroyed.\nIf your disk is encrypted with customer managed encryption keys these will be reused for the snapshot creation.\nThe name of the snapshot by default will be '{{disk-name}}-YYYYMMDD-HHmm'",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "This is a Terraform destroy-time backup choice. Requiring a snapshot for every disk could retain data that a team intended to delete, so it is not a safe organisation-wide rule; deletion_policy is the direct control for accidental destruction."
+      "security_impact": true,
+      "rationale": "Creating a snapshot before destruction provides a recovery copy if a disk is removed accidentally. A policy can require this protection for disks that may contain important data."
     },
     "create_snapshot_before_destroy_prefix": {
       "description": "This will set a custom name prefix for the snapshot that's created when the disk is deleted.",
@@ -41,8 +41,8 @@
       "description": "The image from which to initialize this disk. This can be\none of: the image's 'self_link', 'projects/{project}/global/images/{image}',\n'projects/{project}/global/images/family/{family}', 'global/images/{image}',\n'global/images/family/{family}', 'family/{family}', '{project}/{family}',\n'{project}/{image}', '{family}', or '{image}'. If referred by family, the\nimages names must include the family name. If they don't, use the\n[google_compute_image data source](/docs/providers/google/d/compute_image.html).\nFor instance, the image 'centos-6-v20180104' includes its family name 'centos-6'.\nThese images can be referred by family name here.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This is a reference to the image used as a source. A useful allowlist would depend on team-specific image projects, while the source image's own controls should be enforced on the image resource."
+      "security_impact": true,
+      "rationale": "The source image determines the software initially placed on the disk. A policy can restrict it to approved image projects or families so that untrusted images are not used."
     },
     "labels": {
       "description": "Labels to apply to this disk.  A list of key->value pairs.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
@@ -194,15 +194,15 @@
       "description": "The name of the encryption key that is stored in Google Cloud KMS.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This supplies the key reference needed to read an already encrypted source image; it does not choose encryption for the new disk. The valid key is tied to that source image and cannot be constrained generically."
+      "security_impact": true,
+      "rationale": "This identifies the Cloud KMS key used with an encrypted source image. A policy can require a non-empty KMS key reference when source-image encryption is used, without fixing one team's key name."
     },
     "source_image_encryption_key.kms_key_service_account": {
       "description": "The service account used for the encryption request for the given KMS key.\nIf absent, the Compute Engine Service Agent service account is used.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This chooses the identity used to access the source image's KMS key. The correct service account is team-specific, while permission to use the key is enforced by Cloud KMS IAM."
+      "security_impact": true,
+      "rationale": "This service account performs the KMS request for the source image and therefore forms part of the key-access path. A policy can require an explicitly supplied identity instead of relying on the default service agent."
     },
     "source_image_encryption_key.raw_key": {
       "description": "Specifies a 256-bit customer-supplied encryption key, encoded in\nRFC 4648 base64 to either encrypt or decrypt this resource.",
@@ -215,8 +215,8 @@
       "description": "Specifies an RFC 4648 base64 encoded, RSA-wrapped 2048-bit\ncustomer-supplied encryption key to either encrypt or decrypt\nthis resource. You can provide either the rawKey or the rsaEncryptedKey.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This is an RSA-wrapped key used only when a source image already uses that encryption method. It avoids plaintext key material, and requiring or blocking it for every source image would not be a valid general rule."
+      "security_impact": true,
+      "rationale": "This field carries customer-supplied key material in RSA-wrapped form. A policy can disallow this key method when the organisation requires managed KMS keys instead."
     },
     "source_snapshot_encryption_key": {
       "type": "block",
