@@ -1,6 +1,7 @@
 resource "google_iam_workforce_pool_provider" "compliant_example_1" {
   workforce_pool_id = "example-workforce-pool"
-  provider_id       = "code-flow-provider-good"
+  provider_id       = "code-flow-provider"
+  display_name      = "compliant_example_1"
   location          = "global"
 
   attribute_mapping = {

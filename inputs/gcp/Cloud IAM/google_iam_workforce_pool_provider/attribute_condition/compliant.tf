@@ -1,6 +1,7 @@
 resource "google_iam_workforce_pool_provider" "compliant_example_1" {
   workforce_pool_id   = "example-workforce-pool"
-  provider_id         = "condition-provider-good"
+  provider_id       = "condition-provider"
+  display_name      = "compliant_example_1"
   location            = "global"
   attribute_condition = "assertion.sub != \"\""
 

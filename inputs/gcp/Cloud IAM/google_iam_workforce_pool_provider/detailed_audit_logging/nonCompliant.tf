@@ -1,6 +1,7 @@
 resource "google_iam_workforce_pool_provider" "non_compliant_example_1" {
   workforce_pool_id = "example-workforce-pool"
-  provider_id       = "audit-provider-bad"
+  provider_id       = "audit-provider"
+  display_name      = "non_compliant_example_1"
   location          = "global"
 
   attribute_mapping = {
