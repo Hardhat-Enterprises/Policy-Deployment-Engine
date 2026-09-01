@@ -13,8 +13,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "security_impact": true,
+      "rationale": "Controls whether the Dataproc Batch can be destroyed or removed from Terraform management, which can affect resource availability and protection against unintended deletion."
     },
     "labels": {
       "description": "The labels to associate with this batch.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
@@ -51,8 +51,8 @@
       "description": "The Cloud KMS key to use for encryption.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "security_impact": true,
+      "rationale": "Controls the Cloud KMS key used for encryption, directly affecting protection of data associated with the Dataproc Batch workload."
     },
     "environment_config.execution_config.network_tags": {
       "description": "Tags used for network traffic control.",
@@ -86,8 +86,8 @@
       "description": "Subnetwork configuration for workload execution.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "security_impact": true,
+      "rationale": "Controls the subnetwork used for workload execution, which affects the network boundary and connectivity available to the Dataproc Batch workload."
     },
     "environment_config.execution_config.ttl": {
       "description": "The duration after which the workload will be terminated.\nWhen the workload exceeds this duration, it will be unconditionally terminated without waiting for ongoing\nwork to finish. If ttl is not specified for a batch workload, the workload will be allowed to run until it\nexits naturally (or run forever without exiting). If ttl is not specified for an interactive session,\nit defaults to 24 hours. If ttl is not specified for a batch that uses 2.1+ runtime version, it defaults to 4 hours.\nMinimum value is 10 minutes; maximum value is 14 days. If both ttl and idleTtl are specified (for an interactive session),\nthe conditions are treated as OR conditions: the workload will be terminated when it has been idle for idleTtl or\nwhen ttl has been exceeded, whichever occurs first.",
@@ -105,8 +105,8 @@
       "description": "Authentication type for the user workload running in containers. Possible values: [\"SERVICE_ACCOUNT\", \"END_USER_CREDENTIALS\"]",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Not directly relevant to the approved-region location policy for Dataproc Batch."
+      "security_impact": true,
+      "rationale": "Controls the authentication method used by the user workload, determining whether the workload runs with a service account or end user credentials."
     },
     "environment_config.peripherals_config": {
       "type": "block",
