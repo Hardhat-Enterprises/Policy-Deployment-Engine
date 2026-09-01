@@ -115,7 +115,14 @@
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": "Controls whether the extension runs in asynchronous observability mode, where Envoy sends ext_proc calls without waiting for or enforcing the extension response. This is an operational and architectural choice for passive or log-only integration rather than a security exposure or enforcement control. Platform policy should therefore not force observability mode on or off, leaving teams to choose the behaviour that fits their extension design."
+      "rationale": "Controls whether the extension runs in asynchronous observability mode, where Envoy sends ext_proc calls without waiting for or enforcing the extension response. This is an operational and architectural choice for passive or log only integration rather than a security exposure or enforcement control. Platform policy should therefore not force observability mode on or off, leaving teams to choose the behaviour that fits their extension design."
+    },
+    "extension_chains.extensions.request_body_send_mode": {
+      "description": "Configures the send mode for request body processing.\nThe field can only be set if 'supported_events' includes 'REQUEST_BODY'.\nIf 'supported_events' includes 'REQUEST_BODY', but 'request_body_send_mode' is unset, the default value 'STREAMED' is used.\nWhen this field is set to 'FULL_DUPLEX_STREAMED', 'supported_events' must include both 'REQUEST_BODY' and 'REQUEST_TRAILERS'.\nThis field can be set only when the 'service' field of the extension points to a 'BackendService'.\nOnly 'FULL_DUPLEX_STREAMED' mode is supported for 'LbRouteExtension' resources. Possible values: [\"BODY_SEND_MODE_UNSPECIFIED\", \"BODY_SEND_MODE_STREAMED\", \"BODY_SEND_MODE_FULL_DUPLEX_STREAMED\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The wire mode for streaming request bodies to the extension, and the platform has already narrowed the choice to almost nothing on this resource: it can only be set when supported_events includes REQUEST_BODY and the service points at a backend service, and only FULL_DUPLEX_STREAMED is supported for route extensions. No accepted value is safer than another, since this is a streaming protocol detail rather than an exposure control."
     },
     "extension_chains.extensions.service": {
       "description": "The reference to the service that runs the extension.\n\n* To configure a callout extension, service must be a fully-qualified reference to a backend service.\n* To configure a plugin extension, service must be a reference to a WasmPlugin resource.",
@@ -136,7 +143,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Sets the per-message timeout for communication between the load balancer and the extension. The appropriate duration depends on workload latency, extension behaviour, performance requirements, and availability objectives. These are operational tuning choices rather than generic platform security controls, so teams should select the timeout that fits their service without a security policy imposing a universal threshold."
+      "rationale": "Sets the per message timeout for communication between the load balancer and the extension. The appropriate duration depends on workload latency, extension behaviour, performance requirements, and availability objectives. These are operational tuning choices rather than generic platform security controls, so teams should select the timeout that fits their service without a security policy imposing a universal threshold."
     },
     "extension_chains.match_condition": {
       "type": "block",
@@ -148,7 +155,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Defines the free-form CEL expression used to decide which requests invoke the extension chain. The correct expression depends on team-specific routing, hosts, paths, headers, and application logic. A generic platform policy cannot meaningfully constrain arbitrary CEL logic without hardcoding or overreaching into workload-specific behaviour, so this free-form expression should remain a team-defined configuration rather than a platform security policy target."
+      "rationale": "Defines the free form CEL expression used to decide which requests invoke the extension chain. The correct expression depends on team specific routing, hosts, paths, headers, and application logic. A generic platform policy cannot meaningfully constrain arbitrary CEL logic without hardcoding or overreaching into workload specific behaviour, so this free form expression should remain a team defined configuration rather than a platform security policy target."
     }
   }
 }
