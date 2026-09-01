@@ -172,8 +172,8 @@
       "description": "Use local backup.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "This just decides whether the cluster keeps a spare local copy of its data for backup; it doesn't change who can log in, what's exposed on the network, or how data is encrypted. It toggles local/on-cluster backup provisioning at the storage layer, governing availability and recovery, not access control or encryption."
+      "security_impact": true,
+      "rationale": "Controls whether the cluster maintains a local, on-cluster backup copy of its data. This falls under the data-protection/prevent-destructive-loss archetype: without a backup, a destructive event ransomware, malicious deletion, storage corruption becomes unrecoverable rather than merely disruptive, which is a security outcome, not just an operational one. Policies should enforce local_backup_enabled = true so the cluster retains a recovery path against destructive or irrecoverable data loss."
     },
     "properties.memory_size_gb": {
       "description": "Memory allocated in GBs.",
