@@ -6,5 +6,5 @@ resource "google_clouddeploy_target_iam_member" "non_compliant_example_1" {
   location = "us-central1"
   name     = "non_compliant_example_1"
   role     = "roles/owner"
-  member   = "user:admin-user@example.com"
+  member   = "user:dev-user@example.com"
 }
