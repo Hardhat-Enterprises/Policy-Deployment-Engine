@@ -6,16 +6,19 @@ import data.terraform.gcp.security.vertex_ai.google_vertex_ai_feature_online_sto
 conditions := [
     [
         {
-            "situation_description": "The Feature Online Store does not use a customer-managed encryption key. The online and offline data is encrypted with a Google-managed key, so the customer cannot control or rotate the key.",
+            "situation_description": "The Feature Online Store key does not match the customer-managed encryption key path projects/*/locations/*/keyRings/*/cryptoKeys/*.",
             "remedies": [
-                "Set 'encryption_spec.kms_key_name' to a Cloud KMS key. Use the format 'projects/PROJECT_ID/locations/LOCATION/keyRings/KEY_RING/cryptoKeys/KEY'."
+                "Set 'encryption_spec.kms_key_name' to a Cloud KMS key in the form projects/PROJECT/locations/LOCATION/keyRings/RING/cryptoKeys/KEY."
             ]
         },
         {
-            "condition": "Check that a customer-managed encryption key is set",
+            "condition": "Key must match the CMEK path shape",
             "attribute_path": ["encryption_spec", 0, "kms_key_name"],
-            "values": [null],
-            "policy_type": "blacklist"
+            "values": [
+                "projects/*/locations/*/keyRings/*/cryptoKeys/*",
+                [["example-project"], ["australia-southeast1"], ["example-ring"], ["example-key"]]
+            ],
+            "policy_type": "pattern whitelist"
         }
     ]
 ]
