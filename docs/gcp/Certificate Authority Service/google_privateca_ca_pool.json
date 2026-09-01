@@ -288,8 +288,8 @@
       "description": "Corresponds to OID 1.3.6.1.5.5.7.3.2. Officially described as \"TLS WWW client authentication\", though regularly used for non-WWW TLS.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Defines whether the certificate can be used for TLS client authentication. This extended key usage depends on the workload and certificate profile, making it an architectural choice rather than a generic platform security control."
+      "security_impact": true,
+      "rationale": "Controls whether issued certificates may be used for TLS client authentication. Restricting this usage prevents certificates from receiving unnecessary authentication capability and reduces the risk of them being used to impersonate clients."
     },
     "issuance_policy.baseline_values.key_usage.extended_key_usage.code_signing": {
       "description": "Corresponds to OID 1.3.6.1.5.5.7.3.3. Officially described as \"Signing of downloadable executable code client authentication\".",
@@ -361,8 +361,8 @@
       "description": "Contains the excluded email addresses. The value can be a particular\nemail address, a hostname to indicate all email addresses on that host or\na domain with a leading period (e.g. '.example.com') to indicate\nall email addresses in that domain.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Defines email identities and domains excluded from the CA’s certificate scope. These constraints depend on each team’s intended PKI boundaries, so they cannot be universally mandated by a generic platform policy."
+      "security_impact": true,
+      "rationale": "Controls which email identities and domains the CA is prohibited from issuing certificates for. Enforcing excluded email namespaces helps prevent certificate mis-issuance and impersonation of unauthorized email identities."
     },
     "issuance_policy.baseline_values.name_constraints.excluded_ip_ranges": {
       "description": "Contains the excluded IP ranges. For IPv4 addresses, the ranges\nare expressed using CIDR notation as specified in RFC 4632.\nFor IPv6 addresses, the ranges are expressed in similar encoding as IPv4\naddresses.",
