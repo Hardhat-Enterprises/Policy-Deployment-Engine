@@ -4,6 +4,6 @@ resource "google_compute_external_vpn_gateway" "non_compliant_example_1" {
 
   interface {
     id         = 0
-    ip_address = "192.0.2.99"
+    ip_address = "203.0.113.2"
   }
 }

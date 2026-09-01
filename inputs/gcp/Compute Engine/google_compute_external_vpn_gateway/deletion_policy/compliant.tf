@@ -1,15 +1,10 @@
 resource "google_compute_external_vpn_gateway" "compliant_example_1" {
   name            = "compliant-example-1"
   redundancy_type = "SINGLE_IP_INTERNALLY_REDUNDANT"
+  deletion_policy = "PREVENT"
 
   interface {
     id         = 0
     ip_address = "203.0.113.1"
-  }
-
-  params {
-    resource_manager_tags = {
-      "tagKeys/123" = "tagValues/456"
-    }
   }
 }
