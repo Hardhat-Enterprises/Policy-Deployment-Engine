@@ -20,8 +20,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This controls whether Terraform deletes, prevents deletion, or abandons the proxy. These options affect resource lifecycle and Terraform state, but they do not change the proxy's runtime security posture, so a generic security policy is not needed."
+      "security_impact": true,
+      "rationale": "ABANDON can leave the target SSL proxy active after Terraform stops managing it. This could leave TLS settings, certificates, or backend routing outside normal security updates. PREVENT can also stop accidental or malicious deletion of this secure entry point. Because the setting affects TLS management and service availability, it has a security impact."
     },
     "description": {
       "description": "An optional description of this resource.",
